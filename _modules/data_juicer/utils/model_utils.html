@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.utils.model_utils &mdash; data_juicer 0.1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.html">data_juicer package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">data_juicer.utils.model_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.utils.model_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">wget</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">.cache_utils</span> <span class="kn">import</span> <span class="n">DATA_JUICER_MODELS_CACHE</span>
+
+<span class="c1"># Default directory to store models</span>
+<span class="n">MODEL_PATH</span> <span class="o">=</span> <span class="n">DATA_JUICER_MODELS_CACHE</span>
+
+<span class="c1"># Default backup cached models links for downloading</span>
+<span class="n">BACKUP_MODEL_LINKS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># language identification model from fasttext</span>
+    <span class="s1">&#39;lid.176.bin&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://dl.fbaipublicfiles.com/fasttext/supervised-models/&#39;</span><span class="p">,</span>
+
+    <span class="c1"># tokenizer and language model for English from sentencepiece and KenLM</span>
+    <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.sp.model&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://huggingface.co/edugp/kenlm/resolve/main/wikipedia/&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.arpa.bin&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://huggingface.co/edugp/kenlm/resolve/main/wikipedia/&#39;</span><span class="p">,</span>
+
+    <span class="c1"># sentence split model from nltk punkt</span>
+    <span class="s1">&#39;punkt.</span><span class="si">%s</span><span class="s1">.pickle&#39;</span><span class="p">:</span>
+    <span class="s1">&#39;https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/&#39;</span>
+    <span class="s1">&#39;data_juicer/models/&#39;</span>
+<span class="p">}</span>
+
+<span class="c1"># Default cached models links for downloading</span>
+<span class="n">MODEL_LINKS</span> <span class="o">=</span> <span class="s1">&#39;https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/&#39;</span> \
+               <span class="s1">&#39;data_juicer/models/&#39;</span>
+
+<span class="n">MODEL_ZOO</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+<div class="viewcode-block" id="check_model"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.check_model">[docs]</a><span class="k">def</span> <span class="nf">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(),</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check whether a model exists in MODEL_PATH. If exists, return its full path</span>
+<span class="sd">    Else, download it from cached models links.</span>
+
+<span class="sd">    :param model_name: a specified model name</span>
+<span class="sd">    :param args: optional extra args of model.</span>
+<span class="sd">    :param force: Whether to download model forcefully or not, Sometimes</span>
+<span class="sd">        the model file maybe incomplete for some reason, so need to</span>
+<span class="sd">        download again forcefully.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">MODEL_PATH</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">MODEL_PATH</span><span class="p">)</span>
+
+    <span class="c1"># check if the specified model exists. If it does not exist, download it</span>
+    <span class="n">true_model_name</span> <span class="o">=</span> <span class="n">model_name</span> <span class="o">%</span> <span class="n">args</span>
+    <span class="n">mdp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_PATH</span><span class="p">,</span> <span class="n">true_model_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">force</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">mdp</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">mdp</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Model [</span><span class="si">{</span><span class="n">true_model_name</span><span class="si">}</span><span class="s1">] invalid, force to downloading...&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Model [</span><span class="si">{</span><span class="n">true_model_name</span><span class="si">}</span><span class="s1">] not found . Downloading...&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">model_link</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MODEL_LINKS</span><span class="p">,</span> <span class="n">true_model_name</span><span class="p">)</span>
+            <span class="n">wget</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">model_link</span><span class="p">,</span> <span class="n">mdp</span><span class="p">,</span> <span class="n">bar</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">backup_model_link</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">BACKUP_MODEL_LINKS</span><span class="p">[</span><span class="n">model_name</span><span class="p">],</span> <span class="n">true_model_name</span><span class="p">)</span>
+                <span class="n">wget</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">backup_model_link</span><span class="p">,</span> <span class="n">mdp</span><span class="p">,</span> <span class="n">bar</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Downloading model [</span><span class="si">{</span><span class="n">true_model_name</span><span class="si">}</span><span class="s1">] error. &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;Please retry later or download it into </span><span class="si">{</span><span class="n">MODEL_PATH</span><span class="si">}</span><span class="s1"> &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;manually from </span><span class="si">{</span><span class="n">model_link</span><span class="si">}</span><span class="s1"> or </span><span class="si">{</span><span class="n">backup_model_link</span><span class="si">}</span><span class="s1"> &#39;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mdp</span></div>
+
+
+<div class="viewcode-block" id="prepare_fasttext_model"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_fasttext_model">[docs]</a><span class="k">def</span> <span class="nf">prepare_fasttext_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a fasttext model.</span>
+
+<span class="sd">    :param model_name: input model name</span>
+<span class="sd">    :return: model instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">fasttext</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading fasttext language identification model...&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ft_model</span> <span class="o">=</span> <span class="n">fasttext</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">ft_model</span> <span class="o">=</span> <span class="n">fasttext</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ft_model</span></div>
+
+
+<div class="viewcode-block" id="prepare_sentencepiece_model"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_sentencepiece_model">[docs]</a><span class="k">def</span> <span class="nf">prepare_sentencepiece_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a sentencepiece model.</span>
+
+<span class="sd">    :param model_name: input model name in formatting syntax</span>
+<span class="sd">    :param lang: language to render model name</span>
+<span class="sd">    :return: model instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">sentencepiece</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading sentencepiece model...&#39;</span><span class="p">)</span>
+    <span class="n">sentencepiece_model</span> <span class="o">=</span> <span class="n">sentencepiece</span><span class="o">.</span><span class="n">SentencePieceProcessor</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">sentencepiece_model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">lang</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">sentencepiece_model</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">sentencepiece_model</span></div>
+
+
+<div class="viewcode-block" id="prepare_kenlm_model"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_kenlm_model">[docs]</a><span class="k">def</span> <span class="nf">prepare_kenlm_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a kenlm model.</span>
+
+<span class="sd">    :param model_name: input model name in formatting syntax.</span>
+<span class="sd">    :param lang: language to render model name</span>
+<span class="sd">    :return: model instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">kenlm</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading kenlm language model...&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">kenlm_model</span> <span class="o">=</span> <span class="n">kenlm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">lang</span><span class="p">))</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">kenlm_model</span> <span class="o">=</span> <span class="n">kenlm</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">kenlm_model</span></div>
+
+
+<div class="viewcode-block" id="prepare_nltk_model"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_nltk_model">[docs]</a><span class="k">def</span> <span class="nf">prepare_nltk_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a nltk punkt model.</span>
+
+<span class="sd">    :param model_name: input model name in formatting syntax</span>
+<span class="sd">    :param lang: language to render model name</span>
+<span class="sd">    :return: model instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nltk_to_punkt</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;en&#39;</span><span class="p">:</span> <span class="s1">&#39;english&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fr&#39;</span><span class="p">:</span> <span class="s1">&#39;french&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pt&#39;</span><span class="p">:</span> <span class="s1">&#39;portuguese&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;es&#39;</span><span class="p">:</span> <span class="s1">&#39;spanish&#39;</span>
+    <span class="p">}</span>
+    <span class="k">assert</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">nltk_to_punkt</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span>
+    <span class="p">),</span> <span class="s1">&#39;lang must be one of the following: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">nltk_to_punkt</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+    <span class="kn">from</span> <span class="nn">nltk.data</span> <span class="kn">import</span> <span class="n">load</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading nltk punkt split model...&#39;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">nltk_model</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">nltk_to_punkt</span><span class="p">[</span><span class="n">lang</span><span class="p">]))</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">nltk_model</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span>
+            <span class="n">check_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">nltk_to_punkt</span><span class="p">[</span><span class="n">lang</span><span class="p">],</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">nltk_model</span></div>
+
+
+<div class="viewcode-block" id="prepare_huggingface_tokenizer"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_huggingface_tokenizer">[docs]</a><span class="k">def</span> <span class="nf">prepare_huggingface_tokenizer</span><span class="p">(</span><span class="n">tokenizer_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a tokenizer from HuggingFace.</span>
+
+<span class="sd">    :param tokenizer_name: input tokenizer name</span>
+<span class="sd">    :return: a tokenizer instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading tokenizer from HuggingFace...&#39;</span><span class="p">)</span>
+    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">tokenizer_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tokenizer</span></div>
+
+
+<div class="viewcode-block" id="prepare_model"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_model">[docs]</a><span class="k">def</span> <span class="nf">prepare_model</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;sentencepiece&#39;</span><span class="p">,</span> <span class="n">model_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare and load a model or a tokenizer from MODEL_ZOO.</span>
+
+<span class="sd">    :param lang: which lang model to load</span>
+<span class="sd">    :param model_type: model or tokenizer type</span>
+<span class="sd">    :param model_key: tokenizer name, only used when prepare HuggingFace</span>
+<span class="sd">        tokenizer</span>
+<span class="sd">    :return: a model or tokenizer instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">type_to_name</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;fasttext&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;lid.176.bin&#39;</span><span class="p">,</span> <span class="n">prepare_fasttext_model</span><span class="p">),</span>
+        <span class="s1">&#39;sentencepiece&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.sp.model&#39;</span><span class="p">,</span> <span class="n">prepare_sentencepiece_model</span><span class="p">),</span>
+        <span class="s1">&#39;kenlm&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.arpa.bin&#39;</span><span class="p">,</span> <span class="n">prepare_kenlm_model</span><span class="p">),</span>
+        <span class="s1">&#39;nltk&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;punkt.</span><span class="si">%s</span><span class="s1">.pickle&#39;</span><span class="p">,</span> <span class="n">prepare_nltk_model</span><span class="p">),</span>
+        <span class="s1">&#39;huggingface&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">prepare_huggingface_tokenizer</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">assert</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="n">type_to_name</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span>
+    <span class="p">),</span> <span class="s1">&#39;model_type must be one of the following: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">type_to_name</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+    <span class="k">if</span> <span class="n">model_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">model_key</span> <span class="o">=</span> <span class="n">model_type</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">lang</span>
+    <span class="k">if</span> <span class="n">model_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MODEL_ZOO</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">model_name</span><span class="p">,</span> <span class="n">model_func</span> <span class="o">=</span> <span class="n">type_to_name</span><span class="p">[</span><span class="n">model_type</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;fasttext&#39;</span><span class="p">:</span>
+            <span class="n">MODEL_ZOO</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_func</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;huggingface&#39;</span><span class="p">:</span>
+            <span class="n">MODEL_ZOO</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_func</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">MODEL_ZOO</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_func</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model_key</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
