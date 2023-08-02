@@ -1,12 +1,13 @@
 # Refine Alpaca-CoT Config Files
 
-This folder contains some configuration files to allow users to easily and quickly refine [Alpaca-CoT](https://huggingface.co/QingyiSi/Alpaca-CoT).
+This folder contains some configuration files to allow users to easily and quickly refine [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT).
 
 ## Preprocess
-The raw data files can be downloaded from [Alpaca-CoT](https://huggingface.co/QingyiSi/Alpaca-CoT) on HuggingFace.
+
+The raw data files can be downloaded from [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT) on HuggingFace.
 
 ### Convert raw Alpaca-CoT data to jsonl 
-Use [raw_alpaca_cot_merge_add_meta.py](../../tools/preprocess/raw_alpaca_cot_merge_add_meta.py) to select `instruction`, `input` and `output` columns and merge them to `text` field with a space, and add extra [ META ]( #meta_info) info to dataset:
+Use [raw_alpaca_cot_merge_add_meta.py](../../../tools/preprocess/raw_alpaca_cot_merge_add_meta.py) to select `instruction`, `input` and `output` columns and merge them to `text` field with a space, and add extra [ META ]( #meta_info) info to dataset:
 
 ```shell
 python tools/preprocess/raw_alpaca_cot_merge_add_meta.py    \
@@ -16,7 +17,7 @@ python tools/preprocess/raw_alpaca_cot_merge_add_meta.py    \
 ```
 
 ### Split datasets to sub-datasets by language
-Use [dataset_split_by_language.py](../../tools/preprocess/dataset_split_by_language.py) to split the dataset to EN and ZH sub-datasets:
+Use [dataset_split_by_language.py](../../../tools/preprocess/dataset_split_by_language.py) to split the dataset to EN and ZH sub-datasets:
 
 ```shell
 python tools/preprocess/dataset_split_by_language.py    \
@@ -27,13 +28,13 @@ python tools/preprocess/dataset_split_by_language.py    \
 ```
 
 ## Process
-After preprocess, modify the dataset path in [alpaca-cot-en-refine](alpaca-cot-en-refine].yaml) and [alpaca-cot-zh-refine](alpaca-cot-zh-refine.yaml), and then execute the following command to reproduce the processing flow of refined Alpaca-CoT.
+After preprocess, modify the dataset path in [alpaca-cot-en-refine.yaml](alpaca-cot-en-refine.yaml) and [alpaca-cot-zh-refine.yaml](alpaca-cot-zh-refine.yaml), and then execute the following command to reproduce the processing flow of refined Alpaca-CoT.
 ```shell
 # refine English dataset
-python tools/process_data.py --config configs/data_juicer_recipes/alpaca_cot/alpaca-cot-en-refine].yaml
+python tools/process_data.py --config configs/data_juicer_recipes/alpaca_cot/alpaca-cot-en-refine.yaml
 
 # refine Chinese dataset
-python tools/process_data.py --config configs/data_juicer_recipes/alpaca_cot/alpaca-cot-zh-refine].yaml
+python tools/process_data.py --config configs/data_juicer_recipes/alpaca_cot/alpaca-cot-zh-refine.yaml
 ```
 
 ### Meta Info <a name="meta_info"/>
@@ -65,7 +66,7 @@ Each sample in refined data of Alpaca-CoT contains meta info listed as below:
 
 * Preference: Preference datasets
 
-* origin_path: origin file path in in Alpaca-CoT
+* origin_path: original file path in Alpaca-CoT
 
 
 #### Refined Alpaca-CoT dataset Meta info

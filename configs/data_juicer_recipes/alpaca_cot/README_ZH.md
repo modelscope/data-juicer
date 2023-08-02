@@ -1,13 +1,13 @@
 # Alpaca-CoT 完善配置文件
 
-该文件夹包含的配置文件能够让用户轻松快速地完善 [Alpaca-CoT](https://huggingface.co/QingyiSi/Alpaca-CoT)。
+该文件夹包含的配置文件能够让用户轻松快速地完善 [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT)。
 
 ## 预处理
 
-原始数据文件在 HuggingFace 中的 [Alpaca-CoT](https://huggingface.co/QingyiSi/Alpaca-CoT) 下载。
+原始数据文件在 HuggingFace 中的 [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT) 下载。
 
 ### 将 Alpaca-CoT 转换为 jsonl 文件
-使用 [raw_alpaca_cot_merge_add_meta.py](../../tools/preprocess/raw_alpaca_cot_merge_add_meta.py) 选择数据集的 `instruction`, `input` 和 `output` 3个字段，并使用空格将它们合并到 `text`，同时在数据集中增加额外的[元信息]( #meta_info) ：
+使用 [raw_alpaca_cot_merge_add_meta.py](../../../tools/preprocess/raw_alpaca_cot_merge_add_meta.py) 选择数据集的 `instruction`, `input` 和 `output` 3个字段，并使用空格将它们合并到 `text`，同时在数据集中增加额外的[元信息]( #meta_info) ：
 
 ```shell
 python tools/preprocess/raw_alpaca_cot_merge_add_meta.py    \
@@ -17,7 +17,7 @@ python tools/preprocess/raw_alpaca_cot_merge_add_meta.py    \
 ```
 
 ### 按照语言将数据集拆分子数据集
-使用 [dataset_split_by_language.py](../../tools/preprocess/dataset_split_by_language.py) 将数据集拆分为中文和英文：
+使用 [dataset_split_by_language.py](../../../tools/preprocess/dataset_split_by_language.py) 将数据集拆分为中文和英文：
 
 ```shell
 python tools/preprocess/dataset_split_by_language.py    \
@@ -28,14 +28,14 @@ python tools/preprocess/dataset_split_by_language.py    \
 ```
 
 ## 处理
-在预处理完成之后，修改 [alpaca-cot-en-refine](alpaca-cot-en-refine].yaml) 和 [alpaca-cot-zh-refine](alpaca-cot-zh-refine.yaml) 中的数据集路径，然后执行以下命令来复现完善过的 Alpaca-CoT 的处理流程。
+在预处理完成之后，修改 [alpaca-cot-en-refine.yaml](alpaca-cot-en-refine.yaml) 和 [alpaca-cot-zh-refine.yaml](alpaca-cot-zh-refine.yaml) 中的数据集路径，然后执行以下命令来复现完善过的 Alpaca-CoT 的处理流程。
 
 ```shell
 # refine English dataset
-python tools/process_data.py --config configs/data_juicer_recipes/alpaca_cot/alpaca-cot-en-refine].yaml
+python tools/process_data.py --config configs/data_juicer_recipes/alpaca_cot/alpaca-cot-en-refine.yaml
 
 # refine Chinese dataset
-python tools/process_data.py --config configs/data_juicer_recipes/alpaca_cot/alpaca-cot-zh-refine].yaml
+python tools/process_data.py --config configs/data_juicer_recipes/alpaca_cot/alpaca-cot-zh-refine.yaml
 ```
 
 ### 元信息 <a name="meta_info"/>

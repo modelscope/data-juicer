@@ -1,6 +1,6 @@
 # Postprocess tools
 
-This folder contains some postprocess scripts for additional processing of your processed dataset using data-juicer.
+This folder contains some postprocess scripts for additional processing of your processed dataset using Data-Juicer.
 
 ## Usage
 

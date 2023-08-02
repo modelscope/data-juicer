@@ -1,6 +1,6 @@
 # 预处理工具
 
-此文件夹包含一些预处理脚本，用于在使用 data-juicer 之前对数据集进行处理。
+此文件夹包含一些预处理脚本，用于在使用 Data-Juicer 之前对数据集进行处理。
 
 ## 用法
 
@@ -28,7 +28,7 @@ python tools/preprocess/dataset_split_by_language.py --help
 
 ### 将原始 arxiv 数据转换为 jsonl
 
-该工具用于将从 S3 下载的原始 arxiv 数据转换为对 data-juicer 友好的 jsonl 格式。
+该工具用于将从 S3 下载的原始 arxiv 数据转换为对 Data-Juicer 友好的 jsonl 格式。
 
 ```shell
 python tools/preprocess/raw_arxiv_to_jsonl.py           \
@@ -80,7 +80,7 @@ python tools/preprocess/raw_stackexchange_to_jsonl.py  --help
 
 使用 `raw_alpaca_cot_merge_add_meta.py` 来转化原始 Alpaca-CoT 数据.
 
-该工具用于将从 [HuggingFace]( https://huggingface.co/QingyiSi/Alpaca-CoT) 下载的原始 Alpaca-Cot 数据转化为 jsonl 文件.
+该工具用于将从 [HuggingFace]( https://huggingface.co/datasets/QingyiSi/Alpaca-CoT) 下载的原始 Alpaca-Cot 数据转化为 jsonl 文件.
 
 ```shell
 python tools/preprocess/raw_alpaca_cot_merge_add_meta.py           \

@@ -188,7 +188,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 * [BLOOM 数据处理菜谱](configs/reproduced_bloom/README_ZH.md)
 * [RedPajama 数据处理菜谱](configs/reproduced_redpajama/README_ZH.md)
 * [预训练数据增强菜谱](configs/data_juicer_recipes/README_ZH.md)
-* [SFT数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#L32)
+* [SFT数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#完善前后的alpaca-cot数据集)
 
 ## 演示样例
 
@@ -200,7 +200,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 * 数据处理:
   * 科学文献 (例如 [ArXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)]
   * 编程代码 (例如 [TheStack](https://huggingface.co/datasets/bigcode/the-stack)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_code_data/summary)]
-  * 中文指令数据 (例如 [Alpaca-CoT](https://huggingface.co/QingyiSi/Alpaca-CoT)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/sft_data_zh/summary)]
+  * 中文指令数据 (例如 [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/sft_data_zh/summary)]
 * 工具池:
   * CommonCrawl 质量分类器 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/tool_quality_classifier/summary)]
   * 基于 [HELM](https://github.com/stanford-crfm/helm) 的自动评测 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/auto_evaluation_helm/summary)]
