@@ -1,0 +1,806 @@
+diff --git a/requirements.txt b/requirements.txt
+index 2a97e02b..bec4a16a 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -67,8 +67,8 @@ spacy~=3.2.4
+ summ-eval~=0.892
+ surge-api~=1.1.0
+ # End users should install a CUDA version of PyTorch manually if needed
+-torch~=1.12.1  # Summarization metrics
+-torchvision~=0.13.1
++torch~=1.13.0  # Summarization metrics
++torchvision~=0.14.0
+ 
+ # plotting
+ colorcet~=3.0.1
+diff --git a/setup.cfg b/setup.cfg
+index fce3cfc8..2f9b6d12 100644
+--- a/setup.cfg
++++ b/setup.cfg
+@@ -75,8 +75,8 @@ install_requires=
+     summ-eval~=0.892
+     surge-api~=1.1.0
+     # End users should install a CUDA version of PyTorch manually if needed
+-    torch~=1.12.1  # Summarization metrics
+-    torchvision~=0.13.1
++    torch~=1.13.0  # Summarization metrics
++    torchvision~=0.14.0
+ 
+     # plotting
+     colorcet~=3.0.1
+diff --git a/src/helm/benchmark/executor.py b/src/helm/benchmark/executor.py
+index 9f619df4..d60ccfa8 100644
+--- a/src/helm/benchmark/executor.py
++++ b/src/helm/benchmark/executor.py
+@@ -32,6 +32,8 @@ class ExecutionSpec:
+     # How many threads to have at once
+     parallelism: int
+ 
++    my_config_path: Optional[str]
++
+     # Whether to skip execution
+     dry_run: bool = False
+ 
+@@ -58,7 +60,8 @@ class Executor:
+         elif execution_spec.local_path:
+             hlog(f"Running in local mode with base path: {execution_spec.local_path}")
+             self.service = ServerService(
+-                base_path=execution_spec.local_path, root_mode=True, mongo_uri=execution_spec.mongo_uri
++                base_path=execution_spec.local_path, root_mode=True, mongo_uri=execution_spec.mongo_uri,
++                my_config_path=execution_spec.my_config_path
+             )
+         else:
+             raise ValueError("Either the proxy server URL or the local path must be set")
+@@ -73,7 +76,7 @@ class Executor:
+         request_states = parallel_map(
+             self.process,
+             scenario_state.request_states,
+-            parallelism=self.execution_spec.parallelism,
++            parallelism=1,
+         )
+ 
+         hlog(f"Processed {len(request_states)} requests")
+diff --git a/src/helm/benchmark/presentation/create_plots.py b/src/helm/benchmark/presentation/create_plots.py
+index b5dfe7ff..599f98b8 100644
+--- a/src/helm/benchmark/presentation/create_plots.py
++++ b/src/helm/benchmark/presentation/create_plots.py
+@@ -579,18 +579,25 @@ class Plotter:
+ 
+     def create_all_plots(self):
+         """Create all the plots used in the HELM paper."""
+-        self.create_accuracy_v_x_plots()
+-        self.create_correlation_plots()
+-        self.create_leaderboard_plots()
+-        self.create_all_accuracy_v_model_property_plots()
+-        self.create_accuracy_v_access_bar_plot()
+-        self.create_task_summary_plots()
+-        self.create_targeted_eval_plots()
+-        self.create_copyright_plot()
+-        self.create_bbq_plot()
+-        self.create_in_context_examples_plot()
+-        self.create_mc_ablations_plot()
+-        self.create_constrast_set_plots()
++        plot_funcs = [
++            self.create_accuracy_v_x_plots,
++            self.create_correlation_plots,
++            self.create_leaderboard_plots,
++            self.create_all_accuracy_v_model_property_plots,
++            self.create_accuracy_v_access_bar_plot,
++            self.create_task_summary_plots,
++            self.create_targeted_eval_plots,
++            self.create_copyright_plot,
++            self.create_bbq_plot,
++            self.create_in_context_examples_plot,
++            self.create_mc_ablations_plot,
++            self.create_constrast_set_plots
++        ]
++        for plot_func in plot_funcs:
++            try:
++                plot_func()
++            except Exception as e:
++                hlog(f"WARNING: {plot_func.__name__} failed: {e}")
+ 
+ 
+ def main():
+diff --git a/src/helm/benchmark/run.py b/src/helm/benchmark/run.py
+index 5d950dfc..cf59d150 100644
+--- a/src/helm/benchmark/run.py
++++ b/src/helm/benchmark/run.py
+@@ -11,10 +11,10 @@ from helm.proxy.clients.remote_model_registry import check_and_register_remote_m
+ from helm.proxy.services.remote_service import create_authentication, add_service_args
+ 
+ from helm.benchmark.adaptation.adapter_spec import AdapterSpec
+-from .executor import ExecutionSpec
+-from .runner import Runner, RunSpec, LATEST_SYMLINK
+-from .slurm_runner import SlurmRunner
+-from .run_specs import construct_run_specs
++from helm.benchmark.executor import ExecutionSpec
++from helm.benchmark.runner import Runner, RunSpec, LATEST_SYMLINK
++from helm.benchmark.run_specs import construct_run_specs
++from helm.benchmark.slurm_runner import SlurmRunner
+ 
+ 
+ def run_entries_to_run_specs(
+@@ -68,6 +68,7 @@ def run_benchmarking(
+     local_path: str,
+     num_threads: int,
+     output_path: str,
++    my_config_path: str,
+     suite: str,
+     dry_run: bool,
+     skip_instances: bool,
+@@ -84,6 +85,7 @@ def run_benchmarking(
+         url=url,
+         local_path=local_path,
+         parallelism=num_threads,
++        my_config_path=my_config_path,
+         dry_run=dry_run,
+         mongo_uri=mongo_uri,
+     )
+@@ -226,6 +228,10 @@ def main():
+         help="Experimental: Enable using AutoModelForCausalLM models from Hugging Face Model Hub. "
+         "Format: namespace/model_name[@revision]",
+     )
++    parser.add_argument(
++        "--my-config-path", type=str, default=None,
++        help='Config to support mymodel/model_name'
++    )
+     parser.add_argument(
+         "--enable-remote-models",
+         nargs="+",
+@@ -282,6 +288,7 @@ def main():
+         local_path=args.local_path,
+         num_threads=args.num_threads,
+         output_path=args.output_path,
++        my_config_path=args.my_config_path,
+         suite=args.suite,
+         dry_run=args.dry_run,
+         skip_instances=args.skip_instances,
+diff --git a/src/helm/benchmark/run_specs.py b/src/helm/benchmark/run_specs.py
+index 0a1f6cb7..534dc8c7 100644
+--- a/src/helm/benchmark/run_specs.py
++++ b/src/helm/benchmark/run_specs.py
+@@ -512,7 +512,7 @@ def get_bias_metric_specs() -> List[MetricSpec]:
+ def get_generative_harms_metric_specs(include_basic_metrics: bool = False) -> List[MetricSpec]:
+     return (
+         get_bias_metric_specs()
+-        + get_toxicity_metric_specs()
++        # + get_toxicity_metric_specs() # Connection Error
+         + (get_basic_metric_specs([]) if include_basic_metrics else [])
+     )
+ 
+diff --git a/src/helm/benchmark/window_services/megatron_window_service.py b/src/helm/benchmark/window_services/megatron_window_service.py
+deleted file mode 100644
+index 0a37943e..00000000
+--- a/src/helm/benchmark/window_services/megatron_window_service.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-from .gpt2_window_service import GPT2WindowService
+-
+-
+-# NOTE: The only difference between this and GPT2WindowService is that
+-# the request length is constrained to the sequence length.
+-class MegatronWindowService(GPT2WindowService):
+-    @property
+-    def max_request_length(self) -> int:
+-        """Return the max request length of GPT-2."""
+-        return self.max_sequence_length
+diff --git a/src/helm/benchmark/window_services/my_window_service.py b/src/helm/benchmark/window_services/my_window_service.py
+new file mode 100644
+index 00000000..51e3f9e8
+--- /dev/null
++++ b/src/helm/benchmark/window_services/my_window_service.py
+@@ -0,0 +1,31 @@
++from .local_window_service import LocalWindowService
++from .tokenizer_service import TokenizerService
++
++
++class MyWindowService(LocalWindowService):
++    def __init__(self, service: TokenizerService):
++        super().__init__(service)
++
++    @property
++    def tokenizer_name(self) -> str:
++        return "mymodel/model"
++
++    @property
++    def max_sequence_length(self) -> int:
++        """Return the max sequence length."""
++        return 2048
++
++    @property
++    def max_request_length(self) -> int:
++        """Return the max request length."""
++        return self.max_sequence_length
++
++    @property
++    def end_of_text_token(self) -> str:
++        """The end of text token."""
++        return "<|endoftext|>"
++
++    @property
++    def prefix_token(self) -> str:
++        """The prefix token"""
++        return self.end_of_text_token
+diff --git a/src/helm/benchmark/window_services/window_service_factory.py b/src/helm/benchmark/window_services/window_service_factory.py
+index 2fb7ce68..22e4b0c2 100644
+--- a/src/helm/benchmark/window_services/window_service_factory.py
++++ b/src/helm/benchmark/window_services/window_service_factory.py
+@@ -35,7 +35,7 @@ from .starcoder_window_service import StarCoderWindowService
+ from .gpt2_window_service import GPT2WindowService
+ from .gptj_window_service import GPTJWindowService
+ from .gptneox_window_service import GPTNeoXWindowService
+-from .megatron_window_service import MegatronWindowService
++from .my_window_service import MyWindowService
+ from .opt_window_service import OPTWindowService
+ from .palmyra_window_service import PalmyraWindowService, SilkRoadWindowService
+ from .remote_window_service import get_remote_window_service
+@@ -153,8 +153,8 @@ class WindowServiceFactory:
+             window_service = UL2WindowService(service)
+         elif model_name == "together/yalm":
+             window_service = YaLMWindowService(service)
+-        elif model_name == "nvidia/megatron-gpt2":
+-            window_service = MegatronWindowService(service)
++        elif organization == "mymodel":
++            window_service = MyWindowService(service)
+         elif model_name in [
+             "together/llama-7b",
+             "together/alpaca-7b",
+diff --git a/src/helm/proxy/clients/auto_client.py b/src/helm/proxy/clients/auto_client.py
+index 2069a12c..a77e8f09 100644
+--- a/src/helm/proxy/clients/auto_client.py
++++ b/src/helm/proxy/clients/auto_client.py
+@@ -27,7 +27,7 @@ from .google_client import GoogleClient
+ from .goose_ai_client import GooseAIClient
+ from .huggingface_client import HuggingFaceClient
+ from .ice_tokenizer_client import ICETokenizerClient
+-from .megatron_client import MegatronClient
++from .my_client import MyModelClient
+ from .openai_client import OpenAIClient
+ from .microsoft_client import MicrosoftClient
+ from .perspective_api_client import PerspectiveAPIClient
+@@ -40,7 +40,7 @@ from helm.proxy.clients.huggingface_model_registry import get_huggingface_model_
+ class AutoClient(Client):
+     """Automatically dispatch to the proper `Client` based on the organization."""
+ 
+-    def __init__(self, credentials: Dict[str, str], cache_path: str, mongo_uri: str = ""):
++    def __init__(self, credentials: Dict[str, str], cache_path: str, mongo_uri: str = "", my_config_path: str = None):
+         self.credentials = credentials
+         self.cache_path = cache_path
+         self.mongo_uri = mongo_uri
+@@ -50,6 +50,7 @@ class AutoClient(Client):
+         self.critique_client: Optional[CritiqueClient] = None
+         huggingface_cache_config = self._build_cache_config("huggingface")
+         self.huggingface_client = HuggingFaceClient(huggingface_cache_config)
++        self.my_config_path = my_config_path
+         hlog(f"AutoClient: cache_path = {cache_path}")
+         hlog(f"AutoClient: mongo_uri = {mongo_uri}")
+ 
+@@ -131,8 +132,8 @@ class AutoClient(Client):
+                     cache_config=cache_config,
+                     tokenizer_client=self._get_tokenizer_client("huggingface"),
+                 )
+-            elif organization == "nvidia":
+-                client = MegatronClient(cache_config=cache_config)
++            elif organization == "mymodel":
++                client = MyModelClient(cache_config=cache_config, my_config_path=self.my_config_path)
+             else:
+                 raise ValueError(f"Could not find client for model: {model}")
+             self.clients[model] = client
+@@ -182,7 +183,6 @@ class AutoClient(Client):
+                 "huggingface",
+                 "microsoft",
+                 "Writer",
+-                "hf-internal-testing",
+             ]:
+                 client = HuggingFaceClient(cache_config=cache_config)
+             elif organization == "openai":
+@@ -205,8 +205,8 @@ class AutoClient(Client):
+                 client = CohereClient(api_key=self.credentials["cohereApiKey"], cache_config=cache_config)
+             elif organization == "simple":
+                 client = SimpleClient(cache_config=cache_config)
+-            elif organization == "nvidia":
+-                client = MegatronClient(cache_config=cache_config)
++            elif organization == "mymodel":
++                client = MyModelClient(cache_config=cache_config, my_config_path=self.my_config_path)
+             else:
+                 raise ValueError(f"Could not find tokenizer client for model: {tokenizer}")
+             self.tokenizer_clients[tokenizer] = client
+diff --git a/src/helm/proxy/clients/huggingface_client.py b/src/helm/proxy/clients/huggingface_client.py
+index 55e9bc34..76944839 100644
+--- a/src/helm/proxy/clients/huggingface_client.py
++++ b/src/helm/proxy/clients/huggingface_client.py
+@@ -31,10 +31,10 @@ class HuggingFaceServer:
+             model_kwargs["revision"] = model_config.revision
+         with htrack_block(f"Loading Hugging Face model for config {model_config}"):
+             self.model = AutoModelForCausalLM.from_pretrained(
+-                model_config.model_id, trust_remote_code=True, **model_kwargs
++                model_config.model_id, trust_remote_code=True, local_files_only=True, **model_kwargs
+             ).to(self.device)
+         with htrack_block(f"Loading Hugging Face tokenizer model for config {model_config}"):
+-            self.tokenizer = AutoTokenizer.from_pretrained(model_config.model_id, **model_kwargs)
++            self.tokenizer = AutoTokenizer.from_pretrained(model_config.model_id, local_files_only=True, **model_kwargs)
+ 
+     def serve_request(self, raw_request: Dict[str, Any]):
+         encoded_input = self.tokenizer(raw_request["prompt"], return_tensors="pt").to(self.device)
+@@ -59,43 +59,67 @@ class HuggingFaceServer:
+             for key in raw_request
+             if key not in ["engine", "prompt", "echo_prompt", "stop_sequences"]
+         }
++        if raw_request['echo_prompt'] and raw_request['max_new_tokens'] == 0:
++            logits = self.model.forward(**encoded_input).logits
++            sequences = encoded_input.input_ids
++            all_tokens = [self.tokenizer.convert_ids_to_tokens(sequence) for sequence in sequences]
++            all_decoded_text = raw_request["prompt"]
++            all_logprobs_of_chosen_tokens = []
++            all_top_logprobs_dicts = []
++            for completion_id in range(raw_request["num_return_sequences"]):
++                logprobs_of_chosen_tokens = [0.0]
++                top_logprobs_dicts = [{}]
++                for i in range(len(encoded_input.input_ids[0]) - 1):
++                    logprobs = torch.nn.functional.log_softmax(logits[completion_id][i], dim=0)
++                    # Get top tokens in terms of log probability.
++                    topk_logprobs = torch.topk(logprobs, k=top_k_per_token)
++                    top_logprobs_dicts.append(
++                        {
++                            self.tokenizer.convert_ids_to_tokens(k.item()): v.item()
++                            for (k, v) in zip(topk_logprobs.indices, topk_logprobs.values)
++                        }
++                    )
+ 
+-        # Use HuggingFace's `generate` method.
+-        output = self.model.generate(**encoded_input, **relevant_raw_request)
+-        sequences = output.sequences
+-        scores = output.scores
+-
+-        # Compute logprobs for each completed sequence.
+-        all_logprobs_of_chosen_tokens = []
+-        all_top_logprobs_dicts = []
+-        for completion_id in range(raw_request["num_return_sequences"]):
+-            logprobs_of_chosen_tokens = []
+-            top_logprobs_dicts = []
+-            for i in range(len(sequences[completion_id]) - len(encoded_input.input_ids[0])):
+-                logprobs = torch.nn.functional.log_softmax(scores[i][completion_id], dim=0)
+-
+-                # Get top tokens in terms of log probability.
+-                topk_logprobs = torch.topk(logprobs, k=top_k_per_token)
+-                top_logprobs_dicts.append(
+-                    {
+-                        self.tokenizer.convert_ids_to_tokens(k.item()): v.item()
+-                        for (k, v) in zip(topk_logprobs.indices, topk_logprobs.values)
+-                    }
+-                )
++                    logprobs_of_chosen_tokens.append(logprobs[sequences[completion_id][i + 1]].item())
++                all_logprobs_of_chosen_tokens.append(logprobs_of_chosen_tokens)
++                all_top_logprobs_dicts.append(top_logprobs_dicts)
++        else:
++            # Use HuggingFace's `generate` method.
++            output = self.model.generate(**encoded_input, **relevant_raw_request)
++            sequences = output.sequences
++            scores = output.scores
++
++            # Compute logprobs for each completed sequence.
++            all_logprobs_of_chosen_tokens = []
++            all_top_logprobs_dicts = []
++            for completion_id in range(raw_request["num_return_sequences"]):
++                logprobs_of_chosen_tokens = []
++                top_logprobs_dicts = []
++                for i in range(len(sequences[completion_id]) - len(encoded_input.input_ids[0])):
++                    logprobs = torch.nn.functional.log_softmax(scores[i][completion_id], dim=0)
++
++                    # Get top tokens in terms of log probability.
++                    topk_logprobs = torch.topk(logprobs, k=top_k_per_token)
++                    top_logprobs_dicts.append(
++                        {
++                            self.tokenizer.convert_ids_to_tokens(k.item()): v.item()
++                            for (k, v) in zip(topk_logprobs.indices, topk_logprobs.values)
++                        }
++                    )
+ 
+-                # Get log probability of chosen token.
+-                j = i + len(encoded_input.input_ids[0])
+-                logprobs_of_chosen_tokens.append(logprobs[sequences[completion_id][j]].item())
+-            all_logprobs_of_chosen_tokens.append(logprobs_of_chosen_tokens)
+-            all_top_logprobs_dicts.append(top_logprobs_dicts)
++                    # Get log probability of chosen token.
++                    j = i + len(encoded_input.input_ids[0])
++                    logprobs_of_chosen_tokens.append(logprobs[sequences[completion_id][j]].item())
++                all_logprobs_of_chosen_tokens.append(logprobs_of_chosen_tokens)
++                all_top_logprobs_dicts.append(top_logprobs_dicts)
+ 
+-        # Remove prompt from the start of each sequence if echo_prompt is False.
+-        if not raw_request["echo_prompt"]:
+-            sequences = [sequence[len(encoded_input.input_ids[0]) :] for sequence in sequences]
++            # Remove prompt from the start of each sequence if echo_prompt is False.
++            if not raw_request["echo_prompt"]:
++                sequences = [sequence[len(encoded_input.input_ids[0]) :] for sequence in sequences]
+ 
+-        # TODO: Get rid of the extra tokenization?
+-        all_tokens = [self.tokenizer.convert_ids_to_tokens(sequence) for sequence in sequences]
+-        all_decoded_text = self.tokenizer.batch_decode(sequences)
++            # TODO: Get rid of the extra tokenization?
++            all_tokens = [self.tokenizer.convert_ids_to_tokens(sequence) for sequence in sequences]
++            all_decoded_text = self.tokenizer.batch_decode(sequences)
+ 
+         completions = []
+         for (decoded_text, tokens, logprobs_of_chosen_tokens, top_logprobs_dicts) in zip(
+@@ -166,7 +190,6 @@ class HuggingFaceClient(Client):
+         # Get cached model server instance if possible (to save on model and tokenizer
+         # loading times).
+         model_server_instance: HuggingFaceServer = self.get_model_server_instance(request.model)
+-
+         try:
+ 
+             def do_it():
+@@ -183,7 +206,9 @@ class HuggingFaceClient(Client):
+             sequence_logprob: float = 0
+             tokens: List[Token] = []
+ 
+-            if request.echo_prompt:
++            if request.echo_prompt and request.max_tokens == 0:
++                generated_tokens = raw_completion["tokens"]
++            elif request.echo_prompt:
+                 # Add prompt to list of generated tokens.
+                 generated_tokens = raw_completion["tokens"][response["input_length"] :]
+                 for token_text in raw_completion["tokens"][: response["input_length"]]:
+diff --git a/src/helm/proxy/clients/huggingface_tokenizer.py b/src/helm/proxy/clients/huggingface_tokenizer.py
+index e55cf039..4bc87ede 100644
+--- a/src/helm/proxy/clients/huggingface_tokenizer.py
++++ b/src/helm/proxy/clients/huggingface_tokenizer.py
+@@ -59,14 +59,17 @@ class HuggingFaceTokenizers:
+                 # the Hugging Face Transformers library, while the fast versions are the ones provided by Hugging Face
+                 # Tokenizers, which are written in Rust." So, use the "fast" version of the tokenizers if available.
+                 return AutoTokenizer.from_pretrained(
+-                    hf_tokenizer_name, local_files_only=True, use_fast=True, **tokenizer_kwargs
++                    hf_tokenizer_name, local_files_only=True, use_fast=False, **tokenizer_kwargs
+                 )
+             except OSError:
+                 hlog(f"Local files do not exist for HuggingFace tokenizer: {hf_tokenizer_name}. Downloading...")
+                 return AutoTokenizer.from_pretrained(
+                     hf_tokenizer_name, local_files_only=False, use_fast=True, **tokenizer_kwargs
+                 )
+-
++            except ValueError:
++                return AutoTokenizer.from_pretrained(
++                    hf_tokenizer_name, local_files_only=True, **tokenizer_kwargs
++                )
+         if tokenizer_name not in HuggingFaceTokenizers.tokenizers:
+             with htrack_block(f"Loading {tokenizer_name} with Hugging Face Transformers"):
+                 # To avoid deadlocks when using HuggingFace tokenizers with multiple processes
+diff --git a/src/helm/proxy/clients/megatron_client.py b/src/helm/proxy/clients/megatron_client.py
+deleted file mode 100644
+index 6d0e3867..00000000
+--- a/src/helm/proxy/clients/megatron_client.py
++++ /dev/null
+@@ -1,99 +0,0 @@
+-import json
+-import requests
+-from typing import Any, Dict, List
+-import traceback
+-
+-from helm.common.request import EMBEDDING_UNAVAILABLE_REQUEST_RESULT, Request, RequestResult, Sequence, Token
+-from helm.common.tokenization_request import TokenizationRequest
+-from helm.proxy.clients.huggingface_client import HuggingFaceClient
+-from helm.proxy.clients.client import Client, wrap_request_time, truncate_sequence
+-
+-
+-class MegatronClient(HuggingFaceClient):
+-    """Client for remote Megatron-LM server.
+-
+-    This client expects an external Megatron-LM server to be run on localhost:5000. See the
+-    Megatron-LM respository for documentation on starting a Megatron text generation server:
+-
+-    https://github.com/NVIDIA/Megatron-LM#gpt-text-generation
+-    """
+-
+-    def _send_request(self, raw_request: Dict[str, Any]) -> Dict[str, Any]:
+-        response = requests.request(
+-            method="PUT",
+-            # TODO(tgale): Make this configurable.
+-            url="http://localhost:5000/api",
+-            headers={
+-                "Content-Type": "application/json; charset=UTF-8",
+-            },
+-            data=json.dumps(raw_request),
+-        )
+-        out = json.loads(response.text)
+-
+-        # Detect if the server returned an error string.
+-        if type(out) != dict:
+-            raise ValueError(f"{response}: {response.text}")
+-        return out
+-
+-    def _tokenize_response(self, text: str) -> List[Token]:
+-        tokenized_text = self.tokenize(TokenizationRequest(text, tokenizer="huggingface/gpt2"))
+-
+-        # TODO(tgale): Support logprobs.
+-        tokens = [Token(text=str(token), logprob=0, top_logprobs={}) for token in tokenized_text.raw_tokens]
+-        return tokens
+-
+-    def _make_request(self, request: Request) -> RequestResult:
+-        # Embedding not supported for this model
+-        if request.embedding:
+-            return EMBEDDING_UNAVAILABLE_REQUEST_RESULT
+-
+-        # TODO(tgale): Relax these.
+-        assert request.num_completions == 1
+-        assert not request.echo_prompt
+-        assert not request.stop_sequences
+-        assert request.top_p == 1
+-
+-        # TODO(tgale): Handle log probabilities.
+-        raw_request = {
+-            "prompts": [request.prompt],
+-            "tokens_to_generate": request.max_tokens,
+-            "temperature": request.temperature,
+-            "top_k": request.top_k_per_token,
+-        }
+-
+-        cache_key = Client.make_cache_key(raw_request, request)
+-        response, cached = self.cache.get(cache_key, wrap_request_time(lambda: self._send_request(raw_request)))
+-
+-        # Verify we got a single response for the prompt.
+-        assert len(response["text"]) == 1
+-
+-        # NOTE: Megatron returns the response with the prompt included.
+-        generated_text = response["text"][0]
+-        if not request.echo_prompt:
+-            generated_text = generated_text[len(request.prompt) :]
+-
+-        # NOTE: Megatron returns the de-tokenized response. Re-tokenize.
+-        tokens = self._tokenize_response(generated_text)
+-        completion = Sequence(text=generated_text, logprob=0, tokens=tokens)
+-        completion = truncate_sequence(completion, request, print_warning=True)
+-
+-        return RequestResult(
+-            success=True,
+-            cached=cached,
+-            request_time=response["request_time"],
+-            request_datetime=response.get("request_datetime"),
+-            completions=[completion],
+-            embedding=[],
+-        )
+-
+-    def make_request(self, request: Request) -> RequestResult:
+-        try:
+-            return self._make_request(request)
+-        except Exception as e:
+-            return RequestResult(
+-                success=False,
+-                cached=False,
+-                error=f"MegatronClient Error: {e}\n\n{traceback.format_exc()}",
+-                completions=[],
+-                embedding=[],
+-            )
+diff --git a/src/helm/proxy/clients/my_client.py b/src/helm/proxy/clients/my_client.py
+new file mode 100644
+index 00000000..0eb8de52
+--- /dev/null
++++ b/src/helm/proxy/clients/my_client.py
+@@ -0,0 +1,112 @@
++import requests
++import json
++import yaml
++from typing import Any, Dict, List
++from dataclasses import asdict
++
++from helm.common.cache import Cache, CacheConfig
++from helm.common.request import Request, RequestResult, Sequence, Token
++from helm.common.tokenization_request import (
++    DecodeRequest,
++    DecodeRequestResult,
++    TokenizationRequest,
++    TokenizationRequestResult,
++    TokenizationToken
++)
++from helm.proxy.clients.my_tokenizer.my_tokenizer import MyTokenizer
++
++from .client import Client, truncate_sequence, wrap_request_time
++
++
++class MyModelClient(Client):
++    def __init__(self, cache_config: CacheConfig, my_config_path):
++        if my_config_path == None:
++            raise NotImplementedError("--my-config-path must be set")
++        with open(my_config_path, 'r') as f:
++            cfg = yaml.safe_load(f)
++            port = cfg['port'] if 'port' in cfg else 5000
++            self.tokenizer = MyTokenizer(cfg['tokenizer'])
++            self.url = f'http://localhost:{port}/api'
++        self.cache = Cache(cache_config)
++
++    def _send_request(self, raw_request: Dict[str, Any]) -> Dict[str, Any]:
++        header = {
++            'Content-Type': 'application/json; charset=UTF-8',
++        }
++        response = requests.put(url=self.url, headers=header, data=json.dumps(raw_request))
++        return response.json()
++
++    def make_request(self, request: Request) -> RequestResult:
++        completions: List[Sequence] = []
++        raw_request = {
++            'prompts': [request.prompt for _ in range(request.num_completions)],
++            'tokens_to_generate': request.max_tokens,
++            'temperature': request.temperature,
++            'top_p': request.top_p,
++            'logprobs': True,
++            'echo_prompts': request.echo_prompt,
++            'engine': request.model_engine
++        }
++        try:
++            def do_it():
++                result = self._send_request(raw_request)
++                if 'text' not in result:
++                    raise ValueError(f'Invalid response: {result}')
++                return result
++            cache_key = Client.make_cache_key(raw_request, request)
++            response, cached = self.cache.get(cache_key, wrap_request_time(do_it))
++        except Exception as e:
++            error: str = f"Megatron-Server error: {e}"
++            return RequestResult(success=False, cached=False, error=error, completions=[], embedding=[])
++        for completion_idx in range(request.num_completions):
++            text: str = response['text'][completion_idx]
++            response['logprobs'][completion_idx].insert(0, 0)
++            if text.endswith(self.tokenizer.eos):
++                text = text[:-len(self.tokenizer.eos)]
++                response['segments'][completion_idx].pop()
++                response['logprobs'][completion_idx].pop()
++            tokens = [
++                Token(text=text, logprob=logprob, top_logprobs={}) for text, logprob in zip(response['segments'][completion_idx], response['logprobs'][completion_idx])
++            ]
++            completion = Sequence(text=text, logprob=sum(response['logprobs'][completion_idx]), tokens=tokens)
++            sequence = truncate_sequence(completion, request, print_warning=True)
++            completions.append(sequence)
++        return RequestResult(
++            success=True,
++            cached=cached,
++            request_time=response['request_time'],
++            request_datetime=response['request_datetime'],
++            completions=completions,
++            embedding=[]
++        )
++
++    def tokenize(self, request: TokenizationRequest) -> TokenizationRequestResult:
++        cache_key = asdict(request)
++        def do_it():
++            token_ids = self.tokenizer.tokenize(request.text)
++            if request.truncation:
++                token_ids = token_ids[: request.max_length]
++            return {"tokens": token_ids}
++        result, cached = self.cache.get(cache_key, wrap_request_time(do_it))
++        return TokenizationRequestResult(
++            success=True,
++            cached=cached,
++            text=request.text,
++            tokens=[TokenizationToken(value) for value in result["tokens"]],
++            request_time=result["request_time"],
++        )
++
++    def decode(self, request: DecodeRequest) -> DecodeRequestResult:
++        cache_key = asdict(request)
++        try:
++            def do_it():
++                return {"text": self.tokenizer.decode(request.tokens)}
++
++            result, cached = self.cache.get(cache_key, wrap_request_time(do_it))
++        except Exception as e:
++            error: str = f"My Tokenizer error: {request.tokens}"
++            return DecodeRequestResult(success=False, cached=False, error=error, text="")
++
++        return DecodeRequestResult(
++            success=True, cached=cached, text=result["text"], request_time=result["request_time"]
++        )
+diff --git a/src/helm/proxy/clients/my_tokenizer/__init__.py b/src/helm/proxy/clients/my_tokenizer/__init__.py
+new file mode 100644
+index 00000000..e69de29b
+diff --git a/src/helm/proxy/clients/my_tokenizer/config.json b/src/helm/proxy/clients/my_tokenizer/config.json
+new file mode 100644
+index 00000000..3997f5c0
+--- /dev/null
++++ b/src/helm/proxy/clients/my_tokenizer/config.json
+@@ -0,0 +1,7 @@
++{
++    "local": {
++        "type": "gpt2",
++        "vocab_path": "/home/data/panxuchen.pxc/code/helm/gpt2-zhcn3-v4.json",
++        "merge_path": "/home/data/panxuchen.pxc/code/helm/gpt2-zhcn3-v4.bpe"
++    }
++}
+\ No newline at end of file
+diff --git a/src/helm/proxy/clients/my_tokenizer/my_tokenizer.py b/src/helm/proxy/clients/my_tokenizer/my_tokenizer.py
+new file mode 100644
+index 00000000..af96931a
+--- /dev/null
++++ b/src/helm/proxy/clients/my_tokenizer/my_tokenizer.py
+@@ -0,0 +1,29 @@
++import json
++import importlib_resources as resources
++from io import open
++from transformers import AutoTokenizer, GPT2Tokenizer, LlamaTokenizer
++
++TOKENIZER_PACKAGE: str = "helm.proxy.clients.my_tokenizer"
++TOKENIZER_CONFIG: str = "config.json"
++
++class MyTokenizer(object):
++
++    def __init__(self, config):
++        if config['type'] == 'huggingface':
++            self.tokenizer = AutoTokenizer.from_pretrained(config['model_path'])
++        elif config['type'] == 'gpt2':
++            self.tokenizer = GPT2Tokenizer(vocab_file=config['vocab_path'], merges_file=config['merge_path'])
++        elif config['type'] == 'sentencepiece' or config['type'] == 'llama':
++            self.tokenizer = LlamaTokenizer(vocab_file=config['tokenizer_path'])
++        else:
++            raise NotImplementedError("Unknown tokenizer")
++
++    def tokenize(self, text):
++        return self.tokenizer(text)['input_ids']
++
++    def decode(self, token_ids):
++        return self.tokenizer.decode(token_ids)
++
++    @property
++    def eos(self):
++        return self.tokenizer.eos_token
+\ No newline at end of file
+diff --git a/src/helm/proxy/models.py b/src/helm/proxy/models.py
+index bfa3ed3c..df1c2c1d 100644
+--- a/src/helm/proxy/models.py
++++ b/src/helm/proxy/models.py
+@@ -631,11 +631,11 @@ ALL_MODELS = [
+         name="google/palm",
+         tags=[TEXT_MODEL_TAG, LIMITED_FUNCTIONALITY_TEXT_MODEL_TAG],
+     ),
+-    # NVIDIA
++    # My Model
+     Model(
+-        group="nvidia",
+-        name="nvidia/megatron-gpt2",
+-        tags=[TEXT_MODEL_TAG, FULL_FUNCTIONALITY_TEXT_MODEL_TAG, GPT2_TOKENIZER_TAG, BUGGY_TEMP_0_TAG],
++        group="mymodel",
++        name="mymodel/model",
++        tags=[TEXT_MODEL_TAG, FULL_FUNCTIONALITY_TEXT_MODEL_TAG, GPT2_TOKENIZER_TAG]
+     ),
+     # For debugging
+     Model(
+@@ -649,10 +649,15 @@ MODEL_NAME_TO_MODEL: Dict[str, Model] = {model.name: model for model in ALL_MODE
+ 
+ def get_model(model_name: str) -> Model:
+     """Get the `Model` given the name."""
+-    if model_name not in MODEL_NAME_TO_MODEL:
+-        raise ValueError(f"No model with name: {model_name}")
++    if model_name in MODEL_NAME_TO_MODEL:
++        return MODEL_NAME_TO_MODEL[model_name]
++    else:
++        model_name_prefix = model_name.split('/')[0]
++        if model_name_prefix == 'mymodel':
++            return MODEL_NAME_TO_MODEL['mymodel/model']
++        else:
++            raise ValueError(f"No model with name: {model_name}")
+ 
+-    return MODEL_NAME_TO_MODEL[model_name]
+ 
+ 
+ def get_model_group(model_name: str) -> str:
+diff --git a/src/helm/proxy/services/server_service.py b/src/helm/proxy/services/server_service.py
+index f08e4a06..222934d7 100644
+--- a/src/helm/proxy/services/server_service.py
++++ b/src/helm/proxy/services/server_service.py
+@@ -40,7 +40,7 @@ class ServerService(Service):
+     Main class that supports various functionality for the server.
+     """
+ 
+-    def __init__(self, base_path: str = ".", root_mode=False, mongo_uri: str = ""):
++    def __init__(self, base_path: str = ".", root_mode=False, mongo_uri: str = "", my_config_path: str = None):
+         credentials_path = os.path.join(base_path, CREDENTIALS_FILE)
+         cache_path = os.path.join(base_path, CACHE_DIR)
+         ensure_directory_exists(cache_path)
+@@ -52,7 +52,7 @@ class ServerService(Service):
+         else:
+             credentials = {}
+ 
+-        self.client = AutoClient(credentials, cache_path, mongo_uri)
++        self.client = AutoClient(credentials, cache_path, mongo_uri, my_config_path)
+         self.token_counter = AutoTokenCounter(self.client.huggingface_client)
+         self.accounts = Accounts(accounts_path, root_mode=root_mode)
+         # Lazily instantiated by get_toxicity_scores()

@@ -1,0 +1,3 @@
+{"category": "general", "metadata": {"temperature": 0.2, "max_tokens": 1024, "model": "gpt-3.5-turbo"}}
+{"category": "coding", "metadata": {"temperature": 0.2, "max_tokens": 1024, "model": "gpt-3.5-turbo"}}
+{"category": "math", "metadata": {"temperature": 0.2, "max_tokens": 1024, "model": "gpt-3.5-turbo"}}
