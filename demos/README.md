@@ -1,35 +1,34 @@
 # Demos
 
-This folder contains some demos developed with streamlit to allow users to easily experience the basic functions and tools of Data-Juicer.
+This folder contains some demos, which allow users to easily experience the basic functions and tools of Data-Juicer.
 
 ## Usage
 
+Use `app.py` in the subdirectory of `demos` to run the demos.
+
 ```shell
-cd xxx
-streamlit run  xxx/app.py
+cd <subdir_of_demos>
+streamlit run app.py
 ```
 
-## Categories
+## Available Demos
 
-### Data
+- Data (`data`)
+  - This folder contains some sample datasets.
 
-This folder contains some demo of datasets.
+- Data visualization diversity (`data_visualization_diversity`)
+  - This demo analyzes the verb-noun structure of the SFT dataset and plots its diversity in sunburst format.
 
-### Data visualization diversity
+- Data visualization op effect (`data_visualization_op_effect`)
+  - This demo analyzes the statistics of dataset, and displays the effect of each Filter op by setting different thresholds.
 
-This demo analyze Verb-Noun structures of SFT dataset, and draw its diversity in sunburst format.
+- Data visualization statistics (`data_visualization_statistics`)
+  - This demo analyzes the dataset and obtain up to 13 statistics.
 
-### Data visualization op effect
+- Tool quality classifier (`tool_quality_classifier`)
+  - This demo provides 3 text quality classifier to score the dataset.
 
-This demo analyze the statistics of dataset, and display every Filter op effect by setting different thresholds.
-
-### Data visualization statistics
-This demo analyze the statistics (up to 13 for now) of dataset.
-
-### Tool quality classifier
-This demo supply 3 text quality classifier, and score dataset
-
-## Coming Soon
+## Demos Coming Soon
 - Overview scan
 - Auto evaluation helm
 - Data process loop

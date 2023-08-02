@@ -1,10 +1,10 @@
 # Third-parties (LLM Ecosystems)
 
-Dependencies of Auto Evaluation Toolkit, see `tools/evaluator/README.md` for more details.
+Dependencies of Auto Evaluation Toolkit, see [`tools/evaluator/README.md`](../tools/evaluator/README.md) for more details.
 
 ## Installation
 
-The auto-evaluation toolkit requires customized Megatron-LM and HELM.
+The auto-evaluation toolkit requires customized [Megatron-LM](https://github.com/NVIDIA/Megatron-LM) and [HELM](https://github.com/stanford-crfm/helm).
 To avoid dependency problems when installing those packages, we recommand using NGC's PyTorch container (`nvcr.io/nvidia/pytorch:22.12-py3`).
 Assuming the path to your shared file system (where your data and model checkpoints are saved) is `/mnt/shared`, start the docker container with following commands.
 
@@ -28,7 +28,7 @@ The evaluation machine needs to install both Megatron-LM and HELM
 ./setup_helm.sh
 ```
 
-The toolkit use [WandB](https://wandb.ai/) to monitor the trend of metrics during training. Above steps have installed wandb, and you only need to run `wandb login` and enter your wandb API key. If you have your own instance of wandb, run the following script.
+The toolkit use [W&B](https://wandb.ai/) (wandb) to monitor the trend of metrics during training. Above steps have installed wandb, and you only need to run `wandb login` and enter your wandb API key. If you have your own instance of wandb, run the following script.
 
 ```shell
 wandb login --host <URL of your wandb instance>

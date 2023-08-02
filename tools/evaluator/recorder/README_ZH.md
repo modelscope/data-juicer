@@ -1,6 +1,6 @@
 # Evaluation Results Recorder
 
-使用 `wandb_writer.py` 将评测结果记录到 [WandB](https://wandb.ai/) 并可视化展示。
+使用 [`wandb_writer.py`](wandb_writer.py) 将评测结果记录到 [W&B](https://wandb.ai/) (wandb) 并可视化展示。
 
 `wandb_writer.py` 能够:
 
@@ -16,11 +16,11 @@ python wandb_writer.py --config <config_file> [--print-only]
 ```
 
 - `config_file`: yaml 配置文件路径（配置项细节请见[配置](#配置)）
-- `--print-only`: 仅将结果打印到命令行，不执行写wandb操作，用于调试
+- `--print-only`: 仅将结果打印到命令行，不执行写 wandb 操作，用于调试
 
 ## 配置
 
-我们在 `config` 文件夹中为三种不同的情况提供了三个示例文件，其中通用的配置项格式如下:
+我们在 [`config`](config) 文件夹中为三种不同的情况提供了三个示例文件，其中通用的配置项格式如下:
 
 ```yaml
 project: <str>   # wandb 项目名
@@ -62,8 +62,9 @@ evals:  # evaluations to record
 ```
 
 > 本工具使用 HELM 的 16 组核心指标作为默认评测指标。如果配置中没有提供 benchmarks 域，则会自动使用如下16个评测指标：
->
-> `mmlu.EM, raft.EM, imdb.EM, truthful_qa.EM, summarization_cnndm.ROUGE-2, summarization_xsum.ROUGE-2, boolq.EM, msmarco_trec.NDCG@10, msmarco_regular.RR@10, narrative_qa.F1, natural_qa_closedbook.F1, natural_qa_openbook_longans.F1, civil_comments.EM, hellaswag.EM, openbookqa.EM`
+>  ```
+>  mmlu.EM, raft.EM, imdb.EM, truthful_qa.EM, summarization_cnndm.ROUGE-2, summarization_xsum.ROUGE-2, boolq.EM, msmarco_trec.NDCG@10, msmarco_regular.RR@10, narrative_qa.F1, natural_qa_closedbook.F1, natural_qa_openbook_longans.F1, civil_comments.EM, hellaswag.EM, openbookqa.EM
+>  ```
 
 ### 从配置文件中读取评测结果
 
@@ -109,5 +110,4 @@ excluded_models:   # 不参与排行榜的模型名称
   - ...
 ```
 
-> 工具使用 HELM 的 16 组核心指标作为默认的排行榜指标。如果没有提供 `leaderboard_metrics` 域，则会自动使用如下16个评测指标：
-> `mmlu.EM, raft.EM, imdb.EM, truthful_qa.EM, summarization_cnndm.ROUGE-2, summarization_xsum.ROUGE-2, boolq.EM, msmarco_trec.NDCG@10, msmarco_regular.RR@10, narrative_qa.F1, natural_qa_closedbook.F1, natural_qa_openbook_longans.F1, civil_comments.EM, hellaswag.EM, openbookqa.EM`
+> 工具使用 HELM 的 16 组核心指标作为默认的排行榜指标。如果没有提供 `leaderboard_metrics` 域，则会自动使用这 16 组核心指标。

@@ -1,36 +1,34 @@
-# 示例文件
+# 演示
 
-此文件夹包含一些示例，帮助用户轻松体验 Data-Juicer各种功能和工具。
+此文件夹包含一些演示样例，帮助用户轻松体验 Data-Juicer 的各种功能和工具。
 
 ## 用法
 
+使用 `demos` 子目录下的 `app.py` 来执行演示样例。
+
 ```shell
-cd xxx
-streamlit run  xxx/app.py
+cd <subdir_of_demos>
+streamlit run app.py
 ```
 
-## 目录
+## 可用的演示
 
-### Data
+- 数据集样例 (`data`)
+  - 该文件夹包含一些样例数据集。
 
-该文件夹包含一些样例数据集。
+- 词法多样性可视化 (`data_visualization_diversity`)
+  - 该示例可以用来分析 SFT 数据集的动词-名词结构, 并绘制成sunburst层级环形图表。
 
-### Data visualization diversity
+- 算子效果可视化 (`data_visualization_op_effect`)
+  - 该示例可以分析数据集的统计信息，并根据这些统计信息可以显示出每个 `Filter` 算子在不同阈值下的效果。
 
-该示例可以用来分析 SFT 数据集的动词-名词结构, 并绘制成sunburst层级环形图表。
+- 统计信息可视化 (`data_visualization_statistics`)
+  - 示例可以分析数据集，并获得多达13种统计信息。
 
-### Data visualization op effect
+- 文本质量打分器 (`tool_quality_classifier`)
+  - 该示例提供了3种文本质量打分器， 对数据集进行打分评估。
 
-该示例可以分析数据集的统计信息，并根据这些统计信息可以显示出每个 `Filter` 算子的在不用阈值下的效果。
-
-### Data visualization statistics
-
-该示例可以分析数据集，并获得多达13种统计信息。
-
-### Tool quality classifier
-该示例提供了3种文本质量打分器， 对数据集进行打分评估。
-
-## Coming Soon
+## 即将上线的的演示
 - Overview scan ｜ 初体验
 - Auto evaluation helm ｜ 自动HELM评测
 - Data process loop ｜ 数据分析处理迭代

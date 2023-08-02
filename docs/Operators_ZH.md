@@ -35,7 +35,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | tsv_formatter     | General | en, zh | 准备本地 `.tsv` 文件                                                 |
 | json_formatter    | General | en, zh | 准备本地 `.json`, `.jsonl`, `.jsonl.zst` 文件                        |
 | parquet_formatter | General | en, zh | 准备本地 `.parquet` 文件                                             |
-| text_formatter    | General | en, zh | 准备其他本地文本文件（[完整的支持列表](data_juicer/format/text_formatter.py#L46,56)） |
+| text_formatter    | General | en, zh | 准备其他本地文本文件（[完整的支持列表](../data_juicer/format/text_formatter.py#L63,73)） |
 | mixture_formatter | General | en, zh | 处理可支持本地文件的混合                                        |
 
 ## Mapper <a name="mapper"/>

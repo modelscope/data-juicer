@@ -1,6 +1,6 @@
 # Evaluation Results Recorder
 
-Record your evaluation results to [WandB](https://wandb.ai/) with `wandb_writer.py`.
+Record your evaluation results to [W&B](https://wandb.ai/) (wandb) with [`wandb_writer.py`](wandb_writer.py).
 
 With `wandb_writer.py`, you can:
 
@@ -20,7 +20,7 @@ python wandb_writer.py --config <config_file> [--print-only]
 
 ## Configuration
 
-We provided three example files in `config` folder for three different cases.
+We provided three example files in [`config`](config) folder for three different cases.
 
 The general format is as follows:
 
@@ -62,8 +62,9 @@ evals:  # evaluations to record
 ```
 
 > We use 16 core metrics of HELM as the default benchmarks if the `benchmarks` field is not provided, the 16 metrics are as follows:
->
-> `mmlu.EM, raft.EM, imdb.EM, truthful_qa.EM, summarization_cnndm.ROUGE-2, summarization_xsum.ROUGE-2, boolq.EM, msmarco_trec.NDCG@10, msmarco_regular.RR@10, narrative_qa.F1, natural_qa_closedbook.F1, natural_qa_openbook_longans.F1, civil_comments.EM, hellaswag.EM, openbookqa.EM`
+>  ```
+>  mmlu.EM, raft.EM, imdb.EM, truthful_qa.EM, summarization_cnndm.ROUGE-2, summarization_xsum.ROUGE-2, boolq.EM, msmarco_trec.NDCG@10, msmarco_regular.RR@10, narrative_qa.F1, natural_qa_closedbook.F1, natural_qa_openbook_longans.F1, civil_comments.EM, hellaswag.EM, openbookqa.EM
+>  ```
 
 ### Parse from configuration file
 
