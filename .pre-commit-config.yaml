@@ -1,0 +1,37 @@
+repos:
+  - repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+  - repo: https://github.com/PyCQA/isort.git
+    rev: 4.3.21
+    hooks:
+      - id: isort
+  - repo: https://github.com/pre-commit/mirrors-yapf
+    rev: v0.32.0
+    hooks:
+      - id: yapf
+        exclude: data_juicer/ops/common/special_characters.py
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: thirdparty/
+      - id: check-yaml
+        exclude: thirdparty/
+      - id: end-of-file-fixer
+        exclude: thirdparty/
+      - id: requirements-txt-fixer
+        exclude: thirdparty/
+      - id: double-quote-string-fixer
+        exclude: ^(thirdparty/|data_juicer/ops/common/special_characters.py)
+      - id: check-merge-conflict
+        exclude: thirdparty/
+      - id: fix-encoding-pragma
+        exclude: thirdparty/
+        args: [ "--remove" ]
+      - id: mixed-line-ending
+        exclude: thirdparty/
+        args: [ "--fix=lf" ]
+
+exclude: 'docs/.*'

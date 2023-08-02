@@ -1,0 +1,15 @@
+
+# data & resources
+models/
+outputs/
+assets/
+
+# setup
+data_juicer.egg-info/
+build/
+dist
+
+# others
+.DS_Store
+.idea/
+__pycache__

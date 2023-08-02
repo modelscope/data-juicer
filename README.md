@@ -1,12 +1,12 @@
 # Data-Juicer: A Data-Centric Text Processing System for Large Language Models
 
-![Data-Juicer](docs/imgs/data-juicer.png "Data-Juicer")
+![Data-Juicer](docs/imgs/data-juicer.jpg "Data-Juicer")
 
 ![](https://img.shields.io/badge/language-Python-214870.svg)
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![Contributing](https://img.shields.io/badge/Contribution-welcome-brightgreen.svg)](docs/DeveloperGuide.md)
 
-[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documentation-|-文档)
+[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documentation--文档)
 [![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md)
 [![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
 [![ModelScope-10+ Demos](https://img.shields.io/badge/ModelScope-10+_Demos-4e29ff.svg?logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjI0IDEyMS4zMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im0wIDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtOTkuMTQgNzMuNDloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xNzYuMDkgOTkuMTRoLTI1LjY1djIyLjE5aDQ3Ljg0di00Ny44NGgtMjIuMTl6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTEyNC43OSA0Ny44NGgyNS42NXYyNS42NWgtMjUuNjV6IiBmaWxsPSIjMzZjZmQxIiAvPgoJPHBhdGggZD0ibTAgMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xOTguMjggNDcuODRoMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xOTguMjggMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xNTAuNDQgMHYyMi4xOWgyNS42NXYyNS42NWgyMi4xOXYtNDcuODR6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTczLjQ5IDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiMzNmNmZDEiIC8+Cgk8cGF0aCBkPSJtNDcuODQgMjIuMTloMjUuNjV2LTIyLjE5aC00Ny44NHY0Ny44NGgyMi4xOXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtNDcuODQgNzMuNDloLTIyLjE5djQ3Ljg0aDQ3Ljg0di0yMi4xOWgtMjUuNjV6IiBmaWxsPSIjNjI0YWZmIiAvPgo8L3N2Zz4K)](#demos)
@@ -34,7 +34,7 @@ Table of Contents
       * [Data Visualization](#data-visualization)
       * [Build Up Config Files](#build-up-config-files)
       * [Preprocess raw data (Optional)](#preprocess-raw-data-optional)
-   * [Documentation | 文档](#documentation-|-文档)
+   * [Documentation | 文档](#documentation--文档)
    * [Data Recipes](#data-recipes)
    * [Demos](#demos)
    * [License](#license)
@@ -53,7 +53,7 @@ Table of Contents
 
 - **Comprehensive Processing Recipes**: Offering tens of [pre-built data processing recipes](configs/refine_recipe/README.md) for pre-training, SFT, en, zh, and more scenarios.
 
-- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documentation-|-文档), [easy start guides](#quick-start) and [demo configs](configs/), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
+- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documentation--文档), [easy start guides](#quick-start) and [demo configs](configs/), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
 
 - **Flexible & Extensible**: Accommodating most types of data formats (e.g., jsonl, parquet, csv, ...) and allowing flexible combinations of OPs. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
 
@@ -169,7 +169,7 @@ streamlit run app.py
 
 ## Documentation | 文档
 
-- [Overall](README.md) | [概览](README_ZH.md)
+- [Overview](README.md) | [概览](README_ZH.md)
 - [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
 - [Configs](configs/README.md) | [配置系统](configs/README_ZH.md)
 - [Developer Guide](docs/DeveloperGuide.md) | [开发者指南](docs/DeveloperGuide_ZH.md)

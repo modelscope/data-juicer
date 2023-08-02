@@ -133,7 +133,7 @@ python eval.py --help
 ### Tokenizers
 
 - Spark 中的标准 Tokenizer: 根据空白字符分割文本.
-- zh/code.sp.model: 使用 sentencepiece BPE 训练得到。
+- zh/code.sp.model: 使用 sentencepiece 训练得到。
 
 ### Keep Methods
 
