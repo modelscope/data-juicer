@@ -15,22 +15,22 @@ docker run --gpus all -it --rm -v /mnt/shared:/workspace
 
 启动 Docker 容器后，在容器中运行以下脚本以安装 Megatron-LM 或 HELM。
 
-训练机只需要安装Megatron-LM：
+训练机只需要安装 Megatron-LM：
 
 ```shell
 ./setup_megatron.sh
 ```
 
-评测机需要同时安装Megatron-LM和HELM
+评测机需要同时安装 Megatron-LM 和 HELM
 
 ```shell
 ./setup_megatron.sh
 ./setup_helm.sh
 ```
 
-工具包使用[WandB](https://wandb.ai/)来监视训练期间各指标的趋势。上面的步骤中已安装 wandb，您只需要运行 `wand login` 并输入 wandb API 密钥即可。如果您有自己的wandb实例，请运行以下脚本。
+工具包使用 [WandB](https://wandb.ai/) 来监视训练期间各指标的趋势。上面的步骤中已安装 wandb，您只需要运行 `wand login` 并输入 wandb API 密钥即可。如果您有自己的 wandb 实例，请运行以下脚本。
 
 ```shell
 wandb login --host <URL of your wandb instance>
-＃输入您的API密钥
+＃输入您的 API 密钥
 ```

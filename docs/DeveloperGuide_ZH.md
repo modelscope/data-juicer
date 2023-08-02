@@ -1,6 +1,11 @@
 # 开发者指南
 
-[TOC]
+* [开发者指南](#开发者指南)
+   * [编码规范](#编码规范)
+   * [构建自己的算子](#构建自己的算子)
+   * [构建自己的配置](#构建自己的配置)
+      * [丰富的配置源和类型提示](#丰富的配置源和类型提示)
+      * [层次化的配置和帮助](#层次化的配置和帮助)
 
 ## 编码规范
 
@@ -137,7 +142,7 @@ self.cfg = init_configs()
 此外，还支持许多参数类型和相应的验证。
 包含 Python内置类型、来自 [Lib/typing](https://docs.python.org/3/library/typing.html) 的类型，以及来自 jsonargparse 的 [扩展类型](https://jsonargparse.readthedocs.io/en/stable/#type-hints)，例如具有自定义限制的 `restricted types` 和 `Paths`。
 
-### Hierarchical configs and helps
+### 层次化的配置和帮助
 
 - 您可以在参数名称中自由使用点符号来定义层次结构， 例如 `maximum_line_length_filter.min`.
 更重要的是，默认情况下，我们自动注册已实现的运算符的 docstring。 也就是说，所有的结构配置始终与代码同步。
