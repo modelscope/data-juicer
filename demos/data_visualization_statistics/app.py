@@ -116,8 +116,7 @@ class Visualize:
             # initial_sidebar_state="expanded",
         )
 
-        readme_link = 'https://code.alibaba-inc.com/DAIL-DATA/' \
-                      'data_juicer/blob/master/README.md'
+        readme_link = 'https://github.com/alibaba/data-juicer'
         st.markdown(
             '<div align = "center"> <font size = "70"> Data-Juicer \
             </font> </div>',
@@ -126,7 +125,7 @@ class Visualize:
         st.markdown(
             f'<div align = "center"> A Data-Centric Text Processing System for \
                 Large Language Models, \
-                see more details in <a href={readme_link}>Document</a></div>',
+                see more details in our <a href={readme_link}>page</a></div>',
             unsafe_allow_html=True,
         )
 
