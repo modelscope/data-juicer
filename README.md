@@ -53,7 +53,7 @@ Table of Contents
 
 - **Data-in-the-loop**: Allowing detailed data analyses with an automated report generation feature for a deeper understanding of your dataset. Coupled with real-time multi-dimension automatic evaluation capabilities, it supports a feedback loop at multiple stages in the LLM development process.
 
-- **Comprehensive Processing Recipes**: Offering tens of [pre-built data processing recipes](configs/refine_recipe/README.md) for pre-training, SFT, en, zh, and more scenarios.
+- **Comprehensive Processing Recipes**: Offering tens of [pre-built data processing recipes](configs/data_juicer_recipes/README.md) for pre-training, SFT, en, zh, and more scenarios.
 
 - **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documentation), [easy start guides](#quick-start) and [demo configs](configs/README.md), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
 
@@ -189,10 +189,10 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 - [API references](https://alibaba.github.io/data-juicer/)
 
 ## Data Recipes
-- [Recipes for data process in BLOOM](configs/bloom/README.md)
+- [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
 - [Recipes for data process in RedPajama](configs/redpajama/README.md)
-- [Refined recipes for pretraining data](configs/refine_recipe/README.md)
-- [Refined recipes for SFT data](configs/refine_recipe/README.md#L28)
+- [Refined recipes for pretraining data](configs/data_juicer_recipes/README.md)
+- [Refined recipes for SFT data](configs/data_juicer_recipes/README.md#L28)
 
 ## Demos
 - Introduction to Data-Juicer [[ModelScope](https://modelscope.cn/studios/Data-Juicer/overview_scan/summary)]

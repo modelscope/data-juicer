@@ -16,10 +16,10 @@ python tools/preprocess/raw_arxiv_to_jsonl.py           \
     --num_proc            <num_proc>
 ```
 
-预处理完成后，修改 [redpajama-arxiv.yaml](redpajama-arxiv.yaml) 中的数据路径，执行以下命令复现 redpajama 的处理流程：
+预处理完成后，修改 [redpajama-arxiv.yaml](redpajama-arxiv.yaml) 中的数据路径，执行以下命令复现 RedPajama 的处理流程：
 
 ```shell
-python tools/process_data.py --config configs/redpajama/redpajama-arxiv.yaml
+python tools/process_data.py --config configs/reproduced_redpajama/redpajama-arxiv.yaml
 ```
 
 ### 指标对比
@@ -33,10 +33,10 @@ python tools/process_data.py --config configs/redpajama/redpajama-arxiv.yaml
 
 原始数据文件从 [Redpajama/Books](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/book) 中相同的 HuggingFace 链接下载。
 
-下载完成后，修改 [redpajama-books.yaml](redpajama-books.yaml) 中的数据路径，执行以下命令复现 redpajama 的处理流程：
+下载完成后，修改 [redpajama-books.yaml](redpajama-books.yaml) 中的数据路径，执行以下命令复现 RedPajama 的处理流程：
 
 ```shell
-python tools/process_data.py --config configs/redpajama/redpajama-books.yaml
+python tools/process_data.py --config configs/reproduced_redpajama/redpajama-books.yaml
 ```
 
 ### 指标对比

@@ -20,13 +20,13 @@ The current configuration files are classified into the subsequent categories.
 Demo configuration files are used to help users quickly familiarize the basic functions of Data-Juicer. Please refer to the [demo](demo) folder for details.
 
 
-### Redpajama
+### Reproduced Redpajama
 
-We have reproduced the processing flow of some redpajama datasets. Please refer to the [redpajama](redpajama) folder for details.
+We have reproduced the processing flow of some RedPajama datasets. Please refer to the [reproduced_redpajama](reproduced_redpajama) folder for details.
 
-### Bloom
+### Reproduced BLOOM
 
-We have reproduced the processing flow of some bloom datasets. please refer to the [bloom](bloom) folder for details.
+We have reproduced the processing flow of some BLOOM datasets. please refer to the [reproduced_bloom](reproduced_bloom) folder for details.
 
-### Refine_recipe
-We have refined some open source datasets (including SFT datasets) by using Data-Juicer and have provided configuration files for the refine flow. please refer to the [refine_recipe](refine_recipe) folder for details.
+### Data-Juicer Recipes
+We have refined some open source datasets (including SFT datasets) by using Data-Juicer and have provided configuration files for the refine flow. please refer to the [data_juicer_recipes](data_juicer_recipes) folder for details.

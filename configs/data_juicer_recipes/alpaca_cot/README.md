@@ -1,13 +1,12 @@
-# Redpajama Config Files
+# Refine Alpaca-CoT Config Files
 
-该文件夹包含的配置文件能够让用户轻松快速地完善 [Alpaca-CoT](https://huggingface.co/QingyiSi/Alpaca-CoT)。
+This folder contains some configuration files to allow users to easily and quickly refine [Alpaca-CoT](https://huggingface.co/QingyiSi/Alpaca-CoT).
 
-## 预处理
+## Preprocess
+The raw data files can be downloaded from [Alpaca-CoT](https://huggingface.co/QingyiSi/Alpaca-CoT) on HuggingFace.
 
-原始数据文件在 HuggingFace 中的 [Alpaca-CoT](https://huggingface.co/QingyiSi/Alpaca-CoT) 下载。
-
-### 将 Alpaca-CoT 转换为 jsonl 文件
-使用 [raw_alpaca_cot_merge_add_meta.py](../../tools/preprocess/raw_alpaca_cot_merge_add_meta.py) 选择数据集的 `instruction`, `input` 和 `output` 3个字段，并使用空格将它们合并到 `text`，同时在数据集中增加额外的[元信息]( #meta_info) ：
+### Convert raw Alpaca-CoT data to jsonl 
+Use [raw_alpaca_cot_merge_add_meta.py](../../tools/preprocess/raw_alpaca_cot_merge_add_meta.py) to select `instruction`, `input` and `output` columns and merge them to `text` field with a space, and add extra [ META ]( #meta_info) info to dataset:
 
 ```shell
 python tools/preprocess/raw_alpaca_cot_merge_add_meta.py    \
@@ -16,8 +15,8 @@ python tools/preprocess/raw_alpaca_cot_merge_add_meta.py    \
     --num_proc            <num_proc>
 ```
 
-### 按照语言将数据集拆分子数据集
-使用 [dataset_split_by_language.py](../../tools/preprocess/dataset_split_by_language.py) 将数据集拆分为中文和英文：
+### Split datasets to sub-datasets by language
+Use [dataset_split_by_language.py](../../tools/preprocess/dataset_split_by_language.py) to split the dataset to EN and ZH sub-datasets:
 
 ```shell
 python tools/preprocess/dataset_split_by_language.py    \
@@ -27,52 +26,51 @@ python tools/preprocess/dataset_split_by_language.py    \
     --num_proc            <num_proc>
 ```
 
-## 处理
-在预处理完成之后，修改 [alpaca-cot-en-refine](alpaca-cot-en-refine].yaml) 和 [alpaca-cot-zh-refine](alpaca-cot-zh-refine.yaml) 中的数据集路径，然后执行以下命令来复现完善过的 Alpaca-CoT 的处理流程。
-
+## Process
+After preprocess, modify the dataset path in [alpaca-cot-en-refine](alpaca-cot-en-refine].yaml) and [alpaca-cot-zh-refine](alpaca-cot-zh-refine.yaml), and then execute the following command to reproduce the processing flow of refined Alpaca-CoT.
 ```shell
 # refine English dataset
-python tools/process_data.py --config configs/refine_recipe/alpaca_cot/alpaca-cot-en-refine].yaml
+python tools/process_data.py --config configs/data_juicer_recipes/alpaca_cot/alpaca-cot-en-refine].yaml
 
 # refine Chinese dataset
-python tools/process_data.py --config configs/refine_recipe/alpaca_cot/alpaca-cot-zh-refine].yaml
+python tools/process_data.py --config configs/data_juicer_recipes/alpaca_cot/alpaca-cot-zh-refine].yaml
 ```
 
-### 元信息 <a name="meta_info"/>
+### Meta Info <a name="meta_info"/>
 
-在完善后的 Alpaca-CoT 的数据集中每个样本都包含元信息，标签说明如下：
+Each sample in refined data of Alpaca-CoT contains meta info listed as below:
 
-#### Alpaca-CoT 元信息
-* Language 标签:
-    - EN: 英文数据集
-    - CN: 中文数据集
-    - ML: 多语言数据集
-* Task 标签:
-    - MT: 多任务数据集
-    - TS: 特定任务数据集
-* 产生方法:
-    - HG: 人工产出数据集
-    - SI: 机器产出数据集
-    - MIX: 人工和机器混合数据集
-    - COL: 从其他数据集合成的数据集
+#### Alpaca-CoT original meta info
+* Language Tags:
+    - EN: Instruction datasets in English
+    - CN: Instruction datasets in Chinese
+    - ML: [Multi-lingual] Instruction datasets in multiple languages
+* Task Tags
+    - MT: [Multi-task] Datasets containing multiple tasks
+    - TS: [Task-specific] Datasets tailored for specific tasks
+* Generation-method:
+    - HG: [Human Generated Dataset] Datasets created by humans
+    - SI: [Self-Instruct] Datasets generated using self-instruct methods
+    - MIX: [Mixed Dataset] Dataset contains both human and machine generated data
+    - COL: [Collection of Dataset] Dataset made from a collection of other datasets
 
-#### Data-Juicer 元信息
-* Dataset: Alpaca-CoT 中的数据集
+#### Data-Juicer Meta info
+* Dataset: Dataset in Alpaca-CoT
 
-* Multi-round Dialog (MRD): 多轮对话数据集
+* Multi-round Dialog (MRD): Multi-round Dialog datasets
 
-* IFT: 指令微调数据集
+* IFT: Instruction Fine-Tuning datasets
 
-* SFT: 有监督微调数据集
+* SFT: Supervised Fine-Tuning datasets
 
-* Preference: 偏好数据集
+* Preference: Preference datasets
 
-* origin_path: Alpaca-CoT 中的原始文件路径
+* origin_path: origin file path in in Alpaca-CoT
 
 
-#### 完善的 Alpaca-CoT 数据集元信息
-|                      | 任务   | 产生方法   | 语言   | 数据集              | 多轮对话   | 指令跟随   | 监督微调   | 偏好   |
-|:---------------------|:-------|:------|:-------|:---------------------|:---:|:---:|:----:|:----:|
+#### Refined Alpaca-CoT dataset Meta info
+|                      | Task   | Gen   | Lang   | Dataset              | MRD  | IFT   | SFT   | Preference   |
+|:---------------------|:-------|:------|:-------|:---------------------|:----:|:---:|:---:|:---:|
 | Chain-of-Thought     | MT     | HG    | EN/CN  | Chain-of-Thought     |                 | ✅  |  |         |
 | GPT4all              | MT     | COL   | EN     | GPT4all              |                 | ✅  | ✅  |         |
 | GPTeacher            | MT     | SI    | EN     | GPTeacher            |                 |  | ✅  |         |

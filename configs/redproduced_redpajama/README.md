@@ -15,10 +15,10 @@ python tools/preprocess/raw_arxiv_to_jsonl.py           \
     --num_proc            <num_proc>
 ```
 
-After conversion, modify the path configurations in [redpajama-arxiv.yaml](redpajama-arxiv.yaml) and execute the following command to reproduce the processing flow of redpajama:
+After conversion, modify the path configurations in [redpajama-arxiv.yaml](redpajama-arxiv.yaml) and execute the following command to reproduce the processing flow of RedPajama:
 
 ```shell
-python tools/process_data.py --config configs/redpajama/redpajama-arxiv.yaml
+python tools/process_data.py --config configs/reproduced_redpajama/redpajama-arxiv.yaml
 ```
 
 ### Comparison
@@ -32,10 +32,10 @@ python tools/process_data.py --config configs/redpajama/redpajama-arxiv.yaml
 
 The raw data files can be downloaded from the same HuggingFace datasets as in [Redpajama/Books](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/book).
 
-Once downloaded, modify the path configurations in [redpajama-books.yaml](redpajama-books.yaml) and execute the following command to reproduce the processing flow of redpajama.
+Once downloaded, modify the path configurations in [redpajama-books.yaml](redpajama-books.yaml) and execute the following command to reproduce the processing flow of RedPajama.
 
 ```shell
-python tools/process_data.py --config configs/redpajama/redpajama-books.yaml
+python tools/process_data.py --config configs/reproduced_redpajama/redpajama-books.yaml
 ```
 
 ### Comparison
