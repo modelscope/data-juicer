@@ -1,3 +1,5 @@
+[**English**](https://github.com/alibaba/data-juicer) | 中文
+
 # Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据
 
 ![Data-Juicer](docs/imgs/data-juicer.jpg "Data-Juicer")
@@ -6,8 +8,8 @@
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![Contributing](https://img.shields.io/badge/Contribution-welcome-brightgreen.svg)](docs/DeveloperGuide_ZH.md)
 
-[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documentation--文档)
-[![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md)
+[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](README.md#documentation)
+[![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documentation)
 [![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
 [![ModelScope-10+ Demos](https://img.shields.io/badge/ModelScope-10+_Demos-4e29ff.svg?logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjI0IDEyMS4zMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im0wIDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtOTkuMTQgNzMuNDloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xNzYuMDkgOTkuMTRoLTI1LjY1djIyLjE5aDQ3Ljg0di00Ny44NGgtMjIuMTl6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTEyNC43OSA0Ny44NGgyNS42NXYyNS42NWgtMjUuNjV6IiBmaWxsPSIjMzZjZmQxIiAvPgoJPHBhdGggZD0ibTAgMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xOTguMjggNDcuODRoMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xOTguMjggMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xNTAuNDQgMHYyMi4xOWgyNS42NXYyNS42NWgyMi4xOXYtNDcuODR6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTczLjQ5IDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiMzNmNmZDEiIC8+Cgk8cGF0aCBkPSJtNDcuODQgMjIuMTloMjUuNjV2LTIyLjE5aC00Ny44NHY0Ny44NGgyMi4xOXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtNDcuODQgNzMuNDloLTIyLjE5djQ3Ljg0aDQ3Ljg0di0yMi4xOWgtMjUuNjV6IiBmaWxsPSIjNjI0YWZmIiAvPgo8L3N2Zz4K)](#demos)
 [![ModelScope-20+_Refined_Datasets](https://img.shields.io/badge/ModelScope-20+_Refined_Datasets-4e29ff.svg?logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjI0IDEyMS4zMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im0wIDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtOTkuMTQgNzMuNDloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xNzYuMDkgOTkuMTRoLTI1LjY1djIyLjE5aDQ3Ljg0di00Ny44NGgtMjIuMTl6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTEyNC43OSA0Ny44NGgyNS42NXYyNS42NWgtMjUuNjV6IiBmaWxsPSIjMzZjZmQxIiAvPgoJPHBhdGggZD0ibTAgMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xOTguMjggNDcuODRoMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xOTguMjggMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xNTAuNDQgMHYyMi4xOWgyNS42NXYyNS42NWgyMi4xOXYtNDcuODR6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTczLjQ5IDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiMzNmNmZDEiIC8+Cgk8cGF0aCBkPSJtNDcuODQgMjIuMTloMjUuNjV2LTIyLjE5aC00Ny44NHY0Ny44NGgyMi4xOXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtNDcuODQgNzMuNDloLTIyLjE5djQ3Ljg0aDQ3Ljg0di0yMi4xOWgtMjUuNjV6IiBmaWxsPSIjNjI0YWZmIiAvPgo8L3N2Zz4K)](#data-recipes)
@@ -23,7 +25,7 @@ Data-Juicer 是一个以数据为中心的文本处理系统，旨在为大语�
 目录
 ===
 
-* [Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据](#data-juicer-为大语言模型提供更高质量、更丰富、更易“消化”的数据)
+* [Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据](#data-juicer-为大语言模型提供更高质量更丰富更易消化的数据)
 * [目录](#目录)
   * [特点](#特点)
   * [前置条件](#前置条件)
@@ -33,8 +35,8 @@ Data-Juicer 是一个以数据为中心的文本处理系统，旨在为大语�
     * [数据分析](#数据分析)
     * [数据可视化](#数据可视化)
     * [构建配置文件](#构建配置文件)
-    * [预处理原始数据（可选）](#预处理原始数据（可选）)
-  * [Documentation | 文档](#documentation--文档)
+    * [预处理原始数据（可选）](#预处理原始数据可选)
+  * [Documentation | 文档](#documentation)
   * [数据处理菜谱](#数据处理菜谱)
   * [演示样例](#演示样例)
   * [开源协议](#开源协议)
@@ -43,21 +45,21 @@ Data-Juicer 是一个以数据为中心的文本处理系统，旨在为大语�
 
 ## 特点
 
-* **丰富的算子**: 内置了 50 多个核心 [算子(OPs)](docs/Operators_ZH.md)，包括 Formatters，Mappers，Filters，Deduplicators 等。
+* **丰富的算子**：内置了 50 多个核心 [算子(OPs)](docs/Operators_ZH.md)，包括 Formatters，Mappers，Filters，Deduplicators 等。
 
-* **专业的工具库**: 提供功能丰富的专业工具库，例如 [文本质量打分器](tools/quality_classifier/README_ZH.md), [数据分割器](tools/preprocess/README_ZH.md), [分析器](#数据分析), [评估器](tools/evaluator/README_ZH.md) 等，提升您的数据处理能力。
+* **专业的工具库**：提供功能丰富的专业工具库，例如 [文本质量打分器](tools/quality_classifier/README_ZH.md)，[数据分割器](tools/preprocess/README_ZH.md)，[分析器](#数据分析)，[评估器](tools/evaluator/README_ZH.md) 等，提升您的数据处理能力。
 
-* **系统化 & 可复用**: 为用户提供系统化且可复用的[配置菜谱](configs)和[算子库](docs/Operators_ZH.md)，旨在让数据处理独立于特定的数据集、模型或任务运行。
+* **系统化 & 可复用**：为用户提供系统化且可复用的[配置菜谱](configs/README_ZH.md)和[算子库](docs/Operators_ZH.md)，旨在让数据处理独立于特定的数据集、模型或任务运行。
 
-* **数据反馈回路**: 支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合实时多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行[反馈循环](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)。
+* **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合实时多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行反馈循环。
 
-* **全面的处理菜谱**: 为预训练、SFT、中英文等场景提供数十种[预构建的数据处理菜谱](configs/refine_recipe/README_ZH.md)。
+* **全面的处理菜谱**：为预训练、SFT、中英文等场景提供数十种[预构建的数据处理菜谱](configs/refine_recipe/README_ZH.md)。
 
-* **用户友好**: 设计简单易用，提供全面的[文档](#documentation--文档)、简易[入门指南](#快速上手)和[演示配置](configs/)，并且可以轻松地添加/删除[现有配置](configs/config_all.yaml)中的算子。
+* **用户友好**：设计简单易用，提供全面的[文档](#documentation)、简易[入门指南](#快速上手)和[演示配置](configs/README_ZH.md)，并且可以轻松地添加/删除[现有配置](configs/config_all.yaml)中的算子。
 
-* **灵活 & 易扩展**: 支持大多数数据格式（如jsonl、parquet、csv等），并允许灵活组合算子。支持[自定义算子](docs/DeveloperGuide_ZH.md#构建自己的算子)，以执行定制化的数据处理。
+* **灵活 & 易扩展**：支持大多数数据格式（如jsonl、parquet、csv等），并允许灵活组合算子。支持[自定义算子](docs/DeveloperGuide_ZH.md#构建自己的算子)，以执行定制化的数据处理。
 
-* **效率增强**: 提供高效的数据处理流水线，减少内存占用，提高生产力。
+* **效率增强**：提供高效的数据处理流水线，减少内存占用，提高生产力。
 
 ## 前置条件
 
@@ -107,7 +109,7 @@ print(dj.__version__)
 python tools/process_data.py --config configs/demo/process.yaml
 ```
 
-* **注意**: 使用未保存在本地的第三方模型或资源的算子第一次运行可能会很慢，因为这些算子需要将相应的资源下载到缓存目录中。默认的下载缓存目录为`~/.cache/data_juicer`。您可通过设置 shell 环境变量 `DATA_JUICER_CACHE_HOME` 更改缓存目录位置，您也可以通过同样的方式更改 `DATA_JUICER_MODELS_CACHE` 或 `DATA_JUICER_ASSETS_CACHE` 来分别修改模型缓存或资源缓存目录:
+* **注意**：使用未保存在本地的第三方模型或资源的算子第一次运行可能会很慢，因为这些算子需要将相应的资源下载到缓存目录中。默认的下载缓存目录为`~/.cache/data_juicer`。您可通过设置 shell 环境变量 `DATA_JUICER_CACHE_HOME` 更改缓存目录位置，您也可以通过同样的方式更改 `DATA_JUICER_MODELS_CACHE` 或 `DATA_JUICER_ASSETS_CACHE` 来分别修改模型缓存或资源缓存目录:
 
 ```shell
 # 缓存主目录
@@ -126,7 +128,7 @@ export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 python tools/analyze_data.py --config configs/demo/analyser.yaml
 ```
 
-* **注意**: Analyser 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
+* **注意**：Analyser 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
 
 ### 数据可视化
 
@@ -139,15 +141,20 @@ streamlit run app.py
 ### 构建配置文件
 
 * 配置文件包含一系列全局参数和用于数据处理的算子列表。您需要设置:
-  * 全局参数: 输入/输出 数据集路径，worker 进程数量等。
+  * 全局参数：输入/输出 数据集路径，worker 进程数量等。
   * 算子列表：列出用于处理数据集的算子及其参数。
 * 您可以通过如下方式构建自己的配置文件:
   * ➖：修改我们的样例配置文件 [`config_all.yaml`](configs/config_all.yaml)。该文件包含了**所有**算子以及算子对应的默认参数。您只需要**移除**不需要的算子并重新设置部分算子的参数即可。
   * ➕：从头开始构建自己的配置文件。您可以参考我们提供的样例配置文件 [`config_all.yaml`](configs/config_all.yaml)，[算子文档](docs/Operators_ZH.md)，以及 [开发者指南](docs/DeveloperGuide_ZH.md#构建自己的算子).
-  * 除了使用 yaml 文件外，您还可以在命令行上指定一个或多个参数，这些参数将覆盖 yaml 文件中的值，例如：`python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang=en`
+  * 除了使用 yaml 文件外，您还可以在命令行上指定一个或多个参数，这些参数将覆盖 yaml 文件中的值。
+
+```shell
+python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang=en
+```
+
 * 基础的配置项格式及定义如下图所示
 
-  ![基础配置项格式及定义样例](docs/config_def.png "基础配置文件样例")
+  ![基础配置项格式及定义样例](docs/imgs/config-def-ZH.jpg "基础配置文件样例")
 
 ### 预处理原始数据（可选）
 
@@ -162,7 +169,7 @@ streamlit run app.py
   * 欢迎您为社区贡献新的预处理工具。
   * 我们**强烈建议**将复杂的数据预处理为 jsonl 或 parquet 文件。
 
-## Documentation | 文档
+## Documentation | 文档 <a name="documentation"/>
 
 * [Overview](README.md) | [概览](README_ZH.md)
 * [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
