@@ -132,7 +132,7 @@ The quality classifiers here mainly refer to the GPT-3 quality classifier mentio
 ### Tokenizers
 
 - Standard Tokenizer in Spark: split texts by whitespaces.
-- zh/code.sp.model: trained using sentencepiece with BPE.
+- zh/code.sp.model: trained using sentencepiece.
 
 ### Keep Methods
 - label: `doc_score > 0.5`

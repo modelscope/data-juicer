@@ -1,12 +1,12 @@
 # Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据
 
-![Data-Juicer](docs/imgs/data-juicer.png "Data-Juicer")
+![Data-Juicer](docs/imgs/data-juicer.jpg "Data-Juicer")
 
 ![](https://img.shields.io/badge/language-Python-214870.svg)
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![Contributing](https://img.shields.io/badge/Contribution-welcome-brightgreen.svg)](docs/DeveloperGuide_ZH.md)
 
-[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documentation-|-文档)
+[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documentation--文档)
 [![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md)
 [![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
 [![ModelScope-10+ Demos](https://img.shields.io/badge/ModelScope-10+_Demos-4e29ff.svg?logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjI0IDEyMS4zMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im0wIDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtOTkuMTQgNzMuNDloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xNzYuMDkgOTkuMTRoLTI1LjY1djIyLjE5aDQ3Ljg0di00Ny44NGgtMjIuMTl6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTEyNC43OSA0Ny44NGgyNS42NXYyNS42NWgtMjUuNjV6IiBmaWxsPSIjMzZjZmQxIiAvPgoJPHBhdGggZD0ibTAgMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xOTguMjggNDcuODRoMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xOTguMjggMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xNTAuNDQgMHYyMi4xOWgyNS42NXYyNS42NWgyMi4xOXYtNDcuODR6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTczLjQ5IDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiMzNmNmZDEiIC8+Cgk8cGF0aCBkPSJtNDcuODQgMjIuMTloMjUuNjV2LTIyLjE5aC00Ny44NHY0Ny44NGgyMi4xOXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtNDcuODQgNzMuNDloLTIyLjE5djQ3Ljg0aDQ3Ljg0di0yMi4xOWgtMjUuNjV6IiBmaWxsPSIjNjI0YWZmIiAvPgo8L3N2Zz4K)](#demos)
@@ -34,7 +34,7 @@ Data-Juicer 是一个以数据为中心的文本处理系统，旨在为大语�
     * [数据可视化](#数据可视化)
     * [构建配置文件](#构建配置文件)
     * [预处理原始数据（可选）](#预处理原始数据（可选）)
-  * [Documentation | 文档](#documentation-|-文档)
+  * [Documentation | 文档](#documentation--文档)
   * [数据处理菜谱](#数据处理菜谱)
   * [演示样例](#演示样例)
   * [开源协议](#开源协议)
@@ -53,7 +53,7 @@ Data-Juicer 是一个以数据为中心的文本处理系统，旨在为大语�
 
 * **全面的处理菜谱**: 为预训练、SFT、中英文等场景提供数十种[预构建的数据处理菜谱](configs/refine_recipe/README_ZH.md)。
 
-* **用户友好**: 设计简单易用，提供全面的[文档](#documentation-|-文档)、简易[入门指南](#快速上手)和[演示配置](configs/)，并且可以轻松地添加/删除[现有配置](configs/config_all.yaml)中的算子。
+* **用户友好**: 设计简单易用，提供全面的[文档](#documentation--文档)、简易[入门指南](#快速上手)和[演示配置](configs/)，并且可以轻松地添加/删除[现有配置](configs/config_all.yaml)中的算子。
 
 * **灵活 & 易扩展**: 支持大多数数据格式（如jsonl、parquet、csv等），并允许灵活组合算子。支持[自定义算子](docs/DeveloperGuide_ZH.md#构建自己的算子)，以执行定制化的数据处理。
 
@@ -164,7 +164,7 @@ streamlit run app.py
 
 ## Documentation | 文档
 
-* [Overall](README.md) | [概览](README_ZH.md)
+* [Overview](README.md) | [概览](README_ZH.md)
 * [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
 * [Configs](configs/README.md) | [配置系统](configs/README_ZH.md)
 * [Developer Guide](docs/DeveloperGuide.md) | [开发者指南](docs/DeveloperGuide_ZH.md)
