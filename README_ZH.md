@@ -1,4 +1,4 @@
-[**English**](https://github.com/alibaba/data-juicer) | 中文
+[**English**](README.md) | 中文
 
 # Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据
 
