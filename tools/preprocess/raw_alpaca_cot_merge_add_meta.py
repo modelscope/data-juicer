@@ -1,5 +1,5 @@
 # This tool is used for converting the raw Alpaca-Cot data downloaded
-# from Huggingface (ref: https://huggingface.co/QingyiSi/Alpaca-CoT)
+# from Huggingface (ref: https://huggingface.co/datasets/QingyiSi/Alpaca-CoT)
 # to several jsonl files.
 
 import os

@@ -53,7 +53,7 @@ Data-Juicer 是一个以数据为中心的文本处理系统，旨在为大语�
 
 * **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合实时多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行反馈循环。
 
-* **全面的处理菜谱**：为预训练、SFT、中英文等场景提供数十种[预构建的数据处理菜谱](configs/refine_recipe/README_ZH.md)。
+* **全面的处理菜谱**：为预训练、SFT、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。
 
 * **用户友好**：设计简单易用，提供全面的[文档](#documentation)、简易[入门指南](#快速上手)和[演示配置](configs/README_ZH.md)，并且可以轻松地添加/删除[现有配置](configs/config_all.yaml)中的算子。
 
@@ -185,10 +185,10 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 
 ## 数据处理菜谱
 
-* [BLOOM 数据处理菜谱](configs/bloom/README_ZH.md)
-* [RedPajama 数据处理菜谱](configs/redpajama/README_ZH.md)
-* [预训练数据增强菜谱](configs/refine_recipe/README_ZH.md)
-* [SFT数据增强菜谱](configs/refine_recipe/README_ZH.md#L32)
+* [BLOOM 数据处理菜谱](configs/reproduced_bloom/README_ZH.md)
+* [RedPajama 数据处理菜谱](configs/reproduced_redpajama/README_ZH.md)
+* [预训练数据增强菜谱](configs/data_juicer_recipes/README_ZH.md)
+* [SFT数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#完善前后的alpaca-cot数据集)
 
 ## 演示样例
 
@@ -200,7 +200,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 * 数据处理:
   * 科学文献 (例如 [ArXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)]
   * 编程代码 (例如 [TheStack](https://huggingface.co/datasets/bigcode/the-stack)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_code_data/summary)]
-  * 中文指令数据 (例如 [Alpaca-CoT](https://huggingface.co/QingyiSi/Alpaca-CoT)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/sft_data_zh/summary)]
+  * 中文指令数据 (例如 [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/sft_data_zh/summary)]
 * 工具池:
   * CommonCrawl 质量分类器 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/tool_quality_classifier/summary)]
   * 基于 [HELM](https://github.com/stanford-crfm/helm) 的自动评测 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/auto_evaluation_helm/summary)]

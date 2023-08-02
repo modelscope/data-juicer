@@ -8,7 +8,7 @@
 
 2. 将共享文件系统（例如NAS）挂载到上述机器上的相同路径（例如`/mnt/shared`）。
 
-3. 在共享文件系统中安装 data-juicer（例如 `/mnt/shared/code/data-juicer`）。
+3. 在共享文件系统中安装 Data-Juicer（例如 `/mnt/shared/code/data-juicer`）。
 
 4. 根据 [`thirdparty/README_ZH.md`](../../thirdparty/README_ZH.md) 在每台机器上安装第三方依赖项（Megatron-LM 和 HELM）。
 

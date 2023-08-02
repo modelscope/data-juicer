@@ -1,6 +1,6 @@
 # Preprocess Tools
 
-This folder contains some preprocess scripts for additional processing of your dataset before using data-juicer.
+This folder contains some preprocess scripts for additional processing of your dataset before using Data-Juicer.
 
 ## Usage
 
@@ -28,7 +28,7 @@ python tools/preprocess/dataset_split_by_language.py --help
 
 ### Convert raw arxiv data to jsonl
 
-This tool is used to convert the raw arxiv data downloaded from S3 into the jsonl format which is friendly to data-juicer.
+This tool is used to convert the raw arxiv data downloaded from S3 into the jsonl format which is friendly to Data-Juicer.
 
 
 
@@ -82,7 +82,7 @@ python tools/preprocess/raw_stackexchange_to_jsonl.py  --help
 
 Use `raw_alpaca_cot_merge_add_meta.py` to convert raw Alpaca-CoT data.
 
-This tool is used for converting the raw Alpaca-Cot data downloaded from [HuggingFace](https://huggingface.co/QingyiSi/Alpaca-CoT) to jsonl files.
+This tool is used for converting the raw Alpaca-Cot data downloaded from [HuggingFace](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT) to jsonl files.
 
 
 

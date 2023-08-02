@@ -8,7 +8,7 @@ Automatically evaluate your model and monitor changes of metrics during the trai
 
 2. Mount a shared file system (e.g., NAS) to the same path (e.g., `/mnt/shared`) on the above machines.
 
-3. Install data-juicer in the shared file system (e.g., `/mnt/shared/code/data-juicer`).
+3. Install Data-Juicer in the shared file system (e.g., `/mnt/shared/code/data-juicer`).
 
 4. Install thirdparty dependencies (Megatron-LM and HELM) accoroding to [`thirdparty/README.md`](../../thirdparty/README.md) on each machine.
 
