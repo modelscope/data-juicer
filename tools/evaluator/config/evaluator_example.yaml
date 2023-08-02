@@ -1,0 +1,33 @@
+auto_eval:
+  project_name: <your project name>
+  model_name: <your model name>
+  cache_dir: <path of cache dir>
+  megatron:
+    process_num: <number of process to run megatron>
+    megatron_home: <root dir of Megatron-LM>
+    checkpoint_path: <path of checkpoint dir>
+    tokenizer_type: <gpt2 or sentencepiece>
+    vocab_path: <path to vocab file>
+    merge_path: <path to merge file>
+    max_tokens: <max tokens in inference>
+    token_per_iteration: <billions tokens per iteraion>
+    # tokenizer_path: 
+    # log_path: <default is cache_path/megatron.log>
+  helm:
+    helm_spec_template_path: <path of helm spec template file>
+    helm_output_path: <path of helm output dir>
+    helm_env_name: <helm conda env name>
+  gpt_evaluation:
+    # openai config
+    openai_api_key: <your api key>
+    openai_organization: <your organization>
+    # files config
+    question_file: ./tools/eval/gpt_eval/config/question.jsonl
+    answer_file: <path to generated answer file>
+    baseline_file: ./tools/eval/gpt_eval/answer/openai/chatgpt.jsonl
+    prompt_file: ./tools/eval/gpt_eval/config/prompt.jsonl
+    reviewer_file: ./tools/eval/gpt_eval/config/reviewer.jsonl
+    result_file: <path to generated review file>
+  wandb:
+    project: <wandb project name>
+    base_url: <your wandb base url>

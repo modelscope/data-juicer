@@ -1,0 +1,148 @@
+# Process config example including:
+#   - all global arguments
+#   - all ops and their default arguments
+
+# global parameters
+project_name: 'all'                                         # project name for distinguish your configs
+dataset_path: '/path/to/your/dataset'                       # path to your dataset directory or file with weights(0.0-1.0), 1.0 as default.
+                                                            # Accepted format: 'weight1(optional) dataset1-path weight2(optional) dataset2-path '
+export_path: '/path/to/result/dataset.jsonl'                # path to processed result dataset. Supported suffixes include ['jsonl', 'json', 'parquet']
+export_shard_size: 0                                        # Shard size of exported dataset in Byte. In default, it's 0, which means export the whole dataset into only one file. If it's set a positive number, the exported dataset will be split into several dataset shards, and the max size of each shard won't larger than the export_shard_size
+np: 4                                                       # number of subprocess to process your dataset
+text_key_to_process: 'content'                              # the key name of field where the sample texts to be processed, e.g., `text`, `text.instruction`, `text.output`, ...'
+                                                            # Note: currently, we support specify only ONE key for each op, for cases requiring multiple keys, users can specify the op multiple times
+text_keys_to_load:                                          # the key name of field where the sample texts stored in the original data
+  - 'text'
+suffixes: []                                                # the suffix of files that will be read. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
+use_cache: true                                             # whether to use the cache management of hugging face datasets. It might take up lots of disk space when using cache
+ds_cache_dir: '~/.cache/huggingface/datasets'               # cache dir for hugging face datasets. In default it's the default cache dir "~/.cache/huggingface/datasets". If this argument is reset by users, it will override the default cache dir
+use_checkpoint: false                                       # whether to use the checkpoint management to save the latest version of dataset to work dir when processing. Rerun the same config will reload the checkpoint and skip ops before it. Cache will be disabled when using checkpoint. If args of ops before the checkpoint are changed, all ops will be rerun from the beginning.
+temp_dir: null                                              # the path to the temp directory to store intermediate caches when cache is disabled, these cache files will be removed on-the-fly. In default, it's None, so the temp dir will be specified by system. NOTICE: you should be caution when setting this argument because it might cause unexpected program behaviors when this path is set to an unsafe directory.
+open_tracer: false                                          # whether to open the tracer to trace the changes during process. It might take more time when opening tracer
+op_list_to_trace: []                                        # only ops in this list will be traced by tracer. If it's empty, all ops will be traced. Only available when tracer is opened.
+trace_num: 10                                               # number of samples to show the differences between datasets before and after each op. Only available when tracer is opened.
+
+# only for data analysis
+save_stats_in_one_file: false                               # whether to store all stats result into one file
+
+# process schedule: a list of several process operators with their arguments
+process:
+  # Mapper ops. Most of these ops need no arguments.
+  - clean_email_mapper:                                     # remove emails from text.
+  - clean_html_mapper:                                      # remove html formats form text.
+  - clean_ip_mapper:                                        # remove ip addresses from text.
+  - clean_links_mapper:                                     # remove web links from text.
+  - clean_copyright_mapper:                                 # remove copyright comments.
+  - expand_macro_mapper:                                    # expand macro definitions in Latex text.
+  - fix_unicode_mapper:                                     # fix unicode errors in text.
+  - punctuation_normalization_mapper:                       # normalize unicode punctuations to English punctuations.
+  - remove_bibliography_mapper:                             # remove bibliography from Latex text.
+  - remove_comments_mapper:                                 # remove comments from Latex text, code, etc.
+      doc_type: tex                                           # comment type you want to remove. Only support 'tex' for now.
+      inline: true                                            # whether to remove inline comments
+      multiline: true                                         # whether to remove multiline comments
+  - remove_header_mapper:                                   # remove header texts from Latex text.
+      drop_no_head: true                                      # whether to drop sample texts without headers
+  - remove_long_words_mapper:                               # remove much too long words from text.
+      min_len: 1                                              # the min word length to keep words.
+      max_len: 128                                            # the max word length to keep words.
+  - remove_specific_chars_mapper:                           # remove characters specified by users
+      chars_to_remove: '◆●■►▼▲▴∆▻▷❖♡□'                        # a string or a list including those characters that need to be removed
+  - remove_table_text_mapper:                               # remove possible table texts from text.
+      min_col: 2                                              # the min num of columns in tables to remove
+      max_col: 20                                             # the max num of columns in tables to remove
+  - remove_words_with_incorrect_substrings_mapper:          # remove words with incorrect substrings from text.
+      lang: en                                                # sample in which language
+      tokenization: false                                     # whether to use model to tokenize documents
+      substrings: ['http', 'www', '.com', 'href', '//']       # incorrect substrings to remove
+  - sentence_split_mapper:                                  # split text to sentences and join them with '\n'
+      lang: 'en'                                            # split text in what language
+  - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
+
+  # Filter ops
+  - alphanumeric_filter:                                    # filter text with alphabet/numeric ratio out of specific range.
+      tokenization: false                                     # Whether to count the ratio of alphanumeric to the total number of tokens.
+      min_ratio: 0.0                                          # the min ratio of filter range
+      max_ratio: 0.9                                          # the max ratio of filter range
+  - average_line_length_filter:                             # filter text with the average length of lines out of specific range.
+      min_len: 10                                             # the min length of filter range
+      max_len: 10000                                          # the max length of filter range
+  - character_repetition_filter:                            # filter text with the character repetition ratio out of specific range
+      rep_len: 10                                             # repetition length for char-level n-gram
+      min_ratio: 0.0                                          # the min ratio of filter range
+      max_ratio: 0.5                                          # the max ratio of filter range
+  - flagged_words_filter:                                   # filter text with the flagged-word ratio larger than a specific max value
+      lang: en                                                # consider flagged words in what language
+      tokenization: false                                     # whether to use model to tokenize documents
+      max_ratio: 0.0045                                       # the max ratio to filter text
+      flagged_words_dir: ./assets                             # directory to store flagged words dictionaries
+      use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
+      words_aug_group_sizes: [2]                              # the group size of words to augment
+      words_aug_join_char: ""                                 # the join char between words to augment
+  - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
+      lang: en                                                # keep text in what language
+      min_score: 0.8                                          # the min language scores to filter text
+  - maximum_line_length_filter:                             # filter text with the maximum length of lines out of specific range
+      min_len: 10                                             # the min length of filter range
+      max_len: 10000                                          # the max length of filter range
+  - perplexity_filter:                                      # filter text with perplexity score out of specific range
+      lang: en                                                # compute perplexity in what language
+      max_ppl: 1500                                           # the max perplexity score to filter text
+  - special_characters_filter:                              # filter text with special-char ratio out of specific range
+      min_ratio: 0.0                                          # the min ratio of filter range
+      max_ratio: 0.25                                         # the max ratio of filter range
+  - stopwords_filter:                                       # filter text with stopword ratio smaller than a specific min value
+      lang: en                                                # consider stopwords in what language
+      tokenization: false                                     # whether to use model to tokenize documents
+      min_ratio: 0.3                                          # the min ratio to filter text
+      stopwords_dir: ./assets                                 # directory to store stopwords dictionaries
+      use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
+      words_aug_group_sizes: [2]                              # the group size of words to augment
+      words_aug_join_char: ""                                 # the join char between words to augment
+  - text_length_filter:                                     # filter text with length out of specific range
+      min_len: 10                                             # the min length of filter range
+      max_len: 10000                                          # the max length of filter range
+  - words_num_filter:                                       # filter text with number of words out of specific range
+      lang: en                                                # sample in which language
+      tokenization: false                                     # whether to use model to tokenize documents
+      min_num: 10                                             # the min number of filter range
+      max_num: 10000                                          # the max number of filter range
+  - word_repetition_filter:                                 # filter text with the word repetition ratio out of specific range
+      lang: en                                                # sample in which language
+      tokenization: false                                     # whether to use model to tokenize documents
+      rep_len: 10                                             # repetition length for word-level n-gram
+      min_ratio: 0.0                                          # the min ratio of filter range
+      max_ratio: 0.5                                          # the max ratio of filter range
+  - suffix_filter:                                          # filter to keep samples with specified suffix.
+      suffixes: []                                            # the suffix of text that will be keep. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
+  - specified_field_filter:                                 # filter text with the specified field info out of specific range
+      text_key: ''                                          # the target key corresponding to multi-level field information need to be separated by '.'
+      target_value: []                                        # the range of specified field information corresponding to the samples that need to be retained
+  - specified_numeric_field_filter:                         # filter text with the specified numeric field info out of specific range
+      text_key: ''                                          # the target key corresponding to multi-level field information need to be separated by '.'
+      min_value: 0                                            # the min filter value in SpecifiedNumericField op
+      max_value: 10000                                        # the max filter value in SpecifiedNumericField op
+
+  # Deduplicator ops
+  - document_deduplicator:                                  # deduplicate text samples using md5 hashing exact matching method
+      lowercase: false                                        # whether to convert text to lower case
+      ignore_non_character: false                             # whether to ignore non-alphabet characters, including whitespaces, digits, and punctuations
+  - document_simhash_deduplicator:                          # deduplicate text samples using SimHash-LSH method
+      tokenization: space                                     # tokenization method for text. One of [space, punctuation, character]
+      window_size: 6                                          # window size of shingling
+      num_blocks: 6                                           # number of blocks in SimHash computing
+      hamming_distance: 4                                     # the max hamming distance to regard 2 samples as similar enough pair. Should be less than num_blocks always
+      lowercase: true                                         # whether to convert text to lower case
+      ignore_pattern: null                                    # whether to ignore sub-strings with specific pattern when computing simhash.
+
+  # Selector ops
+  - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
+      text_key: ''                                          # the target keys corresponding to multi-level field information need to be separated by '.'
+      top_ratio:                                              # ratio of selected top samples
+      topk:                                                   # number of selected top sample
+      reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
+  - frequency_specified_field_selector:                     # selector to select samples based on the sorted frequency of specified field value
+      text_key: ''                                          # the target keys corresponding to multi-level field information need to be separated by '.'
+      top_ratio:                                              # ratio of selected top specified field value
+      topk:                                                   # number of selected top specified field value
+      reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order

@@ -1,0 +1,13 @@
+fasttext
+kenlm @ http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/kenlm-master.zip
+sentencepiece
+scipy
+tabulate
+pandas
+ftfy
+emoji==2.2.0
+regex
+simhash-py
+selectolax
+nltk
+transformers

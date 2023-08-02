@@ -1,0 +1,40 @@
+project: <your wandb project name>
+base_url: <your wandb instance url>
+evals:
+  - eval_type: helm
+    model_name: llama-7b
+    source: file
+    token_num: 1000
+    eval_result:
+      mmlu:
+        EM: 0.345
+      raft:
+        EM: 0.583
+      imdb:
+        EM: 0.933
+      truthful_qa:
+        EM: 0.297
+      summarization_cnndm:
+        ROUGE-2: 0.149
+      summarization_xsum:
+        ROUGE-2: 0.127
+      boolq:
+        EM: 0.751
+      msmarco_trec:
+        NDCG@10: 0.482
+      msmarco_regular:
+        RR@10: 0.252
+      narrative_qa:
+        F1: 0.524
+      natural_qa_closedbook:
+        F1: 0.297
+      natural_qa_openbook_longans:
+        F1: 0.580
+      quac:
+        F1: 0.332
+      civil_comments:
+        EM: 0.578
+      hellaswag:
+        EM: 0.747
+      openbookqa:
+        EM: 0.574

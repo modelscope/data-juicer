@@ -1,0 +1,310 @@
+# Some code here has been modified from:
+# https://github.com/bigcode-project/bigcode-dataset/blob/main/near_deduplication/minhash_deduplication.py
+# --------------------------------------------------------
+
+import hashlib
+import struct
+from collections import defaultdict
+
+import numpy as np
+import regex
+from jsonargparse.typing import ClosedUnitInterval, PositiveInt
+from loguru import logger
+from scipy.integrate import quad as integrate
+from tqdm import tqdm
+
+from ..base_op import OPERATORS, Deduplicator
+from ..common.helper_func import UnionFind, split_on_whitespace
+
+MERSENNE_PRIME = np.uint64((1 << 61) - 1)
+MAX_HASH = np.uint64((1 << 32) - 1)
+
+
+def sha1_hash32(data):
+    """
+    Directly taken from datasketch package to avoid dependency.
+
+    Parameters
+    ----------
+    data : bytes
+
+    Returns
+    -------
+    int
+    """
+    return struct.unpack('<I', hashlib.sha1(data).digest()[:4])[0]
+
+
+def optimal_param(
+    threshold: float,
+    num_perm: int,
+    false_positive_weight: float = 0.5,
+    false_negative_weight: float = 0.5,
+):
+    """
+    Compute the optimal `MinHashLSH` parameter that minimizes the weighted sum
+    of probabilities of false positive and false negative, taken from
+    datasketch.
+
+    :param threshold: float. The threshold for similarity
+    :param num_perm: int. The number of permutations
+    :param false_positive_weight: float. The weight of false positive
+    :param false_negative_weight: float. The weight of false negative
+    :return: Tuple[int, int]. The optimal `b` and `r` parameters. The number of
+        bands, and the number of rows per band respectively
+    """
+
+    def false_positive_probability(th: float, band: int, rows: int):
+        """Source: `datasketch.lsh`"""
+
+        def proba(s):
+            return 1 - (1 - s**float(rows))**float(band)
+
+        a, _ = integrate(proba, 0.0, th)
+        return a
+
+    def false_negative_probability(th: float, band: int, rows: int):
+        """Source: `datasketch.lsh`"""
+
+        def proba(s):
+            return 1 - (1 - (1 - s**float(rows))**float(band))
+
+        a, _ = integrate(proba, th, 1.0)
+        return a
+
+    # object: minimize the weighted FP and FN ratio
+    min_error = float('inf')
+    opt = (0, 0)
+    for b in range(1, num_perm + 1):
+        max_r = int(num_perm / b)
+        for r in range(1, max_r + 1):
+            fp = false_positive_probability(threshold, b, r)
+            fn = false_negative_probability(threshold, b, r)
+            error = fp * false_positive_weight + fn * false_negative_weight
+            if error < min_error:
+                min_error = error
+                opt = (b, r)
+    return opt
+
+
+@OPERATORS.register_module('document_minhash_deduplicator')
+class DocumentMinhashDeduplicator(Deduplicator):
+    """
+    Deduplicator to deduplicate samples at document-level using MinHashLSH.
+
+    Different from simhash, minhash is stored as bytes, so they won't be
+    kept in the final dataset.
+    """
+
+    def __init__(
+        self,
+        tokenization: str = 'space',
+        window_size: PositiveInt = 5,
+        lowercase: bool = True,
+        ignore_pattern: str = None,
+        num_permutations: PositiveInt = 256,
+        jaccard_threshold: ClosedUnitInterval = 0.7,
+        num_bands: PositiveInt = None,
+        num_rows_per_band: PositiveInt = None,
+        *args,
+        **kwargs,
+    ):
+        """
+        Initialization method.
+
+        :param tokenization: tokenization method for sample texts. It
+            should be one of [space, punctuation, character]. For
+            English-like languages, we recommend to use 'space'. And for
+            Chinese-like languages, we recommend to use 'character'
+        :param window_size: window size of shingling
+        :param lowercase: whether to convert text to lower case first
+        :param ignore_pattern: whether to ignore sub-strings with
+            specific pattern when computing minhash
+        :param num_permutations: number of permutations in minhash
+            computing
+        :param jaccard_threshold: the min jaccard similarity threshold
+            in near-duplicate detection. When the jaccard similarity of
+            two sample texts is >= this threshold, they are regarded as
+            similar samples and this op will only keep one of them after
+            deduplication
+        :param num_bands: number of bands in LSH. Default it's None, and
+            it will be determined by an optimal params computation
+            algorithm by minimize the weighted sum of probs of False
+            Positives and False Negatives
+        :param num_rows_per_band: number of rows in each band in LSH.
+            Default it's None, and it will be determined by an optimal
+            params computation algorithm
+        """
+        super().__init__(*args, **kwargs)
+        # about minhash computation
+        self.tokenization = tokenization
+        self.window_size = window_size
+        self.lowercase = lowercase
+        self.ignore_pattern = ignore_pattern
+        if self.ignore_pattern:
+            self.ignore_pattern = regex.compile(self.ignore_pattern)
+
+        # check parameters
+        if self.ignore_pattern and self.tokenization == 'punctuation':
+            logger.warning('Be careful that tokenization with punctuations '
+                           'won\'t work if the ignore pattern includes '
+                           'punctuations.')
+
+        # about deduplication
+        self.num_permutation = num_permutations
+        self.jaccard_threshold = jaccard_threshold
+        self.num_bands = num_bands
+        self.num_rows_per_band = num_rows_per_band
+
+        # initialize deduplication parameters
+        # check number of bands and rows
+        if self.num_bands is None or self.num_rows_per_band is None:
+            self.num_bands, self.num_rows_per_band = optimal_param(
+                self.jaccard_threshold,
+                self.num_permutation,
+            )
+
+        # compute hash ranges and create hash tables
+        self.hash_ranges = [(i * self.num_rows_per_band,
+                             (i + 1) * self.num_rows_per_band)
+                            for i in range(self.num_bands)]
+        self.hash_tables = [defaultdict(set) for _ in range(self.num_bands)]
+
+        # generate permutations
+        gen = np.random.RandomState(seed=42)
+        self.perm_a, self.perm_b = np.array(
+            [(
+                gen.randint(1, MERSENNE_PRIME, dtype=np.uint64),
+                gen.randint(0, MERSENNE_PRIME, dtype=np.uint64),
+            ) for _ in range(self.num_permutation)],
+            dtype=np.uint64,
+        ).T
+
+    def compute_hash(self, sample):
+        """
+        Compute minhash values for the sample.
+
+        :param sample: input sample
+        :return: sample with minhash value.
+        """
+        # check if it's computed already
+        if 'minhash' in sample:
+            return sample
+
+        text = sample[self.text_key]
+
+        if self.lowercase:
+            text = text.lower()
+        if self.ignore_pattern:
+            text = self.ignore_pattern.sub('', text)
+
+        # get tokens for different tokenization method
+        tokens = set()
+        if self.tokenization == 'character':
+            tokens = {
+                str.encode(text[i:i + self.window_size])
+                for i in range(len(text) - self.window_size)
+            }
+        elif self.tokenization == 'punctuation':
+            tokens = self.punctuation_pattern.split(text)
+            tokens = {
+                str.encode(' '.join(tokens[i:i + self.window_size]))
+                for i in range(len(tokens) - self.window_size)
+            }
+        elif self.tokenization == 'space':
+            tokens = split_on_whitespace(text)
+            tokens = {
+                str.encode(' '.join(tokens[i:i + self.window_size]))
+                for i in range(len(tokens) - self.window_size)
+            }
+        else:
+            raise NotImplementedError(
+                f'Unimplemented tokenization method [{self.tokenization}]')
+
+        # compute minhash value
+        hv = np.array([sha1_hash32(token) for token in tokens],
+                      dtype=np.uint64)
+        phv = np.bitwise_and(
+            ((hv * np.tile(self.perm_a,
+                           (len(hv), 1)).T).T + self.perm_b) % MERSENNE_PRIME,
+            MAX_HASH)
+        hash_values = np.vstack([
+            phv,
+            np.ones(self.num_permutation, dtype=np.uint64) * MAX_HASH
+        ]).min(axis=0)
+        sample['minhash'] = [
+            bytes(hash_values[start:end].byteswap().data)
+            for start, end in self.hash_ranges
+        ]
+        return sample
+
+    def process(self, dataset, show_num=0):
+        """
+        For doc-level, dataset --> dataset.
+
+        :param dataset: input dataset
+        :param show_num: number of traced samples used when tracer is
+            open.
+        :return: deduplicated dataset and the sampled duplicate pairs.
+        """
+        # no need to deduplicate because too few samples
+        if len(dataset) <= 1:
+            return dataset, {}
+
+        minhashes = dataset['minhash']
+        # remove bytes minhash column otherwise unexpected error would occur
+        # when exporting the processed dataset
+        dataset = dataset.remove_columns(['minhash'])
+
+        # make clusters -- construct the minhash lookup tables of seg to ids
+        logger.info(f'Start clustering for {len(dataset)} samples...')
+        batch_size = 10000
+        for i in tqdm(range(0, len(minhashes), batch_size),
+                      dynamic_ncols=True,
+                      desc='Iterating MinHashes of samples...'):
+            batch = minhashes[i:i + batch_size]
+            for idx, hs in enumerate(batch):
+                for h, hashtable in zip(hs, self.hash_tables):
+                    hashtable[h].add(idx + i)
+
+        # using UnionFind set to union samples within the same clusters
+        union_find = UnionFind()
+        for table in tqdm(self.hash_tables,
+                          dynamic_ncols=True,
+                          desc='Clustering'):
+            for cluster in table.values():
+                if len(cluster) <= 1:
+                    continue
+                idx = min(cluster)
+                for x in cluster:
+                    union_find.union(x, idx)
+        logger.info(f'There are {len(set(union_find.parent.values()))} '
+                    f'clusters that includes multiple near-duplicate samples.')
+
+        # record the duplicate sample pairs
+        dup_pairs = {}
+        if show_num > 0:
+            for i in range(len(dataset)):
+                cluster_idx = union_find.find(i)
+                if cluster_idx not in dup_pairs and cluster_idx != i:
+                    dup_pairs[cluster_idx] = [
+                        dataset[cluster_idx],
+                        dataset[i],
+                    ]
+                if len(dup_pairs) >= show_num:
+                    break
+
+        # filtering -- only keep those samples whose parent index is itself,
+        # including:
+        # 1. samples that form a cluster by themselves
+        # 2. the first sample in a cluster that includes multiple samples
+        def _filter_minhash_dup_helper(sample, index):
+            return union_find.find(index) == index
+
+        dataset = dataset.filter(
+            _filter_minhash_dup_helper,
+            with_indices=True,
+        )
+        logger.info(f'Keep {len(dataset)} samples after MinHash dedup.')
+
+        return dataset, dup_pairs
