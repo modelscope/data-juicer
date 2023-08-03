@@ -2,7 +2,7 @@
 
 set -e
 
-WORKDIR=/home/data/gaodawei.gdw/stanford_alpaca
+WORKDIR='.'
 
 MODEL_TO_CONVERT=(
 )

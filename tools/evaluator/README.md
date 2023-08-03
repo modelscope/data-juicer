@@ -10,7 +10,7 @@ Automatically evaluate your model and monitor changes of metrics during the trai
 
 3. Install Data-Juicer in the shared file system (e.g., `/mnt/shared/code/data-juicer`).
 
-4. Install thirdparty dependencies (Megatron-LM and HELM) accoroding to [`thirdparty/README.md`](../../thirdparty/README.md) on each machine.
+4. Install thirdparty dependencies (Megatron-LM and HELM) accoroding to [thirdparty/README.md](../../thirdparty/README.md) on each machine.
 
 5. Prepare your dataset and tokenizer, preprocess your dataset with Megatron-LM into mmap format (see [README](../../thirdparty/Megatron-LM/README.md) of Megatron-LM for more details) in the shared file system (e.g., `/mnt/shared/dataset`).
 
@@ -18,7 +18,7 @@ Automatically evaluate your model and monitor changes of metrics during the trai
 
 ## Usage
 
-Use [`evaluator.py`](evaluator.py) to automatically evaluate your models with HELM and OpenAI API.
+Use [evaluator.py](evaluator.py) to automatically evaluate your models with HELM and OpenAI API.
 
 ```shell
 python tools/evaluator.py  \
@@ -26,9 +26,9 @@ python tools/evaluator.py  \
     --begin-iteration     <begin_iteration>     \
     [--end-iteration      <end_iteration>]      \
     [--iteration-interval <iteration_interval>] \
-    [--check-interval <check_interval>]   \
-    [--model-type     <model_type>]       \
-    [--eval-type      <eval_type>]        \
+    [--check-interval <check_interval>]         \
+    [--model-type     <model_type>]             \
+    [--eval-type      <eval_type>]
 ```
 
 - `config`: a yaml file containing various settings required to run the evaluation (see [Configuration](#configuration) for details)
@@ -41,13 +41,15 @@ python tools/evaluator.py  \
     - `huggingface`: evaluate HuggingFace model, only support gpt eval type
 - `eval-type`: type of the evaluation to run, support `helm` and `gpt` for now
     - `helm`: evaluate your model with HELM (default), you can change the benchmarks to run by modifying the helm specific template file
-    - `gpt`: evaluate your model with OpenAI API, more details can be found in `gpt_eval/README.md`
+    - `gpt`: evaluate your model with OpenAI API, more details can be found in [gpt_eval/README.md](gpt_eval/README.md).
 
 > e.g.,
-> `python evaluator.py --config <config_file> --begin-iteration 2000 --iteration-interval 1000 --check-interval 10`
-> will use HELM to evaluate a Megatron-LM checkpoint every 1000 iterations starting from iteration 2000, and check whether there is a new checkpoint meets the condition every 10 minutes
+> ```shell
+> python evaluator.py --config <config_file> --begin-iteration 2000 --iteration-interval 1000 --check-interval 10
+> ```
+> will use HELM to evaluate a Megatron-LM checkpoint every 1000 iterations starting from iteration 2000, and check whether there is a new checkpoint meets the condition every 10 minutes.
 
-After running the [`evaluator.py`](evaluator.py), you can use [`recorder/wandb_writer.py`](recorder/wandb_writer.py) to visualize the evaluation results, more details can be found in [`recorder/README.md`](recorder/README.md).
+After running the [evaluator.py](evaluator.py), you can use [recorder/wandb_writer.py](recorder/wandb_writer.py) to visualize the evaluation results, more details can be found in [recorder/README.md](recorder/README.md).
 
 ## Configuration
 

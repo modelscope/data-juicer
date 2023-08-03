@@ -2,18 +2,18 @@
 
 ## Quick Start
 
-1. Prepare your model and the baseline model
+1. Prepare your model and the baseline model.
     - your model: Huggingface and Megatron-LM format models are supported, other models will be supported in future releases
     - baseline model: Huggingface, Megatron-LM or OpenAI model
-    > Evaluating Megatron-LM models requires a customized Megatron-LM which is provided in [`thirdparty`](../../../thirdparty)
+    > Evaluating Megatron-LM models requires a customized Megatron-LM which is provided in [`thirdparty`](../../../thirdparty/).
 
-2. generate answers using [`answer_generator.py`](answer_generator.py) for both your model and the baseline model
-    1. prepare the benchmark dataset: the toolkit has provided Vicuna Bench([`config/question.jsonl`](./config/question.jsonl)), and you can create custom dataset to generate answers. The custom datasets must be a single file in jsonl format, and each json object in it contains 3 attributes:
+2. Generate answers using [`answer_generator.py`](answer_generator.py) for both your model and the baseline model.
+    1. Prepare the benchmark dataset. The toolkit has provided Vicuna Bench([`config/question.jsonl`](./config/question.jsonl)), and you can create custom dataset to generate answers. The custom datasets must be a single file in jsonl format, and each json object in it contains 3 attributes:
         - question_id: int type
         - text: the specific content of the question, string type
         - category: the type of the question, string type
 
-    2. build the config file (`config.yaml`): the format of the file is as follows:
+    2. Build the config file (`config.yaml`). The format of the file is as follows:
         ```yaml
         answer_generation:
           model_name: <str>
@@ -44,19 +44,19 @@
             model: <str> # the type of model，e.g., gpt-3.5-turbo
             max_retry: <int> # the maxium number of retries when api access fails
         ```
-    3. run the script
+    3. Run the script.
         ```shell
         python answer_generator.py --config <path to config.yaml>
         ```
 
-3. get OpenAI API evaluation result via [`gpt_evaluator.py`](gpt_evaluator.py)
-    1. prepare dependencies: make sure the following files are ready
+3. Get OpenAI API evaluation results via [`gpt_evaluator.py`](gpt_evaluator.py).
+    1. Prepare dependencies. Make sure the following files are ready:
         - question_file: the benchmark dataset file in previous step
         - answer_file: the answer file of your model in previous step
         - baseline_file: the answer file of the baseline model in previous step
         - prompt_file: a file contains multiple prompt templates, the toolkit has provided a sample file ([`config/prompt.json`](config/prompt.json))
         - reviewer_file: a file contains multiple reviewer templates (including the model type and other parameters used in the OpenAI api request)，the toolkit has provided a sample file ([`config/reviewer.json`](config/reviewer.jsonl))
-    2. build the config file (`config.yaml`): the format of the file is as follows:
+    2. Build the config file (`config.yaml`). The format of the file is as follows:
         ```yaml
         gpt_evaluation:
           openai_organization: <str>
@@ -68,7 +68,7 @@
           reviewer_file: <str>
           result_file: <str>    # path of the evaulation result
         ```
-    3. run the script
-    ```shell
+    3. Run the script.
+        ```shell
         python gpt_evaluator.py --config <path to config.yaml>
-    ```
+        ```
