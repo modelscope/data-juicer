@@ -134,6 +134,6 @@ python tools/preprocess/reformat_jsonl_nan_value.py           \
 python tools/preprocess/reformat_jsonl_nan_value.py --help
 ```
 
-- `src_dir`: 将此参数设置为存储数据集的路径，例如 `*.jsonl`.
+- `src_dir`: 将此参数设置为存储数据集的路径，例如 `*.jsonl`。
 - `target_dir`: 用于存储转换后的 jsonl 文件的结果目录。
 - `num_proc` (可选): worker 进程数量，默认为 1。

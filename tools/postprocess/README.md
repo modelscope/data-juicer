@@ -6,7 +6,7 @@ This folder contains some postprocess scripts for additional processing of your 
 
 ### Mix multiple datasets with optional weights
 
-Use `data_mixture.py` to mix multiple datasets.
+Use [data_mixture.py](data_mixture.py) to mix multiple datasets.
 
 This script will randomly select samples from every dataset and mix theses samples and export to a new_dataset.
 
@@ -29,4 +29,4 @@ python tools/postprocess/data_mixture.py  --help
 
 - e.g., `python tools/postprocess/data_mixture.py  --data_path  <w1> ds.jsonl <w2> ds_dir <w3> ds_file.json`
 
-**Note:** All datasets must have the same meta field, so we can use `datasets` to align their features.
+**Note:** All datasets must have the same meta field, so we can use [HuggingFace Datasets](https://huggingface.co/docs/datasets/index) to align their features.
