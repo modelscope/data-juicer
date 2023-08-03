@@ -41,7 +41,7 @@ python tools/evaluator.py  \
     - `huggingface`: evaluate HuggingFace model, only support gpt eval type
 - `eval-type`: type of the evaluation to run, support `helm` and `gpt` for now
     - `helm`: evaluate your model with HELM (default), you can change the benchmarks to run by modifying the helm specific template file
-    - `gpt`: evaluate your model with OpenAI API, more details can be found in [gpt_eval/README_ZH.md](gpt_eval/README_ZH.md).
+    - `gpt`: evaluate your model with OpenAI API, more details can be found in [gpt_eval/README.md](gpt_eval/README.md).
 
 > e.g.,
 > ```shell
