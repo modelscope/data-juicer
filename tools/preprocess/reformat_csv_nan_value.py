@@ -1,4 +1,4 @@
-# This tool is used for reformat csv or tsv files which may contain Nan values
+# This tool is used to reformat csv or tsv files which may contain Nan values
 # in some field to several jsonl files.
 
 import os

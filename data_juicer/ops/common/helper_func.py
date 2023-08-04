@@ -177,7 +177,7 @@ def get_sentences_from_document(document, model_func=None):
 
     :param document: document that need to split sentences
     :param model_func: function of sentence model, if specified, the
-        function will be used for split document into different
+        function will be used for spliting document into different
         sentences.
     :return: document with the sentences separated by '\\\\n'
     """
