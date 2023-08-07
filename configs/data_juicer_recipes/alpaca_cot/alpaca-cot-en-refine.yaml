@@ -16,19 +16,19 @@ process:
   - alphanumeric_filter: # 104636381
       tokenization: false
       min_ratio: 0.1  
-  - character_repetition_filter:    # 104630030
+  - character_repetition_filter: # 104630030
       rep_len: 10
       max_ratio: 0.6  
-  - flagged_words_filter:   # 104576967
+  - flagged_words_filter: # 104576967
       lang: en
       tokenization: true
       max_ratio: 0.017  
   - maximum_line_length_filter: # 104575811
       min_len: 20
-  - text_length_filter: #92673211
+  - text_length_filter: # 104573711
       min_len: 30 
 
-  - document_simhash_deduplicator:  # coming soon
+  - document_simhash_deduplicator:  # 72855345
       tokenization: space
       window_size: 3
       lowercase: true

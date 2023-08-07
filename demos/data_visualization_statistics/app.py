@@ -13,13 +13,14 @@ from data_juicer.ops.base_op import OPERATORS
 @st.cache_data
 def convert_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_csv().encode('utf-8')
+    return df.to_csv(encoding='utf_8_sig').encode('utf-8')
 
 
 @st.cache_data
 def convert_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_json(orient='records', lines=True).encode('utf-8')
+    return df.to_json(orient='records', lines=True,
+                      force_ascii=False).encode('utf-8')
 
 
 def pretty_out(d):
@@ -159,7 +160,7 @@ class Visualize:
             if len(original_imgs) > 0:
                 st.header('Histograms')
                 for img in original_imgs:
-                    st.image(img, output_format='png', use_column_width = True)
+                    st.image(img, output_format='png', use_column_width=True)
 
     @staticmethod
     def visualize():
