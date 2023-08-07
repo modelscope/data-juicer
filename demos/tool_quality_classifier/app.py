@@ -9,7 +9,7 @@ from quality_classifier.qc_utils import (init_spark, load_dataset, predict,
 
 @st.cache_data
 def install_jdk():
-    
+
     os.system('apt update')
     os.system('apt install -y default-jre')
     os.system('apt install -y default-jdk')
@@ -19,13 +19,14 @@ def install_jdk():
 @st.cache_data
 def convert_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_csv().encode('utf-8')
+    return df.to_csv(encoding='utf_8_sig').encode('utf-8')
 
 
 @st.cache_data
 def convert_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_json(orient='records', lines=True).encode('utf-8')
+    return df.to_json(orient='records', lines=True,
+                      force_ascii=False).encode('utf-8')
 
 
 @st.cache_resource
@@ -51,10 +52,11 @@ def st_predict(model, ds, tokenizer=None, keep_method='label'):
                    tokenizer=tokenizer,
                    keep_method=keep_method)
 
+
 def quality_classifier(dataset_file, model):
 
     del_file = False
-    
+
     logger.info('=========Stage: analyze original data=========')
     if dataset_file is not None:
         file_contents = dataset_file.getvalue()
@@ -119,12 +121,12 @@ class Visualize:
         col1, col2 = st.columns(2)
         with col1:
             dataset_file = st.file_uploader(
-                label='Upload you custom dataset(jsonl/parquet)',
+                label='Upload your custom dataset(jsonl/parquet)',
                 type=['json', 'jsonl', 'parquet'])
 
             st.text_input(label='Default Demo dataset',
                           disabled=True,
-                          key = 'default_demo_dataset',
+                          key='default_demo_dataset',
                           value='data/demo-dataset.jsonl')
         with col2:
             label = 'Select a quality classifier'

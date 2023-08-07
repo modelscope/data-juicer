@@ -16,6 +16,9 @@ streamlit run app.py
 - Data (`data`)
   - This folder contains some sample datasets.
 
+- Data process loop (`data_process_loop`)
+  - This demo analyzes and processes a dataset, providing a comparison of statistical information before and after the processing.
+
 - Data visualization diversity (`data_visualization_diversity`)
   - This demo analyzes the verb-noun structure of the SFT dataset and plots its diversity in sunburst format.
 
@@ -28,10 +31,12 @@ streamlit run app.py
 - Tool quality classifier (`tool_quality_classifier`)
   - This demo provides 3 text quality classifier to score the dataset.
 
+- Tool dataset splitting by language (`tool_dataset_splitting_by_language`)
+  - This demo splits a dataset to different sub-datasets by language.
+
 ## Demos Coming Soon
 - Overview scan
 - Auto evaluation helm
-- Data process loop
 - Data mixture
 - SFT data zh
 - Process sci data

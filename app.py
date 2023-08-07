@@ -10,11 +10,11 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 import yaml
 from loguru import logger
 
-import plotly.express as px
 from data_juicer.analysis.diversity_analysis import (DiversityAnalysis,
                                                      get_diversity,
                                                      prepare_diversity_model)
@@ -27,13 +27,14 @@ from data_juicer.utils.logger_utils import get_log_file_path
 @st.cache_data
 def convert_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_csv().encode('utf-8')
+    return df.to_csv(encoding='utf_8_sig').encode('utf-8')
 
 
 @st.cache_data
 def convert_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_json(orient='records', lines=True).encode('utf-8')
+    return df.to_json(orient='records', lines=True,
+                      force_ascii=False).encode('utf-8')
 
 
 @st.cache_data
@@ -136,7 +137,7 @@ def analyze_and_show_res():
             images_ori.append(os.path.join(analyzer.analysis_path, f_path))
 
     st.session_state.dataset = dataset
-    st.session_state.orginal_overall = analysis_res_ori
+    st.session_state.original_overall = analysis_res_ori
     st.session_state.original_imgs = images_ori
 
 
@@ -161,6 +162,8 @@ def process_and_show_res():
             cfg.export_path) + '_processed/data.jsonl'
         cfg_for_processed_data.text_keys_to_load = [cfg.text_key_to_process]
         analyzer = Analyser(cfg_for_processed_data)
+        analyzer.analysis_path = os.path.dirname(
+            cfg_for_processed_data.export_path) + '/analysis'
         analyzer.run()
         analysis_res_processed = pd.read_csv(
             os.path.join(analyzer.analysis_path, 'overall.csv'))
@@ -613,17 +616,16 @@ class Visualize:
             # initial_sidebar_state="expanded",
         )
 
-        readme_link = 'https://code.alibaba-inc.com/DAIL-LLM/' \
-                      'data_juicer/blob/master/README.md'
-
+        readme_link = 'https://github.com/alibaba/data-juicer'
         st.markdown(
-            '<div align = "center"> <font size = "70"> Data-Juicer </font> '
-            '</div>',
+            '<div align = "center"> <font size = "70"> Data-Juicer \
+            </font> </div>',
             unsafe_allow_html=True,
         )
         st.markdown(
-            f'<div align = "center"> A Dataset Preparation System for Large Models, \
-                see more detail in <a href={readme_link}>Readme</a></div>',
+            f'<div align = "center"> A Data-Centric Text Processing System for \
+                Large Language Models, \
+                see more details in our <a href={readme_link}>page</a></div>',
             unsafe_allow_html=True,
         )
 
@@ -638,11 +640,12 @@ class Visualize:
             with col1:
                 example_cfg_f = os.path.abspath(
                     os.path.join(os.path.dirname(__file__),
-                                 './configs/demo.yaml'))
+                                 './configs/demo/process.yaml'))
                 st.text_area(label='(i) Input Cfg Commands',
                              key='input_cfg_cmd',
                              value=f'--config {example_cfg_f}')
-                example_my_cmd = '--dataset_path ./demo/demo-dataset.jsonl ' \
+                example_my_cmd = '--dataset_path ' \
+                                 './demos/data/demo-dataset.jsonl ' \
                                  '--export_path '\
                                  './outputs/demo/demo-processed.jsonl'
 
@@ -695,7 +698,7 @@ class Visualize:
                 with st.spinner('Wait for process...'):
                     process_and_show_res()
 
-            orginal_overall = st.session_state.get('orginal_overall', None)
+            original_overall = st.session_state.get('original_overall', None)
             original_imgs = st.session_state.get('original_imgs', [])
             processed_overall = st.session_state.get('processed_overall', None)
             processed_imgs = st.session_state.get('processed_imgs', [])
@@ -703,7 +706,7 @@ class Visualize:
             col1, col2 = st.columns(2)
             with col1:
                 st.caption('Original Data')
-                st.dataframe(orginal_overall, use_container_width=True)
+                st.dataframe(original_overall, use_container_width=True)
                 for img in original_imgs:
                     st.image(img, output_format='png')
 

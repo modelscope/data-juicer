@@ -13,10 +13,10 @@ process:
       lowercase: true # whether to convert text to lower case
       ignore_non_character: true
 
-  - alphanumeric_filter:  # 16957388
+  - alphanumeric_filter: # 16957388
       tokenization: false
       min_ratio: 0.10  
-  - character_repetition_filter: #  16956845
+  - character_repetition_filter: # 16956845
       rep_len: 10
       max_ratio: 0.6  
   - flagged_words_filter: # 16954629
