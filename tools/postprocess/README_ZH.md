@@ -29,3 +29,24 @@ python tools/postprocess/data_mixture.py  --help
 - 例，`python tools/postprocess/data_mixture.py  --data_path  <w1> ds.jsonl <w2> ds_dir <w3> ds_file.json`
 
 **注意事项:** 所有数据集必须具有相同的元字段，从而可以使用 [HuggingFace Datasets](https://huggingface.co/docs/datasets/index) 来对齐它们的特征。
+
+### 反序列化 jsonl 文件中的元字段
+
+该工具通常和 [serialize_meta.py](../preprocess/serialize_meta.py) 配合使用，将指定字段反序列化为原始格式。
+
+```shell
+python tools/postprocess/deserialize_meta.py           \
+    --src_dir           <src_dir>         \
+    --target_dir        <target_dir>      \
+    --serialized_key    <serialized_key>  \
+    --num_proc          <num_proc>
+
+# get help
+python tools/postprocess/deserialize_meta.py --help
+```
+- `src_dir`: 存储原始 jsonl 文件的路径。
+- `target_dir`: 保存转换后的 jsonl 文件的路径。
+- `serialized_key`: 将被反序列化的字段对应的 key, 默认为“source_info”。.
+- `num_proc` (optional): worker 进程数量，默认为 1
+
+**注意事项:** 经过反序列化后原始文件中所有被序列化的字段都会放在`‘serialized_key’`中，这样做是为了保证 data-juicer 处理后生成的字段不会和原有的元字段冲突。

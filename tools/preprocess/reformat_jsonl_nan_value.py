@@ -1,4 +1,4 @@
-# This tool is used for reformat jsonl files which may have Nan values
+# This tool is used to reformat jsonl files which may have Nan values
 # in some field.
 
 import os

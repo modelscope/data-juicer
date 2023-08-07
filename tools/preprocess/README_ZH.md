@@ -137,3 +137,25 @@ python tools/preprocess/reformat_jsonl_nan_value.py --help
 - `src_dir`: 将此参数设置为存储数据集的路径，例如 `*.jsonl`。
 - `target_dir`: 用于存储转换后的 jsonl 文件的结果目录。
 - `num_proc` (可选): worker 进程数量，默认为 1。
+
+### 序列化 jsonl 文件中的元字段
+
+在一些jsonl文件中，不同的样本可能有不同的meta字段，甚至同一个meta字段中的数据类型也可能不同，这会导致使用 [HuggingFace Dataset](https://huggingface.co/docs/datasets/index) 读取数据集失败。 该工具用于将这些jsonl文件中除 `text_key` 之外的所有元字段序列化为字符串，以方便后续的Data-juicer处理。 数据集处理后，通常需要配合使用 [deserialize_meta.py](../postprocess/deserialize_meta.py) 对其进行反序列化。
+
+
+```shell
+python tools/preprocess/serialize_meta.py           \
+    --src_dir           <src_dir>         \
+    --target_dir        <target_dir>      \
+    --text_key          <text_key>        \
+    --serialized_key    <serialized_key>  \
+    --num_proc          <num_proc>
+
+# get help
+python tools/preprocess/serialize_meta.py --help
+```
+- `src_dir`: 存储原始 jsonl 文件的路径。
+- `target_dir`: 保存转换后的 jsonl 文件的路径。
+- `text_key`: 不会被序列化的字段对应的 key, 默认为 “text”。
+- `serialized_key`: 序列化后的信息保存的字段对应的 key, 默认为 “source_info”。
+- `num_proc` (可选): worker 进程数量，默认为 1

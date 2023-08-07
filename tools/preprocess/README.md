@@ -99,9 +99,9 @@ python tools/preprocess/raw_alpaca_cot_merge_add_meta.py --help
 - `target_dir`: result directory to store the converted jsonl files.
 - `num_proc` (optional): number of process workers. Default it's 1.
 
-### reformat csv or tsv file
+### Reformat csv or tsv file
 
-This tool is used for reformat csv or tsv files which may have Nan values in some field to several jsonl files.
+This tool is used to reformat csv or tsv files which may have Nan values in some field to several jsonl files.
 
 
 
@@ -120,13 +120,13 @@ python tools/preprocess/reformat_csv_nan_value.py --help
 - `src_dir`: you just need to set this argument to the path which stores filenames are like `*.csv` or `*.tsv`.
 - `target_dir`: result directory to store the converted jsonl files.
 - `suffixes`: what kind of suffixes you want to process, multi-suffixes args like  `--suffixes '.tsv', '.csv'`.
-- `is_tsv`: if true, sep will be set to `\t`, otherwize `,` as default.
+- `is_tsv`: if true, sep will be set to `'\t'`, otherwize `','` as default.
 - `keep_default_na`: if False, strings will be parsed as NaN, otherwise only the default NaN values are used for parsing.
 - `num_proc` (optional): number of process workers. Default it's 1.
 
-### reformat jsonl file
+### Reformat jsonl file
 
-This tool is used for reformat jsonl files which may have Nan values in some field.
+This tool is used to reformat jsonl files which may have Nan values in some field.
 
 
 
@@ -141,4 +141,28 @@ python tools/preprocess/reformat_jsonl_nan_value.py --help
 ```
 - `src_dir`: you just need to set this argument to the path which stores filenames are like `*.jsonl`.
 - `target_dir`: result directory to store the converted jsonl files.
+- `num_proc` (optional): number of process workers. Default it's 1.
+
+
+### Serialize meta fields in jsonl file
+
+In some jsonl files, different samples may have different meta fields, and even the data types in the same meta field may be different, which will cause failure to read the dataset using [HuggingFace Dataset](https://huggingface.co/docs/datasets/index). This tool is used to serialize all meta fields except `text_key` in these jsonl files into strings to facilitate subsequent Data-juicer processing. After the dataset is processed, it usually needs to be deserialized using [deserialize_meta.py](../postprocess/deserialize_meta.py).
+
+
+
+```shell
+python tools/preprocess/serialize_meta.py           \
+    --src_dir           <src_dir>         \
+    --target_dir        <target_dir>      \
+    --text_key          <text_key>        \
+    --serialized_key    <serialized_key>  \
+    --num_proc          <num_proc>
+
+# get help
+python tools/preprocess/serialize_meta.py --help
+```
+- `src_dir`: path to store jsonl files.
+- `target_dir`: path to save the converted jsonl files.
+- `text_key`: the key corresponding to the field that will not be serialized. Defaul it's 'text'.
+- `serialized_key`: the key corresponding to the field that the serialized info saved. Default it's 'source_info'.
 - `num_proc` (optional): number of process workers. Default it's 1.
