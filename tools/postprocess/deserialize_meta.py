@@ -18,7 +18,7 @@ def fp_iter(src_dir):
 
 def meta_deserialize(file_name, target_file, serialized_key):
     """
-    Unerialize the specified field into dict.
+    Deserialize the specified field into dict.
     :param file_name: path to source jsonl files.
     :param target_file: path to store the converted jsonl files.
     :param serialized_key: the key corresponding to the field that will be
