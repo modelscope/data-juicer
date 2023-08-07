@@ -28,10 +28,10 @@ streamlit run app.py
 - Data visualization statistics (`data_visualization_statistics`)
   - This demo analyzes the dataset and obtain up to 13 statistics.
 
-- Tool quality classifier (`tool_quality_classifier`)
+- Text quality classifier (`tool_quality_classifier`)
   - This demo provides 3 text quality classifier to score the dataset.
 
-- Tool dataset splitting by language (`tool_dataset_splitting_by_language`)
+- Dataset splitting by language (`tool_dataset_splitting_by_language`)
   - This demo splits a dataset to different sub-datasets by language.
 
 ## Demos Coming Soon
