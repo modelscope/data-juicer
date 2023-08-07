@@ -31,7 +31,7 @@ streamlit run app.py
 - 文本质量打分器 (`tool_quality_classifier`)
   - 该示例提供了3种文本质量打分器， 对数据集进行打分评估。
 
-- 多语言分割数据集 (`tool_dataset_splitting_by_language`)
+- 按语言分割数据集 (`tool_dataset_splitting_by_language`)
   - 该示例按照语言将数据集拆分为不同的子数据集。
 
 ## 即将上线的的演示
