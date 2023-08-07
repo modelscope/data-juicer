@@ -46,7 +46,9 @@ python tools/postprocess/deserialize_meta.py           \
 # get help
 python tools/postprocess/deserialize_meta.py --help
 ```
-- `src_dir`: path thats stores jsonl files.
+- `src_dir`: path to store jsonl files.
 - `target_dir`: path to save the converted jsonl files.
 - `serialized_key`: the key corresponding to the field that will be deserialized. Default it's 'source_info'.
 - `num_proc` (optional): number of process workers. Default it's 1.
+
+**Note:** After deserialization, all serialized fields in the original file will be placed in `'serialized_key'`, this is to ensure that the fields generated after data-juicer processing will not conflict with the original meta fields.

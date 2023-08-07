@@ -48,3 +48,5 @@ python tools/postprocess/deserialize_meta.py --help
 - `target_dir`: 保存转换后的 jsonl 文件的路径。
 - `serialized_key`: 将被反序列化的字段对应的 key, 默认为“source_info”。.
 - `num_proc` (optional): worker 进程数量，默认为 1
+
+**注意事项:** 经过反序列化后原始文件中所有被序列化的字段都会放在`‘serialized_key’`中，这样做是为了保证 data-juicer 处理后生成的字段不会和原有的元字段冲突。

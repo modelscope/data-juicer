@@ -1,9 +1,10 @@
-import os
 import json
+import os
 import pathlib
-import jsonlines
 from multiprocessing import Pool
+
 import fire
+import jsonlines
 
 
 def fp_iter(src_dir):
@@ -29,12 +30,17 @@ def meta_serialize(file_name, target_file, text_key, serialized_key):
         target = {}
         with jsonlines.open(file_name, 'r') as fr:
             for obj in fr:
-                target[text_key] = obj.pop(text_key)
+                for key in text_key:
+                    target[key] = obj.pop(key)
                 target[serialized_key] = json.dumps(obj, ensure_ascii=False)
                 fw.write(json.dumps(target, ensure_ascii=False) + '\n')
 
 
-def main(src_dir, target_dir, text_key='text', serialized_key='source_info', num_proc=1):
+def main(src_dir,
+         target_dir,
+         text_key='text',
+         serialized_key='source_info',
+         num_proc=1):
     """
     Serialize all the fields in the jsonl file except the fields specified
     by users to ensure that the jsonl file with inconsistent text format
@@ -48,7 +54,17 @@ def main(src_dir, target_dir, text_key='text', serialized_key='source_info', num
     :param num_proc: number of process worke. Default it's 1.
     """
 
-    assert text_key != serialized_key, "text_key cannot be the same as serialized_key."
+    assert isinstance(
+        text_key, str) or isinstance(text_key, list) or isinstance(
+            text_key, tuple), 'text_key must be a string, list or tuple.'
+
+    if isinstance(text_key, str):
+        text_key = [text_key]
+
+    for key in text_key:
+        assert key != serialized_key, "text_key '{}' cannot be the same as serialized_key.".format(
+            key)
+
     # check if the source directory exists
     if not os.path.exists(src_dir):
         raise ValueError('The raw source data directory does not exist,'
@@ -60,7 +76,8 @@ def main(src_dir, target_dir, text_key='text', serialized_key='source_info', num
     for fp in fp_iter(src_dir):
         print(fp)
         jsonl_fp = os.path.join(target_dir, fp.name)
-        pool.apply_async(meta_serialize, args=(str(fp), jsonl_fp, text_key, serialized_key))
+        pool.apply_async(meta_serialize,
+                         args=(str(fp), jsonl_fp, text_key, serialized_key))
 
     pool.close()
     pool.join()
