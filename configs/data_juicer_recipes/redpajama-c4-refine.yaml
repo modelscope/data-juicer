@@ -42,3 +42,11 @@ process:
       tokenization: true
       rep_len: 10
       max_ratio: 0.231  # 3sigma
+
+  - document_simhash_deduplicator:
+      tokenization: space
+      window_size: 6
+      lowercase: true
+      ignore_pattern: '\p{P}'
+      num_blocks: 6
+      hamming_distance: 4
