@@ -16,6 +16,9 @@ streamlit run app.py
 - Data (`data`)
   - This folder contains some sample datasets.
 
+- Overview scan (`overview_scan`)
+  - This demo introduces the basic concepts and functions of Data-Juicer, such as features, configuration, operators, and so on.
+
 - Data process loop (`data_process_loop`)
   - This demo analyzes and processes a dataset, providing a comparison of statistical information before and after the processing.
 
@@ -28,17 +31,20 @@ streamlit run app.py
 - Data visualization statistics (`data_visualization_statistics`)
   - This demo analyzes the dataset and obtain up to 13 statistics.
 
+- Process SFT Chinese data (`process_sft_zh_data`)
+  - This demos analyzes and processes part of Chinese dataset in Alpaca-CoT to show how to process IFT or SFT data for LLM fine-tuning.
+
+- Process SCI data (`process_sci_data`)
+  - This demos analyzes and processes part of arXiv dataset to show how to process scientific literature data for LLM pre-training.
+
+- Process code data (`process_code_data`)
+  - This demos analyzes and processes part of Stack-Exchange dataset to show how to process code data for LLM pre-training.
+
 - Text quality classifier (`tool_quality_classifier`)
   - This demo provides 3 text quality classifier to score the dataset.
 
 - Dataset splitting by language (`tool_dataset_splitting_by_language`)
   - This demo splits a dataset to different sub-datasets by language.
 
-## Demos Coming Soon
-- Overview scan
-- Auto evaluation helm
-- Data mixture
-- SFT data zh
-- Process sci data
-- Process code data
-- Data process hpo
+- Data mixture (`data_mixture`)
+  - This demo selects and mixes samples from multiple datasets and exports them into a new dataset.
