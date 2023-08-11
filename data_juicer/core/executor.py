@@ -166,6 +166,17 @@ class Executor:
 
         # 4. data export
         logger.info('Exporting dataset to disk...')
-        self.exporter.export(dataset)
+        try:
+            self.exporter.export(dataset)
+        except:  # noqa: E722
+            logger.error(f'An error occurred during exporting the processed '
+                         f'dataset.')
+            import traceback
+            traceback.print_exc()
+            if self.cfg.use_checkpoint:
+                logger.info('Writing checkpoint of dataset processed by '
+                            'last op...')
+                dataset.cleanup_cache_files()
+                self.ckpt_manager.save_ckpt(dataset)
 
         return dataset
