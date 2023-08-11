@@ -266,6 +266,18 @@ def init_setup_from_cfg(cfg):
             cfg.add_suffix = True
             break
 
+    # Apply text_key modification during initializing configs
+    # users can freely specify text_key for different ops using `text_key`
+    # otherwise, set arg text_key of each op to text_key_to_process
+    for op in cfg.process:
+        for op_name in op:
+            args = op[op_name]
+            if args is None:
+                args = {'text_key': cfg.text_key_to_process}
+            elif args['text_key'] is None:
+                args['text_key'] = cfg.text_key_to_process
+            op[op_name] = args
+
     return cfg
 
 

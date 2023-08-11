@@ -14,12 +14,6 @@ def load_ops(process_list, text_key='text'):
     ops = []
     for process in process_list:
         op_name, args = list(process.items())[0]
-
-        # users can freely specify text_key for different ops
-        if args is None:
-            args = {'text_key': text_key}
-        elif args['text_key'] is None:
-            args['text_key'] = text_key
         ops.append(OPERATORS.modules[op_name](**args))
 
     return ops
