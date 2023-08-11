@@ -3,6 +3,8 @@ from multiprocessing import Pool
 
 from loguru import logger
 
+from data_juicer.utils.constant import Fields
+
 
 class Exporter:
     """The Exporter class is used to export a dataset to files of specific
@@ -147,9 +149,9 @@ class Exporter:
                 pool.close()
                 pool.join()
 
-        if 'stats' in dataset.features and export_stats:
+        if Fields.stats in dataset.features and export_stats:
             # export stats of datasets into a single file.
-            ds_stats = dataset.select_columns('stats').flatten()
+            ds_stats = dataset.select_columns(Fields.stats)
             stats_file = export_path.replace('.' + suffix, '_stats.jsonl')
             Exporter.to_jsonl(ds_stats, stats_file)
 

@@ -6,6 +6,7 @@ from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
 from data_juicer.format import load_formatter
 from data_juicer.ops import Filter, load_ops
+from data_juicer.utils.constant import Fields
 
 from .exporter import Exporter
 
@@ -77,11 +78,11 @@ class Analyser:
         for op_cfg, op in zip(self.cfg.process, self.ops):
             op_name = list(op_cfg.keys())[0]
             if isinstance(op, Filter):
-                if 'stats' not in dataset.features:
+                if Fields.stats not in dataset.features:
                     # TODO:
                     # this is a temp solution,
                     # only add stats when calling filter op
-                    dataset = dataset.add_column(name='stats',
+                    dataset = dataset.add_column(name=Fields.stats,
                                                  column=[{}] *
                                                  dataset.num_rows)
                 dataset = dataset.map(op.compute_stats,
@@ -94,7 +95,7 @@ class Analyser:
             return dataset
 
         # 3. analysis and output result to the export path
-        # 3.1. Only consider fields in 'stats'
+        # 3.1. Only consider fields in Fields.stats
         # 3.2. For string fields, only consider its histogram
         # 3.3. For numeric fields, consider its histogram and box
         # 3.4. Otherwise, DO NOT analyse

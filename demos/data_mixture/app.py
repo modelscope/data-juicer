@@ -14,14 +14,14 @@ else:
 @st.cache_data
 def convert_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_csv(encoding='utf_8_sig').encode('utf-8')
+    return df.to_csv().encode('utf_8_sig')
 
 
 @st.cache_data
 def convert_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_json(orient='records', lines=True,
-                      force_ascii=False).encode('utf-8')
+                      force_ascii=False).encode('utf_8_sig')
 
 
 class Visualize:

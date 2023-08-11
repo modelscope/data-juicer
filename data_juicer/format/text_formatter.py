@@ -4,6 +4,7 @@ from multiprocessing import Pool
 import pdfplumber
 from datasets import Dataset, concatenate_datasets, load_dataset
 from docx import Document
+from jsonargparse import Namespace
 from loguru import logger
 
 from data_juicer.utils.cache_utils import DATA_JUICER_CACHE_HOME
@@ -96,7 +97,9 @@ class TextFormatter(LocalFormatter):
         self.dataset_path = dataset_path
         self.add_suffix = add_suffix
 
-    def load_dataset(self, num_proc: int = 1) -> Dataset:
+    def load_dataset(self,
+                     num_proc: int = 1,
+                     global_cfg: Namespace = None) -> Dataset:
         """
         Load a dataset from local text-type files.
 
@@ -154,4 +157,7 @@ class TextFormatter(LocalFormatter):
             datasets = concatenate_datasets([ds for _, ds in datasets.items()])
         return unify_format(datasets,
                             text_keys_to_load=self.text_keys_to_load,
-                            num_proc=num_proc)
+                            text_key_to_process=global_cfg.text_key_to_process
+                            if global_cfg else None,
+                            num_proc=num_proc,
+                            global_cfg=global_cfg)

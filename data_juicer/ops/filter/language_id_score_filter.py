@@ -1,6 +1,7 @@
 from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
+from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -32,7 +33,8 @@ class LanguageIDScoreFilter(Filter):
 
     def compute_stats(self, sample):
         # check if it's computed already
-        if 'lang' in sample['stats'] and 'lang_score' in sample['stats']:
+        if StatsKeys.lang in sample[
+                Fields.stats] and StatsKeys.lang_score in sample[Fields.stats]:
             return sample
 
         text = sample[self.text_key].lower().replace('\n', ' ')
@@ -45,14 +47,14 @@ class LanguageIDScoreFilter(Filter):
         lang_id = pred[0][0].replace('__label__', '')
         lang_score = pred[1][0]
 
-        sample['stats']['lang'] = lang_id
-        sample['stats']['lang_score'] = lang_score
+        sample[Fields.stats][StatsKeys.lang] = lang_id
+        sample[Fields.stats][StatsKeys.lang_score] = lang_score
 
         return sample
 
     def process(self, sample):
         if self.lang:
-            return sample['stats']['lang'] == self.lang \
-                   and sample['stats']['lang_score'] >= self.min_score
+            return sample[Fields.stats][StatsKeys.lang] == self.lang \
+                   and sample[Fields.stats][StatsKeys.lang_score] >= self.min_score
         else:
-            return sample['stats']['lang_score'] >= self.min_score
+            return sample[Fields.stats][StatsKeys.lang_score] >= self.min_score

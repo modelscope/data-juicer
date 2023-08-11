@@ -9,10 +9,16 @@ from dataset_splitting_by_language import main as split_dataset_by_language
 
 
 @st.cache_data
+def convert_csv(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf_8_sig')
+
+
+@st.cache_data
 def convert_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_json(orient='records', lines=True,
-                      force_ascii=False).encode('utf-8-sig')
+                      force_ascii=False).encode('utf_8_sig')
 
 
 def split_dataset(dataset_file, target_dir):

@@ -79,8 +79,8 @@ def init_configs(args=None):
                         'each op, for cases requiring multiple keys, users can'
                         ' specify the op multiple times')
     parser.add_argument('--text_keys_to_load',
-                        type=Union[List[str], Tuple[str]],
-                        default=['text'],
+                        type=Union[List[str], Tuple[str], str],
+                        default='deprecated',
                         help='Key name of field where the sample '
                         'texts stored in the original data')
     parser.add_argument('--suffixes',

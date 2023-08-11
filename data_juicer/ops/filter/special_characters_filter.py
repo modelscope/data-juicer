@@ -4,6 +4,8 @@
 
 from jsonargparse.typing import ClosedUnitInterval
 
+from data_juicer.utils.constant import Fields, StatsKeys
+
 from ..base_op import OPERATORS, Filter
 from ..common import SPECIAL_CHARACTERS
 
@@ -36,11 +38,11 @@ class SpecialCharactersFilter(Filter):
 
     def compute_stats(self, sample):
         # check if it's computed already
-        if 'special_char_ratio' in sample['stats']:
+        if StatsKeys.special_char_ratio in sample[Fields.stats]:
             return sample
 
         # get ratio of special characters
-        sample['stats']['special_char_ratio'] = (
+        sample[Fields.stats][StatsKeys.special_char_ratio] = (
             len([c
                  for c in sample[self.text_key] if c in SPECIAL_CHARACTERS]) /
             len(sample[self.text_key])) if len(
@@ -48,7 +50,7 @@ class SpecialCharactersFilter(Filter):
         return sample
 
     def process(self, sample):
-        if self.min_ratio <= sample['stats']['special_char_ratio'] \
+        if self.min_ratio <= sample[Fields.stats][StatsKeys.special_char_ratio] \
                 <= self.max_ratio:
             return True
         else:

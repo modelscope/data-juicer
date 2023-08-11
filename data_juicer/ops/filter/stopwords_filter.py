@@ -4,9 +4,10 @@
 
 from jsonargparse.typing import ClosedUnitInterval, List
 
+from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
+from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
-from ...utils.asset_utils import ASSET_DIR, load_words_asset
 from ..base_op import OPERATORS, Filter
 from ..common import SPECIAL_CHARACTERS, get_words_from_document
 
@@ -64,7 +65,7 @@ class StopWordsFilter(Filter):
 
     def compute_stats(self, sample):
         # check if it's computed already
-        if 'stopwords_ratio' in sample['stats']:
+        if StatsKeys.stopwords_ratio in sample[Fields.stats]:
             return sample
 
         tokenizer = MODEL_ZOO.get(self.model_key, None)
@@ -85,8 +86,9 @@ class StopWordsFilter(Filter):
         if stopwords_ratio > 1.0:
             stopwords_ratio = 1.0
 
-        sample['stats']['stopwords_ratio'] = stopwords_ratio
+        sample[Fields.stats][StatsKeys.stopwords_ratio] = stopwords_ratio
         return sample
 
     def process(self, sample):
-        return sample['stats']['stopwords_ratio'] >= self.min_ratio
+        return sample[Fields.stats][
+            StatsKeys.stopwords_ratio] >= self.min_ratio

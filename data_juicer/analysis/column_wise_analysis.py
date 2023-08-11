@@ -4,6 +4,8 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from data_juicer.utils.constant import Fields
+
 from .overall_analysis import OverallAnalysis
 
 
@@ -64,7 +66,7 @@ class ColumnWiseAnalysis:
         :param save_stats_in_one_file: whether save all analysis figures of all
             stats into one image file
         """
-        self.stats = pd.DataFrame(dataset['stats'])
+        self.stats = pd.DataFrame(dataset[Fields.stats])
         self.output_path = output_path
         if not os.path.exists(self.output_path):
             os.makedirs(self.output_path)

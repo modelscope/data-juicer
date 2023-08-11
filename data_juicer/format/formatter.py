@@ -5,6 +5,7 @@ from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 from jsonargparse import Namespace
 from loguru import logger
 
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (find_files_with_suffix,
                                           is_absolute_path)
 from data_juicer.utils.registry import Registry
@@ -78,6 +79,8 @@ class LocalFormatter(BaseFormatter):
             datasets = concatenate_datasets([ds for _, ds in datasets.items()])
         ds = unify_format(datasets,
                           text_keys_to_load=self.text_keys_to_load,
+                          text_key_to_process=global_cfg.text_key_to_process
+                          if global_cfg else None,
                           num_proc=num_proc,
                           global_cfg=global_cfg)
         return ds
@@ -119,6 +122,7 @@ class RemoteFormatter(BaseFormatter):
                           **self.kwargs)
         ds = unify_format(ds,
                           text_keys_to_load=self.text_keys_to_load,
+                          text_key_to_process=global_cfg.text_key_to_process,
                           num_proc=num_proc,
                           global_cfg=global_cfg)
         return ds
@@ -133,10 +137,9 @@ def add_suffixes(datasets: DatasetDict) -> Dataset:
     """
     logger.info('Add suffix column for dataset')
     for key, ds in datasets.items():
-        if 'suffix' in ds.features:
-            ds = ds.rename_column('suffix', '__original__suffix')
-        datasets[key] = ds.add_column(name='suffix',
-                                      column=['.' + key] * ds.num_rows)
+        if Fields.suffix not in ds.features:
+            datasets[key] = ds.add_column(name=Fields.suffix,
+                                          column=['.' + key] * ds.num_rows)
     datasets = concatenate_datasets([ds for _, ds in datasets.items()])
     return datasets
 
@@ -161,25 +164,17 @@ def rename_ops_args_text_key(cfg, original_text_key, target_text_key):
 
 def unify_format(
     dataset: Dataset,
-    text_keys_to_load: List[str] = None,
+    text_keys_to_load: List[str] = 'deprecated',
+    text_key_to_process: str = 'text',
     num_proc: int = 1,
     global_cfg: Namespace = None,
 ) -> Dataset:
     """
     Get an unified internal format, conduct the following modifications.
 
-    1. based on the given keys, unifying the key name of sample text to
-
-        1.1. 'text' (for single column case)
-
-        1.2. 'text.keys[0]', 'text.keys[i]', ... (for multiple column case)
+    1. based on the given keys, checking the key name of sample
 
     2. filter out those samples with empty or None text
-
-    3. combining all remaining fields except 'stats' into meta related fields,
-       users can access them by ds['meta'], ds['meta']['xx'], or ds['meta.xx']
-
-    4. add 'stats' field into dataset
 
     As a result, the dataset will being with the unified format such as:
 
@@ -189,14 +184,16 @@ def unify_format(
     >>>     "meta": {"date": 2012}
     >>>     'meta.src": "customized",
     >>>     "meta.version": "0.1",
-    >>>     'stats': {
+    >>>     Fields.stats: {
     >>>         "lang": "en",
     >>>         "lang_score": 0.965
     >>>     }
     >>> }
 
     :param dataset: input dataset
-    :param text_keys_to_load: original text key(s) of dataset
+    :param text_keys_to_load: original text key(s) of dataset, `deprecated`
+    :param text_key_to_process: key name of field where the sample
+        text to be processed,
     :param num_proc: number of processes for mapping
     :param global_cfg: the global cfg used in consequent processes,
         since cfg.text_key_to_process may need to be modified after unifying
@@ -212,69 +209,38 @@ def unify_format(
                                          'processing data with ' \
                                          "'huggingface-Dataset format'"
 
-    if text_keys_to_load is None:
-        text_keys_to_load = ['text']
+    if text_keys_to_load != 'deprecated':
+        logger.warning('`text_keys_to_load` was deprecated, '
+            'you can use text_key_to_process instead.')
+        text_key_to_process = text_keys_to_load
+
+    if text_key_to_process is None:
+        text_key_to_process = ['text']
+
+    if isinstance(text_key_to_process, str):
+        text_key_to_process = [text_key_to_process]
+
     logger.info('Unifying the input dataset formats...')
-    final_text_related_keys = set()
 
     from data_juicer.core.data import NestedDataset
     dataset = NestedDataset(dataset)
 
-    # 1. unify text related keys
-    for key in text_keys_to_load:
+    # 1. check text related keys
+    for key in text_key_to_process:
         if key not in dataset.features:
             err_msg = f'There is no key [{key}] in dataset. You might set ' \
                       f'wrong text_key in the config file for your dataset. ' \
                       f'Please check and retry!'
             logger.error(err_msg)
             raise ValueError(err_msg)
-        # 1.1 (single-column case)
-        if len(text_keys_to_load) == 1:
-            # rename the specified key into 'text'
-            if 'text' not in dataset.features:
-                dataset = dataset.rename_column(key, 'text')
-                rename_ops_args_text_key(global_cfg, key, 'text')
-                logger.info(f'The field `{key}` has been renamed into `text`')
-                if global_cfg and key == global_cfg.text_key_to_process:
-                    global_cfg.text_key_to_process = 'text'
-            elif key == 'text':  # text' in dataset.features
-                # There is 'text' field, we regard it as the real text field.
-                # DO NOT need to unify
-                pass
-            else:  # if 'text' in dataset.features and keys[0] != 'text'
-                # There is 'text' field, but we need another field as the
-                # real text field.
-                # We need to put the original 'text' field into meta and
-                # rename this key field to 'text' field
-                dataset = dataset.rename_column('text', 'text.original')
-                rename_ops_args_text_key(global_cfg, 'text', 'text.original')
-                logger.info('The field `text` has been renamed into '
-                            '`text.original`')
-                if global_cfg and 'text' == global_cfg.text_key_to_process:
-                    global_cfg.text_key_to_process = 'text.original'
-                dataset = dataset.rename_column(key, 'text')
-                rename_ops_args_text_key(global_cfg, key, 'text')
-                logger.info(f'The field `{key}` has been renamed into `text`')
-                if global_cfg and key == global_cfg.text_key_to_process:
-                    global_cfg.text_key_to_process = 'text'
-                final_text_related_keys.add('text.original')
-            # Finally, the dataset contains a column named 'text'
-            final_text_related_keys.add('text')
-        else:
-            # 1.2 (multiple-column case)
-            dataset = dataset.rename_column(key, f'text.{key}')
-            rename_ops_args_text_key(global_cfg, key, f'text.{key}')
-            logger.info(f'The field `{key}` has been renamed into '
-                        f'`text.{key}`')
-            if global_cfg and key == global_cfg.text_key_to_process:
-                global_cfg.text_key_to_process = f'text.{key}'
-            final_text_related_keys.add(f'text.{key}')
+
+    # update cfg
+    if global_cfg:
+        global_cfg.text_key_to_process = text_key_to_process[0]
 
     # 2. filter out those samples with empty or None text
     # TODO: optimize the filtering operation for better efficiency
     logger.info(f'There are {len(dataset)} sample(s) in the original dataset.')
-
-    dataset.cleanup_cache_files()
 
     def non_empty_text(sample, target_keys):
         for target_key in target_keys:
@@ -288,33 +254,17 @@ def unify_format(
     dataset = dataset.filter(
         non_empty_text,
         num_proc=num_proc,
-        fn_kwargs={'target_keys': list(final_text_related_keys)})
+        fn_kwargs={'target_keys': list(text_key_to_process)})
     logger.info(f'{len(dataset)} samples left after filtering empty text.')
-    dataset.cleanup_cache_files()
-
-    # 3. combine other fields with 'meta' prefix
-    # 3.1 the original 'meta' field will be remained,
-    # 3.2 the 'stats' field will be reserved as a dict
-    remain_root_keys = set(dataset.features.keys()) - set(
-        final_text_related_keys) - {'stats'} - {'meta'}
-    for key in remain_root_keys:
-        dataset = dataset.rename_column(key, f'meta.{key}')
-        logger.info(f'The field `{key}` has been renamed into `meta.{key}`')
-    dataset.cleanup_cache_files()
-
-    if 'stats' in set(dataset.features.keys()) - set(
-            final_text_related_keys) and \
-            not isinstance(dataset.features['stats'], dict):
-        # put the original non-dict field into meta
-        dataset = dataset.rename_column('stats', 'meta.stats')
 
     dataset.cleanup_cache_files()
-    # 4. add 'stats' field
+
+    # 3. add Fields.stats field
     # TODO:
     # this is a temp solution,
     # it will occur errors when only call mapper ops
     # dataset = dataset.add_column( \
-    # name='stats', column=[{}] * dataset.num_rows)
+    # name=Fields.stats, column=[{}] * dataset.num_rows)
 
     return dataset
 

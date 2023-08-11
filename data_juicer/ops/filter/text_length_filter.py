@@ -2,6 +2,8 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
+from data_juicer.utils.constant import Fields, StatsKeys
+
 from ..base_op import OPERATORS, Filter
 
 
@@ -33,14 +35,15 @@ class TextLengthFilter(Filter):
 
     def compute_stats(self, sample):
         # check if it's computed already
-        if 'text_len' in sample['stats']:
+        if StatsKeys.text_len in sample[Fields.stats]:
             return sample
 
-        sample['stats']['text_len'] = len(sample[self.text_key])
+        sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
         return sample
 
     def process(self, sample):
-        if self.min_len <= sample['stats']['text_len'] <= self.max_len:
+        if self.min_len <= sample[Fields.stats][
+                StatsKeys.text_len] <= self.max_len:
             return True
         else:
             return False

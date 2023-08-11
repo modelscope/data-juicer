@@ -14,19 +14,20 @@ import yaml
 from data_juicer.config import init_configs
 from data_juicer.core import Analyser
 from data_juicer.ops.base_op import OPERATORS
+from data_juicer.utils.constant import Fields, StatsKeys
 
 
 @st.cache_data
 def convert_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_csv(encoding='utf_8_sig').encode('utf-8')
+    return df.to_csv().encode('utf_8_sig')
 
 
 @st.cache_data
 def convert_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_json(orient='records', lines=True,
-                      force_ascii=False).encode('utf-8')
+                      force_ascii=False).encode('utf_8_sig')
 
 
 def pretty_out(d):
@@ -130,18 +131,19 @@ def get_min_max_step(data):
 
 
 op_stats_dict = {
-    'alphanumeric_filter': ['alpha_token_ratio', 'alnum_ratio'],
-    'average_line_length_filter': ['avg_line_length'],
-    'character_repetition_filter': ['char_rep_ratio'],
-    'flagged_words_filter': ['flagged_words_ratio'],
-    'language_id_score_filter': ['lang', 'lang_score'],
-    'maximum_line_length_filter': ['max_line_length'],
-    'perplexity_filter': ['perplexity'],
-    'special_characters_filter': ['special_char_ratio'],
-    'stopwords_filter': ['stopwords_ratio'],
-    'text_length_filter': ['text_len'],
-    'words_num_filter': ['num_words'],
-    'word_repetition_filter': ['word_rep_ratio'],
+    'alphanumeric_filter':
+    [StatsKeys.alpha_token_ratio, StatsKeys.alnum_ratio],
+    'average_line_length_filter': [StatsKeys.avg_line_length],
+    'character_repetition_filter': [StatsKeys.char_rep_ratio],
+    'flagged_words_filter': [StatsKeys.flagged_words_ratio],
+    'language_id_score_filter': [StatsKeys.lang, StatsKeys.lang_score],
+    'maximum_line_length_filter': [StatsKeys.max_line_length],
+    'perplexity_filter': [StatsKeys.perplexity],
+    'special_characters_filter': [StatsKeys.special_char_ratio],
+    'stopwords_filter': [StatsKeys.stopwords_ratio],
+    'text_length_filter': [StatsKeys.text_len],
+    'words_num_filter': [StatsKeys.num_words],
+    'word_repetition_filter': [StatsKeys.word_rep_ratio],
 }
 
 
@@ -308,21 +310,19 @@ class Visualize:
 
     @staticmethod
     def filter_dataset(dataset):
+
         text = dataset['text']
-        if 'stats' not in dataset.features:
-            stats = pd.DataFrame(dataset['stats.meta'])
-        else:
-            stats = pd.DataFrame(dataset['stats'])
+        stats = pd.DataFrame(dataset[Fields.stats])
         stats['text'] = text
 
-        non_num_list = ['lang']
+        non_num_list = [StatsKeys.lang]
         min_cutoff_list = [
-            'lang_score',
-            'stopwords_ratio',
+            StatsKeys.lang_score,
+            StatsKeys.stopwords_ratio,
         ]
         max_cutoff_list = [
-            'flagged_words_ratio',
-            'max_ppl',
+            StatsKeys.flagged_words_ratio,
+            StatsKeys.perplexity,
         ]
         mask_list = ['text']
 

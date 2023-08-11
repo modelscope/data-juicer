@@ -11,6 +11,7 @@ from loguru import logger
 from data_juicer.format import load_formatter
 from data_juicer.ops.filter.language_id_score_filter import \
     LanguageIDScoreFilter
+from data_juicer.utils.constant import Fields, StatsKeys
 
 
 def keep_by_lang(sample, lang):
@@ -20,7 +21,7 @@ def keep_by_lang(sample, lang):
     :param lang: the specified language
     :return: True to keep,  False to discard
     """
-    if sample['stats']['lang'] == lang:
+    if sample[Fields.stats][StatsKeys.lang] == lang:
         return True
     return False
 
@@ -60,17 +61,17 @@ def main(src_dir,
 
     op = LanguageIDScoreFilter(text_key=tmp_cfg['text_key_to_process'])
 
-    if 'stats' not in dataset.features:
+    if Fields.stats not in dataset.features:
         # TODO:
         # this is a temp solution,
         # only add stats when calling filter op
-        dataset = dataset.add_column(name='stats',
+        dataset = dataset.add_column(name=Fields.stats,
                                      column=[{}] * dataset.num_rows)
 
     # identify language
     dataset = dataset.map(op.compute_stats, num_proc=num_proc)
 
-    langs = pd.DataFrame(dataset['stats'])['lang']
+    langs = pd.DataFrame(dataset[Fields.stats])[StatsKeys.lang]
     unique_langs = list(set(langs))
 
     logger.info(f'There are {len(dataset)} in dataset')

@@ -2,6 +2,7 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
+from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -45,11 +46,11 @@ class WordNumFilter(Filter):
 
     def compute_stats(self, sample):
         # check if it's computed already
-        if 'num_words' in sample['stats']:
+        if StatsKeys.num_words in sample[Fields.stats]:
             return sample
 
         tokenizer = MODEL_ZOO.get(self.model_key, None)
-        sample['stats']['num_words'] = len(
+        sample[Fields.stats][StatsKeys.num_words] = len(
             get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None,
@@ -58,7 +59,8 @@ class WordNumFilter(Filter):
         return sample
 
     def process(self, sample):
-        if self.min_num <= sample['stats']['num_words'] <= self.max_num:
+        if self.min_num <= sample[Fields.stats][
+                StatsKeys.num_words] <= self.max_num:
             return True
         else:
             return False
