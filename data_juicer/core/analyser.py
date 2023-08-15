@@ -69,7 +69,7 @@ class Analyser:
 
         # extract processes
         logger.info('Preparing process operators...')
-        self.ops = load_ops(self.cfg.process, self.cfg.text_key_to_process)
+        self.cfg.process, self.ops = load_ops(self.cfg.process, self.cfg.op_fusion)
 
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')

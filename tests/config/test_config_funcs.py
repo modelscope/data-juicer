@@ -48,7 +48,7 @@ class ConfigTest(unittest.TestCase):
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
-            op_from_cfg = load_ops(cfg.process, cfg.text_key_to_process)
+            _, op_from_cfg = load_ops(cfg.process)
             self.assertTrue(len(op_from_cfg) == 3)
 
     def test_mixture_cfg(self):

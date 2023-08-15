@@ -141,6 +141,13 @@ def init_configs(args=None):
                         help='Number of samples extracted by tracer to show '
                         'the dataset difference before and after a op. '
                         'Only available when open_tracer is true.')
+    parser.add_argument('--op_fusion',
+                        type=bool,
+                        default=False,
+                        help='Whether to fuse operators that share the same '
+                             'intermediate variables. Op fusion might reduce '
+                             'the memory requirements and speed up the whole '
+                             'process.')
     parser.add_argument(
         '--process',
         type=List[Dict],
@@ -253,6 +260,10 @@ def init_setup_from_cfg(cfg):
         if cfg.temp_dir is not None and not os.path.exists(cfg.temp_dir):
             os.makedirs(cfg.temp_dir, exist_ok=True)
         tempfile.tempdir = cfg.temp_dir
+
+    # The checkpoint mode is not compatible with op fusion for now.
+    if cfg.op_fusion:
+        cfg.use_checkpoint = False
 
     # reset huggingface datasets cache directory
     from datasets import config

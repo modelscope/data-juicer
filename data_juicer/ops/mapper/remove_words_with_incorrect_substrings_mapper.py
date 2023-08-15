@@ -46,8 +46,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
             tokenizer = MODEL_ZOO.get(self.model_key, None)
             sentences = get_words_from_document(
                 sample[self.text_key],
-                token_func=tokenizer.encode_as_pieces if tokenizer else None,
-                lower_case=False)
+                token_func=tokenizer.encode_as_pieces if tokenizer else None)
             words = [
                 word.replace('▁', '') for word in sentences
                 if self.should_keep_word_with_incorrect_substrings(

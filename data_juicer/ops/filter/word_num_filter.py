@@ -5,10 +5,13 @@ from jsonargparse.typing import PositiveInt
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
-from ..common import SPECIAL_CHARACTERS, get_words_from_document
+from ..op_fusion import INTER_WORDS
+from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
+                      words_refinement)
 
 
 @OPERATORS.register_module('words_num_filter')
+@INTER_WORDS.register_module('words_num_filter')
 class WordNumFilter(Filter):
     """Filter to keep samples with total words number within a specific
     range."""
@@ -43,18 +46,23 @@ class WordNumFilter(Filter):
             self.model_key = prepare_model(lang=lang,
                                            model_type='sentencepiece')
 
-    def compute_stats(self, sample):
+    def compute_stats(self, sample, context=False):
         # check if it's computed already
         if 'num_words' in sample['stats']:
             return sample
 
-        tokenizer = MODEL_ZOO.get(self.model_key, None)
-        sample['stats']['num_words'] = len(
-            get_words_from_document(
+        words_key = f'words-{self.model_key}'
+        if context and words_key in sample['__dj__context__']:
+            words = sample['__dj__context__'][words_key]
+        else:
+            tokenizer = MODEL_ZOO.get(self.model_key, None)
+            words = get_words_from_document(
                 sample[self.text_key],
-                token_func=tokenizer.encode_as_pieces if tokenizer else None,
-                lower_case=False,
-                strip_chars=SPECIAL_CHARACTERS))
+                token_func=tokenizer.encode_as_pieces if tokenizer else None)
+            if context:
+                sample['__dj__context__'][words_key] = words
+        words = words_refinement(words, strip_chars=SPECIAL_CHARACTERS)
+        sample['stats']['num_words'] = len(words)
         return sample
 
     def process(self, sample):

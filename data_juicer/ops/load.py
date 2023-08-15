@@ -1,14 +1,14 @@
 from .base_op import OPERATORS
+from .op_fusion import fuse_operators
 
-
-def load_ops(process_list, text_key='text'):
+def load_ops(process_list, op_fusion=False):
     """
     Load op list according to the process list from config file.
 
     :param process_list: A process list. Each item is an op name and its
         arguments.
-    :param text_key: the key name of field that stores sample texts to
-        be processed
+    :param op_fusion: whether to fuse ops that share the same intermediate
+        variables.
     :return: The op instance list.
     """
     ops = []
@@ -16,4 +16,8 @@ def load_ops(process_list, text_key='text'):
         op_name, args = list(process.items())[0]
         ops.append(OPERATORS.modules[op_name](**args))
 
-    return ops
+    # detect filter groups
+    if op_fusion:
+        process_list, ops = fuse_operators(process_list, ops)
+
+    return process_list, ops

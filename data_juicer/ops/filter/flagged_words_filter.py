@@ -8,10 +8,13 @@ from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ...utils.asset_utils import ASSET_DIR, load_words_asset
 from ..base_op import OPERATORS, Filter
-from ..common import SPECIAL_CHARACTERS, get_words_from_document
+from ..op_fusion import INTER_WORDS
+from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
+                      words_refinement)
 
 
 @OPERATORS.register_module('flagged_words_filter')
+@INTER_WORDS.register_module('flagged_words_filter')
 class FlaggedWordFilter(Filter):
     """Filter to keep samples with flagged-word ratio less than a specific max
     value."""
@@ -64,15 +67,41 @@ class FlaggedWordFilter(Filter):
             self.model_key = prepare_model(lang=lang,
                                            model_type='sentencepiece')
 
-    def compute_stats(self, sample):
+    def compute_stats(self, sample, context=False):
         # check if it's computed already
         if 'flagged_words_ratio' in sample['stats']:
             return sample
 
-        tokenizer = MODEL_ZOO.get(self.model_key, None)
-        words = get_words_from_document(
-            sample[self.text_key],
-            token_func=tokenizer.encode_as_pieces if tokenizer else None,
+        words_key = f'words-{self.model_key}'
+        if context and words_key in sample['__dj__context__']:
+            words = sample['__dj__context__'][words_key]
+        else:
+            tokenizer = MODEL_ZOO.get(self.model_key, None)
+            words = get_words_from_document(
+                sample[self.text_key],
+                token_func=tokenizer.encode_as_pieces if tokenizer else None)
+            if context:
+                sample['__dj__context__'][words_key] = words
+
+        # refined_words_key = f'refined-words-True-SPECIAL_CHARS-' \
+        #                     f'{self.use_words_aug}-' \
+        #                     f'{self.words_aug_group_sizes}-' \
+        #                     f'{self.words_aug_join_char}'
+        # if context and refined_words_key in sample['__dj__context__']:
+        #     words = sample['__dj__context__'][refined_words_key]
+        # else:
+        #     words = words_refinement(
+        #         words,
+        #         lower_case=True,
+        #         strip_chars=SPECIAL_CHARACTERS,
+        #         use_words_aug=self.use_words_aug,
+        #         words_aug_group_sizes=self.words_aug_group_sizes,
+        #         words_aug_join_char=self.words_aug_join_char)
+        #     if context:
+        #         sample['__dj__context__'][refined_words_key] = words
+        words = words_refinement(
+            words,
+            lower_case=True,
             strip_chars=SPECIAL_CHARACTERS,
             use_words_aug=self.use_words_aug,
             words_aug_group_sizes=self.words_aug_group_sizes,
