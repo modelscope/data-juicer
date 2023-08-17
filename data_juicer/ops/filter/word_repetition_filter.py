@@ -56,6 +56,7 @@ class WordRepetitionFilter(Filter):
         if 'word_rep_ratio' in sample['stats']:
             return sample
 
+        # try to get words from context
         words_key = f'words-{self.model_key}'
         if context and words_key in sample['__dj__context__']:
             words = sample['__dj__context__'][words_key]
@@ -66,20 +67,18 @@ class WordRepetitionFilter(Filter):
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)
             if context:
                 sample['__dj__context__'][words_key] = words
-        # refined_words_key = f'refined-words-True-SPECIAL_CHARS-False-[2]-'
-        # if context and refined_words_key in sample['__dj__context__']:
-        #     words = sample['__dj__context__'][refined_words_key]
-        # else:
-        #     words = words_refinement(
-        #         words,
-        #         lower_case=True,
-        #         strip_chars=SPECIAL_CHARACTERS)
-        #     if context:
-        #         sample['__dj__context__'][refined_words_key] = words
-        words = words_refinement(
-            words,
-            lower_case=True,
-            strip_chars=SPECIAL_CHARACTERS)
+
+        # try to get refined words from context
+        refined_words_key = f'refined-words-True-SPECIAL_CHARS-False-[2]-'
+        if context and refined_words_key in sample['__dj__context__']:
+            words = sample['__dj__context__'][refined_words_key]
+        else:
+            words = words_refinement(
+                words,
+                lower_case=True,
+                strip_chars=SPECIAL_CHARACTERS)
+            if context:
+                sample['__dj__context__'][refined_words_key] = words
         word_ngrams = [
             ' '.join(words[i:i + self.n])
             for i in range(len(words) - self.n + 1)

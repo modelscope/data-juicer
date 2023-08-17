@@ -70,6 +70,7 @@ class StopWordsFilter(Filter):
         if 'stopwords_ratio' in sample['stats']:
             return sample
 
+        # try to get words from context
         words_key = f'words-{self.model_key}'
         if context and words_key in sample['__dj__context__']:
             words = sample['__dj__context__'][words_key]
@@ -80,29 +81,24 @@ class StopWordsFilter(Filter):
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)
             if context:
                 sample['__dj__context__'][words_key] = words
-        # refined_words_key = f'refined-words-True-SPECIAL_CHARS-' \
-        #                     f'{self.use_words_aug}-' \
-        #                     f'{self.words_aug_group_sizes}-' \
-        #                     f'{self.words_aug_join_char}'
-        # if context and refined_words_key in sample['__dj__context__']:
-        #     words = sample['__dj__context__'][refined_words_key]
-        # else:
-        #     words = words_refinement(
-        #         words,
-        #         lower_case=True,
-        #         strip_chars=SPECIAL_CHARACTERS,
-        #         use_words_aug=self.use_words_aug,
-        #         words_aug_group_sizes=self.words_aug_group_sizes,
-        #         words_aug_join_char=self.words_aug_join_char)
-        #     if context:
-        #         sample['__dj__context__'][refined_words_key] = words
-        words = words_refinement(
-            words,
-            lower_case=True,
-            strip_chars=SPECIAL_CHARACTERS,
-            use_words_aug=self.use_words_aug,
-            words_aug_group_sizes=self.words_aug_group_sizes,
-            words_aug_join_char=self.words_aug_join_char)
+
+        # try to get refined words from context
+        refined_words_key = f'refined-words-True-SPECIAL_CHARS-' \
+                            f'{self.use_words_aug}-' \
+                            f'{self.words_aug_group_sizes}-' \
+                            f'{self.words_aug_join_char}'
+        if context and refined_words_key in sample['__dj__context__']:
+            words = sample['__dj__context__'][refined_words_key]
+        else:
+            words = words_refinement(
+                words,
+                lower_case=True,
+                strip_chars=SPECIAL_CHARACTERS,
+                use_words_aug=self.use_words_aug,
+                words_aug_group_sizes=self.words_aug_group_sizes,
+                words_aug_join_char=self.words_aug_join_char)
+            if context:
+                sample['__dj__context__'][refined_words_key] = words
 
         stopwords_ratio = (
                 len([word for word in words
