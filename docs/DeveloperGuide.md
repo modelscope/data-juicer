@@ -35,7 +35,15 @@ git commit -m "xxxx"
 - Before implementing a new op, please refer to [Operators](Operators.md) to avoid unnecessary duplication.
 - Assuming we want to add a new Filter operator called "TextLengthFilter" to get corpus of expected text length, we can follow these steps to build it.
 
-1. Create a new op file `text_length_filter.py` in the corresponding `data_juicer/ops/filter/` directory as follows.
+1. (Optional) Add a new StatsKeys in `data_juicer/utils/constant.py` when you want to reuse a intermediate variable.
+
+```python
+class StatsKeys(object):
+    ...              # other keys
+    text_len = 'text_len'
+```
+
+2. Create a new op file `text_length_filter.py` in the corresponding `data_juicer/ops/filter/` directory as follows.
    - Because it's a Filter op, so the new op needs to inherit from the basic `Filter` class in the `base_op.py`, and be decorated with `OPERATORS` to register itself automatically.
 
 ```python
@@ -89,14 +97,14 @@ class TextLengthFilter(Filter):
             return False
 ```
 
-2. After implemention, add it to the op dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
+3. After implemention, add it to the op dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
 
 ```python
 from . import (...,              # other ops
                text_length_filter)  # import this new op module
 ```
 
-3. Now you can use this new op with custom arguments in your own config files!
+4. Now you can use this new op with custom arguments in your own config files!
 
 ```yaml
 # other configs
@@ -109,7 +117,7 @@ process:
       max_len: 1000
 ```
 
-4. (Strongly Recommend) It's better to add corresponding tests for your own ops. For `TextLengthFilter` above, you would like to add `test_text_length_filter.py` into `tests/ops/filter/` directory as below.
+5. (Strongly Recommend) It's better to add corresponding tests for your own ops. For `TextLengthFilter` above, you would like to add `test_text_length_filter.py` into `tests/ops/filter/` directory as below.
 
 ```python
 import unittest

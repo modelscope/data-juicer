@@ -82,7 +82,9 @@ def init_configs(args=None):
                         type=Union[List[str], Tuple[str], str],
                         default='deprecated',
                         help='Key name of field where the sample '
-                        'texts stored in the original data')
+                        'texts stored in the original data. '
+                        '`text_keys_to_load` was deprecated, '
+                        'you can use `text_key_to_process` instead')
     parser.add_argument('--suffixes',
                         type=Union[str, List[str], Tuple[str]],
                         default=[],

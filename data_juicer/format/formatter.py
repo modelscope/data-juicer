@@ -122,9 +122,11 @@ class RemoteFormatter(BaseFormatter):
                           **self.kwargs)
         ds = unify_format(ds,
                           text_keys_to_load=self.text_keys_to_load,
-                          text_key_to_process=global_cfg.text_key_to_process,
+                          text_key_to_process=global_cfg.text_key_to_process
+                          if global_cfg else None,
                           num_proc=num_proc,
-                          global_cfg=global_cfg)
+                          global_cfg=global_cfg
+                          )
         return ds
 
 
@@ -164,7 +166,7 @@ def rename_ops_args_text_key(cfg, original_text_key, target_text_key):
 
 def unify_format(
     dataset: Dataset,
-    text_keys_to_load: List[str] = 'deprecated',
+    text_keys_to_load: Union[List[str], str] = 'deprecated',
     text_key_to_process: str = 'text',
     num_proc: int = 1,
     global_cfg: Namespace = None,
@@ -172,31 +174,17 @@ def unify_format(
     """
     Get an unified internal format, conduct the following modifications.
 
-    1. based on the given keys, checking the key name of sample
+    1. check keys of dataset
 
     2. filter out those samples with empty or None text
 
-    As a result, the dataset will being with the unified format such as:
-
-    >>> {
-    >>>     'text': 'hello-world',
-    >>>     'text.instruction': "Let's think step by step.",
-    >>>     "meta": {"date": 2012}
-    >>>     'meta.src": "customized",
-    >>>     "meta.version": "0.1",
-    >>>     Fields.stats: {
-    >>>         "lang": "en",
-    >>>         "lang_score": 0.965
-    >>>     }
-    >>> }
-
     :param dataset: input dataset
-    :param text_keys_to_load: original text key(s) of dataset, `deprecated`
+    :param text_keys_to_load: original text key(s) of dataset, `deprecated`.
     :param text_key_to_process: key name of field where the sample
-        text to be processed,
+        text to be processed.
     :param num_proc: number of processes for mapping
     :param global_cfg: the global cfg used in consequent processes,
-        since cfg.text_key_to_process may need to be modified after unifying
+        since cfg.text_key_to_process may be modified after unifying
 
     :return: unified_format_dataset
     """

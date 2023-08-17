@@ -25,7 +25,7 @@ git add .
 pre-commit run --all-files
 
 # commit after all checking are passed
-git commit -m "xxxx"
+git commit -m "<your_commit_message>"
 ```
 
 ## 构建自己的算子
@@ -34,7 +34,15 @@ git commit -m "xxxx"
 - 在实现新的算子之前，请参考 [Operators](Operators_ZH.md) 以避免不必要的重复。
 - 假设要添加一个名为 “TextLengthFilter” 的运算符以过滤仅包含预期文本长度的样本语料，可以按照以下步骤进行构建。
 
-1. 在 `data_juicer/ops/filter/` 目录下创建一个新的算子文件 `text_length_filter.py`，内容如下：
+1. (可选) 当你想复用一个中间变量时，可以在 `data_juicer/utils/constant.py` 文件中为其添加一个新的StatsKeys。
+
+```python
+class StatsKeys(object):
+    ...              # other keys
+    text_len = 'text_len'
+```
+
+2. 在 `data_juicer/ops/filter/` 目录下创建一个新的算子文件 `text_length_filter.py`，内容如下：
     - 因为它是一个 Filter 算子，所以需要继承 `base_op.py` 中的 `Filter` 基类，并用 `OPERATORS` 修饰以实现自动注册。
 
 ```python
@@ -88,7 +96,7 @@ class TextLengthFilter(Filter):
             return False
 ```
 
-2. 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
+3. 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
 
 ```python
 from . import (...,              # other ops
@@ -96,7 +104,7 @@ from . import (...,              # other ops
 
 ```
 
-3. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
+4. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
 
 ```yaml
 # other configs
@@ -109,7 +117,7 @@ process:
       max_len: 1000
 ```
 
-4. （强烈推荐）最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，建议在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
+5. （强烈推荐）最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，建议在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
 
 ```python
 import unittest
@@ -141,10 +149,10 @@ self.cfg = init_configs()
 ```
 
 - 其中可以指定和混合来自不同来源的函数参数，包括
-1. *硬编码默认值* 将配置注册到解析器中或在类的 `__init__` 函数中指定
-2. json 格式的默认*配置文件*（yaml 或 jsonnet 超集）
-3. *环境变量*
-4. *POSIX-style 命令行参数*， 例如 `--project_name my_data_demo` 或 `--project_name=my_data_demo`，包含配置文件
+    1. *硬编码默认值* 将配置注册到解析器中或在类的 `__init__` 函数中指定
+    2. json 格式的默认*配置文件*（yaml 或 jsonnet 超集）
+    3. *环境变量*
+    4. *POSIX-style 命令行参数*， 例如 `--project_name my_data_demo` 或 `--project_name=my_data_demo`，包含配置文件
 
 - 最终解析的值是来自这些来源的混合。 并且覆盖顺序与上面的数字相同。
 
