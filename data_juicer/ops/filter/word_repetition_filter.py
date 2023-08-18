@@ -4,6 +4,7 @@
 
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
+from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -53,7 +54,7 @@ class WordRepetitionFilter(Filter):
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
-        if 'word_rep_ratio' in sample['stats']:
+        if StatsKeys.word_rep_ratio in sample[Fields.stats]:
             return sample
 
         # try to get words from context
@@ -89,18 +90,18 @@ class WordRepetitionFilter(Filter):
                 freq_word_ngrams.get(word_ngram, 0) + 1)
 
         if len(freq_word_ngrams) == 0:
-            sample['stats']['word_rep_ratio'] = 0.0
+            sample[Fields.stats][StatsKeys.word_rep_ratio] = 0.0
             return sample
 
         freq_word_ngrams = list(freq_word_ngrams.values())
         rep_more_than_one = [freq for freq in freq_word_ngrams if freq > 1]
-        sample['stats']['word_rep_ratio'] = (
+        sample[Fields.stats][StatsKeys.word_rep_ratio] = (
             sum(rep_more_than_one) /
             sum(freq_word_ngrams)) if sum(freq_word_ngrams) != 0 else 0.0
         return sample
 
     def process(self, sample):
-        if self.min_ratio <= sample['stats']['word_rep_ratio'] \
+        if self.min_ratio <= sample[Fields.stats][StatsKeys.word_rep_ratio] \
                 <= self.max_ratio:
             return True
         else:

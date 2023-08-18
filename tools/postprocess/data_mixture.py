@@ -46,25 +46,24 @@ def parse_args():
 def run_mixture():
     """
     Mix multiple datasets into one dataset.
-    Randomly select samples from every dataset and mix theses 
+    Randomly select samples from every dataset and mix theses
     samples, then export to a new mixed dataset
 
-    `data_path` with optional weight(1.0 as default), 
+    `data_path` with optional weight(1.0 as default),
         e.g.
         1) a single data path
-        2) multiple datasets in the format: <w1> dataset1-path 
-            <w2> dataset1-file  <w3>dataset3-path ...' 
-        
+        2) multiple datasets in the format: <w1> dataset1-path
+            <w2> dataset1-file  <w3>dataset3-path ...'
+
     """
     args = parse_args()
     data_path = ' '.join(args.data_path)
     formatter = load_formatter(data_path)
-    dataset = formatter.load_dataset(args.num_proc, args)
-    exporter = Exporter(
-                        export_path = args.export_path, 
-                        export_shard_size = args.export_shard_size,
-                        num_proc = args.num_proc,
-                        export_stats = False)
+    dataset = formatter.load_dataset(args.num_proc)
+    exporter = Exporter(export_path=args.export_path,
+                        export_shard_size=args.export_shard_size,
+                        num_proc=args.num_proc,
+                        export_stats=False)
     exporter.export(dataset)
 
 

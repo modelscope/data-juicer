@@ -2,6 +2,7 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
+from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -48,7 +49,7 @@ class WordNumFilter(Filter):
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
-        if 'num_words' in sample['stats']:
+        if StatsKeys.num_words in sample[Fields.stats]:
             return sample
 
         words_key = f'words-{self.model_key}'
@@ -62,11 +63,12 @@ class WordNumFilter(Filter):
             if context:
                 sample['__dj__context__'][words_key] = words
         words = words_refinement(words, strip_chars=SPECIAL_CHARACTERS)
-        sample['stats']['num_words'] = len(words)
+        sample[Fields.stats][StatsKeys.num_words] = len(words)
         return sample
 
     def process(self, sample):
-        if self.min_num <= sample['stats']['num_words'] <= self.max_num:
+        if self.min_num <= sample[Fields.stats][
+                StatsKeys.num_words] <= self.max_num:
             return True
         else:
             return False

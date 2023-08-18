@@ -25,7 +25,7 @@ git add .
 pre-commit run --all-files
 
 # commit after all checking are passed
-git commit -m "xxxx"
+git commit -m "<your_commit_message>"
 ```
 
 ## 构建自己的算子
@@ -34,7 +34,15 @@ git commit -m "xxxx"
 - 在实现新的算子之前，请参考 [Operators](Operators_ZH.md) 以避免不必要的重复。
 - 假设要添加一个名为 “TextLengthFilter” 的运算符以过滤仅包含预期文本长度的样本语料，可以按照以下步骤进行构建。
 
-1. 在 `data_juicer/ops/filter/` 目录下创建一个新的算子文件 `text_length_filter.py`，内容如下：
+1. (可选) 在 `data_juicer/utils/constant.py` 文件中添加一个新的StatsKeys来保存新算子的统计变量。
+
+```python
+class StatsKeys(object):
+    ...              # other keys
+    text_len = 'text_len'
+```
+
+2. 在 `data_juicer/ops/filter/` 目录下创建一个新的算子文件 `text_length_filter.py`，内容如下：
     - 因为它是一个 Filter 算子，所以需要继承 `base_op.py` 中的 `Filter` 基类，并用 `OPERATORS` 修饰以实现自动注册。
 
 ```python
@@ -42,44 +50,53 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
+from data_juicer.utils.constant import Fields, StatsKeys
+
 from ..base_op import OPERATORS, Filter
 
 
 @OPERATORS.register_module('text_length_filter')
 class TextLengthFilter(Filter):
-    """
-Filter to keep samples with total text length within a specific range.
-    """
+    """Filter to keep samples with total text length within a specific
+    range."""
 
-    def __init__(
-        self,
-        min_len: PositiveInt = 10,
-        max_len: PositiveInt = sys.maxsize,
-    ):
+    def __init__(self,
+                 min_len: PositiveInt = 10,
+                 max_len: PositiveInt = sys.maxsize,
+                 *args,
+                 **kwargs):
         """
         Initialization method.
-        :param min_len: The min text length in the filtering.
-        :param max_len: The max text length in the filtering.
+
+        :param min_len: The min text length in the filtering. samples
+            will be filtered if their text length is below this
+            parameter.
+        :param max_len: The max text length in the filtering. samples
+            will be filtered if their text length exceeds this
+            parameter.
+        :param args: extra args
+        :param kwargs: extra args
         """
+        super().__init__(*args, **kwargs)
         self.min_len = min_len
         self.max_len = max_len
 
     def compute_stats(self, sample):
         # check if it's computed already
-        if 'text_len' in sample['stats']:
+        if StatsKeys.text_len in sample[Fields.stats]:
             return sample
 
-        sample['stats']['text_len'] = len(sample['text'])
+        sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
         return sample
 
     def process(self, sample):
-        if self.min_len <= sample['stats']['text_len'] <= self.max_len:
+        if self.min_len <= sample[Fields.stats][StatsKeys.text_len] <= self.max_len:
             return True
         else:
             return False
 ```
 
-2. 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
+3. 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
 
 ```python
 from . import (...,              # other ops
@@ -87,7 +104,7 @@ from . import (...,              # other ops
 
 ```
 
-3. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
+4. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
 
 ```yaml
 # other configs
@@ -100,7 +117,7 @@ process:
       max_len: 1000
 ```
 
-4. （强烈推荐）最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，建议在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
+5. （强烈推荐）最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，建议在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
 
 ```python
 import unittest
@@ -132,10 +149,10 @@ self.cfg = init_configs()
 ```
 
 - 其中可以指定和混合来自不同来源的函数参数，包括
-1. *硬编码默认值* 将配置注册到解析器中或在类的 `__init__` 函数中指定
-2. json 格式的默认*配置文件*（yaml 或 jsonnet 超集）
-3. *环境变量*
-4. *POSIX-style 命令行参数*， 例如 `--project_name my_data_demo` 或 `--project_name=my_data_demo`，包含配置文件
+    1. *硬编码默认值* 将配置注册到解析器中或在类的 `__init__` 函数中指定
+    2. json 格式的默认*配置文件*（yaml 或 jsonnet 超集）
+    3. *环境变量*
+    4. *POSIX-style 命令行参数*， 例如 `--project_name my_data_demo` 或 `--project_name=my_data_demo`，包含配置文件
 
 - 最终解析的值是来自这些来源的混合。 并且覆盖顺序与上面的数字相同。
 
@@ -152,7 +169,7 @@ self.cfg = init_configs()
 $ python tools/process_data.py --help
 
 usage: process_data.py [-h] [--config CONFIG] [--print_config[=flags]] [--project_name PROJECT_NAME] [--dataset_path DATASET_PATH] [--dataset_dir DATASET_DIR] [--export_path EXPORT_PATH] [--process PROCESS]
-                            [--np NP] [--text_key TEXT_KEY] [--document_deduplicator CONFIG] [--document_deduplicator.hash_method HASH_METHOD] [--document_deduplicator.lowercase LOWERCASE]
+                            [--np NP] [--text_kes TEXT_KEYS] [--document_deduplicator CONFIG] [--document_deduplicator.hash_method HASH_METHOD] [--document_deduplicator.lowercase LOWERCASE]
                             [--document_deduplicator.ignore_non_character IGNORE_NON_CHARACTER] [--language_id_score_filter CONFIG] [--language_id_score_filter.lang LANG] [--words_num_filter CONFIG] [--words_num_filter.min MIN] [--words_num_filter.max MAX]
                             [--alphanumeric_filter CONFIG] [--alphanumeric_filter.min MIN] [--alphanumeric_filter.max MAX] [--average_line_length_filter CONFIG] [--average_line_length_filter.min MIN] [--average_line_length_filter.max MAX]
                             [--maximum_line_length_filter CONFIG] [--maximum_line_length_filter.min MIN] [--maximum_line_length_filter.max MAX] [--text_length_filter CONFIG] [--text_length_filter.min MIN] [--text_length_filter.max MAX]
@@ -175,7 +192,6 @@ optional arguments:
   --process PROCESS, --process+ PROCESS
                         a list of several process operators with their arguments (type: List[Dict], default: null)
   --np NP               number of subprocess to process your dataset. (type: PositiveInt, default: null)
-  --text_key TEXT_KEY   the key name of field that stores sample texts (type: Optional[str], default: content)
 
 <class 'data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter'>:
   --alphanumeric_filter CONFIG

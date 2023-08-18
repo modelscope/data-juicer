@@ -153,5 +153,5 @@ class TextFormatter(LocalFormatter):
         else:
             datasets = concatenate_datasets([ds for _, ds in datasets.items()])
         return unify_format(datasets,
-                            text_keys_to_load=self.text_keys_to_load,
+                            text_keys=self.text_keys,
                             num_proc=num_proc)

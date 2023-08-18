@@ -3,7 +3,7 @@ project_name: 'Data-Juicer-recipes-the-stack'
 dataset_path: '/path/to/your/dataset'  # path to your dataset directory or file
 export_path: '/path/to/your/dataset.jsonl'
 
-text_key: 'content'
+text_keys: 'content'
 
 np: 50  # number of subprocess to process your dataset
 open_tracer: true

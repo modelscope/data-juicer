@@ -2,6 +2,7 @@ import sys
 
 from jsonargparse.typing import PositiveFloat
 
+from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -48,7 +49,7 @@ class AlphanumericFilter(Filter):
 
     def compute_stats(self, sample):
         if self.tokenization:
-            if 'alpha_token_ratio' in sample['stats']:
+            if StatsKeys.alpha_token_ratio in sample[Fields.stats]:
                 return sample
             alpha_count = sum(
                 map(lambda char: 1
@@ -58,23 +59,23 @@ class AlphanumericFilter(Filter):
                 get_words_from_document(
                     sample[self.text_key],
                     token_func=tokenizer.tokenize if tokenizer else None))
-            sample['stats']['alpha_token_ratio'] = (
+            sample[Fields.stats][StatsKeys.alpha_token_ratio] = (
                 alpha_count / token_count) if token_count != 0 else 0.0
         else:
-            if 'alnum_ratio' in sample['stats']:
+            if StatsKeys.alnum_ratio in sample[Fields.stats]:
                 return sample
             alnum_count = sum(
                 map(lambda char: 1
                     if char.isalnum() else 0, sample[self.text_key]))
-            sample['stats']['alnum_ratio'] = (
+            sample[Fields.stats][StatsKeys.alnum_ratio] = (
                 alnum_count / len(sample[self.text_key])) if len(
                     sample[self.text_key]) != 0 else 0.0
         return sample
 
     def process(self, sample):
-        ratio = sample['stats'][
-            'alpha_token_ratio'] if self.tokenization else sample['stats'][
-                'alnum_ratio']
+        ratio = sample[Fields.stats][
+            StatsKeys.alpha_token_ratio] if self.tokenization else sample[
+                Fields.stats][StatsKeys.alnum_ratio]
         if self.min_ratio <= ratio <= self.max_ratio:
             return True
         else:

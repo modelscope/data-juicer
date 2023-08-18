@@ -9,10 +9,16 @@ from dataset_splitting_by_language import main as split_dataset_by_language
 
 
 @st.cache_data
-def convert_jsonl(df):
+def convert_to_csv(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf_8_sig')
+
+
+@st.cache_data
+def convert_to_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_json(orient='records', lines=True,
-                      force_ascii=False).encode('utf-8-sig')
+                      force_ascii=False).encode('utf_8_sig')
 
 
 def split_dataset(dataset_file, target_dir):
@@ -104,7 +110,7 @@ class Visualize:
                     f'There {be} :red[ {count} ] {samples} in :red[{k}]')
                 st.dataframe(df, use_container_width=True)
                 st.download_button(f'Download {k} as JSONL',
-                                   data=convert_jsonl(df),
+                                   data=convert_to_jsonl(df),
                                    file_name=v.name)
 
             shutil.rmtree(target_dir, ignore_errors=True)

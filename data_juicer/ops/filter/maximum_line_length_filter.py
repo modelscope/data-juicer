@@ -2,6 +2,8 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
+from data_juicer.utils.constant import Fields, StatsKeys
+
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_LINES
 
@@ -35,7 +37,7 @@ class MaximumLineLengthFilter(Filter):
 
     def compute_stats(self, sample, context=None):
         # check if it's computed already
-        if 'max_line_length' in sample['stats']:
+        if StatsKeys.max_line_length in sample[Fields.stats]:
             return sample
 
         context_key = 'lines'
@@ -46,12 +48,13 @@ class MaximumLineLengthFilter(Filter):
             if context:
                 sample['__dj__context__'][context_key] = lines
         line_lengths = list(map(len, lines))
-        sample['stats']['max_line_length'] = max(
+        sample[Fields.stats][StatsKeys.max_line_length] = max(
             line_lengths) if line_lengths else 0.0
         return sample
 
     def process(self, sample):
-        if self.min_len <= sample['stats']['max_line_length'] <= self.max_len:
+        if self.min_len <= sample[Fields.stats][
+                StatsKeys.max_line_length] <= self.max_len:
             return True
         else:
             return False

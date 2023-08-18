@@ -61,7 +61,7 @@ class SpecifiedNumericFieldFilterTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = SpecifiedNumericFieldFilter(text_key='meta.star',
+        op = SpecifiedNumericFieldFilter(field_key='meta.star',
                                          min_value=10,
                                          max_value=70)
         self._run_specified_numeric_field_filter(dataset, tgt_list, op)
@@ -143,7 +143,7 @@ class SpecifiedNumericFieldFilterTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = SpecifiedNumericFieldFilter(text_key='meta.key1.key2.count',
+        op = SpecifiedNumericFieldFilter(field_key='meta.key1.key2.count',
                                          min_value=10,
                                          max_value=70)
         self._run_specified_numeric_field_filter(dataset, tgt_list, op)
@@ -194,7 +194,7 @@ class SpecifiedNumericFieldFilterTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = SpecifiedNumericFieldFilter(text_key='meta.star',
+        op = SpecifiedNumericFieldFilter(field_key='meta.star',
                                          min_value=10,
                                          max_value=70)
         self._run_specified_numeric_field_filter(dataset, tgt_list, op)

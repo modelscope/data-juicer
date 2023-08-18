@@ -7,6 +7,7 @@ from data_juicer.format.load import load_formatter
 from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
                              load_ops)
 from data_juicer.utils.ckpt_utils import CheckpointManager
+from data_juicer.utils.constant import Fields
 
 from .exporter import Exporter
 from .tracer import Tracer
@@ -37,8 +38,8 @@ class Executor:
         # setup formatter
         logger.info('Setting up data formatter...')
         self.formatter = load_formatter(self.cfg.dataset_path,
-                                        self.cfg.text_keys_to_load,
-                                        self.cfg.suffixes, self.cfg.add_suffix)
+                                        self.cfg.text_keys, self.cfg.suffixes,
+                                        self.cfg.add_suffix)
 
         # whether to use checkpoint mechanism. If it's true, Executor will
         # check if there are existing checkpoints first and try to load the
@@ -86,7 +87,7 @@ class Executor:
             logger.info('Loading dataset from data formatter...')
             if load_data_np is None:
                 load_data_np = self.cfg.np
-            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+            dataset = self.formatter.load_dataset(load_data_np)
 
         # 2. extract processes
         logger.info('Preparing process operators...')
@@ -110,11 +111,11 @@ class Executor:
                     if self.open_tracer and op_name in self.op_list_to_trace:
                         self.tracer.trace_mapper(op_name, dataset, tmp)
                 elif isinstance(op, Filter):
-                    if 'stats' not in dataset.features:
+                    if Fields.stats not in dataset.features:
                         # TODO:
                         # this is a temp solution,
                         # only add stats when calling filter op
-                        dataset = dataset.add_column(name='stats',
+                        dataset = dataset.add_column(name=Fields.stats,
                                                      column=[{}] *
                                                      dataset.num_rows)
                         if self.cfg.use_checkpoint:

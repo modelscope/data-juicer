@@ -4,6 +4,7 @@
 
 from jsonargparse.typing import PositiveFloat
 
+from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -39,7 +40,7 @@ class PerplexityFilter(Filter):
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
-        if 'perplexity' in sample['stats']:
+        if StatsKeys.perplexity in sample[Fields.stats]:
             return sample
 
         # tokenization
@@ -61,9 +62,9 @@ class PerplexityFilter(Filter):
             logits += kenlm_model.score(line)
             length += (len(line.split()) + 1)
         ppl = (10.0**(-logits / length)) if length != 0 else 0.0
-        sample['stats']['perplexity'] = round(ppl, 1)
+        sample[Fields.stats][StatsKeys.perplexity] = round(ppl, 1)
 
         return sample
 
     def process(self, sample):
-        return sample['stats']['perplexity'] <= self.max_ppl
+        return sample[Fields.stats][StatsKeys.perplexity] <= self.max_ppl

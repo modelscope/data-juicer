@@ -3,16 +3,17 @@ import unittest
 from datasets import Dataset
 
 from data_juicer.ops.filter.flagged_words_filter import FlaggedWordFilter
+from data_juicer.utils.constant import Fields
 
 
 class FlaggedWordFilterTest(unittest.TestCase):
 
     def _run_flagged_words_filter(self, dataset: Dataset, target_list, op):
-        if 'stats' not in dataset.features:
+        if Fields.stats not in dataset.features:
             # TODO:
             # this is a temp solution,
             # only add stats when calling filter op
-            dataset = dataset.add_column(name='stats',
+            dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
         dataset = dataset.map(op.compute_stats)
         dataset = dataset.filter(op.process)

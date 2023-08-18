@@ -13,6 +13,8 @@ from loguru import logger
 from scipy.integrate import quad as integrate
 from tqdm import tqdm
 
+from data_juicer.utils.constant import HashKeys
+
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import UnionFind, split_on_whitespace
 
@@ -188,7 +190,7 @@ class DocumentMinhashDeduplicator(Deduplicator):
         :return: sample with minhash value.
         """
         # check if it's computed already
-        if 'minhash' in sample:
+        if HashKeys.minhash in sample:
             return sample
 
         text = sample[self.text_key]
@@ -232,7 +234,7 @@ class DocumentMinhashDeduplicator(Deduplicator):
             phv,
             np.ones(self.num_permutation, dtype=np.uint64) * MAX_HASH
         ]).min(axis=0)
-        sample['minhash'] = [
+        sample[HashKeys.minhash] = [
             bytes(hash_values[start:end].byteswap().data)
             for start, end in self.hash_ranges
         ]
@@ -251,10 +253,10 @@ class DocumentMinhashDeduplicator(Deduplicator):
         if len(dataset) <= 1:
             return dataset, {}
 
-        minhashes = dataset['minhash']
+        minhashes = dataset[HashKeys.minhash]
         # remove bytes minhash column otherwise unexpected error would occur
         # when exporting the processed dataset
-        dataset = dataset.remove_columns(['minhash'])
+        dataset = dataset.remove_columns([HashKeys.minhash])
 
         # make clusters -- construct the minhash lookup tables of seg to ids
         logger.info(f'Start clustering for {len(dataset)} samples...')

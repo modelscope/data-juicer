@@ -2,6 +2,8 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
+from data_juicer.utils.constant import Fields, StatsKeys
+
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_LINES
 
@@ -35,7 +37,7 @@ class AverageLineLengthFilter(Filter):
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
-        if 'avg_line_length' in sample['stats']:
+        if StatsKeys.avg_line_length in sample[Fields.stats]:
             return sample
 
         context_key = 'lines'
@@ -46,13 +48,14 @@ class AverageLineLengthFilter(Filter):
             if context:
                 sample['__dj__context__'][context_key] = lines
         line_lengths = list(map(len, lines))
-        sample['stats']['avg_line_length'] = \
+        sample[Fields.stats][StatsKeys.avg_line_length] = \
             len(sample[self.text_key]) / len(line_lengths) \
             if len(line_lengths) != 0 else 0.0
         return sample
 
     def process(self, sample):
-        if self.min_len <= sample['stats']['avg_line_length'] <= self.max_len:
+        if self.min_len <= sample[Fields.stats][
+                StatsKeys.avg_line_length] <= self.max_len:
             return True
         else:
             return False
