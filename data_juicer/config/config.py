@@ -71,7 +71,7 @@ def init_configs(args=None):
                         help='Number of processes to process dataset.')
     parser.add_argument(
         '--text_keys',
-        type=Optional[str],
+        type=Union[str, List[str]],
         default='text',
         help='Key name of field where the sample '
         'texts to be processed, e.g., '
