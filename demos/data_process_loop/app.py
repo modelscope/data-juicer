@@ -12,13 +12,13 @@ from data_juicer.ops.base_op import OPERATORS
 
 
 @st.cache_data
-def convert_csv(df):
+def convert_to_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf_8_sig')
 
 
 @st.cache_data
-def convert_jsonl(df):
+def convert_to_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_json(orient='records', lines=True,
                       force_ascii=False).encode('utf_8_sig')
@@ -128,9 +128,6 @@ def process_and_show_res():
             cfg_for_processed_data.export_path = os.path.dirname(
                 cfg.export_path) + '_processed/data.jsonl'
 
-            cfg_for_processed_data.text_keys_to_load = [
-                cfg.text_key_to_process
-            ]
             analyzer = Analyser(cfg_for_processed_data)
             analyzer.analysis_path = os.path.dirname(
                 cfg_for_processed_data.export_path) + '/analysis'
@@ -257,7 +254,7 @@ class Visualize:
                         'analyzed_dataset', None)
                     st.dataframe(analyzed_dataset, use_container_width=True)
                     st.download_button('Download Original data as JSONL',
-                                       data=convert_jsonl(
+                                       data=convert_to_jsonl(
                                            pd.DataFrame(analyzed_dataset)),
                                        file_name='original_dataset.jsonl')
 
@@ -269,7 +266,7 @@ class Visualize:
                         'processed_dataset', None)
                     st.dataframe(processed_dataset, use_container_width=True)
                     st.download_button('Download Processed data as JSONL',
-                                       data=convert_jsonl(
+                                       data=convert_to_jsonl(
                                            pd.DataFrame(processed_dataset)),
                                        file_name='processed_dataset.jsonl')
 

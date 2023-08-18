@@ -2,7 +2,6 @@ import os
 from typing import List, Tuple, Union
 
 from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
-from jsonargparse import Namespace
 from loguru import logger
 
 from data_juicer.utils.constant import Fields
@@ -29,7 +28,7 @@ class LocalFormatter(BaseFormatter):
         dataset_path: str,
         type: str,
         suffixes: Union[str, List[str], Tuple[str]] = None,
-        text_keys_to_load: List[str] = None,
+        text_keys: List[str] = None,
         add_suffix=False,
         **kwargs,
     ):
@@ -40,23 +39,19 @@ class LocalFormatter(BaseFormatter):
             directory
         :param type: a packaged dataset module type (json, csv, etc.)
         :param suffixes: files with specified suffixes to be processed
-        :param text_keys_to_load: key names of field that stores sample
+        :param text_keys: key names of field that stores sample
             text.
         :param add_suffix: whether to add the file suffix to dataset
             meta info
         :param kwargs: extra args
         """
-        if text_keys_to_load is None:
-            text_keys_to_load = ['text']
         self.type = type
         self.kwargs = kwargs
-        self.text_keys_to_load = text_keys_to_load
+        self.text_keys = text_keys
         self.data_files = find_files_with_suffix(dataset_path, suffixes)
         self.add_suffix = add_suffix
 
-    def load_dataset(self,
-                     num_proc: int = 1, global_cfg: Namespace = None) -> \
-            Dataset:
+    def load_dataset(self, num_proc: int = 1) -> Dataset:
         """
         Load a dataset from dataset file or dataset directory, and unify its
         format.
@@ -78,11 +73,8 @@ class LocalFormatter(BaseFormatter):
         else:
             datasets = concatenate_datasets([ds for _, ds in datasets.items()])
         ds = unify_format(datasets,
-                          text_keys_to_load=self.text_keys_to_load,
-                          text_key_to_process=global_cfg.text_key_to_process
-                          if global_cfg else None,
-                          num_proc=num_proc,
-                          global_cfg=global_cfg)
+                          text_keys=self.text_keys,
+                          num_proc=num_proc)
         return ds
 
 
@@ -92,23 +84,21 @@ class RemoteFormatter(BaseFormatter):
 
     def __init__(self,
                  dataset_path: str,
-                 text_keys_to_load: List[str] = None,
+                 text_keys: List[str] = None,
                  **kwargs):
         """
         Initialization method.
 
         :param dataset_path: a dataset file or a dataset directory
-        :param text_keys_to_load: key names of field that stores sample
+        :param text_keys: key names of field that stores sample
             text.
         :param kwargs: extra args
         """
         self.path = dataset_path
-        self.text_keys_to_load = text_keys_to_load
+        self.text_keys = text_keys
         self.kwargs = kwargs
 
-    def load_dataset(self,
-                     num_proc: int = 1,
-                     global_cfg: Namespace = None) -> Dataset:
+    def load_dataset(self, num_proc: int = 1) -> Dataset:
         """
         Load a dataset from HuggingFace, and unify its format.
 
@@ -120,13 +110,7 @@ class RemoteFormatter(BaseFormatter):
                           split='train',
                           num_proc=num_proc,
                           **self.kwargs)
-        ds = unify_format(ds,
-                          text_keys_to_load=self.text_keys_to_load,
-                          text_key_to_process=global_cfg.text_key_to_process
-                          if global_cfg else None,
-                          num_proc=num_proc,
-                          global_cfg=global_cfg
-                          )
+        ds = unify_format(ds, text_keys=self.text_keys, num_proc=num_proc)
         return ds
 
 
@@ -146,30 +130,10 @@ def add_suffixes(datasets: DatasetDict) -> Dataset:
     return datasets
 
 
-def rename_ops_args_text_key(cfg, original_text_key, target_text_key):
-    """
-    Rename some ops args in cfg from a source text key to target text key.
-
-    :param cfg: the global cfg used in consequent processes,
-    :param original_text_key: source text key in op args :param modified
-        cfg object
-    """
-    if not hasattr(cfg, 'process'):
-        return
-    process_list = cfg.process
-    for i in range(len(process_list)):
-        for op_name in process_list[i]:
-            if process_list[i][op_name] and \
-                    process_list[i][op_name]['text_key'] == original_text_key:
-                process_list[i][op_name]['text_key'] = target_text_key
-
-
 def unify_format(
     dataset: Dataset,
-    text_keys_to_load: Union[List[str], str] = 'deprecated',
-    text_key_to_process: str = 'text',
+    text_keys: Union[List[str], str] = 'text',
     num_proc: int = 1,
-    global_cfg: Namespace = None,
 ) -> Dataset:
     """
     Get an unified internal format, conduct the following modifications.
@@ -179,12 +143,10 @@ def unify_format(
     2. filter out those samples with empty or None text
 
     :param dataset: input dataset
-    :param text_keys_to_load: original text key(s) of dataset, `deprecated`.
-    :param text_key_to_process: key name of field where the sample
-        text to be processed.
+    :param text_keys: original text key(s) of dataset.
     :param num_proc: number of processes for mapping
     :param global_cfg: the global cfg used in consequent processes,
-        since cfg.text_key_to_process may be modified after unifying
+        since cfg.text_key may be modified after unifying
 
     :return: unified_format_dataset
     """
@@ -197,16 +159,11 @@ def unify_format(
                                          'processing data with ' \
                                          "'huggingface-Dataset format'"
 
-    if text_keys_to_load != 'deprecated':
-        logger.warning('`text_keys_to_load` was deprecated, '
-            'you can use text_key_to_process instead.')
-        text_key_to_process = text_keys_to_load
+    if text_keys is None:
+        text_keys = []
 
-    if text_key_to_process is None:
-        text_key_to_process = ['text']
-
-    if isinstance(text_key_to_process, str):
-        text_key_to_process = [text_key_to_process]
+    if isinstance(text_keys, str):
+        text_keys = [text_keys]
 
     logger.info('Unifying the input dataset formats...')
 
@@ -214,17 +171,13 @@ def unify_format(
     dataset = NestedDataset(dataset)
 
     # 1. check text related keys
-    for key in text_key_to_process:
+    for key in text_keys:
         if key not in dataset.features:
             err_msg = f'There is no key [{key}] in dataset. You might set ' \
                       f'wrong text_key in the config file for your dataset. ' \
                       f'Please check and retry!'
             logger.error(err_msg)
             raise ValueError(err_msg)
-
-    # update cfg
-    if global_cfg:
-        global_cfg.text_key_to_process = text_key_to_process[0]
 
     # 2. filter out those samples with empty or None text
     # TODO: optimize the filtering operation for better efficiency
@@ -239,10 +192,9 @@ def unify_format(
                 return False
         return True
 
-    dataset = dataset.filter(
-        non_empty_text,
-        num_proc=num_proc,
-        fn_kwargs={'target_keys': list(text_key_to_process)})
+    dataset = dataset.filter(non_empty_text,
+                             num_proc=num_proc,
+                             fn_kwargs={'target_keys': text_keys})
     logger.info(f'{len(dataset)} samples left after filtering empty text.')
 
     dataset.cleanup_cache_files()
@@ -258,7 +210,7 @@ def unify_format(
 
 
 def load_formatter(dataset_path,
-                   keys_to_load=None,
+                   text_keys=None,
                    suffixes=None,
                    add_suffix=False,
                    **kwargs) -> BaseFormatter:
@@ -266,14 +218,13 @@ def load_formatter(dataset_path,
     Load the appropriate formatter for different types of data formats.
 
     :param dataset_path: Path to dataset file or dataset directory
-    :param keys_to_load: key names of field that stores sample text.
-        Default: ['text']
+    :param text_keys: key names of field that stores sample text.
+        Default: None
     :param suffixes: the suffix of files that will be read. Default:
         None
     :return: a dataset formatter.
     """
-    if keys_to_load is None:
-        keys_to_load = ['text']
+
     if suffixes is None:
         suffixes = []
     ext_num = {}
@@ -298,16 +249,14 @@ def load_formatter(dataset_path,
         target_suffixes = set(ext_num.keys()).intersection(
             set(FORMATTERS.modules[formatter].SUFFIXES))
         return FORMATTERS.modules[formatter](dataset_path,
-                                             text_keys_to_load=keys_to_load,
+                                             text_keys=text_keys,
                                              suffixes=target_suffixes,
                                              add_suffix=add_suffix,
                                              **kwargs)
 
     # try huggingface dataset hub
     elif not is_absolute_path(dataset_path) and dataset_path.count('/') <= 1:
-        return RemoteFormatter(dataset_path,
-                               text_keys_to_load=keys_to_load,
-                               **kwargs)
+        return RemoteFormatter(dataset_path, text_keys=text_keys, **kwargs)
 
     # no data
     else:

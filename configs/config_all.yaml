@@ -9,10 +9,8 @@ dataset_path: '/path/to/your/dataset'                       # path to your datas
 export_path: '/path/to/result/dataset.jsonl'                # path to processed result dataset. Supported suffixes include ['jsonl', 'json', 'parquet']
 export_shard_size: 0                                        # Shard size of exported dataset in Byte. In default, it's 0, which means export the whole dataset into only one file. If it's set a positive number, the exported dataset will be split into several dataset shards, and the max size of each shard won't larger than the export_shard_size
 np: 4                                                       # number of subprocess to process your dataset
-text_key_to_process: 'content'                              # the key name of field where the sample texts to be processed, e.g., `text`, `text.instruction`, `text.output`, ...'
-                                                            # Note: currently, we support specify only ONE key for each op, for cases requiring multiple keys, users can specify the op multiple times
-text_keys_to_load:                                          # the key name of field where the sample texts stored in the original data
-  - 'text'
+text_keys: 'content'                                        # the key name of field where the sample texts to be processed, e.g., `text`, `instruction`, `output`, ...'
+                                                            # Note: currently, we support specify only ONE key for each op, for cases requiring multiple keys, users can specify the op multiple times. We will only use the first key of `text_keys` when you set multiple keys.
 suffixes: []                                                # the suffix of files that will be read. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
 use_cache: true                                             # whether to use the cache management of hugging face datasets. It might take up lots of disk space when using cache
 ds_cache_dir: '~/.cache/huggingface/datasets'               # cache dir for hugging face datasets. In default it's the default cache dir "~/.cache/huggingface/datasets". If this argument is reset by users, it will override the default cache dir
@@ -116,10 +114,10 @@ process:
   - suffix_filter:                                          # filter to keep samples with specified suffix.
       suffixes: []                                            # the suffix of text that will be keep. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
   - specified_field_filter:                                 # filter text with the specified field info out of specific range
-      text_key: ''                                          # the target key corresponding to multi-level field information need to be separated by '.'
+      field_key: ''                                           # the target key corresponding to multi-level field information need to be separated by '.'
       target_value: []                                        # the range of specified field information corresponding to the samples that need to be retained
   - specified_numeric_field_filter:                         # filter text with the specified numeric field info out of specific range
-      text_key: ''                                          # the target key corresponding to multi-level field information need to be separated by '.'
+      field_key: ''                                           # the target key corresponding to multi-level field information need to be separated by '.'
       min_value: 0                                            # the min filter value in SpecifiedNumericField op
       max_value: 10000                                        # the max filter value in SpecifiedNumericField op
 
@@ -137,12 +135,12 @@ process:
 
   # Selector ops
   - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
-      text_key: ''                                          # the target keys corresponding to multi-level field information need to be separated by '.'
+      field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
       top_ratio:                                              # ratio of selected top samples
       topk:                                                   # number of selected top sample
       reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
   - frequency_specified_field_selector:                     # selector to select samples based on the sorted frequency of specified field value
-      text_key: ''                                          # the target keys corresponding to multi-level field information need to be separated by '.'
+      field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
       top_ratio:                                              # ratio of selected top specified field value
       topk:                                                   # number of selected top specified field value
       reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order

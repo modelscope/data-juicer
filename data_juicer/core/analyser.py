@@ -36,8 +36,8 @@ class Analyser:
         # setup formatter
         logger.info('Setting up data formatter...')
         self.formatter = load_formatter(self.cfg.dataset_path,
-                                        self.cfg.text_keys_to_load,
-                                        self.cfg.suffixes, self.cfg.add_suffix)
+                                        self.cfg.text_keys, self.cfg.suffixes,
+                                        self.cfg.add_suffix)
 
         # prepare exporter and check export path suffix
         # NOTICE: no need to export dataset texts for analyser
@@ -66,11 +66,11 @@ class Analyser:
         logger.info('Loading dataset from data formatter...')
         if load_data_np is None:
             load_data_np = self.cfg.np
-        dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+        dataset = self.formatter.load_dataset(load_data_np)
 
         # extract processes
         logger.info('Preparing process operators...')
-        self.ops = load_ops(self.cfg.process, self.cfg.text_key_to_process)
+        self.ops = load_ops(self.cfg.process, self.cfg.text_keys)
 
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')

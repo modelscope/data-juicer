@@ -35,7 +35,7 @@ git commit -m "xxxx"
 - Before implementing a new op, please refer to [Operators](Operators.md) to avoid unnecessary duplication.
 - Assuming we want to add a new Filter operator called "TextLengthFilter" to get corpus of expected text length, we can follow these steps to build it.
 
-1. (Optional) Add a new StatsKeys in `data_juicer/utils/constant.py` when you want to reuse a intermediate variable.
+1. (Optional) Add a new StatsKeys in `data_juicer/utils/constant.py` to store the statistical variable of the new op.
 
 ```python
 class StatsKeys(object):
@@ -173,7 +173,7 @@ our executor such as
 $ python tools/process_data.py --help
 
 usage: process_data.py [-h] [--config CONFIG] [--print_config[=flags]] [--project_name PROJECT_NAME] [--dataset_path DATASET_PATH] [--dataset_dir DATASET_DIR] [--export_path EXPORT_PATH] [--process PROCESS]
-                            [--np NP] [--text_key TEXT_KEY] [--document_deduplicator CONFIG] [--document_deduplicator.hash_method HASH_METHOD] [--document_deduplicator.lowercase LOWERCASE]
+                            [--np NP] [--text_keys TEXT_KEYS] [--document_deduplicator CONFIG] [--document_deduplicator.hash_method HASH_METHOD] [--document_deduplicator.lowercase LOWERCASE]
                             [--document_deduplicator.ignore_non_character IGNORE_NON_CHARACTER] [--language_id_score_filter CONFIG] [--language_id_score_filter.lang LANG] [--words_num_filter CONFIG] [--words_num_filter.min MIN] [--words_num_filter.max MAX]
                             [--alphanumeric_filter CONFIG] [--alphanumeric_filter.min MIN] [--alphanumeric_filter.max MAX] [--average_line_length_filter CONFIG] [--average_line_length_filter.min MIN] [--average_line_length_filter.max MAX]
                             [--maximum_line_length_filter CONFIG] [--maximum_line_length_filter.min MIN] [--maximum_line_length_filter.max MAX] [--text_length_filter CONFIG] [--text_length_filter.min MIN] [--text_length_filter.max MAX]
@@ -196,7 +196,6 @@ optional arguments:
   --process PROCESS, --process+ PROCESS
                         a list of several process operators with their arguments (type: List[Dict], default: null)
   --np NP               number of subprocess to process your dataset. (type: PositiveInt, default: null)
-  --text_key TEXT_KEY   the key name of field that stores sample texts (type: Optional[str], default: content)
 
 <class 'data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter'>:
   --alphanumeric_filter CONFIG

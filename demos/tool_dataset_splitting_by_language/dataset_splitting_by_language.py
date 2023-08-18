@@ -5,7 +5,6 @@ import os
 
 import fire
 import pandas as pd
-from jsonargparse import Namespace
 from loguru import logger
 
 from data_juicer.format import load_formatter
@@ -26,12 +25,7 @@ def keep_by_lang(sample, lang):
     return False
 
 
-def main(src_dir,
-         target_dir,
-         text_keys_to_load=None,
-         text_key_to_process='text',
-         suffixes=[],
-         num_proc=1):
+def main(src_dir, target_dir, text_key=None, suffixes=[], num_proc=1):
     """
     Load dataset from the source directory, then apply language identification
     using the operation filter called `LanguageIDScoreFilter`,
@@ -42,8 +36,8 @@ def main(src_dir,
     :param suffixes: files with suffixes to be loaded, default None
     :param num_proc: number of processes to process dataset, default 1.
     """
-    if text_keys_to_load is None:
-        text_keys_to_load = ['text']
+    if text_key is None:
+        text_key = 'text'
     # check if the source directory exists.
     if not os.path.exists(src_dir):
         raise ValueError('The raw source data directory does not exist,'
@@ -51,15 +45,10 @@ def main(src_dir,
     if not os.path.exists(target_dir):
         os.makedirs(target_dir, exist_ok=True)
 
-    # Note:
-    # key name of `"keys_to_load"` in sample will be rename to "text"
-    formatter = load_formatter(src_dir,
-                               keys_to_load=text_keys_to_load,
-                               suffixes=suffixes)
-    tmp_cfg = Namespace({'text_key_to_process': text_key_to_process})
-    dataset = formatter.load_dataset(num_proc, tmp_cfg)
+    formatter = load_formatter(src_dir, text_keys=text_key, suffixes=suffixes)
+    dataset = formatter.load_dataset(num_proc)
 
-    op = LanguageIDScoreFilter(text_key=tmp_cfg['text_key_to_process'])
+    op = LanguageIDScoreFilter(text_key=text_key)
 
     if Fields.stats not in dataset.features:
         # TODO:

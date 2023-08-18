@@ -11,7 +11,7 @@ class FrequencySpecifiedFieldSelector(Selector):
     field."""
 
     def __init__(self,
-                 text_key: str = '',
+                 field_key: str = '',
                  top_ratio: ClosedUnitInterval = None,
                  topk: PositiveInt = None,
                  reverse: bool = True,
@@ -20,7 +20,7 @@ class FrequencySpecifiedFieldSelector(Selector):
         """
         Initialization method.
 
-        :param text_key: Selector based on the specified value
+        :param field_key: Selector based on the specified value
             corresponding to the target key. The target key
             corresponding to multi-level field information need to be
             separated by '.'.
@@ -40,23 +40,23 @@ class FrequencySpecifiedFieldSelector(Selector):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.text_key = text_key
+        self.field_key = field_key
         self.top_ratio = top_ratio
         self.topk = topk
         self.reverse = reverse
 
     def process(self, dataset):
-        if len(dataset) <= 1 or not self.text_key:
+        if len(dataset) <= 1 or not self.field_key:
             return dataset
 
-        text_keys = self.text_key.split('.')
-        assert text_keys[0] in dataset.features.keys(
-        ), "'{}' not in {}".format(text_keys[0], dataset.features.keys())
+        field_keys = self.field_key.split('.')
+        assert field_keys[0] in dataset.features.keys(
+        ), "'{}' not in {}".format(field_keys[0], dataset.features.keys())
 
         field_value_dict = {}
-        for i, item in enumerate(dataset[text_keys[0]]):
+        for i, item in enumerate(dataset[field_keys[0]]):
             field_value = item
-            for key in text_keys[1:]:
+            for key in field_keys[1:]:
                 assert key in field_value.keys(), "'{}' not in {}".format(
                     key, field_value.keys())
                 field_value = field_value[key]

@@ -36,8 +36,8 @@ class Executor:
         # setup formatter
         logger.info('Setting up data formatter...')
         self.formatter = load_formatter(self.cfg.dataset_path,
-                                        self.cfg.text_keys_to_load,
-                                        self.cfg.suffixes, self.cfg.add_suffix)
+                                        self.cfg.text_keys, self.cfg.suffixes,
+                                        self.cfg.add_suffix)
 
         # whether to use checkpoint mechanism. If it's true, Executor will
         # check if there are existing checkpoints first and try to load the
@@ -85,11 +85,11 @@ class Executor:
             logger.info('Loading dataset from data formatter...')
             if load_data_np is None:
                 load_data_np = self.cfg.np
-            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+            dataset = self.formatter.load_dataset(load_data_np)
 
         # 2. extract processes
         logger.info('Preparing process operators...')
-        self.ops = load_ops(self.cfg.process, self.cfg.text_key_to_process)
+        self.ops = load_ops(self.cfg.process, self.cfg.text_keys)
 
         # 3. data process
         # - If tracer is open, trace each op after it's processed

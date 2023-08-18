@@ -34,7 +34,7 @@ git commit -m "<your_commit_message>"
 - 在实现新的算子之前，请参考 [Operators](Operators_ZH.md) 以避免不必要的重复。
 - 假设要添加一个名为 “TextLengthFilter” 的运算符以过滤仅包含预期文本长度的样本语料，可以按照以下步骤进行构建。
 
-1. (可选) 当你想复用一个中间变量时，可以在 `data_juicer/utils/constant.py` 文件中为其添加一个新的StatsKeys。
+1. (可选) 在 `data_juicer/utils/constant.py` 文件中添加一个新的StatsKeys来保存新算子的统计变量。
 
 ```python
 class StatsKeys(object):
@@ -169,7 +169,7 @@ self.cfg = init_configs()
 $ python tools/process_data.py --help
 
 usage: process_data.py [-h] [--config CONFIG] [--print_config[=flags]] [--project_name PROJECT_NAME] [--dataset_path DATASET_PATH] [--dataset_dir DATASET_DIR] [--export_path EXPORT_PATH] [--process PROCESS]
-                            [--np NP] [--text_key TEXT_KEY] [--document_deduplicator CONFIG] [--document_deduplicator.hash_method HASH_METHOD] [--document_deduplicator.lowercase LOWERCASE]
+                            [--np NP] [--text_kes TEXT_KEYS] [--document_deduplicator CONFIG] [--document_deduplicator.hash_method HASH_METHOD] [--document_deduplicator.lowercase LOWERCASE]
                             [--document_deduplicator.ignore_non_character IGNORE_NON_CHARACTER] [--language_id_score_filter CONFIG] [--language_id_score_filter.lang LANG] [--words_num_filter CONFIG] [--words_num_filter.min MIN] [--words_num_filter.max MAX]
                             [--alphanumeric_filter CONFIG] [--alphanumeric_filter.min MIN] [--alphanumeric_filter.max MAX] [--average_line_length_filter CONFIG] [--average_line_length_filter.min MIN] [--average_line_length_filter.max MAX]
                             [--maximum_line_length_filter CONFIG] [--maximum_line_length_filter.min MIN] [--maximum_line_length_filter.max MAX] [--text_length_filter CONFIG] [--text_length_filter.min MIN] [--text_length_filter.max MAX]
@@ -192,7 +192,6 @@ optional arguments:
   --process PROCESS, --process+ PROCESS
                         a list of several process operators with their arguments (type: List[Dict], default: null)
   --np NP               number of subprocess to process your dataset. (type: PositiveInt, default: null)
-  --text_key TEXT_KEY   the key name of field that stores sample texts (type: Optional[str], default: content)
 
 <class 'data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter'>:
   --alphanumeric_filter CONFIG

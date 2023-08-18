@@ -3,7 +3,7 @@ from .mixture_formatter import MixtureFormatter
 
 
 def load_formatter(dataset_path,
-                   keys_to_load=None,
+                   text_keys=None,
                    suffixes=[],
                    add_suffix=False,
                    **kwargs) -> BaseFormatter:
@@ -12,17 +12,15 @@ def load_formatter(dataset_path,
     weight(default 1.0) according to their formats.
 
     :param dataset_path: path to a dataset file or a dataset directory
-    :param keys_to_load: key names of field that stores sample text.
-        Default: ['text']
+    :param text_keys: key names of field that stores sample text.
+        Default: None
     :param suffixes: files with specified suffixes to be processed.
     :param add_suffix: whether to add the file suffix to dataset meta
         info
     :return: a dataset formatter.
     """
-    if keys_to_load is None:
-        keys_to_load = ['text']
     formatter = MixtureFormatter(dataset_path=dataset_path,
-                                 keys_to_load=keys_to_load,
+                                 text_keys=text_keys,
                                  suffixes=suffixes,
                                  add_suffix=add_suffix,
                                  **kwargs)

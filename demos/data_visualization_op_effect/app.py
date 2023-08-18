@@ -18,13 +18,13 @@ from data_juicer.utils.constant import Fields, StatsKeys
 
 
 @st.cache_data
-def convert_csv(df):
+def convert_to_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf_8_sig')
 
 
 @st.cache_data
-def convert_jsonl(df):
+def convert_to_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_json(orient='records', lines=True,
                       force_ascii=False).encode('utf_8_sig')
@@ -77,6 +77,11 @@ def parse_cfg():
     try:
         parsed_cfg = init_configs(args=args_in_cmd)
         st.session_state.cfg = parsed_cfg
+        if isinstance(parsed_cfg.text_keys, list):
+            text_key = parsed_cfg.text_keys[0]
+        else:
+            text_key = parsed_cfg.text_keys
+        st.session_state.text_key = text_key
 
         return pretty_out(parsed_cfg), pretty_out(specified_cfg), parsed_cfg
     except Exception as e:
@@ -311,9 +316,10 @@ class Visualize:
     @staticmethod
     def filter_dataset(dataset):
 
-        text = dataset['text']
+        text_key = st.session_state.get('text_key', 'text')
+        text = dataset[text_key]
         stats = pd.DataFrame(dataset[Fields.stats])
-        stats['text'] = text
+        stats[text_key] = text
 
         non_num_list = [StatsKeys.lang]
         min_cutoff_list = [
@@ -324,7 +330,7 @@ class Visualize:
             StatsKeys.flagged_words_ratio,
             StatsKeys.perplexity,
         ]
-        mask_list = ['text']
+        mask_list = [text_key]
 
         cfg = st.session_state.get('cfg', None)
         if cfg is None:
@@ -468,12 +474,12 @@ class Visualize:
         Visualize.display_dataset(ds, all_conds, show_num, 'Retained sampels',
                                   'docs')
         st.download_button('Download Retained data as JSONL',
-                           data=convert_jsonl(ds.loc[all_conds]),
+                           data=convert_to_jsonl(ds.loc[all_conds]),
                            file_name='retained.jsonl')
         Visualize.display_dataset(ds, np.invert(all_conds), show_num,
                                   'Discarded sampels', 'docs')
         st.download_button('Download Discarded data as JSONL',
-                           data=convert_jsonl(ds.loc[np.invert(all_conds)]),
+                           data=convert_to_jsonl(ds.loc[np.invert(all_conds)]),
                            file_name='discarded.jsonl')
         display_discarded_details = st.checkbox(
             'Display discarded documents by filter details')
@@ -485,7 +491,7 @@ class Visualize:
             for op_key, cond in item.items():
                 op_name, column_name = op_key
                 if column_name not in mask_list:
-                    sub_stats = show_stats[[column_name, 'text']]
+                    sub_stats = show_stats[[column_name, text_key]]
                     if display_discarded_details:
                         Visualize.display_dataset(
                             sub_stats,

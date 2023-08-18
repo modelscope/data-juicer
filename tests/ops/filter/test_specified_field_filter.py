@@ -59,7 +59,7 @@ class SpecifiedFieldFilterTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = SpecifiedFieldFilter(text_key='meta.suffix',
+        op = SpecifiedFieldFilter(field_key='meta.suffix',
                                   target_value=['.pdf', '.txt'])
         self._run_specified_field_filter(dataset, tgt_list, op)
 
@@ -138,7 +138,7 @@ class SpecifiedFieldFilterTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = SpecifiedFieldFilter(text_key='meta.path.test',
+        op = SpecifiedFieldFilter(field_key='meta.path.test',
                                   target_value=['pdf', 'txt', 'json'])
         self._run_specified_field_filter(dataset, tgt_list, op)
 

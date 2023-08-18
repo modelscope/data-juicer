@@ -197,7 +197,7 @@ class FrequencySpecifiedFieldSelectorTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = FrequencySpecifiedFieldSelector(text_key='meta.suffix',
+        op = FrequencySpecifiedFieldSelector(field_key='meta.suffix',
                                              top_ratio=0.3,
                                              topk=5,
                                              reverse=True)
@@ -387,7 +387,7 @@ class FrequencySpecifiedFieldSelectorTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = FrequencySpecifiedFieldSelector(text_key='meta.key1.key2.count',
+        op = FrequencySpecifiedFieldSelector(field_key='meta.key1.key2.count',
                                              top_ratio=0.4,
                                              topk=2,
                                              reverse=True)
@@ -541,7 +541,7 @@ class FrequencySpecifiedFieldSelectorTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = FrequencySpecifiedFieldSelector(text_key='meta.key1.key2.count',
+        op = FrequencySpecifiedFieldSelector(field_key='meta.key1.key2.count',
                                              top_ratio=0.4,
                                              topk=2,
                                              reverse=False)

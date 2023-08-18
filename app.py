@@ -26,13 +26,13 @@ from data_juicer.utils.logger_utils import get_log_file_path
 
 
 @st.cache_data
-def convert_csv(df):
+def convert_to_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf_8_sig')
 
 
 @st.cache_data
-def convert_jsonl(df):
+def convert_to_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_json(orient='records', lines=True,
                       force_ascii=False).encode('utf_8_sig')
@@ -112,6 +112,11 @@ def parse_cfg():
     try:
         parsed_cfg = init_configs(args=args_in_cmd)
         st.session_state.cfg = parsed_cfg
+        if isinstance(parsed_cfg.text_keys, list):
+            text_key = parsed_cfg.text_keys[0]
+        else:
+            text_key = parsed_cfg.text_keys
+        st.session_state.text_key = text_key
         if del_cfg_file:
             os.remove(cfg_f_name)
         return pretty_out(parsed_cfg), pretty_out(specified_cfg), parsed_cfg
@@ -161,7 +166,6 @@ def process_and_show_res():
 
         cfg_for_processed_data.export_path = os.path.dirname(
             cfg.export_path) + '_processed/data.jsonl'
-        cfg_for_processed_data.text_keys_to_load = [cfg.text_key_to_process]
         analyzer = Analyser(cfg_for_processed_data)
         analyzer.analysis_path = os.path.dirname(
             cfg_for_processed_data.export_path) + '/analysis'
@@ -195,7 +199,8 @@ def get_min_max_step(data):
 
 
 op_stats_dict = {
-    'alphanumeric_filter': [StatsKeys.alpha_token_ratio, StatsKeys.alnum_ratio],
+    'alphanumeric_filter':
+    [StatsKeys.alpha_token_ratio, StatsKeys.alnum_ratio],
     'average_line_length_filter': [StatsKeys.avg_line_length],
     'character_repetition_filter': [StatsKeys.char_rep_ratio],
     'flagged_words_filter': [StatsKeys.flagged_words_ratio],
@@ -214,10 +219,10 @@ class Visualize:
 
     @staticmethod
     def filter_dataset(dataset):
-
-        text = dataset['text']
+        text_key = st.session_state.get('text_key', 'text')
+        text = dataset[text_key]
         stats = pd.DataFrame(dataset[Fields.stats])
-        stats['text'] = text
+        stats[text_key] = text
 
         non_num_list = [StatsKeys.lang]
         min_cutoff_list = [
@@ -228,7 +233,7 @@ class Visualize:
             StatsKeys.flagged_words_ratio,
             StatsKeys.perplexity,
         ]
-        mask_list = ['text']
+        mask_list = [text_key]
 
         cfg = st.session_state.get('cfg', None)
         if cfg is None:
@@ -370,12 +375,12 @@ class Visualize:
         Visualize.display_dataset(ds, all_conds, show_num, 'Retained sampels',
                                   'docs')
         st.download_button('Download Retained data as JSONL',
-                           data=convert_jsonl(ds.loc[all_conds]),
+                           data=convert_to_jsonl(ds.loc[all_conds]),
                            file_name='retained.jsonl')
         Visualize.display_dataset(ds, np.invert(all_conds), show_num,
                                   'Discarded sampels', 'docs')
         st.download_button('Download Discarded data as JSONL',
-                           data=convert_jsonl(ds.loc[np.invert(all_conds)]),
+                           data=convert_to_jsonl(ds.loc[np.invert(all_conds)]),
                            file_name='discarded.jsonl')
         display_discarded_details = st.checkbox(
             'Display discarded documents by filter details')
@@ -387,7 +392,7 @@ class Visualize:
             for op_key, cond in item.items():
                 op_name, column_name = op_key
                 if column_name not in mask_list:
-                    sub_stats = show_stats[[column_name, 'text']]
+                    sub_stats = show_stats[[column_name, text_key]]
                     if display_discarded_details:
                         Visualize.display_dataset(
                             sub_stats,
@@ -419,6 +424,7 @@ class Visualize:
         with st.expander('Diversity for sft dataset', expanded=False):
             dataset = st.session_state.get('dataset', None)
             cfg = st.session_state.get('cfg', parse_cfg()[2])
+            text_key = st.session_state.get('text_key', 'text')
             if dataset:
 
                 col1, col2, col3, col4 = st.columns(4)
@@ -442,19 +448,19 @@ class Visualize:
                                           max_value=100,
                                           step=1)
 
-                disversity_btn = st.button('Analyse_diversity',
-                                           use_container_width=True)
+                diversity_btn = st.button('Analyse_diversity',
+                                          use_container_width=True)
                 output_path = os.path.join(os.path.dirname(cfg.export_path),
                                            'analysis')
                 raw_df = None
-                if disversity_btn:
+                if diversity_btn:
                     try:
                         diversity_analysis = DiversityAnalysis(
                             dataset, output_path)
                         with st.spinner('Wait for analyze diversity...'):
                             raw_df = diversity_analysis.compute(
                                 lang_or_model=get_diversity_model(lang_select),
-                                column_name=cfg.text_key_to_process)
+                                column_name=text_key)
 
                         st.session_state[f'diversity{lang_select}'] = raw_df
 
@@ -475,7 +481,7 @@ class Visualize:
 
                     st.download_button(
                         label='Download diversity data as CSV',
-                        data=convert_csv(df),
+                        data=convert_to_csv(df),
                         file_name='diversity.csv',
                         mime='text/csv',
                     )
