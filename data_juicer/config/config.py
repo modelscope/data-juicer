@@ -25,10 +25,11 @@ def init_configs(args=None):
     """
     parser = ArgumentParser(default_env=True, default_config_files=None)
 
-    parser.add_argument('--config',
-                        action=ActionConfigFile,
-                        help='Path to a configuration file.',
-                        required=True)
+    parser.add_argument(
+        '--config',
+        action=ActionConfigFile,
+        help='Path to a configuration file.',
+        required=True)
 
     # basic global paras with extended type hints
     # e.g., files can be mode include flags
@@ -37,124 +38,126 @@ def init_configs(args=None):
     # "dw": "path to a directory that exists and is writeable")
     # "dc": "path to a directory that can be created if it does not exist")
     # "drw": "path to a directory that exists and is readable and writeable")
-    parser.add_argument('--project_name',
-                        type=str,
-                        default='hello_world',
-                        help='Name of your data process project.')
+    parser.add_argument(
+        '--project_name',
+        type=str,
+        default='hello_world',
+        help='Name of your data process project.')
     parser.add_argument(
         '--dataset_path',
         type=str,
-        help='Path to datasets with optional weights(0.0-1.0), '
-        '1.0 as default. Accepted format:'
-        '<w1> dataset1-path <w2> dataset2-path '
-        '<w3> dataset3-path ...')
+        help='Path to datasets with optional weights(0.0-1.0), 1.0 as '
+             'default. Accepted format:<w1> dataset1-path <w2> dataset2-path '
+             '<w3> dataset3-path ...')
     parser.add_argument(
         '--export_path',
         type=str,
         default='./outputs/hello_world.jsonl',
-        help='Path to export and save the output processed dataset.'
-        ' The directory to store the processed dataset will be the '
-        'work directory of this process.')
-    parser.add_argument('--export_shard_size',
-                        type=NonNegativeInt,
-                        default=0,
-                        help='Shard size of exported dataset in Byte. In '
-                        'default, it\'s 0, which means export the whole '
-                        'dataset into only one file. If it\'s set a '
-                        'positive number, the exported dataset will be '
-                        'split into several sub-dataset shards, and the max '
-                        'size of each shard won\'t larger than the '
-                        'export_shard_size')
-    parser.add_argument('--np',
-                        type=PositiveInt,
-                        default=4,
-                        help='Number of processes to process dataset.')
+        help='Path to export and save the output processed dataset. The '
+             'directory to store the processed dataset will be the work '
+             'directory of this process.')
+    parser.add_argument(
+        '--export_shard_size',
+        type=NonNegativeInt,
+        default=0,
+        help='Shard size of exported dataset in Byte. In default, it\'s 0, '
+             'which means export the whole dataset into only one file. If '
+             'it\'s set a positive number, the exported dataset will be split '
+             'into several sub-dataset shards, and the max size of each shard '
+             'won\'t larger than the export_shard_size')
+    parser.add_argument(
+        '--np',
+        type=PositiveInt,
+        default=4,
+        help='Number of processes to process dataset.')
     parser.add_argument(
         '--text_keys',
         type=Union[str, List[str]],
         default='text',
-        help='Key name of field where the sample '
-        'texts to be processed, e.g., '
-        '`text`, `text.instruction`, `text.output`, ...'
-        'Note: currently, we support specify only ONE key for '
-        'each op, for cases requiring multiple keys, users can'
-        ' specify the op multiple times.  We will only use the '
-        'first key of `text_keys` when you set multiple keys.')
-    parser.add_argument('--suffixes',
-                        type=Union[str, List[str], Tuple[str]],
-                        default=[],
-                        help='Suffixes of files that will be find and loaded. '
-                        'If not set, we will find all suffix files, and select'
-                        'a suitable formatter with the most files as default.')
-    parser.add_argument('--use_cache',
-                        type=bool,
-                        default=True,
-                        help='Whether to use the cache management of hugging'
-                        'face datasets. It might take up lots of disk '
-                        'space when using cache')
-    parser.add_argument('--ds_cache_dir',
-                        type=str,
-                        default='~/.cache/huggingface/datasets',
-                        help='Cache dir for HuggingFace datasets. In default '
-                        'it\'s the default cache dir "~/.cache/huggingface/dat'
-                        'asets". If this argument is reset by users, it will '
-                        'override the default cache dir.')
-    parser.add_argument('--use_checkpoint',
-                        type=bool,
-                        default=False,
-                        help='Whether to use the checkpoint management to '
-                        'save the latest version of dataset to work dir when '
-                        'processing. Rerun the same config will reload the '
-                        'checkpoint and skip ops before it. Cache will be '
-                        'disabled when it is true . If args of ops '
-                        'before the checkpoint are changed, all ops will be '
-                        'rerun from the beginning.')
-    parser.add_argument('--temp_dir',
-                        type=str,
-                        default=None,
-                        help='Path to the temp directory to store '
-                        'intermediate caches when cache is disabled. In '
-                        'default it\'s None, so the temp dir will be '
-                        'specified by system. NOTICE: you should be caution '
-                        'when setting this argument because it might cause '
-                        'unexpected program behaviors when this path is set '
-                        'to an unsafe directory.')
-    parser.add_argument('--open_tracer',
-                        type=bool,
-                        default=False,
-                        help='Whether to open the tracer to trace samples'
-                        'changed during process. It might take more '
-                        'time when opening tracer.')
+        help='Key name of field where the sample texts to be processed, e.g., '
+             '`text`, `text.instruction`, `text.output`, ... Note: currently, '
+             'we support specify only ONE key for each op, for cases '
+             'requiring multiple keys, users can specify the op multiple '
+             'times.  We will only use the first key of `text_keys` when you '
+             'set multiple keys.')
+    parser.add_argument(
+        '--suffixes',
+        type=Union[str, List[str], Tuple[str]],
+        default=[],
+        help='Suffixes of files that will be find and loaded. If not set, we '
+             'will find all suffix files, and select a suitable formatter '
+             'with the most files as default.')
+    parser.add_argument(
+        '--use_cache',
+        type=bool,
+        default=True,
+        help='Whether to use the cache management of huggingface datasets. It '
+             'might take up lots of disk space when using cache')
+    parser.add_argument(
+        '--ds_cache_dir',
+        type=str,
+        default='~/.cache/huggingface/datasets',
+        help='Cache dir for HuggingFace datasets. In default it\'s the '
+             'default cache dir "~/.cache/huggingface/datasets". If this '
+             'argument is reset by users, it will override the default cache '
+             'dir.')
+    parser.add_argument(
+        '--use_checkpoint',
+        type=bool,
+        default=False,
+        help='Whether to use the checkpoint management to save the latest '
+             'version of dataset to work dir when processing. Rerun the same '
+             'config will reload the checkpoint and skip ops before it. Cache '
+             'will be disabled when it is true . If args of ops before the '
+             'checkpoint are changed, all ops will be rerun from the '
+             'beginning.')
+    parser.add_argument(
+        '--temp_dir',
+        type=str,
+        default=None,
+        help='Path to the temp directory to store intermediate caches when '
+             'cache is disabled. In default it\'s None, so the temp dir will '
+             'be specified by system. NOTICE: you should be caution when '
+             'setting this argument because it might cause unexpected program '
+             'behaviors when this path is set to an unsafe directory.')
+    parser.add_argument(
+        '--open_tracer',
+        type=bool,
+        default=False,
+        help='Whether to open the tracer to trace samples changed during '
+             'process. It might take more time when opening tracer.')
     parser.add_argument(
         '--op_list_to_trace',
         type=List[str],
         default=[],
-        help='Which ops will be traced by tracer. '
-        'If it\'s empty, all ops in cfg.process will be traced. Only '
-        'available when open_tracer is true.')
-    parser.add_argument('--trace_num',
-                        type=int,
-                        default=10,
-                        help='Number of samples extracted by tracer to show '
-                        'the dataset difference before and after a op. '
-                        'Only available when open_tracer is true.')
-    parser.add_argument('--op_fusion',
-                        type=bool,
-                        default=False,
-                        help='Whether to fuse operators that share the same '
-                             'intermediate variables. Op fusion might reduce '
-                             'the memory requirements and speed up the whole '
-                             'process.')
+        help='Which ops will be traced by tracer. If it\'s empty, all ops in '
+             'cfg.process will be traced. Only available when open_tracer is '
+             'true.')
+    parser.add_argument(
+        '--trace_num',
+        type=int,
+        default=10,
+        help='Number of samples extracted by tracer to show the dataset '
+             'difference before and after a op. Only available when '
+             'open_tracer is true.')
+    parser.add_argument(
+        '--op_fusion',
+        type=bool,
+        default=False,
+        help='Whether to fuse operators that share the same intermediate '
+             'variables automatically. Op fusion might reduce the memory '
+             'requirements slightly but speed up the whole process.')
     parser.add_argument(
         '--process',
         type=List[Dict],
-        help='List of several operators with their '
-        'arguments, these ops will be applied to dataset in order')
-    parser.add_argument('--save_stats_in_one_file',
-                        type=bool,
-                        default=False,
-                        help='Whether to save all stats to only one file. Only'
-                        ' used in Analysis.')
+        help='List of several operators with their arguments, these ops will '
+             'be applied to dataset in order')
+    parser.add_argument(
+        '--save_stats_in_one_file',
+        type=bool,
+        default=False,
+        help='Whether to save all stats to only one file. Only used in '
+             'Analysis.')
 
     # add all parameters of the registered ops class to the parser,
     # and these op parameters can be modified through the command line,
@@ -277,13 +280,17 @@ def init_setup_from_cfg(cfg):
     # Apply text_key modification during initializing configs
     # users can freely specify text_key for different ops using `text_key`
     # otherwise, set arg text_key of each op to text_key_to_process
+    if isinstance(cfg.text_keys, list):
+        text_key = cfg.text_keys[0]
+    else:
+        text_key = cfg.text_keys
     for op in cfg.process:
         for op_name in op:
             args = op[op_name]
             if args is None:
-                args = {'text_key': cfg.text_key_to_process}
+                args = {'text_key': text_key}
             elif args['text_key'] is None:
-                args['text_key'] = cfg.text_key_to_process
+                args['text_key'] = text_key
             op[op_name] = args
 
     return cfg

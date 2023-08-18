@@ -2,7 +2,7 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.constant import Fields, StatsKeys, InterVars
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -52,16 +52,16 @@ class WordNumFilter(Filter):
         if StatsKeys.num_words in sample[Fields.stats]:
             return sample
 
-        words_key = f'words-{self.model_key}'
-        if context and words_key in sample['__dj__context__']:
-            words = sample['__dj__context__'][words_key]
+        words_key = f'{InterVars.words}-{self.model_key}'
+        if context and words_key in sample[Fields.context]:
+            words = sample[Fields.context][words_key]
         else:
             tokenizer = MODEL_ZOO.get(self.model_key, None)
             words = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)
             if context:
-                sample['__dj__context__'][words_key] = words
+                sample[Fields.context][words_key] = words
         words = words_refinement(words, strip_chars=SPECIAL_CHARACTERS)
         sample[Fields.stats][StatsKeys.num_words] = len(words)
         return sample

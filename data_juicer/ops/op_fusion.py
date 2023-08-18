@@ -3,11 +3,12 @@ from typing import List
 from loguru import logger
 
 from .base_op import Filter
+from data_juicer.utils.constant import Fields, InterVars
 from data_juicer.utils.registry import Registry
 
 # Type of intermediate vars
-INTER_LINES = Registry('Intermediate_Vars_Lines')
-INTER_WORDS = Registry('Intermediate_Vars_Words')
+INTER_LINES = Registry(InterVars.lines)
+INTER_WORDS = Registry(InterVars.words)
 
 def fuse_operators(process_list, ops):
     """
@@ -116,12 +117,12 @@ class FusedFilter(Filter):
 
     def compute_stats(self, sample):
         # context for the intermediate vars
-        sample['__dj__context__'] = {}
+        sample[Fields.context] = {}
         for op in self.fused_filters:
             # open the context for these fused ops
             sample = op.compute_stats(sample, context=True)
         # clean up the contexts after processing
-        _ = sample.pop('__dj__context__')
+        _ = sample.pop(Fields.context)
         return sample
 
     def process(self, sample):

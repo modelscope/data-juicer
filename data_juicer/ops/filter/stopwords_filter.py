@@ -5,7 +5,7 @@
 from jsonargparse.typing import ClosedUnitInterval, List
 
 from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
-from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.constant import Fields, StatsKeys, InterVars
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -72,24 +72,24 @@ class StopWordsFilter(Filter):
             return sample
 
         # try to get words from context
-        words_key = f'words-{self.model_key}'
-        if context and words_key in sample['__dj__context__']:
-            words = sample['__dj__context__'][words_key]
+        words_key = f'{InterVars.words}-{self.model_key}'
+        if context and words_key in sample[Fields.context]:
+            words = sample[Fields.context][words_key]
         else:
             tokenizer = MODEL_ZOO.get(self.model_key, None)
             words = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)
             if context:
-                sample['__dj__context__'][words_key] = words
+                sample[Fields.context][words_key] = words
 
         # try to get refined words from context
-        refined_words_key = f'refined-words-True-SPECIAL_CHARS-' \
+        refined_words_key = f'{InterVars.refined_words}-True-SPECIAL_CHARS-' \
                             f'{self.use_words_aug}-' \
                             f'{self.words_aug_group_sizes}-' \
                             f'{self.words_aug_join_char}'
-        if context and refined_words_key in sample['__dj__context__']:
-            words = sample['__dj__context__'][refined_words_key]
+        if context and refined_words_key in sample[Fields.context]:
+            words = sample[Fields.context][refined_words_key]
         else:
             words = words_refinement(
                 words,
@@ -99,7 +99,7 @@ class StopWordsFilter(Filter):
                 words_aug_group_sizes=self.words_aug_group_sizes,
                 words_aug_join_char=self.words_aug_join_char)
             if context:
-                sample['__dj__context__'][refined_words_key] = words
+                sample[Fields.context][refined_words_key] = words
 
         stopwords_ratio = (
                 len([word for word in words

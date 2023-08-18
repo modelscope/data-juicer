@@ -2,7 +2,7 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.constant import Fields, StatsKeys, InterVars
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_LINES
@@ -40,13 +40,13 @@ class MaximumLineLengthFilter(Filter):
         if StatsKeys.max_line_length in sample[Fields.stats]:
             return sample
 
-        context_key = 'lines'
-        if context and context_key in sample['__dj__context__']:
-            lines = sample['__dj__context__'][context_key]
+        context_key = f'{InterVars.lines}'
+        if context and context_key in sample[Fields.context]:
+            lines = sample[Fields.context][context_key]
         else:
             lines = sample[self.text_key].splitlines()
             if context:
-                sample['__dj__context__'][context_key] = lines
+                sample[Fields.context][context_key] = lines
         line_lengths = list(map(len, lines))
         sample[Fields.stats][StatsKeys.max_line_length] = max(
             line_lengths) if line_lengths else 0.0

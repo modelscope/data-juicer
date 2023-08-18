@@ -4,7 +4,7 @@
 
 from jsonargparse.typing import PositiveFloat
 
-from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.constant import Fields, StatsKeys, InterVars
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -44,16 +44,16 @@ class PerplexityFilter(Filter):
             return sample
 
         # tokenization
-        words_key = f'words-{self.sp_model_key}'
-        if context and words_key in sample['__dj__context__']:
-            words = sample['__dj__context__'][words_key]
+        words_key = f'{InterVars.words}-{self.sp_model_key}'
+        if context and words_key in sample[Fields.context]:
+            words = sample[Fields.context][words_key]
         else:
             tokenizer = MODEL_ZOO.get(self.sp_model_key, None)
             words = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)
             if context:
-                sample['__dj__context__'][words_key] = words
+                sample[Fields.context][words_key] = words
         text = ' '.join(words)
         # compute perplexity
         logits, length = 0, 0
