@@ -9,6 +9,8 @@ from typing import Dict, Set
 
 import regex as re
 
+from data_juicer.utils.constant import HashKeys
+
 from ..base_op import OPERATORS, Deduplicator
 
 
@@ -48,7 +50,7 @@ class DocumentDeduplicator(Deduplicator):
         :return: sample with md5 hash value.
         """
         # check if it's computed already
-        if 'hash' in sample:
+        if HashKeys.hash in sample:
             return sample
 
         text = sample[self.text_key]
@@ -60,7 +62,7 @@ class DocumentDeduplicator(Deduplicator):
         def _get_hash(txt):
             return hashlib.md5(txt.strip().encode('utf-8')).hexdigest()
 
-        sample['hash'] = _get_hash(text)
+        sample[HashKeys.hash] = _get_hash(text)
         return sample
 
     def process(self, dataset, show_num=0):
@@ -80,7 +82,7 @@ class DocumentDeduplicator(Deduplicator):
         if show_num > 0:
             # sample duplicate pairs
             hash2ids: Dict[int, Set[int]] = defaultdict(set)
-            for sid, hash_val in enumerate(dataset['hash']):
+            for sid, hash_val in enumerate(dataset[HashKeys.hash]):
                 hash2ids[hash_val].add(sid)
             dup_samples = sorted(list(hash2ids.items()),
                                  key=lambda x: len(x[1]),
@@ -90,7 +92,7 @@ class DocumentDeduplicator(Deduplicator):
             ][:show_num])
 
         def _filter_dup_helper(sample, hashes):
-            hash = sample['hash']
+            hash = sample[HashKeys.hash]
             if show_num > 0 and hash in dup_hashes \
                     and len(dup_pairs[hash]) < 2:
                 # tracer is open and not enough duplicate sample pairs

@@ -69,20 +69,17 @@ def init_configs(args=None):
                         type=PositiveInt,
                         default=4,
                         help='Number of processes to process dataset.')
-    parser.add_argument('--text_key_to_process',
-                        type=Optional[str],
-                        default='text',
-                        help='Key name of field where the sample '
-                        'texts to be processed, e.g., '
-                        '`text`, `text.instruction`, `text.output`, ...'
-                        'Note: currently, we support specify only ONE key for '
-                        'each op, for cases requiring multiple keys, users can'
-                        ' specify the op multiple times')
-    parser.add_argument('--text_keys_to_load',
-                        type=Union[List[str], Tuple[str]],
-                        default=['text'],
-                        help='Key name of field where the sample '
-                        'texts stored in the original data')
+    parser.add_argument(
+        '--text_keys',
+        type=Union[str, List[str]],
+        default='text',
+        help='Key name of field where the sample '
+        'texts to be processed, e.g., '
+        '`text`, `text.instruction`, `text.output`, ...'
+        'Note: currently, we support specify only ONE key for '
+        'each op, for cases requiring multiple keys, users can'
+        ' specify the op multiple times.  We will only use the '
+        'first key of `text_keys` when you set multiple keys.')
     parser.add_argument('--suffixes',
                         type=Union[str, List[str], Tuple[str]],
                         default=[],

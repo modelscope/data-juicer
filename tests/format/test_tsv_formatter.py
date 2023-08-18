@@ -7,7 +7,8 @@ from data_juicer.format.tsv_formatter import TsvFormatter
 class TsvFormatterTest(unittest.TestCase):
 
     def setUp(self):
-        self._path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'structured')
+        self._path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                                  'data', 'structured')
         self._file = os.path.join(self._path, 'demo-dataset.tsv')
         print(self._file)
 

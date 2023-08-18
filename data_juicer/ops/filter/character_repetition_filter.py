@@ -5,6 +5,8 @@
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
+from data_juicer.utils.constant import Fields, StatsKeys
+
 from ..base_op import OPERATORS, Filter
 
 
@@ -39,7 +41,7 @@ class CharacterRepetitionFilter(Filter):
 
     def compute_stats(self, sample):
         # check if it's computed already
-        if 'char_rep_ratio' in sample['stats']:
+        if StatsKeys.char_rep_ratio in sample[Fields.stats]:
             return sample
 
         char_ngrams = [
@@ -52,7 +54,7 @@ class CharacterRepetitionFilter(Filter):
                 freq_char_ngrams.get(char_ngram, 0) + 1)
 
         if len(freq_char_ngrams) == 0:
-            sample['stats']['char_rep_ratio'] = 0.0
+            sample[Fields.stats][StatsKeys.char_rep_ratio] = 0.0
             return sample
 
         freq_char_ngrams = sorted(list(freq_char_ngrams.values()),
@@ -62,13 +64,13 @@ class CharacterRepetitionFilter(Filter):
             int(np.sqrt(len(freq_char_ngrams))),
             len(freq_char_ngrams) - rep_more_than_one,
         )
-        sample['stats']['char_rep_ratio'] = (sum(
+        sample[Fields.stats][StatsKeys.char_rep_ratio] = (sum(
             freq_char_ngrams[:num_rep_char_ngrams]) / sum(freq_char_ngrams)) \
             if sum(freq_char_ngrams) != 0 else 0.0
         return sample
 
     def process(self, sample):
-        if self.min_ratio <= sample['stats']['char_rep_ratio'] \
+        if self.min_ratio <= sample[Fields.stats][StatsKeys.char_rep_ratio] \
                 <= self.max_ratio:
             return True
         else:

@@ -161,7 +161,7 @@ class TopkSpecifiedFieldSelectorTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = TopkSpecifiedFieldSelector(text_key='meta.key1.key2.count',
+        op = TopkSpecifiedFieldSelector(field_key='meta.key1.key2.count',
                                         top_ratio=0.2,
                                         topk=5,
                                         reverse=True)
@@ -339,7 +339,7 @@ class TopkSpecifiedFieldSelectorTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = TopkSpecifiedFieldSelector(text_key='meta.key1.key2.count',
+        op = TopkSpecifiedFieldSelector(field_key='meta.key1.key2.count',
                                         top_ratio=0.5,
                                         topk=4,
                                         reverse=True)
@@ -505,7 +505,7 @@ class TopkSpecifiedFieldSelectorTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = TopkSpecifiedFieldSelector(text_key='meta.key1.key2.count',
+        op = TopkSpecifiedFieldSelector(field_key='meta.key1.key2.count',
                                         top_ratio=0.5,
                                         topk=3,
                                         reverse=False)
@@ -671,7 +671,7 @@ class TopkSpecifiedFieldSelectorTest(unittest.TestCase):
             }
         }]
         dataset = Dataset.from_list(ds_list)
-        op = TopkSpecifiedFieldSelector(text_key='meta.key1.key2.count',
+        op = TopkSpecifiedFieldSelector(field_key='meta.key1.key2.count',
                                         top_ratio=0.5,
                                         topk=3,
                                         reverse=False)

@@ -70,16 +70,16 @@ We use simple 3-σ rule to set the hyperparameters for ops in each recipe.
 
 
 @st.cache_data
-def convert_csv(df):
+def convert_to_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_csv(encoding='utf_8_sig').encode('utf-8')
+    return df.to_csv().encode('utf_8_sig')
 
 
 @st.cache_data
-def convert_jsonl(df):
+def convert_to_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_json(orient='records', lines=True,
-                      force_ascii=False).encode('utf-8')
+                      force_ascii=False).encode('utf_8_sig')
 
 
 def process_and_show_res():
@@ -163,7 +163,7 @@ class Visualize:
                 st.header('Original Data')
                 st.dataframe(analyzed_dataset, use_container_width=True)
                 st.download_button('Download Original data as JSONL',
-                                   data=convert_jsonl(
+                                   data=convert_to_jsonl(
                                        pd.DataFrame(analyzed_dataset)),
                                    file_name='original_dataset.jsonl')
 
@@ -171,7 +171,7 @@ class Visualize:
                 st.header('Processed Data')
                 st.dataframe(processed_dataset, use_container_width=True)
                 st.download_button('Download Processed data as JSONL',
-                                   data=convert_jsonl(
+                                   data=convert_to_jsonl(
                                        pd.DataFrame(processed_dataset)),
                                    file_name='processed_dataset.jsonl')
 

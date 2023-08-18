@@ -11,6 +11,8 @@ import simhash
 from jsonargparse.typing import PositiveInt
 from loguru import logger
 
+from data_juicer.utils.constant import HashKeys
+
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
 
@@ -118,7 +120,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
         :return: sample with simhash value.
         """
         # check if it's computed already
-        if 'simhash' in sample:
+        if HashKeys.simhash in sample:
             return sample
 
         text = sample[self.text_key]
@@ -152,7 +154,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
                 f'Unimplemented tokenization method [{self.tokenization}]')
 
         # compute simhash
-        sample['simhash'] = np.uint64(
+        sample[HashKeys.simhash] = np.uint64(
             simhash.compute(map(simhash.unsigned_hash, tokens)))
         return sample
 
@@ -172,7 +174,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
         # find matches
         logger.info(f'Start querying {len(dataset)} samples.')
         matches = simhash.find_all(
-            dataset['simhash'],
+            dataset[HashKeys.simhash],
             self.num_blocks,
             self.hamming_distance,
         )
@@ -188,12 +190,12 @@ class DocumentSimhashDeduplicator(Deduplicator):
         logger.info(f'Hash diff distribution: {dist}')
 
         hash2ids: Dict[int, Set[str]] = defaultdict(set)
-        hashes: Set[int] = set(dataset['simhash'])
+        hashes: Set[int] = set(dataset[HashKeys.simhash])
         hash2cluster: Dict[int, int] = {}
         visited: Set[int] = set()
         cluster_id: int = 0
 
-        for sid, hash_val in enumerate(dataset['simhash']):
+        for sid, hash_val in enumerate(dataset[HashKeys.simhash]):
             hash2ids[hash_val].add(str(sid))
 
         # clustering
@@ -233,7 +235,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
         # there are some better strategies later.
         def _filter_simhash_dup_helper(sample, visited_clusters,
                                        visited_hashes):
-            sample_hash_val = sample['simhash']
+            sample_hash_val = sample[HashKeys.simhash]
             cluster_num = hash2cluster[sample_hash_val]
             if cluster_num == -1:
                 # single-sample cluster, we need to check hash value still.

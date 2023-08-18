@@ -1,5 +1,7 @@
 from typing import List, Tuple, Union
 
+from data_juicer.utils.constant import Fields
+
 from ..base_op import OPERATORS, Filter
 
 
@@ -32,7 +34,7 @@ class SuffixFilter(Filter):
 
     def process(self, sample):
         if self.suffixes:
-            if sample['meta.suffix'] in self.suffixes:
+            if sample[Fields.suffix] in self.suffixes:
                 return True
             else:
                 return False

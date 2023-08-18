@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 
-
+from data_juicer.utils.constant import Fields
 class OverallAnalysis:
     """Apply analysis on the overall stats, including mean, std, quantiles,
     etc."""
@@ -14,7 +14,7 @@ class OverallAnalysis:
         :param dataset: the dataset to be analysed
         :param output_path: path to store the analysis results.
         """
-        self.stats = pd.DataFrame(dataset['stats'])
+        self.stats = pd.DataFrame(dataset[Fields.stats])
         self.output_path = output_path
         if not os.path.exists(self.output_path):
             os.makedirs(self.output_path)

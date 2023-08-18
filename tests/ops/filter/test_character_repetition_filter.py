@@ -4,17 +4,18 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.character_repetition_filter import \
     CharacterRepetitionFilter
+from data_juicer.utils.constant import Fields
 
 
 class CharacterRepetitionFilterTest(unittest.TestCase):
 
     def _run_character_repetition_filter(self, dataset: Dataset, target_list,
                                          op):
-        if 'stats' not in dataset.features:
+        if Fields.stats not in dataset.features:
             # TODO:
             # this is a temp solution,
             # only add stats when calling filter op
-            dataset = dataset.add_column(name='stats',
+            dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
         dataset = dataset.map(op.compute_stats)
         dataset = dataset.filter(op.process)

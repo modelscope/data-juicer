@@ -12,16 +12,16 @@ else:
 
 
 @st.cache_data
-def convert_csv(df):
+def convert_to_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_csv(encoding='utf_8_sig').encode('utf-8')
+    return df.to_csv().encode('utf_8_sig')
 
 
 @st.cache_data
-def convert_jsonl(df):
+def convert_to_jsonl(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_json(orient='records', lines=True,
-                      force_ascii=False).encode('utf-8')
+                      force_ascii=False).encode('utf_8_sig')
 
 
 class Visualize:
@@ -88,7 +88,8 @@ class Visualize:
                         with tab:
                             st.write(pd.read_json(ds_file, lines=True))
 
-        start_btn = st.button('Start to mix datasets', use_container_width=True)
+        start_btn = st.button('Start to mix datasets',
+                              use_container_width=True)
         if start_btn:
             if len(datasets) > 0:
                 data_path = ' '.join([
@@ -106,7 +107,7 @@ class Visualize:
         st.subheader('Mixed dataset')
         st.dataframe(dataset, use_container_width=True)
         st.download_button(label='Download mixed dataset as JSONL',
-                           data=convert_jsonl(dataset),
+                           data=convert_to_jsonl(dataset),
                            file_name='mixed_dataset.jsonl')
 
     @staticmethod

@@ -4,6 +4,7 @@ import unittest
 from datasets import Dataset
 
 from data_juicer.format.formatter import load_dataset, unify_format
+from data_juicer.utils.constant import Fields
 
 
 class UnifyFormatTest(unittest.TestCase):
@@ -24,7 +25,7 @@ class UnifyFormatTest(unittest.TestCase):
                 }],
                 'target': [{
                     'text': 'This is a test text',
-                    'meta.outer_key': 1,
+                    'outer_key': 1,
                 }]
             },
             {
@@ -33,8 +34,8 @@ class UnifyFormatTest(unittest.TestCase):
                     'outer_key': 1,
                 }],
                 'target': [{
-                    'text': 'This is a test text',
-                    'meta.outer_key': 1,
+                    'content': 'This is a test text',
+                    'outer_key': 1,
                 }]
             },
             {
@@ -44,17 +45,16 @@ class UnifyFormatTest(unittest.TestCase):
                     'outer_key': 1,
                 }],
                 'target': [{
-                    'text.input': 'This is a test text, input part',
-                    'text.instruction':
-                    'This is a test text, instruction part',
-                    'meta.outer_key': 1,
+                    'input': 'This is a test text, input part',
+                    'instruction': 'This is a test text, instruction part',
+                    'outer_key': 1,
                 }]
             },
         ]
         self.run_test(samples[0])
-        self.run_test(samples[1], args={'text_keys_to_load': ['content']})
+        self.run_test(samples[1], args={'text_keys': ['content']})
         self.run_test(samples[2],
-                      args={'text_keys_to_load': ['input', 'instruction']})
+                      args={'text_keys': ['input', 'instruction']})
 
     def test_empty_text(self):
         # filter out samples containing None field, but '' is OK
@@ -66,7 +66,7 @@ class UnifyFormatTest(unittest.TestCase):
                 }],
                 'target': [{
                     'text': '',
-                    'meta.outer_key': 1,
+                    'outer_key': 1,
                 }],
             },
             {
@@ -84,13 +84,13 @@ class UnifyFormatTest(unittest.TestCase):
         samples = [{
             'source': [{
                 'text': 'This is a test text.',
-                'stats': {
+                Fields.stats: {
                     'lang': 'en'
                 },
             }],
             'target': [{
                 'text': 'This is a test text.',
-                'stats': {
+                Fields.stats: {
                     'lang': 'en'
                 },
             }],
@@ -112,7 +112,7 @@ class UnifyFormatTest(unittest.TestCase):
                 'meta': {
                     'version': 1
                 },
-                'stats': {
+                Fields.stats: {
                     'lang': 'en'
                 },
             }],
@@ -121,7 +121,7 @@ class UnifyFormatTest(unittest.TestCase):
                 'meta': {
                     'version': 1
                 },
-                'stats': {
+                Fields.stats: {
                     'lang': 'en'
                 },
             }],
@@ -143,7 +143,7 @@ class UnifyFormatTest(unittest.TestCase):
             self.run_test(sample)
 
     def test_invalid_stats(self):
-        # non-dict stats will be unified into meta.stats
+        # non-dict stats will be unified into stats
         samples = [{
             'source': [{
                 'text': 'This is a test text.',
@@ -151,18 +151,18 @@ class UnifyFormatTest(unittest.TestCase):
             }],
             'target': [{
                 'text': 'This is a test text.',
-                'meta.stats': 'nice'
+                'stats': 'nice'
             }],
         }, {
             'source': [{
                 'text': 'This is a test text.',
-                'stats': {
+                Fields.stats: {
                     'version': 1
                 },
             }],
             'target': [{
                 'text': 'This is a test text.',
-                'stats': {
+                Fields.stats: {
                     'version': 1
                 },
             }],
@@ -185,7 +185,7 @@ class UnifyFormatTest(unittest.TestCase):
                     'meta': {
                         'meta_inner': 'nice',
                     },
-                    'meta.outer_field': 'value',
+                    'outer_field': 'value',
                 }],
             },
             {
@@ -196,8 +196,8 @@ class UnifyFormatTest(unittest.TestCase):
                 }],
                 'target': [{
                     'text': 'This is a test text.',
-                    'meta.outer_key': 'nice',
-                    'meta.outer_field': 'value',
+                    'outer_key': 'nice',
+                    'outer_field': 'value',
                 }],
             },
             {
@@ -209,7 +209,7 @@ class UnifyFormatTest(unittest.TestCase):
                 'target': [{
                     'text': 'This is a test text.',
                     'meta': 'nice',
-                    'meta.outer_field': 'value',
+                    'outer_field': 'value',
                 }],
             },
             {
@@ -219,7 +219,7 @@ class UnifyFormatTest(unittest.TestCase):
                         'meta_inner': 'nice'
                     },
                     'outer_field': 'value',
-                    'stats': {
+                    Fields.stats: {
                         'lang': 'en'
                     },
                 }],
@@ -228,8 +228,8 @@ class UnifyFormatTest(unittest.TestCase):
                     'meta': {
                         'meta_inner': 'nice'
                     },
-                    'meta.outer_field': 'value',
-                    'stats': {
+                    'outer_field': 'value',
+                    Fields.stats: {
                         'lang': 'en'
                     },
                 }],
@@ -239,15 +239,15 @@ class UnifyFormatTest(unittest.TestCase):
                     'text': 'This is a test text.',
                     'outer_key': 'nice',
                     'outer_field': 'value',
-                    'stats': {
+                    Fields.stats: {
                         'lang': 'en'
                     },
                 }],
                 'target': [{
                     'text': 'This is a test text.',
-                    'meta.outer_key': 'nice',
-                    'meta.outer_field': 'value',
-                    'stats': {
+                    'outer_key': 'nice',
+                    'outer_field': 'value',
+                    Fields.stats: {
                         'lang': 'en'
                     },
                 }],
@@ -257,15 +257,15 @@ class UnifyFormatTest(unittest.TestCase):
                     'text': 'This is a test text.',
                     'meta': 'nice',
                     'outer_field': 'value',
-                    'stats': {
+                    Fields.stats: {
                         'lang': 'en'
                     },
                 }],
                 'target': [{
                     'text': 'This is a test text.',
                     'meta': 'nice',
-                    'meta.outer_field': 'value',
-                    'stats': {
+                    'outer_field': 'value',
+                    Fields.stats: {
                         'lang': 'en'
                     },
                 }],
@@ -277,15 +277,15 @@ class UnifyFormatTest(unittest.TestCase):
                         'meta_inner': 'nice'
                     },
                     'outer_field': 'value',
-                    'stats': 'en',
+                    'stats': 'en'
                 }],
                 'target': [{
                     'text': 'This is a test text.',
                     'meta': {
                         'meta_inner': 'nice'
                     },
-                    'meta.outer_field': 'value',
-                    'meta.stats': 'en'
+                    'outer_field': 'value',
+                    'stats': 'en'
                 }],
             },
             {
@@ -293,13 +293,13 @@ class UnifyFormatTest(unittest.TestCase):
                     'text': 'This is a test text.',
                     'outer_key': 'nice',
                     'outer_field': 'value',
-                    'stats': 'en',
+                    'stats': 'en'
                 }],
                 'target': [{
                     'text': 'This is a test text.',
-                    'meta.outer_key': 'nice',
-                    'meta.outer_field': 'value',
-                    'meta.stats': 'en'
+                    'outer_key': 'nice',
+                    'outer_field': 'value',
+                    'stats': 'en'
                 }],
             },
             {
@@ -312,8 +312,8 @@ class UnifyFormatTest(unittest.TestCase):
                 'target': [{
                     'text': 'This is a test text.',
                     'meta': 'nice',
-                    'meta.outer_field': 'value',
-                    'meta.stats': 'en'
+                    'outer_field': 'value',
+                    'stats': 'en'
                 }],
             },
         ]
@@ -332,7 +332,7 @@ class UnifyFormatTest(unittest.TestCase):
             }],
             'target': [{
                 'text': 'This is a test text.',
-                'meta.outer_field': {
+                'outer_field': {
                     'rec1': {
                         'rec2': 'value'
                     }
@@ -343,7 +343,8 @@ class UnifyFormatTest(unittest.TestCase):
             self.run_test(sample)
 
     def test_hetero_meta(self):
-        cur_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'data', 'structured')
+        cur_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                               'data', 'structured')
         file_path = os.path.join(cur_dir, 'demo-dataset.jsonl')
         ds = load_dataset('json', data_files=file_path)
         ds = unify_format(ds)
@@ -406,12 +407,12 @@ class UnifyFormatTest(unittest.TestCase):
             'source': [{
                 'text': 'This is a test text.',
                 'meta': {},
-                'stats': {},
+                Fields.stats: {},
             }],
             'target': [{
                 'text': 'This is a test text.',
                 'meta': {},
-                'stats': {},
+                Fields.stats: {},
             }],
         }]
         for sample in samples:
@@ -427,7 +428,7 @@ class UnifyFormatTest(unittest.TestCase):
             'target': [{
                 'text': 'This is a test text.',
                 'meta': {},
-                'meta.out_field': {},
+                'out_field': {},
             }],
         }, {
             'source': [{
@@ -436,7 +437,7 @@ class UnifyFormatTest(unittest.TestCase):
             }],
             'target': [{
                 'text': 'This is a test text.',
-                'meta.out_field': {},
+                'out_field': {},
             }],
         }]
         for sample in samples:

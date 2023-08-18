@@ -4,6 +4,7 @@
 
 from jsonargparse.typing import ClosedUnitInterval, List
 
+from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ...utils.asset_utils import ASSET_DIR, load_words_asset
@@ -66,7 +67,7 @@ class FlaggedWordFilter(Filter):
 
     def compute_stats(self, sample):
         # check if it's computed already
-        if 'flagged_words_ratio' in sample['stats']:
+        if StatsKeys.flagged_words_ratio in sample[Fields.stats]:
             return sample
 
         tokenizer = MODEL_ZOO.get(self.model_key, None)
@@ -86,8 +87,10 @@ class FlaggedWordFilter(Filter):
         if flagged_words_ratio > 1.0:
             flagged_words_ratio = 1.0
 
-        sample['stats']['flagged_words_ratio'] = flagged_words_ratio
+        sample[Fields.stats][
+            StatsKeys.flagged_words_ratio] = flagged_words_ratio
         return sample
 
     def process(self, sample):
-        return sample['stats']['flagged_words_ratio'] <= self.max_ratio
+        return sample[Fields.stats][
+            StatsKeys.flagged_words_ratio] <= self.max_ratio

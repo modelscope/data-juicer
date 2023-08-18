@@ -23,7 +23,7 @@ class SpecifiedNumericFieldFilter(Filter):
     """
 
     def __init__(self,
-                 text_key: str = '',
+                 field_key: str = '',
                  min_value: float = -sys.maxsize,
                  max_value: float = sys.maxsize,
                  *args,
@@ -31,7 +31,7 @@ class SpecifiedNumericFieldFilter(Filter):
         """
         Initialization method.
 
-        :param text_key: Filter based on the specified numeric value
+        :param field_key: Filter based on the specified numeric value
             corresponding to the target key. The target key
             corresponding to multi-level field information need to be
             separated by '.'.
@@ -45,7 +45,7 @@ class SpecifiedNumericFieldFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.text_key = text_key
+        self.field_key = field_key
         self.min_value = min_value
         self.max_value = max_value
 
@@ -53,11 +53,11 @@ class SpecifiedNumericFieldFilter(Filter):
         return sample
 
     def process(self, sample):
-        if not self.text_key:
+        if not self.field_key:
             return True
 
         field_value = sample
-        for key in self.text_key.split('.'):
+        for key in self.field_key.split('.'):
             assert key in field_value.keys(), "'{}' not in {}".format(
                 key, field_value.keys())
             field_value = field_value[key]

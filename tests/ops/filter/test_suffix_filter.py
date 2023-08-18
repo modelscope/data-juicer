@@ -3,6 +3,7 @@ import unittest
 from datasets import Dataset
 
 from data_juicer.ops.filter.suffix_filter import SuffixFilter
+from data_juicer.utils.constant import Fields
 
 
 class SuffixFilterTest(unittest.TestCase):
@@ -17,40 +18,26 @@ class SuffixFilterTest(unittest.TestCase):
 
         ds_list = [{
             'text': 'Today is Sun',
-            'meta': {
-                'suffix': '.pdf'
-            }
+            Fields.suffix: '.pdf'
         }, {
             'text': 'a v s e c s f e f g a a a  ',
-            'meta': {
-                'suffix': '.docx'
-            }
+            Fields.suffix: '.docx'
         }, {
             'text': '中文也是一个字算一个长度',
-            'meta': {
-                'suffix': '.txt'
-            }
+            Fields.suffix: '.txt'
         }, {
             'text': '，。、„”“«»１」「《》´∶：？！',
-            'meta': {
-                'suffix': '.html'
-            }
+            Fields.suffix: '.html'
         }, {
             'text': 'dasdasdasdasdasdasdasd',
-            'meta': {
-                'suffix': '.py'
-            }
+            Fields.suffix: '.py'
         }]
         tgt_list = [{
             'text': 'Today is Sun',
-            'meta': {
-                'suffix': '.pdf'
-            }
+            Fields.suffix: '.pdf'
         }, {
             'text': '中文也是一个字算一个长度',
-            'meta': {
-                'suffix': '.txt'
-            }
+            Fields.suffix: '.txt'
         }]
         dataset = Dataset.from_list(ds_list)
         op = SuffixFilter(suffixes=['.txt', '.pdf'])
@@ -60,55 +47,35 @@ class SuffixFilterTest(unittest.TestCase):
 
         ds_list = [{
             'text': 'Today is Sun',
-            'meta': {
-                'suffix': '.pdf'
-            }
+            Fields.suffix: '.pdf'
         }, {
             'text': 'a v s e c s f e f g a a a  ',
-            'meta': {
-                'suffix': '.docx'
-            }
+            Fields.suffix: '.docx'
         }, {
             'text': '中文也是一个字算一个长度',
-            'meta': {
-                'suffix': '.txt'
-            }
+            Fields.suffix: '.txt'
         }, {
             'text': '，。、„”“«»１」「《》´∶：？！',
-            'meta': {
-                'suffix': '.html'
-            }
+            Fields.suffix: '.html'
         }, {
             'text': 'dasdasdasdasdasdasdasd',
-            'meta': {
-                'suffix': '.py'
-            }
+            Fields.suffix: '.py'
         }]
         tgt_list = [{
             'text': 'Today is Sun',
-            'meta': {
-                'suffix': '.pdf'
-            }
+            Fields.suffix: '.pdf'
         }, {
             'text': 'a v s e c s f e f g a a a  ',
-            'meta': {
-                'suffix': '.docx'
-            }
+            Fields.suffix: '.docx'
         }, {
             'text': '中文也是一个字算一个长度',
-            'meta': {
-                'suffix': '.txt'
-            }
+            Fields.suffix: '.txt'
         }, {
             'text': '，。、„”“«»１」「《》´∶：？！',
-            'meta': {
-                'suffix': '.html'
-            }
+            Fields.suffix: '.html'
         }, {
             'text': 'dasdasdasdasdasdasdasd',
-            'meta': {
-                'suffix': '.py'
-            }
+            Fields.suffix: '.py'
         }]
         dataset = Dataset.from_list(ds_list)
         op = SuffixFilter()

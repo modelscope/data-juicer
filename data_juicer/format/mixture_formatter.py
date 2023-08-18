@@ -2,7 +2,6 @@ from typing import List, Tuple, Union
 
 import numpy as np
 from datasets import Dataset, concatenate_datasets
-from jsonargparse import Namespace
 from loguru import logger
 
 from .formatter import BaseFormatter, load_formatter
@@ -16,7 +15,7 @@ class MixtureFormatter(BaseFormatter):
     def __init__(self,
                  dataset_path: str,
                  suffixes: Union[str, List[str], Tuple[str]] = None,
-                 keys_to_load=None,
+                 text_keys=None,
                  add_suffix=False,
                  **kwargs):
         """
@@ -26,19 +25,17 @@ class MixtureFormatter(BaseFormatter):
             of them, optional weights, default 1.0 e.g. `<w1> ds.jsonl
             <w2> ds_dir <w3> ds_file.json`
         :param suffixes: files with specified suffixes to be processed
-        :param keys_to_load: key names of field that stores sample text.
+        :param text_keys: key names of field that stores sample text.
         :param add_suffix: whether to add the file suffix to dataset
             meta info
         :param kwargs: extra args
         """
-        if keys_to_load is None:
-            keys_to_load = ['text']
         data_prefixes, weights = self._get_weight(data_prefix=dataset_path)
         self.weights = weights
         self.formatters = [
             load_formatter(dataset_path=data_prefix,
                            suffixes=suffixes,
-                           keys_to_load=keys_to_load,
+                           text_keys=text_keys,
                            add_suffix=add_suffix,
                            **kwargs) for data_prefix in data_prefixes
         ]
@@ -84,9 +81,7 @@ class MixtureFormatter(BaseFormatter):
             return dataset
         return dataset.shuffle(seed=seed).select(range(num_samples))
 
-    def load_dataset(self,
-                     num_proc: int = 1,
-                     global_cfg: Namespace = None) -> Dataset:
+    def load_dataset(self, num_proc: int = 1) -> Dataset:
         """
         Load a mixed dataset.
 
@@ -96,7 +91,7 @@ class MixtureFormatter(BaseFormatter):
         """
         dataset_list = []
         for weight, formatter in zip(self.weights, self.formatters):
-            dataset = formatter.load_dataset(num_proc, global_cfg)
+            dataset = formatter.load_dataset(num_proc)
             sampled = self._random_sample(dataset, weight)
             logger.info(f'sampled {len(sampled)} from '
                         f'{len(dataset)} with weight {weight}')

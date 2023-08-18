@@ -87,7 +87,7 @@ class NestedQueryDict(dict):
 class NestedDatasetDict(DatasetDict):
     """Enhanced HuggingFace-DatasetDict for better usability and efficiency."""
 
-    def __init(self, *args, **kargs):
+    def __init__(self, *args, **kargs):
         if len(args) == 1 and isinstance(args[0], Dataset):
             # init from another DatasetDict instance
             self.__dict__ = copy.copy(args[0].__dict__)
