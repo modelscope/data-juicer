@@ -279,7 +279,7 @@ def init_setup_from_cfg(cfg):
 
     # Apply text_key modification during initializing configs
     # users can freely specify text_key for different ops using `text_key`
-    # otherwise, set arg text_key of each op to text_key_to_process
+    # otherwise, set arg text_key of each op to text_keys
     if isinstance(cfg.text_keys, list):
         text_key = cfg.text_keys[0]
     else:

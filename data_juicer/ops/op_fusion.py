@@ -106,14 +106,14 @@ def fuse_filter_group(original_filter_group):
 
 class FusedFilter(Filter):
     """A fused operator for filters."""
-    def __init__(self, fused_filers: List):
+    def __init__(self, fused_filters: List):
         """
         Initialization method.
 
         :param fused_filers: a list of filters to be fused.
         """
         super().__init__()
-        self.fused_filters = fused_filers
+        self.fused_filters = fused_filters
 
     def compute_stats(self, sample):
         # context for the intermediate vars

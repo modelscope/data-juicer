@@ -162,7 +162,7 @@ def words_refinement(words,
         be merged
     :param words_aug_join_char: characters to be added between word
         group
-    :return: refined word
+    :return: refined words or word list
     """
 
     if lower_case:

@@ -35,7 +35,7 @@ class MaximumLineLengthFilter(Filter):
         self.min_len = min_len
         self.max_len = max_len
 
-    def compute_stats(self, sample, context=None):
+    def compute_stats(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.max_line_length in sample[Fields.stats]:
             return sample
