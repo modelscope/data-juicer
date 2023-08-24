@@ -101,7 +101,7 @@ class NestedDatasetDict(DatasetDict):
     def map(self, **args):
         """Override the map func, which is called by most common operations,
         such that the processed samples can be accessed by nested manner."""
-        if args['function'] is None:
+        if 'function' not in args or args['function'] is None:
             args['function'] = lambda x: nested_obj_factory(x)
         else:
             args['function'] = wrap_func_with_nested_access(args['function'])
@@ -141,7 +141,7 @@ class NestedDataset(Dataset):
             else:
                 args[0] = wrap_func_with_nested_access(args[0])
         else:
-            if kargs['function'] is None:
+            if 'function' not in kargs or kargs['function'] is None:
                 kargs['function'] = lambda x: nested_obj_factory(x)
             else:
                 kargs['function'] = wrap_func_with_nested_access(
