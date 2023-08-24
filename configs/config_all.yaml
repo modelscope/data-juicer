@@ -19,6 +19,7 @@ temp_dir: null                                              # the path to the te
 open_tracer: false                                          # whether to open the tracer to trace the changes during process. It might take more time when opening tracer
 op_list_to_trace: []                                        # only ops in this list will be traced by tracer. If it's empty, all ops will be traced. Only available when tracer is opened.
 trace_num: 10                                               # number of samples to show the differences between datasets before and after each op. Only available when tracer is opened.
+op_fusion: false                                            # whether to fuse operators that share the same intermediate variables automatically. Op fusion might reduce the memory requirements slightly but speed up the whole process.
 
 # only for data analysis
 save_stats_in_one_file: false                               # whether to store all stats result into one file

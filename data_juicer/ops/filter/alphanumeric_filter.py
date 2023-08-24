@@ -58,8 +58,7 @@ class AlphanumericFilter(Filter):
             token_count = len(
                 get_words_from_document(
                     sample[self.text_key],
-                    token_func=tokenizer.tokenize if tokenizer else None,
-                    lower_case=False))
+                    token_func=tokenizer.tokenize if tokenizer else None))
             sample[Fields.stats][StatsKeys.alpha_token_ratio] = (
                 alpha_count / token_count) if token_count != 0 else 0.0
         else:

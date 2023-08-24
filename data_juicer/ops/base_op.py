@@ -44,12 +44,14 @@ class Filter:
         self.process = wrap_func_with_nested_access(self.process)
         self.compute_stats = wrap_func_with_nested_access(self.compute_stats)
 
-    def compute_stats(self, sample):
+    def compute_stats(self, sample, context=False):
         """
         Compute stats for the sample which is used as a metric to decide
         whether to filter this sample.
 
-        :param sample: input sample
+        :param sample: input sample.
+        :param context: whether to store context information of intermediate
+            vars in the sample temporarily.
         :return: sample with computed stats
         """
         raise NotImplementedError

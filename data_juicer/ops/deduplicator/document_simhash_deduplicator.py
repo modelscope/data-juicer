@@ -208,7 +208,6 @@ class DocumentSimhashDeduplicator(Deduplicator):
             # if this hash value is not in the matches list, it's regarded as a
             # single cluster
             if hash_val not in graph:
-                hash2cluster[hash_val] = -1
                 continue
 
             # Otherwise, BFS to find the cluster
@@ -236,8 +235,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
         def _filter_simhash_dup_helper(sample, visited_clusters,
                                        visited_hashes):
             sample_hash_val = sample[HashKeys.simhash]
-            cluster_num = hash2cluster[sample_hash_val]
-            if cluster_num == -1:
+            if sample_hash_val not in hash2cluster:
                 # single-sample cluster, we need to check hash value still.
                 if sample_hash_val in visited_hashes:
                     return False
@@ -245,6 +243,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
                     visited_hashes.add(sample_hash_val)
                     return True
             else:
+                cluster_num = hash2cluster[sample_hash_val]
                 if show_num > 0 and cluster_num in dup_pairs \
                         and len(dup_pairs[cluster_num]) < 2:
                     dup_pairs[cluster_num].append(sample)

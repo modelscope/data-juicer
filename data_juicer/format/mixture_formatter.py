@@ -86,7 +86,6 @@ class MixtureFormatter(BaseFormatter):
         Load a mixed dataset.
 
         :param num_proc: number of processes when loading the dataset
-        :param global_cfg: the global cfg used in consequent processes,
         :return: mixed dataset
         """
         dataset_list = []
@@ -97,6 +96,7 @@ class MixtureFormatter(BaseFormatter):
                         f'{len(dataset)} with weight {weight}')
             dataset_list.append(sampled)
 
-        mixed_dataset = concatenate_datasets(dataset_list)
+        from data_juicer.core.data import NestedDataset
+        mixed_dataset = NestedDataset(concatenate_datasets(dataset_list))
         logger.info(f'There are {len(mixed_dataset)} in final dataset')
         return mixed_dataset

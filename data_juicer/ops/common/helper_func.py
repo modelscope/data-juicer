@@ -124,37 +124,46 @@ def words_augmentation(words, group_size, join_char):
 
 def get_words_from_document(document,
                             token_func=None,
-                            lower_case=True,
                             new_line=True,
-                            tab=True,
-                            strip_chars=None,
-                            use_words_aug=False,
-                            words_aug_group_sizes=[2],
-                            words_aug_join_char=''):
+                            tab=True,):
     """
-    Get words from a document. Non reversible since the document is split on
-    multiple characters, words are stripped of special characters and
-    characters are converted to lower case. Useful to compute ratios, like the
+    Get words from a document. Useful to compute ratios, like the
     stopwords ratio.
 
     :param document: document that need to split words
     :param token_func: function of tokenizer, if specified, the function
         will be used for split document into different tokens.
-    :param lower_case: whether to convert word to lowercase
     :param new_line: whether to use `\\\\n' to split words
     :param tab: whether to use '\\\\t' to split words
-    :param strip_chars: chars that need to be stripped in words
-    :param use_words_aug: whether to use word augmentation
-    :param words_aug_group_sizes: the size of word groups that need to
-        be merged
-    :param words_aug_join_char: characters to be added between word
-        group
     :return: word list obtained from document
     """
     if token_func:
         words = token_func(document)
     else:
         words = split_on_whitespace(document, new_line, tab)
+    return words
+
+def words_refinement(words,
+                     lower_case=False,
+                     strip_chars=None,
+                     use_words_aug=False,
+                     words_aug_group_sizes=[2],
+                     words_aug_join_char=''):
+    """
+    Refine split words. Non reversible since the document is split on
+    multiple characters, words are stripped of special characters and
+    characters are converted to lower case.
+
+    :param words: the word list to be augmented
+    :param lower_case: whether to convert word to lowercase
+    :param strip_chars: chars that need to be stripped in words
+    :param use_words_aug: whether to use word augmentation
+    :param words_aug_group_sizes: the size of word groups that need to
+        be merged
+    :param words_aug_join_char: characters to be added between word
+        group
+    :return: refined words or word list
+    """
 
     if lower_case:
         words = [word.lower() for word in words]

@@ -2,12 +2,14 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.constant import Fields, StatsKeys, InterVars
 
 from ..base_op import OPERATORS, Filter
+from ..op_fusion import INTER_LINES
 
 
 @OPERATORS.register_module('average_line_length_filter')
+@INTER_LINES.register_module('average_line_length_filter')
 class AverageLineLengthFilter(Filter):
     """Filter to keep samples with average line length within a specific
     range."""
@@ -33,15 +35,21 @@ class AverageLineLengthFilter(Filter):
         self.min_len = min_len
         self.max_len = max_len
 
-    def compute_stats(self, sample):
+    def compute_stats(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.avg_line_length in sample[Fields.stats]:
             return sample
 
-        line_lengths = list(map(len, sample[self.text_key].splitlines()))
+        context_key = f'{InterVars.lines}'
+        if context and context_key in sample[Fields.context]:
+            lines = sample[Fields.context][context_key]
+        else:
+            lines = sample[self.text_key].splitlines()
+            if context:
+                sample[Fields.context][context_key] = lines
         sample[Fields.stats][StatsKeys.avg_line_length] = \
-            len(sample[self.text_key]) / len(line_lengths) \
-            if len(line_lengths) != 0 else 0.0
+            len(sample[self.text_key]) / len(lines) \
+            if len(lines) != 0 else 0.0
         return sample
 
     def process(self, sample):

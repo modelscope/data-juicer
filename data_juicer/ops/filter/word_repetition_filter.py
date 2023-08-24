@@ -4,14 +4,17 @@
 
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
-from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.constant import Fields, StatsKeys, InterVars
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
-from ..common import SPECIAL_CHARACTERS, get_words_from_document
+from ..op_fusion import INTER_WORDS
+from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
+                      words_refinement)
 
 
 @OPERATORS.register_module('word_repetition_filter')
+@INTER_WORDS.register_module('word_repetition_filter')
 class WordRepetitionFilter(Filter):
     """Filter to keep samples with word-level n-gram repetition ratio within a
     \ specific range."""
@@ -49,16 +52,35 @@ class WordRepetitionFilter(Filter):
             self.model_key = prepare_model(lang=lang,
                                            model_type='sentencepiece')
 
-    def compute_stats(self, sample):
+    def compute_stats(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.word_rep_ratio in sample[Fields.stats]:
             return sample
 
-        tokenizer = MODEL_ZOO.get(self.model_key, None)
-        words = get_words_from_document(
-            sample[self.text_key],
-            token_func=tokenizer.encode_as_pieces if tokenizer else None,
-            strip_chars=SPECIAL_CHARACTERS)
+        # try to get words from context
+        words_key = f'{InterVars.words}-{self.model_key}'
+        if context and words_key in sample[Fields.context]:
+            words = sample[Fields.context][words_key]
+        else:
+            tokenizer = MODEL_ZOO.get(self.model_key, None)
+            words = get_words_from_document(
+                sample[self.text_key],
+                token_func=tokenizer.encode_as_pieces if tokenizer else None)
+            if context:
+                sample[Fields.context][words_key] = words
+
+        # try to get refined words from context
+        refined_words_key = f'{InterVars.refined_words}-True-SPECIAL_CHARS-' \
+                            f'False-[2]-'
+        if context and refined_words_key in sample[Fields.context]:
+            words = sample[Fields.context][refined_words_key]
+        else:
+            words = words_refinement(
+                words,
+                lower_case=True,
+                strip_chars=SPECIAL_CHARACTERS)
+            if context:
+                sample[Fields.context][refined_words_key] = words
         word_ngrams = [
             ' '.join(words[i:i + self.n])
             for i in range(len(words) - self.n + 1)

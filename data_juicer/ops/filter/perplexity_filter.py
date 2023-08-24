@@ -4,14 +4,16 @@
 
 from jsonargparse.typing import PositiveFloat
 
-from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.constant import Fields, StatsKeys, InterVars
 from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 from ..base_op import OPERATORS, Filter
+from ..op_fusion import INTER_WORDS
 from ..common import get_words_from_document
 
 
 @OPERATORS.register_module('perplexity_filter')
+@INTER_WORDS.register_module('perplexity_filter')
 class PerplexityFilter(Filter):
     """Filter to keep samples with perplexity score less than a specific max
     value."""
@@ -36,18 +38,23 @@ class PerplexityFilter(Filter):
                                           model_type='sentencepiece')
         self.kl_model_key = prepare_model(lang=lang, model_type='kenlm')
 
-    def compute_stats(self, sample):
+    def compute_stats(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.perplexity in sample[Fields.stats]:
             return sample
 
         # tokenization
-        tokenizer = MODEL_ZOO.get(self.sp_model_key, None)
-        tokens = get_words_from_document(
-            sample[self.text_key],
-            token_func=tokenizer.encode_as_pieces if tokenizer else None,
-            lower_case=False)
-        text = ' '.join(tokens)
+        words_key = f'{InterVars.words}-{self.sp_model_key}'
+        if context and words_key in sample[Fields.context]:
+            words = sample[Fields.context][words_key]
+        else:
+            tokenizer = MODEL_ZOO.get(self.sp_model_key, None)
+            words = get_words_from_document(
+                sample[self.text_key],
+                token_func=tokenizer.encode_as_pieces if tokenizer else None)
+            if context:
+                sample[Fields.context][words_key] = words
+        text = ' '.join(words)
         # compute perplexity
         logits, length = 0, 0
         kenlm_model = MODEL_ZOO.get(self.kl_model_key, None)

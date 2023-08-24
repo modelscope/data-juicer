@@ -29,3 +29,8 @@ class HashKeys(object):
     hash = DEFAULT_PREFIX + 'hash'
     minhash = DEFAULT_PREFIX + 'minhash'
     simhash = DEFAULT_PREFIX + 'simhash'
+
+class InterVars(object):
+    lines = DEFAULT_PREFIX + 'lines'
+    words = DEFAULT_PREFIX + 'words'
+    refined_words = DEFAULT_PREFIX + 'refined_words'

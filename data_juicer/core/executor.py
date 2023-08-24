@@ -12,6 +12,8 @@ from data_juicer.utils.constant import Fields
 from .exporter import Exporter
 from .tracer import Tracer
 
+from time import time
+
 
 class Executor:
     """
@@ -89,12 +91,15 @@ class Executor:
 
         # 2. extract processes
         logger.info('Preparing process operators...')
-        self.ops = load_ops(self.cfg.process, self.cfg.text_keys)
+        self.process_list, self.ops = load_ops(self.cfg.process,
+                                               self.cfg.op_fusion)
 
         # 3. data process
         # - If tracer is open, trace each op after it's processed
         # - If checkpoint is open, clean the cache files after each process
         logger.info('Processing data...')
+        start = time()
+        tstart = start
         for op_cfg, op in zip(self.process_list, self.ops):
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
@@ -162,11 +167,26 @@ class Executor:
                 dataset.cleanup_cache_files()
                 self.ckpt_manager.record(op_name, op_args)
 
-            logger.info(f'Op [{op_name}] Done. Left '
-                        f'{len(dataset)} samples.')
+            end = time()
+            logger.info(f'Op [{op_name}] Done in {"%.3f" % (end - start)}(s). '
+                        f'Left {len(dataset)} samples.')
+            start = end
+        tend = time()
+        logger.info(f'All Ops are done in {"%.3f" % (tend - tstart)}(s).')
 
         # 4. data export
         logger.info('Exporting dataset to disk...')
-        self.exporter.export(dataset)
+        try:
+            self.exporter.export(dataset)
+        except:  # noqa: E722
+            logger.error(f'An error occurred during exporting the processed '
+                         f'dataset.')
+            import traceback
+            traceback.print_exc()
+            if self.cfg.use_checkpoint:
+                logger.info('Writing checkpoint of dataset processed by '
+                            'last op...')
+                dataset.cleanup_cache_files()
+                self.ckpt_manager.save_ckpt(dataset)
 
         return dataset
