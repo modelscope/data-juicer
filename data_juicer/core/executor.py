@@ -1,4 +1,5 @@
 import os
+from time import time
 
 from loguru import logger
 
@@ -6,15 +7,12 @@ from data_juicer.config import init_configs
 from data_juicer.format.load import load_formatter
 from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
                              load_ops)
+from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
-from data_juicer.utils.cache_utils import CACHE_COMPRESS
 from data_juicer.utils.constant import Fields
-
 
 from .exporter import Exporter
 from .tracer import Tracer
-
-from time import time
 
 
 class Executor:
@@ -37,9 +35,9 @@ class Executor:
 
         self.ops = None
 
-        CACHE_COMPRESS = self.cfg.cache_compress
-        print('CACHE', CACHE_COMPRESS)
-        
+        if not self.cfg.use_checkpoint:
+            cache_utils.CACHE_COMPRESS = self.cfg.cache_compress
+
         # setup formatter
         logger.info('Setting up data formatter...')
         self.formatter = load_formatter(self.cfg.dataset_path,
@@ -110,7 +108,6 @@ class Executor:
             prev = dataset  # record last dataset
             try:
                 if isinstance(op, Mapper):
-                    print(op, type(dataset))
                     tmp = dataset.map(op.process,
                                       num_proc=self.cfg.np,
                                       desc=op_name + '_process')
@@ -185,8 +182,8 @@ class Executor:
         try:
             self.exporter.export(dataset)
         except:  # noqa: E722
-            logger.error(f'An error occurred during exporting the processed '
-                         f'dataset.')
+            logger.error('An error occurred during exporting the processed \
+                          dataset.')
             import traceback
             traceback.print_exc()
             if self.cfg.use_checkpoint:
@@ -194,5 +191,4 @@ class Executor:
                             'last op...')
                 dataset.cleanup_cache_files()
                 self.ckpt_manager.save_ckpt(dataset)
-
         return dataset

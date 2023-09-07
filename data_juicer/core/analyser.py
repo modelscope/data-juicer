@@ -6,6 +6,7 @@ from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
 from data_juicer.format import load_formatter
 from data_juicer.ops import Filter, load_ops
+from data_juicer.utils import cache_utils
 from data_juicer.utils.constant import Fields
 
 from .exporter import Exporter
@@ -32,6 +33,9 @@ class Analyser:
 
         self.work_dir = self.cfg.work_dir
         self.ops = None
+
+        if not self.cfg.use_checkpoint:
+            cache_utils.CACHE_COMPRESS = self.cfg.cache_compress
 
         # setup formatter
         logger.info('Setting up data formatter...')
@@ -70,7 +74,8 @@ class Analyser:
 
         # extract processes
         logger.info('Preparing process operators...')
-        self.cfg.process, self.ops = load_ops(self.cfg.process, self.cfg.op_fusion)
+        self.cfg.process, self.ops = load_ops(self.cfg.process,
+                                              self.cfg.op_fusion)
 
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')

@@ -4,8 +4,8 @@ from typing import List, Tuple, Union
 from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 from loguru import logger
 
-from data_juicer.utils.constant import Fields
 from data_juicer.core.data import NestedDataset
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (find_files_with_suffix,
                                           is_absolute_path)
 from data_juicer.utils.registry import Registry
@@ -72,7 +72,8 @@ class LocalFormatter(BaseFormatter):
             logger.info('Add suffix info into dataset...')
             datasets = NestedDataset(add_suffixes(datasets))
         else:
-            datasets = NestedDataset(concatenate_datasets([ds for _, ds in datasets.items()]))
+            datasets = NestedDataset(
+                concatenate_datasets([ds for _, ds in datasets.items()]))
         ds = unify_format(datasets,
                           text_keys=self.text_keys,
                           num_proc=num_proc)
@@ -156,8 +157,10 @@ def unify_format(
         assert len(datasets) == 1, 'Please make sure the passed datasets ' \
                                    'contains only 1 dataset'
         dataset = datasets[0]
-    assert isinstance(dataset, Dataset) or isinstance(dataset, NestedDataset), \
-        'Currently we only support processing data with huggingface-Dataset format'
+    assert isinstance(dataset, Dataset) or \
+           isinstance(dataset, NestedDataset), \
+           'Currently we only support processing data' \
+           'with huggingface-Dataset format'
 
     if text_keys is None:
         text_keys = []
@@ -196,7 +199,7 @@ def unify_format(
                              fn_kwargs={'target_keys': text_keys})
     logger.info(f'{len(dataset)} samples left after filtering empty text.')
 
-    #dataset.cleanup_cache_files()
+    dataset.cleanup_cache_files()
 
     # 3. add Fields.stats field
     # TODO:

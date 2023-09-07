@@ -5,8 +5,10 @@ from typing import Union
 from datasets import Dataset, DatasetDict
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
+
+from data_juicer.utils.compress import (cleanup_compressed_cache_files,
+                                        compress, decompress)
 from data_juicer.utils.fingerprint_utils import generate_fingerprint
-from data_juicer.utils.compress import compress, decompress, cleanup_cache_files
 
 
 def wrap_func_with_nested_access(f):
@@ -95,7 +97,7 @@ class NestedDatasetDict(DatasetDict):
             self.__dict__ = copy.copy(args[0].__dict__)
         else:
             # init from scratch
-            super().__init__(*args, **kargs)    
+            super().__init__(*args, **kargs)
 
     def __getitem__(self, key):
         return nested_query(self, key)
@@ -118,8 +120,6 @@ class NestedDataset(Dataset):
         if len(args) == 1 and isinstance(args[0], Dataset):
             # init from another Dataset instance
             self.__dict__ = copy.copy(args[0].__dict__)
-            #import pdb
-            #pdb.set_trace()
         else:
             # init from scratch
             super().__init__(*args, **kargs)
@@ -151,7 +151,7 @@ class NestedDataset(Dataset):
             else:
                 kargs['function'] = wrap_func_with_nested_access(
                     kargs['function'])
-                
+
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
             kargs['new_fingerprint'] = new_fingerprint
@@ -170,14 +170,13 @@ class NestedDataset(Dataset):
                 args[0] = lambda x: nested_obj_factory(x)
             else:
                 args[0] = wrap_func_with_nested_access(args[0])
-            print('filter this way args', args)
         else:
             if 'function' not in kargs or kargs['function'] is None:
                 kargs['function'] = lambda x: nested_obj_factory(x)
             else:
                 kargs['function'] = wrap_func_with_nested_access(
                     kargs['function'])
-                
+
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
             kargs['new_fingerprint'] = new_fingerprint
@@ -188,7 +187,7 @@ class NestedDataset(Dataset):
         by nested manner."""
         decompress(self, self._fingerprint)
         return nested_obj_factory(super().select(*args, **kargs))
-    
+
     @classmethod
     def from_dict(cls, *args, **kargs):
         """Override the from_dict func, which is called by most from_xx
@@ -201,7 +200,7 @@ class NestedDataset(Dataset):
         can be accessed by nested manner."""
         decompress(self, self._fingerprint)
         return NestedDataset(super().add_column(*args, **kargs))
-       
+
     def select_columns(self, *args, **kargs):
         """Override the select columns func, such that the processed samples
         can be accessed by nested manner."""
@@ -211,9 +210,15 @@ class NestedDataset(Dataset):
     def remove_columns(self, *args, **kargs):
         """Override the remove columns func, such that the processed samples
         can be accessed by nested manner."""
-        decompress(self,self._fingerprint)
+        decompress(self, self._fingerprint)
         return NestedDataset(super().remove_columns(*args, **kargs))
-    
+
+    def cleanup_cache_files(self):
+        """Override the cleanup_cache_files func, clear raw and compressed
+        cache files."""
+        cleanup_compressed_cache_files(self)
+        return super().cleanup_cache_files()
+
 
 def nested_query(root_obj: Union[NestedDatasetDict, NestedDataset,
                                  NestedQueryDict], key):
