@@ -27,7 +27,7 @@ This project is being actively updated and maintained, and we will periodically 
 Table of Contents
 =================
 
-* [Data-Juicer: A Data-Centric Text Processing System for Large Language Models](#data-juicer-a-data-centric-text-processing-system-for-large-language-models)
+* [Data-Juicer: A One-Stop Data Processing System for Large Language Models](#data-juicer-a-one-stop-data-processing-system-for-large-language-models)
 * [Table of Contents](#table-of-contents)
    * [Features](#features)
    * [Prerequisites](#prerequisites)
@@ -169,7 +169,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
   - Multi-sample in one file: jsonl/json, parquet, csv/tsv, etc.
   - Single-sample in one file: txt, code, docx, pdf, etc.
 - However, data from different sources are complicated and diverse. Such as:
-  - [Raw arxiv data downloaded from S3](https://info.arxiv.org/help/bulk_data_s3.html) include thousands of tar files and even more gzip files in them, and expected tex files are embedded in the gzip files so they are hard to obtain directly.
+  - [Raw arXiv data downloaded from S3](https://info.arxiv.org/help/bulk_data_s3.html) include thousands of tar files and even more gzip files in them, and expected tex files are embedded in the gzip files so they are hard to obtain directly.
   - Some crawled data include different kinds of files (pdf, html, docx, etc.). And extra information like tables, charts, and so on is hard to extract.
 - It's impossible to handle all kinds of data in Data-Juicer, issues/PRs are welcome to contribute to process new data types!
 - Thus, we provide some **common preprocessing tools** in [`tools/preprocess`](tools/preprocess/) for you to preprocess these data.
