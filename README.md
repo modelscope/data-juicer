@@ -203,7 +203,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 ## Data Recipes
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
 - [Recipes for data process in RedPajama](configs/redpajama/README.md)
-- [Refined recipes for pretraining data](configs/data_juicer_recipes/README.md)
+- [Refined recipes for pre-training data](configs/data_juicer_recipes/README.md)
 - [Refined recipes for post-tuning data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
 
 ## Demos
@@ -221,8 +221,8 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
   - Quality Classifier for CommonCrawl [[ModelScope](https://modelscope.cn/studios/Data-Juicer/tool_quality_classifier/summary)]
   - Auto Evaluation on [HELM](https://github.com/stanford-crfm/helm) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/auto_evaluation_helm/summary)]
   - Data Sampling and Mixture [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_mixture/summary)]
-- Data Process Loop [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)]
-- Data Process HPO [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_hpo/summary)]
+- Data Processing Loop [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)]
+- Data Processing HPO [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_hpo/summary)]
 
 ## License
 Data-Juicer is released under Apache License 2.0.
