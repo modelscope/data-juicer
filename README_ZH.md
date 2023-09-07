@@ -4,6 +4,7 @@
 
 ![Data-Juicer](docs/imgs/data-juicer.jpg "Data-Juicer")
 
+[![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 ![](https://img.shields.io/badge/language-Python-214870.svg)
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![Contributing](https://img.shields.io/badge/Contribution-welcome-brightgreen.svg)](docs/DeveloperGuide_ZH.md)
@@ -17,7 +18,7 @@
 [![QualityClassifier](https://img.shields.io/badge/Tools-Quality_Classifier-saddlebrown?logo=Markdown)](tools/quality_classifier/README_ZH.md)
 [![AutoEvaluation](https://img.shields.io/badge/Tools-Auto_Evaluation-saddlebrown?logo=Markdown)](tools/evaluator/README_ZH.md)
 
-Data-Juicer 是一个以数据为中心的文本处理系统，旨在为大语言模型 (LLM) 提供更高质量、更丰富、更易“消化”的数据。
+Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM) 提供更高质量、更丰富、更易“消化”的数据。
 本项目在积极更新和维护中，我们将定期强化和新增更多的功能和数据菜谱。欢迎您加入我们推进 LLM 数据的开发和研究工作！
 
 ----
@@ -51,7 +52,7 @@ Data-Juicer 是一个以数据为中心的文本处理系统，旨在为大语�
 
 * **系统化 & 可复用**：为用户提供系统化且可复用的[配置菜谱](configs/README_ZH.md)和[算子库](docs/Operators_ZH.md)，旨在让数据处理独立于特定的数据集、模型或任务运行。
 
-* **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合实时多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行反馈循环。
+* **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合及时多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行反馈循环。
 
 * **全面的处理菜谱**：为预训练、SFT、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。
 
@@ -162,7 +163,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
   * 单个文件中包含多个样本：jsonl/json、parquet、csv/tsv 等。
   * 单个文件中包含单个样本：txt、code、docx、pdf 等。
 * 但来自不同源的数据是复杂和多样化的，例如:
-  * [从 S3 下载的 arxiv 原始数据](https://info.arxiv.org/help/bulk_data_s3.html) 包括数千个 tar 文件以及更多的 gzip 文件，并且所需的 tex 文件在 gzip 文件中，很难直接获取。
+  * [从 S3 下载的 arXiv 原始数据](https://info.arxiv.org/help/bulk_data_s3.html) 包括数千个 tar 文件以及更多的 gzip 文件，并且所需的 tex 文件在 gzip 文件中，很难直接获取。
   * 一些爬取的数据包含不同类型的文件（pdf、html、docx 等），并且很难提取额外的信息，例如表格、图表等。
 * Data-Juicer 不可能处理所有类型的数据，欢迎提 Issues/PRs，贡献对新数据类型的处理能力！
 * 因此我们在 [`tools/preprocess`](tools/preprocess) 中提供了一些**常见的预处理工具**，用于预处理这些类型各异的数据。
@@ -198,7 +199,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
   * 词汇多样性 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_diversity/summary)]
   * 算子效果 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_op_effect/summary)]
 * 数据处理:
-  * 科学文献 (例如 [ArXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)]
+  * 科学文献 (例如 [arXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)]
   * 编程代码 (例如 [TheStack](https://huggingface.co/datasets/bigcode/the-stack)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_code_data/summary)]
   * 中文指令数据 (例如 [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sft_zh_data/summary)]
 * 工具池:
@@ -218,5 +219,15 @@ Data-Juicer 在 Apache License 2.0 协议下发布。
 我们非常欢迎贡献新功能、修复漏洞以及讨论。请参考[开发者指南](docs/DeveloperGuide_ZH.md)。
 
 ## 参考文献
+如果您发现我们的工作对您的研发有帮助，请引用以下[论文](https://arxiv.org/abs/2309.02033) 。
 
-我们的论文即将发布！
+```
+@misc{chen2023datajuicer,
+title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
+author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
+year={2023},
+eprint={2309.02033},
+archivePrefix={arXiv},
+primaryClass={cs.LG}
+}
+```
