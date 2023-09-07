@@ -47,21 +47,31 @@ Table of Contents
 
 ## Features
 
-- **Broad Range of Operators**: Equipped with 50+ core [operators (OPs)](docs/Operators.md), including Formatters, Mappers, Filters, Deduplicators, and beyond.
+![Overview](docs/imgs/overview.png)
 
-- **Specialized Toolkits**: Feature-rich specialized toolkits such as [Text Quality Classifier](tools/quality_classifier/README.md), [Dataset Splitter](tools/preprocess/README.md), [Analysers](#data-analysis), [Evaluators](tools/evaluator/README.md), and more that elevate your dataset handling capabilities.
+- **Systematic & Reusable**: 
+  Empowering users with a systematic library of 20+ reusable [config recipes](configs), 50+ core [OPs](docs/Operators.md), and feature-rich 
+  dedicated [toolkits](#documentation), designed to 
+  function independently of specific datasets and processing pipelines.
 
-- **Systematic & Reusable**: Empowering users with a systematic library of reusable [config recipes](configs) and [OPs](docs/Operators.md), designed to function independently of specific datasets, models, or tasks.
+- **Data-in-the-loop**: Allowing detailed data analyses with an automated 
+  report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.
+  ![Data-in-the-loop](docs/imgs/feedback_loop.png)
 
-- **Data-in-the-loop**: Allowing detailed data analyses with an automated report generation feature for a deeper understanding of your dataset. Coupled with timely multi-dimension automatic evaluation capabilities, it supports a feedback loop at multiple stages in the LLM development process.
+- **Comprehensive Processing Recipes**: Offering tens of [pre-built data 
+  processing recipes](configs/data_juicer_recipes/README.md) for 
+  pre-training, post-tuning, en, zh, and more scenarios. Validated on  
+  reference LLaMA models.  
+  ![exp_llama](docs/imgs/exp_on_llama.png)
 
-- **Comprehensive Processing Recipes**: Offering tens of [pre-built data processing recipes](configs/data_juicer_recipes/README.md) for pre-training, SFT, en, zh, and more scenarios.
+- **Enhanced Efficiency**: Providing a speedy data processing pipeline 
+  requiring less memory and CPU usage, optimized for maximum productivity. 
+  ![sys-perf](docs/imgs/sys_perf.png)
 
-- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documentation), [easy start guides](#quick-start) and [demo configs](configs/README.md), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
 
 - **Flexible & Extensible**: Accommodating most types of data formats (e.g., jsonl, parquet, csv, ...) and allowing flexible combinations of OPs. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
 
-- **Enhanced Efficiency**: Providing a speedy data processing pipeline requiring less memory, optimized for maximum productivity.
+- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documentation), [easy start guides](#quick-start) and [demo configs](configs/README.md), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
 
 ## Prerequisites
 
@@ -194,7 +204,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
 - [Recipes for data process in RedPajama](configs/redpajama/README.md)
 - [Refined recipes for pretraining data](configs/data_juicer_recipes/README.md)
-- [Refined recipes for SFT data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
+- [Refined recipes for post-tuning data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
 
 ## Demos
 - Introduction to Data-Juicer [[ModelScope](https://modelscope.cn/studios/Data-Juicer/overview_scan/summary)]
