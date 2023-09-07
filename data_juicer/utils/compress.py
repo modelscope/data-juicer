@@ -5,9 +5,54 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
 
-from datasets.utils.extract import Extractor
-from datasets.utils.filelock import FileLock
+from datasets.utils.extract import Extractor as HF_Extractor
+from datasets.utils.filelock import FileLock as HF_FileLock
 from loguru import logger
+
+
+class FileLock(HF_FileLock):
+    """
+    File lock for compresssion or decompression, and
+    remove lock file automatically.
+    """
+
+    def _release(self):
+        super()._release()
+        try:
+            logger.info(f'Remove {self._lock_file}')
+            os.remove(self._lock_file)
+        # The file is already deleted and that's what we want.
+        except OSError:
+            pass
+        return None
+
+
+class Extractor(HF_Extractor):
+    """
+    Extract content from a compressed file.
+    """
+
+    @classmethod
+    def extract(
+        cls,
+        input_path: Union[Path, str],
+        output_path: Union[Path, str],
+        extractor_format: str,
+    ):
+        """
+        Extract content from a compressed file.
+        :param input_path: path to compressed file.
+        :param output_path: path to uncompressed file.
+        :param extractor_format: extraction format,
+            see supported algorithm in datasets. `compressors`.
+        """
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        # Prevent parallel extractions
+        lock_path = str(Path(output_path).with_suffix('.lock'))
+        with FileLock(lock_path):
+            shutil.rmtree(output_path, ignore_errors=True)
+            extractor = cls.extractors[extractor_format]
+            return extractor.extract(input_path, output_path)
 
 
 class BaseCompressor(ABC):
@@ -121,7 +166,12 @@ class Compressor:
         with FileLock(lock_path):
             shutil.rmtree(output_path, ignore_errors=True)
             compressor = cls.compressors[compressor_format]
-            return compressor.compress(input_path, output_path)
+            compressor.compress(input_path, output_path)
+        # try:
+        #     #os.remove(lock_path)
+        #     pass
+        # except OSError:
+        #     pass
 
 
 class CompressManager:
@@ -171,7 +221,7 @@ class CompressManager:
 
 class CacheCompressManager:
     """
-    This class is used to compress or decompress a huggingface cache files
+    This class is used to compress or decompress huggingface cache files
     using compression format algorithms.
     """
 
@@ -229,7 +279,7 @@ class CacheCompressManager:
         which ends with specified extension.
         :param cache_directory: dataset cache directory.
         :param fingerprint: fingerprint of cache files.
-            If `None`, we will find all cache files which starts with 
+            If `None`, we will find all cache files which starts with
             `cache-` and ends with specified extension
         :param extension: extension of cache files, default `.arrow`
         :return: list of file names
@@ -251,8 +301,8 @@ class CacheCompressManager:
         """
         Compress cache files with fingerprint in dataset cache directory.
         :param ds: input dataset.
-        :param fingerprint: fingerprint of cache files. 
-            If `None`, we will find all cache files which starts with 
+        :param fingerprint: fingerprint of cache files.
+            If `None`, we will find all cache files which starts with
             `cache-` and ends with `.arrow`
         """
         cache_directory = self._get_cache_diretory(ds)
@@ -294,7 +344,7 @@ class CacheCompressManager:
         dataset cache directory.
         :param ds: input dataset.
         :param fingerprint: fingerprint of cache files.
-            If `None`, we will find all cache files which starts with 
+            If `None`, we will find all cache files which starts with
             `cache-` and ends with compression format.
         """
         cache_directory = self._get_cache_diretory(ds)
@@ -333,7 +383,7 @@ class CacheCompressManager:
 
     def cleanup_cache_files(self, ds):
         """
-        Clean up all compressed cache files in dataset cache directory, 
+        Clean up all compressed cache files in dataset cache directory,
         which starts with `cache-` and ends with compression format
         :param ds: input dataset.
         """
