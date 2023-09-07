@@ -58,9 +58,9 @@ Table of Contents
   report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.
   ![Data-in-the-loop](docs/imgs/feedback_loop.png)
 
-- **Comprehensive Processing Recipes**: Offering tens of [pre-built data 
+- **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data 
   processing recipes](configs/data_juicer_recipes/README.md) for 
-  pre-training, post-tuning, en, zh, and more scenarios. Validated on  
+  pre-training, post-tuning, en, zh, and more scenarios. Validated on 
   reference LLaMA models.  
   ![exp_llama](docs/imgs/exp_on_llama.png)
 
