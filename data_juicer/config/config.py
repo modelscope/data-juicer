@@ -148,6 +148,13 @@ def init_configs(args=None):
              'variables automatically. Op fusion might reduce the memory '
              'requirements slightly but speed up the whole process.')
     parser.add_argument(
+        '--cache_compress',
+        type=str,
+        default=None,
+        help='The compression method of the cache file, which can be'
+             'specified in ["gzip", "zstd", "lz4"]. If this parameter is'
+             'None, the cache file will not be compressed.')
+    parser.add_argument(
         '--process',
         type=List[Dict],
         help='List of several operators with their arguments, these ops will '

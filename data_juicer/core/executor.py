@@ -7,7 +7,9 @@ from data_juicer.format.load import load_formatter
 from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
                              load_ops)
 from data_juicer.utils.ckpt_utils import CheckpointManager
+from data_juicer.utils.cache_utils import CACHE_COMPRESS
 from data_juicer.utils.constant import Fields
+
 
 from .exporter import Exporter
 from .tracer import Tracer
@@ -35,6 +37,9 @@ class Executor:
 
         self.ops = None
 
+        CACHE_COMPRESS = self.cfg.cache_compress
+        print('CACHE', CACHE_COMPRESS)
+        
         # setup formatter
         logger.info('Setting up data formatter...')
         self.formatter = load_formatter(self.cfg.dataset_path,
@@ -105,6 +110,7 @@ class Executor:
             prev = dataset  # record last dataset
             try:
                 if isinstance(op, Mapper):
+                    print(op, type(dataset))
                     tmp = dataset.map(op.process,
                                       num_proc=self.cfg.np,
                                       desc=op_name + '_process')

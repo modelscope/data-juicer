@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
 
+from data_juicer.utils.cache_utils import CACHE_COMPRESS
 from datasets.utils.extract import Extractor
 from datasets.utils.filelock import FileLock
 from loguru import logger
@@ -352,3 +353,17 @@ class CacheCompressManager:
                 files_printed.add(formated_cache_name)
             os.remove(full_name)
         return len(f_names)
+
+
+def compress(ds, fingerprint = None):
+    if CACHE_COMPRESS:
+        CacheCompressManager(CACHE_COMPRESS).compress(ds, fingerprint)
+    
+
+def decompress(ds, fingerprint = None):
+    if CACHE_COMPRESS:
+        CacheCompressManager(CACHE_COMPRESS).decompress(ds, fingerprint)
+    
+
+def cleanup_cache_files(ds):
+    CacheCompressManager().cleanup_cache_files(ds)
