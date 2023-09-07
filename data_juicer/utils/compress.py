@@ -44,7 +44,7 @@ class Extractor(HF_Extractor):
         :param input_path: path to compressed file.
         :param output_path: path to uncompressed file.
         :param extractor_format: extraction format,
-            see supported algorithm in datasets. `compressors`.
+            see supported algorithm in `Extractor` of huggingface dataset.
         """
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         # Prevent parallel extractions
@@ -73,7 +73,7 @@ class BaseCompressor(ABC):
 
 class ZstdCompressor(BaseCompressor):
     """
-    This class compresses a file using the zstd algorithm.
+    This class compresses a file using the `zstd` algorithm.
     """
 
     @staticmethod
@@ -93,7 +93,7 @@ class ZstdCompressor(BaseCompressor):
 
 class Lz4Compressor(BaseCompressor):
     """
-    This class compresses a file using the lz4 algorithm.
+    This class compresses a file using the `lz4` algorithm.
     """
 
     @staticmethod
@@ -112,7 +112,7 @@ class Lz4Compressor(BaseCompressor):
 
 class GzipCompressor(BaseCompressor):
     """
-    This class compresses a file using the gzip algorithm.
+    This class compresses a file using the `gzip` algorithm.
     """
 
     @staticmethod
@@ -167,11 +167,6 @@ class Compressor:
             shutil.rmtree(output_path, ignore_errors=True)
             compressor = cls.compressors[compressor_format]
             compressor.compress(input_path, output_path)
-        # try:
-        #     #os.remove(lock_path)
-        #     pass
-        # except OSError:
-        #     pass
 
 
 class CompressManager:
