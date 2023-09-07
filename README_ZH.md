@@ -46,21 +46,20 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
 
 ## 特点
 
-* **丰富的算子**：内置了 50 多个核心 [算子(OPs)](docs/Operators_ZH.md)，包括 Formatters，Mappers，Filters，Deduplicators 等。
+![Overview](docs/imgs/overview.png)
 
-* **专业的工具库**：提供功能丰富的专业工具库，例如 [文本质量打分器](tools/quality_classifier/README_ZH.md)，[数据分割器](tools/preprocess/README_ZH.md)，[分析器](#数据分析)，[评估器](tools/evaluator/README_ZH.md) 等，提升您的数据处理能力。
+* **系统化 & 可复用**：为用户提供系统化且可复用的20+[配置菜谱](configs/README_ZH.md)，50+核心[算子](docs/Operators_ZH.md)和专用[工具池](#documentation)，旨在让数据处理独立于特定的大语言模型数据集和处理流水线。
 
-* **系统化 & 可复用**：为用户提供系统化且可复用的[配置菜谱](configs/README_ZH.md)和[算子库](docs/Operators_ZH.md)，旨在让数据处理独立于特定的数据集、模型或任务运行。
+* **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行及时反馈循环。  ![Data-in-the-loop](docs/imgs/feedback_loop.png)
 
-* **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合及时多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行反馈循环。
+* **全面的数据处理菜谱**：为pre-training、post-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。  ![exp_llama](docs/imgs/exp_on_llama.png)
 
-* **全面的处理菜谱**：为预训练、SFT、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。
+* **效率增强**：提供高效的数据处理流水线，减少内存占用和CPU开销，提高生产力。  ![sys-perf](docs/imgs/sys_perf.png)
 
 * **用户友好**：设计简单易用，提供全面的[文档](#documentation)、简易[入门指南](#快速上手)和[演示配置](configs/README_ZH.md)，并且可以轻松地添加/删除[现有配置](configs/config_all.yaml)中的算子。
-
+  
 * **灵活 & 易扩展**：支持大多数数据格式（如jsonl、parquet、csv等），并允许灵活组合算子。支持[自定义算子](docs/DeveloperGuide_ZH.md#构建自己的算子)，以执行定制化的数据处理。
 
-* **效率增强**：提供高效的数据处理流水线，减少内存占用，提高生产力。
 
 ## 前置条件
 
@@ -189,7 +188,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 * [BLOOM 数据处理菜谱](configs/reproduced_bloom/README_ZH.md)
 * [RedPajama 数据处理菜谱](configs/reproduced_redpajama/README_ZH.md)
 * [预训练数据增强菜谱](configs/data_juicer_recipes/README_ZH.md)
-* [SFT数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#完善前后的alpaca-cot数据集)
+* [Post-tuning数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#完善前后的alpaca-cot数据集)
 
 ## 演示样例
 
