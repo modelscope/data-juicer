@@ -52,7 +52,7 @@ Table of Contents
 - **Systematic & Reusable**: 
   Empowering users with a systematic library of 20+ reusable [config recipes](configs), 50+ core [OPs](docs/Operators.md), and feature-rich 
   dedicated [toolkits](#documentation), designed to 
-  function independently of specific datasets and processing pipelines.
+  function independently of specific LLM datasets and processing pipelines.
 
 - **Data-in-the-loop**: Allowing detailed data analyses with an automated 
   report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.

@@ -48,11 +48,12 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
 
 ![Overview](docs/imgs/overview.png)
 
-* **系统化 & 可复用**：为用户提供系统化且可复用的20+[配置菜谱](configs/README_ZH.md)，50+核心[算子](docs/Operators_ZH.md)和专用[工具池](#documentation)，旨在让数据处理独立于特定的数据集、模型或任务运行。
+* **系统化 & 可复用**：为用户提供系统化且可复用的20+[配置菜谱](configs/README_ZH.md)，50+核心[算子](docs/Operators_ZH.md)和专用[工具池](#documentation)，旨在让数据处理独立于特定的大语言模型数据集和处理流水线。
 
 * **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行及时反馈循环。  ![Data-in-the-loop](docs/imgs/feedback_loop.png)
 
-* **全面的数据处理菜谱**：为pre-train、post-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。  ![exp_llama](docs/imgs/exp_on_llama.png)
+* **全面的数据处理菜谱**：为pre-training、post-tuning、中英文等场景提供数十种[预构建的数据处理菜谱]
+  (configs/data_juicer_recipes/README_ZH.md)。  ![exp_llama](docs/imgs/exp_on_llama.png)
 
 * **效率增强**：提供高效的数据处理流水线，减少内存占用和CPU开销，提高生产力。  ![sys-perf](docs/imgs/sys_perf.png)
 
