@@ -1,6 +1,6 @@
 import unittest
 
-from copy import deepcopy
+from datasets import Dataset
 
 from data_juicer.ops.mapper.simple_aug_en_mapper import SimpleAugEnMapper
 
@@ -8,10 +8,16 @@ from data_juicer.ops.mapper.simple_aug_en_mapper import SimpleAugEnMapper
 class SimpleAugEnMapperTest(unittest.TestCase):
 
     def setUp(self):
-        self.samples = {
-            'text': ['I am a deep learning engineer. I love LLM.'],
-            'meta': ['meta information'],
-        }
+        self.samples = Dataset.from_dict({
+            'text': [
+                'I am a deep learning engineer. I love LLM.',
+                'A short test with numbers 2023'
+            ],
+            'meta': [
+                'meta information',
+                'meta information with numbers'
+            ],
+        })
 
     def test_number_of_generated_samples_with_sequential_on(self):
         aug_num = 3
@@ -24,8 +30,9 @@ class SimpleAugEnMapperTest(unittest.TestCase):
             spelling_error_word=True,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = op.process(self.samples)
-        self.assertEqual(len(result['text']), aug_num + 1)
+        result = self.samples.map(op.process, batched=True, batch_size=1)
+        self.assertEqual(len(result['text']),
+                         (aug_num + 1) * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
     def test_number_of_generated_samples_with_sequential_off(self):
@@ -39,8 +46,9 @@ class SimpleAugEnMapperTest(unittest.TestCase):
             spelling_error_word=True,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = op.process(self.samples)
-        self.assertEqual(len(result['text']), aug_num * aug_method_num + 1)
+        result = self.samples.map(op.process, batched=True, batch_size=1)
+        self.assertEqual(len(result['text']),
+                         (aug_num * aug_method_num + 1) * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
     def test_zero_aug_methods_with_sequential_on(self):
@@ -52,8 +60,8 @@ class SimpleAugEnMapperTest(unittest.TestCase):
             aug_num=aug_num,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = op.process(self.samples)
-        self.assertEqual(len(result['text']), 1)
+        result = self.samples.map(op.process, batched=True, batch_size=1)
+        self.assertEqual(len(result['text']), len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
     def test_zero_aug_methods_with_sequential_off(self):
@@ -65,8 +73,8 @@ class SimpleAugEnMapperTest(unittest.TestCase):
             aug_num=aug_num,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = op.process(self.samples)
-        self.assertEqual(len(result['text']), 1)
+        result = self.samples.map(op.process, batched=True, batch_size=1)
+        self.assertEqual(len(result['text']), len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
     def test_all_aug_methods_with_sequential_on(self):
@@ -87,8 +95,9 @@ class SimpleAugEnMapperTest(unittest.TestCase):
             insert_random_char=True,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = op.process(self.samples)
-        self.assertEqual(len(result['text']), aug_num + 1)
+        result = self.samples.map(op.process, batched=True, batch_size=1)
+        self.assertEqual(len(result['text']),
+                         (aug_num + 1) * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
     def test_all_aug_methods_with_sequential_off(self):
@@ -109,8 +118,9 @@ class SimpleAugEnMapperTest(unittest.TestCase):
             insert_random_char=True,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = op.process(self.samples)
-        self.assertEqual(len(result['text']), aug_num * aug_method_num + 1)
+        result = self.samples.map(op.process, batched=True, batch_size=1)
+        self.assertEqual(len(result['text']),
+                         (aug_num * aug_method_num + 1) * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
 

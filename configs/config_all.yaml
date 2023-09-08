@@ -68,6 +68,14 @@ process:
       delete_random_char: false                               # whether to open the augmentation method of deleting random characters from the original texts. e.g. "I love LLM" --> "I oe LLM"
       swap_random_char: false                                 # whether to open the augmentation method of swapping random contiguous characters in the original texts. e.g. "I love LLM" --> "I ovle LLM"
       insert_random_char: false                               # whether to open the augmentation method of inserting random characters into the original texts. e.g. "I love LLM" --> "I ^lKove LLM"
+  - simple_aug_zh_mapper:                                   # simply augment texts in Chinese based on the nlpaug library
+      sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
+      aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.
+      replace_similar_word: false                             # whether to open the augmentation method of replacing random words with their similar words in the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这边一共有5种不同的数据增强方法"
+      replace_homophone_char: false                           # whether to open the augmentation method of replacing random characters with their homophones in the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的濖据增强方法"
+      delete_random_char: false                               # whether to open the augmentation method of deleting random characters from the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的数据增强"
+      swap_random_char: false                                 # whether to open the augmentation method of swapping random contiguous characters in the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的数据强增方法"
+      replace_equivalent_num: false                           # whether to open the augmentation method of replacing random numbers with their equivalent representations in the original texts. **Notice**: Only for numbers for now. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有伍种不同的数据增强方法"
   - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
 
   # Filter ops

@@ -109,12 +109,6 @@ class SimpleAugEnMapper(BatchMapper):
         else:
             self.aug = aug_pipeline
 
-        # record the actual aug num
-        if self.sequential:
-            self.actual_aug_num = self.aug_num
-        else:
-            self.actual_aug_num = self.aug_num * len(self.aug)
-
     def process(self, samples):
         # no augmentation methods are opened
         if len(self.aug) == 0:

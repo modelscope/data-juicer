@@ -77,7 +77,7 @@ class Tracer:
                        force_ascii=False)
 
     def trace_batch_mapper(self, op_name: str, previous_ds: Dataset,
-                           processed_ds: Dataset, aug_num: int = 1):
+                           processed_ds: Dataset):
         """
         Compare datasets before and after a BatchMapper.
 
@@ -86,38 +86,30 @@ class Tracer:
         :param op_name: the op name of mapper
         :param previous_ds: dataset before the mapper process
         :param processed_ds: dataset processed by the mapper
-        :param aug_num: number of samples augmented from the original samples
         :return:
         """
-        assert len(previous_ds) * (aug_num + 1) == len(processed_ds)
-        dif_dict = []
-        num = 0
+        assert previous_ds[0]['text'] == processed_ds[0]['text']
+        aug_dict = []
 
-        aug_num += 1
-        # Get the first aug_num samples
-        for i in range(len(previous_ds)):
-            previous_sample = previous_ds[i]['text']
-            processed_samples = processed_ds[aug_num*i+1:aug_num*(i+1)]['text']
-            dif_dict.append({
-                'original text': previous_sample,
-                'processed_text': processed_samples,
-            })
-            num += 1
-            if num >= self.show_num:
+        # Get the first samples
+        for i in range(len(processed_ds)):
+            processed_sample = processed_ds[i]
+            aug_dict.append(processed_sample)
+            if i + 1 >= self.show_num:
                 break
 
-        if len(dif_dict) == 0:
+        if len(aug_dict) == 0:
             logger.warning(f'Datasets before and after op [{op_name}] are '
                            f'empty. Thus no comparison results would be '
                            f'generated.')
             return
-        elif len(dif_dict) < self.show_num:
-            logger.warning(f'There are only {len(dif_dict)} samples -- less '
+        elif len(aug_dict) < self.show_num:
+            logger.warning(f'There are only {len(aug_dict)} samples -- less '
                            f'than expected {self.show_num} samples.')
 
         # export the tracer results.
         res_name = f'mapper-{op_name}.jsonl'
-        dif_df = pd.DataFrame(dif_dict)
+        dif_df = pd.DataFrame(aug_dict)
         dif_df.to_json(os.path.join(self.work_dir, res_name),
                        orient='records',
                        lines=True,

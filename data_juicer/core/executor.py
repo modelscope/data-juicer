@@ -116,9 +116,7 @@ class Executor:
                             self.tracer.trace_batch_mapper(
                                 op_name,
                                 dataset,
-                                tmp,
-                                op.actual_aug_num
-                                if hasattr(op, 'actual_aug_num') else 1)
+                                tmp)
                     else:
                         tmp = dataset.map(op.process,
                                           num_proc=self.cfg.np,

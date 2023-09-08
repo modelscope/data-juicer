@@ -10,7 +10,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
-| [ Mapper ]( #mapper )             |   18   | Edits and transforms samples                    |
+| [ Mapper ]( #mapper )             |   19   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   15   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   3    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
@@ -62,6 +62,7 @@ All the specific operators are listed below, each featured with several capabili
 | remove_words_with_incorrect_<br />substrings_mapper | General            | en, zh | Removes words containing specified substrings                                                                  |
 | sentence_split_mapper                               | General            | en     | Splits and reorganizes sentences according to semantics                                                        |
 | simple_aug_en_mapper                                | General            | en     | Simply augment texts in English based on the `nlpaug` library                                                  | 
+| simple_aug_zh_mapper                                | General            | zh     | Simply augment texts in Chinese based on the `nlpcda` library                                                  | 
 | whitespace_normalization_mapper                     | General            | en, zh | Normalizes various Unicode whitespaces to the normal ASCII space (U+0020)                                      |
 
 
