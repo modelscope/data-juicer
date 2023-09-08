@@ -54,8 +54,20 @@ process:
       lang: en                                                # sample in which language
       tokenization: false                                     # whether to use model to tokenize documents
       substrings: ['http', 'www', '.com', 'href', '//']       # incorrect substrings to remove
-  - sentence_split_mapper:                                  # split text to sentences and join them with '\n'
-      lang: 'en'                                            # split text in what language
+  - sentence_split_mapper:                                  # split text to multiple sentences and join them with '\n'
+      lang: 'en'                                              # split text in what language
+  - simple_aug_en_mapper:                                   # simply augment texts in English based on the nlpaug library
+      sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
+      aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.
+      delete_random_word: false                               # whether to open the augmentation method of deleting random words from the original texts. e.g. "I love LLM" --> "I LLM"
+      swap_random_word: false                                 # whether to open the augmentation method of swapping random contiguous words in the original texts. e.g. "I love LLM" --> "Love I LLM"
+      spelling_error_word: false                              # whether to open the augmentation method of simulating the spelling error for words in the original texts. e.g. "I love LLM" --> "Ai love LLM"
+      split_random_word: false                                # whether to open the augmentation method of splitting words randomly with whitespaces in the original texts. e.g. "I love LLM" --> "I love LL M"
+      keyboard_error_char: false                              # whether to open the augmentation method of simulating the keyboard error for characters in the original texts. e.g. "I love LLM" --> "I ;ov4 LLM"
+      ocr_error_char: false                                   # whether to open the augmentation method of simulating the OCR error for characters in the original texts. e.g. "I love LLM" --> "I 10ve LLM"
+      delete_random_char: false                               # whether to open the augmentation method of deleting random characters from the original texts. e.g. "I love LLM" --> "I oe LLM"
+      swap_random_char: false                                 # whether to open the augmentation method of swapping random contiguous characters in the original texts. e.g. "I love LLM" --> "I ovle LLM"
+      insert_random_char: false                               # whether to open the augmentation method of inserting random characters into the original texts. e.g. "I love LLM" --> "I ^lKove LLM"
   - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
 
   # Filter ops
