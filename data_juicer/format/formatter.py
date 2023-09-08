@@ -70,7 +70,7 @@ class LocalFormatter(BaseFormatter):
                                 **self.kwargs)
         if self.add_suffix:
             logger.info('Add suffix info into dataset...')
-            datasets = NestedDataset(add_suffixes(datasets))
+            datasets = add_suffixes(datasets)
         else:
             datasets = NestedDataset(
                 concatenate_datasets([ds for _, ds in datasets.items()]))
@@ -129,7 +129,7 @@ def add_suffixes(datasets: DatasetDict) -> Dataset:
             datasets[key] = ds.add_column(name=Fields.suffix,
                                           column=['.' + key] * ds.num_rows)
     datasets = concatenate_datasets([ds for _, ds in datasets.items()])
-    return datasets
+    return NestedDataset(datasets)
 
 
 def unify_format(
