@@ -66,6 +66,13 @@ def init_configs(args=None):
              'into several sub-dataset shards, and the max size of each shard '
              'won\'t larger than the export_shard_size')
     parser.add_argument(
+        '--export_in_parallel',
+        type=bool,
+        default=False,
+        help='Whether to export the result dataset in parallel to a single '
+             'file. It only works when export_shard_size is 0, and its default'
+             'number of processes is the same as the argument np.')
+    parser.add_argument(
         '--np',
         type=PositiveInt,
         default=4,

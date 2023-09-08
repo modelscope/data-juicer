@@ -18,6 +18,7 @@ class Exporter:
     def __init__(self,
                  export_path,
                  export_shard_size=0,
+                 export_in_parallel=True,
                  num_proc=1,
                  export_ds=True,
                  export_stats=True):
@@ -34,6 +35,7 @@ class Exporter:
         """
         self.export_path = export_path
         self.export_shard_size = export_shard_size
+        self.export_in_parallel = export_in_parallel
         self.export_ds = export_ds
         self.export_stats = export_stats
         self.suffix = self._get_suffix(export_path)
@@ -102,7 +104,10 @@ class Exporter:
             if self.export_shard_size <= 0:
                 # export the whole dataset into one single file.
                 logger.info('Export dataset into 1 file...')
-                export_method(dataset, export_path)
+                export_method(
+                    dataset,
+                    export_path,
+                    num_proc=self.num_proc if self.export_in_parallel else 1)
             else:
                 # compute the dataset size and number of shards to split
                 if dataset._indices is not None:
@@ -153,7 +158,11 @@ class Exporter:
             # export stats of datasets into a single file.
             ds_stats = dataset.select_columns(Fields.stats)
             stats_file = export_path.replace('.' + suffix, '_stats.jsonl')
-            Exporter.to_jsonl(ds_stats, stats_file)
+            Exporter.to_jsonl(
+                ds_stats,
+                stats_file,
+                num_proc=self.num_proc if self.export_in_parallel else 1
+            )
 
     def export(self, dataset):
         """
@@ -166,16 +175,18 @@ class Exporter:
                           self.export_stats)
 
     @staticmethod
-    def to_jsonl(dataset, export_path, **kwargs):
+    def to_jsonl(dataset, export_path, num_proc=1, **kwargs):
         """
         Export method for json/jsonl target files.
 
         :param dataset: the dataset to export.
         :param export_path: the path to store the exported dataset.
+        :param num_proc: the number of processes used to export the dataset.
         :param kwargs: extra arguments.
         :return:
         """
-        dataset.to_json(export_path, force_ascii=False)
+        print(num_proc)
+        dataset.to_json(export_path, force_ascii=False, num_proc=num_proc)
 
     @staticmethod
     def to_parquet(dataset, export_path, **kwargs):
