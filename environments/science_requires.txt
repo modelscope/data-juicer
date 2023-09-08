@@ -10,5 +10,6 @@ regex
 simhash-py
 selectolax
 nlpaug
+nlpcda
 nltk
 transformers
