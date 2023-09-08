@@ -185,7 +185,6 @@ class Exporter:
         :param kwargs: extra arguments.
         :return:
         """
-        print(num_proc)
         dataset.to_json(export_path, force_ascii=False, num_proc=num_proc)
 
     @staticmethod
