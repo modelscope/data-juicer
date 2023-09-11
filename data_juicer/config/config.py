@@ -1,7 +1,8 @@
 import os
+import shutil
 import time
 from argparse import ArgumentError
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
                           namespace_to_dict)
@@ -226,6 +227,13 @@ def init_configs(args=None):
             }
 
         cfg = init_setup_from_cfg(cfg)
+
+        # copy the config file into the work directory
+        config_backup(cfg)
+
+        # show the final config tables before the process started
+        display_config(cfg)
+
         return cfg
     except ArgumentError:
         logger.error('Config initialization failed')
@@ -248,8 +256,9 @@ def init_setup_from_cfg(cfg):
     log_dir = os.path.join(cfg.work_dir, 'log')
     if not os.path.exists(log_dir):
         os.makedirs(log_dir, exist_ok=True)
-    logfile_name = time.strftime('%Y%m%d%H%M%S', time.localtime(
-        time.time())) + '.txt'
+    timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
+    cfg.timestamp = timestamp
+    logfile_name = timestamp + '.txt'
     setup_logger(save_dir=log_dir, filename=logfile_name)
 
     # whether or not to use cache management
@@ -342,3 +351,29 @@ def sort_op_by_types_and_names(op_name_classes):
     ops_sorted_by_types = sorted(mapper_ops) + sorted(filter_ops) + sorted(
         deduplicator_ops) + sorted(selector_ops)
     return ops_sorted_by_types
+
+def config_backup(cfg):
+    cfg_path = cfg.config[0].absolute
+    work_dir = cfg.work_dir
+    target_path = os.path.join(work_dir, os.path.basename(cfg_path))
+    logger.info(f'Back up the input config file [{cfg_path}] into the '
+                f'work_dir [{work_dir}]')
+    shutil.copyfile(cfg_path, target_path)
+
+def display_config(cfg):
+    from tabulate import tabulate
+    import pprint
+    table_header = ['key', 'values']
+
+    # remove ops outside the process list for better displaying
+    shown_cfg = cfg.clone()
+    for op in OPERATORS.modules.keys():
+        _ = shown_cfg.pop(op)
+
+    # construct the table as 2 columns
+    config_table = [(k, pprint.pformat(v, compact=True))
+                    for k, v in shown_cfg.items()]
+    table = tabulate(config_table, headers=table_header, tablefmt='fancy_grid')
+
+    logger.info('Configuration table: ')
+    print(table)
