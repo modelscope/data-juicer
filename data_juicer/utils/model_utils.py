@@ -61,12 +61,12 @@ def check_model(model_name, args=(), force=False):
 
         try:
             model_link = os.path.join(MODEL_LINKS, true_model_name)
-            wget.download(model_link, mdp, bar=None)
+            wget.download(model_link, mdp)
         except:  # noqa: E722
             try:
                 backup_model_link = os.path.join(
                     BACKUP_MODEL_LINKS[model_name], true_model_name)
-                wget.download(backup_model_link, mdp, bar=None)
+                wget.download(backup_model_link, mdp)
             except:  # noqa: E722
                 logger.error(
                     f'Downloading model [{true_model_name}] error. '

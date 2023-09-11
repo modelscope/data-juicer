@@ -199,8 +199,6 @@ def unify_format(
                              fn_kwargs={'target_keys': text_keys})
     logger.info(f'{len(dataset)} samples left after filtering empty text.')
 
-    dataset.cleanup_cache_files()
-
     # 3. add Fields.stats field
     # TODO:
     # this is a temp solution,

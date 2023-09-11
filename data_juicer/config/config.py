@@ -259,6 +259,7 @@ def init_setup_from_cfg(cfg):
         logger.warning('Cache management of datasets is disabled.')
         from datasets import disable_caching
         disable_caching()
+        cfg.use_cache = False
 
         # when disabling cache, enable the temp_dir argument
         logger.warning(f'Set temp directory to store temp files to '

@@ -34,7 +34,7 @@ class Analyser:
         self.work_dir = self.cfg.work_dir
         self.ops = None
 
-        if not self.cfg.use_checkpoint:
+        if self.cfg.use_cache:
             cache_utils.CACHE_COMPRESS = self.cfg.cache_compress
 
         # setup formatter

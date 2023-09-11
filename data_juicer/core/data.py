@@ -123,7 +123,6 @@ class NestedDataset(Dataset):
         else:
             # init from scratch
             super().__init__(*args, **kargs)
-        compress(self)
 
     def __getitem__(self, key):
         if isinstance(key, str):
@@ -155,9 +154,6 @@ class NestedDataset(Dataset):
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
             kargs['new_fingerprint'] = new_fingerprint
-            decompress(self, self._fingerprint)
-        else:
-            decompress(self, self._fingerprint)
         return NestedDataset(super().map(*args, **kargs))
 
     def filter(self, *args, **kargs):
@@ -185,7 +181,6 @@ class NestedDataset(Dataset):
     def select(self, *args, **kargs):
         """Override the select func, such that selected samples can be accessed
         by nested manner."""
-        decompress(self, self._fingerprint)
         return nested_obj_factory(super().select(*args, **kargs))
 
     @classmethod
@@ -198,19 +193,16 @@ class NestedDataset(Dataset):
     def add_column(self, *args, **kargs):
         """Override the add column func, such that the processed samples
         can be accessed by nested manner."""
-        decompress(self, self._fingerprint)
         return NestedDataset(super().add_column(*args, **kargs))
 
     def select_columns(self, *args, **kargs):
         """Override the select columns func, such that the processed samples
         can be accessed by nested manner."""
-        decompress(self, self._fingerprint)
         return NestedDataset(super().select_columns(*args, **kargs))
 
     def remove_columns(self, *args, **kargs):
         """Override the remove columns func, such that the processed samples
         can be accessed by nested manner."""
-        decompress(self, self._fingerprint)
         return NestedDataset(super().remove_columns(*args, **kargs))
 
     def cleanup_cache_files(self):

@@ -3,7 +3,7 @@
 # --------------------------------------------------------
 
 from ..base_op import OPERATORS, Mapper
-
+from ..common.special_characters import VARIOUS_WHITESPACES
 
 @OPERATORS.register_module('whitespace_normalization_mapper')
 class WhitespaceNormalizationMapper(Mapper):
@@ -22,13 +22,7 @@ class WhitespaceNormalizationMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        # whitespaces in unicode can be found here:
-        # https://en.wikipedia.org/wiki/Whitespace_character
         super().__init__(*args, **kwargs)
-        self.whitespaces = {
-            ' ', '	', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ',
-            ' ', ' ', ' ', '　', '​', '‌', '‍', '⁠', '￼', ''
-        }
 
     def process(self, sample):
         # remove whitespaces before and after the main content
@@ -36,6 +30,7 @@ class WhitespaceNormalizationMapper(Mapper):
 
         # replace all kinds of whitespaces with ' '
         sample[self.text_key] = ''.join(
-            [char if char not in self.whitespaces else ' ' for char in text])
+            [char if char not in VARIOUS_WHITESPACES else ' '
+             for char in text])
 
         return sample
