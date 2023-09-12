@@ -102,6 +102,13 @@ def init_configs(args=None):
              'argument is reset by users, it will override the default cache '
              'dir.')
     parser.add_argument(
+        '--cache_compress',
+        type=str,
+        default=None,
+        help='The compression method of the cache file, which can be'
+             'specified in ["gzip", "zstd", "lz4"]. If this parameter is'
+             'None, the cache file will not be compressed.')
+    parser.add_argument(
         '--use_checkpoint',
         type=bool,
         default=False,
@@ -147,13 +154,6 @@ def init_configs(args=None):
         help='Whether to fuse operators that share the same intermediate '
              'variables automatically. Op fusion might reduce the memory '
              'requirements slightly but speed up the whole process.')
-    parser.add_argument(
-        '--cache_compress',
-        type=str,
-        default=None,
-        help='The compression method of the cache file, which can be'
-             'specified in ["gzip", "zstd", "lz4"]. If this parameter is'
-             'None, the cache file will not be compressed.')
     parser.add_argument(
         '--process',
         type=List[Dict],
@@ -260,6 +260,11 @@ def init_setup_from_cfg(cfg):
         from datasets import disable_caching
         disable_caching()
         cfg.use_cache = False
+
+        # disabled cache compression when cache is disabled
+        if cfg.cache_compress:
+            logger.warning('Disable cache compression due to disabled cache.')
+            cfg.cache_compress = None
 
         # when disabling cache, enable the temp_dir argument
         logger.warning(f'Set temp directory to store temp files to '

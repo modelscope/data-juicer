@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
 
+from datasets import Dataset
 from datasets.utils.extract import Extractor as HF_Extractor
 from datasets.utils.filelock import FileLock as HF_FileLock
 from loguru import logger
@@ -252,7 +253,7 @@ class CacheCompressManager:
         """
         return str(filename) + self.compressor_extension
 
-    def _get_cache_diretory(self, ds) -> str:
+    def _get_cache_diretory(self, ds):
         """
         Get dataset cache directory.
         :param ds: input dataset.
@@ -269,65 +270,77 @@ class CacheCompressManager:
 
     def _get_cache_file_names(self,
                               cache_directory: str,
-                              fingerprint: Optional[str] = None,
+                              fingerprints: Union[str, List[str]] = None,
                               extension='.arrow'):
         """
-        Get all cache files in the dataset cache directory with fingerprint,
+        Get all cache files in the dataset cache directory with fingerprints,
         which ends with specified extension.
         :param cache_directory: dataset cache directory.
-        :param fingerprint: fingerprint of cache files.
-            If `None`, we will find all cache files which starts with
-            `cache-` and ends with specified extension
+        :param fingerprints: fingerprints of cache files. String or List are
+            accepted. If `None`, we will find all cache files which starts with
+            `cache-` and ends with specified extension.
         :param extension: extension of cache files, default `.arrow`
         :return: list of file names
         """
         if cache_directory is None:
             return []
-        if fingerprint is None:
-            fingerprint = ''
+        if fingerprints is None:
+            fingerprints = ['']
+        if isinstance(fingerprints, str):
+            fingerprints = [fingerprints]
 
         files: List[str] = os.listdir(cache_directory)
         f_names = []
         for f_name in files:
-            if f_name.startswith(f'cache-{fingerprint}') and f_name.endswith(
-                    extension):
-                f_names.append(f_name)
+            for fingerprint in fingerprints:
+                if f_name.startswith(f'cache-{fingerprint}') \
+                        and f_name.endswith(extension):
+                    f_names.append(f_name)
         return f_names
 
-    def compress(self, ds, fingerprint: Optional[str] = None):
+    def compress(self, prev_ds: Dataset, this_ds: Dataset = None):
         """
         Compress cache files with fingerprint in dataset cache directory.
-        :param ds: input dataset.
-        :param fingerprint: fingerprint of cache files.
-            If `None`, we will find all cache files which starts with
-            `cache-` and ends with `.arrow`
+        :param prev_ds: previous dataset whose cache files need to be
+            compressed here.
+        :param this_ds: Current dataset that is computed from the previous
+            dataset. There might be overlaps between cache files of them, so we
+            must not compress cache files that will be used again in the
+            current dataset. If it's None, it means all cache files of previous
+            dataset should be compressed.
         """
-        cache_directory = self._get_cache_diretory(ds)
-        if cache_directory is None:
-            return
+        # remove cache files from the list of cahce files to be compressed
+        prev_cache_names = [item['filename'] for item in prev_ds.cache_files]
+        this_cache_names = [item['filename'] for item in this_ds.cache_files] \
+            if this_ds else []
+        caches_to_compress = list(
+            set(prev_cache_names) - set(this_cache_names))
 
-        f_names = self._get_cache_file_names(cache_directory=cache_directory,
-                                             fingerprint=fingerprint,
-                                             extension='.arrow')
         files_to_remove = []
         files_printed = set()
-        for f_name in f_names:
-            full_name = os.path.abspath(os.path.join(cache_directory, f_name))
+        for full_name in caches_to_compress:
+            # ignore the cache file of the original dataset and only consider
+            # the cache files of following OPs
+            if not os.path.basename(full_name).startswith('cache-'):
+                continue
+            # If there are no specified cache files, just skip
+            if not os.path.exists(full_name):
+                continue
             compress_filename = self._get_compressed_filename(full_name)
-            formated_cache_name = self.format_cache_file_name(
+            formatted_cache_name = self.format_cache_file_name(
                 compress_filename)
 
             if not os.path.exists(compress_filename):
-                if formated_cache_name not in files_printed:
+                if formatted_cache_name not in files_printed:
                     logger.info(
-                        f'Compress cache file to {formated_cache_name}')
-                    self.compress_manager.compress(full_name,
-                                                   compress_filename)
+                        f'Compress cache file to {formatted_cache_name}')
+                self.compress_manager.compress(full_name,
+                                               compress_filename)
             else:
-                if formated_cache_name not in files_printed:
+                if formatted_cache_name not in files_printed:
                     logger.debug(
-                        f'Found compressed cache file {formated_cache_name}')
-            files_printed.add(formated_cache_name)
+                        f'Found compressed cache file {formatted_cache_name}')
+            files_printed.add(formatted_cache_name)
             files_to_remove.append(full_name)
 
         # clean up raw cache file
@@ -335,33 +348,42 @@ class CacheCompressManager:
             logger.debug(f'Removing cache file {file_path}')
             os.remove(file_path)
 
-    def decompress(self, ds, fingerprint: Optional[str] = None):
+    def decompress(self,
+                   ds: Dataset,
+                   fingerprints: Union[str, List[str]] = None):
         """
         Decompress compressed cache files with fingerprint in
         dataset cache directory.
         :param ds: input dataset.
-        :param fingerprint: fingerprint of cache files.
-            If `None`, we will find all cache files which starts with
+        :param fingerprints: fingerprintd of cache files. String or List are
+            accepted. If `None`, we will find all cache files which starts with
             `cache-` and ends with compression format.
         """
         cache_directory = self._get_cache_diretory(ds)
         if cache_directory is None:
             return
 
+        # find compressed cache files with given fingerprints
         f_names = self._get_cache_file_names(
             cache_directory=cache_directory,
-            fingerprint=fingerprint,
+            fingerprints=fingerprints,
             extension=self.compressor_extension)
         files_printed = set()
         for f_name in f_names:
             full_name = os.path.abspath(os.path.join(cache_directory, f_name))
             raw_filename = self._get_raw_filename(full_name)
-            formated_cache_name = self.format_cache_file_name(raw_filename)
+            formatted_cache_name = self.format_cache_file_name(raw_filename)
 
-            if formated_cache_name not in files_printed:
-                logger.info(f'Decompress cache file to {formated_cache_name}')
-                files_printed.add(formated_cache_name)
-            self.compress_manager.decompress(full_name, raw_filename)
+            if not os.path.exists(raw_filename):
+                if formatted_cache_name not in files_printed:
+                    logger.info(f'Decompress cache file to '
+                                f'{formatted_cache_name}')
+                    files_printed.add(formatted_cache_name)
+                self.compress_manager.decompress(full_name, raw_filename)
+            else:
+                if formatted_cache_name not in files_printed:
+                    logger.info(f'Found uncompressed cache files '
+                                f'{formatted_cache_name}')
 
     def format_cache_file_name(
             self, cache_file_name: Optional[str]) -> Optional[str]:
@@ -393,24 +415,40 @@ class CacheCompressManager:
         files_printed = set()
         for f_name in f_names:
             full_name = os.path.abspath(os.path.join(cache_directory, f_name))
-            formated_cache_name = self.format_cache_file_name(full_name)
-            if formated_cache_name not in files_printed:
-                logger.debug(f'Clean up cache file {formated_cache_name}')
-                files_printed.add(formated_cache_name)
+            formatted_cache_name = self.format_cache_file_name(full_name)
+            if formatted_cache_name not in files_printed:
+                logger.debug(f'Clean up cache file {formatted_cache_name}')
+                files_printed.add(formatted_cache_name)
             os.remove(full_name)
         return len(f_names)
 
+class CompressionOff:
+    """Define a range that turn off the cache compression temporarily."""
+    def __enter__(self):
+        """
+        Record the original cache compression method and turn it off.
+        """
+        from . import cache_utils
+        self.original_cache_compress = cache_utils.CACHE_COMPRESS
+        cache_utils.CACHE_COMPRESS = None
 
-def compress(ds, fingerprint=None):
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Restore the original cache compression method.
+        """
+        from . import cache_utils
+        cache_utils.CACHE_COMPRESS = self.original_cache_compress
+
+def compress(prev_ds, this_ds=None):
     if cache_utils.CACHE_COMPRESS:
         CacheCompressManager(cache_utils.CACHE_COMPRESS).compress(
-            ds, fingerprint)
+            prev_ds, this_ds)
 
 
-def decompress(ds, fingerprint=None):
+def decompress(ds, fingerprints=None):
     if cache_utils.CACHE_COMPRESS:
         CacheCompressManager(cache_utils.CACHE_COMPRESS).decompress(
-            ds, fingerprint)
+            ds, fingerprints)
 
 
 def cleanup_compressed_cache_files(ds):

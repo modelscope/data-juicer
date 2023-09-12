@@ -35,6 +35,8 @@ class Analyser:
         self.ops = None
 
         if self.cfg.use_cache:
+            logger.info(f'Using cache compression method: '
+                        f'[{self.cfg.cache_compress}]')
             cache_utils.CACHE_COMPRESS = self.cfg.cache_compress
 
         # setup formatter
@@ -120,5 +122,7 @@ class Analyser:
         # 4. data export
         logger.info('Exporting dataset to disk...')
         self.exporter.export(dataset)
-
+        if self.cfg.use_cache and self.cfg.cache_compress:
+            from data_juicer.utils.compress import compress
+            compress(dataset)
         return dataset

@@ -6,8 +6,9 @@ from datasets import Dataset, DatasetDict
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
+from data_juicer.utils import cache_utils
 from data_juicer.utils.compress import (cleanup_compressed_cache_files,
-                                        compress, decompress)
+                                        compress, decompress, CompressionOff)
 from data_juicer.utils.fingerprint_utils import generate_fingerprint
 
 
@@ -154,7 +155,16 @@ class NestedDataset(Dataset):
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
             kargs['new_fingerprint'] = new_fingerprint
-        return NestedDataset(super().map(*args, **kargs))
+
+        if cache_utils.CACHE_COMPRESS:
+            decompress(self, kargs['new_fingerprint'])
+
+        new_ds = NestedDataset(super().map(*args, **kargs))
+
+        if cache_utils.CACHE_COMPRESS:
+            compress(self, new_ds)
+
+        return new_ds
 
     def filter(self, *args, **kargs):
         """Override the filter func, which is called by most common operations,
@@ -176,7 +186,25 @@ class NestedDataset(Dataset):
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
             kargs['new_fingerprint'] = new_fingerprint
-        return NestedDataset(super().filter(*args, **kargs))
+
+        # For filter, it involves a map and a filter operations, so the final
+        # cache files includes two sets with different fingerprint (before and
+        # after). So we need to decompress these two sets of compressed cache
+        # files
+        if cache_utils.CACHE_COMPRESS:
+            decompress(self, [kargs['new_fingerprint'], self._fingerprint])
+
+        # Turn off the compression due to it invokes map actually in the filter
+        # function. For cache file changes, map: A -> B, filter: A -> A, B. If
+        # we compress the caches of map, ops after filter cannot find the cache
+        # files A. So we turn off the inner cache compression for filter.
+        with CompressionOff():
+            new_ds = NestedDataset(super().filter(*args, **kargs))
+
+        if cache_utils.CACHE_COMPRESS:
+            compress(self, new_ds)
+
+        return new_ds
 
     def select(self, *args, **kargs):
         """Override the select func, such that selected samples can be accessed

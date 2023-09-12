@@ -37,6 +37,8 @@ class Executor:
 
         # only enable it when using cache
         if self.cfg.use_cache:
+            logger.info(f'Using cache compression method: '
+                        f'[{self.cfg.cache_compress}]')
             cache_utils.CACHE_COMPRESS = self.cfg.cache_compress
 
         # setup formatter
@@ -198,4 +200,8 @@ class Executor:
                 logger.info('Writing checkpoint of dataset processed by '
                             'last op...')
                 self.ckpt_manager.save_ckpt(dataset)
+        # compress the last dataset after exporting
+        if self.cfg.use_cache and self.cfg.cache_compress:
+            from data_juicer.utils.compress import compress
+            compress(dataset)
         return dataset
