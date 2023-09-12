@@ -4,6 +4,7 @@ import shutil
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
+from multiprocessing import Pool
 
 from datasets import Dataset
 from datasets.utils.extract import Extractor as HF_Extractor
@@ -22,7 +23,7 @@ class FileLock(HF_FileLock):
     def _release(self):
         super()._release()
         try:
-            logger.debug(f'Remove {self._lock_file}')
+            # logger.debug(f'Remove {self._lock_file}')
             os.remove(self._lock_file)
         # The file is already deleted and that's what we want.
         except OSError:
@@ -298,7 +299,10 @@ class CacheCompressManager:
                     f_names.append(f_name)
         return f_names
 
-    def compress(self, prev_ds: Dataset, this_ds: Dataset = None):
+    def compress(self,
+                 prev_ds: Dataset,
+                 this_ds: Dataset = None,
+                 num_proc: int = 1):
         """
         Compress cache files with fingerprint in dataset cache directory.
         :param prev_ds: previous dataset whose cache files need to be
@@ -308,6 +312,7 @@ class CacheCompressManager:
             must not compress cache files that will be used again in the
             current dataset. If it's None, it means all cache files of previous
             dataset should be compressed.
+        :param num_proc: number of processes to compress cache files.
         """
         # remove cache files from the list of cahce files to be compressed
         prev_cache_names = [item['filename'] for item in prev_ds.cache_files]
@@ -318,6 +323,8 @@ class CacheCompressManager:
 
         files_to_remove = []
         files_printed = set()
+        if num_proc > 1:
+            pool = Pool(num_proc)
         for full_name in caches_to_compress:
             # ignore the cache file of the original dataset and only consider
             # the cache files of following OPs
@@ -333,15 +340,22 @@ class CacheCompressManager:
             if not os.path.exists(compress_filename):
                 if formatted_cache_name not in files_printed:
                     logger.info(
-                        f'Compress cache file to {formatted_cache_name}')
-                self.compress_manager.compress(full_name,
-                                               compress_filename)
+                        f'Compressing cache file to {formatted_cache_name}')
+                if num_proc > 1:
+                    pool.apply_async(self.compress_manager.compress,
+                                     args=(full_name, compress_filename,))
+                else:
+                    self.compress_manager.compress(full_name,
+                                                   compress_filename)
             else:
                 if formatted_cache_name not in files_printed:
                     logger.debug(
                         f'Found compressed cache file {formatted_cache_name}')
             files_printed.add(formatted_cache_name)
             files_to_remove.append(full_name)
+        if num_proc > 1:
+            pool.close()
+            pool.join()
 
         # clean up raw cache file
         for file_path in files_to_remove:
@@ -350,7 +364,8 @@ class CacheCompressManager:
 
     def decompress(self,
                    ds: Dataset,
-                   fingerprints: Union[str, List[str]] = None):
+                   fingerprints: Union[str, List[str]] = None,
+                   num_proc: int = 1):
         """
         Decompress compressed cache files with fingerprint in
         dataset cache directory.
@@ -358,6 +373,7 @@ class CacheCompressManager:
         :param fingerprints: fingerprintd of cache files. String or List are
             accepted. If `None`, we will find all cache files which starts with
             `cache-` and ends with compression format.
+        :param num_proc: number of processes to decompress cache files.
         """
         cache_directory = self._get_cache_diretory(ds)
         if cache_directory is None:
@@ -369,6 +385,8 @@ class CacheCompressManager:
             fingerprints=fingerprints,
             extension=self.compressor_extension)
         files_printed = set()
+        if num_proc > 1:
+            pool = Pool(num_proc)
         for f_name in f_names:
             full_name = os.path.abspath(os.path.join(cache_directory, f_name))
             raw_filename = self._get_raw_filename(full_name)
@@ -376,14 +394,21 @@ class CacheCompressManager:
 
             if not os.path.exists(raw_filename):
                 if formatted_cache_name not in files_printed:
-                    logger.info(f'Decompress cache file to '
+                    logger.info(f'Decompressing cache file to '
                                 f'{formatted_cache_name}')
                     files_printed.add(formatted_cache_name)
-                self.compress_manager.decompress(full_name, raw_filename)
+                if num_proc > 1:
+                    pool.apply_async(self.compress_manager.decompress,
+                                     args=(full_name, raw_filename,))
+                else:
+                    self.compress_manager.decompress(full_name, raw_filename)
             else:
                 if formatted_cache_name not in files_printed:
-                    logger.info(f'Found uncompressed cache files '
-                                f'{formatted_cache_name}')
+                    logger.debug(f'Found uncompressed cache files '
+                                 f'{formatted_cache_name}')
+        if num_proc > 1:
+            pool.close()
+            pool.join()
 
     def format_cache_file_name(
             self, cache_file_name: Optional[str]) -> Optional[str]:
@@ -439,16 +464,16 @@ class CompressionOff:
         from . import cache_utils
         cache_utils.CACHE_COMPRESS = self.original_cache_compress
 
-def compress(prev_ds, this_ds=None):
+def compress(prev_ds, this_ds=None, num_proc=1):
     if cache_utils.CACHE_COMPRESS:
         CacheCompressManager(cache_utils.CACHE_COMPRESS).compress(
-            prev_ds, this_ds)
+            prev_ds, this_ds, num_proc)
 
 
-def decompress(ds, fingerprints=None):
+def decompress(ds, fingerprints=None, num_proc=1):
     if cache_utils.CACHE_COMPRESS:
         CacheCompressManager(cache_utils.CACHE_COMPRESS).decompress(
-            ds, fingerprints)
+            ds, fingerprints, num_proc)
 
 
 def cleanup_compressed_cache_files(ds):

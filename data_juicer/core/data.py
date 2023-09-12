@@ -157,12 +157,16 @@ class NestedDataset(Dataset):
             kargs['new_fingerprint'] = new_fingerprint
 
         if cache_utils.CACHE_COMPRESS:
-            decompress(self, kargs['new_fingerprint'])
+            decompress(self,
+                       kargs['new_fingerprint'],
+                       kargs['num_proc'] if 'num_proc' in kargs else 1)
 
         new_ds = NestedDataset(super().map(*args, **kargs))
 
         if cache_utils.CACHE_COMPRESS:
-            compress(self, new_ds)
+            compress(self,
+                     new_ds,
+                     kargs['num_proc'] if 'num_proc' in kargs else 1)
 
         return new_ds
 
@@ -192,7 +196,9 @@ class NestedDataset(Dataset):
         # after). So we need to decompress these two sets of compressed cache
         # files
         if cache_utils.CACHE_COMPRESS:
-            decompress(self, [kargs['new_fingerprint'], self._fingerprint])
+            decompress(self,
+                       [kargs['new_fingerprint'], self._fingerprint],
+                       kargs['num_proc'] if 'num_proc' in kargs else 1)
 
         # Turn off the compression due to it invokes map actually in the filter
         # function. For cache file changes, map: A -> B, filter: A -> A, B. If
@@ -202,7 +208,9 @@ class NestedDataset(Dataset):
             new_ds = NestedDataset(super().filter(*args, **kargs))
 
         if cache_utils.CACHE_COMPRESS:
-            compress(self, new_ds)
+            compress(self,
+                     new_ds,
+                     kargs['num_proc'] if 'num_proc' in kargs else 1)
 
         return new_ds
 
