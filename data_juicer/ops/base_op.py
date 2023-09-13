@@ -18,6 +18,9 @@ class Mapper:
         from data_juicer.core.data import wrap_func_with_nested_access
         self.process = wrap_func_with_nested_access(self.process)
 
+        # In default, it's a normal OP instead of batched OP
+        self._batched_op = False
+
     def process(self, sample):
         """
         For sample level, sample --> sample
@@ -27,29 +30,8 @@ class Mapper:
         """
         raise NotImplementedError
 
-class BatchMapper(Mapper):
-
-    def __init__(self, text_key: str = None):
-        """
-        Base class that conducts text editing.
-
-        :param text_key: the key name of field that stores sample texts
-            to be processed.
-        """
-        if text_key is None:
-            text_key = 'text'
-        self.text_key = text_key
-        from data_juicer.core.data import wrap_func_with_nested_access
-        self.process = wrap_func_with_nested_access(self.process)
-
-    def process(self, samples):
-        """
-        For sample level, samples --> samples
-
-        :param samples: samples to process
-        :return: processed samples
-        """
-        raise NotImplementedError
+    def is_batched_op(self):
+        return self._batched_op
 
 
 class Filter:

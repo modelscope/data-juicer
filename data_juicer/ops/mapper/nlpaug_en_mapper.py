@@ -7,11 +7,11 @@ from nlpaug.util import Action
 from loguru import logger
 from copy import deepcopy
 
-from ..base_op import OPERATORS, BatchMapper
+from ..base_op import OPERATORS, Mapper
 
 
 @OPERATORS.register_module('nlpaug_en_mapper')
-class NlpaugEnMapper(BatchMapper):
+class NlpaugEnMapper(Mapper):
     """Mapper to simply augment samples in English based on nlpaug library."""
 
     def __init__(self,
@@ -74,6 +74,8 @@ class NlpaugEnMapper(BatchMapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self._batched_op = True  # this is a batched OP
+
         self.aug_num = aug_num
         if aug_num >= 10:
             logger.warning(f'Relatively large augmentation number [{aug_num}]'

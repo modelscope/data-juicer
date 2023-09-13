@@ -5,7 +5,7 @@ from loguru import logger
 from data_juicer.config import init_configs
 from data_juicer.format.load import load_formatter
 from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
-                             load_ops, BatchMapper)
+                             load_ops)
 from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.constant import Fields
 
@@ -107,25 +107,18 @@ class Executor:
             prev = dataset  # record last dataset
             try:
                 if isinstance(op, Mapper):
-                    if isinstance(op, BatchMapper):
-                        tmp = dataset.map(op.process,
-                                          num_proc=self.cfg.np,
-                                          batched=True,
-                                          batch_size=1,
-                                          desc=op_name + '_process')
-                        if self.open_tracer and \
-                                op_name in self.op_list_to_trace:
+                    tmp = dataset.map(function=op.process,
+                                      num_proc=self.cfg.np,
+                                      desc=op_name + '_process')
+                    if self.open_tracer and \
+                            op_name in self.op_list_to_trace:
+                        if op.is_batched_op():
                             self.tracer.trace_batch_mapper(
                                 op_name,
                                 dataset,
                                 tmp,
                                 op.text_key)
-                    else:
-                        tmp = dataset.map(op.process,
-                                          num_proc=self.cfg.np,
-                                          desc=op_name + '_process')
-                        if self.open_tracer and \
-                                op_name in self.op_list_to_trace:
+                        else:
                             self.tracer.trace_mapper(op_name,
                                                      dataset,
                                                      tmp,

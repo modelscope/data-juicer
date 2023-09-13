@@ -2,12 +2,12 @@
 from loguru import logger
 from copy import deepcopy
 
-from ..base_op import OPERATORS, BatchMapper
+from ..base_op import OPERATORS, Mapper
 from data_juicer.utils.logger_utils import HiddenPrints
 
 
-@OPERATORS.register_module('nlpaug_zh_mapper')
-class NlpaugZhMapper(BatchMapper):
+@OPERATORS.register_module('nlpcda_zh_mapper')
+class NlpcdaZhMapper(Mapper):
     """Mapper to simply augment samples in Chinese based on nlpcda library."""
 
     def __init__(self,
@@ -56,6 +56,8 @@ class NlpaugZhMapper(BatchMapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self._batched_op = True  # this is a batched OP
+
         self.aug_num = aug_num
         if aug_num >= 10:
             logger.warning(f'Relatively large augmentation number [{aug_num}]'

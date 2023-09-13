@@ -1,14 +1,13 @@
 import unittest
 
-from datasets import Dataset
-
+from data_juicer.core import NestedDataset
 from data_juicer.ops.mapper.nlpaug_en_mapper import NlpaugEnMapper
 
 
 class NlpaugEnMapperTest(unittest.TestCase):
 
     def setUp(self):
-        self.samples = Dataset.from_dict({
+        self.samples = NestedDataset.from_dict({
             'text': [
                 'I am a deep learning engineer. I love LLM.',
                 'A short test with numbers 2023'
@@ -30,7 +29,7 @@ class NlpaugEnMapperTest(unittest.TestCase):
             spelling_error_word=True,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = self.samples.map(op.process, batched=True, batch_size=1)
+        result = self.samples.map(op.process)
         self.assertEqual(len(result['text']),
                          (aug_num + 1) * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
@@ -46,7 +45,7 @@ class NlpaugEnMapperTest(unittest.TestCase):
             spelling_error_word=True,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = self.samples.map(op.process, batched=True, batch_size=1)
+        result = self.samples.map(op.process)
         self.assertEqual(len(result['text']),
                          (aug_num * aug_method_num + 1) * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
@@ -60,7 +59,7 @@ class NlpaugEnMapperTest(unittest.TestCase):
             aug_num=aug_num,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = self.samples.map(op.process, batched=True, batch_size=1)
+        result = self.samples.map(op.process)
         self.assertEqual(len(result['text']), len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
@@ -73,7 +72,7 @@ class NlpaugEnMapperTest(unittest.TestCase):
             aug_num=aug_num,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = self.samples.map(op.process, batched=True, batch_size=1)
+        result = self.samples.map(op.process)
         self.assertEqual(len(result['text']), len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
@@ -95,7 +94,7 @@ class NlpaugEnMapperTest(unittest.TestCase):
             insert_random_char=True,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = self.samples.map(op.process, batched=True, batch_size=1)
+        result = self.samples.map(op.process)
         self.assertEqual(len(result['text']),
                          (aug_num + 1) * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
@@ -118,7 +117,7 @@ class NlpaugEnMapperTest(unittest.TestCase):
             insert_random_char=True,
         )
         self.assertEqual(len(op.aug), aug_method_num)
-        result = self.samples.map(op.process, batched=True, batch_size=1)
+        result = self.samples.map(op.process)
         self.assertEqual(len(result['text']),
                          (aug_num * aug_method_num + 1) * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
