@@ -6,8 +6,8 @@ from ..base_op import OPERATORS, BatchMapper
 from data_juicer.utils.logger_utils import HiddenPrints
 
 
-@OPERATORS.register_module('simple_aug_zh_mapper')
-class SimpleAugZhMapper(BatchMapper):
+@OPERATORS.register_module('nlpaug_zh_mapper')
+class NlpaugZhMapper(BatchMapper):
     """Mapper to simply augment samples in Chinese based on nlpcda library."""
 
     def __init__(self,

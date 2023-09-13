@@ -28,7 +28,7 @@ class Tracer:
         self.show_num = show_num
 
     def trace_mapper(self, op_name: str, previous_ds: Dataset,
-                     processed_ds: Dataset):
+                     processed_ds: Dataset, text_key: str):
         """
         Compare datasets before and after a Mapper.
 
@@ -38,6 +38,7 @@ class Tracer:
         :param op_name: the op name of mapper
         :param previous_ds: dataset before the mapper process
         :param processed_ds: dataset processed by the mapper
+        :param text_key: which text_key to trace
         :return:
         """
         assert len(previous_ds) == len(processed_ds)
@@ -47,8 +48,8 @@ class Tracer:
         # Find different samples orderly between previous and processed
         # datasets until the total number of found sample pairs is enough.
         for i in range(len(previous_ds)):
-            previous_sample = previous_ds[i]['text']
-            processed_sample = processed_ds[i]['text']
+            previous_sample = previous_ds[i][text_key]
+            processed_sample = processed_ds[i][text_key]
             if previous_sample != processed_sample:
                 dif_dict.append({
                     'original text': previous_sample,
@@ -77,7 +78,7 @@ class Tracer:
                        force_ascii=False)
 
     def trace_batch_mapper(self, op_name: str, previous_ds: Dataset,
-                           processed_ds: Dataset):
+                           processed_ds: Dataset, text_key: str):
         """
         Compare datasets before and after a BatchMapper.
 
@@ -86,9 +87,10 @@ class Tracer:
         :param op_name: the op name of mapper
         :param previous_ds: dataset before the mapper process
         :param processed_ds: dataset processed by the mapper
+        :param text_key: which text_key to trace
         :return:
         """
-        assert previous_ds[0]['text'] == processed_ds[0]['text']
+        assert previous_ds[0][text_key] == processed_ds[0][text_key]
         aug_dict = []
 
         # Get the first samples

@@ -103,7 +103,7 @@ class Exporter:
             export_method = Exporter._router()[suffix]
             if self.export_shard_size <= 0:
                 # export the whole dataset into one single file.
-                logger.info('Export dataset into 1 file...')
+                logger.info('Export dataset into a single file...')
                 export_method(
                     dataset,
                     export_path,

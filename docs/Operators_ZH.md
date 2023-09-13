@@ -40,27 +40,27 @@ Data-Juicer 中的算子分为以下 5 种类型。
 
 ## Mapper <a name="mapper"/>
 
-| 算子                                                  | 场景                    | 语言        | 描述                                                     |
-|-----------------------------------------------------|-----------------------|-----------|--------------------------------------------------------|
-| clean_copyright_mapper                              | Code                  | en, zh    | 删除代码文件开头的版权声明 (:warning: 必须包含单词 *copyright*)           |
-| clean_email_mapper                                  | General               | en, zh    | 删除邮箱信息                                                 |
-| clean_html_mapper                                   | General               | en, zh    | 删除 HTML 标签并返回所有节点的纯文本                                  |
-| clean_ip_mapper                                     | General               | en, zh    | 删除 IP 地址                                               |
-| clean_links_mapper                                  | General, Code         | en, zh    | 删除链接，例如以 http 或 ftp 开头的                                |
-| expand_macro_mapper                                 | LaTeX                 | en, zh    | 扩展通常在 TeX 文档顶部定义的宏                                     |
-| fix_unicode_mapper                                  | General               | en, zh    | 修复损坏的 Unicode（借助 [ftfy](https://ftfy.readthedocs.io/)） |
-| punctuation_normalization_mapper                    | General               | en, zh    | 将各种 Unicode 标点符号标准化为其 ASCII 等效项                        |
-| remove_bibliography_mapper                          | LaTeX                 | en, zh    | 删除 TeX 文档的参考文献                                         |
-| remove_comments_mapper                              | LaTeX                 | en, zh    | 删除 TeX 文档中的注释                                          |
-| remove_header_mapper                                | LaTeX                 | en, zh    | 删除 TeX 文档头，例如标题、章节数字/名称等                               |
-| remove_long_words_mapper                            | General               | en, zh    | 删除长度超出指定范围的单词                                          |
-| remove_specific_chars_mapper                        | General               | en, zh    | 删除任何用户指定的字符或子字符串                                       |
-| remove_table_text_mapper                            | General, Financial    | en        | 检测并删除可能的表格内容（:warning: 依赖正则表达式匹配，因此很脆弱）                |
-| remove_words_with_incorrect_<br />substrings_mapper | General               | en, zh    | 删除包含指定子字符串的单词                                          |
-| sentence_split_mapper                               | General               | en        | 根据语义拆分和重组句子                                            |
-| simple_aug_en_mapper                                | General               | en        | 使用`nlpaug`库对英语文本进行简单增强                                 | 
-| simple_aug_zh_mapper                                | General               | zh        | 使用`nlpcda`库对中文文本进行简单增强                                 | 
-| whitespace_normalization_mapper                     | General               | en, zh    | 将各种 Unicode 空白标准化为常规 ASCII 空格 (U+0020)                 |
+| 算子                                                   | 场景                    | 语言        | 描述                                                     |
+|------------------------------------------------------|-----------------------|-----------|--------------------------------------------------------|
+| clean_copyright_mapper                               | Code                  | en, zh    | 删除代码文件开头的版权声明 (:warning: 必须包含单词 *copyright*)           |
+| clean_email_mapper                                   | General               | en, zh    | 删除邮箱信息                                                 |
+| clean_html_mapper                                    | General               | en, zh    | 删除 HTML 标签并返回所有节点的纯文本                                  |
+| clean_ip_mapper                                      | General               | en, zh    | 删除 IP 地址                                               |
+| clean_links_mapper                                   | General, Code         | en, zh    | 删除链接，例如以 http 或 ftp 开头的                                |
+| expand_macro_mapper                                  | LaTeX                 | en, zh    | 扩展通常在 TeX 文档顶部定义的宏                                     |
+| fix_unicode_mapper                                   | General               | en, zh    | 修复损坏的 Unicode（借助 [ftfy](https://ftfy.readthedocs.io/)） |
+| nlpaug_en_mapper                                     | General               | en        | 使用`nlpaug`库对英语文本进行简单增强                                 | 
+| nlpaug_zh_mapper                                     | General               | zh        | 使用`nlpcda`库对中文文本进行简单增强                                 | 
+| punctuation_normalization_mapper                     | General               | en, zh    | 将各种 Unicode 标点符号标准化为其 ASCII 等效项                        |
+| remove_bibliography_mapper                           | LaTeX                 | en, zh    | 删除 TeX 文档的参考文献                                         |
+| remove_comments_mapper                               | LaTeX                 | en, zh    | 删除 TeX 文档中的注释                                          |
+| remove_header_mapper                                 | LaTeX                 | en, zh    | 删除 TeX 文档头，例如标题、章节数字/名称等                               |
+| remove_long_words_mapper                             | General               | en, zh    | 删除长度超出指定范围的单词                                          |
+| remove_specific_chars_mapper                         | General               | en, zh    | 删除任何用户指定的字符或子字符串                                       |
+| remove_table_text_mapper                             | General, Financial    | en        | 检测并删除可能的表格内容（:warning: 依赖正则表达式匹配，因此很脆弱）                |
+| remove_words_with_incorrect_<br />substrings_mapper  | General               | en, zh    | 删除包含指定子字符串的单词                                          |
+| sentence_split_mapper                                | General               | en        | 根据语义拆分和重组句子                                            |
+| whitespace_normalization_mapper                      | General               | en, zh    | 将各种 Unicode 空白标准化为常规 ASCII 空格 (U+0020)                 |
 
 ## Filter <a name="filter"/>
 

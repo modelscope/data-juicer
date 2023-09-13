@@ -71,8 +71,13 @@ def init_configs(args=None):
         type=bool,
         default=False,
         help='Whether to export the result dataset in parallel to a single '
-             'file. It only works when export_shard_size is 0, and its default'
-             'number of processes is the same as the argument np.')
+             'file, which usually takes less time. It only works when '
+             'export_shard_size is 0, and its default number of processes is '
+             'the same as the argument np. **Notice**: If it\'s True, '
+             'sometimes exporting in parallel might require much more time '
+             'due to the IO blocking, especially for very large datasets. '
+             'When this happens, False is a better choice, although it takes '
+             'more time.')
     parser.add_argument(
         '--np',
         type=PositiveInt,

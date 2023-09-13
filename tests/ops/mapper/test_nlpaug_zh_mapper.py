@@ -2,9 +2,9 @@ import unittest
 
 from datasets import Dataset
 
-from data_juicer.ops.mapper.simple_aug_zh_mapper import SimpleAugZhMapper
+from data_juicer.ops.mapper.nlpaug_zh_mapper import NlpaugZhMapper
 
-class SimpleAugEnMapperTest(unittest.TestCase):
+class NlpaugEnMapperTest(unittest.TestCase):
 
     def setUp(self):
         self.samples = Dataset.from_dict({
@@ -15,7 +15,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
     def test_create_number_with_sequential_on(self):
         aug_num = 3
         aug_method_num = 3
-        op = SimpleAugZhMapper(
+        op = NlpaugZhMapper(
             sequential=True,
             aug_num=aug_num,
             replace_similar_word=True,
@@ -29,7 +29,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
     def test_create_number_with_sequential_off(self):
         aug_num = 3
         aug_method_num = 3
-        op = SimpleAugZhMapper(
+        op = NlpaugZhMapper(
             sequential=False,
             aug_num=aug_num,
             replace_similar_word=True,
@@ -43,7 +43,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
     def test_number_of_generated_samples_with_sequential_on(self):
         aug_num = 3
         aug_method_num = 3
-        op = SimpleAugZhMapper(
+        op = NlpaugZhMapper(
             sequential=True,
             aug_num=aug_num,
             replace_similar_word=True,
@@ -60,7 +60,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
     def test_number_of_generated_samples_with_sequential_off(self):
         aug_num = 3
         aug_method_num = 3
-        op = SimpleAugZhMapper(
+        op = NlpaugZhMapper(
             sequential=False,
             aug_num=aug_num,
             replace_similar_word=True,
@@ -79,7 +79,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
         aug_num = 3
         aug_method_num = 0
         # sequential on
-        op = SimpleAugZhMapper(
+        op = NlpaugZhMapper(
             sequential=True,
             aug_num=aug_num,
         )
@@ -92,7 +92,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
         aug_num = 3
         aug_method_num = 0
         # sequential off
-        op = SimpleAugZhMapper(
+        op = NlpaugZhMapper(
             sequential=False,
             aug_num=aug_num,
         )
@@ -105,7 +105,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
         aug_num = 3
         aug_method_num = 5
         # sequential on
-        op = SimpleAugZhMapper(
+        op = NlpaugZhMapper(
             sequential=True,
             aug_num=aug_num,
             replace_similar_word=True,
@@ -125,7 +125,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
         aug_num = 3
         aug_method_num = 5
         # sequential off
-        op = SimpleAugZhMapper(
+        op = NlpaugZhMapper(
             sequential=False,
             aug_num=aug_num,
             replace_similar_word=True,

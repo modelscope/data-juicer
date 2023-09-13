@@ -10,8 +10,8 @@ from copy import deepcopy
 from ..base_op import OPERATORS, BatchMapper
 
 
-@OPERATORS.register_module('simple_aug_en_mapper')
-class SimpleAugEnMapper(BatchMapper):
+@OPERATORS.register_module('nlpaug_en_mapper')
+class NlpaugEnMapper(BatchMapper):
     """Mapper to simply augment samples in English based on nlpaug library."""
 
     def __init__(self,

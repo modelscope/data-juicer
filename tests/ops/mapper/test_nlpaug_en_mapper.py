@@ -2,10 +2,10 @@ import unittest
 
 from datasets import Dataset
 
-from data_juicer.ops.mapper.simple_aug_en_mapper import SimpleAugEnMapper
+from data_juicer.ops.mapper.nlpaug_en_mapper import NlpaugEnMapper
 
 
-class SimpleAugEnMapperTest(unittest.TestCase):
+class NlpaugEnMapperTest(unittest.TestCase):
 
     def setUp(self):
         self.samples = Dataset.from_dict({
@@ -22,7 +22,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
     def test_number_of_generated_samples_with_sequential_on(self):
         aug_num = 3
         aug_method_num = 3
-        op = SimpleAugEnMapper(
+        op = NlpaugEnMapper(
             sequential=True,
             aug_num=aug_num,
             delete_random_word=True,
@@ -38,7 +38,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
     def test_number_of_generated_samples_with_sequential_off(self):
         aug_num = 3
         aug_method_num = 3
-        op = SimpleAugEnMapper(
+        op = NlpaugEnMapper(
             sequential=False,
             aug_num=aug_num,
             delete_random_word=True,
@@ -55,7 +55,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
         aug_num = 3
         aug_method_num = 0
         # sequential on
-        op = SimpleAugEnMapper(
+        op = NlpaugEnMapper(
             sequential=True,
             aug_num=aug_num,
         )
@@ -68,7 +68,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
         aug_num = 3
         aug_method_num = 0
         # sequential off
-        op = SimpleAugEnMapper(
+        op = NlpaugEnMapper(
             sequential=False,
             aug_num=aug_num,
         )
@@ -81,7 +81,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
         aug_num = 3
         aug_method_num = 9
         # sequential on
-        op = SimpleAugEnMapper(
+        op = NlpaugEnMapper(
             sequential=True,
             aug_num=aug_num,
             delete_random_word=True,
@@ -104,7 +104,7 @@ class SimpleAugEnMapperTest(unittest.TestCase):
         aug_num = 3
         aug_method_num = 9
         # sequential off
-        op = SimpleAugEnMapper(
+        op = NlpaugEnMapper(
             sequential=False,
             aug_num=aug_num,
             delete_random_word=True,

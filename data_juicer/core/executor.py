@@ -118,14 +118,18 @@ class Executor:
                             self.tracer.trace_batch_mapper(
                                 op_name,
                                 dataset,
-                                tmp)
+                                tmp,
+                                op.text_key)
                     else:
                         tmp = dataset.map(op.process,
                                           num_proc=self.cfg.np,
                                           desc=op_name + '_process')
                         if self.open_tracer and \
                                 op_name in self.op_list_to_trace:
-                            self.tracer.trace_mapper(op_name, dataset, tmp)
+                            self.tracer.trace_mapper(op_name,
+                                                     dataset,
+                                                     tmp,
+                                                     op.text_key)
                 elif isinstance(op, Filter):
                     if Fields.stats not in dataset.features:
                         # TODO:
