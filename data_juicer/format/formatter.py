@@ -4,7 +4,6 @@ from typing import List, Tuple, Union
 from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 from loguru import logger
 
-from data_juicer.core.data import NestedDataset
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (find_files_with_suffix,
                                           is_absolute_path)
@@ -72,6 +71,7 @@ class LocalFormatter(BaseFormatter):
             logger.info('Add suffix info into dataset...')
             datasets = add_suffixes(datasets)
         else:
+            from data_juicer.core.data import NestedDataset
             datasets = NestedDataset(
                 concatenate_datasets([ds for _, ds in datasets.items()]))
         ds = unify_format(datasets,
@@ -129,6 +129,7 @@ def add_suffixes(datasets: DatasetDict) -> Dataset:
             datasets[key] = ds.add_column(name=Fields.suffix,
                                           column=['.' + key] * ds.num_rows)
     datasets = concatenate_datasets([ds for _, ds in datasets.items()])
+    from data_juicer.core.data import NestedDataset
     return NestedDataset(datasets)
 
 
@@ -152,6 +153,7 @@ def unify_format(
 
     :return: unified_format_dataset
     """
+    from data_juicer.core.data import NestedDataset
     if isinstance(dataset, DatasetDict):
         datasets = list(dataset.values())
         assert len(datasets) == 1, 'Please make sure the passed datasets ' \
