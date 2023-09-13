@@ -107,7 +107,7 @@ def tar_fp_iter(src_dir):
 
 def main(arxiv_src_dir, target_dir, work_dir='./tmp/', num_proc=1):
     """
-    :param arxiv_src_dir: if you download raw arxiv data as Redpajama did,
+    :param arxiv_src_dir: if you download raw arXiv data as Redpajama did,
            you will get a directory src which includes thousands of tar
            files whose filenames are like "arXiv_src_yymm_xxx.tar". You
            just need to set this argument to the path of this dir.
@@ -118,7 +118,7 @@ def main(arxiv_src_dir, target_dir, work_dir='./tmp/', num_proc=1):
     """
     # check if the source directory exists.
     if not os.path.exists(arxiv_src_dir):
-        raise ValueError('The raw arxiv source data directory does not exist,'
+        raise ValueError('The raw arXiv source data directory does not exist,'
                          ' Please check and retry.')
     if not os.path.exists(target_dir):
         os.makedirs(target_dir, exist_ok=True)

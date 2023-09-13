@@ -2,9 +2,9 @@
 
 此文件夹包含的配置文件用于轻松复现 [Redpajama](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep) 的处理流程。
 
-## Arxiv
+## arXiv
 
-原始数据文件从 [Redpajama/Arxiv](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/arxiv) 中相同的 AWS 链接下载。
+原始数据文件从 [Redpajama/arXiv](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/arxiv) 中相同的 AWS 链接下载。
 
 下载完成后，使用 [raw_arxiv_to_jsonl.py](../../tools/preprocess/raw_arxiv_to_jsonl.py) 将原始格式转换为 Data-Juicer 易于处理的格式：
 

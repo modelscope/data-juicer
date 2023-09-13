@@ -168,7 +168,7 @@ class Visualize:
             unsafe_allow_html=True,
         )
         st.markdown(
-            f'<div align = "center"> A Data-Centric Text Processing System for \
+            f'<div align = "center"> A One-Stop Data Processing System for \
                 Large Language Models, \
                 see more details in our <a href={readme_link}>page</a></div>',
             unsafe_allow_html=True,

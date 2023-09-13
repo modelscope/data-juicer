@@ -1,9 +1,10 @@
 English | [**中文**](README_ZH.md) 
 
-# Data-Juicer: A Data-Centric Text Processing System for Large Language Models
+# Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
 ![Data-Juicer](docs/imgs/data-juicer.jpg "Data-Juicer")
 
+[![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 ![](https://img.shields.io/badge/language-Python-214870.svg)
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![Contributing](https://img.shields.io/badge/Contribution-welcome-brightgreen.svg)](docs/DeveloperGuide.md)
@@ -17,7 +18,8 @@ English | [**中文**](README_ZH.md)
 [![QualityClassifier](https://img.shields.io/badge/Tools-Quality_Classifier-saddlebrown?logo=Markdown)](tools/quality_classifier/README.md)
 [![AutoEvaluation](https://img.shields.io/badge/Tools-Auto_Evaluation-saddlebrown?logo=Markdown)](tools/evaluator/README.md)
 
-Data-Juicer is a data-centric text processing system to make data higher-quality, juicier, and more digestible for LLMs.
+Data-Juicer is a one-stop data processing system to make data higher-quality, 
+juicier, and more digestible for LLMs.
 This project is being actively updated and maintained, and we will periodically enhance and add more features and data recipes. We welcome you to join us in promoting LLM data development and research!
 
 ----
@@ -25,7 +27,7 @@ This project is being actively updated and maintained, and we will periodically 
 Table of Contents
 =================
 
-* [Data-Juicer: A Data-Centric Text Processing System for Large Language Models](#data-juicer-a-data-centric-text-processing-system-for-large-language-models)
+* [Data-Juicer: A One-Stop Data Processing System for Large Language Models](#data-juicer-a-one-stop-data-processing-system-for-large-language-models)
 * [Table of Contents](#table-of-contents)
    * [Features](#features)
    * [Prerequisites](#prerequisites)
@@ -45,21 +47,31 @@ Table of Contents
 
 ## Features
 
-- **Broad Range of Operators**: Equipped with 50+ core [operators (OPs)](docs/Operators.md), including Formatters, Mappers, Filters, Deduplicators, and beyond.
+![Overview](docs/imgs/overview.png)
 
-- **Specialized Toolkits**: Feature-rich specialized toolkits such as [Text Quality Classifier](tools/quality_classifier/README.md), [Dataset Splitter](tools/preprocess/README.md), [Analysers](#data-analysis), [Evaluators](tools/evaluator/README.md), and more that elevate your dataset handling capabilities.
+- **Systematic & Reusable**: 
+  Empowering users with a systematic library of 20+ reusable [config recipes](configs), 50+ core [OPs](docs/Operators.md), and feature-rich 
+  dedicated [toolkits](#documentation), designed to 
+  function independently of specific LLM datasets and processing pipelines.
 
-- **Systematic & Reusable**: Empowering users with a systematic library of reusable [config recipes](configs) and [OPs](docs/Operators.md), designed to function independently of specific datasets, models, or tasks.
+- **Data-in-the-loop**: Allowing detailed data analyses with an automated 
+  report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.
+  ![Data-in-the-loop](docs/imgs/feedback_loop.png)
 
-- **Data-in-the-loop**: Allowing detailed data analyses with an automated report generation feature for a deeper understanding of your dataset. Coupled with real-time multi-dimension automatic evaluation capabilities, it supports a feedback loop at multiple stages in the LLM development process.
+- **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data 
+  processing recipes](configs/data_juicer_recipes/README.md) for 
+  pre-training, post-tuning, en, zh, and more scenarios. Validated on 
+  reference LLaMA models.  
+  ![exp_llama](docs/imgs/exp_on_llama.png)
 
-- **Comprehensive Processing Recipes**: Offering tens of [pre-built data processing recipes](configs/data_juicer_recipes/README.md) for pre-training, SFT, en, zh, and more scenarios.
+- **Enhanced Efficiency**: Providing a speedy data processing pipeline 
+  requiring less memory and CPU usage, optimized for maximum productivity. 
+  ![sys-perf](docs/imgs/sys_perf.png)
 
-- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documentation), [easy start guides](#quick-start) and [demo configs](configs/README.md), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
 
 - **Flexible & Extensible**: Accommodating most types of data formats (e.g., jsonl, parquet, csv, ...) and allowing flexible combinations of OPs. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
 
-- **Enhanced Efficiency**: Providing a speedy data processing pipeline requiring less memory, optimized for maximum productivity.
+- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documentation), [easy start guides](#quick-start) and [demo configs](configs/README.md), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
 
 ## Prerequisites
 
@@ -167,7 +179,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
   - Multi-sample in one file: jsonl/json, parquet, csv/tsv, etc.
   - Single-sample in one file: txt, code, docx, pdf, etc.
 - However, data from different sources are complicated and diverse. Such as:
-  - [Raw arxiv data downloaded from S3](https://info.arxiv.org/help/bulk_data_s3.html) include thousands of tar files and even more gzip files in them, and expected tex files are embedded in the gzip files so they are hard to obtain directly.
+  - [Raw arXiv data downloaded from S3](https://info.arxiv.org/help/bulk_data_s3.html) include thousands of tar files and even more gzip files in them, and expected tex files are embedded in the gzip files so they are hard to obtain directly.
   - Some crawled data include different kinds of files (pdf, html, docx, etc.). And extra information like tables, charts, and so on is hard to extract.
 - It's impossible to handle all kinds of data in Data-Juicer, issues/PRs are welcome to contribute to process new data types!
 - Thus, we provide some **common preprocessing tools** in [`tools/preprocess`](tools/preprocess/) for you to preprocess these data.
@@ -191,8 +203,8 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 ## Data Recipes
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
 - [Recipes for data process in RedPajama](configs/redpajama/README.md)
-- [Refined recipes for pretraining data](configs/data_juicer_recipes/README.md)
-- [Refined recipes for SFT data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
+- [Refined recipes for pre-training data](configs/data_juicer_recipes/README.md)
+- [Refined recipes for post-tuning data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
 
 ## Demos
 - Introduction to Data-Juicer [[ModelScope](https://modelscope.cn/studios/Data-Juicer/overview_scan/summary)]
@@ -201,7 +213,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
   - Lexical Diversity [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_diversity/summary)]
   - Operator Effect [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_op_effect/summary)]
 - Data Processing:
-  - Scientific Literature (e.g. [ArXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)]
+  - Scientific Literature (e.g. [arXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)]
   - Programming Code (e.g. [TheStack](https://huggingface.co/datasets/bigcode/the-stack)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_code_data/summary)]
   - Chinese Instruction Data (e.g. [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sft_zh_data/summary)]
 - Tool Pool:
@@ -209,8 +221,8 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
   - Quality Classifier for CommonCrawl [[ModelScope](https://modelscope.cn/studios/Data-Juicer/tool_quality_classifier/summary)]
   - Auto Evaluation on [HELM](https://github.com/stanford-crfm/helm) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/auto_evaluation_helm/summary)]
   - Data Sampling and Mixture [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_mixture/summary)]
-- Data Process Loop [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)]
-- Data Process HPO [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_hpo/summary)]
+- Data Processing Loop [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)]
+- Data Processing HPO [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_hpo/summary)]
 
 ## License
 Data-Juicer is released under Apache License 2.0.
@@ -219,4 +231,14 @@ Data-Juicer is released under Apache License 2.0.
 We greatly welcome contributions of new features, bug fixes, and discussions. Please refer to [How-to Guide for Developers](docs/DeveloperGuide.md).
 
 ## References
-Our paper is coming soon!
+If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2309.02033).
+```
+@misc{chen2023datajuicer,
+title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
+author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
+year={2023},
+eprint={2309.02033},
+archivePrefix={arXiv},
+primaryClass={cs.LG}
+}
+```

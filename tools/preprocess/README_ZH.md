@@ -26,9 +26,9 @@ python tools/preprocess/dataset_split_by_language.py --help
 - `suffixes`: 待读取文件的后缀名，默认为 None。
 - `num_proc` (可选): worker 进程数量，默认为 1。
 
-### 将原始 arxiv 数据转换为 jsonl
+### 将原始 arXiv 数据转换为 jsonl
 
-该工具用于将从 S3 下载的原始 arxiv 数据转换为对 Data-Juicer 友好的 jsonl 格式。
+该工具用于将从 S3 下载的原始 arXiv 数据转换为对 Data-Juicer 友好的 jsonl 格式。
 
 ```shell
 python tools/preprocess/raw_arxiv_to_jsonl.py           \
@@ -41,7 +41,7 @@ python tools/preprocess/raw_arxiv_to_jsonl.py           \
 python tools/preprocess/raw_arxiv_to_jsonl.py  --help
 ```
 
-- `arxiv_src_dir`: 如果你像 Redpajama 一样下载原始 arxiv 数据，你将得到一个目录 src，其中包含数千个 tar 文件，其文件名类似于 `arXiv_src_yymm_xxx.tar`。 您只需将此参数设置为该目录的路径即可。
+- `arxiv_src_dir`: 如果你像 Redpajama 一样下载原始 arXiv 数据，你将得到一个目录 src，其中包含数千个 tar 文件，其文件名类似于 `arXiv_src_yymm_xxx.tar`。 您只需将此参数设置为该目录的路径即可。
 - `target_dir`: 用于存储转换后的 jsonl 文件的结果目录。
 - `temp_dir`: 用于存储临时文件的目录，该目录将在转化结束时自动被删除，默认为 `./tmp`。
 - `num_proc` (可选): worker 进程数量，默认为 1。

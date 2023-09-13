@@ -26,9 +26,9 @@ python tools/preprocess/dataset_split_by_language.py --help
 - `suffixes`: the suffix of files that will be read. Default: None
 - `num_proc` (optional): number of process workers. Default it's 1.
 
-### Convert raw arxiv data to jsonl
+### Convert raw arXiv data to jsonl
 
-This tool is used to convert the raw arxiv data downloaded from S3 into the jsonl format which is friendly to Data-Juicer.
+This tool is used to convert the raw arXiv data downloaded from S3 into the jsonl format which is friendly to Data-Juicer.
 
 
 
@@ -42,7 +42,7 @@ python tools/preprocess/raw_arxiv_to_jsonl.py           \
 # get help
 python tools/preprocess/raw_arxiv_to_jsonl.py  --help
 ```
-- `arxiv_src_dir`: if you download raw arxiv data as Redpajama did, you will get a directory src which includes thousands of tar files whose filenames are like `arXiv_src_yymm_xxx.tar`. You just need to set this argument to the path of this dir.
+- `arxiv_src_dir`: if you download raw arXiv data as Redpajama did, you will get a directory src which includes thousands of tar files whose filenames are like `arXiv_src_yymm_xxx.tar`. You just need to set this argument to the path of this dir.
 - `target_dir`: result directory to store the converted jsonl files.
 - `temp_dir`: directory to store intermediate files, and they will be removed once the conversion ends. Default it's `./tmp`
 - `num_proc` (optional): number of process workers. Default it's 1.

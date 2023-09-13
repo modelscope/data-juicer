@@ -14,7 +14,7 @@ demo_path = os.path.dirname(os.path.abspath(__file__))
 project_path = os.path.dirname(os.path.dirname(demo_path))
 
 project_desc = '''
-**Data-Juicer** is a data-centric text processing system to make data higher-quality, juicier, and more digestible for LLMs.
+**Data-Juicer** is a one-stop data processing system to make data higher-quality, juicier, and more digestible for LLMs.
 This project is being actively updated and maintained, and we will periodically enhance and add more features and data recipes. We welcome you to join us in promoting LLM data development and research!
 '''
 
@@ -25,7 +25,7 @@ features_desc = '''
 
 - **Systematic & Reusable**: Empowering users with a systematic library of reusable `config recipes` and `OPs`, designed to function independently of specific datasets, models, or tasks.
 
-- **Data-in-the-loop**: Allowing detailed data analyses with an automated report generation feature for a deeper understanding of your dataset. Coupled with real-time multi-dimension automatic evaluation capabilities, it supports a feedback loop at multiple stages in the LLM development process.
+- **Data-in-the-loop**: Allowing detailed data analyses with an automated report generation feature for a deeper understanding of your dataset. Coupled with timely multi-dimension automatic evaluation capabilities, it supports a feedback loop at multiple stages in the LLM development process.
 
 - **Comprehensive Processing Recipes**: Offering tens of `pre-built data processing recipes` for pre-training, SFT, en, zh, and more scenarios.
 
@@ -171,7 +171,7 @@ demo_desc = '''
   - Lexical Diversity [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_diversity/summary)]
   - Operator Effect [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_op_effect/summary)]
 - Data Processing:
-  - Scientific Literature (e.g. [ArXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)]
+  - Scientific Literature (e.g. [arXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)]
   - Programming Code (e.g. [TheStack](https://huggingface.co/datasets/bigcode/the-stack)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_code_data/summary)]
   - Chinese Instruction Data (e.g. [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sft_zh_data/summary)]
 - Tool Pool:
@@ -238,7 +238,7 @@ class Visualize:
         )
 
         st.markdown(
-            f'<div align = "center"> A Data-Centric Text Processing System for \
+            f'<div align = "center"> A One-Stop Data Processing System for \
                 Large Language Models, \
                 see more details in <a href={readme_link}>GitHub</a></div>',
             unsafe_allow_html=True,

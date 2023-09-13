@@ -5,11 +5,12 @@
 # global parameters
 project_name: 'all'                                         # project name for distinguish your configs
 dataset_path: '/path/to/your/dataset'                       # path to your dataset directory or file with weights(0.0-1.0), 1.0 as default.
-                                                            # Accepted format: 'weight1(optional) dataset1-path weight2(optional) dataset2-path '
+                                                            # Accepted format: 'weight1(optional) dataset1-path weight2(optional) dataset2-path'
 export_path: '/path/to/result/dataset.jsonl'                # path to processed result dataset. Supported suffixes include ['jsonl', 'json', 'parquet']
 export_shard_size: 0                                        # Shard size of exported dataset in Byte. In default, it's 0, which means export the whole dataset into only one file. If it's set a positive number, the exported dataset will be split into several dataset shards, and the max size of each shard won't larger than the export_shard_size
+export_in_parallel: false                                   # Whether to export the result dataset in parallel to a single file, which usually takes less time. It only works when export_shard_size is 0, and its default number of processes is the same as the argument np. **Notice**: If it's True, sometimes exporting in parallel might require much more time due to the IO blocking, especially for very large datasets. When this happens, False is a better choice, although it takes more time.
 np: 4                                                       # number of subprocess to process your dataset
-text_keys: 'content'                                        # the key name of field where the sample texts to be processed, e.g., `text`, `instruction`, `output`, ...'
+text_keys: 'content'                                        # the key name of field where the sample texts to be processed, e.g., `text`, `instruction`, `output`, ...
                                                             # Note: currently, we support specify only ONE key for each op, for cases requiring multiple keys, users can specify the op multiple times. We will only use the first key of `text_keys` when you set multiple keys.
 suffixes: []                                                # the suffix of files that will be read. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
 use_cache: true                                             # whether to use the cache management of hugging face datasets. It might take up lots of disk space when using cache
@@ -35,6 +36,26 @@ process:
   - clean_copyright_mapper:                                 # remove copyright comments.
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
   - fix_unicode_mapper:                                     # fix unicode errors in text.
+  - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library
+      sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
+      aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.
+      delete_random_word: false                               # whether to open the augmentation method of deleting random words from the original texts. e.g. "I love LLM" --> "I LLM"
+      swap_random_word: false                                 # whether to open the augmentation method of swapping random contiguous words in the original texts. e.g. "I love LLM" --> "Love I LLM"
+      spelling_error_word: false                              # whether to open the augmentation method of simulating the spelling error for words in the original texts. e.g. "I love LLM" --> "Ai love LLM"
+      split_random_word: false                                # whether to open the augmentation method of splitting words randomly with whitespaces in the original texts. e.g. "I love LLM" --> "I love LL M"
+      keyboard_error_char: false                              # whether to open the augmentation method of simulating the keyboard error for characters in the original texts. e.g. "I love LLM" --> "I ;ov4 LLM"
+      ocr_error_char: false                                   # whether to open the augmentation method of simulating the OCR error for characters in the original texts. e.g. "I love LLM" --> "I 10ve LLM"
+      delete_random_char: false                               # whether to open the augmentation method of deleting random characters from the original texts. e.g. "I love LLM" --> "I oe LLM"
+      swap_random_char: false                                 # whether to open the augmentation method of swapping random contiguous characters in the original texts. e.g. "I love LLM" --> "I ovle LLM"
+      insert_random_char: false                               # whether to open the augmentation method of inserting random characters into the original texts. e.g. "I love LLM" --> "I ^lKove LLM"
+  - nlpcda_zh_mapper:                                       # simply augment texts in Chinese based on the nlpaug library
+      sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
+      aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.
+      replace_similar_word: false                             # whether to open the augmentation method of replacing random words with their similar words in the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这边一共有5种不同的数据增强方法"
+      replace_homophone_char: false                           # whether to open the augmentation method of replacing random characters with their homophones in the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的濖据增强方法"
+      delete_random_char: false                               # whether to open the augmentation method of deleting random characters from the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的数据增强"
+      swap_random_char: false                                 # whether to open the augmentation method of swapping random contiguous characters in the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的数据强增方法"
+      replace_equivalent_num: false                           # whether to open the augmentation method of replacing random numbers with their equivalent representations in the original texts. **Notice**: Only for numbers for now. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有伍种不同的数据增强方法"
   - punctuation_normalization_mapper:                       # normalize unicode punctuations to English punctuations.
   - remove_bibliography_mapper:                             # remove bibliography from Latex text.
   - remove_comments_mapper:                                 # remove comments from Latex text, code, etc.
@@ -55,8 +76,8 @@ process:
       lang: en                                                # sample in which language
       tokenization: false                                     # whether to use model to tokenize documents
       substrings: ['http', 'www', '.com', 'href', '//']       # incorrect substrings to remove
-  - sentence_split_mapper:                                  # split text to sentences and join them with '\n'
-      lang: 'en'                                            # split text in what language
+  - sentence_split_mapper:                                  # split text to multiple sentences and join them with '\n'
+      lang: 'en'                                              # split text in what language
   - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
 
   # Filter ops

@@ -52,7 +52,7 @@ setuptools.setup(
     name='data_juicer',
     version=version,
     author='SysML team of Alibaba DAMO Academy',
-    description='A Data-Centric Text Processing System for Large Language '
+    description='A One-Stop Data Processing System for Large Language '
     'Models.',
     long_description=readme_md,
     long_description_content_type='text/markdown',

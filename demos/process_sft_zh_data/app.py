@@ -39,7 +39,7 @@ We use simple 3-σ rule to set the hyperparameters for ops in each recipe.
 
 | subset               |       #samples before       | #samples after | keep ratio |data link                                                                                                                                                                                                                                                                                  | source                  |
 |----------------------|:---------------------------:|:--------------:|:----------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|
-| Arxiv                |          1,724,497          |   1,655,259    |   95.99%   | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/pretraining/redpajama-arxiv-refine-result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/redpajama-arxiv-refined-by-data-juicer/summary)                                       | Redpajama               |
+| arXiv                |          1,724,497          |   1,655,259    |   95.99%   | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/pretraining/redpajama-arxiv-refine-result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/redpajama-arxiv-refined-by-data-juicer/summary)                                       | Redpajama               |
 | Books                |           205,182           |    195,983     |   95.51%   | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/pretraining/redpajama-book-refine-result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/redpajama-book-refined-by-data-juicer/summary)                                         | Redpajama               |
 | Wikipedia            |         29,834,171          |   26,990,659   |   90.47%   | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/pretraining/redpajama-wiki-refine-result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/redpajama-wiki-refined-by-data-juicer/summary)                                         | Redpajama               |
 | C4                   |         364,868,892         |  344,491,171   |   94.42%   | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/pretraining/redpajama-c4-refine-result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/redpajama-c4-refined-by-data-juicer/summary)                                             | Redpajama               |
@@ -128,7 +128,7 @@ class Visualize:
             unsafe_allow_html=True,
         )
         st.markdown(
-            f'<div align = "center"> A Data-Centric Text Processing System for \
+            f'<div align = "center"> A One-Stop Data Processing System for \
                 Large Language Models, \
                 see more details in our <a href={readme_link}>page</a></div>',
             unsafe_allow_html=True,

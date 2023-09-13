@@ -66,7 +66,9 @@ class Executor:
         # prepare exporter and check export path suffix
         logger.info('Preparing exporter...')
         self.exporter = Exporter(self.cfg.export_path,
-                                 self.cfg.export_shard_size, self.cfg.np)
+                                 self.cfg.export_shard_size,
+                                 self.cfg.export_in_parallel,
+                                 self.cfg.np)
 
         # setup tracer
         self.open_tracer = self.cfg.open_tracer
@@ -114,11 +116,22 @@ class Executor:
             prev = dataset  # record last dataset
             try:
                 if isinstance(op, Mapper):
-                    tmp = dataset.map(op.process,
+                    tmp = dataset.map(function=op.process,
                                       num_proc=self.cfg.np,
                                       desc=op_name + '_process')
-                    if self.open_tracer and op_name in self.op_list_to_trace:
-                        self.tracer.trace_mapper(op_name, dataset, tmp)
+                    if self.open_tracer and \
+                            op_name in self.op_list_to_trace:
+                        if op.is_batched_op():
+                            self.tracer.trace_batch_mapper(
+                                op_name,
+                                dataset,
+                                tmp,
+                                op.text_key)
+                        else:
+                            self.tracer.trace_mapper(op_name,
+                                                     dataset,
+                                                     tmp,
+                                                     op.text_key)
                 elif isinstance(op, Filter):
                     if Fields.stats not in dataset.features:
                         # TODO:

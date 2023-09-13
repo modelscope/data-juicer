@@ -2,8 +2,8 @@
 
 This folder contains example configuration files to easily and quickly reproduce the processing flow of [Redpajama](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep).
 
-## Arxiv
-The raw data files can be downloaded from the same AWS link as in [Redpajama/Arxiv](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/arxiv).
+## arXiv
+The raw data files can be downloaded from the same AWS link as in [Redpajama/arXiv](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/arxiv).
 
 Once downloaded, use [raw_arxiv_to_jsonl.py](../../tools/preprocess/raw_arxiv_to_jsonl.py) to convert from the original format to `jsonl` that Data-Juicer can handle easily:
 
