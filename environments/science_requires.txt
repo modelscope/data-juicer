@@ -9,5 +9,7 @@ emoji==2.2.0
 regex
 simhash-py
 selectolax
+nlpaug
+nlpcda
 nltk
 transformers

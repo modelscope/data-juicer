@@ -1,4 +1,5 @@
 import copy
+import inspect
 from functools import wraps
 from typing import Union
 
@@ -140,12 +141,25 @@ class NestedDataset(Dataset):
                 args[0] = lambda x: nested_obj_factory(x)
             else:
                 args[0] = wrap_func_with_nested_access(args[0])
+            called_func = args[0]
         else:
             if 'function' not in kargs or kargs['function'] is None:
                 kargs['function'] = lambda x: nested_obj_factory(x)
             else:
                 kargs['function'] = wrap_func_with_nested_access(
                     kargs['function'])
+            called_func = kargs['function']
+
+        # For wrapped function, try to get its original unwrapped method
+        while hasattr(called_func, '__wrapped__'):
+            called_func = called_func.__wrapped__
+        # Does the called function belong to a batched OP?
+        if inspect.ismethod(called_func) \
+                and 'is_batched_op' in dir(called_func.__self__) \
+                and callable(getattr(called_func.__self__, 'is_batched_op')) \
+                and called_func.__self__.is_batched_op():
+            kargs['batched'] = True
+            kargs['batch_size'] = 1
 
         return NestedDataset(super().map(*args, **kargs))
 

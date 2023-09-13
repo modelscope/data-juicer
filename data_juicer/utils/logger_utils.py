@@ -130,3 +130,21 @@ def setup_logger(save_dir, distributed_rank=0, filename='log.txt', mode='o'):
     # redirect stdout/stderr to loguru
     redirect_sys_output('INFO')
     LOGGER_SETUP = True
+
+class HiddenPrints:
+    """Define a range that hide the outputs within this range."""
+    def __enter__(self):
+        """
+        Store the original standard output and redirect the standard output to
+        null when entering this range.
+        """
+        self._original_stdout = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Close the redirected standard output and restore it when exiting from
+        this range.
+        """
+        sys.stdout.close()
+        sys.stdout = self._original_stdout

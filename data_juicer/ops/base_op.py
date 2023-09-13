@@ -18,14 +18,20 @@ class Mapper:
         from data_juicer.core.data import wrap_func_with_nested_access
         self.process = wrap_func_with_nested_access(self.process)
 
+        # In default, it's a normal OP instead of batched OP
+        self._batched_op = False
+
     def process(self, sample):
         """
-        For sample level, sample --> sample or sample --> [samples, ...]
+        For sample level, sample --> sample
 
         :param sample: sample to process
         :return: processed sample
         """
         raise NotImplementedError
+
+    def is_batched_op(self):
+        return self._batched_op
 
 
 class Filter:
