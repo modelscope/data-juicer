@@ -92,7 +92,7 @@ def get_log_file_path():
             return handler._sink._file.name
 
 
-def setup_logger(save_dir, distributed_rank=0, filename='log.txt', mode='o'):
+def setup_logger(save_dir, distributed_rank=0, filename='log.txt', mode='o', redirect=True):
     """
     Setup logger for training and testing.
 
@@ -100,6 +100,7 @@ def setup_logger(save_dir, distributed_rank=0, filename='log.txt', mode='o'):
     :param distributed_rank: device rank when multi-gpu environment
     :param filename: log file name to save
     :param mode: log file write mode, `append` or `override`. default is `o`.
+    :param redirect: whether to redirect system output
     :return: logger instance.
     """
     global LOGGER_SETUP
@@ -128,7 +129,8 @@ def setup_logger(save_dir, distributed_rank=0, filename='log.txt', mode='o'):
         logger.add(save_file)
 
     # redirect stdout/stderr to loguru
-    redirect_sys_output('INFO')
+    if redirect:
+        redirect_sys_output('INFO')
     LOGGER_SETUP = True
 
 class HiddenPrints:
