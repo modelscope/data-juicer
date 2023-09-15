@@ -2,7 +2,7 @@ English | [**中文**](README_ZH.md)
 
 # Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
-![Data-Juicer](docs/imgs/data-juicer.jpg "Data-Juicer")
+![Data-Juicer](https://img.alicdn.com/imgextra/i3/O1CN017Eq5kf27AlA2NUKef_!!6000000007757-0-tps-1280-720.jpg "Data-Juicer")
 
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 ![](https://img.shields.io/badge/language-Python-214870.svg)
@@ -32,6 +32,9 @@ Table of Contents
    * [Features](#features)
    * [Prerequisites](#prerequisites)
    * [Installation](#installation)
+     * [From Source](#from-source)
+     * [Using pip](#using-pip)
+     * [Installation check](#installation-check)
    * [Quick Start](#quick-start)
       * [Data Processing](#data-processing)
       * [Data Analysis](#data-analysis)
@@ -47,7 +50,7 @@ Table of Contents
 
 ## Features
 
-![Overview](docs/imgs/overview.png)
+![Overview](https://img.alicdn.com/imgextra/i4/O1CN01uvLL0T1VIaX28dMLg_!!6000000002630-2-tps-2509-1192.png)
 
 - **Systematic & Reusable**: 
   Empowering users with a systematic library of 20+ reusable [config recipes](configs), 50+ core [OPs](docs/Operators.md), and feature-rich 
@@ -56,17 +59,17 @@ Table of Contents
 
 - **Data-in-the-loop**: Allowing detailed data analyses with an automated 
   report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.
-  ![Data-in-the-loop](docs/imgs/feedback_loop.png)
+  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
 
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data 
   processing recipes](configs/data_juicer_recipes/README.md) for 
   pre-training, post-tuning, en, zh, and more scenarios. Validated on 
   reference LLaMA models.  
-  ![exp_llama](docs/imgs/exp_on_llama.png)
+  ![exp_llama](https://img.alicdn.com/imgextra/i1/O1CN01D0Nuof1uOPxvBVEq9_!!6000000006027-0-tps-2324-754.jpg)
 
 - **Enhanced Efficiency**: Providing a speedy data processing pipeline 
   requiring less memory and CPU usage, optimized for maximum productivity. 
-  ![sys-perf](docs/imgs/sys_perf.png)
+  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 
 - **Flexible & Extensible**: Accommodating most types of data formats (e.g., jsonl, parquet, csv, ...) and allowing flexible combinations of OPs. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
@@ -79,6 +82,8 @@ Table of Contents
 - gcc >= 5 (at least C++14 support)
 
 ## Installation
+
+### From Source
 
 - Run the following commands to install the latest `data_juicer` version in
   editable mode:
@@ -103,7 +108,20 @@ The dependency options are listed below:
 | .[dev]   | Install dependencies for developing the package as contributors        |
 | .[tools] | Install dependencies for dedicated tools, such as quality classifiers. |
 
-- Installation check:
+### Using pip
+
+- Run the following command to install the latest `data_juicer` using `pip`:
+
+```shell
+pip install py-data-juicer
+```
+
+- **Notice**: only the basic APIs in `data_juicer` and two basic tools
+  (data [processing](#data-processing) and [analysis](#data-analysis)) are available in this way. If you want customizable
+  and complete functions, we recommend you install `data_juicer` [from source](#from-source).
+
+### Installation check
+
 ```python
 import data_juicer as dj
 print(dj.__version__)
@@ -114,11 +132,15 @@ print(dj.__version__)
 
 ### Data Processing
 
-- Run `process_data.py` tool with your config as the argument to process
+- Run `process_data.py` tool or `dj-process` command line tool with your config as the argument to process
   your dataset.
 
 ```shell
+# only for installation from source
 python tools/process_data.py --config configs/demo/process.yaml
+
+# use command line tool
+dj-process --config configs/demo/process.yaml
 ```
 
 - **Note:** For some operators that involve third-party models or resources which are not stored locally on your computer, it might be slow for the first running because these ops need to download corresponding resources into a directory first.
@@ -134,10 +156,14 @@ export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 ```
 
 ### Data Analysis
-- Run `analyze_data.py` tool with your config as the argument to analyse your dataset.
+- Run `analyze_data.py` tool or `dj-analyze` command line tool with your config as the argument to analyse your dataset.
 
 ```shell
+# only for installation from source
 python tools/analyze_data.py --config configs/demo/analyser.yaml
+
+# use command line tool
+dj-analyze --config configs/demo/analyser.yaml
 ```
 
 - **Note:** Analyser only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
@@ -145,6 +171,7 @@ python tools/analyze_data.py --config configs/demo/analyser.yaml
 ### Data Visualization
 
 - Run `app.py` tool to visualize your dataset in your browser.
+- **Notice**: only available for installation from source.
 
 ```shell
 streamlit run app.py
@@ -172,7 +199,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 
 - The basic config format and definition is shown below.
 
-  ![Basic config example of format and definition](docs/imgs/config-def-EN.jpg "Basic config file example")
+  ![Basic config example of format and definition](https://img.alicdn.com/imgextra/i1/O1CN01uXgjgj1khWKOigYww_!!6000000004715-0-tps-1745-871.jpg "Basic config file example")
 
 ### Preprocess Raw Data (Optional)
 - Our formatters support some common input dataset formats for now:

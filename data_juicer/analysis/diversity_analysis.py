@@ -4,37 +4,7 @@ import pandas as pd
 import spacy
 from loguru import logger
 
-diversity_models = {}
-
-
-def load_diversity_model(model_name):
-    """
-    Load diversity model according to the model name.
-
-    :param model_name: name of diversity model
-    :return: loaded diversity model.
-    """
-    nlp = spacy.load(model_name)
-    return nlp
-
-
-def prepare_diversity_model(lang):
-    """
-    Prepare diversity model for specific language.
-
-    :param lang: language of diversity model. Should be one of ["zh",
-        "en"]
-    :return: corresponding diversity model
-    """
-    assert lang in ['zh', 'en'], 'Diversity only support zh and en'
-
-    # return loaded models directly
-    if lang in diversity_models.keys():
-        return diversity_models[lang]
-
-    model_name = lang + '_core_web_md'
-    diversity_models[lang] = load_diversity_model(model_name)
-    return diversity_models[lang]
+from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 
 # Modify from self_instruct, please refer to
@@ -140,7 +110,8 @@ class DiversityAnalysis:
         # load diversity model
         lang_or_model = lang_or_model if lang_or_model else self.lang_or_model
         if isinstance(lang_or_model, str):
-            diversity_model = prepare_diversity_model(lang_or_model)
+            diversity_model = MODEL_ZOO.get(
+                prepare_model(lang_or_model, 'spacy'))
         else:
             diversity_model = lang_or_model
 

@@ -1,5 +1,5 @@
 fasttext
-kenlm @ http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/kenlm-master.zip
+kenlm
 sentencepiece
 scipy
 tabulate

@@ -16,13 +16,13 @@ import yaml
 from loguru import logger
 
 from data_juicer.analysis.diversity_analysis import (DiversityAnalysis,
-                                                     get_diversity,
-                                                     prepare_diversity_model)
+                                                     get_diversity)
 from data_juicer.config import init_configs
 from data_juicer.core import Analyser, Executor
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.logger_utils import get_log_file_path
+from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
 
 
 @st.cache_data
@@ -40,7 +40,8 @@ def convert_to_jsonl(df):
 
 @st.cache_data
 def get_diversity_model(lang):
-    diversity_model = prepare_diversity_model(lang)
+    model_key = prepare_model(lang, 'spacy')
+    diversity_model = MODEL_ZOO.get(model_key)
     return diversity_model
 
 
