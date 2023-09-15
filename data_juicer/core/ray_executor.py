@@ -3,6 +3,7 @@ import os
 from loguru import logger
 from data_juicer.config import init_configs
 from data_juicer.ops import (Filter, Mapper, load_ops)
+from data_juicer.utils.constant import Fields
 
 import ray
 import ray.data as rd
@@ -54,6 +55,9 @@ class RayExecutor:
         # 3. data process
         # - If tracer is open, trace each op after it's processed
         # - If checkpoint is open, clean the cache files after each process
+        if Fields.stats not in dataset.columns(fetch_if_missing=False):
+            logger.info(f'columns {dataset.columns(fetch_if_missing=False)}')
+            dataset = dataset.add_column(Fields.stats, lambda df: [{}] * len(df))
         logger.info('Processing data...')
         for op_cfg, op in zip(self.process_list, self.ops):
             op_name, _ = list(op_cfg.items())[0]
@@ -61,8 +65,6 @@ class RayExecutor:
                 if isinstance(op, Mapper):
                     dataset = dataset.map(op.process)
                 elif isinstance(op, Filter):
-                    if 'stats' not in dataset.columns():
-                        dataset = dataset.add_column('stats', lambda df: [{}] * len(df))
                     dataset = dataset.map(op.compute_stats)
                     dataset = dataset.filter(op.process)
                 else:

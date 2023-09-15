@@ -202,3 +202,14 @@ def prepare_model(lang='en', model_type='sentencepiece', model_key=None):
         else:
             MODEL_ZOO[model_key] = model_func(model_name, lang)
     return model_key
+
+
+def get_model(model_key, lang='en', model_type='sentencepiece'):
+    """
+    Get a model or a tokenizer from MODEL_ZOO.
+
+    :param model_key: name of the model or tokenzier
+    """
+    if model_key not in MODEL_ZOO:
+        prepare_model(lang=lang, model_type=model_type, model_key=model_key)
+    return MODEL_ZOO.get(model_key, None)

@@ -15,3 +15,4 @@ en_core_web_md @ https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/mo
 zh_core_web_md @ https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/models/zh_core_web_md-3.5.0-py3-none-any.whl
 multiprocess==0.70.12
 dill==0.3.4
+ray

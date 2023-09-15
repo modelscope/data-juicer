@@ -3,7 +3,7 @@ import sys
 from jsonargparse.typing import PositiveFloat
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
+from data_juicer.utils.model_utils import prepare_model, get_model
 
 from ..base_op import OPERATORS, Filter
 from ..common import get_words_from_document
@@ -54,7 +54,7 @@ class AlphanumericFilter(Filter):
             alpha_count = sum(
                 map(lambda char: 1
                     if char.isalpha() else 0, sample[self.text_key]))
-            tokenizer = MODEL_ZOO.get(self.model_key, None)
+            tokenizer = get_model(self.model_key, model_type='huggingface')
             token_count = len(
                 get_words_from_document(
                     sample[self.text_key],
