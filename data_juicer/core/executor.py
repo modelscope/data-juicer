@@ -96,9 +96,6 @@ class Executor:
             if load_data_np is None:
                 load_data_np = self.cfg.np
             dataset = self.formatter.load_dataset(load_data_np)
-        # cleanup caches from unify_format before processing
-        if not self.cfg.use_cache:
-            dataset.cleanup_cache_files()
 
         # 2. extract processes
         logger.info('Preparing process operators...')
@@ -140,14 +137,12 @@ class Executor:
                         dataset = dataset.add_column(name=Fields.stats,
                                                      column=[{}] *
                                                      dataset.num_rows)
-                        if not self.cfg.use_cache:
-                            dataset.cleanup_cache_files()
+                        if self.cfg.use_checkpoint:
                             prev = dataset
                     dataset = dataset.map(op.compute_stats,
                                           num_proc=self.cfg.np,
                                           desc=op_name + '_compute_stats')
-                    if not self.cfg.use_cache:
-                        dataset.cleanup_cache_files()
+                    if self.cfg.use_checkpoint:
                         prev = dataset
                     tmp = dataset.filter(op.process,
                                          num_proc=self.cfg.np,
@@ -162,8 +157,7 @@ class Executor:
                     dataset = dataset.map(op.compute_hash,
                                           num_proc=self.cfg.np,
                                           desc=op_name + '_compute_hash')
-                    if not self.cfg.use_cache:
-                        dataset.cleanup_cache_files()
+                    if self.cfg.use_checkpoint:
                         prev = dataset
                     tmp, dup_pairs = op.process(
                         dataset, self.tracer.show_num if self.open_tracer
@@ -177,17 +171,14 @@ class Executor:
                 logger.error(f'An error occurred during Op [{op_name}].')
                 import traceback
                 traceback.print_exc()
-                if not self.cfg.use_cache:
-                    prev.cleanup_cache_files()
                 if self.cfg.use_checkpoint:
                     logger.info('Writing checkpoint of dataset processed by '
                                 'last op...')
+                    prev.cleanup_cache_files()
                     self.ckpt_manager.save_ckpt(prev)
                 exit(1)
 
             # clean up cache files and record processed ops
-            if not self.cfg.use_cache:
-                dataset.cleanup_cache_files()
             if self.cfg.use_checkpoint:
                 self.ckpt_manager.record(op_name, op_args)
 
@@ -207,11 +198,10 @@ class Executor:
                          'dataset.')
             import traceback
             traceback.print_exc()
-            if not self.cfg.use_cache:
-                dataset.cleanup_cache_files()
             if self.cfg.use_checkpoint:
                 logger.info('Writing checkpoint of dataset processed by '
                             'last op...')
+                dataset.cleanup_cache_files()
                 self.ckpt_manager.save_ckpt(dataset)
         # compress the last dataset after exporting
         if self.cfg.use_cache and self.cfg.cache_compress:

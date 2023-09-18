@@ -3,7 +3,7 @@ import inspect
 from functools import wraps
 from typing import Union
 
-from datasets import Dataset, DatasetDict
+from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
@@ -126,6 +126,8 @@ class NestedDataset(Dataset):
             # init from scratch
             super().__init__(*args, **kargs)
 
+        self.need_to_cleanup_caches = not is_caching_enabled()
+
     def __getitem__(self, key):
         if isinstance(key, str):
             # to index columns by query as string name(s)
@@ -182,6 +184,9 @@ class NestedDataset(Dataset):
                      new_ds,
                      kargs['num_proc'] if 'num_proc' in kargs else 1)
 
+        if self.need_to_cleanup_caches:
+            new_ds.cleanup_cache_files()
+
         return new_ds
 
     def filter(self, *args, **kargs):
@@ -218,13 +223,20 @@ class NestedDataset(Dataset):
         # function. For cache file changes, map: A -> B, filter: A -> A, B. If
         # we compress the caches of map, ops after filter cannot find the cache
         # files A. So we turn off the inner cache compression for filter.
+        # Same for cleaning up cache files.
         with CompressionOff():
+            prev_state = self.need_to_cleanup_caches
+            self.need_to_cleanup_caches = False
             new_ds = NestedDataset(super().filter(*args, **kargs))
+            self.need_to_cleanup_caches = prev_state
 
         if cache_utils.CACHE_COMPRESS:
             compress(self,
                      new_ds,
                      kargs['num_proc'] if 'num_proc' in kargs else 1)
+
+        if self.need_to_cleanup_caches:
+            new_ds.cleanup_cache_files()
 
         return new_ds
 
