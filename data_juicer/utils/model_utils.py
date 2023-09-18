@@ -165,7 +165,8 @@ def prepare_huggingface_tokenizer(tokenizer_name):
     """
     from transformers import AutoTokenizer
     logger.info('Loading tokenizer from HuggingFace...')
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name,
+                                              trust_remote_code=True)
     return tokenizer
 
 def prepare_diversity_model(model_name, lang):

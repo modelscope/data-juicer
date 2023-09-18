@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   19   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   15   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   16   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   3    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -83,6 +83,7 @@ All the specific operators are listed below, each featured with several capabili
 | stopwords_filter               | General | en, zh | Keeps samples with stopword ratio above the specified threshold                            |
 | suffix_filter                  | General | en, zh | Keeps samples with specified suffixes                                                      |
 | text_length_filter             | General | en, zh | Keeps samples with total text length within the specified range                            |
+| token_num_filter               | General | en, zh | Keeps samples with token count within the specified range                                  |
 | word_num_filter                | General | en, zh | Keeps samples with word count within the specified range                                   |
 | word_repetition_filter         | General | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range           |
 
