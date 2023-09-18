@@ -168,6 +168,41 @@ def prepare_huggingface_tokenizer(tokenizer_name):
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     return tokenizer
 
+def prepare_diversity_model(model_name, lang):
+    """
+    Prepare diversity model for specific language.
+
+    :param model_name: the model name to be loaded.
+    :param lang: language of diversity model. Should be one of ["zh",
+        "en"]
+    :return: corresponding diversity model
+    """
+    import spacy
+    print(lang)
+    assert lang in ['zh', 'en'], 'Diversity only support zh and en'
+    model_name = model_name % lang
+    logger.info(f'Loading spacy model [{model_name}]...')
+    compressed_model = '%s.zip' % model_name
+
+    # decompress the compressed model if it's not decompressed
+    def decompress_model(compressed_model_path):
+        decompressed_model_path = compressed_model_path.replace('.zip', '')
+        if os.path.exists(decompressed_model_path) \
+                and os.path.isdir(decompressed_model_path):
+            return decompressed_model_path
+        import zipfile
+        with zipfile.ZipFile(compressed_model_path) as zf:
+            zf.extractall(MODEL_PATH)
+        return decompressed_model_path
+
+    try:
+        diversity_model = spacy.load(
+            decompress_model(check_model(compressed_model)))
+    except:  # noqa: E722
+        diversity_model = spacy.load(
+            decompress_model(check_model(compressed_model, force=True)))
+    return diversity_model
+
 
 def prepare_model(lang='en', model_type='sentencepiece', model_key=None):
     """
@@ -185,7 +220,8 @@ def prepare_model(lang='en', model_type='sentencepiece', model_key=None):
         'sentencepiece': ('%s.sp.model', prepare_sentencepiece_model),
         'kenlm': ('%s.arpa.bin', prepare_kenlm_model),
         'nltk': ('punkt.%s.pickle', prepare_nltk_model),
-        'huggingface': ('%s', prepare_huggingface_tokenizer)
+        'huggingface': ('%s', prepare_huggingface_tokenizer),
+        'spacy': ('%s_core_web_md-3.5.0', prepare_diversity_model),
     }
     assert model_type in type_to_name.keys(
     ), 'model_type must be one of the following: {}'.format(

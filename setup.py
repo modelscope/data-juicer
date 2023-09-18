@@ -49,16 +49,24 @@ with open('README.md', encoding='utf-8') as f:
     readme_md = f.read()
 
 setuptools.setup(
-    name='data_juicer',
+    name='py-data-juicer',
     version=version,
+    url='https://github.com/alibaba/data-juicer',
     author='SysML team of Alibaba DAMO Academy',
     description='A One-Stop Data Processing System for Large Language '
     'Models.',
     long_description=readme_md,
     long_description_content_type='text/markdown',
     license='Apache License 2.0',
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=['tests*', 'tools*'])
+            + list(get_package_dir().keys()),
     package_dir=get_package_dir(),
+    entry_points={
+        'console_scripts': [
+            'dj-process = data_juicer.tools.process_data:main',
+            'dj-analyze = data_juicer.tools.analyze_data:main',
+        ]
+    },
     install_requires=min_requires,
     extras_require=extra_requires,
     classifiers=[

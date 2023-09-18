@@ -2,7 +2,7 @@
 
 # Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据
 
-![Data-Juicer](docs/imgs/data-juicer.jpg "Data-Juicer")
+![Data-Juicer](https://img.alicdn.com/imgextra/i3/O1CN017Eq5kf27AlA2NUKef_!!6000000007757-0-tps-1280-720.jpg "Data-Juicer")
 
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 ![](https://img.shields.io/badge/language-Python-214870.svg)
@@ -31,12 +31,17 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
   * [特点](#特点)
   * [前置条件](#前置条件)
   * [安装](#安装)
+    * [从源码安装](#从源码安装)
+    * [使用 pip 安装](#使用-pip-安装)
+    * [使用 Docker 安装](#使用-docker-安装)
+    * [安装校验](#安装校验)
   * [快速上手](#快速上手)
     * [数据处理](#数据处理)
     * [数据分析](#数据分析)
     * [数据可视化](#数据可视化)
     * [构建配置文件](#构建配置文件)
     * [预处理原始数据（可选）](#预处理原始数据可选)
+    * [对于 Docker 用户](#对于-docker-用户)
   * [Documentation | 文档](#documentation)
   * [数据处理菜谱](#数据处理菜谱)
   * [演示样例](#演示样例)
@@ -46,15 +51,15 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
 
 ## 特点
 
-![Overview](docs/imgs/overview.png)
+![Overview](https://img.alicdn.com/imgextra/i4/O1CN01uvLL0T1VIaX28dMLg_!!6000000002630-2-tps-2509-1192.png)
 
 * **系统化 & 可复用**：为用户提供系统化且可复用的20+[配置菜谱](configs/README_ZH.md)，50+核心[算子](docs/Operators_ZH.md)和专用[工具池](#documentation)，旨在让数据处理独立于特定的大语言模型数据集和处理流水线。
 
-* **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行及时反馈循环。  ![Data-in-the-loop](docs/imgs/feedback_loop.png)
+* **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行及时反馈循环。  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
 
-* **全面的数据处理菜谱**：为pre-training、post-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。  ![exp_llama](docs/imgs/exp_on_llama.png)
+* **全面的数据处理菜谱**：为pre-training、post-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。  ![exp_llama](https://img.alicdn.com/imgextra/i1/O1CN01D0Nuof1uOPxvBVEq9_!!6000000006027-0-tps-2324-754.jpg)
 
-* **效率增强**：提供高效的数据处理流水线，减少内存占用和CPU开销，提高生产力。  ![sys-perf](docs/imgs/sys_perf.png)
+* **效率增强**：提供高效的数据处理流水线，减少内存占用和CPU开销，提高生产力。  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 * **用户友好**：设计简单易用，提供全面的[文档](#documentation)、简易[入门指南](#快速上手)和[演示配置](configs/README_ZH.md)，并且可以轻松地添加/删除[现有配置](configs/config_all.yaml)中的算子。
   
@@ -67,6 +72,8 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
 * gcc >= 5 (at least C++14 support)
 
 ## 安装
+
+### 从源码安装
 
 * 运行以下命令以安装 `data_juicer` 可编辑模式的最新版本
 
@@ -92,7 +99,26 @@ pip install -v -e .[tools] # 安装部分工具库的依赖
 | .[dev]   | 安装作为贡献者开发 Data-Juicer 所需的依赖项       |
 | .[tools] | 安装专用工具库（如质量分类器）所需的依赖项          |
 
-* 核验安装是否成功:
+### 使用 pip 安装
+
+* 运行以下命令用 `pip` 安装 `data_juicer` 的最新版本：
+
+```shell
+pip install py-data-juicer
+```
+
+* **注意**：使用这种方法安装时，只有`data_juicer`中的基础的 API 和2个基础工具
+  （数据[处理](数据处理)与[分析](数据分析)）可以使用。如需更定制化地使用完整功能，建议[从源码进行安装](#从源码安装)。
+
+### 使用 Docker 安装
+
+- 运行如下命令用我们提供的 [Dockerfile](Dockerfile) 来构建包括最新版本的 `data-juicer` 的 docker 镜像：
+
+```shell
+docker build -t data-juicer:<version_tag> .
+```
+
+### 安装校验
 
 ```python
 import data_juicer as dj
@@ -103,10 +129,14 @@ print(dj.__version__)
 
 ### 数据处理
 
-* 以配置文件路径作为参数来运行 `process_data.py` 来处理数据集。
+* 以配置文件路径作为参数来运行 `process_data.py` 或者 `dj-process` 命令行工具来处理数据集。
 
 ```shell
+# 适用于从源码安装
 python tools/process_data.py --config configs/demo/process.yaml
+
+# 使用命令行工具
+dj-process --config configs/demo/process.yaml
 ```
 
 * **注意**：使用未保存在本地的第三方模型或资源的算子第一次运行可能会很慢，因为这些算子需要将相应的资源下载到缓存目录中。默认的下载缓存目录为`~/.cache/data_juicer`。您可通过设置 shell 环境变量 `DATA_JUICER_CACHE_HOME` 更改缓存目录位置，您也可以通过同样的方式更改 `DATA_JUICER_MODELS_CACHE` 或 `DATA_JUICER_ASSETS_CACHE` 来分别修改模型缓存或资源缓存目录:
@@ -122,10 +152,14 @@ export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 
 ### 数据分析
 
-- 以配置文件路径为参数运行 `analyze_data.py` 来分析数据集。
+- 以配置文件路径为参数运行 `analyze_data.py` 或者 `dj-analyze` 命令行工具来分析数据集。
 
 ```shell
+# 适用于从源码安装
 python tools/analyze_data.py --config configs/demo/analyser.yaml
+
+# 使用命令行工具
+dj-analyze --config configs/demo/analyser.yaml
 ```
 
 * **注意**：Analyser 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
@@ -133,6 +167,7 @@ python tools/analyze_data.py --config configs/demo/analyser.yaml
 ### 数据可视化
 
 * 运行 `app.py` 来在浏览器中可视化您的数据集。
+* **注意**：只可用于从源码安装的方法。
 
 ```shell
 streamlit run app.py
@@ -154,7 +189,7 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 
 * 基础的配置项格式及定义如下图所示
 
-  ![基础配置项格式及定义样例](docs/imgs/config-def-ZH.jpg "基础配置文件样例")
+  ![基础配置项格式及定义样例](https://img.alicdn.com/imgextra/i4/O1CN01xPtU0t1YOwsZyuqCx_!!6000000003050-0-tps-1692-879.jpg "基础配置文件样例")
 
 ### 预处理原始数据（可选）
 
@@ -168,6 +203,36 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 * 因此我们在 [`tools/preprocess`](tools/preprocess) 中提供了一些**常见的预处理工具**，用于预处理这些类型各异的数据。
   * 欢迎您为社区贡献新的预处理工具。
   * 我们**强烈建议**将复杂的数据预处理为 jsonl 或 parquet 文件。
+
+### 对于 Docker 用户
+
+- 如果您构建或者拉取了 `data-juicer` 的 docker 镜像，您可以使用这个 docker 镜像来运行上面提到的这些命令或者工具。
+- 直接运行：
+
+```shell
+# 直接运行数据处理
+docker run --rm \  # 在处理结束后将容器移除
+  --name dj \  # 容器名称
+  -v <host_data_path>:<image_data_path> \  # 将本地的数据或者配置目录挂载到容器中
+  -v ~/.cache/:/root/.cache/ \  # 将 cache 目录挂载到容器以复用 cache 和模型资源（推荐）
+  data-juicer:<version_tag> \  # 运行的镜像
+  dj-process --config /path/to/config.yaml  # 类似的数据处理命令
+```
+
+- 或者您可以进入正在运行的容器，然后在可编辑模式下运行命令：
+
+```shell
+# 启动容器
+docker run -dit \  # 在后台启动容器
+  --rm \
+  --name dj \
+  -v <host_data_path>:<image_data_path> \
+  -v ~/.cache/:/root/.cache/ \
+  data-juicer:latest /bin/bash
+
+# 进入这个容器，然后您可以在编辑模式下使用 data-juicer
+docker exec -it <container_id> bash
+```
 
 ## Documentation | 文档 <a name="documentation"/>
 
