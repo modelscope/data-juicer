@@ -27,7 +27,7 @@ This project is being actively updated and maintained, and we will periodically 
 Table of Contents
 =================
 
-* [Data-Juicer: A One-Stop Data Processing System for Large Language Models](#data-juicer-a-one-stop-data-processing-system-for-large-language-models)
+* [Data-Juicer: A One-Stop Data Processing System for Large Language Models](#data-juicer--a-one-stop-data-processing-system-for-large-language-models)
 * [Table of Contents](#table-of-contents)
    * [Features](#features)
    * [Prerequisites](#prerequisites)
@@ -116,7 +116,7 @@ The dependency options are listed below:
 pip install py-data-juicer
 ```
 
-- **Notice**: only the basic APIs in `data_juicer` and two basic tools
+- **Note**: only the basic APIs in `data_juicer` and two basic tools
   (data [processing](#data-processing) and [analysis](#data-analysis)) are available in this way. If you want customizable
   and complete functions, we recommend you install `data_juicer` [from source](#from-source).
 
@@ -171,7 +171,7 @@ dj-analyze --config configs/demo/analyser.yaml
 ### Data Visualization
 
 - Run `app.py` tool to visualize your dataset in your browser.
-- **Notice**: only available for installation from source.
+- **Note**: only available for installation from source.
 
 ```shell
 streamlit run app.py
