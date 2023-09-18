@@ -5,7 +5,7 @@
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys, InterVars
-from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
+from data_juicer.utils.model_utils import prepare_model, get_model
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_WORDS
@@ -47,6 +47,7 @@ class WordRepetitionFilter(Filter):
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
         self.model_key = None
+        self.lang = lang
 
         if tokenization:
             self.model_key = prepare_model(lang=lang,
@@ -62,7 +63,8 @@ class WordRepetitionFilter(Filter):
         if context and words_key in sample[Fields.context]:
             words = sample[Fields.context][words_key]
         else:
-            tokenizer = MODEL_ZOO.get(self.model_key, None)
+            tokenizer = get_model(self.model_key, lang=self.lang,
+                                            model_type='sentencepiece')
             words = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)

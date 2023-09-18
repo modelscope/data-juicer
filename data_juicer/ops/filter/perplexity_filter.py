@@ -5,7 +5,7 @@
 from jsonargparse.typing import PositiveFloat
 
 from data_juicer.utils.constant import Fields, StatsKeys, InterVars
-from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
+from data_juicer.utils.model_utils import prepare_model, get_model
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_WORDS
@@ -34,6 +34,7 @@ class PerplexityFilter(Filter):
         """
         super().__init__(*args, **kwargs)
         self.max_ppl = max_ppl
+        self.lang = lang
         self.sp_model_key = prepare_model(lang=lang,
                                           model_type='sentencepiece')
         self.kl_model_key = prepare_model(lang=lang, model_type='kenlm')
@@ -48,7 +49,7 @@ class PerplexityFilter(Filter):
         if context and words_key in sample[Fields.context]:
             words = sample[Fields.context][words_key]
         else:
-            tokenizer = MODEL_ZOO.get(self.sp_model_key, None)
+            tokenizer = get_model(self.sp_model_key, self.lang, 'sentencepiece')
             words = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)
@@ -57,7 +58,7 @@ class PerplexityFilter(Filter):
         text = ' '.join(words)
         # compute perplexity
         logits, length = 0, 0
-        kenlm_model = MODEL_ZOO.get(self.kl_model_key, None)
+        kenlm_model = get_model(self.kl_model_key, self.lang, 'kenlm')
         for line in text.splitlines():
             logits += kenlm_model.score(line)
             length += (len(line.split()) + 1)

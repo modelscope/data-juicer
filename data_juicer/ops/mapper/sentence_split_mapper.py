@@ -1,4 +1,4 @@
-from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
+from data_juicer.utils.model_utils import prepare_model, get_model
 
 from ..base_op import OPERATORS, Mapper
 from ..common import get_sentences_from_document
@@ -17,11 +17,12 @@ class SentenceSplitMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self.lang = lang
         self.model_key = prepare_model(lang=lang, model_type='nltk')
 
     def process(self, sample):
 
-        nltk_model = MODEL_ZOO.get(self.model_key, None)
+        nltk_model = get_model(self.model_key, lang=self.lang, model_type='nltk')
         sample[self.text_key] = get_sentences_from_document(
             sample[self.text_key],
             model_func=nltk_model.tokenize if nltk_model else None)
