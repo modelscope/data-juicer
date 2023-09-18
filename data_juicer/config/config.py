@@ -45,6 +45,13 @@ def init_configs(args=None):
         default='hello_world',
         help='Name of your data process project.')
     parser.add_argument(
+        '--executor_type',
+        type=str,
+        default='default',
+        choices=['default', 'ray'],
+        help='Type of executor, support "default" or "ray" for now.'
+    )
+    parser.add_argument(
         '--dataset_path',
         type=str,
         help='Path to datasets with optional weights(0.0-1.0), 1.0 as '
@@ -178,6 +185,12 @@ def init_configs(args=None):
         default=False,
         help='Whether to save all stats to only one file. Only used in '
              'Analysis.')
+    parser.add_argument(
+        '--ray_address',
+        type=str,
+        default='auto',
+        help='The address of the Ray cluster.'
+    )
 
     # add all parameters of the registered ops class to the parser,
     # and these op parameters can be modified through the command line,
@@ -271,7 +284,7 @@ def init_setup_from_cfg(cfg):
     timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
     cfg.timestamp = timestamp
     logfile_name = timestamp + '.txt'
-    setup_logger(save_dir=log_dir, filename=logfile_name)
+    setup_logger(save_dir=log_dir, filename=logfile_name, redirect=cfg.executor_type=='default')
 
     # whether or not to use cache management
     # disabling the cache or using checkpoint explicitly will turn off the

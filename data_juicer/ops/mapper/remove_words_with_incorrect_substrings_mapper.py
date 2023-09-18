@@ -1,6 +1,6 @@
 from jsonargparse.typing import List
 
-from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
+from data_juicer.utils.model_utils import prepare_model, get_model
 
 from ..base_op import OPERATORS, Mapper
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
@@ -32,6 +32,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
         super().__init__(*args, **kwargs)
         self.tokenization = tokenization
         self.substrings = substrings
+        self.lang = lang
         if tokenization:
             self.model_key = prepare_model(lang=lang,
                                            model_type='sentencepiece')
@@ -43,7 +44,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
 
     def process(self, sample):
         if self.tokenization:
-            tokenizer = MODEL_ZOO.get(self.model_key, None)
+            tokenizer = get_model(self.model_key, lang=self.lang, model_type='sentencepiece')
             sentences = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)

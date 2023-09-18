@@ -5,7 +5,7 @@
 from jsonargparse.typing import ClosedUnitInterval, List
 
 from data_juicer.utils.constant import Fields, StatsKeys, InterVars
-from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
+from data_juicer.utils.model_utils import prepare_model, get_model
 
 from ...utils.asset_utils import ASSET_DIR, load_words_asset
 from ..base_op import OPERATORS, Filter
@@ -56,6 +56,7 @@ class FlaggedWordFilter(Filter):
         self.words_aug_group_sizes = words_aug_group_sizes
         self.words_aug_join_char = words_aug_join_char
         self.model_key = None
+        self.lang = lang
 
         self.FLAGGED_WORDS = load_words_asset(words_dir=flagged_words_dir,
                                               words_type='flagged_words')
@@ -78,7 +79,8 @@ class FlaggedWordFilter(Filter):
         if context and words_key in sample[Fields.context]:
             words = sample[Fields.context][words_key]
         else:
-            tokenizer = MODEL_ZOO.get(self.model_key, None)
+            tokenizer = get_model(self.model_key, lang=self.lang,
+                                                model_type='sentencepiece')
             words = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)
