@@ -71,7 +71,9 @@ class LocalFormatter(BaseFormatter):
             logger.info('Add suffix info into dataset...')
             datasets = add_suffixes(datasets)
         else:
-            datasets = concatenate_datasets([ds for _, ds in datasets.items()])
+            from data_juicer.core.data import NestedDataset
+            datasets = NestedDataset(
+                concatenate_datasets([ds for _, ds in datasets.items()]))
         ds = unify_format(datasets,
                           text_keys=self.text_keys,
                           num_proc=num_proc)
@@ -127,7 +129,8 @@ def add_suffixes(datasets: DatasetDict) -> Dataset:
             datasets[key] = ds.add_column(name=Fields.suffix,
                                           column=['.' + key] * ds.num_rows)
     datasets = concatenate_datasets([ds for _, ds in datasets.items()])
-    return datasets
+    from data_juicer.core.data import NestedDataset
+    return NestedDataset(datasets)
 
 
 def unify_format(
@@ -150,14 +153,16 @@ def unify_format(
 
     :return: unified_format_dataset
     """
+    from data_juicer.core.data import NestedDataset
     if isinstance(dataset, DatasetDict):
         datasets = list(dataset.values())
         assert len(datasets) == 1, 'Please make sure the passed datasets ' \
                                    'contains only 1 dataset'
         dataset = datasets[0]
-    assert isinstance(dataset, Dataset), 'Currently we only support ' \
-                                         'processing data with ' \
-                                         "'huggingface-Dataset format'"
+    assert isinstance(dataset, Dataset) or \
+           isinstance(dataset, NestedDataset), \
+           'Currently we only support processing data' \
+           'with huggingface-Dataset format'
 
     if text_keys is None:
         text_keys = []
@@ -167,7 +172,6 @@ def unify_format(
 
     logger.info('Unifying the input dataset formats...')
 
-    from data_juicer.core.data import NestedDataset
     dataset = NestedDataset(dataset)
 
     # 1. check text related keys
@@ -196,8 +200,6 @@ def unify_format(
                              num_proc=num_proc,
                              fn_kwargs={'target_keys': text_keys})
     logger.info(f'{len(dataset)} samples left after filtering empty text.')
-
-    dataset.cleanup_cache_files()
 
     # 3. add Fields.stats field
     # TODO:

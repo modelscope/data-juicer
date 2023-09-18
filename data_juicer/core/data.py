@@ -3,9 +3,14 @@ import inspect
 from functools import wraps
 from typing import Union
 
-from datasets import Dataset, DatasetDict
+from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
+
+from data_juicer.utils import cache_utils
+from data_juicer.utils.compress import (cleanup_compressed_cache_files,
+                                        compress, decompress, CompressionOff)
+from data_juicer.utils.fingerprint_utils import generate_fingerprint
 
 
 def wrap_func_with_nested_access(f):
@@ -121,6 +126,8 @@ class NestedDataset(Dataset):
             # init from scratch
             super().__init__(*args, **kargs)
 
+        self.need_to_cleanup_caches = not is_caching_enabled()
+
     def __getitem__(self, key):
         if isinstance(key, str):
             # to index columns by query as string name(s)
@@ -161,7 +168,82 @@ class NestedDataset(Dataset):
             kargs['batched'] = True
             kargs['batch_size'] = 1
 
-        return NestedDataset(super().map(*args, **kargs))
+        if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
+            new_fingerprint = generate_fingerprint(self, *args, **kargs)
+            kargs['new_fingerprint'] = new_fingerprint
+
+        if cache_utils.CACHE_COMPRESS:
+            decompress(self,
+                       kargs['new_fingerprint'],
+                       kargs['num_proc'] if 'num_proc' in kargs else 1)
+
+        new_ds = NestedDataset(super().map(*args, **kargs))
+
+        if cache_utils.CACHE_COMPRESS:
+            compress(self,
+                     new_ds,
+                     kargs['num_proc'] if 'num_proc' in kargs else 1)
+
+        if self.need_to_cleanup_caches:
+            new_ds.cleanup_cache_files()
+
+        return new_ds
+
+    def filter(self, *args, **kargs):
+        """Override the filter func, which is called by most common operations,
+        such that the processed samples can be accessed by nested manner."""
+        if args:
+            args = list(args)
+            # the first positional para is function
+            if args[0] is None:
+                args[0] = lambda x: nested_obj_factory(x)
+            else:
+                args[0] = wrap_func_with_nested_access(args[0])
+        else:
+            if 'function' not in kargs or kargs['function'] is None:
+                kargs['function'] = lambda x: nested_obj_factory(x)
+            else:
+                kargs['function'] = wrap_func_with_nested_access(
+                    kargs['function'])
+
+        if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
+            new_fingerprint = generate_fingerprint(self, *args, **kargs)
+            kargs['new_fingerprint'] = new_fingerprint
+
+        # For filter, it involves a map and a filter operations, so the final
+        # cache files includes two sets with different fingerprint (before and
+        # after). So we need to decompress these two sets of compressed cache
+        # files
+        if cache_utils.CACHE_COMPRESS:
+            decompress(self,
+                       [kargs['new_fingerprint'], self._fingerprint],
+                       kargs['num_proc'] if 'num_proc' in kargs else 1)
+
+        # Turn off the compression due to it invokes map actually in the filter
+        # function. For cache file changes, map: A -> B, filter: A -> A, B. If
+        # we compress the caches of map, ops after filter cannot find the cache
+        # files A. So we turn off the inner cache compression for filter.
+        # Same for cleaning up cache files.
+        with CompressionOff():
+            prev_state = self.need_to_cleanup_caches
+            self.need_to_cleanup_caches = False
+            new_ds = NestedDataset(super().filter(*args, **kargs))
+            self.need_to_cleanup_caches = prev_state
+
+        if cache_utils.CACHE_COMPRESS:
+            compress(self,
+                     new_ds,
+                     kargs['num_proc'] if 'num_proc' in kargs else 1)
+
+        if self.need_to_cleanup_caches:
+            new_ds.cleanup_cache_files()
+
+        return new_ds
+
+    def select(self, *args, **kargs):
+        """Override the select func, such that selected samples can be accessed
+        by nested manner."""
+        return nested_obj_factory(super().select(*args, **kargs))
 
     @classmethod
     def from_dict(cls, *args, **kargs):
@@ -170,10 +252,26 @@ class NestedDataset(Dataset):
         NestedDataset."""
         return NestedDataset(super().from_dict(*args, **kargs))
 
-    def select(self, *args, **kargs):
-        """Override the select fun, such that selected samples can be accessed
-        by  nested manner."""
-        return nested_obj_factory(super().select(*args, **kargs))
+    def add_column(self, *args, **kargs):
+        """Override the add column func, such that the processed samples
+        can be accessed by nested manner."""
+        return NestedDataset(super().add_column(*args, **kargs))
+
+    def select_columns(self, *args, **kargs):
+        """Override the select columns func, such that the processed samples
+        can be accessed by nested manner."""
+        return NestedDataset(super().select_columns(*args, **kargs))
+
+    def remove_columns(self, *args, **kargs):
+        """Override the remove columns func, such that the processed samples
+        can be accessed by nested manner."""
+        return NestedDataset(super().remove_columns(*args, **kargs))
+
+    def cleanup_cache_files(self):
+        """Override the cleanup_cache_files func, clear raw and compressed
+        cache files."""
+        cleanup_compressed_cache_files(self)
+        return super().cleanup_cache_files()
 
 
 def nested_query(root_obj: Union[NestedDatasetDict, NestedDataset,

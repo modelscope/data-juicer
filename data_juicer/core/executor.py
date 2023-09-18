@@ -1,4 +1,5 @@
 import os
+from time import time
 
 from loguru import logger
 
@@ -6,13 +7,12 @@ from data_juicer.config import init_configs
 from data_juicer.format.load import load_formatter
 from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
                              load_ops)
+from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.constant import Fields
 
 from .exporter import Exporter
 from .tracer import Tracer
-
-from time import time
 
 
 class Executor:
@@ -34,6 +34,12 @@ class Executor:
         self.work_dir = self.cfg.work_dir
 
         self.ops = None
+
+        # only enable it when using cache
+        if self.cfg.use_cache:
+            logger.info(f'Using cache compression method: '
+                        f'[{self.cfg.cache_compress}]')
+            cache_utils.CACHE_COMPRESS = self.cfg.cache_compress
 
         # setup formatter
         logger.info('Setting up data formatter...')
@@ -132,13 +138,11 @@ class Executor:
                                                      column=[{}] *
                                                      dataset.num_rows)
                         if self.cfg.use_checkpoint:
-                            dataset.cleanup_cache_files()
                             prev = dataset
                     dataset = dataset.map(op.compute_stats,
                                           num_proc=self.cfg.np,
                                           desc=op_name + '_compute_stats')
                     if self.cfg.use_checkpoint:
-                        dataset.cleanup_cache_files()
                         prev = dataset
                     tmp = dataset.filter(op.process,
                                          num_proc=self.cfg.np,
@@ -154,7 +158,6 @@ class Executor:
                                           num_proc=self.cfg.np,
                                           desc=op_name + '_compute_hash')
                     if self.cfg.use_checkpoint:
-                        dataset.cleanup_cache_files()
                         prev = dataset
                     tmp, dup_pairs = op.process(
                         dataset, self.tracer.show_num if self.open_tracer
@@ -177,7 +180,6 @@ class Executor:
 
             # clean up cache files and record processed ops
             if self.cfg.use_checkpoint:
-                dataset.cleanup_cache_files()
                 self.ckpt_manager.record(op_name, op_args)
 
             end = time()
@@ -192,8 +194,8 @@ class Executor:
         try:
             self.exporter.export(dataset)
         except:  # noqa: E722
-            logger.error(f'An error occurred during exporting the processed '
-                         f'dataset.')
+            logger.error('An error occurred during exporting the processed '
+                         'dataset.')
             import traceback
             traceback.print_exc()
             if self.cfg.use_checkpoint:
@@ -201,5 +203,8 @@ class Executor:
                             'last op...')
                 dataset.cleanup_cache_files()
                 self.ckpt_manager.save_ckpt(dataset)
-
+        # compress the last dataset after exporting
+        if self.cfg.use_cache and self.cfg.cache_compress:
+            from data_juicer.utils.compress import compress
+            compress(dataset)
         return dataset

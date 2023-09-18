@@ -54,8 +54,7 @@ def prepare_model(model_name, model_path=DATA_JUICER_MODELS_CACHE):
     # No specific models in local file systems. Download them from remote.
     os.makedirs(model_path, exist_ok=True)
     wget.download(os.path.join(MODEL_LINKS, f'{model_name}.zip'),
-                  os.path.join(model_path, f'{model_name}.zip'),
-                  bar=None)
+                  os.path.join(model_path, f'{model_name}.zip'))
     with zipfile.ZipFile(os.path.join(model_path, f'{model_name}.zip')) as zip:
         zip.extractall(os.path.join(model_path))
     return PipelineModel.load(real_model_path)

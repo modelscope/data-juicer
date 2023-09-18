@@ -7,8 +7,8 @@ from loguru import logger
 
 class CheckpointManager:
     """
-    This class is used to save the latest version of dataset to checkpint
-    directory or load it from checkpint directory, a bit like cache management
+    This class is used to save the latest version of dataset to checkpoint
+    directory or load it from checkpoint directory, a bit like cache management
     Rerun the same config will reload the checkpoint and skip ops before it.
 
     If any args of operator in process list is changed, all ops will be

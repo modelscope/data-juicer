@@ -19,3 +19,5 @@ DEFAULT_DATA_JUICER_MODELS_CACHE = os.path.join(DATA_JUICER_CACHE_HOME,
                                                 'models')
 DATA_JUICER_MODELS_CACHE = os.getenv('DATA_JUICER_MODELS_CACHE',
                                      DEFAULT_DATA_JUICER_MODELS_CACHE)
+
+CACHE_COMPRESS = None
