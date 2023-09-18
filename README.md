@@ -34,6 +34,7 @@ Table of Contents
    * [Installation](#installation)
      * [From Source](#from-source)
      * [Using pip](#using-pip)
+     * [Using Docker](#using-docker)
      * [Installation check](#installation-check)
    * [Quick Start](#quick-start)
       * [Data Processing](#data-processing)
@@ -41,6 +42,7 @@ Table of Contents
       * [Data Visualization](#data-visualization)
       * [Build Up Config Files](#build-up-config-files)
       * [Preprocess raw data (Optional)](#preprocess-raw-data-optional)
+      * [For Docker Users](#for-docker-users)
    * [Documentation | 文档](#documentation)
    * [Data Recipes](#data-recipes)
    * [Demos](#demos)
@@ -119,6 +121,14 @@ pip install py-data-juicer
 - **Note**: only the basic APIs in `data_juicer` and two basic tools
   (data [processing](#data-processing) and [analysis](#data-analysis)) are available in this way. If you want customizable
   and complete functions, we recommend you install `data_juicer` [from source](#from-source).
+
+### Using Docker
+
+- Run the following command to build the docker image including the latest `data-juicer` with provided [Dockerfile](Dockerfile):
+
+```shell
+docker build -t data-juicer:<version_tag> .
+```
 
 ### Installation check
 
@@ -212,6 +222,36 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 - Thus, we provide some **common preprocessing tools** in [`tools/preprocess`](tools/preprocess/) for you to preprocess these data.
   - You are welcome to make your contributions to new preprocessing tools for the community.
   - We **highly recommend** that complicated data can be preprocessed to jsonl or parquet files.
+
+### For Docker Users
+
+- If you build or pull the docker image of `data-juicer`, you can run the commands or tools mentioned above using this docker image.
+- Run directly:
+
+```shell
+# run the data processing directly
+docker run --rm \  # remove container after the processing
+  --name dj \  # name of the container
+  -v <host_data_path>:<image_data_path> \  # mount data or config directory into the container
+  -v ~/.cache/:/root/.cache/ \  # mount the cache directory into the container to reuse caches and models (recommended)
+  data-juicer:<version_tag> \  # image to run
+  dj-process --config /path/to/config.yaml  # similar data processing commands
+```
+
+- Or enter into the running container and run commands in editable mode:
+
+```shell
+# start the container
+docker run -dit \  # run the container in the background
+  --rm \
+  --name dj \
+  -v <host_data_path>:<image_data_path> \
+  -v ~/.cache/:/root/.cache/ \
+  data-juicer:latest /bin/bash
+
+# enter into this container and then you can use data-juicer in editable mode
+docker exec -it <container_id> bash
+```
 
 ## Documentation | 文档 <a name="documentation"/>
 

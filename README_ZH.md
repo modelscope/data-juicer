@@ -33,6 +33,7 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
   * [安装](#安装)
     * [从源码安装](#从源码安装)
     * [使用 pip 安装](#使用-pip-安装)
+    * [使用 Docker 安装](#使用-docker-安装)
     * [安装校验](#安装校验)
   * [快速上手](#快速上手)
     * [数据处理](#数据处理)
@@ -40,6 +41,7 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
     * [数据可视化](#数据可视化)
     * [构建配置文件](#构建配置文件)
     * [预处理原始数据（可选）](#预处理原始数据可选)
+    * [对于 Docker 用户](#对于-docker-用户)
   * [Documentation | 文档](#documentation)
   * [数据处理菜谱](#数据处理菜谱)
   * [演示样例](#演示样例)
@@ -107,6 +109,14 @@ pip install py-data-juicer
 
 * **注意**：使用这种方法安装时，只有`data_juicer`中的基础的 API 和2个基础工具
   （数据[处理](数据处理)与[分析](数据分析)）可以使用。如需更定制化地使用完整功能，建议[从源码进行安装](#从源码安装)。
+
+### 使用 Docker 安装
+
+- 运行如下命令用我们提供的 [Dockerfile](Dockerfile) 来构建包括最新版本的 `data-juicer` 的 docker 镜像：
+
+```shell
+docker build -t data-juicer:<version_tag> .
+```
 
 ### 安装校验
 
@@ -193,6 +203,36 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 * 因此我们在 [`tools/preprocess`](tools/preprocess) 中提供了一些**常见的预处理工具**，用于预处理这些类型各异的数据。
   * 欢迎您为社区贡献新的预处理工具。
   * 我们**强烈建议**将复杂的数据预处理为 jsonl 或 parquet 文件。
+
+### 对于 Docker 用户
+
+- 如果您构建或者拉取了 `data-juicer` 的 docker 镜像，您可以使用这个 docker 镜像来运行上面提到的这些命令或者工具。
+- 直接运行：
+
+```shell
+# 直接运行数据处理
+docker run --rm \  # 在处理结束后将容器移除
+  --name dj \  # 容器名称
+  -v <host_data_path>:<image_data_path> \  # 将本地的数据或者配置目录挂载到容器中
+  -v ~/.cache/:/root/.cache/ \  # 将 cache 目录挂载到容器以复用 cache 和模型资源（推荐）
+  data-juicer:<version_tag> \  # 运行的镜像
+  dj-process --config /path/to/config.yaml  # 类似的数据处理命令
+```
+
+- 或者您可以进入正在运行的容器，然后在可编辑模式下运行命令：
+
+```shell
+# 启动容器
+docker run -dit \  # 在后台启动容器
+  --rm \
+  --name dj \
+  -v <host_data_path>:<image_data_path> \
+  -v ~/.cache/:/root/.cache/ \
+  data-juicer:latest /bin/bash
+
+# 进入这个容器，然后您可以在编辑模式下使用 data-juicer
+docker exec -it <container_id> bash
+```
 
 ## Documentation | 文档 <a name="documentation"/>
 
