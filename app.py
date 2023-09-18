@@ -445,7 +445,7 @@ class Visualize:
                 with col4:
                     threshold = st.slider('Count threshold',
                                           min_value=0,
-                                          value=32,
+                                          value=0,
                                           max_value=100,
                                           step=1)
 

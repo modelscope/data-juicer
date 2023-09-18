@@ -23,6 +23,10 @@ trace_num: 10                                               # number of samples 
 op_fusion: false                                            # whether to fuse operators that share the same intermediate variables automatically. Op fusion might reduce the memory requirements slightly but speed up the whole process.
 cache_compress: null                                        # The compression method of the cache file, which can be specified in ['gzip', 'zstd', 'lz4']. If this parameter is None, the cache file will not be compressed. We recommend you turn on this argument when your input dataset is larger than tens of GB and your disk space is not enough.
 
+# for distributed processing
+executor_type: default                                      # Type of executor, support "default" or "ray" for now.
+ray_address: auto                                           # The address of the Ray cluster.
+
 # only for data analysis
 save_stats_in_one_file: false                               # whether to store all stats result into one file
 
