@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Cache data-juicer assets and models
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ~/.cache/data_juicer
         key: dj-assets-models
