@@ -22,6 +22,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install pybind11
         pip install -v -e .[all]
     - name: Run the test
       run: |
