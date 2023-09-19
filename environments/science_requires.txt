@@ -1,4 +1,4 @@
-fasttext
+fasttext-wheel
 kenlm
 sentencepiece
 scipy
