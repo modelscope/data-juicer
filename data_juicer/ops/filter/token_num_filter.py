@@ -23,7 +23,7 @@ class TokenNumFilter(Filter):
         """
         Initialization method.
 
-        :param hf_tokenizer: the tokenizer name of hugging face tokenizers.
+        :param hf_tokenizer: the tokenizer name of Hugging Face tokenizers.
         :param min_num: The min filter token number in this op, samples
             will be filtered if their token number is below this
             parameter.

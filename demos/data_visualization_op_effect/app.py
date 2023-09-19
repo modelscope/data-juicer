@@ -147,6 +147,7 @@ op_stats_dict = {
     'special_characters_filter': [StatsKeys.special_char_ratio],
     'stopwords_filter': [StatsKeys.stopwords_ratio],
     'text_length_filter': [StatsKeys.text_len],
+    'token_num_filter': [StatsKeys.num_token],
     'words_num_filter': [StatsKeys.num_words],
     'word_repetition_filter': [StatsKeys.word_rep_ratio],
 }

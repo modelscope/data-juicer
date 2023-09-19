@@ -13,8 +13,8 @@ np: 4                                                       # number of subproce
 text_keys: 'content'                                        # the key name of field where the sample texts to be processed, e.g., `text`, `instruction`, `output`, ...
                                                             # Note: currently, we support specify only ONE key for each op, for cases requiring multiple keys, users can specify the op multiple times. We will only use the first key of `text_keys` when you set multiple keys.
 suffixes: []                                                # the suffix of files that will be read. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
-use_cache: true                                             # whether to use the cache management of hugging face datasets. It might take up lots of disk space when using cache
-ds_cache_dir: '~/.cache/huggingface/datasets'               # cache dir for hugging face datasets. In default it's the default cache dir "~/.cache/huggingface/datasets". If this argument is reset by users, it will override the default cache dir
+use_cache: true                                             # whether to use the cache management of Hugging Face datasets. It might take up lots of disk space when using cache
+ds_cache_dir: '~/.cache/huggingface/datasets'               # cache dir for Hugging Face datasets. In default it's the default cache dir "~/.cache/huggingface/datasets". If this argument is reset by users, it will override the default cache dir
 use_checkpoint: false                                       # whether to use the checkpoint management to save the latest version of dataset to work dir when processing. Rerun the same config will reload the checkpoint and skip ops before it. Cache will be disabled when using checkpoint. If args of ops before the checkpoint are changed, all ops will be rerun from the beginning.
 temp_dir: null                                              # the path to the temp directory to store intermediate caches when cache is disabled, these cache files will be removed on-the-fly. In default, it's None, so the temp dir will be specified by system. NOTICE: you should be caution when setting this argument because it might cause unexpected program behaviors when this path is set to an unsafe directory.
 open_tracer: false                                          # whether to open the tracer to trace the changes during process. It might take more time when opening tracer
@@ -128,7 +128,7 @@ process:
       min_len: 10                                             # the min length of filter range
       max_len: 10000                                          # the max length of filter range
   - token_num_filter:                                       # filter text with total token number out of specific range
-      hf_tokenizer: EleutherAI/pythia-6.9b-deduped            # name of used hugging face tokenizer
+      hf_tokenizer: EleutherAI/pythia-6.9b-deduped            # name of used Hugging Face tokenizer
       min_num: 10                                             # the min number of filter range
       max_num: 10000                                          # the max number of filter range
   - words_num_filter:                                       # filter text with number of words out of specific range

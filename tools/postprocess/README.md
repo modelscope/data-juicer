@@ -4,6 +4,26 @@ This folder contains some postprocess scripts for additional processing of your 
 
 ## Usage
 
+### Count tokens for datasets
+
+Use [count_token.py](count_token.py) to count tokens for datasets.
+
+```shell
+python tools/postprocess/count_token.py        \
+    --data_path            <data_path>         \
+    --text_keys            <text_keys>         \
+    --tokenizer_method     <tokenizer_method>  \
+    --num_proc             <num_proc>
+    
+# get help
+python tools/postprocess/count_token.py --help
+```
+
+- `data_path`: path to the input dataset. Only support `jsonl` now.
+- `text_keys`: field keys that will be considered into token counts.
+- `tokenizer_method`: name of the Hugging Face tokenizer.
+- `num_proc`: number of processes to count tokens.
+
 ### Mix multiple datasets with optional weights
 
 Use [data_mixture.py](data_mixture.py) to mix multiple datasets.
