@@ -4,6 +4,26 @@
 
 ## 用法
 
+### 为数据集计算token数目
+
+使用 [count_token.py](count_token.py) 计算数据集包含的 token 数目。
+
+```shell
+python tools/postprocess/count_token.py        \
+    --data_path            <data_path>         \
+    --text_keys            <text_keys>         \
+    --tokenizer_method     <tokenizer_method>  \
+    --num_proc             <num_proc>
+    
+# get help
+python tools/postprocess/count_token.py --help
+```
+
+- `data_path`: 输入数据集的路径。目前只支持 `jsonl` 格式。
+- `text_keys`: 单个样本中会被算入 token 数目的字段名称。
+- `tokenizer_method`: 使用的 Hugging Face tokenizer 的名称。
+- `num_proc`: 计算 token 数目时所用的进程数。
+
 ### 将多个数据集以可选的权重混合
 
 使用 [data_mixture.py](data_mixture.py) 将多个数据集混合。

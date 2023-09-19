@@ -61,12 +61,12 @@ def check_model(model_name, args=(), force=False):
 
         try:
             model_link = os.path.join(MODEL_LINKS, true_model_name)
-            wget.download(model_link, mdp)
+            wget.download(model_link, mdp, bar=None)
         except:  # noqa: E722
             try:
                 backup_model_link = os.path.join(
                     BACKUP_MODEL_LINKS[model_name], true_model_name)
-                wget.download(backup_model_link, mdp)
+                wget.download(backup_model_link, mdp, bar=None)
             except:  # noqa: E722
                 logger.error(
                     f'Downloading model [{true_model_name}] error. '
@@ -165,7 +165,8 @@ def prepare_huggingface_tokenizer(tokenizer_name):
     """
     from transformers import AutoTokenizer
     logger.info('Loading tokenizer from HuggingFace...')
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name,
+                                              trust_remote_code=True)
     return tokenizer
 
 def prepare_diversity_model(model_name, lang):
@@ -178,7 +179,6 @@ def prepare_diversity_model(model_name, lang):
     :return: corresponding diversity model
     """
     import spacy
-    print(lang)
     assert lang in ['zh', 'en'], 'Diversity only support zh and en'
     model_name = model_name % lang
     logger.info(f'Loading spacy model [{model_name}]...')
