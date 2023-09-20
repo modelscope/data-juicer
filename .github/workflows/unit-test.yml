@@ -1,0 +1,35 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Unit Test
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Cache data-juicer assets and models
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/data_juicer
+        key: dj-assets-models
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.8"
+        cache: 'pip'
+        cache-dependency-path: 'environments/**_requires.txt'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -v -e .[all]
+    - name: Run the test
+      run: |
+        python tests/run.py
