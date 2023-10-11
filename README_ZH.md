@@ -112,11 +112,16 @@ pip install py-data-juicer
 
 ### 使用 Docker 安装
 
-- 运行如下命令用我们提供的 [Dockerfile](Dockerfile) 来构建包括最新版本的 `data-juicer` 的 docker 镜像：
+- 您可以选择
+  - 从DockerHub直接拉取我们的预置镜像:
+    ```shell
+    docker pull datajuicer/data-juicer:<version_tag>
+    ```
+  - 或者运行如下命令用我们提供的 [Dockerfile](Dockerfile) 来构建包括最新版本的 `data-juicer` 的 docker 镜像：
 
-```shell
-docker build -t data-juicer:<version_tag> .
-```
+    ```shell
+    docker build -t data-juicer:<version_tag> .
+    ```
 
 ### 安装校验
 

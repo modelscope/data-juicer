@@ -123,11 +123,18 @@ pip install py-data-juicer
 
 ### Using Docker
 
-- Run the following command to build the docker image including the latest `data-juicer` with provided [Dockerfile](Dockerfile):
+- You can 
+  - either pull our pre-built image from DockerHub:
+    ```shell
+    docker pull datajuicer/data-juicer:<version_tag>
+    ```
 
-```shell
-docker build -t data-juicer:<version_tag> .
-```
+  - or run the following command to build the docker image including the 
+    latest `data-juicer` with provided [Dockerfile](Dockerfile):
+
+    ```shell
+    docker build -t data-juicer:<version_tag> .
+    ```
 
 ### Installation check
 
