@@ -19,7 +19,7 @@ A refined Chinese version of Alpaca-CoT dataset by [Data-Juicer](https://github.
 
 This dataset is usually used to fine-tune a Large Language Model.
 
-The whole dataset is available [here](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/SFT/alpaca-cot-zh-refine_result.jsonl) (About 18.7GB).
+The whole dataset is available [here](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/CFT/alpaca-cot-zh-refine_result.jsonl) (About 18.7GB).
 
 ## Dataset Information
 
@@ -64,8 +64,8 @@ We use simple 3-σ rule to set the hyperparameters for ops in each recipe.
 
 | subset               |       #samples before       | #samples after | keep ratio |data link                                                                                                                                                                                                                                                                                  | source                  |
 |----------------------|:---------------------------:|:--------------:|:----------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|
-| Alpaca-Cot EN | 136,219,879               | 72,855,345 |   54.48% | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/SFT/alpaca-cot-en-refine_result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/alpaca-cot-en-refined-by-data-juicer/summary)                           | [39 Subsets of Alpaca-CoT](alpaca_cot/README.md#refined-alpaca-cot-dataset-meta-info)              |
-| Alpaca-Cot ZH | 21,197,246               |               9,873,214                |   46.58%   | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/SFT/alpaca-cot-zh-refine_result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/alpaca-cot-zh-refined-by-data-juicer/summary)                           | [28 Subsets of Alpaca-CoT](alpaca_cot/README.md#refined-alpaca-cot-dataset-meta-info)              |
+| Alpaca-Cot EN | 136,219,879               | 72,855,345 |   54.48% | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/CFT/alpaca-cot-en-refine_result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/alpaca-cot-en-refined-by-data-juicer/summary)                           | [39 Subsets of Alpaca-CoT](alpaca_cot/README.md#refined-alpaca-cot-dataset-meta-info)              |
+| Alpaca-Cot ZH | 21,197,246               |               9,873,214                |   46.58%   | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/CFT/alpaca-cot-zh-refine_result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/alpaca-cot-zh-refined-by-data-juicer/summary)                           | [28 Subsets of Alpaca-CoT](alpaca_cot/README.md#refined-alpaca-cot-dataset-meta-info)              |
 '''
 
 

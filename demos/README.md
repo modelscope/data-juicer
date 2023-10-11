@@ -31,7 +31,7 @@ streamlit run app.py
 - Data visualization statistics (`data_visualization_statistics`)
   - This demo analyzes the dataset and obtain up to 13 statistics.
 
-- Process CFT Chinese data (`process_sft_zh_data`)
+- Process CFT Chinese data (`process_cft_zh_data`)
   - This demos analyzes and processes part of Chinese dataset in Alpaca-CoT to show how to process IFT or CFT data for LLM fine-tuning.
 
 - Process SCI data (`process_sci_data`)

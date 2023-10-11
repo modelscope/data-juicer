@@ -31,7 +31,7 @@ streamlit run app.py
 - 统计信息可视化 (`data_visualization_statistics`)
   - 该示例可以分析数据集，并获得多达13种统计信息。
 
-- 处理 CFT 中文数据 (`process_sft_zh_data`)
+- 处理 CFT 中文数据 (`process_cft_zh_data`)
   - 以 Alpaca-CoT 的部分中文数据为例，演示了 LLM 中指令跟随微调数据和有监督微调数据的分析和处理流程。
 
 - 处理预训练科学文献类数据 (`process_sci_data`)
