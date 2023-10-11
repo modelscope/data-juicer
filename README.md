@@ -64,8 +64,7 @@ Table of Contents
   ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
 
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data 
-  processing recipes](configs/data_juicer_recipes/README.md) for 
-  pre-training, post-tuning, en, zh, and more scenarios. Validated on 
+  processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on 
   reference LLaMA models.  
   ![exp_llama](https://img.alicdn.com/imgextra/i1/O1CN01D0Nuof1uOPxvBVEq9_!!6000000006027-0-tps-2324-754.jpg)
 
@@ -271,7 +270,7 @@ docker exec -it <container_id> bash
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
 - [Recipes for data process in RedPajama](configs/redpajama/README.md)
 - [Refined recipes for pre-training data](configs/data_juicer_recipes/README.md)
-- [Refined recipes for post-tuning data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
+- [Refined recipes for fine-tuning data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
 
 ## Demos
 - Introduction to Data-Juicer [[ModelScope](https://modelscope.cn/studios/Data-Juicer/overview_scan/summary)]

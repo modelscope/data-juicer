@@ -27,7 +27,7 @@ features_desc = '''
 
 - **Data-in-the-loop**: Allowing detailed data analyses with an automated report generation feature for a deeper understanding of your dataset. Coupled with timely multi-dimension automatic evaluation capabilities, it supports a feedback loop at multiple stages in the LLM development process.
 
-- **Comprehensive Processing Recipes**: Offering tens of `pre-built data processing recipes` for pre-training, SFT, en, zh, and more scenarios.
+- **Comprehensive Processing Recipes**: Offering tens of `pre-built data processing recipes` for pre-training, CFT, en, zh, and more scenarios.
 
 - **User-Friendly Experience**: Designed for simplicity, with `comprehensive documentation`, `easy start guides` and `demo configs`, and intuitive configuration with simple adding/removing OPs from existing configs.
 
@@ -305,7 +305,7 @@ class Visualize:
                 show_yaml(config_dict[selected])
             with tab3:
                 label = 'Data-Juicer have refined some open source datasets \
-                    (including SFT datasets) by using Data-Juicer and have \
+                    (including CFT datasets) by using Data-Juicer and have \
                         provided configuration files for the refine flow.'
 
                 config_files = Path(

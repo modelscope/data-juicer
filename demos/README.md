@@ -23,7 +23,7 @@ streamlit run app.py
   - This demo analyzes and processes a dataset, providing a comparison of statistical information before and after the processing.
 
 - Data visualization diversity (`data_visualization_diversity`)
-  - This demo analyzes the verb-noun structure of the SFT dataset and plots its diversity in sunburst format.
+  - This demo analyzes the verb-noun structure of the CFT dataset and plots its diversity in sunburst format.
 
 - Data visualization op effect (`data_visualization_op_effect`)
   - This demo analyzes the statistics of dataset, and displays the effect of each Filter op by setting different thresholds.
@@ -31,8 +31,8 @@ streamlit run app.py
 - Data visualization statistics (`data_visualization_statistics`)
   - This demo analyzes the dataset and obtain up to 13 statistics.
 
-- Process SFT Chinese data (`process_sft_zh_data`)
-  - This demos analyzes and processes part of Chinese dataset in Alpaca-CoT to show how to process IFT or SFT data for LLM fine-tuning.
+- Process CFT Chinese data (`process_sft_zh_data`)
+  - This demos analyzes and processes part of Chinese dataset in Alpaca-CoT to show how to process IFT or CFT data for LLM fine-tuning.
 
 - Process SCI data (`process_sci_data`)
   - This demos analyzes and processes part of arXiv dataset to show how to process scientific literature data for LLM pre-training.

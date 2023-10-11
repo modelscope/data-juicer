@@ -29,4 +29,4 @@ We have reproduced the processing flow of some RedPajama datasets. Please refer 
 We have reproduced the processing flow of some BLOOM datasets. please refer to the [reproduced_bloom](reproduced_bloom) folder for details.
 
 ### Data-Juicer Recipes
-We have refined some open source datasets (including SFT datasets) by using Data-Juicer and have provided configuration files for the refined flow. please refer to the [data_juicer_recipes](data_juicer_recipes) folder for details.
+We have refined some open source datasets (including CFT datasets) by using Data-Juicer and have provided configuration files for the refined flow. please refer to the [data_juicer_recipes](data_juicer_recipes) folder for details.

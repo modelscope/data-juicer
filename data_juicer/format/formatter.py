@@ -189,7 +189,7 @@ def unify_format(
 
     def non_empty_text(sample, target_keys):
         for target_key in target_keys:
-            # TODO: case for SFT, in which the len(sample[target_key]) == 0
+            # TODO: case for CFT, in which the len(sample[target_key]) == 0
             if sample[target_key] is None:
                 # we filter out the samples contains at least None column
                 # since the op can not handle it now

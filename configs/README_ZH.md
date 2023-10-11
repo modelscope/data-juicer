@@ -30,4 +30,4 @@ Demo 配置文件用于帮助用户快速熟悉 Data-Juicer 的基本功能，�
 我们已经重现了部分 BLOOM 数据集的处理流程，请参阅 [reproduced_bloom](reproduced_bloom) 文件夹以获取详细说明。
 
 ### Data-Juicer 菜谱
-我们使用 Data-Juicer 更细致地处理了一些开源数据集（包含 SFT 数据集），并提供了处理流程的配置文件。请参阅 [data_juicer_recipes](data_juicer_recipes) 文件夹以获取详细说明。
+我们使用 Data-Juicer 更细致地处理了一些开源数据集（包含 CFT 数据集），并提供了处理流程的配置文件。请参阅 [data_juicer_recipes](data_juicer_recipes) 文件夹以获取详细说明。
