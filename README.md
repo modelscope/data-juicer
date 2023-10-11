@@ -52,7 +52,7 @@ Table of Contents
 
 ## Features
 
-![Overview](https://img.alicdn.com/imgextra/i4/O1CN01uvLL0T1VIaX28dMLg_!!6000000002630-2-tps-2509-1192.png)
+![Overview](https://img.alicdn.com/imgextra/i2/O1CN01IMPeD11xYRUYLmXKO_!!6000000006455-2-tps-3620-1604.png)
 
 - **Systematic & Reusable**: 
   Empowering users with a systematic library of 20+ reusable [config recipes](configs), 50+ core [OPs](docs/Operators.md), and feature-rich 
@@ -64,8 +64,7 @@ Table of Contents
   ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
 
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data 
-  processing recipes](configs/data_juicer_recipes/README.md) for 
-  pre-training, post-tuning, en, zh, and more scenarios. Validated on 
+  processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on 
   reference LLaMA models.  
   ![exp_llama](https://img.alicdn.com/imgextra/i1/O1CN01D0Nuof1uOPxvBVEq9_!!6000000006027-0-tps-2324-754.jpg)
 
@@ -124,11 +123,18 @@ pip install py-data-juicer
 
 ### Using Docker
 
-- Run the following command to build the docker image including the latest `data-juicer` with provided [Dockerfile](Dockerfile):
+- You can 
+  - either pull our pre-built image from DockerHub:
+    ```shell
+    docker pull datajuicer/data-juicer:<version_tag>
+    ```
 
-```shell
-docker build -t data-juicer:<version_tag> .
-```
+  - or run the following command to build the docker image including the 
+    latest `data-juicer` with provided [Dockerfile](Dockerfile):
+
+    ```shell
+    docker build -t data-juicer:<version_tag> .
+    ```
 
 ### Installation check
 
@@ -271,7 +277,7 @@ docker exec -it <container_id> bash
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
 - [Recipes for data process in RedPajama](configs/redpajama/README.md)
 - [Refined recipes for pre-training data](configs/data_juicer_recipes/README.md)
-- [Refined recipes for post-tuning data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
+- [Refined recipes for fine-tuning data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
 
 ## Demos
 - Introduction to Data-Juicer [[ModelScope](https://modelscope.cn/studios/Data-Juicer/overview_scan/summary)]

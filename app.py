@@ -423,7 +423,7 @@ class Visualize:
 
     @staticmethod
     def diversity():
-        with st.expander('Diversity for sft dataset', expanded=False):
+        with st.expander('Diversity for CFT dataset', expanded=False):
             dataset = st.session_state.get('dataset', None)
             cfg = st.session_state.get('cfg', parse_cfg()[2])
             text_key = st.session_state.get('text_key', 'text')

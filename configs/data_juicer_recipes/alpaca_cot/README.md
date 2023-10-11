@@ -56,58 +56,59 @@ Each sample in refined data of Alpaca-CoT contains meta info listed as below:
     - COL: [Collection of Dataset] Dataset made from a collection of other datasets
 
 #### Data-Juicer Meta info
-* Dataset: Dataset in Alpaca-CoT
+* `Dataset`: dataset name in Alpaca-CoT
+* `origin_path`: original file path in Alpaca-CoT
 
-* Multi-round Dialog (MRD): Multi-round Dialog datasets
+* `IFT`: tagged as Instruct Fine-Tuning datasets
 
-* IFT: Instruction Fine-Tuning datasets
+* `CFT`: tagged as Chat Fine-Tuning datasets
 
-* SFT: Supervised Fine-Tuning datasets
+  * `CFT-SR`: tagged as Single-round Dialog datasets
 
-* Preference: Preference datasets
+  * `CFT-MR`: tagged as Multi-round Dialog datasets
+  
+  * `CFT-P`: tagged as Preference datasets
 
-* origin_path: original file path in Alpaca-CoT
 
 
 #### Refined Alpaca-CoT dataset Meta info
-|                      | Task   | Gen   | Lang   | Dataset              | MRD  | IFT   | SFT   | Preference   |
-|:---------------------|:-------|:------|:-------|:---------------------|:----:|:---:|:---:|:---:|
-| Chain-of-Thought     | MT     | HG    | EN/CN  | Chain-of-Thought     |                 | ✅  |  |         |
-| GPT4all              | MT     | COL   | EN     | GPT4all              |                 | ✅  | ✅  |         |
-| GPTeacher            | MT     | SI    | EN     | GPTeacher            |                 |  | ✅  |         |
-| Guanaco              | MT     | SI    | ML     | Guanaco              |                 |  | ✅  |         |
-| HC3                  | TS     | MIX   | EN/CN  | HC3                  |                 |  | ✅  | ✅         |
-| alpaca               | MT     | SI    | EN     | alpaca               |                 |  | ✅  |         |
-| Natural-Instructions | MT     | COL   | ML     | Natural-Instructions |                 | ✅  |  |         |
-| belle_cn             | TS/MT  | SI    | CN     | belle_cn             |                 |  | ✅  |         |
-| instinwild           | MT     | SI    | EN/CN  | instinwild           |                 |  | ✅  |         |
-| prosocial-dialog     | TS     | MIX   | EN     | prosocial-dialog     |                 |  | ✅  |         |
-| finance              | TS     | COL   | EN     | finance              |                 |  | ✅  |         |
-| xP3                  | MT     | COL   | ML     | xP3                  |                 | ✅  |  |         |
-| firefly              | MT     | COL   | CN     | firefly              |                 | ✅  |  |         |
-| instruct             | MT     | COL   | EN     | instruct             |                 |  | ✅  |         |
-| CodeAlpaca           | TS     | SI    | EN     | CodeAlpaca           |                 | ✅  |  |         |
-| alpacaGPT4           | MT     | SI    | EN/CN  | alpacaGPT4           |                 |  | ✅  | ✅         |
-| webGPT               | TS     | MIX   | EN     | webGPT               |                 | ✅  |  | ✅         |
-| dolly                | TS     | HG    | EN     | dolly                |                 |  | ✅  |         |
-| baize                | MT     | COL   | EN     | baize                |                 |  | ✅  |         |
-| hh-rlhf              | TS     | MIX   | EN     | hh-rlhf              | ✅                 |  | ✅  | ✅         |
-| OIG                  | MT     | COL   | EN     | OIG                  |                 |  | ✅  |         |
-| GAOKAO               | MT     | COL   | CN     | GAOKAO               |                 | ✅  |  |         |
-| camel                | MT     | SI    | EN     | camel                |                 | ✅  |  |         |
-| FLAN-Muffin          | MT     | COL   | EN     | FLAN-Muffin          |                 | ✅  |  |         |
-| COIG                 | MT     | COL   | CN     | COIG                 |                 |  | ✅  |         |
-| gpt4tools            | MT     | SI    | EN     | gpt4tools            |                 | ✅  |  |         |
-| ShareGPT             | MT     | MIX   | EN     | ShareGPT             | ✅                 |  | ✅  |         |
-| Auto-CoT             | MT     | COL   | EN     | Auto-CoT             |                 | ✅  |  |         |
-| MOSS                 | TS     | SI    | EN/CN  | MOSS                 |                 |  | ✅  |         |
-| ultrachat            | TS     | SI    | EN     | ultrachat            |                 |  | ✅  |         |
-| Chinese-medical      | TS     | COL   | CN     | Chinese-medical      |                 |  | ✅  |         |
-| CSL                  | MT     | COL   | CN     | CSL                  |                 | ✅  |  |         |
-| pCLUE                | MT     | COL   | CN     | pCLUE                |                 | ✅  |  |         |
-| news_commentary      | TS     | COL   | CN     | news_commentary      |                 | ✅  |  |         |
-| StackExchange        | MT     | COL   | EN     | StackExchange        |                 |  | ✅  | ✅         |
-| ConvAI2              | TS     | HG    | EN     | ConvAI2              |                 |  | ✅  |         |
-| FastChat             | MT     | SI    | EN     | FastChat             |                 |  | ✅  |         |
-| Tabular-LLM-Data     | MT     | COL   | EN/CN  | Tabular-LLM-Data     |                 | ✅  |  |         |
-| ThoughtSource        | MT     | COL   | EN     | ThoughtSource        |                 | ✅  |  |         |
+|                      	| Task  	| Gen 	| Lang  	| Dataset              	| IFT 	| CFT-SR 	| CFT-MR 	| CFT-P 	|
+|----------------------	|-------	|-----	|-------	|----------------------	|-----	|---------	|---------	|----------------	|
+| Chain-of-Thought     	| MT    	| HG  	| EN/CN 	| Chain-of-Thought     	| ✅   	|         	|         	|                	|
+| GPT4all              	| MT    	| COL 	| EN    	| GPT4all              	| ✅   	| ✅       	|         	|                	|
+| GPTeacher            	| MT    	| SI  	| EN    	| GPTeacher            	|     	| ✅       	|         	|                	|
+| Guanaco              	| MT    	| SI  	| ML    	| Guanaco              	|     	| ✅       	|         	|                	|
+| HC3                  	| TS    	| MIX 	| EN/CN 	| HC3                  	|     	| ✅       	|         	| ✅              	|
+| alpaca               	| MT    	| SI  	| EN    	| alpaca               	|     	| ✅       	|         	|                	|
+| Natural-Instructions 	| MT    	| COL 	| ML    	| Natural-Instructions 	| ✅   	|         	|         	|                	|
+| belle_cn             	| TS/MT 	| SI  	| CN    	| belle_cn             	|     	| ✅       	|         	|                	|
+| instinwild           	| MT    	| SI  	| EN/CN 	| instinwild           	|     	| ✅       	|         	|                	|
+| prosocial-dialog     	| TS    	| MIX 	| EN    	| prosocial-dialog     	|     	| ✅       	|         	|                	|
+| finance              	| TS    	| COL 	| EN    	| finance              	|     	| ✅       	|         	|                	|
+| xP3                  	| MT    	| COL 	| ML    	| xP3                  	| ✅   	|         	|         	|                	|
+| firefly              	| MT    	| COL 	| CN    	| firefly              	| ✅   	|         	|         	|                	|
+| instruct             	| MT    	| COL 	| EN    	| instruct             	|     	| ✅       	|         	|                	|
+| CodeAlpaca           	| TS    	| SI  	| EN    	| CodeAlpaca           	| ✅   	|         	|         	|                	|
+| alpacaGPT4           	| MT    	| SI  	| EN/CN 	| alpacaGPT4           	|     	| ✅       	|         	| ✅              	|
+| webGPT               	| TS    	| MIX 	| EN    	| webGPT               	| ✅   	|         	|         	| ✅              	|
+| dolly                	| TS    	| HG  	| EN    	| dolly                	|     	| ✅       	|         	|                	|
+| baize                	| MT    	| COL 	| EN    	| baize                	|     	| ✅       	|         	|                	|
+| hh-rlhf              	| TS    	| MIX 	| EN    	| hh-rlhf              	|     	| ✅       	| ✅       	| ✅              	|
+| OIG                  	| MT    	| COL 	| EN    	| OIG                  	|     	| ✅       	|         	|                	|
+| GAOKAO               	| MT    	| COL 	| CN    	| GAOKAO               	| ✅   	|         	|         	|                	|
+| camel                	| MT    	| SI  	| EN    	| camel                	| ✅   	|         	|         	|                	|
+| FLAN-Muffin          	| MT    	| COL 	| EN    	| FLAN-Muffin          	| ✅   	|         	|         	|                	|
+| COIG                 	| MT    	| COL 	| CN    	| COIG                 	|     	| ✅       	|         	|                	|
+| gpt4tools            	| MT    	| SI  	| EN    	| gpt4tools            	| ✅   	|         	|         	|                	|
+| ShareGPT             	| MT    	| MIX 	| EN    	| ShareGPT             	|     	| ✅       	| ✅       	|                	|
+| Auto-CoT             	| MT    	| COL 	| EN    	| Auto-CoT             	| ✅   	|         	|         	|                	|
+| MOSS                 	| TS    	| SI  	| EN/CN 	| MOSS                 	|     	| ✅       	|         	|                	|
+| ultrachat            	| TS    	| SI  	| EN    	| ultrachat            	|     	| ✅       	|         	|                	|
+| Chinese-medical      	| TS    	| COL 	| CN    	| Chinese-medical      	|     	| ✅       	|         	|                	|
+| CSL                  	| MT    	| COL 	| CN    	| CSL                  	| ✅   	|         	|         	|                	|
+| pCLUE                	| MT    	| COL 	| CN    	| pCLUE                	| ✅   	|         	|         	|                	|
+| news_commentary      	| TS    	| COL 	| CN    	| news_commentary      	| ✅   	|         	|         	|                	|
+| StackExchange        	| MT    	| COL 	| EN    	| StackExchange        	|     	| ✅       	|         	| ✅              	|
+| ConvAI2              	| TS    	| HG  	| EN    	| ConvAI2              	|     	| ✅       	|         	|                	|
+| FastChat             	| MT    	| SI  	| EN    	| FastChat             	|     	| ✅       	|         	|                	|
+| Tabular-LLM-Data     	| MT    	| COL 	| EN/CN 	| Tabular-LLM-Data     	| ✅   	|         	|         	|                	|

@@ -23,7 +23,7 @@ streamlit run app.py
   - 该示例用来分析和处理数据集，并给出处理前后数据集的统计信息比对。
 
 - 词法多样性可视化 (`data_visualization_diversity`)
-  - 该示例可以用来分析 SFT 数据集的动词-名词结构，并绘制成sunburst层级环形图表。
+  - 该示例可以用来分析 CFT 数据集的动词-名词结构，并绘制成sunburst层级环形图表。
 
 - 算子效果可视化 (`data_visualization_op_effect`)
   - 该示例可以分析数据集的统计信息，并根据这些统计信息可以显示出每个 `Filter` 算子在不同阈值下的效果。
@@ -31,7 +31,7 @@ streamlit run app.py
 - 统计信息可视化 (`data_visualization_statistics`)
   - 该示例可以分析数据集，并获得多达13种统计信息。
 
-- 处理 SFT 中文数据 (`process_sft_zh_data`)
+- 处理 CFT 中文数据 (`process_cft_zh_data`)
   - 以 Alpaca-CoT 的部分中文数据为例，演示了 LLM 中指令跟随微调数据和有监督微调数据的分析和处理流程。
 
 - 处理预训练科学文献类数据 (`process_sci_data`)

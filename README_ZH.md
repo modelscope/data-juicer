@@ -51,13 +51,13 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
 
 ## 特点
 
-![Overview](https://img.alicdn.com/imgextra/i4/O1CN01uvLL0T1VIaX28dMLg_!!6000000002630-2-tps-2509-1192.png)
+![Overview](https://img.alicdn.com/imgextra/i2/O1CN01IMPeD11xYRUYLmXKO_!!6000000006455-2-tps-3620-1604.png)
 
 * **系统化 & 可复用**：为用户提供系统化且可复用的20+[配置菜谱](configs/README_ZH.md)，50+核心[算子](docs/Operators_ZH.md)和专用[工具池](#documentation)，旨在让数据处理独立于特定的大语言模型数据集和处理流水线。
 
 * **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行及时反馈循环。  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
 
-* **全面的数据处理菜谱**：为pre-training、post-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。  ![exp_llama](https://img.alicdn.com/imgextra/i1/O1CN01D0Nuof1uOPxvBVEq9_!!6000000006027-0-tps-2324-754.jpg)
+* **全面的数据处理菜谱**：为pre-training、fine-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。  ![exp_llama](https://img.alicdn.com/imgextra/i1/O1CN01D0Nuof1uOPxvBVEq9_!!6000000006027-0-tps-2324-754.jpg)
 
 * **效率增强**：提供高效的数据处理流水线，减少内存占用和CPU开销，提高生产力。  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
@@ -112,11 +112,16 @@ pip install py-data-juicer
 
 ### 使用 Docker 安装
 
-- 运行如下命令用我们提供的 [Dockerfile](Dockerfile) 来构建包括最新版本的 `data-juicer` 的 docker 镜像：
+- 您可以选择
+  - 从DockerHub直接拉取我们的预置镜像:
+    ```shell
+    docker pull datajuicer/data-juicer:<version_tag>
+    ```
+  - 或者运行如下命令用我们提供的 [Dockerfile](Dockerfile) 来构建包括最新版本的 `data-juicer` 的 docker 镜像：
 
-```shell
-docker build -t data-juicer:<version_tag> .
-```
+    ```shell
+    docker build -t data-juicer:<version_tag> .
+    ```
 
 ### 安装校验
 
@@ -253,7 +258,7 @@ docker exec -it <container_id> bash
 * [BLOOM 数据处理菜谱](configs/reproduced_bloom/README_ZH.md)
 * [RedPajama 数据处理菜谱](configs/reproduced_redpajama/README_ZH.md)
 * [预训练数据增强菜谱](configs/data_juicer_recipes/README_ZH.md)
-* [Post-tuning数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#完善前后的alpaca-cot数据集)
+* [Fine-tuning数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#完善前后的alpaca-cot数据集)
 
 ## 演示样例
 
