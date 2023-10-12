@@ -66,7 +66,7 @@ Table of Contents
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data 
   processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on 
   reference LLaMA models.  
-  ![exp_llama](https://img.alicdn.com/imgextra/i1/O1CN01D0Nuof1uOPxvBVEq9_!!6000000006027-0-tps-2324-754.jpg)
+  ![exp_llama](https://img.alicdn.com/imgextra/i2/O1CN019WtUPP1uhebnDlPR8_!!6000000006069-2-tps-2530-1005.png)
 
 - **Enhanced Efficiency**: Providing a speedy data processing pipeline 
   requiring less memory and CPU usage, optimized for maximum productivity. 
