@@ -1,0 +1,51 @@
+name: ❓ Question
+description: Ask a Data-Juicer question
+# title: " "
+labels: [question]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your attention. We will try our best to solve your problem, but more concrete information is necessary to reproduce your problem.
+        感谢您的关注。我们会尽我们最大努力解决您的问题，但是更详细的信息对于我们复现您遇到的问题是必要的。
+  - type: checkboxes
+    attributes:
+      label: Before Asking 在提问之前
+      description: >
+        Please check and try following methods to solve it by yourself. 请检查并尝试以下方法来以尝试自己解决问题。
+      options:
+        - label: >
+           I have read the [README](https://github.com/alibaba/data-juicer/blob/main/README.md) carefully.
+           我已经仔细阅读了 [README](https://github.com/alibaba/data-juicer/blob/main/README_ZH.md) 上的操作指引。
+          required: true
+        - label: >
+           I have pulled the latest code of main branch to run again and the problem still existed.
+           我已经拉取了主分支上最新的代码，重新运行之后，问题仍不能解决。
+          required: true
+
+
+  - type: checkboxes
+    attributes:
+      label: Search before asking 先搜索，再提问
+      description: >
+        Please search the [issues](https://github.com/alibaba/data-juicer/issues) to see if a similar question already exists. 请先在 [issue 列表](https://github.com/alibaba/data-juicer/issues)中搜索是否已经有类似的问题已经存在。
+      options:
+        - label: >
+            I have searched the Data-Juicer [issues](https://github.com/alibaba/data-juicer/issues) and found no similar questions.
+            我已经在 [issue列表](https://github.com/alibaba/data-juicer/issues) 中搜索但是没有发现类似的问题。
+          required: true
+
+  - type: textarea
+    attributes:
+      label: Question
+      description: What is your question? 您遇到的问题是什么？
+      placeholder: |
+        💡 ProTip! Include as much information as possible (screenshots, logs, tracebacks, processing configs and commands, etc.) to receive the most helpful response.
+        (请仔细阅读上面的信息先进行问题排查，如果仍不能解决您的问题，请将问题尽可能地描述详细，以及提供相关命令、配置、报错日志等信息或截图，以便更快地定位和解决问题。)
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional 额外信息
+      description: Anything else you would like to share? 其他您想分享的信息。

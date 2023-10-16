@@ -14,3 +14,7 @@ dist
 .DS_Store
 .idea/
 __pycache__
+
+configs/test.yaml
+sample_idxs_valid_iter_35k_ns10.jsonl
+sample_idxs_valid_iter_36k_n2304.jsonl
