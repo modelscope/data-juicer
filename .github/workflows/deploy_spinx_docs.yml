@@ -18,7 +18,7 @@ jobs:
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
-        documentation_path: ./docs/spinx_doc/source
+        documentation_path: ./docs/sphinx_doc/source
         python_version: ${{ matrix.python-version }}
         publish: false
         requirements_path: ./environments/dev_requires.txt
