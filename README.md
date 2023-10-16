@@ -24,6 +24,12 @@ This project is being actively updated and maintained, and we will periodically 
 
 ----
 
+## News
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2023-10-13] Our first data-centric LLM competition begins! Please
+  visit the competition's official websites, **FT-Data Ranker** ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), for more information.
+
+- [2023-10-8] We update our paper to the 2nd version and release the corresponding version 0.1.2 of Data-Juicer!
+
 Table of Contents
 =================
 
@@ -302,6 +308,8 @@ Data-Juicer is released under Apache License 2.0.
 
 ## Contributing
 We greatly welcome contributions of new features, bug fixes, and discussions. Please refer to [How-to Guide for Developers](docs/DeveloperGuide.md).
+
+Welcome to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw), or [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) for discussion.
 
 ## References
 If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2309.02033).
