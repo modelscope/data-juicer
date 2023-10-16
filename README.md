@@ -24,6 +24,12 @@ This project is being actively updated and maintained, and we will periodically 
 
 ----
 
+## News
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2023-10-13] Our first data-centric LLM competition begins! Please
+  visit the competition's official websites, **FT-Data Ranker** ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), for more information.
+
+- [2023-10-8] We update our paper to the 2nd version and release the corresponding version 0.1.2 of Data-Juicer!
+
 Table of Contents
 =================
 
@@ -49,12 +55,6 @@ Table of Contents
    * [License](#license)
    * [Contributing](#contributing)
    * [References](#references)
-  
-## News
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2023-10-13] Our first data-centric LLM competition begins! Please 
-  visit the competition's official websites, **FT-Data Ranker** ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), for more information.
-  
-- [2023-10-8] We update our paper to the 2nd version and release the corresponding version 0.1.2 of Data-Juicer!
 
 ## Features
 

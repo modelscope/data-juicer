@@ -23,6 +23,12 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
 
 ----
 
+## 新消息
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2023-10-13] 我们的第一届以数据为中心的 LLM 竞赛开始了！
+  请访问大赛官网，**FT-Data Ranker**（[1B赛道](https://tianchi.aliyun.com/competition/entrance/532157) 、[7B赛道](https://tianchi.aliyun.com/competition/entrance/532158) ) ，了解更多信息。
+
+- [2023-10-8] 我们的论文更新至第二版，并发布了对应的Data-Juicer v0.1.2版本！
+
 目录
 ===
 
@@ -48,12 +54,6 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
   * [开源协议](#开源协议)
   * [贡献](#贡献)
   * [参考文献](#参考文献)
-
-## 新消息
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2023-10-13] 我们的第一届以数据为中心的 LLM 竞赛开始了！ 
-  请访问大赛官网，**FT-Data Ranker**（[1B赛道](https://tianchi.aliyun.com/competition/entrance/532157) 、[7B赛道](https://tianchi.aliyun.com/competition/entrance/532158) ) ，了解更多信息。
-
-- [2023-10-8] 我们的论文更新至第二版，并发布了对应的Data-Juicer v0.1.2版本！
 
 ## 特点
 
