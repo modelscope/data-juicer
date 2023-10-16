@@ -18,7 +18,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -v -e .
+        pip install -v -e .[dev]
     - name: Generate rst
       run: |
         cd docs/sphinx_doc/
