@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.utils.constant &mdash; data_juicer 0.1.2 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+              <div class="version">
+                0.1.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.html">data_juicer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">data_juicer.utils.constant</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.utils.constant</h1><div class="highlight"><pre>
+<span></span><span class="n">DEFAULT_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;__dj__&#39;</span>
+
+
+<div class="viewcode-block" id="Fields"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.Fields">[docs]</a><span class="k">class</span> <span class="nc">Fields</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;stats__&#39;</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;meta__&#39;</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;context__&#39;</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;suffix__&#39;</span></div>
+
+
+<div class="viewcode-block" id="StatsKeys"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeys">[docs]</a><span class="k">class</span> <span class="nc">StatsKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">alpha_token_ratio</span> <span class="o">=</span> <span class="s1">&#39;alpha_token_ratio&#39;</span>
+    <span class="n">alnum_ratio</span> <span class="o">=</span> <span class="s1">&#39;alnum_ratio&#39;</span>
+    <span class="n">avg_line_length</span> <span class="o">=</span> <span class="s1">&#39;avg_line_length&#39;</span>
+    <span class="n">char_rep_ratio</span> <span class="o">=</span> <span class="s1">&#39;char_rep_ratio&#39;</span>
+    <span class="n">flagged_words_ratio</span> <span class="o">=</span> <span class="s1">&#39;flagged_words_ratio&#39;</span>
+    <span class="n">lang</span> <span class="o">=</span> <span class="s1">&#39;lang&#39;</span>
+    <span class="n">lang_score</span> <span class="o">=</span> <span class="s1">&#39;lang_score&#39;</span>
+    <span class="n">max_line_length</span> <span class="o">=</span> <span class="s1">&#39;max_line_length&#39;</span>
+    <span class="n">perplexity</span> <span class="o">=</span> <span class="s1">&#39;perplexity&#39;</span>
+    <span class="n">special_char_ratio</span> <span class="o">=</span> <span class="s1">&#39;special_char_ratio&#39;</span>
+    <span class="n">stopwords_ratio</span> <span class="o">=</span> <span class="s1">&#39;stopwords_ratio&#39;</span>
+    <span class="n">text_len</span> <span class="o">=</span> <span class="s1">&#39;text_len&#39;</span>
+    <span class="n">num_token</span> <span class="o">=</span> <span class="s1">&#39;num_token&#39;</span>
+    <span class="n">num_words</span> <span class="o">=</span> <span class="s1">&#39;num_words&#39;</span>
+    <span class="n">word_rep_ratio</span> <span class="o">=</span> <span class="s1">&#39;word_rep_ratio&#39;</span></div>
+
+
+<div class="viewcode-block" id="HashKeys"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.HashKeys">[docs]</a><span class="k">class</span> <span class="nc">HashKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nb">hash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;hash&#39;</span>
+    <span class="n">minhash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;minhash&#39;</span>
+    <span class="n">simhash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;simhash&#39;</span></div>
+
+<div class="viewcode-block" id="InterVars"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.InterVars">[docs]</a><span class="k">class</span> <span class="nc">InterVars</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;lines&#39;</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;words&#39;</span>
+    <span class="n">refined_words</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;refined_words&#39;</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

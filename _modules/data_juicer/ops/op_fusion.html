@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.op_fusion &mdash; data_juicer 0.1.2 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+              <div class="version">
+                0.1.2
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.html">data_juicer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.op_fusion</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.op_fusion</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">.base_op</span> <span class="kn">import</span> <span class="n">Filter</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">InterVars</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.registry</span> <span class="kn">import</span> <span class="n">Registry</span>
+
+<span class="c1"># Type of intermediate vars</span>
+<span class="n">INTER_LINES</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="n">InterVars</span><span class="o">.</span><span class="n">lines</span><span class="p">)</span>
+<span class="n">INTER_WORDS</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="n">InterVars</span><span class="o">.</span><span class="n">words</span><span class="p">)</span>
+
+<div class="viewcode-block" id="fuse_operators"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.fuse_operators">[docs]</a><span class="k">def</span> <span class="nf">fuse_operators</span><span class="p">(</span><span class="n">process_list</span><span class="p">,</span> <span class="n">ops</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fuse the input ops list and return the fused ops list.</span>
+
+<span class="sd">    :param process_list: the list of original process definition, including op</span>
+<span class="sd">        names and args.</span>
+<span class="sd">    :param ops: the corresponding list of op objects.</span>
+<span class="sd">    :return: a list of fused op objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># detect filter groups and try to fuse them</span>
+    <span class="n">fused_op_def</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">fused_ops</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">filter_group</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">in_group</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">process</span><span class="p">,</span> <span class="n">op</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">process_list</span><span class="p">,</span> <span class="n">ops</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">Filter</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">in_group</span><span class="p">:</span>
+                <span class="n">in_group</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">filter_group</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">process</span><span class="p">,</span> <span class="n">op</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">in_group</span><span class="p">:</span>
+            <span class="c1"># got a filter group, try to fuse them</span>
+            <span class="n">fused_group_def</span><span class="p">,</span> <span class="n">fused_group</span> <span class="o">=</span> <span class="n">fuse_filter_group</span><span class="p">(</span><span class="n">filter_group</span><span class="p">)</span>
+            <span class="n">fused_op_def</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">fused_group_def</span><span class="p">)</span>
+            <span class="n">fused_ops</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">fused_group</span><span class="p">)</span>
+            <span class="n">filter_group</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">in_group</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="c1"># and add the current non-filter op into fused_ops</span>
+            <span class="n">fused_op_def</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
+            <span class="n">fused_ops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># not a filter and not in a filter group, skip</span>
+            <span class="n">fused_op_def</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
+            <span class="n">fused_ops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">in_group</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">filter_group</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># the final filter group, try to fuse them</span>
+        <span class="n">fused_group_def</span><span class="p">,</span> <span class="n">fused_group</span> <span class="o">=</span> <span class="n">fuse_filter_group</span><span class="p">(</span><span class="n">filter_group</span><span class="p">)</span>
+        <span class="n">fused_op_def</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">fused_group_def</span><span class="p">)</span>
+        <span class="n">fused_ops</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">fused_group</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fused_op_def</span><span class="p">,</span> <span class="n">fused_ops</span></div>
+
+<div class="viewcode-block" id="fuse_filter_group"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.fuse_filter_group">[docs]</a><span class="k">def</span> <span class="nf">fuse_filter_group</span><span class="p">(</span><span class="n">original_filter_group</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fuse single filter group and return the fused filter group.</span>
+
+<span class="sd">    :param original_filter_group: the original filter group, including op</span>
+<span class="sd">        definitions and objects.</span>
+<span class="sd">    :return: the fused definitions and objects of the input filter group.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fused_group_def</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">fused_group</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">all_intermediate_vars</span> <span class="o">=</span> <span class="p">[</span><span class="n">INTER_LINES</span><span class="p">,</span> <span class="n">INTER_WORDS</span><span class="p">]</span>
+    <span class="n">all_fused_filters</span> <span class="o">=</span> <span class="p">{</span><span class="n">inter_vars</span><span class="p">:</span> <span class="p">[]</span>
+                         <span class="k">for</span> <span class="n">inter_vars</span> <span class="ow">in</span> <span class="n">all_intermediate_vars</span><span class="p">}</span>
+    <span class="c1"># group these filters by their intermediate vars</span>
+    <span class="k">for</span> <span class="n">process</span><span class="p">,</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">original_filter_group</span><span class="p">:</span>
+        <span class="n">op_name</span><span class="p">,</span> <span class="n">op_args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">inter_vars</span> <span class="ow">in</span> <span class="n">all_intermediate_vars</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">op_name</span> <span class="ow">in</span> <span class="n">inter_vars</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                <span class="n">all_fused_filters</span><span class="p">[</span><span class="n">inter_vars</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">process</span><span class="p">,</span> <span class="n">op</span><span class="p">))</span>
+                <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># first apply other filters to decrease the number of samples, so</span>
+            <span class="c1"># we add them into the fused_group list directly</span>
+            <span class="n">fused_group_def</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
+            <span class="n">fused_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+
+    <span class="c1"># try to fuse ops for each type of intermediate vars</span>
+    <span class="k">for</span> <span class="n">inter_vars</span> <span class="ow">in</span> <span class="n">all_intermediate_vars</span><span class="p">:</span>
+        <span class="n">inter_vars_filter</span> <span class="o">=</span> <span class="n">all_fused_filters</span><span class="p">[</span><span class="n">inter_vars</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inter_vars_filter</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># no ops include this type of intermediate var</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">inter_vars_filter</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># more than 1 ops share the same intermediate var, try to fuse them</span>
+            <span class="n">defs</span><span class="p">,</span> <span class="n">ops</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">inter_vars_filter</span><span class="p">)</span>
+            <span class="c1"># new definition: new name and a definition list of fused op list</span>
+            <span class="n">fused_filter_def</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;OpFusion:(</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="n">process</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                                            <span class="k">for</span> <span class="n">process</span> <span class="ow">in</span> <span class="n">defs</span><span class="p">]):</span> <span class="nb">list</span><span class="p">(</span><span class="n">defs</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Ops are fused into one op &#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">fused_filter_def</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="c1"># use these ops to create a FusedFilter object, and add the fused</span>
+            <span class="c1"># definition and op into the fused group</span>
+            <span class="n">fused_filter</span> <span class="o">=</span> <span class="n">FusedFilter</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+            <span class="n">fused_group_def</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fused_filter_def</span><span class="p">)</span>
+            <span class="n">fused_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fused_filter</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># only 1 op for this type of intermediate var, add it to the fused</span>
+            <span class="c1"># group directly without fusion</span>
+            <span class="n">fused_group_def</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inter_vars_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">fused_group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inter_vars_filter</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">fused_group_def</span><span class="p">,</span> <span class="n">fused_group</span></div>
+
+<div class="viewcode-block" id="FusedFilter"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.FusedFilter">[docs]</a><span class="k">class</span> <span class="nc">FusedFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A fused operator for filters.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fused_filters</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param fused_filers: a list of filters to be fused.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fused_filters</span> <span class="o">=</span> <span class="n">fused_filters</span>
+
+<div class="viewcode-block" id="FusedFilter.compute_stats"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.FusedFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+        <span class="c1"># context for the intermediate vars</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_filters</span><span class="p">:</span>
+            <span class="c1"># open the context for these fused ops</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># clean up the contexts after processing</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sample</span></div>
+
+<div class="viewcode-block" id="FusedFilter.process"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.FusedFilter.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+        <span class="c1"># Only return True when all filters return True</span>
+        <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fused_filters</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">op</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">sample</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
