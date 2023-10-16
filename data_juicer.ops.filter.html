@@ -121,6 +121,30 @@
 <p>Filter to keep samples with alphabet/numeric ratio within a specific
 range.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9223372036854775807</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/alphanumeric_filter.html#AlphanumericFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tokenization</strong> – Whether to count the ratio of alphanumeric
+to the total number of tokens. if tokenization=False, it
+will count the ratio of alphanumeric to the total number of
+characters.</p></li>
+<li><p><strong>min_ratio</strong> – The min filter ratio in alphanumeric op,
+samples will be filtered if their alphabet/numeric ratio is
+below this parameter.</p></li>
+<li><p><strong>max_ratio</strong> – The max filter ratio in alphanumeric op,
+samples will be filtered if their alphabet/numeric ratio
+exceeds this parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/alphanumeric_filter.html#AlphanumericFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
@@ -164,6 +188,26 @@ vars in the sample temporarily.</p></li>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Filter" title="data_juicer.ops.base_op.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p>
 <p>Filter to keep samples with average line length within a specific
 range.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.average_line_length_filter.AverageLineLengthFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9223372036854775807</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/average_line_length_filter.html#AverageLineLengthFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.average_line_length_filter.AverageLineLengthFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_len</strong> – The min filter length in this op, samples will
+be filtered if their average line length is below this
+parameter.</p></li>
+<li><p><strong>max_len</strong> – The max filter length in this op, samples will
+be filtered if their average line length exceeds this
+parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.average_line_length_filter.AverageLineLengthFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/average_line_length_filter.html#AverageLineLengthFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.average_line_length_filter.AverageLineLengthFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
@@ -209,6 +253,27 @@ vars in the sample temporarily.</p></li>
 <p>Filter to keep samples with char-level n-gram repetition ratio within a
 specific range.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rep_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/character_repetition_filter.html#CharacterRepetitionFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rep_len</strong> – Repetition length for char-level n-gram.</p></li>
+<li><p><strong>min_ratio</strong> – The min filter ratio in this op, samples will
+be filtered if their char-level n-gram repetition ratio is
+below this parameter.</p></li>
+<li><p><strong>max_ratio</strong> – The max filter ratio in this op, samples will
+be filtered if their char-level n-gram repetition ratio
+exceeds this parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/character_repetition_filter.html#CharacterRepetitionFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
@@ -252,6 +317,33 @@ vars in the sample temporarily.</p></li>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Filter" title="data_juicer.ops.base_op.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p>
 <p>Filter to keep samples with flagged-word ratio less than a specific max
 value.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.flagged_words_filter.FlaggedWordFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'en'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.045</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flagged_words_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/home/runner/.cache/data_juicer/assets'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_words_aug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words_aug_group_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[2]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words_aug_join_char</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/flagged_words_filter.html#FlaggedWordFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.flagged_words_filter.FlaggedWordFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> – Consider flagged words in what language. If lang ==
+“all”, we will adopt the one merged from all the available
+languages</p></li>
+<li><p><strong>tokenization</strong> – Whether to use model to tokenize documents</p></li>
+<li><p><strong>max_ratio</strong> – The max filter ratio in this op.</p></li>
+<li><p><strong>flagged_words_dir</strong> – The directory storing the
+flagged_words file(s) whose name includes “flagged_words”
+and in json format</p></li>
+<li><p><strong>use_words_aug</strong> – Whether to augment words, especially for
+Chinese and Vietnamese</p></li>
+<li><p><strong>words_aug_group_sizes</strong> – The group size of words to augment</p></li>
+<li><p><strong>words_aug_join_char</strong> – The join char between words to
+augment</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.flagged_words_filter.FlaggedWordFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/flagged_words_filter.html#FlaggedWordFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.flagged_words_filter.FlaggedWordFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
@@ -297,6 +389,23 @@ vars in the sample temporarily.</p></li>
 <p>Filter to keep samples in a specific language with confidence score
 larger than a specific min value.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/language_id_score_filter.html#LanguageIDScoreFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> – Samples in which language to keep.</p></li>
+<li><p><strong>min_score</strong> – The min language identification confidence
+scores of samples to keep.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/language_id_score_filter.html#LanguageIDScoreFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
@@ -340,6 +449,26 @@ vars in the sample temporarily.</p></li>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Filter" title="data_juicer.ops.base_op.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p>
 <p>Filter to keep samples with maximum line length within a specific
 range.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.maximum_line_length_filter.MaximumLineLengthFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9223372036854775807</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/maximum_line_length_filter.html#MaximumLineLengthFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.maximum_line_length_filter.MaximumLineLengthFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_len</strong> – The min filter length in this op, samples will
+be filtered if their maximum line length is below this
+parameter.</p></li>
+<li><p><strong>max_len</strong> – The max filter length in this op, samples will
+be filtered if their maximum line length exceeds this
+parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.maximum_line_length_filter.MaximumLineLengthFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/maximum_line_length_filter.html#MaximumLineLengthFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.maximum_line_length_filter.MaximumLineLengthFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
@@ -385,6 +514,23 @@ vars in the sample temporarily.</p></li>
 <p>Filter to keep samples with perplexity score less than a specific max
 value.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.perplexity_filter.PerplexityFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'en'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ppl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveFloat</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/perplexity_filter.html#PerplexityFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.perplexity_filter.PerplexityFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> – Compute perplexity for samples in which language.</p></li>
+<li><p><strong>max_ppl</strong> – The max filter perplexity in this op, samples
+will be filtered if their perplexity exceeds this parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.perplexity_filter.PerplexityFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/perplexity_filter.html#PerplexityFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.perplexity_filter.PerplexityFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
@@ -428,6 +574,26 @@ vars in the sample temporarily.</p></li>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Filter" title="data_juicer.ops.base_op.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p>
 <p>Filter to keep samples with special-char ratio within a specific
 range.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/special_characters_filter.html#SpecialCharactersFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_ratio</strong> – The min filter ratio in this op, samples will
+be filtered if their special-char ratio is below this
+parameter.</p></li>
+<li><p><strong>max_ratio</strong> – The max filter ratio in this op, samples will
+be filtered if their special-char ratio exceeds this
+parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/special_characters_filter.html#SpecialCharactersFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
@@ -474,6 +640,26 @@ vars in the sample temporarily.</p></li>
 <p>If the specified field information in the sample is not within the
 specified target value, the sample will be filtered.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.specified_field_filter.SpecifiedFieldFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/specified_field_filter.html#SpecifiedFieldFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.specified_field_filter.SpecifiedFieldFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field_key</strong> – Filter based on the specified value
+corresponding to the target key. The target key
+corresponding to multi-level field information need to be
+separated by ‘.’.</p></li>
+<li><p><strong>target_value</strong> – The range of specified field information
+corresponding to the samples that need to be retained.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.specified_field_filter.SpecifiedFieldFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/specified_field_filter.html#SpecifiedFieldFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.specified_field_filter.SpecifiedFieldFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
@@ -518,6 +704,30 @@ vars in the sample temporarily.</p></li>
 <p>Filter based on specified numeric field information.</p>
 <p>If the specified numeric information in the sample is not within the
 specified range, the sample will be filtered.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-9223372036854775807</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9223372036854775807</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/specified_numeric_field_filter.html#SpecifiedNumericFieldFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field_key</strong> – Filter based on the specified numeric value
+corresponding to the target key. The target key
+corresponding to multi-level field information need to be
+separated by ‘.’.</p></li>
+<li><p><strong>min_value</strong> – The min filter value in SpecifiedNumericField
+op, samples will be filtered if their specified numeric
+field value is below this parameter.</p></li>
+<li><p><strong>max_value</strong> – The max filter value in SpecifiedNumericField
+op, samples will be filtered if their specified numeric
+field value exceeds this parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/specified_numeric_field_filter.html#SpecifiedNumericFieldFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
@@ -568,6 +778,32 @@ vars in the sample temporarily.</p></li>
 <p>Filter to keep samples with stopword ratio larger than a specific min
 value.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.stopwords_filter.StopWordsFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'en'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stopwords_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/home/runner/.cache/data_juicer/assets'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_words_aug</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words_aug_group_sizes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[2]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words_aug_join_char</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/stopwords_filter.html#StopWordsFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.stopwords_filter.StopWordsFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> – Consider stopwords in what language. If lang ==
+“all”, we will adopt the one merged from all the available
+languages</p></li>
+<li><p><strong>tokenization</strong> – whether to use model to tokenize documents</p></li>
+<li><p><strong>min_ratio</strong> – The min filter ratio in this op.</p></li>
+<li><p><strong>stopwords_dir</strong> – The directory storing the stopwords
+file(s) whose name includes “stopwords” and in json format</p></li>
+<li><p><strong>use_words_aug</strong> – Whether to augment words, especially for
+Chinese and Vietnamese</p></li>
+<li><p><strong>words_aug_group_sizes</strong> – The group size of words to augment</p></li>
+<li><p><strong>words_aug_join_char</strong> – The join char between words to
+augment</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.stopwords_filter.StopWordsFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/stopwords_filter.html#StopWordsFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.stopwords_filter.StopWordsFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
@@ -610,6 +846,22 @@ vars in the sample temporarily.</p></li>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.filter.suffix_filter.</span></span><span class="sig-name descname"><span class="pre">SuffixFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/suffix_filter.html#SuffixFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.suffix_filter.SuffixFilter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Filter" title="data_juicer.ops.base_op.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p>
 <p>Filter to keep samples with specified suffix.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.suffix_filter.SuffixFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/suffix_filter.html#SuffixFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.suffix_filter.SuffixFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>suffixes</strong> – the suffix of text that will be keep.
+For example: ‘.txt’, ‘txt’ or [‘txt’, ‘.pdf’, ‘docx’]</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.suffix_filter.SuffixFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/suffix_filter.html#SuffixFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.suffix_filter.SuffixFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
@@ -655,6 +907,26 @@ vars in the sample temporarily.</p></li>
 <p>Filter to keep samples with total text length within a specific
 range.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.text_length_filter.TextLengthFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9223372036854775807</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/text_length_filter.html#TextLengthFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.text_length_filter.TextLengthFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_len</strong> – The min text length in the filtering. samples
+will be filtered if their text length is below this
+parameter.</p></li>
+<li><p><strong>max_len</strong> – The max text length in the filtering. samples
+will be filtered if their text length exceeds this
+parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.text_length_filter.TextLengthFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/text_length_filter.html#TextLengthFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.text_length_filter.TextLengthFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
@@ -698,6 +970,27 @@ vars in the sample temporarily.</p></li>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Filter" title="data_juicer.ops.base_op.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p>
 <p>Filter to keep samples with total token number within a specific
 range.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.token_num_filter.TokenNumFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_tokenizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'EleutherAI/pythia-6.9b-deduped'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9223372036854775807</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/token_num_filter.html#TokenNumFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.token_num_filter.TokenNumFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hf_tokenizer</strong> – the tokenizer name of Hugging Face tokenizers.</p></li>
+<li><p><strong>min_num</strong> – The min filter token number in this op, samples
+will be filtered if their token number is below this
+parameter.</p></li>
+<li><p><strong>max_num</strong> – The max filter token number in this op, samples
+will be filtered if their token number exceeds this
+parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.token_num_filter.TokenNumFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/token_num_filter.html#TokenNumFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.token_num_filter.TokenNumFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
@@ -743,6 +1036,28 @@ vars in the sample temporarily.</p></li>
 <p>Filter to keep samples with total words number within a specific
 range.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.word_num_filter.WordNumFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'en'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">9223372036854775807</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/word_num_filter.html#WordNumFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.word_num_filter.WordNumFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> – sample in which language.</p></li>
+<li><p><strong>tokenization</strong> – whether to use model to tokenize documents</p></li>
+<li><p><strong>min_num</strong> – The min filter word number in this op, samples
+will be filtered if their word number is below this
+parameter.</p></li>
+<li><p><strong>max_num</strong> – The max filter word number in this op, samples
+will be filtered if their word number exceeds this
+parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.word_num_filter.WordNumFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/word_num_filter.html#WordNumFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.word_num_filter.WordNumFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
@@ -786,6 +1101,29 @@ vars in the sample temporarily.</p></li>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Filter" title="data_juicer.ops.base_op.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p>
 <p>Filter to keep samples with word-level n-gram repetition ratio within a
 specific range.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'en'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rep_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/word_repetition_filter.html#WordRepetitionFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lang</strong> – sample in which language.</p></li>
+<li><p><strong>tokenization</strong> – whether to use model to tokenize documents</p></li>
+<li><p><strong>rep_len</strong> – Repetition length for word-level n-gram.</p></li>
+<li><p><strong>min_ratio</strong> – The min filter ratio in this op, samples will
+be filtered if their word-level n-gram repetition ratio is
+below this parameter.</p></li>
+<li><p><strong>max_ratio</strong> – The max filter ratio in this op, samples will
+be filtered if their word-level n-gram repetition ratio
+exceeds this parameter.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter.compute_stats">
 <span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/word_repetition_filter.html#WordRepetitionFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter.compute_stats" title="Permalink to this definition">¶</a></dt>

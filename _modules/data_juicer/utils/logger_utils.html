@@ -114,7 +114,7 @@
 <div class="viewcode-block" id="StreamToLoguru"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.logger_utils.StreamToLoguru">[docs]</a><span class="k">class</span> <span class="nc">StreamToLoguru</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Stream object that redirects writes to a logger instance.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">,</span> <span class="n">caller_names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;datasets&#39;</span><span class="p">,</span> <span class="s1">&#39;logging&#39;</span><span class="p">)):</span>
+<div class="viewcode-block" id="StreamToLoguru.__init__"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.logger_utils.StreamToLoguru.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">,</span> <span class="n">caller_names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;datasets&#39;</span><span class="p">,</span> <span class="s1">&#39;logging&#39;</span><span class="p">)):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -124,7 +124,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">=</span> <span class="n">level</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">linebuf</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">caller_names</span> <span class="o">=</span> <span class="n">caller_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caller_names</span> <span class="o">=</span> <span class="n">caller_names</span></div>
 
 <div class="viewcode-block" id="StreamToLoguru.write"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.logger_utils.StreamToLoguru.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
         <span class="n">full_name</span> <span class="o">=</span> <span class="n">get_caller_name</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>

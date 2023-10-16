@@ -86,8 +86,8 @@
 
     <span class="n">dispatch</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">xxhash</span><span class="o">.</span><span class="n">xxh64</span><span class="p">()</span>
+<div class="viewcode-block" id="Hasher.__init__"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.Hasher.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">xxhash</span><span class="o">.</span><span class="n">xxh64</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Hasher.hash_bytes"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.Hasher.hash_bytes">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">hash_bytes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

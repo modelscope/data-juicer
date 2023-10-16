@@ -250,7 +250,7 @@
 <span class="sd">    using compression format algorithms.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compressor_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;zstd&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="CompressManager.__init__"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.compress.CompressManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compressor_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;zstd&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -261,7 +261,7 @@
         <span class="k">assert</span> <span class="n">compressor_format</span> <span class="ow">in</span> <span class="n">Compressor</span><span class="o">.</span><span class="n">compressors</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compressor_format</span> <span class="o">=</span> <span class="n">compressor_format</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compressor</span> <span class="o">=</span> <span class="n">Compressor</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span> <span class="o">=</span> <span class="n">Extractor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extractor</span> <span class="o">=</span> <span class="n">Extractor</span></div>
 
 <div class="viewcode-block" id="CompressManager.compress"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.compress.CompressManager.compress">[docs]</a>    <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -295,7 +295,7 @@
 <span class="sd">    using compression format algorithms.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compressor_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;zstd&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="CacheCompressManager.__init__"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.compress.CacheCompressManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compressor_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;zstd&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -306,7 +306,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">compressor_extension</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">compressor_format</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compress_manager</span> <span class="o">=</span> <span class="n">CompressManager</span><span class="p">(</span>
             <span class="n">compressor_format</span><span class="o">=</span><span class="n">compressor_format</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;_\d</span><span class="si">{5}</span><span class="s1">_of_&#39;</span><span class="p">)</span>  <span class="c1"># noqa W605</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;_\d</span><span class="si">{5}</span><span class="s1">_of_&#39;</span><span class="p">)</span>  <span class="c1"># noqa W605</span></div>
 
     <span class="k">def</span> <span class="nf">_get_raw_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

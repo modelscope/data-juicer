@@ -157,7 +157,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply diversity analysis for each sample and get an overall analysis</span>
 <span class="sd">    result.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">lang_or_model</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="DiversityAnalysis.__init__"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.DiversityAnalysis.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">lang_or_model</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization method :param dataset: the dataset to be analysed</span>
 <span class="sd">        :param output_path: path to store the analysis results :param</span>
 <span class="sd">        lang_or_model: the diversity model or a specific language used to load</span>
@@ -167,7 +167,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">output_path</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lang_or_model</span> <span class="o">=</span> <span class="n">lang_or_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang_or_model</span> <span class="o">=</span> <span class="n">lang_or_model</span></div>
 
 <div class="viewcode-block" id="DiversityAnalysis.compute"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.DiversityAnalysis.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang_or_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

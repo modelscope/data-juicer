@@ -76,7 +76,7 @@
 
 <div class="viewcode-block" id="Mapper"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Mapper">[docs]</a><span class="k">class</span> <span class="nc">Mapper</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Mapper.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Mapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base class that conducts text editing.</span>
 
@@ -90,7 +90,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">)</span>
 
         <span class="c1"># In default, it&#39;s a normal OP instead of batched OP</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="Mapper.process"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Mapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -107,7 +107,7 @@
 
 <div class="viewcode-block" id="Filter"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Filter">[docs]</a><span class="k">class</span> <span class="nc">Filter</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Filter.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Filter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base class that removes specific info.</span>
 
@@ -119,7 +119,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span> <span class="o">=</span> <span class="n">text_key</span>
         <span class="kn">from</span> <span class="nn">data_juicer.core.data</span> <span class="kn">import</span> <span class="n">wrap_func_with_nested_access</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">compute_stats</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_stats</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Filter.compute_stats"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Filter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -145,7 +145,7 @@
 
 <div class="viewcode-block" id="Deduplicator"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator">[docs]</a><span class="k">class</span> <span class="nc">Deduplicator</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Deduplicator.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base class that conducts deduplication.</span>
 
@@ -157,7 +157,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span> <span class="o">=</span> <span class="n">text_key</span>
         <span class="kn">from</span> <span class="nn">data_juicer.core.data</span> <span class="kn">import</span> <span class="n">wrap_func_with_nested_access</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">compute_hash</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_hash</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compute_hash</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_hash</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Deduplicator.compute_hash"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator.compute_hash">[docs]</a>    <span class="k">def</span> <span class="nf">compute_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -182,7 +182,7 @@
 
 <div class="viewcode-block" id="Selector"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Selector">[docs]</a><span class="k">class</span> <span class="nc">Selector</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Selector.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Selector.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base class that conducts selection in dataset-level.</span>
 
@@ -193,7 +193,7 @@
             <span class="n">text_key</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span> <span class="o">=</span> <span class="n">text_key</span>
         <span class="kn">from</span> <span class="nn">data_juicer.core.data</span> <span class="kn">import</span> <span class="n">wrap_func_with_nested_access</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Selector.process"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Selector.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

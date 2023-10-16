@@ -89,7 +89,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with perplexity score less than a specific max</span>
 <span class="sd">    value.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="PerplexityFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.perplexity_filter.PerplexityFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
                  <span class="n">max_ppl</span><span class="p">:</span> <span class="n">PositiveFloat</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
@@ -108,7 +108,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lang</span> <span class="o">=</span> <span class="n">lang</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sp_model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">,</span>
                                           <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;sentencepiece&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">kl_model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;kenlm&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kl_model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;kenlm&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PerplexityFilter.compute_stats"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.perplexity_filter.PerplexityFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>

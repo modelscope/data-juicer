@@ -189,6 +189,21 @@ Rerun the same config will reload the checkpoint and skip ops before it.</p>
 <p>If any args of operator in process list is changed, all ops will be
 rerun from the beginning.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.ckpt_utils.CheckpointManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckpt_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_process_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/ckpt_utils.html#CheckpointManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.ckpt_utils.CheckpointManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ckpt_dir</strong> – path to save and load checkpoint</p></li>
+<li><p><strong>original_process_list</strong> – process list in config</p></li>
+<li><p><strong>num_proc</strong> – number of process workers when saving dataset</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.ckpt_utils.CheckpointManager.check_ckpt">
 <span class="sig-name descname"><span class="pre">check_ckpt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/ckpt_utils.html#CheckpointManager.check_ckpt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.ckpt_utils.CheckpointManager.check_ckpt" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if checkpoint is available.</p>
@@ -283,6 +298,18 @@ the process list from config to decide if a checkpoint is available.</p>
 <p>This class is used to compress or decompress huggingface cache files
 using compression format algorithms.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.compress.CacheCompressManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'zstd'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#CacheCompressManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.CacheCompressManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>compressor_format</strong> – compression format algorithms,
+default <cite>zstd</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.CacheCompressManager.cleanup_cache_files">
 <span class="sig-name descname"><span class="pre">cleanup_cache_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#CacheCompressManager.cleanup_cache_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.CacheCompressManager.cleanup_cache_files" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clean up all compressed cache files in dataset cache directory,
@@ -345,6 +372,18 @@ dataset cache directory.
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class is used to compress or decompress a input file
 using compression format algorithms.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.compress.CompressManager.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compressor_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'zstd'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#CompressManager.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.CompressManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>compressor_format</strong> – compression format algorithms,
+default <cite>zstd</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.CompressManager.compress">
 <span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#CompressManager.compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.CompressManager.compress" title="Permalink to this definition">¶</a></dt>
@@ -677,6 +716,11 @@ path is a relative path.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.fingerprint_utils.</span></span><span class="sig-name descname"><span class="pre">Hasher</span></span><a class="reference internal" href="_modules/data_juicer/utils/fingerprint_utils.html#Hasher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.fingerprint_utils.Hasher" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Hasher that accepts python objets as inputs.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.fingerprint_utils.Hasher.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/fingerprint_utils.html#Hasher.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.fingerprint_utils.Hasher.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.utils.fingerprint_utils.Hasher.dispatch">
 <span class="sig-name descname"><span class="pre">dispatch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#data_juicer.utils.fingerprint_utils.Hasher.dispatch" title="Permalink to this definition">¶</a></dt>
@@ -737,6 +781,21 @@ path is a relative path.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.logger_utils.</span></span><span class="sig-name descname"><span class="pre">StreamToLoguru</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INFO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caller_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('datasets',</span> <span class="pre">'logging')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/logger_utils.html#StreamToLoguru"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.logger_utils.StreamToLoguru" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Stream object that redirects writes to a logger instance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.logger_utils.StreamToLoguru.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INFO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caller_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('datasets',</span> <span class="pre">'logging')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/logger_utils.html#StreamToLoguru.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.logger_utils.StreamToLoguru.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>level</strong> – log level string of loguru. Default value: “INFO”.</p></li>
+<li><p><strong>caller_names</strong> – caller names of redirected module.
+Default value: (apex, pycocotools).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.logger_utils.StreamToLoguru.flush">
 <span class="sig-name descname"><span class="pre">flush</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/logger_utils.html#StreamToLoguru.flush"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.logger_utils.StreamToLoguru.flush" title="Permalink to this definition">¶</a></dt>
@@ -962,6 +1021,17 @@ tokenizer</p></li>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class is used to register some modules to registry by a repo
 name.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.registry.Registry.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/registry.html#Registry.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.registry.Registry.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – a registry repo name</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.registry.Registry.get">
 <span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/registry.html#Registry.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.registry.Registry.get" title="Permalink to this definition">¶</a></dt>

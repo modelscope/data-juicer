@@ -85,7 +85,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with total token number within a specific</span>
 <span class="sd">    range.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="TokenNumFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.token_num_filter.TokenNumFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_tokenizer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;EleutherAI/pythia-6.9b-deduped&#39;</span><span class="p">,</span>
                  <span class="n">min_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
                  <span class="n">max_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
@@ -109,7 +109,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">max_num</span> <span class="o">=</span> <span class="n">max_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hf_tokenizer</span> <span class="o">=</span> <span class="n">hf_tokenizer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
-                                       <span class="n">model_key</span><span class="o">=</span><span class="n">hf_tokenizer</span><span class="p">)</span>
+                                       <span class="n">model_key</span><span class="o">=</span><span class="n">hf_tokenizer</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TokenNumFilter.compute_stats"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.token_num_filter.TokenNumFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>

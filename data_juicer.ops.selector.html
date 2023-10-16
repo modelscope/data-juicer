@@ -107,6 +107,36 @@
 <p>Selector to select samples based on the sorted frequency of specified
 field.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.selector.frequency_specified_field_selector.FrequencySpecifiedFieldSelector.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/selector/frequency_specified_field_selector.html#FrequencySpecifiedFieldSelector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.selector.frequency_specified_field_selector.FrequencySpecifiedFieldSelector.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field_key</strong> – Selector based on the specified value
+corresponding to the target key. The target key
+corresponding to multi-level field information need to be
+separated by ‘.’.</p></li>
+<li><p><strong>top_ratio</strong> – Ratio of selected top specified field value,
+samples will be selected if their specified field values are
+within this parameter. When both topk and top_ratio are set,
+the value corresponding to the smaller number of samples
+will be applied.</p></li>
+<li><p><strong>topk</strong> – Number of selected top specified field value,
+samples will be selected if their specified field values are
+within this parameter. When both topk and top_ratio are set,
+the value corresponding to the smaller number of samples
+will be applied.</p></li>
+<li><p><strong>reverse</strong> – Determine the sorting rule, if reverse=True,
+then sort in descending order.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.selector.frequency_specified_field_selector.FrequencySpecifiedFieldSelector.process">
 <span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/selector/frequency_specified_field_selector.html#FrequencySpecifiedFieldSelector.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.selector.frequency_specified_field_selector.FrequencySpecifiedFieldSelector.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dataset –&gt; dataset.</p>
@@ -131,6 +161,36 @@ field.</p>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Selector" title="data_juicer.ops.base_op.Selector"><code class="xref py py-class docutils literal notranslate"><span class="pre">Selector</span></code></a></p>
 <p>Selector to select top samples based on the sorted specified field
 value.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_ratio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/selector/topk_specified_field_selector.html#TopkSpecifiedFieldSelector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>field_key</strong> – Selector based on the specified value
+corresponding to the target key. The target key
+corresponding to multi-level field information need to be
+separated by ‘.’.</p></li>
+<li><p><strong>top_ratio</strong> – Ratio of selected top samples, samples will be
+selected if their specified field values are within this
+parameter. When both topk and top_ratio are set, the value
+corresponding to the smaller number of samples will be
+applied.</p></li>
+<li><p><strong>topk</strong> – Number of selected top sample, samples will be
+selected if their specified field values are within this
+parameter. When both topk and top_ratio are set, the value
+corresponding to the smaller number of samples will be
+applied.</p></li>
+<li><p><strong>reverse</strong> – Determine the sorting rule, if reverse=True,
+then sort in descending order.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector.process">
 <span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/selector/topk_specified_field_selector.html#TopkSpecifiedFieldSelector.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector.process" title="Permalink to this definition">¶</a></dt>

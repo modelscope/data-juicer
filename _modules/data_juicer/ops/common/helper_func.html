@@ -79,9 +79,9 @@
 
 <div class="viewcode-block" id="UnionFind"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.helper_func.UnionFind">[docs]</a><span class="k">class</span> <span class="nc">UnionFind</span><span class="p">:</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="UnionFind.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.helper_func.UnionFind.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization method.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span></div>
 
 <div class="viewcode-block" id="UnionFind.find"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.helper_func.UnionFind.find">[docs]</a>    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">:</span>

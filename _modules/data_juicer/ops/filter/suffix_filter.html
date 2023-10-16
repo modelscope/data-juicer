@@ -80,7 +80,7 @@
 <span class="k">class</span> <span class="nc">SuffixFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with specified suffix.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="SuffixFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.suffix_filter.SuffixFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">suffixes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -98,7 +98,7 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">suffixes</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">suffixes</span> <span class="o">=</span> <span class="p">[</span><span class="n">suffixes</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">suffixes</span> <span class="o">=</span> <span class="n">suffixes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">suffixes</span> <span class="o">=</span> <span class="n">suffixes</span></div>
 
 <div class="viewcode-block" id="SuffixFilter.compute_stats"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.suffix_filter.SuffixFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">sample</span></div>

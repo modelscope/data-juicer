@@ -81,7 +81,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to normalize unicode punctuations to English punctuations in text</span>
 <span class="sd">    \ samples.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="PunctuationNormalizationMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -124,7 +124,7 @@
             <span class="s1">&#39;】&#39;</span><span class="p">:</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span>
             <span class="s1">&#39;％&#39;</span><span class="p">:</span> <span class="s1">&#39;%&#39;</span><span class="p">,</span>
             <span class="s1">&#39;►&#39;</span><span class="p">:</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span>
-        <span class="p">}</span>
+        <span class="p">}</span></div>
 
 <div class="viewcode-block" id="PunctuationNormalizationMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>

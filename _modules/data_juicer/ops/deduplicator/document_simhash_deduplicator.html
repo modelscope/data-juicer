@@ -135,7 +135,7 @@
 <span class="k">class</span> <span class="nc">DocumentSimhashDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicator to deduplicate samples at document-level using SimHash.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="DocumentSimhashDeduplicator.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">tokenization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;space&#39;</span><span class="p">,</span>
                  <span class="n">window_size</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
                  <span class="n">lowercase</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -181,7 +181,7 @@
 
         <span class="c1"># about deduplication</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_blocks</span> <span class="o">=</span> <span class="n">num_blocks</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hamming_distance</span> <span class="o">=</span> <span class="n">hamming_distance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hamming_distance</span> <span class="o">=</span> <span class="n">hamming_distance</span></div>
 
 <div class="viewcode-block" id="DocumentSimhashDeduplicator.compute_hash"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.compute_hash">[docs]</a>    <span class="k">def</span> <span class="nf">compute_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

@@ -108,6 +108,23 @@
 <p>Deduplicator to deduplicate samples at document-level using exact matching.</p>
 <p>Using md5 hash to deduplicate samples.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lowercase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_non_character</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/document_deduplicator.html#DocumentDeduplicator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lowercase</strong> – Whether to convert sample text to lower case</p></li>
+<li><p><strong>ignore_non_character</strong> – Whether to ignore non-alphabet
+characters, including whitespaces, digits, and punctuations</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator.compute_hash">
 <span class="sig-name descname"><span class="pre">compute_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/document_deduplicator.html#DocumentDeduplicator.compute_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator.compute_hash" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute md5 hash values for the sample.</p>
@@ -151,6 +168,40 @@ open.</p></li>
 <p>Deduplicator to deduplicate samples at document-level using MinHashLSH.</p>
 <p>Different from simhash, minhash is stored as bytes, so they won’t be
 kept in the final dataset.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.document_minhash_deduplicator.DocumentMinhashDeduplicator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'space'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowercase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_permutations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jaccard_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_rows_per_band</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/document_minhash_deduplicator.html#DocumentMinhashDeduplicator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.document_minhash_deduplicator.DocumentMinhashDeduplicator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tokenization</strong> – tokenization method for sample texts. It
+should be one of [space, punctuation, character]. For
+English-like languages, we recommend to use ‘space’. And for
+Chinese-like languages, we recommend to use ‘character’</p></li>
+<li><p><strong>window_size</strong> – window size of shingling</p></li>
+<li><p><strong>lowercase</strong> – whether to convert text to lower case first</p></li>
+<li><p><strong>ignore_pattern</strong> – whether to ignore sub-strings with
+specific pattern when computing minhash</p></li>
+<li><p><strong>num_permutations</strong> – number of permutations in minhash
+computing</p></li>
+<li><p><strong>jaccard_threshold</strong> – the min jaccard similarity threshold
+in near-duplicate detection. When the jaccard similarity of
+two sample texts is &gt;= this threshold, they are regarded as
+similar samples and this op will only keep one of them after
+deduplication</p></li>
+<li><p><strong>num_bands</strong> – number of bands in LSH. Default it’s None, and
+it will be determined by an optimal params computation
+algorithm by minimize the weighted sum of probs of False
+Positives and False Negatives</p></li>
+<li><p><strong>num_rows_per_band</strong> – number of rows in each band in LSH.
+Default it’s None, and it will be determined by an optimal
+params computation algorithm</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.deduplicator.document_minhash_deduplicator.DocumentMinhashDeduplicator.compute_hash">
 <span class="sig-name descname"><span class="pre">compute_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/document_minhash_deduplicator.html#DocumentMinhashDeduplicator.compute_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.document_minhash_deduplicator.DocumentMinhashDeduplicator.compute_hash" title="Permalink to this definition">¶</a></dt>
@@ -229,6 +280,33 @@ bands, and the number of rows per band respectively</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.deduplicator.document_simhash_deduplicator.</span></span><span class="sig-name descname"><span class="pre">DocumentSimhashDeduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'space'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowercase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hamming_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/document_simhash_deduplicator.html#DocumentSimhashDeduplicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator" title="data_juicer.ops.base_op.Deduplicator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Deduplicator</span></code></a></p>
 <p>Deduplicator to deduplicate samples at document-level using SimHash.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenization</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'space'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lowercase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hamming_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/document_simhash_deduplicator.html#DocumentSimhashDeduplicator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method :param tokenization: tokenization method for
+sample texts.</p>
+<p>It should be one of [space, punctuation, character]. For
+English-like languages, we recommend to use ‘space’. And for
+Chinese-like languages, we recommend to use ‘character’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>window_size</strong> – window size of shingling</p></li>
+<li><p><strong>lowercase</strong> – whether to convert text to lower case first</p></li>
+<li><p><strong>ignore_pattern</strong> – whether to ignore sub-strings with
+specific pattern when computing simhash</p></li>
+<li><p><strong>num_blocks</strong> – number of blocks in simhash computing</p></li>
+<li><p><strong>hamming_distance</strong> – the max hamming distance threshold in
+near-duplicate detection. When the hamming distance of two
+sample texts is &lt;= this threshold, they are regarded as
+similar samples and this op will only keep one of them after
+deduplication. This threshold should be always less than
+num_blocks</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.compute_hash">
 <span class="sig-name descname"><span class="pre">compute_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/document_simhash_deduplicator.html#DocumentSimhashDeduplicator.compute_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.compute_hash" title="Permalink to this definition">¶</a></dt>

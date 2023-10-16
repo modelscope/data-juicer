@@ -86,7 +86,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with special-char ratio within a specific</span>
 <span class="sd">    range.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="SpecialCharactersFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">min_ratio</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
                  <span class="n">max_ratio</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
@@ -105,7 +105,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">=</span> <span class="n">min_ratio</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span> <span class="o">=</span> <span class="n">max_ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span> <span class="o">=</span> <span class="n">max_ratio</span></div>
 
 <div class="viewcode-block" id="SpecialCharactersFilter.compute_stats"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>

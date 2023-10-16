@@ -81,7 +81,7 @@
 <span class="k">class</span> <span class="nc">NlpcdaZhMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to simply augment samples in Chinese based on nlpcda library.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="NlpcdaZhMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.nlpcda_zh_mapper.NlpcdaZhMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">sequential</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="n">aug_num</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
                  <span class="n">replace_similar_word</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -185,7 +185,7 @@
                     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
                     <span class="k">else</span> <span class="mi">2</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">EquivalentChar</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span>
+                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">EquivalentChar</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="NlpcdaZhMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.nlpcda_zh_mapper.NlpcdaZhMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="c1"># no augmentation methods are opened</span>

@@ -177,14 +177,14 @@
 
 <div class="viewcode-block" id="FusedFilter"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.FusedFilter">[docs]</a><span class="k">class</span> <span class="nc">FusedFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;A fused operator for filters.&quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fused_filters</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
+<div class="viewcode-block" id="FusedFilter.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.FusedFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fused_filters</span><span class="p">:</span> <span class="n">List</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
 <span class="sd">        :param fused_filers: a list of filters to be fused.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fused_filters</span> <span class="o">=</span> <span class="n">fused_filters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fused_filters</span> <span class="o">=</span> <span class="n">fused_filters</span></div>
 
 <div class="viewcode-block" id="FusedFilter.compute_stats"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.op_fusion.FusedFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="c1"># context for the intermediate vars</span>

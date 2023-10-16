@@ -94,7 +94,7 @@
 <span class="sd">    ops in the config file in order and generate a processed dataset.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Executor.__init__"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.executor.Executor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -149,7 +149,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">op_list_to_trace</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">op_list_to_trace</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Trace for all ops.&#39;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">OPERATORS</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">OPERATORS</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="Executor.run"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.executor.Executor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_data_np</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

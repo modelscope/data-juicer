@@ -92,7 +92,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Selector to select top samples based on the sorted specified field</span>
 <span class="sd">    value.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="TopkSpecifiedFieldSelector.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.selector.html#data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">field_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
                  <span class="n">top_ratio</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">topk</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -125,7 +125,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">field_key</span> <span class="o">=</span> <span class="n">field_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">top_ratio</span> <span class="o">=</span> <span class="n">top_ratio</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">topk</span> <span class="o">=</span> <span class="n">topk</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span> <span class="o">=</span> <span class="n">reverse</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reverse</span> <span class="o">=</span> <span class="n">reverse</span></div>
 
 <div class="viewcode-block" id="TopkSpecifiedFieldSelector.process"><a class="viewcode-back" href="../../../../data_juicer.ops.selector.html#data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_key</span><span class="p">:</span>

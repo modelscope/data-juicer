@@ -90,7 +90,7 @@
 <span class="sd">        2. Advanced functions such as checkpoint, tracer are not supported.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="RayExecutor.__init__"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.ray_executor.RayExecutor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -104,7 +104,7 @@
         <span class="c1"># init ray</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initing Ray ...&#39;</span><span class="p">)</span>
         <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">ray_address</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span></div>
 
 
 <div class="viewcode-block" id="RayExecutor.run"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.ray_executor.RayExecutor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_data_np</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
