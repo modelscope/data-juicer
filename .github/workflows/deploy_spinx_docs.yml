@@ -9,7 +9,8 @@ jobs:
   pages:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@master
+    - name: Checkout
+      uses: actions/checkout@4
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@master
       with:
