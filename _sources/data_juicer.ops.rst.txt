@@ -1,5 +1,5 @@
-d a t a \_ j u i c e r . o p s
-==============================
+data\_juicer.ops
+================
 
 .. toctree::
    :maxdepth: 4
