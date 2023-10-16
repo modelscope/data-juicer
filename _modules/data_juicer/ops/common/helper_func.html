@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.common.helper_func &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.ops.common.helper_func &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -30,7 +30,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -195,37 +195,46 @@
 
 <div class="viewcode-block" id="get_words_from_document"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.helper_func.get_words_from_document">[docs]</a><span class="k">def</span> <span class="nf">get_words_from_document</span><span class="p">(</span><span class="n">document</span><span class="p">,</span>
                             <span class="n">token_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                            <span class="n">lower_case</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                             <span class="n">new_line</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                            <span class="n">tab</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                            <span class="n">strip_chars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                            <span class="n">use_words_aug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                            <span class="n">words_aug_group_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
-                            <span class="n">words_aug_join_char</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+                            <span class="n">tab</span><span class="o">=</span><span class="kc">True</span><span class="p">,):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get words from a document. Non reversible since the document is split on</span>
-<span class="sd">    multiple characters, words are stripped of special characters and</span>
-<span class="sd">    characters are converted to lower case. Useful to compute ratios, like the</span>
+<span class="sd">    Get words from a document. Useful to compute ratios, like the</span>
 <span class="sd">    stopwords ratio.</span>
 
 <span class="sd">    :param document: document that need to split words</span>
 <span class="sd">    :param token_func: function of tokenizer, if specified, the function</span>
 <span class="sd">        will be used for split document into different tokens.</span>
-<span class="sd">    :param lower_case: whether to convert word to lowercase</span>
 <span class="sd">    :param new_line: whether to use `\\\\n&#39; to split words</span>
 <span class="sd">    :param tab: whether to use &#39;\\\\t&#39; to split words</span>
-<span class="sd">    :param strip_chars: chars that need to be stripped in words</span>
-<span class="sd">    :param use_words_aug: whether to use word augmentation</span>
-<span class="sd">    :param words_aug_group_sizes: the size of word groups that need to</span>
-<span class="sd">        be merged</span>
-<span class="sd">    :param words_aug_join_char: characters to be added between word</span>
-<span class="sd">        group</span>
 <span class="sd">    :return: word list obtained from document</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">token_func</span><span class="p">:</span>
         <span class="n">words</span> <span class="o">=</span> <span class="n">token_func</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">words</span> <span class="o">=</span> <span class="n">split_on_whitespace</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">new_line</span><span class="p">,</span> <span class="n">tab</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">words</span></div>
+
+<div class="viewcode-block" id="words_refinement"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.helper_func.words_refinement">[docs]</a><span class="k">def</span> <span class="nf">words_refinement</span><span class="p">(</span><span class="n">words</span><span class="p">,</span>
+                     <span class="n">lower_case</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">strip_chars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">use_words_aug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                     <span class="n">words_aug_group_sizes</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                     <span class="n">words_aug_join_char</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Refine split words. Non reversible since the document is split on</span>
+<span class="sd">    multiple characters, words are stripped of special characters and</span>
+<span class="sd">    characters are converted to lower case.</span>
+
+<span class="sd">    :param words: the word list to be augmented</span>
+<span class="sd">    :param lower_case: whether to convert word to lowercase</span>
+<span class="sd">    :param strip_chars: chars that need to be stripped in words</span>
+<span class="sd">    :param use_words_aug: whether to use word augmentation</span>
+<span class="sd">    :param words_aug_group_sizes: the size of word groups that need to</span>
+<span class="sd">        be merged</span>
+<span class="sd">    :param words_aug_join_char: characters to be added between word</span>
+<span class="sd">        group</span>
+<span class="sd">    :return: refined words or word list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">lower_case</span><span class="p">:</span>
         <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">]</span>
@@ -248,7 +257,7 @@
 
 <span class="sd">    :param document: document that need to split sentences</span>
 <span class="sd">    :param model_func: function of sentence model, if specified, the</span>
-<span class="sd">        function will be used for split document into different</span>
+<span class="sd">        function will be used for spliting document into different</span>
 <span class="sd">        sentences.</span>
 <span class="sd">    :return: document with the sentences separated by &#39;\\\\n&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>

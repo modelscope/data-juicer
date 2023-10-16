@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.filter.specified_numeric_field_filter &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.ops.filter.specified_numeric_field_filter &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -30,7 +30,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -94,7 +94,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">field_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
                  <span class="n">min_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
                  <span class="n">max_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
@@ -102,7 +102,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
-<span class="sd">        :param text_key: Filter based on the specified numeric value</span>
+<span class="sd">        :param field_key: Filter based on the specified numeric value</span>
 <span class="sd">            corresponding to the target key. The target key</span>
 <span class="sd">            corresponding to multi-level field information need to be</span>
 <span class="sd">            separated by &#39;.&#39;.</span>
@@ -116,7 +116,7 @@
 <span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span> <span class="o">=</span> <span class="n">text_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">field_key</span> <span class="o">=</span> <span class="n">field_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_value</span> <span class="o">=</span> <span class="n">min_value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="o">=</span> <span class="n">max_value</span>
 
@@ -124,11 +124,11 @@
         <span class="k">return</span> <span class="n">sample</span></div>
 
 <div class="viewcode-block" id="SpecifiedNumericFieldFilter.process"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_key</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="n">field_value</span> <span class="o">=</span> <span class="n">sample</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">field_key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
             <span class="k">assert</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">field_value</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; not in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">key</span><span class="p">,</span> <span class="n">field_value</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
             <span class="n">field_value</span> <span class="o">=</span> <span class="n">field_value</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>

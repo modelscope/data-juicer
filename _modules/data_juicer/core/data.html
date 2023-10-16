@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.core.data &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.core.data &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -30,7 +30,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -70,12 +70,18 @@
              
   <h1>Source code for data_juicer.core.data</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetDict</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetDict</span><span class="p">,</span> <span class="n">is_caching_enabled</span>
 <span class="kn">from</span> <span class="nn">datasets.formatting.formatting</span> <span class="kn">import</span> <span class="n">LazyBatch</span>
 <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils</span> <span class="kn">import</span> <span class="n">cache_utils</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.compress</span> <span class="kn">import</span> <span class="p">(</span><span class="n">cleanup_compressed_cache_files</span><span class="p">,</span>
+                                        <span class="n">compress</span><span class="p">,</span> <span class="n">decompress</span><span class="p">,</span> <span class="n">CompressionOff</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.fingerprint_utils</span> <span class="kn">import</span> <span class="n">generate_fingerprint</span>
 
 
 <div class="viewcode-block" id="wrap_func_with_nested_access"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.wrap_func_with_nested_access">[docs]</a><span class="k">def</span> <span class="nf">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
@@ -101,11 +107,11 @@
         <span class="c1"># to ensure the args passing to the final calling of f can be nested,</span>
         <span class="c1"># in case of deeper-order wrapper funcs de-wrap this nesting behavior</span>
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">else</span> <span class="n">arg</span>
+            <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">else</span> <span class="n">arg</span>
             <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span>
         <span class="p">]</span>
         <span class="n">kargs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">else</span> <span class="n">arg</span><span class="p">)</span>
+            <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">else</span> <span class="n">arg</span><span class="p">)</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">kargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
@@ -158,7 +164,7 @@
 <div class="viewcode-block" id="NestedDatasetDict"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDatasetDict">[docs]</a><span class="k">class</span> <span class="nc">NestedDatasetDict</span><span class="p">(</span><span class="n">DatasetDict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced HuggingFace-DatasetDict for better usability and efficiency.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Dataset</span><span class="p">):</span>
             <span class="c1"># init from another DatasetDict instance</span>
             <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
@@ -172,7 +178,7 @@
 <div class="viewcode-block" id="NestedDatasetDict.map"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDatasetDict.map">[docs]</a>    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the map func, which is called by most common operations,</span>
 <span class="sd">        such that the processed samples can be accessed by nested manner.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;function&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">])</span>
@@ -190,6 +196,8 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># init from scratch</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">is_caching_enabled</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -211,14 +219,102 @@
                 <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">called_func</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;function&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span>
+                    <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">])</span>
+            <span class="n">called_func</span> <span class="o">=</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span>
+
+        <span class="c1"># For wrapped function, try to get its original unwrapped method</span>
+        <span class="k">while</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">called_func</span><span class="p">,</span> <span class="s1">&#39;__wrapped__&#39;</span><span class="p">):</span>
+            <span class="n">called_func</span> <span class="o">=</span> <span class="n">called_func</span><span class="o">.</span><span class="n">__wrapped__</span>
+        <span class="c1"># Does the called function belong to a batched OP?</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">called_func</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="s1">&#39;is_batched_op&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span> <span class="s1">&#39;is_batched_op&#39;</span><span class="p">))</span> \
+                <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
+            <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batched&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="s1">&#39;new_fingerprint&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_fingerprint</span> <span class="o">=</span> <span class="n">generate_fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+            <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_fingerprint</span>
+
+        <span class="k">if</span> <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span><span class="p">:</span>
+            <span class="n">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">],</span>
+                       <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">new_ds</span> <span class="o">=</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span><span class="p">:</span>
+            <span class="n">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">new_ds</span><span class="p">,</span>
+                     <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span><span class="p">:</span>
+            <span class="n">new_ds</span><span class="o">.</span><span class="n">cleanup_cache_files</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">new_ds</span></div>
+
+<div class="viewcode-block" id="NestedDataset.filter"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the filter func, which is called by most common operations,</span>
+<span class="sd">        such that the processed samples can be accessed by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="c1"># the first positional para is function</span>
+            <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;function&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span>
                     <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">])</span>
 
-        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+        <span class="k">if</span> <span class="s1">&#39;new_fingerprint&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_fingerprint</span> <span class="o">=</span> <span class="n">generate_fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+            <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_fingerprint</span>
+
+        <span class="c1"># For filter, it involves a map and a filter operations, so the final</span>
+        <span class="c1"># cache files includes two sets with different fingerprint (before and</span>
+        <span class="c1"># after). So we need to decompress these two sets of compressed cache</span>
+        <span class="c1"># files</span>
+        <span class="k">if</span> <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span><span class="p">:</span>
+            <span class="n">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="p">[</span><span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fingerprint</span><span class="p">],</span>
+                       <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Turn off the compression due to it invokes map actually in the filter</span>
+        <span class="c1"># function. For cache file changes, map: A -&gt; B, filter: A -&gt; A, B. If</span>
+        <span class="c1"># we compress the caches of map, ops after filter cannot find the cache</span>
+        <span class="c1"># files A. So we turn off the inner cache compression for filter.</span>
+        <span class="c1"># Same for cleaning up cache files.</span>
+        <span class="k">with</span> <span class="n">CompressionOff</span><span class="p">():</span>
+            <span class="n">prev_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">new_ds</span> <span class="o">=</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span> <span class="o">=</span> <span class="n">prev_state</span>
+
+        <span class="k">if</span> <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span><span class="p">:</span>
+            <span class="n">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">new_ds</span><span class="p">,</span>
+                     <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span><span class="p">:</span>
+            <span class="n">new_ds</span><span class="o">.</span><span class="n">cleanup_cache_files</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">new_ds</span></div>
+
+<div class="viewcode-block" id="NestedDataset.select"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.select">[docs]</a>    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the select func, such that selected samples can be accessed</span>
+<span class="sd">        by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="NestedDataset.from_dict"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
@@ -227,10 +323,26 @@
 <span class="sd">        NestedDataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="NestedDataset.select"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.select">[docs]</a>    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the select fun, such that selected samples can be accessed</span>
-<span class="sd">        by  nested manner.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div></div>
+<div class="viewcode-block" id="NestedDataset.add_column"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.add_column">[docs]</a>    <span class="k">def</span> <span class="nf">add_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the add column func, such that the processed samples</span>
+<span class="sd">        can be accessed by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NestedDataset.select_columns"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.select_columns">[docs]</a>    <span class="k">def</span> <span class="nf">select_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the select columns func, such that the processed samples</span>
+<span class="sd">        can be accessed by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NestedDataset.remove_columns"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.remove_columns">[docs]</a>    <span class="k">def</span> <span class="nf">remove_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the remove columns func, such that the processed samples</span>
+<span class="sd">        can be accessed by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NestedDataset.cleanup_cache_files"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.cleanup_cache_files">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup_cache_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the cleanup_cache_files func, clear raw and compressed</span>
+<span class="sd">        cache files.&quot;&quot;&quot;</span>
+        <span class="n">cleanup_compressed_cache_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">cleanup_cache_files</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="nested_query"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.nested_query">[docs]</a><span class="k">def</span> <span class="nf">nested_query</span><span class="p">(</span><span class="n">root_obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NestedDatasetDict</span><span class="p">,</span> <span class="n">NestedDataset</span><span class="p">,</span>

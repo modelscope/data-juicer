@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.utils.logger_utils &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.utils.logger_utils &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -30,7 +30,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -163,7 +163,7 @@
             <span class="k">return</span> <span class="n">handler</span><span class="o">.</span><span class="n">_sink</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">name</span></div>
 
 
-<div class="viewcode-block" id="setup_logger"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.logger_utils.setup_logger">[docs]</a><span class="k">def</span> <span class="nf">setup_logger</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">distributed_rank</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;log.txt&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="setup_logger"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.logger_utils.setup_logger">[docs]</a><span class="k">def</span> <span class="nf">setup_logger</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">distributed_rank</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s1">&#39;log.txt&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">redirect</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Setup logger for training and testing.</span>
 
@@ -171,6 +171,7 @@
 <span class="sd">    :param distributed_rank: device rank when multi-gpu environment</span>
 <span class="sd">    :param filename: log file name to save</span>
 <span class="sd">    :param mode: log file write mode, `append` or `override`. default is `o`.</span>
+<span class="sd">    :param redirect: whether to redirect system output</span>
 <span class="sd">    :return: logger instance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">global</span> <span class="n">LOGGER_SETUP</span>
@@ -199,8 +200,27 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">save_file</span><span class="p">)</span>
 
     <span class="c1"># redirect stdout/stderr to loguru</span>
-    <span class="n">redirect_sys_output</span><span class="p">(</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">redirect</span><span class="p">:</span>
+        <span class="n">redirect_sys_output</span><span class="p">(</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span>
     <span class="n">LOGGER_SETUP</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="HiddenPrints"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.logger_utils.HiddenPrints">[docs]</a><span class="k">class</span> <span class="nc">HiddenPrints</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a range that hide the outputs within this range.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store the original standard output and redirect the standard output to</span>
+<span class="sd">        null when entering this range.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Close the redirected standard output and restore it when exiting from</span>
+<span class="sd">        this range.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_stdout</span></div>
 </pre></div>
 
            </div>

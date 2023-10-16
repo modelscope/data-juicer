@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.utils.model_utils &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.utils.model_utils &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -30,7 +30,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -236,8 +236,43 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading tokenizer from HuggingFace...&#39;</span><span class="p">)</span>
-    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">tokenizer_name</span><span class="p">)</span>
+    <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">tokenizer_name</span><span class="p">,</span>
+                                              <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">tokenizer</span></div>
+
+<div class="viewcode-block" id="prepare_diversity_model"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_diversity_model">[docs]</a><span class="k">def</span> <span class="nf">prepare_diversity_model</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">lang</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Prepare diversity model for specific language.</span>
+
+<span class="sd">    :param model_name: the model name to be loaded.</span>
+<span class="sd">    :param lang: language of diversity model. Should be one of [&quot;zh&quot;,</span>
+<span class="sd">        &quot;en&quot;]</span>
+<span class="sd">    :return: corresponding diversity model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">spacy</span>
+    <span class="k">assert</span> <span class="n">lang</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;zh&#39;</span><span class="p">,</span> <span class="s1">&#39;en&#39;</span><span class="p">],</span> <span class="s1">&#39;Diversity only support zh and en&#39;</span>
+    <span class="n">model_name</span> <span class="o">=</span> <span class="n">model_name</span> <span class="o">%</span> <span class="n">lang</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Loading spacy model [</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s1">]...&#39;</span><span class="p">)</span>
+    <span class="n">compressed_model</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.zip&#39;</span> <span class="o">%</span> <span class="n">model_name</span>
+
+    <span class="c1"># decompress the compressed model if it&#39;s not decompressed</span>
+    <span class="k">def</span> <span class="nf">decompress_model</span><span class="p">(</span><span class="n">compressed_model_path</span><span class="p">):</span>
+        <span class="n">decompressed_model_path</span> <span class="o">=</span> <span class="n">compressed_model_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">decompressed_model_path</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">decompressed_model_path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">decompressed_model_path</span>
+        <span class="kn">import</span> <span class="nn">zipfile</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">compressed_model_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">zf</span><span class="p">:</span>
+            <span class="n">zf</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">MODEL_PATH</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">decompressed_model_path</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">diversity_model</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">decompress_model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">compressed_model</span><span class="p">)))</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+        <span class="n">diversity_model</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="n">decompress_model</span><span class="p">(</span><span class="n">check_model</span><span class="p">(</span><span class="n">compressed_model</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">diversity_model</span></div>
 
 
 <div class="viewcode-block" id="prepare_model"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.prepare_model">[docs]</a><span class="k">def</span> <span class="nf">prepare_model</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;sentencepiece&#39;</span><span class="p">,</span> <span class="n">model_key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -256,7 +291,8 @@
         <span class="s1">&#39;sentencepiece&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.sp.model&#39;</span><span class="p">,</span> <span class="n">prepare_sentencepiece_model</span><span class="p">),</span>
         <span class="s1">&#39;kenlm&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.arpa.bin&#39;</span><span class="p">,</span> <span class="n">prepare_kenlm_model</span><span class="p">),</span>
         <span class="s1">&#39;nltk&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;punkt.</span><span class="si">%s</span><span class="s1">.pickle&#39;</span><span class="p">,</span> <span class="n">prepare_nltk_model</span><span class="p">),</span>
-        <span class="s1">&#39;huggingface&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">prepare_huggingface_tokenizer</span><span class="p">)</span>
+        <span class="s1">&#39;huggingface&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">prepare_huggingface_tokenizer</span><span class="p">),</span>
+        <span class="s1">&#39;spacy&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_core_web_md-3.5.0&#39;</span><span class="p">,</span> <span class="n">prepare_diversity_model</span><span class="p">),</span>
     <span class="p">}</span>
     <span class="k">assert</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="n">type_to_name</span><span class="o">.</span><span class="n">keys</span><span class="p">(</span>
     <span class="p">),</span> <span class="s1">&#39;model_type must be one of the following: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -273,6 +309,17 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">MODEL_ZOO</span><span class="p">[</span><span class="n">model_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_func</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">lang</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">model_key</span></div>
+
+
+<div class="viewcode-block" id="get_model"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.model_utils.get_model">[docs]</a><span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;sentencepiece&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a model or a tokenizer from MODEL_ZOO.</span>
+
+<span class="sd">    :param model_key: name of the model or tokenzier</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MODEL_ZOO</span><span class="p">:</span>
+        <span class="n">prepare_model</span><span class="p">(</span><span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="n">model_type</span><span class="p">,</span> <span class="n">model_key</span><span class="o">=</span><span class="n">model_key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">MODEL_ZOO</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

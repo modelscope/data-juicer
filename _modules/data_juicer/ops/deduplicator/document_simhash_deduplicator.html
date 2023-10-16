@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.deduplicator.document_simhash_deduplicator &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.ops.deduplicator.document_simhash_deduplicator &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -30,7 +30,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -81,6 +81,8 @@
 <span class="kn">import</span> <span class="nn">simhash</span>
 <span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
 <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">HashKeys</span>
 
 <span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Deduplicator</span>
 <span class="kn">from</span> <span class="nn">..common.helper_func</span> <span class="kn">import</span> <span class="n">split_on_whitespace</span>
@@ -189,7 +191,7 @@
 <span class="sd">        :return: sample with simhash value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># check if it&#39;s computed already</span>
-        <span class="k">if</span> <span class="s1">&#39;simhash&#39;</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="n">text</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
@@ -223,7 +225,7 @@
                 <span class="sa">f</span><span class="s1">&#39;Unimplemented tokenization method [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
 
         <span class="c1"># compute simhash</span>
-        <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;simhash&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span>
             <span class="n">simhash</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">simhash</span><span class="o">.</span><span class="n">unsigned_hash</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">sample</span></div>
 
@@ -243,7 +245,7 @@
         <span class="c1"># find matches</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Start querying </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">simhash</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span>
-            <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;simhash&#39;</span><span class="p">],</span>
+            <span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">],</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_blocks</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hamming_distance</span><span class="p">,</span>
         <span class="p">)</span>
@@ -259,12 +261,12 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Hash diff distribution: </span><span class="si">{</span><span class="n">dist</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
         <span class="n">hash2ids</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
-        <span class="n">hashes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;simhash&#39;</span><span class="p">])</span>
+        <span class="n">hashes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">])</span>
         <span class="n">hash2cluster</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">cluster_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">hash_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;simhash&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">hash_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]):</span>
             <span class="n">hash2ids</span><span class="p">[</span><span class="n">hash_val</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sid</span><span class="p">))</span>
 
         <span class="c1"># clustering</span>
@@ -277,7 +279,6 @@
             <span class="c1"># if this hash value is not in the matches list, it&#39;s regarded as a</span>
             <span class="c1"># single cluster</span>
             <span class="k">if</span> <span class="n">hash_val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">graph</span><span class="p">:</span>
-                <span class="n">hash2cluster</span><span class="p">[</span><span class="n">hash_val</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
                 <span class="k">continue</span>
 
             <span class="c1"># Otherwise, BFS to find the cluster</span>
@@ -304,9 +305,8 @@
         <span class="c1"># there are some better strategies later.</span>
         <span class="k">def</span> <span class="nf">_filter_simhash_dup_helper</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">visited_clusters</span><span class="p">,</span>
                                        <span class="n">visited_hashes</span><span class="p">):</span>
-            <span class="n">sample_hash_val</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;simhash&#39;</span><span class="p">]</span>
-            <span class="n">cluster_num</span> <span class="o">=</span> <span class="n">hash2cluster</span><span class="p">[</span><span class="n">sample_hash_val</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">cluster_num</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">sample_hash_val</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">sample_hash_val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hash2cluster</span><span class="p">:</span>
                 <span class="c1"># single-sample cluster, we need to check hash value still.</span>
                 <span class="k">if</span> <span class="n">sample_hash_val</span> <span class="ow">in</span> <span class="n">visited_hashes</span><span class="p">:</span>
                     <span class="k">return</span> <span class="kc">False</span>
@@ -314,6 +314,7 @@
                     <span class="n">visited_hashes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sample_hash_val</span><span class="p">)</span>
                     <span class="k">return</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
+                <span class="n">cluster_num</span> <span class="o">=</span> <span class="n">hash2cluster</span><span class="p">[</span><span class="n">sample_hash_val</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">show_num</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">cluster_num</span> <span class="ow">in</span> <span class="n">dup_pairs</span> \
                         <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">[</span><span class="n">cluster_num</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="n">dup_pairs</span><span class="p">[</span><span class="n">cluster_num</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>

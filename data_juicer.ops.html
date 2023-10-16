@@ -4,16 +4,16 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops package &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.ops package &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -33,7 +33,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -112,6 +112,7 @@
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.split_on_whitespace"><code class="docutils literal notranslate"><span class="pre">split_on_whitespace()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.strip"><code class="docutils literal notranslate"><span class="pre">strip()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.words_augmentation"><code class="docutils literal notranslate"><span class="pre">words_augmentation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.words_refinement"><code class="docutils literal notranslate"><span class="pre">words_refinement()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html#module-data_juicer.ops.common.special_characters">data_juicer.ops.common.special_characters module</a></li>
@@ -145,7 +146,6 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.local_num_differing_bits"><code class="docutils literal notranslate"><span class="pre">local_num_differing_bits()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.num_differing_bits"><code class="docutils literal notranslate"><span class="pre">num_differing_bits()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.num_differing_bits_selector"><code class="docutils literal notranslate"><span class="pre">num_differing_bits_selector()</span></code></a></li>
 </ul>
 </li>
@@ -476,12 +476,16 @@ open.</p></li>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>sample</strong> – input sample</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample</strong> – input sample.</p></li>
+<li><p><strong>context</strong> – whether to store context information of intermediate
+vars in the sample temporarily.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>sample with computed stats</p>
@@ -510,9 +514,14 @@ whether to filter this sample.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper.is_batched_op">
+<span class="sig-name descname"><span class="pre">is_batched_op</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper.is_batched_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper.is_batched_op" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper.process">
 <span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper.process" title="Permalink to this definition">¶</a></dt>
-<dd><p>For sample level, sample –&gt; sample or sample –&gt; [samples, …]</p>
+<dd><p>For sample level, sample –&gt; sample</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>sample</strong> – sample to process</p>
@@ -550,15 +559,15 @@ whether to filter this sample.</p>
 <span id="data-juicer-ops-load-module"></span><h2>data_juicer.ops.load module<a class="headerlink" href="#module-data_juicer.ops.load" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.ops.load.load_ops">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.load.</span></span><span class="sig-name descname"><span class="pre">load_ops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'text'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/load.html#load_ops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.load.load_ops" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.load.</span></span><span class="sig-name descname"><span class="pre">load_ops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_fusion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/load.html#load_ops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.load.load_ops" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load op list according to the process list from config file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>process_list</strong> – A process list. Each item is an op name and its
 arguments.</p></li>
-<li><p><strong>text_key</strong> – the key name of field that stores sample texts to
-be processed</p></li>
+<li><p><strong>op_fusion</strong> – whether to fuse ops that share the same intermediate
+variables.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

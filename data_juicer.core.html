@@ -4,16 +4,16 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.core package &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.core package &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -33,7 +33,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -135,6 +135,27 @@ dataset better.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
 <p>Enhanced HuggingFace-Dataset for better usability and efficiency.</p>
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.NestedDataset.add_column">
+<span class="sig-name descname"><span class="pre">add_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#NestedDataset.add_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDataset.add_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override the add column func, such that the processed samples
+can be accessed by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.NestedDataset.cleanup_cache_files">
+<span class="sig-name descname"><span class="pre">cleanup_cache_files</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#NestedDataset.cleanup_cache_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDataset.cleanup_cache_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override the cleanup_cache_files func, clear raw and compressed
+cache files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.NestedDataset.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#NestedDataset.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDataset.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override the filter func, which is called by most common operations,
+such that the processed samples can be accessed by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.data.NestedDataset.from_dict">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#NestedDataset.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDataset.from_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Override the from_dict func, which is called by most from_xx
@@ -150,17 +171,31 @@ such that the processed samples can be accessed by nested manner.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.NestedDataset.remove_columns">
+<span class="sig-name descname"><span class="pre">remove_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#NestedDataset.remove_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDataset.remove_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override the remove columns func, such that the processed samples
+can be accessed by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.data.NestedDataset.select">
 <span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#NestedDataset.select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDataset.select" title="Permalink to this definition">¶</a></dt>
-<dd><p>Override the select fun, such that selected samples can be accessed
-by  nested manner.</p>
+<dd><p>Override the select func, such that selected samples can be accessed
+by nested manner.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.data.NestedDataset.select_columns">
+<span class="sig-name descname"><span class="pre">select_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#NestedDataset.select_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDataset.select_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override the select columns func, such that the processed samples
+can be accessed by nested manner.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.core.data.NestedDatasetDict">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.</span></span><span class="sig-name descname"><span class="pre">NestedDatasetDict</span></span><a class="reference internal" href="_modules/data_juicer/core/data.html#NestedDatasetDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDatasetDict" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.</span></span><span class="sig-name descname"><span class="pre">NestedDatasetDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#NestedDatasetDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.NestedDatasetDict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetDict</span></code></p>
 <p>Enhanced HuggingFace-DatasetDict for better usability and efficiency.</p>
 <dl class="py method">
@@ -258,7 +293,7 @@ ops in the config file in order and generate a processed dataset.</p>
 <span id="data-juicer-core-exporter-module"></span><h2>data_juicer.core.exporter module<a class="headerlink" href="#module-data_juicer.core.exporter" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.exporter.</span></span><span class="sig-name descname"><span class="pre">Exporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.exporter.</span></span><span class="sig-name descname"><span class="pre">Exporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_in_parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The Exporter class is used to export a dataset to files of specific
 format.</p>
@@ -298,13 +333,14 @@ format.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter.to_jsonl">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_jsonl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter.to_jsonl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter.to_jsonl" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_jsonl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter.to_jsonl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter.to_jsonl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Export method for json/jsonl target files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dataset</strong> – the dataset to export.</p></li>
 <li><p><strong>export_path</strong> – the path to store the exported dataset.</p></li>
+<li><p><strong>num_proc</strong> – the number of processes used to export the dataset.</p></li>
 <li><p><strong>kwargs</strong> – extra arguments.</p></li>
 </ul>
 </dd>
@@ -344,6 +380,26 @@ format.</p>
 <p>The tracer to trace the sample changes before and after an operator
 process.</p>
 <p>The comparison results will be stored in the work directory.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.tracer.Tracer.trace_batch_mapper">
+<span class="sig-name descname"><span class="pre">trace_batch_mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed_ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/tracer.html#Tracer.trace_batch_mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.tracer.Tracer.trace_batch_mapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compare datasets before and after a BatchMapper.</p>
+<p>This will mainly show the new samples augmented by the BatchMapper</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>op_name</strong> – the op name of mapper</p></li>
+<li><p><strong>previous_ds</strong> – dataset before the mapper process</p></li>
+<li><p><strong>processed_ds</strong> – dataset processed by the mapper</p></li>
+<li><p><strong>text_key</strong> – which text_key to trace</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.tracer.Tracer.trace_deduplicator">
 <span class="sig-name descname"><span class="pre">trace_deduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dup_pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/tracer.html#Tracer.trace_deduplicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.tracer.Tracer.trace_deduplicator" title="Permalink to this definition">¶</a></dt>
@@ -388,7 +444,7 @@ deduplicator</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.tracer.Tracer.trace_mapper">
-<span class="sig-name descname"><span class="pre">trace_mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed_ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/tracer.html#Tracer.trace_mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.tracer.Tracer.trace_mapper" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">trace_mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previous_ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed_ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/tracer.html#Tracer.trace_mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.tracer.Tracer.trace_mapper" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compare datasets before and after a Mapper.</p>
 <p>This will mainly show the different sample pairs due to the
 modification by the Mapper</p>
@@ -398,6 +454,7 @@ modification by the Mapper</p>
 <li><p><strong>op_name</strong> – the op name of mapper</p></li>
 <li><p><strong>previous_ds</strong> – dataset before the mapper process</p></li>
 <li><p><strong>processed_ds</strong> – dataset processed by the mapper</p></li>
+<li><p><strong>text_key</strong> – which text_key to trace</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

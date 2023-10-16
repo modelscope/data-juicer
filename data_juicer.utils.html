@@ -4,16 +4,16 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.utils package &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.utils package &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -32,7 +32,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -130,8 +130,8 @@ names, and the values are lists of words</p>
 <dt class="sig sig-object py" id="data_juicer.utils.ckpt_utils.CheckpointManager">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.ckpt_utils.</span></span><span class="sig-name descname"><span class="pre">CheckpointManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckpt_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_process_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/ckpt_utils.html#CheckpointManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.ckpt_utils.CheckpointManager" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This class is used to save the latest version of dataset to checkpint
-directory or load it from checkpint directory, a bit like cache management
+<p>This class is used to save the latest version of dataset to checkpoint
+directory or load it from checkpoint directory, a bit like cache management
 Rerun the same config will reload the checkpoint and skip ops before it.</p>
 <p>If any args of operator in process list is changed, all ops will be
 rerun from the beginning.</p>
@@ -245,6 +245,13 @@ path is a relative path.</p>
 <section id="module-data_juicer.utils.logger_utils">
 <span id="data-juicer-utils-logger-utils-module"></span><h2>data_juicer.utils.logger_utils module<a class="headerlink" href="#module-data_juicer.utils.logger_utils" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.utils.logger_utils.HiddenPrints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.logger_utils.</span></span><span class="sig-name descname"><span class="pre">HiddenPrints</span></span><a class="reference internal" href="_modules/data_juicer/utils/logger_utils.html#HiddenPrints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.logger_utils.HiddenPrints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Define a range that hide the outputs within this range.</p>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.utils.logger_utils.StreamToLoguru">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.logger_utils.</span></span><span class="sig-name descname"><span class="pre">StreamToLoguru</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'INFO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caller_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('datasets',</span> <span class="pre">'logging')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/logger_utils.html#StreamToLoguru"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.logger_utils.StreamToLoguru" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
@@ -299,7 +306,7 @@ path is a relative path.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.logger_utils.setup_logger">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.logger_utils.</span></span><span class="sig-name descname"><span class="pre">setup_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distributed_rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'o'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/logger_utils.html#setup_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.logger_utils.setup_logger" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.logger_utils.</span></span><span class="sig-name descname"><span class="pre">setup_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distributed_rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'log.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'o'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redirect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/logger_utils.html#setup_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.logger_utils.setup_logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>Setup logger for training and testing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -308,6 +315,7 @@ path is a relative path.</p>
 <li><p><strong>distributed_rank</strong> – device rank when multi-gpu environment</p></li>
 <li><p><strong>filename</strong> – log file name to save</p></li>
 <li><p><strong>mode</strong> – log file write mode, <cite>append</cite> or <cite>override</cite>. default is <cite>o</cite>.</p></li>
+<li><p><strong>redirect</strong> – whether to redirect system output</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -333,6 +341,35 @@ Else, download it from cached models links.</p>
 the model file maybe incomplete for some reason, so need to
 download again forcefully.</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.get_model">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">get_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sentencepiece'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#get_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.get_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a model or a tokenizer from MODEL_ZOO.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model_key</strong> – name of the model or tokenzier</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_diversity_model">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_diversity_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_diversity_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_diversity_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare diversity model for specific language.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> – the model name to be loaded.</p></li>
+<li><p><strong>lang</strong> – language of diversity model. Should be one of [“zh”,
+“en”]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>corresponding diversity model</p>
 </dd>
 </dl>
 </dd></dl>

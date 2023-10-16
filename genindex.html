@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; data_juicer 0.1.0 documentation</title>
+  <title>Index &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -30,7 +30,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -78,6 +78,7 @@
  | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#J"><strong>J</strong></a>
  | <a href="#K"><strong>K</strong></a>
@@ -96,6 +97,8 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDataset.add_column">add_column() (data_juicer.core.data.NestedDataset method)</a>
+</li>
       <li><a href="data_juicer.format.html#data_juicer.format.formatter.add_suffixes">add_suffixes() (in module data_juicer.format.formatter)</a>
 </li>
       <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter">AlphanumericFilter (class in data_juicer.ops.filter.alphanumeric_filter)</a>
@@ -148,6 +151,8 @@
 </li>
       <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_links_mapper.CleanLinksMapper">CleanLinksMapper (class in data_juicer.ops.mapper.clean_links_mapper)</a>
 </li>
+      <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDataset.cleanup_cache_files">cleanup_cache_files() (data_juicer.core.data.NestedDataset method)</a>
+</li>
       <li><a href="data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis">ColumnWiseAnalysis (class in data_juicer.analysis.column_wise_analysis)</a>
 </li>
       <li><a href="data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.DiversityAnalysis.compute">compute() (data_juicer.analysis.diversity_analysis.DiversityAnalysis method)</a>
@@ -198,6 +203,8 @@
         <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter.compute_stats">(data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter method)</a>
 </li>
       </ul></li>
+      <li><a href="data_juicer.config.html#data_juicer.config.config.config_backup">config_backup() (in module data_juicer.config.config)</a>
+</li>
       <li><a href="data_juicer.format.html#data_juicer.format.csv_formatter.CsvFormatter">CsvFormatter (class in data_juicer.format.csv_formatter)</a>
 </li>
   </ul></td>
@@ -486,8 +493,6 @@
         <li><a href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.special_characters_filter">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     data_juicer.ops.filter.specified_field_filter
 
@@ -495,6 +500,8 @@
         <li><a href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.specified_field_filter">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     data_juicer.ops.filter.specified_numeric_field_filter
 
@@ -749,6 +756,8 @@
       </ul></li>
       <li><a href="data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator">Deduplicator (class in data_juicer.ops.base_op)</a>
 </li>
+      <li><a href="data_juicer.config.html#data_juicer.config.config.display_config">display_config() (in module data_juicer.config.config)</a>
+</li>
       <li><a href="data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.DiversityAnalysis">DiversityAnalysis (class in data_juicer.analysis.diversity_analysis)</a>
 </li>
       <li><a href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator">DocumentDeduplicator (class in data_juicer.ops.deduplicator.document_deduplicator)</a>
@@ -789,16 +798,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_juicer.ops.html#data_juicer.ops.base_op.Filter">Filter (class in data_juicer.ops.base_op)</a>
 </li>
+      <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDataset.filter">filter() (data_juicer.core.data.NestedDataset method)</a>
+</li>
       <li><a href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.UnionFind.find">find() (data_juicer.ops.common.helper_func.UnionFind method)</a>
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.file_utils.find_files_with_suffix">find_files_with_suffix() (in module data_juicer.utils.file_utils)</a>
 </li>
       <li><a href="data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj">find_root_verb_and_its_dobj() (in module data_juicer.analysis.diversity_analysis)</a>
 </li>
-      <li><a href="data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj_in_string">find_root_verb_and_its_dobj_in_string() (in module data_juicer.analysis.diversity_analysis)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj_in_string">find_root_verb_and_its_dobj_in_string() (in module data_juicer.analysis.diversity_analysis)</a>
+</li>
       <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.fix_unicode_mapper.FixUnicodeMapper">FixUnicodeMapper (class in data_juicer.ops.mapper.fix_unicode_mapper)</a>
 </li>
       <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.flagged_words_filter.FlaggedWordFilter">FlaggedWordFilter (class in data_juicer.ops.filter.flagged_words_filter)</a>
@@ -823,9 +834,11 @@
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.get_left_process_list">get_left_process_list() (data_juicer.utils.ckpt_utils.CheckpointManager method)</a>
 </li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.logger_utils.get_log_file_path">get_log_file_path() (in module data_juicer.utils.logger_utils)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_juicer.utils.html#data_juicer.utils.logger_utils.get_log_file_path">get_log_file_path() (in module data_juicer.utils.logger_utils)</a>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.get_model">get_model() (in module data_juicer.utils.model_utils)</a>
 </li>
       <li><a href="data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.get_row_col">get_row_col() (in module data_juicer.analysis.column_wise_analysis)</a>
 </li>
@@ -834,6 +847,14 @@
       <li><a href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.get_words_from_document">get_words_from_document() (in module data_juicer.ops.common.helper_func)</a>
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.exporter.Exporter.GiB">GiB (data_juicer.core.exporter.Exporter attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.logger_utils.HiddenPrints">HiddenPrints (class in data_juicer.utils.logger_utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -848,6 +869,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_juicer.utils.html#data_juicer.utils.file_utils.is_absolute_path">is_absolute_path() (in module data_juicer.utils.file_utils)</a>
+</li>
+      <li><a href="data_juicer.ops.html#data_juicer.ops.base_op.Mapper.is_batched_op">is_batched_op() (data_juicer.ops.base_op.Mapper method)</a>
 </li>
       <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.specified_numeric_field_filter.is_number">is_number() (in module data_juicer.ops.filter.specified_numeric_field_filter)</a>
 </li>
@@ -893,8 +916,6 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.load_diversity_model">load_diversity_model() (in module data_juicer.analysis.diversity_analysis)</a>
-</li>
       <li><a href="data_juicer.format.html#data_juicer.format.formatter.load_formatter">load_formatter() (in module data_juicer.format.formatter)</a>
 
       <ul>
@@ -1106,15 +1127,13 @@
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.data.nested_query">nested_query() (in module data_juicer.core.data)</a>
 </li>
-      <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDataset">NestedDataset (class in data_juicer.core.data)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDataset">NestedDataset (class in data_juicer.core.data)</a>
+</li>
       <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDatasetDict">NestedDatasetDict (class in data_juicer.core.data)</a>
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.data.NestedQueryDict">NestedQueryDict (class in data_juicer.core.data)</a>
-</li>
-      <li><a href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.num_differing_bits">num_differing_bits() (in module data_juicer.ops.deduplicator.document_simhash_deduplicator)</a>
 </li>
       <li><a href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.num_differing_bits_selector">num_differing_bits_selector() (in module data_juicer.ops.deduplicator.document_simhash_deduplicator)</a>
 </li>
@@ -1140,7 +1159,7 @@
 </li>
       <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.perplexity_filter.PerplexityFilter">PerplexityFilter (class in data_juicer.ops.filter.perplexity_filter)</a>
 </li>
-      <li><a href="data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.prepare_diversity_model">prepare_diversity_model() (in module data_juicer.analysis.diversity_analysis)</a>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_diversity_model">prepare_diversity_model() (in module data_juicer.utils.model_utils)</a>
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_fasttext_model">prepare_fasttext_model() (in module data_juicer.utils.model_utils)</a>
 </li>
@@ -1258,12 +1277,14 @@
 </li>
       <li><a href="data_juicer.format.html#data_juicer.format.formatter.RemoteFormatter">RemoteFormatter (class in data_juicer.format.formatter)</a>
 </li>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper">RemoveBibliographyMapper (class in data_juicer.ops.mapper.remove_bibliography_mapper)</a>
+      <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDataset.remove_columns">remove_columns() (data_juicer.core.data.NestedDataset method)</a>
 </li>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_comments_mapper.RemoveCommentsMapper">RemoveCommentsMapper (class in data_juicer.ops.mapper.remove_comments_mapper)</a>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper">RemoveBibliographyMapper (class in data_juicer.ops.mapper.remove_bibliography_mapper)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_comments_mapper.RemoveCommentsMapper">RemoveCommentsMapper (class in data_juicer.ops.mapper.remove_comments_mapper)</a>
+</li>
       <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_header_mapper.RemoveHeaderMapper">RemoveHeaderMapper (class in data_juicer.ops.mapper.remove_header_mapper)</a>
 </li>
       <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper">RemoveLongWordsMapper (class in data_juicer.ops.mapper.remove_long_words_mapper)</a>
@@ -1273,8 +1294,6 @@
       <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_table_text_mapper.RemoveTableTextMapper">RemoveTableTextMapper (class in data_juicer.ops.mapper.remove_table_text_mapper)</a>
 </li>
       <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper">RemoveWordsWithIncorrectSubstringsMapper (class in data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper)</a>
-</li>
-      <li><a href="data_juicer.format.html#data_juicer.format.formatter.rename_ops_args_text_key">rename_ops_args_text_key() (in module data_juicer.format.formatter)</a>
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.analyser.Analyser.run">run() (data_juicer.core.analyser.Analyser method)</a>
 
@@ -1291,6 +1310,8 @@
       <li><a href="data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.save_ckpt">save_ckpt() (data_juicer.utils.ckpt_utils.CheckpointManager method)</a>
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDataset.select">select() (data_juicer.core.data.NestedDataset method)</a>
+</li>
+      <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDataset.select_columns">select_columns() (data_juicer.core.data.NestedDataset method)</a>
 </li>
       <li><a href="data_juicer.ops.html#data_juicer.ops.base_op.Selector">Selector (class in data_juicer.ops.base_op)</a>
 </li>
@@ -1360,6 +1381,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_juicer.ops.selector.html#data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector">TopkSpecifiedFieldSelector (class in data_juicer.ops.selector.topk_specified_field_selector)</a>
 </li>
+      <li><a href="data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_batch_mapper">trace_batch_mapper() (data_juicer.core.tracer.Tracer method)</a>
+</li>
       <li><a href="data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_deduplicator">trace_deduplicator() (data_juicer.core.tracer.Tracer method)</a>
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.tracer.Tracer.trace_filter">trace_filter() (data_juicer.core.tracer.Tracer method)</a>
@@ -1399,6 +1422,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.words_augmentation">words_augmentation() (in module data_juicer.ops.common.helper_func)</a>
+</li>
+      <li><a href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.words_refinement">words_refinement() (in module data_juicer.ops.common.helper_func)</a>
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.data.wrap_func_with_nested_access">wrap_func_with_nested_access() (in module data_juicer.core.data)</a>
 </li>

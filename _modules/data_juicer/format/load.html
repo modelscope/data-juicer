@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.format.load &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.format.load &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -30,7 +30,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -74,7 +74,7 @@
 
 
 <div class="viewcode-block" id="load_formatter"><a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.load.load_formatter">[docs]</a><span class="k">def</span> <span class="nf">load_formatter</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">,</span>
-                   <span class="n">keys_to_load</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">text_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">suffixes</span><span class="o">=</span><span class="p">[],</span>
                    <span class="n">add_suffix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                    <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseFormatter</span><span class="p">:</span>
@@ -83,17 +83,15 @@
 <span class="sd">    weight(default 1.0) according to their formats.</span>
 
 <span class="sd">    :param dataset_path: path to a dataset file or a dataset directory</span>
-<span class="sd">    :param keys_to_load: key names of field that stores sample text.</span>
-<span class="sd">        Default: [&#39;text&#39;]</span>
+<span class="sd">    :param text_keys: key names of field that stores sample text.</span>
+<span class="sd">        Default: None</span>
 <span class="sd">    :param suffixes: files with specified suffixes to be processed.</span>
 <span class="sd">    :param add_suffix: whether to add the file suffix to dataset meta</span>
 <span class="sd">        info</span>
 <span class="sd">    :return: a dataset formatter.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">keys_to_load</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">keys_to_load</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span>
     <span class="n">formatter</span> <span class="o">=</span> <span class="n">MixtureFormatter</span><span class="p">(</span><span class="n">dataset_path</span><span class="o">=</span><span class="n">dataset_path</span><span class="p">,</span>
-                                 <span class="n">keys_to_load</span><span class="o">=</span><span class="n">keys_to_load</span><span class="p">,</span>
+                                 <span class="n">text_keys</span><span class="o">=</span><span class="n">text_keys</span><span class="p">,</span>
                                  <span class="n">suffixes</span><span class="o">=</span><span class="n">suffixes</span><span class="p">,</span>
                                  <span class="n">add_suffix</span><span class="o">=</span><span class="n">add_suffix</span><span class="p">,</span>
                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

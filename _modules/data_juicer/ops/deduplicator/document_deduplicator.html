@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.deduplicator.document_deduplicator &mdash; data_juicer 0.1.0 documentation</title>
+  <title>data_juicer.ops.deduplicator.document_deduplicator &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
-        <script src="../../../../_static/doctools.js"></script>
-        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -30,7 +30,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.0
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -80,6 +80,8 @@
 
 <span class="kn">import</span> <span class="nn">regex</span> <span class="k">as</span> <span class="nn">re</span>
 
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">HashKeys</span>
+
 <span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Deduplicator</span>
 
 
@@ -119,7 +121,7 @@
 <span class="sd">        :return: sample with md5 hash value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># check if it&#39;s computed already</span>
-        <span class="k">if</span> <span class="s1">&#39;hash&#39;</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">HashKeys</span><span class="o">.</span><span class="n">hash</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="n">text</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
@@ -131,7 +133,7 @@
         <span class="k">def</span> <span class="nf">_get_hash</span><span class="p">(</span><span class="n">txt</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">txt</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
 
-        <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;hash&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_hash</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">hash</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_hash</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span></div>
 
 <div class="viewcode-block" id="DocumentDeduplicator.process"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">show_num</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -151,7 +153,7 @@
         <span class="k">if</span> <span class="n">show_num</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="c1"># sample duplicate pairs</span>
             <span class="n">hash2ids</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">hash_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;hash&#39;</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">hash_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">hash</span><span class="p">]):</span>
                 <span class="n">hash2ids</span><span class="p">[</span><span class="n">hash_val</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span>
             <span class="n">dup_samples</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">hash2ids</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span>
                                  <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
@@ -161,7 +163,7 @@
             <span class="p">][:</span><span class="n">show_num</span><span class="p">])</span>
 
         <span class="k">def</span> <span class="nf">_filter_dup_helper</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">hashes</span><span class="p">):</span>
-            <span class="nb">hash</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;hash&#39;</span><span class="p">]</span>
+            <span class="nb">hash</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">hash</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">show_num</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">hash</span> <span class="ow">in</span> <span class="n">dup_hashes</span> \
                     <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">[</span><span class="nb">hash</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="c1"># tracer is open and not enough duplicate sample pairs</span>
