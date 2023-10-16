@@ -1,29 +1,19 @@
-data\_juicer.ops.common package
-===============================
+data\_juicer.ops.common
+=======================
 
-Submodules
-----------
 
-data\_juicer.ops.common.helper\_func module
--------------------------------------------
+data\_juicer.ops.common.helper\_func
+------------------------------------
 
 .. automodule:: data_juicer.ops.common.helper_func
    :members:
    :undoc-members:
    :show-inheritance:
 
-data\_juicer.ops.common.special\_characters module
---------------------------------------------------
+data\_juicer.ops.common.special\_characters
+-------------------------------------------
 
 .. automodule:: data_juicer.ops.common.special_characters
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: data_juicer.ops.common
    :members:
    :undoc-members:
    :show-inheritance:
