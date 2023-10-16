@@ -16,7 +16,7 @@
 {%- if is_namespace %}
 {{- [pkgname, "namespace"] | join(" ") | e | heading }}
 {% else %}
-{{- pkgname | e | heading }}
+{{- pkgname | join(" ") | e | heading }}
 {% endif %}
 
 {%- if is_namespace %}
@@ -25,6 +25,10 @@
 
 {%- if modulefirst and not is_namespace %}
 {{ automodule(pkgname, automodule_options) }}
+{% endif %}
+
+{%- if subpackages %}
+{{ toctree(subpackages) }}
 {% endif %}
 
 {%- if submodules %}
