@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.format &mdash; data_juicer 0.1.2 documentation</title>
+  <title>d a t a _ j u i c e r . f o r m a t &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,7 +16,9 @@
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="d a t a _ j u i c e r . o p s" href="data_juicer.ops.html" />
+    <link rel="prev" title="d a t a _ j u i c e r . c o r e" href="data_juicer.core.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,8 +43,58 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.html">data_juicer</a></li>
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="data_juicer.html">d a t a _ j u i c e r</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">d a t a _ j u i c e r . a n a l y s i s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">d a t a _ j u i c e r . c o n f i g</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">d a t a _ j u i c e r . c o r e</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">d a t a _ j u i c e r . f o r m a t</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.format.csv_formatter">data_juicer.format.csv_formatter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.csv_formatter.CsvFormatter"><code class="docutils literal notranslate"><span class="pre">CsvFormatter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.format.formatter">data_juicer.format.formatter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.formatter.BaseFormatter"><code class="docutils literal notranslate"><span class="pre">BaseFormatter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.formatter.LocalFormatter"><code class="docutils literal notranslate"><span class="pre">LocalFormatter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.formatter.RemoteFormatter"><code class="docutils literal notranslate"><span class="pre">RemoteFormatter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.formatter.add_suffixes"><code class="docutils literal notranslate"><span class="pre">add_suffixes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.formatter.load_formatter"><code class="docutils literal notranslate"><span class="pre">load_formatter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.formatter.unify_format"><code class="docutils literal notranslate"><span class="pre">unify_format()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.format.json_formatter">data_juicer.format.json_formatter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.json_formatter.JsonFormatter"><code class="docutils literal notranslate"><span class="pre">JsonFormatter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.format.load">data_juicer.format.load</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.load.load_formatter"><code class="docutils literal notranslate"><span class="pre">load_formatter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.format.mixture_formatter">data_juicer.format.mixture_formatter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.mixture_formatter.MixtureFormatter"><code class="docutils literal notranslate"><span class="pre">MixtureFormatter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.format.parquet_formatter">data_juicer.format.parquet_formatter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.parquet_formatter.ParquetFormatter"><code class="docutils literal notranslate"><span class="pre">ParquetFormatter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.format.text_formatter">data_juicer.format.text_formatter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.text_formatter.TextFormatter"><code class="docutils literal notranslate"><span class="pre">TextFormatter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.text_formatter.extract_txt_from_docx"><code class="docutils literal notranslate"><span class="pre">extract_txt_from_docx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.text_formatter.extract_txt_from_pdf"><code class="docutils literal notranslate"><span class="pre">extract_txt_from_pdf()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.format.tsv_formatter">data_juicer.format.tsv_formatter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.format.tsv_formatter.TsvFormatter"><code class="docutils literal notranslate"><span class="pre">TsvFormatter</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">d a t a _ j u i c e r . o p s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html">d a t a _ j u i c e r . t o o l s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.utils.html">d a t a _ j u i c e r . u t i l s</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -59,7 +111,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">data_juicer.format</li>
+          <li class="breadcrumb-item"><a href="data_juicer.html">d a t a _ j u i c e r</a></li>
+      <li class="breadcrumb-item active">d a t a _ j u i c e r . f o r m a t</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/data_juicer.format.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -69,8 +122,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="data-juicer-format">
-<h1>data_juicer.format<a class="headerlink" href="#data-juicer-format" title="Permalink to this heading">¶</a></h1>
+  <section id="d-a-t-a-j-u-i-c-e-r-f-o-r-m-a-t">
+<h1>d a t a _ j u i c e r . f o r m a t<a class="headerlink" href="#d-a-t-a-j-u-i-c-e-r-f-o-r-m-a-t" title="Permalink to this heading">¶</a></h1>
 <section id="module-data_juicer.format.csv_formatter">
 <span id="data-juicer-format-csv-formatter"></span><h2>data_juicer.format.csv_formatter<a class="headerlink" href="#module-data_juicer.format.csv_formatter" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -373,7 +426,10 @@ new mixed dataset.</p>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data_juicer.core.html" class="btn btn-neutral float-left" title="d a t a _ j u i c e r . c o r e" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_juicer.ops.html" class="btn btn-neutral float-right" title="d a t a _ j u i c e r . o p s" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

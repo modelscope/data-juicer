@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.utils &mdash; data_juicer 0.1.2 documentation</title>
+  <title>d a t a _ j u i c e r . u t i l s &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,7 +16,8 @@
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="d a t a _ j u i c e r . t o o l s" href="data_juicer.tools.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,8 +42,87 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.html">data_juicer</a></li>
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="data_juicer.html">d a t a _ j u i c e r</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">d a t a _ j u i c e r . a n a l y s i s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">d a t a _ j u i c e r . c o n f i g</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">d a t a _ j u i c e r . c o r e</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">d a t a _ j u i c e r . f o r m a t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">d a t a _ j u i c e r . o p s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html">d a t a _ j u i c e r . t o o l s</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">d a t a _ j u i c e r . u t i l s</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.asset_utils">data_juicer.utils.asset_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.asset_utils.load_words_asset"><code class="docutils literal notranslate"><span class="pre">load_words_asset()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.cache_utils">data_juicer.utils.cache_utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.ckpt_utils">data_juicer.utils.ckpt_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.ckpt_utils.CheckpointManager"><code class="docutils literal notranslate"><span class="pre">CheckpointManager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.compress">data_juicer.utils.compress</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.BaseCompressor"><code class="docutils literal notranslate"><span class="pre">BaseCompressor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.CacheCompressManager"><code class="docutils literal notranslate"><span class="pre">CacheCompressManager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.CompressManager"><code class="docutils literal notranslate"><span class="pre">CompressManager</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.CompressionOff"><code class="docutils literal notranslate"><span class="pre">CompressionOff</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.Compressor"><code class="docutils literal notranslate"><span class="pre">Compressor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.Extractor"><code class="docutils literal notranslate"><span class="pre">Extractor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.FileLock"><code class="docutils literal notranslate"><span class="pre">FileLock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.GzipCompressor"><code class="docutils literal notranslate"><span class="pre">GzipCompressor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.Lz4Compressor"><code class="docutils literal notranslate"><span class="pre">Lz4Compressor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.ZstdCompressor"><code class="docutils literal notranslate"><span class="pre">ZstdCompressor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.cleanup_compressed_cache_files"><code class="docutils literal notranslate"><span class="pre">cleanup_compressed_cache_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.compress"><code class="docutils literal notranslate"><span class="pre">compress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.compress.decompress"><code class="docutils literal notranslate"><span class="pre">decompress()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.constant">data_juicer.utils.constant</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.constant.Fields"><code class="docutils literal notranslate"><span class="pre">Fields</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.constant.HashKeys"><code class="docutils literal notranslate"><span class="pre">HashKeys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.constant.InterVars"><code class="docutils literal notranslate"><span class="pre">InterVars</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.constant.StatsKeys"><code class="docutils literal notranslate"><span class="pre">StatsKeys</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.file_utils">data_juicer.utils.file_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.file_utils.find_files_with_suffix"><code class="docutils literal notranslate"><span class="pre">find_files_with_suffix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.file_utils.is_absolute_path"><code class="docutils literal notranslate"><span class="pre">is_absolute_path()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.fingerprint_utils">data_juicer.utils.fingerprint_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.fingerprint_utils.Hasher"><code class="docutils literal notranslate"><span class="pre">Hasher</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.fingerprint_utils.generate_fingerprint"><code class="docutils literal notranslate"><span class="pre">generate_fingerprint()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.fingerprint_utils.update_fingerprint"><code class="docutils literal notranslate"><span class="pre">update_fingerprint()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.logger_utils">data_juicer.utils.logger_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.logger_utils.HiddenPrints"><code class="docutils literal notranslate"><span class="pre">HiddenPrints</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.logger_utils.StreamToLoguru"><code class="docutils literal notranslate"><span class="pre">StreamToLoguru</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.logger_utils.get_caller_name"><code class="docutils literal notranslate"><span class="pre">get_caller_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.logger_utils.get_log_file_path"><code class="docutils literal notranslate"><span class="pre">get_log_file_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.logger_utils.redirect_sys_output"><code class="docutils literal notranslate"><span class="pre">redirect_sys_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.logger_utils.setup_logger"><code class="docutils literal notranslate"><span class="pre">setup_logger()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.model_utils">data_juicer.utils.model_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.check_model"><code class="docutils literal notranslate"><span class="pre">check_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.get_model"><code class="docutils literal notranslate"><span class="pre">get_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_diversity_model"><code class="docutils literal notranslate"><span class="pre">prepare_diversity_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_fasttext_model"><code class="docutils literal notranslate"><span class="pre">prepare_fasttext_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_huggingface_tokenizer"><code class="docutils literal notranslate"><span class="pre">prepare_huggingface_tokenizer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_kenlm_model"><code class="docutils literal notranslate"><span class="pre">prepare_kenlm_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_model"><code class="docutils literal notranslate"><span class="pre">prepare_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_nltk_model"><code class="docutils literal notranslate"><span class="pre">prepare_nltk_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_sentencepiece_model"><code class="docutils literal notranslate"><span class="pre">prepare_sentencepiece_model()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.registry">data_juicer.utils.registry</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.registry.Registry"><code class="docutils literal notranslate"><span class="pre">Registry</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -59,7 +139,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">data_juicer.utils</li>
+          <li class="breadcrumb-item"><a href="data_juicer.html">d a t a _ j u i c e r</a></li>
+      <li class="breadcrumb-item active">d a t a _ j u i c e r . u t i l s</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/data_juicer.utils.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -69,8 +150,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="data-juicer-utils">
-<h1>data_juicer.utils<a class="headerlink" href="#data-juicer-utils" title="Permalink to this heading">¶</a></h1>
+  <section id="d-a-t-a-j-u-i-c-e-r-u-t-i-l-s">
+<h1>d a t a _ j u i c e r . u t i l s<a class="headerlink" href="#d-a-t-a-j-u-i-c-e-r-u-t-i-l-s" title="Permalink to this heading">¶</a></h1>
 <section id="module-data_juicer.utils.asset_utils">
 <span id="data-juicer-utils-asset-utils"></span><h2>data_juicer.utils.asset_utils<a class="headerlink" href="#module-data_juicer.utils.asset_utils" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
@@ -961,7 +1042,9 @@ the same name. Default: False.</p></li>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data_juicer.tools.html" class="btn btn-neutral float-left" title="d a t a _ j u i c e r . t o o l s" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
 
   <hr/>
 

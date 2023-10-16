@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.filter &mdash; data_juicer 0.1.2 documentation</title>
+  <title>d a t a _ j u i c e r . o p s . f i l t e r &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,7 +16,9 @@
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="d a t a _ j u i c e r . o p s . m a p p e r" href="data_juicer.ops.mapper.html" />
+    <link rel="prev" title="d a t a _ j u i c e r . o p s . d e d u p l i c a t o r" href="data_juicer.ops.deduplicator.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,8 +43,45 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.html">data_juicer</a></li>
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="data_juicer.html">d a t a _ j u i c e r</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">d a t a _ j u i c e r . a n a l y s i s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">d a t a _ j u i c e r . c o n f i g</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">d a t a _ j u i c e r . c o r e</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">d a t a _ j u i c e r . f o r m a t</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="data_juicer.ops.html">d a t a _ j u i c e r . o p s</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html">d a t a _ j u i c e r . o p s . c o m m o n</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html">d a t a _ j u i c e r . o p s . d e d u p l i c a t o r</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">d a t a _ j u i c e r . o p s . f i l t e r</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.alphanumeric_filter">data_juicer.ops.filter.alphanumeric_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.average_line_length_filter">data_juicer.ops.filter.average_line_length_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.character_repetition_filter">data_juicer.ops.filter.character_repetition_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.flagged_words_filter">data_juicer.ops.filter.flagged_words_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.language_id_score_filter">data_juicer.ops.filter.language_id_score_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.maximum_line_length_filter">data_juicer.ops.filter.maximum_line_length_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.perplexity_filter">data_juicer.ops.filter.perplexity_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.special_characters_filter">data_juicer.ops.filter.special_characters_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.specified_field_filter">data_juicer.ops.filter.specified_field_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.specified_numeric_field_filter">data_juicer.ops.filter.specified_numeric_field_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.stopwords_filter">data_juicer.ops.filter.stopwords_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.suffix_filter">data_juicer.ops.filter.suffix_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.text_length_filter">data_juicer.ops.filter.text_length_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.token_num_filter">data_juicer.ops.filter.token_num_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.word_num_filter">data_juicer.ops.filter.word_num_filter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.filter.word_repetition_filter">data_juicer.ops.filter.word_repetition_filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html">d a t a _ j u i c e r . o p s . m a p p e r</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.selector.html">d a t a _ j u i c e r . o p s . s e l e c t o r</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.html#module-data_juicer.ops.base_op">data_juicer.ops.base_op</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.html#module-data_juicer.ops.load">data_juicer.ops.load</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.html#module-data_juicer.ops.op_fusion">data_juicer.ops.op_fusion</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html">d a t a _ j u i c e r . t o o l s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.utils.html">d a t a _ j u i c e r . u t i l s</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -59,7 +98,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">data_juicer.ops.filter</li>
+          <li class="breadcrumb-item"><a href="data_juicer.html">d a t a _ j u i c e r</a></li>
+          <li class="breadcrumb-item"><a href="data_juicer.ops.html">d a t a _ j u i c e r . o p s</a></li>
+      <li class="breadcrumb-item active">d a t a _ j u i c e r . o p s . f i l t e r</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/data_juicer.ops.filter.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -69,8 +110,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="data-juicer-ops-filter">
-<h1>data_juicer.ops.filter<a class="headerlink" href="#data-juicer-ops-filter" title="Permalink to this heading">¶</a></h1>
+  <section id="d-a-t-a-j-u-i-c-e-r-o-p-s-f-i-l-t-e-r">
+<h1>d a t a _ j u i c e r . o p s . f i l t e r<a class="headerlink" href="#d-a-t-a-j-u-i-c-e-r-o-p-s-f-i-l-t-e-r" title="Permalink to this heading">¶</a></h1>
 <section id="module-data_juicer.ops.filter.alphanumeric_filter">
 <span id="data-juicer-ops-filter-alphanumeric-filter"></span><h2>data_juicer.ops.filter.alphanumeric_filter<a class="headerlink" href="#module-data_juicer.ops.filter.alphanumeric_filter" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -786,7 +827,10 @@ vars in the sample temporarily.</p></li>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data_juicer.ops.deduplicator.html" class="btn btn-neutral float-left" title="d a t a _ j u i c e r . o p s . d e d u p l i c a t o r" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_juicer.ops.mapper.html" class="btn btn-neutral float-right" title="d a t a _ j u i c e r . o p s . m a p p e r" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.analysis &mdash; data_juicer 0.1.2 documentation</title>
+  <title>d a t a _ j u i c e r . a n a l y s i s &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,7 +16,9 @@
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="d a t a _ j u i c e r . c o n f i g" href="data_juicer.config.html" />
+    <link rel="prev" title="d a t a _ j u i c e r" href="data_juicer.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,8 +43,35 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.html">data_juicer</a></li>
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="data_juicer.html">d a t a _ j u i c e r</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">d a t a _ j u i c e r . a n a l y s i s</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.analysis.column_wise_analysis">data_juicer.analysis.column_wise_analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis"><code class="docutils literal notranslate"><span class="pre">ColumnWiseAnalysis</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.column_wise_analysis.get_row_col"><code class="docutils literal notranslate"><span class="pre">get_row_col()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.analysis.diversity_analysis">data_juicer.analysis.diversity_analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.diversity_analysis.DiversityAnalysis"><code class="docutils literal notranslate"><span class="pre">DiversityAnalysis</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj"><code class="docutils literal notranslate"><span class="pre">find_root_verb_and_its_dobj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj_in_string"><code class="docutils literal notranslate"><span class="pre">find_root_verb_and_its_dobj_in_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.diversity_analysis.get_diversity"><code class="docutils literal notranslate"><span class="pre">get_diversity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.analysis.overall_analysis">data_juicer.analysis.overall_analysis</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.overall_analysis.OverallAnalysis"><code class="docutils literal notranslate"><span class="pre">OverallAnalysis</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">d a t a _ j u i c e r . c o n f i g</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">d a t a _ j u i c e r . c o r e</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">d a t a _ j u i c e r . f o r m a t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">d a t a _ j u i c e r . o p s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html">d a t a _ j u i c e r . t o o l s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.utils.html">d a t a _ j u i c e r . u t i l s</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -59,7 +88,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">data_juicer.analysis</li>
+          <li class="breadcrumb-item"><a href="data_juicer.html">d a t a _ j u i c e r</a></li>
+      <li class="breadcrumb-item active">d a t a _ j u i c e r . a n a l y s i s</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/data_juicer.analysis.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -69,8 +99,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="data-juicer-analysis">
-<h1>data_juicer.analysis<a class="headerlink" href="#data-juicer-analysis" title="Permalink to this heading">¶</a></h1>
+  <section id="d-a-t-a-j-u-i-c-e-r-a-n-a-l-y-s-i-s">
+<h1>d a t a _ j u i c e r . a n a l y s i s<a class="headerlink" href="#d-a-t-a-j-u-i-c-e-r-a-n-a-l-y-s-i-s" title="Permalink to this heading">¶</a></h1>
 <section id="module-data_juicer.analysis.column_wise_analysis">
 <span id="data-juicer-analysis-column-wise-analysis"></span><h2>data_juicer.analysis.column_wise_analysis<a class="headerlink" href="#module-data_juicer.analysis.column_wise_analysis" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -300,7 +330,10 @@ method of pandas.</p>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data_juicer.html" class="btn btn-neutral float-left" title="d a t a _ j u i c e r" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_juicer.config.html" class="btn btn-neutral float-right" title="d a t a _ j u i c e r . c o n f i g" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

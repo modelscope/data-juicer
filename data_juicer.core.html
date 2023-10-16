@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.core &mdash; data_juicer 0.1.2 documentation</title>
+  <title>d a t a _ j u i c e r . c o r e &mdash; data_juicer 0.1.2 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -16,7 +16,9 @@
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="d a t a _ j u i c e r . f o r m a t" href="data_juicer.format.html" />
+    <link rel="prev" title="d a t a _ j u i c e r . c o n f i g" href="data_juicer.config.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,8 +43,48 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.html">data_juicer</a></li>
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="data_juicer.html">d a t a _ j u i c e r</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">d a t a _ j u i c e r . a n a l y s i s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">d a t a _ j u i c e r . c o n f i g</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">d a t a _ j u i c e r . c o r e</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.core.analyser">data_juicer.core.analyser</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.analyser.Analyser"><code class="docutils literal notranslate"><span class="pre">Analyser</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.core.data">data_juicer.core.data</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.NestedDataset"><code class="docutils literal notranslate"><span class="pre">NestedDataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.NestedDatasetDict"><code class="docutils literal notranslate"><span class="pre">NestedDatasetDict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.NestedQueryDict"><code class="docutils literal notranslate"><span class="pre">NestedQueryDict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.nested_obj_factory"><code class="docutils literal notranslate"><span class="pre">nested_obj_factory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.nested_query"><code class="docutils literal notranslate"><span class="pre">nested_query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.wrap_func_with_nested_access"><code class="docutils literal notranslate"><span class="pre">wrap_func_with_nested_access()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.core.executor">data_juicer.core.executor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.executor.Executor"><code class="docutils literal notranslate"><span class="pre">Executor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.core.exporter">data_juicer.core.exporter</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.exporter.Exporter"><code class="docutils literal notranslate"><span class="pre">Exporter</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.core.ray_executor">data_juicer.core.ray_executor</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.ray_executor.RayExecutor"><code class="docutils literal notranslate"><span class="pre">RayExecutor</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.core.tracer">data_juicer.core.tracer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.tracer.Tracer"><code class="docutils literal notranslate"><span class="pre">Tracer</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">d a t a _ j u i c e r . f o r m a t</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html">d a t a _ j u i c e r . o p s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html">d a t a _ j u i c e r . t o o l s</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.utils.html">d a t a _ j u i c e r . u t i l s</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -59,7 +101,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">data_juicer.core</li>
+          <li class="breadcrumb-item"><a href="data_juicer.html">d a t a _ j u i c e r</a></li>
+      <li class="breadcrumb-item active">d a t a _ j u i c e r . c o r e</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/data_juicer.core.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -69,8 +112,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="data-juicer-core">
-<h1>data_juicer.core<a class="headerlink" href="#data-juicer-core" title="Permalink to this heading">¶</a></h1>
+  <section id="d-a-t-a-j-u-i-c-e-r-c-o-r-e">
+<h1>d a t a _ j u i c e r . c o r e<a class="headerlink" href="#d-a-t-a-j-u-i-c-e-r-c-o-r-e" title="Permalink to this heading">¶</a></h1>
 <section id="module-data_juicer.core.analyser">
 <span id="data-juicer-core-analyser"></span><h2>data_juicer.core.analyser<a class="headerlink" href="#module-data_juicer.core.analyser" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -476,7 +519,10 @@ modification by the Mapper</p>
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data_juicer.config.html" class="btn btn-neutral float-left" title="d a t a _ j u i c e r . c o n f i g" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_juicer.format.html" class="btn btn-neutral float-right" title="d a t a _ j u i c e r . f o r m a t" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 

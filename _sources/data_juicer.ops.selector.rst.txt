@@ -1,5 +1,5 @@
-data\_juicer.ops.selector
-=========================
+d a t a \_ j u i c e r . o p s . s e l e c t o r
+================================================
 
 
 data\_juicer.ops.selector.frequency\_specified\_field\_selector
