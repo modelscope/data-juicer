@@ -108,11 +108,15 @@ def analyze_and_show_res(dataset_file):
     analyzer = Analyser(cfg)
     dataset = analyzer.run()
 
-    analysis_res_ori = pd.read_csv(
-        os.path.join(analyzer.analysis_path, 'overall.csv'))
-    for f_path in os.listdir(analyzer.analysis_path):
-        if '.png' in f_path and 'all-stats' in f_path:
-            images_ori.append(os.path.join(analyzer.analysis_path, f_path))
+    overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
+    analysis_res_ori = pd.DataFrame()
+    if os.path.exists(overall_file):
+        analysis_res_ori = pd.read_csv(overall_file)
+        
+    if os.path.exists(analyzer.analysis_path):
+        for f_path in os.listdir(analyzer.analysis_path):
+            if '.png' in f_path and 'all-stats' in f_path:
+                images_ori.append(os.path.join(analyzer.analysis_path, f_path))
 
     st.session_state.dataset = dataset
     st.session_state.original_overall = analysis_res_ori
@@ -316,7 +320,8 @@ class Visualize:
 
     @staticmethod
     def filter_dataset(dataset):
-
+        if Fields.stats not in dataset:
+            return 
         text_key = st.session_state.get('text_key', 'text')
         text = dataset[text_key]
         stats = pd.DataFrame(dataset[Fields.stats])
