@@ -59,10 +59,10 @@ class CharacterRepetitionFilter(Filter):
 
         freq_char_ngrams = sorted(list(freq_char_ngrams.values()),
                                   reverse=True)
-        rep_more_than_one = len([el for el in freq_char_ngrams if el > 1])
+        num_no_rep_char_ngrams = len([el for el in freq_char_ngrams if el == 1])
         num_rep_char_ngrams = min(
             int(np.sqrt(len(freq_char_ngrams))),
-            len(freq_char_ngrams) - rep_more_than_one,
+            len(freq_char_ngrams) - num_no_rep_char_ngrams,
         )
         sample[Fields.stats][StatsKeys.char_rep_ratio] = (sum(
             freq_char_ngrams[:num_rep_char_ngrams]) / sum(freq_char_ngrams)) \

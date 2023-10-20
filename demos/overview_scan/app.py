@@ -204,11 +204,15 @@ def run_demo():
         with st.spinner('Wait for analyze...'):
             analyzer.run()
 
-        analysis_res_ori = pd.read_csv(
-            os.path.join(analyzer.analysis_path, 'overall.csv'))
-        for f_path in os.listdir(analyzer.analysis_path):
-            if '.png' in f_path and 'all-stats' in f_path:
-                images_ori.append(os.path.join(analyzer.analysis_path, f_path))
+        overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
+        analysis_res_ori = pd.DataFrame()
+        if os.path.exists(overall_file):
+            analysis_res_ori = pd.read_csv(overall_file)
+            
+        if os.path.exists(analyzer.analysis_path):
+            for f_path in os.listdir(analyzer.analysis_path):
+                if '.png' in f_path and 'all-stats' in f_path:
+                    images_ori.append(os.path.join(analyzer.analysis_path, f_path))
 
         st.subheader('Statistics')
         st.dataframe(analysis_res_ori, use_container_width=True)
