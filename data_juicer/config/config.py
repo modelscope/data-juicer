@@ -316,6 +316,10 @@ def init_setup_from_cfg(cfg):
     # update huggingface datasets cache directory only when ds_cache_dir is set
     from datasets import config
     if cfg.ds_cache_dir:
+        logger.warning(f'Set dataset cache directory to {cfg.ds_cache_dir} '
+                       f'using the ds_cache_dir argument, which is '
+                       f'{config.HF_DATASETS_CACHE} before based on the env '
+                       f'variable HF_DATASETS_CACHE.')
         config.HF_DATASETS_CACHE = cfg.ds_cache_dir
     else:
         cfg.ds_cache_dir = config.HF_DATASETS_CACHE
