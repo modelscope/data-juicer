@@ -1,9 +1,9 @@
+pandas==2.0.0
 datasets==2.11.0
 loguru
 tqdm
 jsonargparse[signatures]
 matplotlib
-pandas
 requests
 wget
 zstandard

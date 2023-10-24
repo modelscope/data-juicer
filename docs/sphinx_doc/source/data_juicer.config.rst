@@ -1,21 +1,11 @@
-data\_juicer.config package
-===========================
+data\_juicer.config
+===================
 
-Submodules
-----------
 
-data\_juicer.config.config module
----------------------------------
+data\_juicer.config.config
+--------------------------
 
 .. automodule:: data_juicer.config.config
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: data_juicer.config
    :members:
    :undoc-members:
    :show-inheritance:

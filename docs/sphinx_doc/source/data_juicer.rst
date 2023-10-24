@@ -1,8 +1,5 @@
-data\_juicer package
-====================
-
-Subpackages
------------
+data\_juicer
+============
 
 .. toctree::
    :maxdepth: 4
@@ -12,12 +9,5 @@ Subpackages
    data_juicer.core
    data_juicer.format
    data_juicer.ops
+   data_juicer.tools
    data_juicer.utils
-
-Module contents
----------------
-
-.. automodule:: data_juicer
-   :members:
-   :undoc-members:
-   :show-inheritance:

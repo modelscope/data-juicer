@@ -1,0 +1,52 @@
+name: 🚀 Feature Request
+description: Suggest a Data-Juicer idea
+# title: " "
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for submitting a Data-Juicer Feature Request! 感谢您提交一个 Data-Juicer 功能需求！
+
+  - type: checkboxes
+    attributes:
+      label: Search before continuing 先搜索，再继续
+      description: >
+        Please search the [issues](https://github.com/alibaba/data-juicer/issues) to see if a similar feature request already exists. 请先在 [issue 列表](https://github.com/alibaba/data-juicer/issues)中搜索是否已经有类似的功能需求已经存在。
+      options:
+        - label: >
+            I have searched the Data-Juicer issues and found no similar feature requests. 我已经搜索了 Data-Juicer 的 issue 列表但是没有发现类似的功能需求。
+          required: true
+
+  - type: textarea
+    attributes:
+      label: Description 描述
+      description: A short description of your feature. 功能简短描述。
+      placeholder: |
+        What new feature would you like to see in Data-Juicer? 您希望 Data-Juicer 可以支持哪些新功能？
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Use case 使用场景
+      description: |
+        Describe the use case of your feature request. It will help us understand and prioritize the feature request. 描述您的功能需求的使用场景。这可以帮助我们理解并确认功能需求的优先级。
+      placeholder: |
+        How would this feature be used, and who would use it? 请描述一下这个新功能的应用场景？
+
+  - type: textarea
+    attributes:
+      label: Additional 额外信息
+      description: Anything else you would like to share? 其他您愿意分享的信息。
+      placeholder: |
+        Additional information. 额外信息。
+
+  - type: checkboxes
+    attributes:
+      label: Are you willing to submit a PR for this feature? 您是否乐意为此功能提交一个 PR？
+      description: >
+        (Optional) We encourage you to submit a [Pull Request](https://github.com/alibaba/data-juicer/pulls) (PR) to help improve Data-Juicer for everyone, especially if you have a good understanding of how to implement a fix or feature.
+        （可选项）我们鼓励您提交一个 [Pull Request (PR)]([Pull Request](https://github.com/alibaba/data-juicer/pulls)) 来为开源社区提升 Data-Juicer 的能力，尤其是如果您对如何实现或者修复一个功能有比较不错的理解的时候~
+      options:
+        - label: Yes I'd like to help by submitting a PR! 是的！我愿意提供帮助并提交一个PR！
