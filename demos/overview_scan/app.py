@@ -85,13 +85,13 @@ config_all_desc = '''
 op_desc = '''
 The operators in Data-Juicer are categorized into 5 types.
 
-| Type                              | Number | Description |
-|-----------------------------------|:------:|-------------|
-| Formatter       |    7   | Discovers, loads, and cannibalizes source data |
-| Mapper            |   17   | Edits and transforms samples                    |
-| Filter              |   15   | Filters out low-quality samples                 |
-| Deduplicator   |    3   | Detects and removes duplicate samples           |
-| Selector         |    2   | Selects top samples based on ranking            |
+| Type                              | Number | Description                                     |
+|-----------------------------------|:------:|-------------------------------------------------|
+| Formatter         |   7    | Discovers, loads, and canonicalizes source data |
+| Mapper            |   19   | Edits and transforms samples                    |
+| Filter            |   16   | Filters out low-quality samples                 |
+| Deduplicator      |   3    | Detects and removes duplicate samples           |
+| Selector          |   2    | Selects top samples based on ranking            |
 '''
 
 op_list_desc = {
@@ -111,42 +111,46 @@ op_list_desc = {
     '''
 | Operator                                      | Domain             | Lang   | Description                                                                                                    |
 |-----------------------------------------------|--------------------|--------|----------------------------------------------------------------------------------------------------------------|
-| remove_header_mapper                          | LaTeX              | en, zh | Removes the running headers of TeX documents, e.g., titles, chapter or section numbers/names                   |
-| remove_bibliography_mapper                    | LaTeX              | en, zh | Removes the bibliography of TeX documents                                                                      |
-| expand_macro_mapper                           | LaTeX              | en, zh | Expands macros usually defined at the top of TeX documents                                                     |
-| whitespace_normalization_mapper               | General            | en, zh | Normalizes various Unicode whitespaces to the normal ASCII space (U+0020)                                      |
-| punctuation_normalization_mapper              | General            | en, zh | Normalizes various Unicode punctuations to their ASCII equivalents                                             |
-| fix_unicode_mapper                            | General            | en, zh | Fixes broken Unicodes (by [ftfy](https://ftfy.readthedocs.io/))                                        |
-| sentence_split_mapper                         | General            | en     | Splits and reorganizes sentences according to semantics                                                        |
-| remove_long_words_mapper                      | General            | en, zh | Removes words with length outside the specified range                                                       |
+| clean_copyright_mapper                              | Code               | en, zh | Removes copyright notice at the beginning of code files (:warning: must contain the word *copyright*)          |
+| clean_email_mapper                                  | General            | en, zh | Removes email information                                                                                      |
+| clean_html_mapper                                   | General            | en, zh | Removes HTML tags and returns plain text of all the nodes                                                      |
+| clean_ip_mapper                                     | General            | en, zh | Removes IP addresses                                                                                           |
+| clean_links_mapper                                  | General, Code      | en, zh | Removes links, such as those starting with http or ftp                                                         |
+| expand_macro_mapper                                 | LaTeX              | en, zh | Expands macros usually defined at the top of TeX documents                                                     |
+| fix_unicode_mapper                                  | General            | en, zh | Fixes broken Unicodes (by [ftfy](https://ftfy.readthedocs.io/))                                                |
+| nlpaug_en_mapper                                    | General            | en     | Simply augment texts in English based on the `nlpaug` library                                                  | 
+| nlpcda_zh_mapper                                    | General            | zh     | Simply augment texts in Chinese based on the `nlpcda` library                                                  | 
+| punctuation_normalization_mapper                    | General            | en, zh | Normalizes various Unicode punctuations to their ASCII equivalents                                             |
+| remove_bibliography_mapper                          | LaTeX              | en, zh | Removes the bibliography of TeX documents                                                                      |
+| remove_comments_mapper                              | LaTeX              | en, zh | Removes the comments of TeX documents                                                                          |
+| remove_header_mapper                                | LaTeX              | en, zh | Removes the running headers of TeX documents, e.g., titles, chapter or section numbers/names                   |
+| remove_long_words_mapper                            | General            | en, zh | Removes words with length outside the specified range                                                          |
+| remove_specific_chars_mapper                        | General            | en, zh | Removes any user-specified characters or substrings                                                            |
+| remove_table_text_mapper                            | General, Financial | en     | Detects and removes possible table contents (:warning: relies on regular expression matching and thus fragile) |
 | remove_words_with_incorrect_<br />substrings_mapper | General            | en, zh | Removes words containing specified substrings                                                                  |
-| clean_email_mapper                            | General            | en, zh | Removes email information                                                                                      |
-| clean_ip_mapper                               | General            | en, zh | Removes IP addresses                                                                                           |
-| clean_links_mapper                            | General, Code      | en, zh | Removes links, such as those starting with http or ftp                                                         |
-| clean_html_mapper                             | General            | en, zh | Removes HTML tags and returns plain text of all the nodes                                                      |
-| remove_table_text_mapper                      | General, Financial | en     | Detects and removes possible table contents (:warning: relies on regular expression matching and thus fragile) |
-| clean_copyright_mapper                        | Code               | en, zh | Removes copyright notice at the beginning of code files (:warning: must contain the word *copyright*)        |
-| remove_specific_chars_mapper                  | General            | en, zh | Removes any user-specified characters or substrings                                                            |
+| sentence_split_mapper                               | General            | en     | Splits and reorganizes sentences according to semantics                                                        |
+| whitespace_normalization_mapper                     | General            | en, zh | Normalizes various Unicode whitespaces to the normal ASCII space (U+0020)                                      |
 ''',
     'filter':
     '''
 | Operator                       | Domain  | Lang   | Description                                                                                |
 |--------------------------------|---------|--------|--------------------------------------------------------------------------------------------|
-| word_num_filter                | General | en, zh | Keeps samples with word count within the specified range                                   |
-| stopwords_filter               | General | en, zh | Keeps samples with stopword ratio above the specified threshold                            |
-| flagged_words_filter           | General | en, zh | Keeps samples with flagged-word ratio below the specified threshold                        |
-| character_repetition_filter    | General | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range           |
-| word_repetition_filter         | General | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range           |
-| special_characters_filter      | General | en, zh | Keeps samples with special-char ratio within the specified range                           |
-| language_id_score_filter       | General | en, zh | Keeps samples of the specified language, judged by a predicted confidence score            |
-| perplexity_filter              | General | en, zh | Keeps samples with perplexity score below the specified threshold                          |
-| maximum_line_length_filter     | Code    | en, zh | Keeps samples with maximum line length within the specified range                          |
-| average_line_length_filter     | Code    | en, zh | Keeps samples with average line length within the specified range                          |
 | alphanumeric_filter            | General | en, zh | Keeps samples with alphanumeric ratio within the specified range                           |
-| text_length_filter             | General | en, zh | Keeps samples with total text length within the specified range                            |
-| suffix_filter                  | General | en, zh | Keeps samples with specified suffixes                                                      |
+| average_line_length_filter     | Code    | en, zh | Keeps samples with average line length within the specified range                          |
+| character_repetition_filter    | General | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range           |
+| flagged_words_filter           | General | en, zh | Keeps samples with flagged-word ratio below the specified threshold                        |
+| language_id_score_filter       | General | en, zh | Keeps samples of the specified language, judged by a predicted confidence score            |
+| maximum_line_length_filter     | Code    | en, zh | Keeps samples with maximum line length within the specified range                          |
+| perplexity_filter              | General | en, zh | Keeps samples with perplexity score below the specified threshold                          |
+| special_characters_filter      | General | en, zh | Keeps samples with special-char ratio within the specified range                           |
 | specified_field_filter         | General | en, zh | Filters samples based on field, with value lies in the specified targets                   |
 | specified_numeric_field_filter | General | en, zh | Filters samples based on field, with value lies in the specified range (for numeric types) |
+| stopwords_filter               | General | en, zh | Keeps samples with stopword ratio above the specified threshold                            |
+| suffix_filter                  | General | en, zh | Keeps samples with specified suffixes                                                      |
+| text_length_filter             | General | en, zh | Keeps samples with total text length within the specified range                            |
+| token_num_filter               | General | en, zh | Keeps samples with token count within the specified range                                  |
+| word_num_filter                | General | en, zh | Keeps samples with word count within the specified range                                   |
+| word_repetition_filter         | General | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range           |
 ''',
     'deduplicator':
     '''
@@ -166,21 +170,22 @@ op_list_desc = {
 }
 
 demo_desc = '''
+- Introduction to Data-Juicer [[ModelScope](https://modelscope.cn/studios/Data-Juicer/overview_scan/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/overview_scan)]
 - Data Visualization:
-  - Basic Statistics [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_statistics/summary)]
-  - Lexical Diversity [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_diversity/summary)]
-  - Operator Effect [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_op_effect/summary)]
+  - Basic Statistics [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_statistics/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_visualization_statistics)]
+  - Lexical Diversity [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_diversity/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_visualization_diversity)]
+  - Operator Effect [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_op_effect/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_visualization_op_effect)]
 - Data Processing:
-  - Scientific Literature (e.g. [arXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)]
-  - Programming Code (e.g. [TheStack](https://huggingface.co/datasets/bigcode/the-stack)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_code_data/summary)]
-  - Chinese Instruction Data (e.g. [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sft_zh_data/summary)]
+  - Scientific Literature (e.g. [arXiv](https://info.arxiv.org/help/bulk_data_s3.html)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sci_data/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/process_sci_data)]
+  - Programming Code (e.g. [TheStack](https://huggingface.co/datasets/bigcode/the-stack)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_code_data/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/process_code_data)]
+  - Chinese Instruction Data (e.g. [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT)) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/process_sft_zh_data/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/process_cft_zh_data)]
 - Tool Pool:
-  - Dataset Splitting by Language [[ModelScope](https://modelscope.cn/studios/Data-Juicer/tool_dataset_splitting_by_language/summary)]
-  - Quality Classifier for CommonCrawl [[ModelScope](https://modelscope.cn/studios/Data-Juicer/tool_quality_classifier/summary)]
-  - Auto Evaluation on [HELM](https://github.com/stanford-crfm/helm) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/auto_evaluation_helm/summary)]
-  - Data Sampling and Mixture [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_mixture/summary)]
-- Data Process Loop [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)]
-- Data Process HPO [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_hpo/summary)]
+  - Dataset Splitting by Language [[ModelScope](https://modelscope.cn/studios/Data-Juicer/tool_dataset_splitting_by_language/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/tool_dataset_splitting_by_language)]
+  - Quality Classifier for CommonCrawl [[ModelScope](https://modelscope.cn/studios/Data-Juicer/tool_quality_classifier/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/tool_quality_classifier)]
+  - Auto Evaluation on [HELM](https://github.com/stanford-crfm/helm) [[ModelScope](https://modelscope.cn/studios/Data-Juicer/auto_evaluation_helm/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/auto_evaluation_helm)]
+  - Data Sampling and Mixture [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_mixture/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_mixture)]
+- Data Processing Loop [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_process_loop)]
+- Data Processing HPO [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_hpo/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_process_hpo)]
 '''
 
 
