@@ -116,11 +116,12 @@ def init_configs(args=None):
     parser.add_argument(
         '--ds_cache_dir',
         type=str,
-        default='~/.cache/huggingface/datasets',
-        help='Cache dir for HuggingFace datasets. In default it\'s the '
-             'default cache dir "~/.cache/huggingface/datasets". If this '
-             'argument is reset by users, it will override the default cache '
-             'dir.')
+        default=None,
+        help='Cache dir for HuggingFace datasets. In default it\'s the same '
+             'as the environment variable `HF_DATASETS_CACHE`, whose default '
+             'value is usually "~/.cache/huggingface/datasets". If this '
+             'argument is set to a valid path by users, it will override the '
+             'default cache dir.')
     parser.add_argument(
         '--cache_compress',
         type=str,
@@ -312,9 +313,12 @@ def init_setup_from_cfg(cfg):
     if cfg.op_fusion:
         cfg.use_checkpoint = False
 
-    # reset huggingface datasets cache directory
+    # update huggingface datasets cache directory only when ds_cache_dir is set
     from datasets import config
-    config.HF_DATASETS_CACHE = cfg.ds_cache_dir
+    if cfg.ds_cache_dir:
+        config.HF_DATASETS_CACHE = cfg.ds_cache_dir
+    else:
+        cfg.ds_cache_dir = config.HF_DATASETS_CACHE
 
     # if there is suffix_filter op, turn on the add_suffix flag
     cfg.add_suffix = False
