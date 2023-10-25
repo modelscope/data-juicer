@@ -112,7 +112,7 @@ class Visualize:
         st.markdown(
             f'<div align = "center"> A One-Stop Data Processing System for \
                 Large Language Models, \
-                see more details in our <a href={readme_link}>page</a></div>',
+                see more details in our <a href={readme_link}>Github</a></div>',
             unsafe_allow_html=True,
         )
 
