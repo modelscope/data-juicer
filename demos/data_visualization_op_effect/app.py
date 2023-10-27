@@ -177,7 +177,7 @@ class Visualize:
         st.markdown(
             f'<div align = "center"> A One-Stop Data Processing System for \
                 Large Language Models, \
-                see more details in our <a href={readme_link}>page</a></div>',
+                see more details in our <a href={readme_link}>Github</a></div>',
             unsafe_allow_html=True,
         )
 
@@ -320,7 +320,7 @@ class Visualize:
 
     @staticmethod
     def filter_dataset(dataset):
-        if Fields.stats not in dataset:
+        if Fields.stats not in dataset.features:
             return 
         text_key = st.session_state.get('text_key', 'text')
         text = dataset[text_key]
