@@ -83,6 +83,9 @@ process:
   - sentence_split_mapper:                                  # split text to multiple sentences and join them with '\n'
       lang: 'en'                                              # split text in what language
   - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
+  - chinese_convert_mapper:                                 # Mapper to convert Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji.
+      mode: 's2t'                                             # Choose the mode to convert Chinese: ['s2t', 't2s', 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 'jp2t']
+  - remove_non_chinese_character_mapper:                    # Mapper to remove non Chinese character in text samples.
 
   # Filter ops
   - alphanumeric_filter:                                    # filter text with alphabet/numeric ratio out of specific range.
