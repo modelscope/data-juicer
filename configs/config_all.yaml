@@ -33,6 +33,8 @@ save_stats_in_one_file: false                               # whether to store a
 # process schedule: a list of several process operators with their arguments
 process:
   # Mapper ops. Most of these ops need no arguments.
+  - chinese_convert_mapper:                                 # convert Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji.
+      mode: 's2t'                                             # Choose the mode to convert Chinese: ['s2t', 't2s', 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 'jp2t']
   - clean_email_mapper:                                     # remove emails from text.
   - clean_html_mapper:                                      # remove html formats form text.
   - clean_ip_mapper:                                        # remove ip addresses from text.
@@ -71,6 +73,7 @@ process:
   - remove_long_words_mapper:                               # remove much too long words from text.
       min_len: 1                                              # the min word length to keep words.
       max_len: 128                                            # the max word length to keep words.
+  - remove_non_chinese_character_mapper:                    # remove non Chinese character in text samples.
   - remove_specific_chars_mapper:                           # remove characters specified by users
       chars_to_remove: '◆●■►▼▲▴∆▻▷❖♡□'                        # a string or a list including those characters that need to be removed
   - remove_table_text_mapper:                               # remove possible table texts from text.
@@ -83,9 +86,6 @@ process:
   - sentence_split_mapper:                                  # split text to multiple sentences and join them with '\n'
       lang: 'en'                                              # split text in what language
   - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
-  - chinese_convert_mapper:                                 # Mapper to convert Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji.
-      mode: 's2t'                                             # Choose the mode to convert Chinese: ['s2t', 't2s', 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 'jp2t']
-  - remove_non_chinese_character_mapper:                    # Mapper to remove non Chinese character in text samples.
 
   # Filter ops
   - alphanumeric_filter:                                    # filter text with alphabet/numeric ratio out of specific range.
