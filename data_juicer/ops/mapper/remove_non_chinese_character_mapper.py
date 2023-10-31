@@ -7,15 +7,31 @@ from ..base_op import OPERATORS, Mapper
 class RemoveNonChineseCharacterlMapper(Mapper):
     """Mapper to remove non chinese Character in text samples."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self,
+                 keep_alphabet: bool = True,
+                 keep_number: bool = True,
+                 keep_punc: bool = True,
+                 *args,
+                 **kwargs):
         """
         Initialization method.
 
+        :param keep_alphabet: whether to keep alpabet
+        :param keep_number: whether to keep number
+        :param keep_punc: whether to keep punctuation
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.pattern = r'[^\u4e00-\u9fa5]'
+        self.pattern = u'[^\u4e00-\u9fa5'
+        if keep_alphabet:
+            self.pattern += u'A-Za-z'
+        if keep_number:
+            self.pattern += u'0-9'
+        if keep_punc:
+            self.pattern += u'.， ,\\-。%《*》/•、&＆(—)（+）：？!！“”·]+'
+        else:
+            self.pattern += u']'
 
     def process(self, sample):
 
