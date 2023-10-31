@@ -96,11 +96,14 @@ class TextFormatter(LocalFormatter):
         self.dataset_path = dataset_path
         self.add_suffix = add_suffix
 
-    def load_dataset(self, num_proc: int = 1) -> Dataset:
+    def load_dataset(self,
+                     num_proc: int = 1,
+                     global_cfg=None) -> Dataset:
         """
         Load a dataset from local text-type files.
 
         :param num_proc: number of processes when loading the dataset
+        :param global_cfg: the global cfg used in consequent processes,
         :return: unified_format_dataset.
         """
         # extract text to cache directory
@@ -154,4 +157,5 @@ class TextFormatter(LocalFormatter):
             datasets = concatenate_datasets([ds for _, ds in datasets.items()])
         return unify_format(datasets,
                             text_keys=self.text_keys,
-                            num_proc=num_proc)
+                            num_proc=num_proc,
+                            global_cfg=global_cfg)

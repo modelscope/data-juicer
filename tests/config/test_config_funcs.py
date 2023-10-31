@@ -37,14 +37,16 @@ class ConfigTest(unittest.TestCase):
             self.assertDictEqual(
                 cfg.process[0],
                 {'whitespace_normalization_mapper': {
-                    'text_key': 'text'
+                    'text_key': 'text',
+                    'image_key': 'images',
                 }}, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
                 cfg.process[1], {
                     'language_id_score_filter': {
                         'lang': 'zh',
                         'min_score': 0.8,
-                        'text_key': 'text'
+                        'text_key': 'text',
+                        'image_key': 'images',
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
@@ -74,7 +76,8 @@ class ConfigTest(unittest.TestCase):
                     'language_id_score_filter': {
                         'lang': 'zh',
                         'min_score': 0.8,
-                        'text_key': 'text'
+                        'text_key': 'text',
+                        'image_key': 'images',
                     }
                 })
             self.assertDictEqual(
@@ -82,7 +85,8 @@ class ConfigTest(unittest.TestCase):
                     'language_id_score_filter': {
                         'lang': 'en',
                         'min_score': 0.8,
-                        'text_key': 'text'
+                        'text_key': 'text',
+                        'image_key': 'images',
                     }
                 })
             self.assertDictEqual(
@@ -90,7 +94,8 @@ class ConfigTest(unittest.TestCase):
                     'language_id_score_filter': {
                         'lang': 'fr',
                         'min_score': 0.8,
-                        'text_key': 'text'
+                        'text_key': 'text',
+                        'image_key': 'images',
                     }
                 })
             self.assertDictEqual(
@@ -98,7 +103,8 @@ class ConfigTest(unittest.TestCase):
                     'language_id_score_filter': {
                         'lang': 'zh',
                         'min_score': 0.6,
-                        'text_key': 'text'
+                        'text_key': 'text',
+                        'image_key': 'images',
                     }
                 })
             self.assertDictEqual(
@@ -106,7 +112,8 @@ class ConfigTest(unittest.TestCase):
                     'language_id_score_filter': {
                         'lang': 'en',
                         'min_score': 0.5,
-                        'text_key': 'text'
+                        'text_key': 'text',
+                        'image_key': 'images',
                     }
                 })
 
