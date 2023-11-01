@@ -9,6 +9,7 @@ class Fields(object):
 
 
 class StatsKeys(object):
+    # text
     alpha_token_ratio = 'alpha_token_ratio'
     alnum_ratio = 'alnum_ratio'
     avg_line_length = 'avg_line_length'
@@ -25,6 +26,9 @@ class StatsKeys(object):
     num_words = 'num_words'
     word_rep_ratio = 'word_rep_ratio'
 
+    # image
+    aspect_ratios = 'aspect_ratios'
+
 
 class HashKeys(object):
     hash = DEFAULT_PREFIX + 'hash'
@@ -32,6 +36,10 @@ class HashKeys(object):
     simhash = DEFAULT_PREFIX + 'simhash'
 
 class InterVars(object):
+    # text
     lines = DEFAULT_PREFIX + 'lines'
     words = DEFAULT_PREFIX + 'words'
     refined_words = DEFAULT_PREFIX + 'refined_words'
+
+    # image
+    loaded_images = DEFAULT_PREFIX + 'loaded_images'
