@@ -13,3 +13,4 @@ nlpaug
 nlpcda
 nltk
 transformers
+opencc==1.1.6
