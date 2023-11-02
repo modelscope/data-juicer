@@ -117,9 +117,9 @@ def init_configs(args=None):
         '--eoc_special_token',
         type=str,
         default=SpecialTokens.eoc,
-        help='The special token that represents the end of a chunnk in the '
-             'text. In default, it\'s "<__dj__eoc>". You can specify your own '
-             'special token according to your input dataset.')
+        help='The special token that represents the end of a chunk in the '
+             'text. In default, it\'s "<|__dj__eoc|>". You can specify your '
+             'own special token according to your input dataset.')
     parser.add_argument(
         '--suffixes',
         type=Union[str, List[str], Tuple[str]],

@@ -23,6 +23,12 @@ trace_num: 10                                               # number of samples 
 op_fusion: false                                            # whether to fuse operators that share the same intermediate variables automatically. Op fusion might reduce the memory requirements slightly but speed up the whole process.
 cache_compress: null                                        # The compression method of the cache file, which can be specified in ['gzip', 'zstd', 'lz4']. If this parameter is None, the cache file will not be compressed. We recommend you turn on this argument when your input dataset is larger than tens of GB and your disk space is not enough.
 
+# for multimodal data processing
+image_key: 'images'                                         # Key name of field to store the list of sample image paths.
+image_special_token: '<__dj__image>'                        # The special token that represents an image in the text. In default, it's "<__dj__image>". You can specify your own special token according to your input dataset.
+
+eoc_special_token: '<|__dj__eoc|>'                          # The special token that represents the end of a chunk in the text. In default, it's "<|__dj__eoc|>". You can specify your own special token according to your input dataset.
+
 # for distributed processing
 executor_type: default                                      # Type of executor, support "default" or "ray" for now.
 ray_address: auto                                           # The address of the Ray cluster.
