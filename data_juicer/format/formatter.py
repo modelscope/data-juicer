@@ -212,6 +212,9 @@ def unify_format(
 
     # 3. convert relative paths to absolute paths
     if global_cfg:
+        logger.info('Converting relative paths in the dataset to their '
+                    'absolute version. (Based on the directory of input '
+                    'dataset file)')
         ds_dir = global_cfg.dataset_dir
         image_key = global_cfg.image_key
 
@@ -234,8 +237,6 @@ def unify_format(
                                   ],
                                   'dataset_dir': ds_dir
                               })
-        logger.info(f'Convert relative paths in the dataset to their absolute '
-                    f'version. (Based on the directory of input dataset file)')
     else:
         logger.warning(f'No global config passed into unify_format function. '
                        f'Relative paths in the dataset might not be converted '
@@ -296,4 +297,8 @@ def load_formatter(dataset_path,
 
     # no data
     else:
-        raise NotImplementedError
+        raise ValueError(f'Unable to load the dataset from [{dataset_path}]. '
+                         f'It might be because Data-Juicer doesn\'t support '
+                         f'the format of this dataset, or the path of this '
+                         f'dataset is incorrect.Please check if it\'s a valid '
+                         f'dataset path and retry.')
