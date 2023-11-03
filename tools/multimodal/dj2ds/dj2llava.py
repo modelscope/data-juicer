@@ -74,7 +74,9 @@ def main(
         keep_only_first_image: bool = True,
         eoc_special_token: str = SpecialTokens.eoc,
         image_special_token: str = '<image>',
-        sent_seperator: str = '\n'
+        sent_seperator: str = '\n',
+        convert_to_relative_paths: bool = False,
+        original_llava_ds_path: str = None,
 ):
     """
     Convert a Data-Juicer-format dataset to a LLaVA-like dataset.
@@ -93,6 +95,14 @@ def main(
         own LLaVA-like datasets but should be careful of possible compatibility
         problems that come from this change. Default: <image>.
     :param sent_seperator: seperator to split different sentences. Default: \n.
+    :param convert_to_relative_paths: whether convert the image paths in this
+        dataset to relative paths to the original dataset. If it's True, an
+        extra argument original_llava_ds_path is required. When the processed
+        and converted dataset will be used in another machine, it's better to
+        set this argument to True. Default: False.
+    :param original_llava_ds_path: path to the original unprocessed llava
+        dataset, which is used to help to recover the relative image paths for
+        better migration. Default: None.
     """
     # ----- Constant settings. Better not to change them. -----
     # default key of field to store the sample text
@@ -123,6 +133,20 @@ def main(
                        f'dataset is "<image>". It\'s better to align the this '
                        f'token. There might be some compatibility problem if '
                        f'you change it.')
+
+    # if convert_to_relative_paths is True, check if the original_llava_ds_path
+    # is provided as well.
+    if convert_to_relative_paths:
+        if not original_llava_ds_path:
+            raise ValueError(f'When convert_to_relative_paths is set to True, '
+                             f'the original_llava_ds_path must be provided '
+                             f'for recovering the relative paths. Please '
+                             f'check and retry.')
+        original_llava_ds_path = os.path.abspath(original_llava_ds_path)
+        # if provided original_llava_ds_path is the dataset file path, only
+        # keep the directory path.
+        if os.path.isfile(original_llava_ds_path):
+            original_llava_ds_path = os.path.dirname(original_llava_ds_path)
 
     logger.info('Start to convert.')
     samples = []
@@ -189,7 +213,22 @@ def main(
                 'conversations': conversations
             }
             if len(images) == 1:
-                new_sample['image'] = images[0]
+                image_path = images[0]
+                if convert_to_relative_paths:
+                    if image_path.startswith(original_llava_ds_path):
+                        image_path = os.path.relpath(image_path,
+                                                     original_llava_ds_path)
+                    else:
+                        raise ValueError(f'The original_llava_ds_path '
+                                         f'[{original_llava_ds_path}] is not '
+                                         f'the directory that contains the '
+                                         f'image [{image_path}] in the sample '
+                                         f'with id [{id}]. Please check if '
+                                         f'the correct original_llava_ds_path '
+                                         f'is provided or something wrong '
+                                         f'with this sample, and try again '
+                                         f'later.')
+                new_sample['image'] = image_path
             samples.append(new_sample)
 
     logger.info(f'Start to write the converted dataset to '
