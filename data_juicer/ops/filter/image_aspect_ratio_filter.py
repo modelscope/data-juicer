@@ -50,6 +50,8 @@ class ImageAspectRatioFilter(Filter):
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
+            sample[Fields.stats][StatsKeys.aspect_ratios] = np.array(
+                [], dtype=np.float64)
             return sample
 
         # load images

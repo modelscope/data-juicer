@@ -265,9 +265,8 @@ def main(
             new_sample = {
                 'id': id,
                 text_key: text,
+                image_key: images,
             }
-            if images:
-                new_sample[image_key] = images
             writer.write(new_sample)
     logger.info(f'Store the target dataset into [{target_ds_path}].')
 
