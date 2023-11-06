@@ -24,7 +24,7 @@
 import fire
 from loguru import logger
 
-from qc_utils import eval, init_spark, load_datasets
+from .qc_utils import eval, init_spark, load_datasets
 
 
 @logger.catch

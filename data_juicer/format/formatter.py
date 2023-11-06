@@ -1,13 +1,12 @@
 import os
 from typing import List, Tuple, Union
 
-from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
-from loguru import logger
-
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (find_files_with_suffix,
                                           is_absolute_path)
 from data_juicer.utils.registry import Registry
+from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
+from loguru import logger
 
 FORMATTERS = Registry('Formatters')
 
@@ -262,4 +261,6 @@ def load_formatter(dataset_path,
 
     # no data
     else:
-        raise NotImplementedError
+        raise ValueError('Can not found local data or huggingface '
+                         'dataset-hub for your given path: '
+                         f'{dataset_path} and suffixes: {suffixes}')

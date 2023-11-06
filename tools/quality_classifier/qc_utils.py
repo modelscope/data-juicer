@@ -2,8 +2,12 @@ import os
 import zipfile
 
 import numpy as np
+
 import sentencepiece as spm
 import wget
+from data_juicer.utils.cache_utils import DATA_JUICER_MODELS_CACHE
+from data_juicer.utils.model_utils import (MODEL_LINKS,
+                                           prepare_sentencepiece_model)
 from loguru import logger
 from pyspark.ml import Pipeline, PipelineModel
 from pyspark.ml.classification import LogisticRegression
@@ -12,25 +16,32 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, rand, udf
 from pyspark.sql.types import ArrayType, DoubleType, IntegerType, StringType
 
-from data_juicer.utils.cache_utils import DATA_JUICER_MODELS_CACHE
-from data_juicer.utils.model_utils import (MODEL_LINKS,
-                                           prepare_sentencepiece_model)
 
-
-def init_spark():
+def init_spark(spark_executor_memory=None,
+               spark_driver_memory=None,
+               spark_executor_memoryOverhead=None):
     """
     Initialize a spark session. You can set parameters such as memory, number
     of partitions, timeout and so on here
     :return: A spark session instance.
     """
-    spark = (SparkSession.builder.config('spark.driver.memory', '64g').config(
-        'spark.executor.memory',
-        '64g').config('spark.sql.shuffle.partitions', '300').config(
-            'spark.sql.execution.arrow.pyspark.enabled',
-            'true').config('spark.executor.memoryOverhead', '20000').config(
-                'spark.network.timeout',
-                '10000s').config('spark.executor.heartbeatInterval',
-                                 '3600s').getOrCreate())
+    if not spark_executor_memory:
+        spark_executor_memory = '64g'
+    if not spark_driver_memory:
+        spark_driver_memory = '64g'
+    if not spark_executor_memoryOverhead:
+        spark_executor_memoryOverhead = '20000'
+    spark = (SparkSession.builder.config(
+        'spark.driver.memory', spark_driver_memory).config(
+            'spark.executor.memory', spark_executor_memory).config(
+                'spark.sql.shuffle.partitions', '300').config(
+                    'spark.sql.execution.arrow.pyspark.enabled',
+                    'true').config('spark.executor.memoryOverhead',
+                                   spark_executor_memoryOverhead).config(
+                                       'spark.network.timeout',
+                                       '10000s').config(
+                                           'spark.executor.heartbeatInterval',
+                                           '3600s').getOrCreate())
     logger.info('Spark initialization done.')
     return spark
 

@@ -30,7 +30,7 @@
 import fire
 from loguru import logger
 
-from qc_utils import eval, init_spark, load_datasets, shuffle, train
+from .qc_utils import eval, init_spark, load_datasets, shuffle, train
 
 
 @logger.catch
