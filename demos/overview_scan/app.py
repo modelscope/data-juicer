@@ -119,8 +119,8 @@ op_list_desc = {
 | clean_links_mapper                                  | General, Code      | en, zh | Removes links, such as those starting with http or ftp                                                         |
 | expand_macro_mapper                                 | LaTeX              | en, zh | Expands macros usually defined at the top of TeX documents                                                     |
 | fix_unicode_mapper                                  | General            | en, zh | Fixes broken Unicodes (by [ftfy](https://ftfy.readthedocs.io/))                                                |
-| nlpaug_en_mapper                                    | General            | en     | Simply augment texts in English based on the `nlpaug` library                                                  | 
-| nlpcda_zh_mapper                                    | General            | zh     | Simply augment texts in Chinese based on the `nlpcda` library                                                  | 
+| nlpaug_en_mapper                                    | General            | en     | Simply augment texts in English based on the `nlpaug` library                                                  |
+| nlpcda_zh_mapper                                    | General            | zh     | Simply augment texts in Chinese based on the `nlpcda` library                                                  |
 | punctuation_normalization_mapper                    | General            | en, zh | Normalizes various Unicode punctuations to their ASCII equivalents                                             |
 | remove_bibliography_mapper                          | LaTeX              | en, zh | Removes the bibliography of TeX documents                                                                      |
 | remove_comments_mapper                              | LaTeX              | en, zh | Removes the comments of TeX documents                                                                          |
@@ -215,11 +215,12 @@ def run_demo():
         analysis_res_ori = pd.DataFrame()
         if os.path.exists(overall_file):
             analysis_res_ori = pd.read_csv(overall_file)
-            
+
         if os.path.exists(analyzer.analysis_path):
             for f_path in os.listdir(analyzer.analysis_path):
                 if '.png' in f_path and 'all-stats' in f_path:
-                    images_ori.append(os.path.join(analyzer.analysis_path, f_path))
+                    images_ori.append(
+                        os.path.join(analyzer.analysis_path, f_path))
 
         st.subheader('Statistics')
         st.dataframe(analysis_res_ori, use_container_width=True)

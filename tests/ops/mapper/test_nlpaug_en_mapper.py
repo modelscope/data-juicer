@@ -12,10 +12,7 @@ class NlpaugEnMapperTest(unittest.TestCase):
                 'I am a deep learning engineer. I love LLM.',
                 'A short test with numbers 2023'
             ],
-            'meta': [
-                'meta information',
-                'meta information with numbers'
-            ],
+            'meta': ['meta information', 'meta information with numbers'],
         })
 
     def test_number_of_generated_samples_with_sequential_on(self):

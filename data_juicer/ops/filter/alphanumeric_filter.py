@@ -3,7 +3,7 @@ import sys
 from jsonargparse.typing import PositiveFloat
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.model_utils import prepare_model, get_model
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 from ..common import get_words_from_document

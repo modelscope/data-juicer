@@ -3,6 +3,8 @@ import os
 import pandas as pd
 
 from data_juicer.utils.constant import Fields
+
+
 class OverallAnalysis:
     """Apply analysis on the overall stats, including mean, std, quantiles,
     etc."""

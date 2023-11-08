@@ -1,6 +1,7 @@
 from .base_op import OPERATORS
 from .op_fusion import fuse_operators
 
+
 def load_ops(process_list, op_fusion=False):
     """
     Load op list according to the process list from config file.

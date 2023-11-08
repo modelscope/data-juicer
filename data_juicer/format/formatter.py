@@ -262,4 +262,6 @@ def load_formatter(dataset_path,
 
     # no data
     else:
-        raise NotImplementedError
+        raise ValueError('Can not found local data or huggingface '
+                         'dataset-hub for your given path: '
+                         f'{dataset_path} and suffixes: {suffixes}')

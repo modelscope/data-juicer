@@ -1,13 +1,13 @@
+from multiprocessing import Pool
 
 import fire
 import jsonlines as jl
-
-from tqdm import tqdm
-from multiprocessing import Pool
 from loguru import logger
+from tqdm import tqdm
 from transformers import AutoTokenizer
 
 TOKENIZER = None
+
 
 def count_token_single(sample, text_keys):
     global TOKENIZER
@@ -22,6 +22,7 @@ def prepare_tokenizer(tokenizer_method):
     logger.info('Loading tokenizer from HuggingFace...')
     TOKENIZER = AutoTokenizer.from_pretrained(tokenizer_method,
                                               trust_remote_code=True)
+
 
 def main(data_path,
          text_keys='text',
@@ -45,8 +46,12 @@ def main(data_path,
         result_list = []
         with Pool(num_proc) as p:
             for sample in tqdm(reader):
-                result_list.append(p.apply_async(count_token_single,
-                                                 args=(sample, text_keys,)))
+                result_list.append(
+                    p.apply_async(count_token_single,
+                                  args=(
+                                      sample,
+                                      text_keys,
+                                  )))
             for res in tqdm(result_list):
                 token_count += res.get()
 

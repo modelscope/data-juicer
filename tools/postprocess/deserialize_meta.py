@@ -1,9 +1,10 @@
-import os
 import json
+import os
 import pathlib
-import jsonlines
 from multiprocessing import Pool
+
 import fire
+import jsonlines
 
 
 def fp_iter(src_dir):
@@ -48,12 +49,12 @@ def main(src_dir, target_dir, serialized_key='source_info', num_proc=1):
     if not os.path.exists(target_dir):
         os.makedirs(target_dir, exist_ok=True)
 
-
     pool = Pool(num_proc)
     for fp in fp_iter(src_dir):
         print(fp)
         jsonl_fp = os.path.join(target_dir, fp.name)
-        pool.apply_async(meta_deserialize, args=(str(fp), jsonl_fp, serialized_key))
+        pool.apply_async(meta_deserialize,
+                         args=(str(fp), jsonl_fp, serialized_key))
 
     pool.close()
     pool.join()

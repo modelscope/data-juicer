@@ -42,7 +42,7 @@ wandb login
 
 ```shell
 docker commit <container_id> data-juicer-eval
-``` 
+```
 
 #### 2. 将数据集预处理为 Megatron-LM 可识别的格式
 

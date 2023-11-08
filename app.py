@@ -230,7 +230,7 @@ class Visualize:
     @staticmethod
     def filter_dataset(dataset):
         if Fields.stats not in dataset.features:
-            return 
+            return
         text_key = st.session_state.get('text_key', 'text')
         text = dataset[text_key]
         stats = pd.DataFrame(dataset[Fields.stats])

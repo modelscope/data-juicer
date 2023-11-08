@@ -2,7 +2,7 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.constant import Fields, StatsKeys, InterVars
+from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_LINES

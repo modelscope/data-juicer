@@ -186,6 +186,7 @@ def eval(model_path, ds, tokenizer=None):
     logger.info(f'FP: {FP}, TN: {TN}')
     logger.info(f'P: {precision}, R: {recall}, F1: {F1}')
 
+
 def predict(model, ds, tokenizer=None, keep_method='label'):
     logger.info('Start scoring dataset...')
     if tokenizer:

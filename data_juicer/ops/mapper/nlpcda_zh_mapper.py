@@ -1,9 +1,10 @@
-
-from loguru import logger
 from copy import deepcopy
 
-from ..base_op import OPERATORS, Mapper
+from loguru import logger
+
 from data_juicer.utils.logger_utils import HiddenPrints
+
+from ..base_op import OPERATORS, Mapper
 
 
 @OPERATORS.register_module('nlpcda_zh_mapper')
@@ -152,4 +153,3 @@ class NlpcdaZhMapper(Mapper):
                     res_samples[key] = res_samples[key] * \
                                        len(res_samples[self.text_key])
         return res_samples
-

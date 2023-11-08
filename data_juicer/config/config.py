@@ -26,11 +26,16 @@ def init_configs(args=None):
     """
     parser = ArgumentParser(default_env=True, default_config_files=None)
 
+    parser.add_argument('--config',
+                        action=ActionConfigFile,
+                        help='Path to a configuration file.',
+                        required=True)
+
     parser.add_argument(
-        '--config',
-        action=ActionConfigFile,
-        help='Path to a configuration file.',
-        required=True)
+        '--hpo_config',
+        type=str,
+        help='Path to a configuration file when using auto-HPO tool.',
+        required=False)
 
     # basic global paras with extended type hints
     # e.g., files can be mode include flags
@@ -39,159 +44,154 @@ def init_configs(args=None):
     # "dw": "path to a directory that exists and is writeable")
     # "dc": "path to a directory that can be created if it does not exist")
     # "drw": "path to a directory that exists and is readable and writeable")
-    parser.add_argument(
-        '--project_name',
-        type=str,
-        default='hello_world',
-        help='Name of your data process project.')
+    parser.add_argument('--project_name',
+                        type=str,
+                        default='hello_world',
+                        help='Name of your data process project.')
     parser.add_argument(
         '--executor_type',
         type=str,
         default='default',
         choices=['default', 'ray'],
-        help='Type of executor, support "default" or "ray" for now.'
-    )
+        help='Type of executor, support "default" or "ray" for now.')
     parser.add_argument(
         '--dataset_path',
         type=str,
         help='Path to datasets with optional weights(0.0-1.0), 1.0 as '
-             'default. Accepted format:<w1> dataset1-path <w2> dataset2-path '
-             '<w3> dataset3-path ...')
+        'default. Accepted format:<w1> dataset1-path <w2> dataset2-path '
+        '<w3> dataset3-path ...')
     parser.add_argument(
         '--export_path',
         type=str,
         default='./outputs/hello_world.jsonl',
         help='Path to export and save the output processed dataset. The '
-             'directory to store the processed dataset will be the work '
-             'directory of this process.')
+        'directory to store the processed dataset will be the work '
+        'directory of this process.')
     parser.add_argument(
         '--export_shard_size',
         type=NonNegativeInt,
         default=0,
         help='Shard size of exported dataset in Byte. In default, it\'s 0, '
-             'which means export the whole dataset into only one file. If '
-             'it\'s set a positive number, the exported dataset will be split '
-             'into several sub-dataset shards, and the max size of each shard '
-             'won\'t larger than the export_shard_size')
+        'which means export the whole dataset into only one file. If '
+        'it\'s set a positive number, the exported dataset will be split '
+        'into several sub-dataset shards, and the max size of each shard '
+        'won\'t larger than the export_shard_size')
     parser.add_argument(
         '--export_in_parallel',
         type=bool,
         default=False,
         help='Whether to export the result dataset in parallel to a single '
-             'file, which usually takes less time. It only works when '
-             'export_shard_size is 0, and its default number of processes is '
-             'the same as the argument np. **Notice**: If it\'s True, '
-             'sometimes exporting in parallel might require much more time '
-             'due to the IO blocking, especially for very large datasets. '
-             'When this happens, False is a better choice, although it takes '
-             'more time.')
-    parser.add_argument(
-        '--np',
-        type=PositiveInt,
-        default=4,
-        help='Number of processes to process dataset.')
+        'file, which usually takes less time. It only works when '
+        'export_shard_size is 0, and its default number of processes is '
+        'the same as the argument np. **Notice**: If it\'s True, '
+        'sometimes exporting in parallel might require much more time '
+        'due to the IO blocking, especially for very large datasets. '
+        'When this happens, False is a better choice, although it takes '
+        'more time.')
+    parser.add_argument('--np',
+                        type=PositiveInt,
+                        default=4,
+                        help='Number of processes to process dataset.')
     parser.add_argument(
         '--text_keys',
         type=Union[str, List[str]],
         default='text',
         help='Key name of field where the sample texts to be processed, e.g., '
-             '`text`, `text.instruction`, `text.output`, ... Note: currently, '
-             'we support specify only ONE key for each op, for cases '
-             'requiring multiple keys, users can specify the op multiple '
-             'times.  We will only use the first key of `text_keys` when you '
-             'set multiple keys.')
+        '`text`, `text.instruction`, `text.output`, ... Note: currently, '
+        'we support specify only ONE key for each op, for cases '
+        'requiring multiple keys, users can specify the op multiple '
+        'times.  We will only use the first key of `text_keys` when you '
+        'set multiple keys.')
     parser.add_argument(
         '--suffixes',
         type=Union[str, List[str], Tuple[str]],
         default=[],
         help='Suffixes of files that will be find and loaded. If not set, we '
-             'will find all suffix files, and select a suitable formatter '
-             'with the most files as default.')
+        'will find all suffix files, and select a suitable formatter '
+        'with the most files as default.')
     parser.add_argument(
         '--use_cache',
         type=bool,
         default=True,
         help='Whether to use the cache management of huggingface datasets. It '
-             'might take up lots of disk space when using cache')
+        'might take up lots of disk space when using cache')
     parser.add_argument(
         '--ds_cache_dir',
         type=str,
         default=None,
         help='Cache dir for HuggingFace datasets. In default it\'s the same '
-             'as the environment variable `HF_DATASETS_CACHE`, whose default '
-             'value is usually "~/.cache/huggingface/datasets". If this '
-             'argument is set to a valid path by users, it will override the '
-             'default cache dir.')
+        'as the environment variable `HF_DATASETS_CACHE`, whose default '
+        'value is usually "~/.cache/huggingface/datasets". If this '
+        'argument is set to a valid path by users, it will override the '
+        'default cache dir.')
     parser.add_argument(
         '--cache_compress',
         type=str,
         default=None,
         help='The compression method of the cache file, which can be'
-             'specified in ["gzip", "zstd", "lz4"]. If this parameter is'
-             'None, the cache file will not be compressed.')
+        'specified in ["gzip", "zstd", "lz4"]. If this parameter is'
+        'None, the cache file will not be compressed.')
     parser.add_argument(
         '--use_checkpoint',
         type=bool,
         default=False,
         help='Whether to use the checkpoint management to save the latest '
-             'version of dataset to work dir when processing. Rerun the same '
-             'config will reload the checkpoint and skip ops before it. Cache '
-             'will be disabled when it is true . If args of ops before the '
-             'checkpoint are changed, all ops will be rerun from the '
-             'beginning.')
+        'version of dataset to work dir when processing. Rerun the same '
+        'config will reload the checkpoint and skip ops before it. Cache '
+        'will be disabled when it is true . If args of ops before the '
+        'checkpoint are changed, all ops will be rerun from the '
+        'beginning.')
     parser.add_argument(
         '--temp_dir',
         type=str,
         default=None,
         help='Path to the temp directory to store intermediate caches when '
-             'cache is disabled. In default it\'s None, so the temp dir will '
-             'be specified by system. NOTICE: you should be caution when '
-             'setting this argument because it might cause unexpected program '
-             'behaviors when this path is set to an unsafe directory.')
+        'cache is disabled. In default it\'s None, so the temp dir will '
+        'be specified by system. NOTICE: you should be caution when '
+        'setting this argument because it might cause unexpected program '
+        'behaviors when this path is set to an unsafe directory.')
     parser.add_argument(
         '--open_tracer',
         type=bool,
         default=False,
         help='Whether to open the tracer to trace samples changed during '
-             'process. It might take more time when opening tracer.')
+        'process. It might take more time when opening tracer.')
     parser.add_argument(
         '--op_list_to_trace',
         type=List[str],
         default=[],
         help='Which ops will be traced by tracer. If it\'s empty, all ops in '
-             'cfg.process will be traced. Only available when open_tracer is '
-             'true.')
+        'cfg.process will be traced. Only available when open_tracer is '
+        'true.')
     parser.add_argument(
         '--trace_num',
         type=int,
         default=10,
         help='Number of samples extracted by tracer to show the dataset '
-             'difference before and after a op. Only available when '
-             'open_tracer is true.')
+        'difference before and after a op. Only available when '
+        'open_tracer is true.')
     parser.add_argument(
         '--op_fusion',
         type=bool,
         default=False,
         help='Whether to fuse operators that share the same intermediate '
-             'variables automatically. Op fusion might reduce the memory '
-             'requirements slightly but speed up the whole process.')
+        'variables automatically. Op fusion might reduce the memory '
+        'requirements slightly but speed up the whole process.')
     parser.add_argument(
         '--process',
         type=List[Dict],
         help='List of several operators with their arguments, these ops will '
-             'be applied to dataset in order')
+        'be applied to dataset in order')
     parser.add_argument(
         '--save_stats_in_one_file',
         type=bool,
         default=False,
         help='Whether to save all stats to only one file. Only used in '
-             'Analysis.')
-    parser.add_argument(
-        '--ray_address',
-        type=str,
-        default='auto',
-        help='The address of the Ray cluster.'
-    )
+        'Analysis.')
+    parser.add_argument('--ray_address',
+                        type=str,
+                        default='auto',
+                        help='The address of the Ray cluster.')
 
     # add all parameters of the registered ops class to the parser,
     # and these op parameters can be modified through the command line,
@@ -285,7 +285,9 @@ def init_setup_from_cfg(cfg):
     timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
     cfg.timestamp = timestamp
     logfile_name = timestamp + '.txt'
-    setup_logger(save_dir=log_dir, filename=logfile_name, redirect=cfg.executor_type=='default')
+    setup_logger(save_dir=log_dir,
+                 filename=logfile_name,
+                 redirect=cfg.executor_type == 'default')
 
     # whether or not to use cache management
     # disabling the cache or using checkpoint explicitly will turn off the
@@ -391,6 +393,7 @@ def sort_op_by_types_and_names(op_name_classes):
         deduplicator_ops) + sorted(selector_ops)
     return ops_sorted_by_types
 
+
 def config_backup(cfg):
     cfg_path = cfg.config[0].absolute
     work_dir = cfg.work_dir
@@ -398,6 +401,7 @@ def config_backup(cfg):
     logger.info(f'Back up the input config file [{cfg_path}] into the '
                 f'work_dir [{work_dir}]')
     shutil.copyfile(cfg_path, target_path)
+
 
 def display_config(cfg):
     from tabulate import tabulate
@@ -416,3 +420,61 @@ def display_config(cfg):
 
     logger.info('Configuration table: ')
     print(table)
+
+
+def merge_config(ori_cfg, new_cfg: Dict):
+    """
+        Merge configuration from new_cfg into ori_cfg
+
+    :param ori_cfg: the original configuration object, whose type is
+    expected as namespace from jsonargparse
+    :param new_cfg: the configuration object to be merged, whose type is
+    expected as dict or namespace from jsonargparse
+
+    :return cfg_after_merge
+    """
+    try:
+        ori_specified_op_names = set()
+        ori_specified_op_idx = {}  # {op_name: op_order}
+
+        for op_order, op_in_process in enumerate(ori_cfg.process):
+            op_name = list(op_in_process.keys())[0]
+            ori_specified_op_names.add(op_name)
+            ori_specified_op_idx[op_name] = op_order
+
+        for new_k, new_v in new_cfg.items():
+            # merge parameters other than `cfg.process` and DJ-OPs
+            if new_k in ori_cfg and new_k != 'process' and '.' not in new_k:
+                logger.info('=' * 15)
+                logger.info(f'Before merging, the cfg item is: '
+                            f'{new_k}: {ori_cfg[new_k]}')
+                ori_cfg[new_k] = new_v
+                logger.info(f'After merging,  the cfg item is: '
+                            f'{new_k}: {new_v}')
+                logger.info('=' * 15)
+            else:
+                # merge parameters of DJ-OPs into cfg.process
+                # for nested style, e.g., `remove_table_text_mapper.min_col: 2`
+                key_as_groups = new_k.split('.')
+                if len(key_as_groups) > 1 and \
+                        key_as_groups[0] in ori_specified_op_names:
+                    op_name, para_name = key_as_groups[0], key_as_groups[1]
+                    op_order = ori_specified_op_idx[op_name]
+                    ori_cfg_val = ori_cfg.process[op_order][op_name][para_name]
+                    logger.info('=' * 15)
+                    logger.info(f'Before merging, the cfg item is: '
+                                f'{new_k}: {ori_cfg_val}')
+                    ori_cfg.process[op_order][op_name][para_name] = new_v
+                    logger.info(f'After merging,  the cfg item is: '
+                                f'{new_k}: {new_v}')
+                    logger.info('=' * 15)
+
+        ori_cfg = init_setup_from_cfg(ori_cfg)
+
+        # copy the config file into the work directory
+        config_backup(ori_cfg)
+
+        return ori_cfg
+
+    except ArgumentError:
+        logger.error('Config merge failed')

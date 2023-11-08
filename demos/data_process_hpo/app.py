@@ -1,5 +1,5 @@
-import os
 import streamlit as st
+
 
 class Visualize:
 
@@ -29,18 +29,24 @@ class Visualize:
     def visualize():
         Visualize.setup()
 
+
 def main():
+
     def hello():
 
-        st.image('imgs/data-juicer.png', output_format='png', use_column_width = True)
+        st.image('imgs/data-juicer.png',
+                 output_format='png',
+                 use_column_width=True)
         demo = 'The demo is coming soon😊'
         st.markdown(
             f'<div align = "center"> <font size = "50"> {demo} \
             </font> </div>',
             unsafe_allow_html=True,
         )
+
     Visualize.visualize()
     hello()
+
 
 if __name__ == '__main__':
     main()

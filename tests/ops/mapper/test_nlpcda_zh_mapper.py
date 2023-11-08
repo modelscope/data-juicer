@@ -3,6 +3,7 @@ import unittest
 from data_juicer.core import NestedDataset
 from data_juicer.ops.mapper.nlpcda_zh_mapper import NlpcdaZhMapper
 
+
 class NlpaugEnMapperTest(unittest.TestCase):
 
     def setUp(self):
@@ -68,9 +69,9 @@ class NlpaugEnMapperTest(unittest.TestCase):
         )
         self.assertEqual(len(op.aug_pipeline), aug_method_num)
         result = self.samples.map(op.process)
-        self.assertLessEqual(
-            len(result['text']),
-            (aug_num * aug_method_num + 1) * len(self.samples['text']))
+        self.assertLessEqual(len(result['text']),
+                             (aug_num * aug_method_num + 1) *
+                             len(self.samples['text']))
         self.assertGreaterEqual(len(result['text']), len(self.samples['text']))
         self.assertEqual(len(result['meta']), len(result['text']))
 
@@ -135,9 +136,9 @@ class NlpaugEnMapperTest(unittest.TestCase):
         )
         self.assertEqual(len(op.aug_pipeline), aug_method_num)
         result = self.samples.map(op.process)
-        self.assertLessEqual(
-            len(result['text']),
-            (aug_num * aug_method_num + 1) * len(self.samples['text']))
+        self.assertLessEqual(len(result['text']),
+                             (aug_num * aug_method_num + 1) *
+                             len(self.samples['text']))
         self.assertGreaterEqual(len(result['text']), len(self.samples['text']))
         self.assertEqual(len(result['meta']), len(result['text']))
 
