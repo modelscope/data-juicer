@@ -40,8 +40,7 @@ python execute_hpo.py --config configs/process.yaml --hpo_config configs/quality
 ```
 
 For the configuration for data recipe, i.e., `<data-process-cfg-file-path>`,
-please see more details in our [guidance](https://github.
-com/alibaba/data-juicer#build-up-config-files). As for the configuration 
+please see more details in our [guidance](https://github.com/alibaba/data-juicer#build-up-config-files). As for the configuration 
 for HPO, i.e., `<hpo-cfg-file-path>`, please refer to sweep [guidance](https://docs.wandb.ai/guides/sweeps/define-sweep-configuration).
 
 We provide an illustrative objective "quality_score" in `hpo/objects.py`,
