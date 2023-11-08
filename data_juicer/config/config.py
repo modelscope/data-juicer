@@ -468,8 +468,7 @@ def merge_config(ori_cfg, new_cfg: Dict):
                     ori_cfg_val = ori_cfg.process[op_order][op_name][para_name]
                     print(
                         '=' * 15, f'\nBefore merging, the cfg item is: '
-                        f'{new_k}: {ori_cfg_val}'
-                    )
+                        f'{new_k}: {ori_cfg_val}')
                     ori_cfg.process[op_order][op_name][para_name] = new_v
                     print(
                         f'After merging,  the cfg item is: '
