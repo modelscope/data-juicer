@@ -6,7 +6,7 @@
 Data-Juicer 中，以简化改良数据处理超参数的过程。
 使用此工具，用户可以研究探索 *数据配方的特定超参数* 和 *指定目标度量（如数据质量分、模型loss等）* 之间的 相关性和重要性得分
 
-*注意*：这是一个实验性功能。 用于数据配方的 Auto-HPO 仍然有
+**注意**：这是一个实验性功能。 用于数据配方的 Auto-HPO 仍然有
 一个极大的探索空间，暂无标准做法。 欢迎大家提出更多的建议、讨论、
 并通过新的 PR 做出贡献！
 
@@ -39,7 +39,7 @@ python execute_hpo.py --config configs/process.yaml --hpo_config configs/quality
 ```
 
 我们在`hpo/objects.py`中提供了一个示意性的搜索目标 `quality_score`，
-它使用质量评分器来度量处理后的数据，并将平均质分数链接到数据配方的超参数。
+它使用质量评分器来度量处理后的数据，并将平均质量分数链接到数据配方的超参数。
 运行后，你会得到类似如下的结果：![img](https://img.alicdn.com/imgextra/i2/O1CN017fT4Al1bVldeuCmiI_!!6000000003471-2-tps-2506-1710.png)
 
 

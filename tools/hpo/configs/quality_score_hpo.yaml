@@ -22,8 +22,7 @@ parameters:
       min: 256
       max: 8192
 
-
-#early_terminate:
-#  type: hyperband
-#  max_iter: 27
-#  s: 2
+early_terminate:
+  type: hyperband
+  max_iter: 27
+  s: 2

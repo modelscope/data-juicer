@@ -436,12 +436,7 @@ def merge_config(ori_cfg, new_cfg: Dict):
     try:
         ori_specified_op_names = set()
         ori_specified_op_idx = {}  # {op_name: op_order}
-        # format of ori_cfg.process
-        # ori_cfg.process[i] = {
-        #     op_in_process_name:
-        #         None if internal_op_para is None else
-        #         namespace_to_dict(internal_op_para)
-        # }
+
         for op_order, op_in_process in enumerate(ori_cfg.process):
             op_name = list(op_in_process.keys())[0]
             ori_specified_op_names.add(op_name)
@@ -450,13 +445,13 @@ def merge_config(ori_cfg, new_cfg: Dict):
         for new_k, new_v in new_cfg.items():
             # merge parameters other than `cfg.process` and DJ-OPs
             if new_k in ori_cfg and new_k != 'process' and '.' not in new_k:
-                print(
-                    '=' * 15, f'\nBefore merging, the cfg item is: '
-                    f'{new_k}: {ori_cfg[new_k]}')
+                logger.info('=' * 15)
+                logger.info(f'Before merging, the cfg item is: '
+                            f'{new_k}: {ori_cfg[new_k]}')
                 ori_cfg[new_k] = new_v
-                print(
-                    f'After merging,  the cfg item is: '
-                    f'{new_k}: {new_v}\n', '=' * 15, '\n')
+                logger.info(f'After merging,  the cfg item is: '
+                            f'{new_k}: {new_v}')
+                logger.info('=' * 15)
             else:
                 # merge parameters of DJ-OPs into cfg.process
                 # for nested style, e.g., `remove_table_text_mapper.min_col: 2`
@@ -466,13 +461,13 @@ def merge_config(ori_cfg, new_cfg: Dict):
                     op_name, para_name = key_as_groups[0], key_as_groups[1]
                     op_order = ori_specified_op_idx[op_name]
                     ori_cfg_val = ori_cfg.process[op_order][op_name][para_name]
-                    print(
-                        '=' * 15, f'\nBefore merging, the cfg item is: '
-                        f'{new_k}: {ori_cfg_val}')
+                    logger.info('=' * 15)
+                    logger.info(f'Before merging, the cfg item is: '
+                                f'{new_k}: {ori_cfg_val}')
                     ori_cfg.process[op_order][op_name][para_name] = new_v
-                    print(
-                        f'After merging,  the cfg item is: '
-                        f'{new_k}: {new_v}\n', '=' * 15, '\n')
+                    logger.info(f'After merging,  the cfg item is: '
+                                f'{new_k}: {new_v}')
+                    logger.info('=' * 15)
 
         ori_cfg = init_setup_from_cfg(ori_cfg)
 
