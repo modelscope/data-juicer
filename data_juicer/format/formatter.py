@@ -221,6 +221,8 @@ def unify_format(
         # function to convert relative paths to absolute paths
         def rel2abs(sample, path_keys, dataset_dir):
             for path_key in path_keys:
+                if path_key not in sample:
+                    continue
                 paths = sample[path_key]
                 if not paths:
                     continue
