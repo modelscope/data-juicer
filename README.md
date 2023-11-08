@@ -1,4 +1,4 @@
-English | [**中文**](README_ZH.md) 
+English | [**中文**](README_ZH.md)
 
 # Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
@@ -26,7 +26,7 @@ English | [**中文**](README_ZH.md)
 [![QualityClassifier](https://img.shields.io/badge/Tools-Quality_Classifier-saddlebrown?logo=Markdown)](tools/quality_classifier/README.md)
 [![AutoEvaluation](https://img.shields.io/badge/Tools-Auto_Evaluation-saddlebrown?logo=Markdown)](tools/evaluator/README.md)
 
-Data-Juicer is a one-stop data processing system to make data higher-quality, 
+Data-Juicer is a one-stop data processing system to make data higher-quality,
 juicier, and more digestible for LLMs.
 This project is being actively updated and maintained, and we will periodically enhance and add more features and data recipes. We welcome you to join us in promoting LLM data development and research!
 
@@ -68,22 +68,22 @@ Table of Contents
 
 ![Overview](https://img.alicdn.com/imgextra/i2/O1CN01IMPeD11xYRUYLmXKO_!!6000000006455-2-tps-3620-1604.png)
 
-- **Systematic & Reusable**: 
-  Empowering users with a systematic library of 20+ reusable [config recipes](configs), 50+ core [OPs](docs/Operators.md), and feature-rich 
-  dedicated [toolkits](#documentation), designed to 
+- **Systematic & Reusable**:
+  Empowering users with a systematic library of 20+ reusable [config recipes](configs), 50+ core [OPs](docs/Operators.md), and feature-rich
+  dedicated [toolkits](#documentation), designed to
   function independently of specific LLM datasets and processing pipelines.
 
-- **Data-in-the-loop**: Allowing detailed data analyses with an automated 
+- **Data-in-the-loop**: Allowing detailed data analyses with an automated
   report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.
   ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
 
-- **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data 
-  processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on 
-  reference LLaMA models.  
+- **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data
+  processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on
+  reference LLaMA models.
   ![exp_llama](https://img.alicdn.com/imgextra/i2/O1CN019WtUPP1uhebnDlPR8_!!6000000006069-2-tps-2530-1005.png)
 
-- **Enhanced Efficiency**: Providing a speedy data processing pipeline 
-  requiring less memory and CPU usage, optimized for maximum productivity. 
+- **Enhanced Efficiency**: Providing a speedy data processing pipeline
+  requiring less memory and CPU usage, optimized for maximum productivity.
   ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 
@@ -137,13 +137,13 @@ pip install py-data-juicer
 
 ### Using Docker
 
-- You can 
+- You can
   - either pull our pre-built image from DockerHub:
     ```shell
     docker pull datajuicer/data-juicer:<version_tag>
     ```
 
-  - or run the following command to build the docker image including the 
+  - or run the following command to build the docker image including the
     latest `data-juicer` with provided [Dockerfile](Dockerfile):
 
     ```shell

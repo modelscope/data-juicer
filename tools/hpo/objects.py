@@ -1,3 +1,6 @@
+import os
+import shutil
+
 from data_juicer.core import Executor
 from tools.quality_classifier.predict import predict_score
 
@@ -45,8 +48,16 @@ def obj_quality_score(dj_cfg):
     # [--tokenizer <tokenizer_type>] \
     # [--keep_method <keep_method>] \
     # [--text_key <text_key>] \
+
+    tmp_res_export_path = dj_cfg.export_path + '.tmp_hpo.jsonl'
+    if os.path.exists(tmp_res_export_path):
+        if os.path.isfile(tmp_res_export_path):
+            os.remove(tmp_res_export_path)
+        if os.path.isdir(tmp_res_export_path):
+            shutil.rmtree(tmp_res_export_path)
+
     overall_quality_stats = predict_score(dj_cfg.export_path,
-                                          dj_cfg.export_path,
+                                          tmp_res_export_path,
                                           overall_stats=True)
 
     # by default, using the mean quality score of processed data as final score

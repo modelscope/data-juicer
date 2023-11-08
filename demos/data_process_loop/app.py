@@ -136,11 +136,11 @@ def process_and_show_res():
             analyzer.analysis_path = os.path.dirname(
                 cfg_for_processed_data.export_path) + '/analysis'
             analyzer.run()
-            
+
             overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
             if os.path.exists(overall_file):
                 analysis_res_processed = pd.read_csv(overall_file)
-                
+
             if os.path.exists(analyzer.analysis_path):
                 for f_path in os.listdir(analyzer.analysis_path):
                     if '.png' in f_path and 'all-stats' in f_path:

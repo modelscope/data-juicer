@@ -161,8 +161,7 @@ class Exporter:
             Exporter.to_jsonl(
                 ds_stats,
                 stats_file,
-                num_proc=self.num_proc if self.export_in_parallel else 1
-            )
+                num_proc=self.num_proc if self.export_in_parallel else 1)
 
     def export(self, dataset):
         """

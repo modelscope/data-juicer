@@ -92,7 +92,11 @@ def get_log_file_path():
             return handler._sink._file.name
 
 
-def setup_logger(save_dir, distributed_rank=0, filename='log.txt', mode='o', redirect=True):
+def setup_logger(save_dir,
+                 distributed_rank=0,
+                 filename='log.txt',
+                 mode='o',
+                 redirect=True):
     """
     Setup logger for training and testing.
 
@@ -133,8 +137,10 @@ def setup_logger(save_dir, distributed_rank=0, filename='log.txt', mode='o', red
         redirect_sys_output('INFO')
     LOGGER_SETUP = True
 
+
 class HiddenPrints:
     """Define a range that hide the outputs within this range."""
+
     def __enter__(self):
         """
         Store the original standard output and redirect the standard output to

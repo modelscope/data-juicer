@@ -1,4 +1,4 @@
-from data_juicer.utils.model_utils import prepare_model, get_model
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
 from ..common import get_sentences_from_document
@@ -22,7 +22,9 @@ class SentenceSplitMapper(Mapper):
 
     def process(self, sample):
 
-        nltk_model = get_model(self.model_key, lang=self.lang, model_type='nltk')
+        nltk_model = get_model(self.model_key,
+                               lang=self.lang,
+                               model_type='nltk')
         sample[self.text_key] = get_sentences_from_document(
             sample[self.text_key],
             model_func=nltk_model.tokenize if nltk_model else None)

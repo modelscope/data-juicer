@@ -1,16 +1,17 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import subprocess
-import yaml
-import jsonlines
 import argparse
-import openai
-import time
 import json
 import os
-import requests
-
+import subprocess
+import time
 from abc import ABC, abstractmethod
+
+import jsonlines
+import requests
+import yaml
 from tqdm import tqdm
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+import openai
 
 
 def parse_args():
@@ -45,12 +46,17 @@ class HuggingfaceGenerator(AbstractGenerator):
 
     def generate(self, texts, max_tokens, temperature):
         texts = [format_question(text) for text in texts]
-        inputs = self.tokenizer(
-            texts, return_tensors='pt', padding=True).to(self.model.device)
-        outputs = self.model.generate(
-            **inputs, max_new_tokens=max_tokens, do_sample=True, temperature=temperature)
-        return [self.tokenizer.decode(
-            output[inputs.input_ids.shape[1]:], skip_special_tokens=True) for output in outputs]
+        inputs = self.tokenizer(texts, return_tensors='pt',
+                                padding=True).to(self.model.device)
+        outputs = self.model.generate(**inputs,
+                                      max_new_tokens=max_tokens,
+                                      do_sample=True,
+                                      temperature=temperature)
+        return [
+            self.tokenizer.decode(output[inputs.input_ids.shape[1]:],
+                                  skip_special_tokens=True)
+            for output in outputs
+        ]
 
 
 class OpenAIGenerator(AbstractGenerator):
@@ -71,31 +77,31 @@ class OpenAIGenerator(AbstractGenerator):
     def generate(self, texts, max_tokens, temperature):
         outputs = []
         for text in texts:
-            output = ""
+            output = ''
             for _ in range(self.max_retry):
                 try:
                     response = openai.ChatCompletion.create(
                         model=self.model,
                         messages=[
                             {
-                                "role": "system",
-                                "content": "You are a helpful assistant."
+                                'role': 'system',
+                                'content': 'You are a helpful assistant.'
                             },
                             {
-                                "role": "user",
-                                "content": text,
+                                'role': 'user',
+                                'content': text,
                             },
                         ],
                         temperature=temperature,
                         max_tokens=max_tokens,
                     )
-                    output = response["choices"][0]["message"]["content"]
+                    output = response['choices'][0]['message']['content']
                     break
                 except Exception as e:
                     print(e)
                     time.sleep(self.retry_wait)
             if len(output) == 0:
-                print(f"Failed to answer [{text}]")
+                print(f'Failed to answer [{text}]')
             outputs.append(output)
         return outputs
 
@@ -121,11 +127,11 @@ class MegatronGenerator(AbstractGenerator):
             self.merge_path = config['merge_path']
             self.tokenizer_path = None
         else:
-            raise NotImplementedError("Unsupported tokenizer type")
+            raise NotImplementedError('Unsupported tokenizer type')
         self.megatron_home = self.cur_dir
         if 'megatron_home' in config:
             self.megatron_home = config['megatron_home']
-        print(f"Megatron-LM home: {self.megatron_home}")
+        print(f'Megatron-LM home: {self.megatron_home}')
         self.server_port = config['port'] if 'port' in config else 5000
         self.handle = self._run_megatron_server()
         self.url = f'http://localhost:{self.server_port}/api'
@@ -148,28 +154,36 @@ class MegatronGenerator(AbstractGenerator):
             args.append(self.tokenizer_path)
 
     def _run_megatron_server(self):
-        args = ['torchrun', '--master_addr', '127.0.0.1', '--master_port', '5950', '--nproc_per_node', '1', '--nnodes', str(self.process_num), '--node_rank', '0', 'tools/run_text_generation_server.py', '--port', str(
-            self.server_port), '--use-checkpoint-args',  '--load', self.checkpoint_path, '--load-iteration', str(self.load_iteration), '--tokenizer-type']
+        args = [
+            'torchrun', '--master_addr', '127.0.0.1', '--master_port', '5950',
+            '--nproc_per_node', '1', '--nnodes',
+            str(self.process_num), '--node_rank', '0',
+            'tools/run_text_generation_server.py', '--port',
+            str(self.server_port), '--use-checkpoint-args', '--load',
+            self.checkpoint_path, '--load-iteration',
+            str(self.load_iteration), '--tokenizer-type'
+        ]
         self._set_megatron_tokenizer(args)
         os.chdir(self.megatron_home)
-        process = subprocess.Popen(
-            args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        process = subprocess.Popen(args,
+                                   stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL)
         os.chdir(self.cur_dir)
         return process
 
     def _request(self, prompts, max_tokens, temperature):
         for _ in range(5):
             try:
-                response = requests.put(self.url, headers=self.header, data=json.dumps({
-                    'prompts': prompts,
-                    'tokens_to_generate': max_tokens,
-                    'temperature': temperature,
-                    'echo_prompts': False
-                })).json()
+                response = requests.put(self.url,
+                                        headers=self.header,
+                                        data=json.dumps({
+                                            'prompts': prompts,
+                                            'tokens_to_generate': max_tokens,
+                                            'temperature': temperature,
+                                            'echo_prompts': False
+                                        })).json()
             except Exception as e:
-                response = {
-                    'message': e
-                }
+                response = {'message': e}
             if 'text' not in response:
                 print(f'Error in megatron response: {response}, retry in 10s')
                 time.sleep(10)
@@ -186,15 +200,18 @@ class MegatronGenerator(AbstractGenerator):
 
 
 class TextGenerator():
+
     def __init__(self, args):
         with open(args.config, 'r') as f:
             config = yaml.safe_load(f)['answer_generation']
-            self.questions = [q for q in jsonlines.open(
-                config['question_file'], 'r')]
+            self.questions = [
+                q for q in jsonlines.open(config['question_file'], 'r')
+            ]
             if not os.path.exists(os.path.dirname(config['answer_file'])):
                 os.makedirs(os.path.dirname(config['answer_file']))
-            self.answer_writer = jsonlines.open(
-                config['answer_file'], 'w', flush=True)
+            self.answer_writer = jsonlines.open(config['answer_file'],
+                                                'w',
+                                                flush=True)
             self.batch_size = config['batch_size']
             self.max_tokens = config['max_tokens']
             self.temperature = config['temperature']
@@ -206,12 +223,12 @@ class TextGenerator():
             elif 'megatron' in config:
                 self.generator = MegatronGenerator(config['megatron'])
             else:
-                raise NotImplementedError("Generator not found")
+                raise NotImplementedError('Generator not found')
 
     def generate(self, questions):
         texts = [question['text'] for question in questions]
-        answer_texts = self.generator.generate(
-            texts, self.max_tokens, self.temperature)
+        answer_texts = self.generator.generate(texts, self.max_tokens,
+                                               self.temperature)
         for (question, answer_text) in zip(questions, answer_texts):
             self.answer_writer.write({
                 'question_id': question['question_id'],

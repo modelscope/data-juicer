@@ -1,12 +1,10 @@
-import os
-
-from loguru import logger
-from data_juicer.config import init_configs
-from data_juicer.ops import (Filter, Mapper, load_ops)
-from data_juicer.utils.constant import Fields
-
 import ray
 import ray.data as rd
+from loguru import logger
+
+from data_juicer.config import init_configs
+from data_juicer.ops import Filter, Mapper, load_ops
+from data_juicer.utils.constant import Fields
 
 
 class RayExecutor:
@@ -35,7 +33,6 @@ class RayExecutor:
         ray.init(self.cfg.ray_address)
         self.process_list = self.cfg.process
 
-
     def run(self, load_data_np=None):
         """
         Running the dataset process pipeline.
@@ -57,7 +54,8 @@ class RayExecutor:
         # - If checkpoint is open, clean the cache files after each process
         if Fields.stats not in dataset.columns(fetch_if_missing=False):
             logger.info(f'columns {dataset.columns(fetch_if_missing=False)}')
-            dataset = dataset.add_column(Fields.stats, lambda df: [{}] * len(df))
+            dataset = dataset.add_column(Fields.stats,
+                                         lambda df: [{}] * len(df))
         logger.info('Processing data...')
         for op_cfg, op in zip(self.process_list, self.ops):
             op_name, _ = list(op_cfg.items())[0]
@@ -68,7 +66,9 @@ class RayExecutor:
                     dataset = dataset.map(op.compute_stats)
                     dataset = dataset.filter(op.process)
                 else:
-                    logger.error('Ray executor only support Filter and Mapper OPs for now')
+                    logger.error(
+                        'Ray executor only support Filter and Mapper OPs for now'
+                    )
                     raise NotImplementedError
             except:  # noqa: E722
                 logger.error(f'An error occurred during Op [{op_name}].')

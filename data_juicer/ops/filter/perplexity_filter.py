@@ -4,12 +4,12 @@
 
 from jsonargparse.typing import PositiveFloat
 
-from data_juicer.utils.constant import Fields, StatsKeys, InterVars
-from data_juicer.utils.model_utils import prepare_model, get_model
+from data_juicer.utils.constant import Fields, InterVars, StatsKeys
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
-from ..op_fusion import INTER_WORDS
 from ..common import get_words_from_document
+from ..op_fusion import INTER_WORDS
 
 
 @OPERATORS.register_module('perplexity_filter')
@@ -49,7 +49,8 @@ class PerplexityFilter(Filter):
         if context and words_key in sample[Fields.context]:
             words = sample[Fields.context][words_key]
         else:
-            tokenizer = get_model(self.sp_model_key, self.lang, 'sentencepiece')
+            tokenizer = get_model(self.sp_model_key, self.lang,
+                                  'sentencepiece')
             words = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)

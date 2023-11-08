@@ -19,8 +19,8 @@ parameters:
     values: [0.3, 0.5, 0.7]
   text_length_filter.min_len:
       distribution: q_log_uniform_values
-      min: 8
-      max: 512
+      min: 256
+      max: 8192
 
 
 #early_terminate:

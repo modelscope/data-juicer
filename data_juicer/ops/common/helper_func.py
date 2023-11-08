@@ -122,10 +122,12 @@ def words_augmentation(words, group_size, join_char):
     return augmentation
 
 
-def get_words_from_document(document,
-                            token_func=None,
-                            new_line=True,
-                            tab=True,):
+def get_words_from_document(
+    document,
+    token_func=None,
+    new_line=True,
+    tab=True,
+):
     """
     Get words from a document. Useful to compute ratios, like the
     stopwords ratio.
@@ -142,6 +144,7 @@ def get_words_from_document(document,
     else:
         words = split_on_whitespace(document, new_line, tab)
     return words
+
 
 def words_refinement(words,
                      lower_case=False,

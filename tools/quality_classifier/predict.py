@@ -60,8 +60,9 @@ import os
 import fire
 from loguru import logger
 
-from .qc_utils import (export_result, init_spark, load_dataset, predict,
-                       prepare_model)
+from tools.quality_classifier.qc_utils import (export_result, init_spark,
+                                               load_dataset, predict,
+                                               prepare_model)
 
 
 @logger.catch
@@ -104,6 +105,12 @@ def predict_score(dataset_path,
         keep_method = 'gpt3'
 
     # initialize a spark session
+    if '_JAVA_OPTIONS' in os.environ and \
+            '-Djava.net.preferIPv6Addresses=true' \
+            in os.environ['_JAVA_OPTIONS']:
+        os.environ['_JAVA_OPTIONS'] = os.environ['_JAVA_OPTIONS'].replace(
+            '-Djava.net.preferIPv6Addresses=true',
+            '-Djava.net.preferIPv6Addresses=false')
     spark = init_spark()
     # load the quality classifier model
     model = prepare_model(model_name=model)

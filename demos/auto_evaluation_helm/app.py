@@ -1,6 +1,8 @@
 import os
 import re
+
 import streamlit as st
+
 
 class Visualize:
 
@@ -29,6 +31,7 @@ class Visualize:
     def visualize():
         Visualize.setup()
 
+
 def main():
 
     def make_image(line):
@@ -38,10 +41,10 @@ def main():
 
     Visualize.visualize()
     buffer = []
-    with open("README_ZH.md", 'r', encoding='utf-8') as f:
+    with open('README_ZH.md', 'r', encoding='utf-8') as f:
         lines = f.readlines()
         for line in lines:
-            if "imgs/" in line:
+            if 'imgs/' in line:
                 st.markdown('\n'.join(buffer))
                 make_image(line)
                 buffer.clear()
@@ -49,6 +52,7 @@ def main():
                 buffer.append(line)
     st.markdown('\n'.join(buffer))
     # hello()
+
 
 if __name__ == '__main__':
     main()

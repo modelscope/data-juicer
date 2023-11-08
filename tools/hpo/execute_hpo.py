@@ -1,9 +1,9 @@
 import sys
 
+import wandb
 import yaml
 from jsonargparse import namespace_to_dict
 
-import wandb
 from data_juicer.config import init_configs, merge_config
 from objects import get_hpo_objective
 
@@ -32,7 +32,7 @@ def search():
     wandb.config = namespace_to_dict(dj_cfg)  # for configuration track
 
     # 2.2: calculate objective using new hyper-parameters, track the results
-    score = object_func(dj_cfg)
+    score = float(object_func(dj_cfg))
     wandb.log({sweep_configuration['metric']['name']: score})
 
 

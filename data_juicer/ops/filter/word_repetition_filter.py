@@ -4,13 +4,13 @@
 
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
-from data_juicer.utils.constant import Fields, StatsKeys, InterVars
-from data_juicer.utils.model_utils import prepare_model, get_model
+from data_juicer.utils.constant import Fields, InterVars, StatsKeys
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
-from ..op_fusion import INTER_WORDS
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
+from ..op_fusion import INTER_WORDS
 
 
 @OPERATORS.register_module('word_repetition_filter')
@@ -63,8 +63,9 @@ class WordRepetitionFilter(Filter):
         if context and words_key in sample[Fields.context]:
             words = sample[Fields.context][words_key]
         else:
-            tokenizer = get_model(self.model_key, lang=self.lang,
-                                            model_type='sentencepiece')
+            tokenizer = get_model(self.model_key,
+                                  lang=self.lang,
+                                  model_type='sentencepiece')
             words = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)
@@ -77,10 +78,9 @@ class WordRepetitionFilter(Filter):
         if context and refined_words_key in sample[Fields.context]:
             words = sample[Fields.context][refined_words_key]
         else:
-            words = words_refinement(
-                words,
-                lower_case=True,
-                strip_chars=SPECIAL_CHARACTERS)
+            words = words_refinement(words,
+                                     lower_case=True,
+                                     strip_chars=SPECIAL_CHARACTERS)
             if context:
                 sample[Fields.context][refined_words_key] = words
         word_ngrams = [

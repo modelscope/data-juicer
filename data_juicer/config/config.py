@@ -7,10 +7,10 @@ from typing import Dict, List, Tuple, Union
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
                           namespace_to_dict)
 from jsonargparse.typing import NonNegativeInt, PositiveInt
+from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.logger_utils import setup_logger
-from loguru import logger
 
 
 def init_configs(args=None):
@@ -450,7 +450,13 @@ def merge_config(ori_cfg, new_cfg: Dict):
         for new_k, new_v in new_cfg.items():
             # merge parameters other than `cfg.process` and DJ-OPs
             if new_k in ori_cfg and new_k != 'process' and '.' not in new_k:
+                print(
+                    '=' * 15, f'\nBefore merging, the cfg item is: '
+                    f'{new_k}: {ori_cfg[new_k]}')
                 ori_cfg[new_k] = new_v
+                print(
+                    f'After merging,  the cfg item is: '
+                    f'{new_k}: {new_v}\n', '=' * 15, '\n')
             else:
                 # merge parameters of DJ-OPs into cfg.process
                 # for nested style, e.g., `remove_table_text_mapper.min_col: 2`
@@ -459,16 +465,20 @@ def merge_config(ori_cfg, new_cfg: Dict):
                         key_as_groups[0] in ori_specified_op_names:
                     op_name, para_name = key_as_groups[0], key_as_groups[1]
                     op_order = ori_specified_op_idx[op_name]
+                    ori_cfg_val = ori_cfg.process[op_order][op_name][para_name]
+                    print(
+                        '=' * 15, f'\nBefore merging, the cfg item is: '
+                        f'{new_k}: {ori_cfg_val}'
+                    )
                     ori_cfg.process[op_order][op_name][para_name] = new_v
+                    print(
+                        f'After merging,  the cfg item is: '
+                        f'{new_k}: {new_v}\n', '=' * 15, '\n')
 
         ori_cfg = init_setup_from_cfg(ori_cfg)
 
         # copy the config file into the work directory
         config_backup(ori_cfg)
-
-        # show the final config tables before the process started
-        print('=' * 10, '\nAfter merging, the new cfg becomes:', '=' * 10)
-        display_config(ori_cfg)
 
         return ori_cfg
 
