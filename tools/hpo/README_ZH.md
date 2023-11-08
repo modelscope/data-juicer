@@ -4,7 +4,7 @@
 
 我们将自动化 HPO (hyper-parameters optimization) 工具 WandB [Sweep](https://docs.wandb.ai/guides/sweeps) 结合到
 Data-Juicer 中，以简化改良数据处理超参数的过程。
-使用此工具，用户可以研究探索 *数据配方的特定超参数* 和 *指定目标度量（如数据质量分、模型loss等）* 之间的 相关性和重要性得分
+使用此工具，用户可以研究探索 *数据配方的特定超参数* 和 *指定目标度量（如数据质量分、模型loss等）* 之间的 相关性和重要性得分。
 
 **注意**：这是一个实验性功能。 用于数据配方的 Auto-HPO 仍然有
 一个极大的探索空间，暂无标准做法。 欢迎大家提出更多的建议、讨论、
@@ -37,6 +37,12 @@ python execute_hpo.py --config <data-process-cfg-file-path> --hpo_config <hpo-cf
 # e.g.,
 python execute_hpo.py --config configs/process.yaml --hpo_config configs/quality_score_hpo.yaml
 ```
+
+对于数据菜谱的配置，即`<data-process-cfg-file-path>`，
+请参阅我们的 [指南](https://github.com/alibaba/data-juicer/blob/main/README_ZH.md#%E6%9E%84%E5%BB%BA%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6) 
+获取更多详细信息。
+对于HPO的配置，即`<hpo-cfg-file-path>`，请参阅Sweep提供的 [指南](https://docs.wandb.ai/guides/sweeps/define-sweep-configuration) 。
+
 
 我们在`hpo/objects.py`中提供了一个示意性的搜索目标 `quality_score`，
 它使用质量评分器来度量处理后的数据，并将平均质量分数链接到数据配方的超参数。

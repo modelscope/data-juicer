@@ -39,6 +39,11 @@ python execute_hpo.py --config <data-process-cfg-file-path> --hpo_config <hpo-cf
 python execute_hpo.py --config configs/process.yaml --hpo_config configs/quality_score_hpo.yaml
 ```
 
+For the configuration for data recipe, i.e., `<data-process-cfg-file-path>`,
+please see more details in our [guidance](https://github.
+com/alibaba/data-juicer#build-up-config-files). As for the configuration 
+for HPO, i.e., `<hpo-cfg-file-path>`, please refer to sweep [guidance](https://docs.wandb.ai/guides/sweeps/define-sweep-configuration).
+
 We provide an illustrative objective "quality_score" in `hpo/objects.py`,
 which uses quality scorer to measure the processed data, and links the average scores to hyper-parameters of data recipes.
 After running it, you will get the result similar to: ![img](https://img.alicdn.com/imgextra/i2/O1CN017fT4Al1bVldeuCmiI_!!6000000003471-2-tps-2506-1710.png)

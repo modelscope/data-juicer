@@ -42,5 +42,5 @@ sweep_id = wandb.sweep(sweep=sweep_configuration,
 
 wandb.agent(sweep_id,
             function=search,
-            count=sweep_configuration['sweep_count']
-            if 'sweep_count' in sweep_configuration else None)
+            count=sweep_configuration['sweep_max_count']
+            if 'sweep_max_count' in sweep_configuration else None)

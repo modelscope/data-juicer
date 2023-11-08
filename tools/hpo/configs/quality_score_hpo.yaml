@@ -1,6 +1,6 @@
 
 sweep_name: hpo_for_data-juicer
-# sweep_count: 10
+sweep_max_count: 1000  # the maximal number of trials; `None` for unlimited
 
 # hpo configuration from original sweep, see more options and details in
 # https://docs.wandb.ai/guides/sweeps/define-sweep-configuration
