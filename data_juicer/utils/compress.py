@@ -2,9 +2,9 @@ import os
 import re
 import shutil
 from abc import ABC, abstractmethod
+from multiprocessing import Pool
 from pathlib import Path
 from typing import Dict, List, Optional, Type, Union
-from multiprocessing import Pool
 
 from datasets import Dataset
 from datasets.utils.extract import Extractor as HF_Extractor
@@ -343,7 +343,10 @@ class CacheCompressManager:
                         f'Compressing cache file to {formatted_cache_name}')
                 if num_proc > 1:
                     pool.apply_async(self.compress_manager.compress,
-                                     args=(full_name, compress_filename,))
+                                     args=(
+                                         full_name,
+                                         compress_filename,
+                                     ))
                 else:
                     self.compress_manager.compress(full_name,
                                                    compress_filename)
@@ -399,7 +402,10 @@ class CacheCompressManager:
                     files_printed.add(formatted_cache_name)
                 if num_proc > 1:
                     pool.apply_async(self.compress_manager.decompress,
-                                     args=(full_name, raw_filename,))
+                                     args=(
+                                         full_name,
+                                         raw_filename,
+                                     ))
                 else:
                     self.compress_manager.decompress(full_name, raw_filename)
             else:
@@ -447,8 +453,10 @@ class CacheCompressManager:
             os.remove(full_name)
         return len(f_names)
 
+
 class CompressionOff:
     """Define a range that turn off the cache compression temporarily."""
+
     def __enter__(self):
         """
         Record the original cache compression method and turn it off.
@@ -463,6 +471,7 @@ class CompressionOff:
         """
         from . import cache_utils
         cache_utils.CACHE_COMPRESS = self.original_cache_compress
+
 
 def compress(prev_ds, this_ds=None, num_proc=1):
     if cache_utils.CACHE_COMPRESS:

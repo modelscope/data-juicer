@@ -8,8 +8,9 @@ from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
 from data_juicer.utils import cache_utils
-from data_juicer.utils.compress import (cleanup_compressed_cache_files,
-                                        compress, decompress, CompressionOff)
+from data_juicer.utils.compress import (CompressionOff,
+                                        cleanup_compressed_cache_files,
+                                        compress, decompress)
 from data_juicer.utils.fingerprint_utils import generate_fingerprint
 
 
@@ -173,15 +174,13 @@ class NestedDataset(Dataset):
             kargs['new_fingerprint'] = new_fingerprint
 
         if cache_utils.CACHE_COMPRESS:
-            decompress(self,
-                       kargs['new_fingerprint'],
+            decompress(self, kargs['new_fingerprint'],
                        kargs['num_proc'] if 'num_proc' in kargs else 1)
 
         new_ds = NestedDataset(super().map(*args, **kargs))
 
         if cache_utils.CACHE_COMPRESS:
-            compress(self,
-                     new_ds,
+            compress(self, new_ds,
                      kargs['num_proc'] if 'num_proc' in kargs else 1)
 
         if self.need_to_cleanup_caches:
@@ -215,8 +214,7 @@ class NestedDataset(Dataset):
         # after). So we need to decompress these two sets of compressed cache
         # files
         if cache_utils.CACHE_COMPRESS:
-            decompress(self,
-                       [kargs['new_fingerprint'], self._fingerprint],
+            decompress(self, [kargs['new_fingerprint'], self._fingerprint],
                        kargs['num_proc'] if 'num_proc' in kargs else 1)
 
         # Turn off the compression due to it invokes map actually in the filter
@@ -231,8 +229,7 @@ class NestedDataset(Dataset):
             self.need_to_cleanup_caches = prev_state
 
         if cache_utils.CACHE_COMPRESS:
-            compress(self,
-                     new_ds,
+            compress(self, new_ds,
                      kargs['num_proc'] if 'num_proc' in kargs else 1)
 
         if self.need_to_cleanup_caches:

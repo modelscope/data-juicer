@@ -13,4 +13,5 @@ dist
 # others
 .DS_Store
 .idea/
+wandb/
 __pycache__

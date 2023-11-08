@@ -14,7 +14,7 @@ python tools/postprocess/count_token.py        \
     --text_keys            <text_keys>         \
     --tokenizer_method     <tokenizer_method>  \
     --num_proc             <num_proc>
-    
+
 # get help
 python tools/postprocess/count_token.py --help
 ```

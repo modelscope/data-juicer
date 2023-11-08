@@ -97,7 +97,7 @@ def analyze_and_show_res(dataset_file):
     analysis_res_ori = pd.DataFrame()
     if os.path.exists(overall_file):
         analysis_res_ori = pd.read_csv(overall_file)
-        
+
     if os.path.exists(analyzer.analysis_path):
         for f_path in os.listdir(analyzer.analysis_path):
             if '.png' in f_path and 'all-stats' in f_path:

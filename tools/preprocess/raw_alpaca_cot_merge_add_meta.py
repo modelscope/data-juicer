@@ -21,8 +21,7 @@ meta_dict = {
         'IFT': True,  # whether is IFT data, added by Data-Juicer
         'CFT-SR': False,  # whether is CFT single-round data, added by
         # Data-Juicer
-        'CFT-P':
-        False,  # whether is Preference data, added by Data-Juicer
+        'CFT-P': False,  # whether is Preference data, added by Data-Juicer
     },
     'GPT4all': {
         'Task': 'MT',
@@ -364,45 +363,45 @@ meta_dict = {
         'CFT-SR': True,
         'CFT-P': True,
     },
-    "ConvAI2": {
-        "Task": "TS",
-        "Gen": "HG",
-        "Lang": "EN",
-        "Dataset": "ConvAI2",
-         "CFT-MR": False,
-        "IFT": False,
-         "CFT-SR": True,
-         "CFT-P": False,
+    'ConvAI2': {
+        'Task': 'TS',
+        'Gen': 'HG',
+        'Lang': 'EN',
+        'Dataset': 'ConvAI2',
+        'CFT-MR': False,
+        'IFT': False,
+        'CFT-SR': True,
+        'CFT-P': False,
     },
-    "FastChat": {
-        "Task": "MT",
-        "Gen": "SI",
-        "Lang": "EN",
-        "Dataset": "FastChat",
-         "CFT-MR": False,
-        "IFT": False,
-         "CFT-SR": True,
-         "CFT-P": False,
+    'FastChat': {
+        'Task': 'MT',
+        'Gen': 'SI',
+        'Lang': 'EN',
+        'Dataset': 'FastChat',
+        'CFT-MR': False,
+        'IFT': False,
+        'CFT-SR': True,
+        'CFT-P': False,
     },
     'Tabular-LLM-Data': {
         'Task': 'MT',
         'Gen': 'COL',
         'Lang': 'EN/CN',
-        "Dataset": "Tabular-LLM-Data",
-         "CFT-MR": False,
-        "IFT": True,
-         "CFT-SR": False,
-         "CFT-P": False,
+        'Dataset': 'Tabular-LLM-Data',
+        'CFT-MR': False,
+        'IFT': True,
+        'CFT-SR': False,
+        'CFT-P': False,
     },
     'ThoughtSource': {
         'Task': 'MT',
         'Gen': 'COL',
         'Lang': 'EN',
-        "Dataset": "ThoughtSource",
-         "CFT-MR": False,
-        "IFT": True,
-         "CFT-SR": False,
-         "CFT-P": False,
+        'Dataset': 'ThoughtSource',
+        'CFT-MR': False,
+        'IFT': True,
+        'CFT-SR': False,
+        'CFT-P': False,
     }
 }
 

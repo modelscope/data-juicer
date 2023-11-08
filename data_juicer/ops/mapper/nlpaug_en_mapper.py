@@ -1,11 +1,10 @@
+from copy import deepcopy
+
 import nlpaug.augmenter.char as nac
 import nlpaug.augmenter.word as naw
 import nlpaug.flow as naf
-
-from nlpaug.util import Action
-
 from loguru import logger
-from copy import deepcopy
+from nlpaug.util import Action
 
 from ..base_op import OPERATORS, Mapper
 
@@ -138,4 +137,3 @@ class NlpaugEnMapper(Mapper):
                     res_samples[key] += res_samples[key] * self.aug_num \
                                         * len(self.aug)
         return res_samples
-

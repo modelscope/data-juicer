@@ -2,7 +2,7 @@ from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.model_utils import prepare_model, get_model
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 
@@ -38,7 +38,9 @@ class LanguageIDScoreFilter(Filter):
             return sample
 
         text = sample[self.text_key].lower().replace('\n', ' ')
-        ft_model = get_model(self.model_key, lang=self.lang, model_type='fasttext')
+        ft_model = get_model(self.model_key,
+                             lang=self.lang,
+                             model_type='fasttext')
         if ft_model is None:
             err_msg = 'Model not loaded. Please retry later.'
             logger.error(err_msg)

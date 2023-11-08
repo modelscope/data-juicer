@@ -169,6 +169,7 @@ def prepare_huggingface_tokenizer(tokenizer_name):
                                               trust_remote_code=True)
     return tokenizer
 
+
 def prepare_diversity_model(model_name, lang):
     """
     Prepare diversity model for specific language.

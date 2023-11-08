@@ -6,7 +6,7 @@ This folder contains some configuration files to allow users to easily and quick
 
 The raw data files can be downloaded from [Alpaca-CoT](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT) on HuggingFace.
 
-### Convert raw Alpaca-CoT data to jsonl 
+### Convert raw Alpaca-CoT data to jsonl
 Use [raw_alpaca_cot_merge_add_meta.py](../../../tools/preprocess/raw_alpaca_cot_merge_add_meta.py) to select `instruction`, `input` and `output` columns and merge them to `text` field with a space, and add extra [ META ]( #meta_info) info to dataset:
 
 ```shell
@@ -66,7 +66,7 @@ Each sample in refined data of Alpaca-CoT contains meta info listed as below:
   * `CFT-SR`: tagged as Single-round Dialog datasets
 
   * `CFT-MR`: tagged as Multi-round Dialog datasets
-  
+
   * `CFT-P`: tagged as Preference datasets
 
 

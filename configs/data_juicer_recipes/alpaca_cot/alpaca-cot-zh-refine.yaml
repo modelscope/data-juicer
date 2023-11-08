@@ -15,10 +15,10 @@ process:
 
   - alphanumeric_filter: # 16957388
       tokenization: false
-      min_ratio: 0.10  
+      min_ratio: 0.10
   - character_repetition_filter: # 16956845
       rep_len: 10
-      max_ratio: 0.6  
+      max_ratio: 0.6
   - flagged_words_filter: # 16954629
       lang: zh
       tokenization: true

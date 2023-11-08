@@ -60,18 +60,19 @@ import os
 import fire
 from loguru import logger
 
-from qc_utils import (export_result, init_spark, load_dataset, predict,
-                      prepare_model)
+from tools.quality_classifier.qc_utils import (export_result, init_spark,
+                                               load_dataset, predict,
+                                               prepare_model)
 
 
 @logger.catch
-def main(dataset_path,
-         result_path,
-         model='gpt3',
-         tokenizer=None,
-         keep_method='gpt3',
-         text_key='text',
-         overall_stats=False):
+def predict_score(dataset_path,
+                  result_path,
+                  model='gpt3',
+                  tokenizer=None,
+                  keep_method='gpt3',
+                  text_key='text',
+                  overall_stats=False):
     """
     Use specific quality classifier to predict document scores on your dataset
     :param dataset_path: the path to the dataset you want to predict for
@@ -90,6 +91,7 @@ def main(dataset_path,
     :param overall_stats: whether to output an overall stats report on
         predicted document scores. It's False in default
     :return:
+        average quality score of the document
     """
     # set default tokenizers for default models
     if model == 'chinese':
@@ -103,6 +105,12 @@ def main(dataset_path,
         keep_method = 'gpt3'
 
     # initialize a spark session
+    if '_JAVA_OPTIONS' in os.environ and \
+            '-Djava.net.preferIPv6Addresses=true' \
+            in os.environ['_JAVA_OPTIONS']:
+        os.environ['_JAVA_OPTIONS'] = os.environ['_JAVA_OPTIONS'].replace(
+            '-Djava.net.preferIPv6Addresses=true',
+            '-Djava.net.preferIPv6Addresses=false')
     spark = init_spark()
     # load the quality classifier model
     model = prepare_model(model_name=model)
@@ -114,12 +122,14 @@ def main(dataset_path,
     export_result(pred, result_path)
 
     # generate overall statistics on doc scores
+    overall = pred.select('doc_score').toPandas().describe(include='all')
     if overall_stats:
-        overall = pred.select('doc_score').toPandas().describe(include='all')
         # export to result report file
         overall.to_csv(os.path.join(result_path, 'overall.csv'))
         overall.to_markdown(os.path.join(result_path, 'overall.md'))
 
+    return overall
+
 
 if __name__ == '__main__':
-    fire.Fire(main)
+    fire.Fire(predict_score)

@@ -67,8 +67,7 @@ class Executor:
         logger.info('Preparing exporter...')
         self.exporter = Exporter(self.cfg.export_path,
                                  self.cfg.export_shard_size,
-                                 self.cfg.export_in_parallel,
-                                 self.cfg.np)
+                                 self.cfg.export_in_parallel, self.cfg.np)
 
         # setup tracer
         self.open_tracer = self.cfg.open_tracer
@@ -120,14 +119,9 @@ class Executor:
                             op_name in self.op_list_to_trace:
                         if op.is_batched_op():
                             self.tracer.trace_batch_mapper(
-                                op_name,
-                                dataset,
-                                tmp,
-                                op.text_key)
+                                op_name, dataset, tmp, op.text_key)
                         else:
-                            self.tracer.trace_mapper(op_name,
-                                                     dataset,
-                                                     tmp,
+                            self.tracer.trace_mapper(op_name, dataset, tmp,
                                                      op.text_key)
                 elif isinstance(op, Filter):
                     if Fields.stats not in dataset.features:

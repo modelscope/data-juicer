@@ -10,16 +10,35 @@ class WordNumFilterTest(unittest.TestCase):
 
     def test_token_num(self):
         src = [
-            {"text": "Today is Sunday and it's a happy day!"},
-            {"text": "Do you need a cup of coffee?"},
-            {"text": "你好，请问你是谁"},
-            {"text": "Sur la plateforme MT4, plusieurs manières d'accéder à "
-                     "ces fonctionnalités sont conçues simultanément."},
-            {"text": "欢迎来到阿里巴巴！"},
-            {"text": "This paper proposed a novel method on LLM pretraining."},
+            {
+                'text': "Today is Sunday and it's a happy day!"
+            },
+            {
+                'text': 'Do you need a cup of coffee?'
+            },
+            {
+                'text': '你好，请问你是谁'
+            },
+            {
+                'text':
+                "Sur la plateforme MT4, plusieurs manières d'accéder à "
+                'ces fonctionnalités sont conçues simultanément.'
+            },
+            {
+                'text': '欢迎来到阿里巴巴！'
+            },
+            {
+                'text':
+                'This paper proposed a novel method on LLM pretraining.'
+            },
         ]
         tgt = [
-            10, 8, 9, 31, 14, 12,
+            10,
+            8,
+            9,
+            31,
+            14,
+            12,
         ]
         ds = Dataset.from_list(src)
         op = TokenNumFilter()
@@ -30,18 +49,39 @@ class WordNumFilterTest(unittest.TestCase):
 
     def test_token_num_filter(self):
         src = [
-            {"text": "Today is Sunday and it's a happy day!"},
-            {"text": "Do you need a cup of coffee?"},
-            {"text": "你好，请问你是谁"},
-            {"text": "Sur la plateforme MT4, plusieurs manières d'accéder à "
-                     "ces fonctionnalités sont conçues simultanément."},
-            {"text": "欢迎来到阿里巴巴！"},
-            {"text": "This paper proposed a novel method on LLM pretraining."},
+            {
+                'text': "Today is Sunday and it's a happy day!"
+            },
+            {
+                'text': 'Do you need a cup of coffee?'
+            },
+            {
+                'text': '你好，请问你是谁'
+            },
+            {
+                'text':
+                "Sur la plateforme MT4, plusieurs manières d'accéder à "
+                'ces fonctionnalités sont conçues simultanément.'
+            },
+            {
+                'text': '欢迎来到阿里巴巴！'
+            },
+            {
+                'text':
+                'This paper proposed a novel method on LLM pretraining.'
+            },
         ]
         tgt = [
-            {"text": "Today is Sunday and it's a happy day!"},
-            {"text": "欢迎来到阿里巴巴！"},
-            {"text": "This paper proposed a novel method on LLM pretraining."},
+            {
+                'text': "Today is Sunday and it's a happy day!"
+            },
+            {
+                'text': '欢迎来到阿里巴巴！'
+            },
+            {
+                'text':
+                'This paper proposed a novel method on LLM pretraining.'
+            },
         ]
         ds = Dataset.from_list(src)
         tgt = Dataset.from_list(tgt)

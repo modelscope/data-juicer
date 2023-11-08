@@ -1,10 +1,11 @@
-
 from typing import List
+
 from loguru import logger
 
-from .base_op import Filter
 from data_juicer.utils.constant import Fields, InterVars
 from data_juicer.utils.registry import Registry
+
+from .base_op import Filter
 
 # Type of intermediate vars
 # text
@@ -16,6 +17,7 @@ LOADED_IMAGES = Registry(InterVars.loaded_images)
 
 # all
 ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_IMAGES]
+
 
 def fuse_operators(process_list, ops):
     """
@@ -56,6 +58,7 @@ def fuse_operators(process_list, ops):
         fused_ops.extend(fused_group)
     return fused_op_def, fused_ops
 
+
 def fuse_filter_group(original_filter_group):
     """
     Fuse single filter group and return the fused filter group.
@@ -67,8 +70,10 @@ def fuse_filter_group(original_filter_group):
     fused_group_def = []
     fused_group = []
     all_intermediate_vars = ALL_INTER_VARS
-    all_fused_filters = {inter_vars: []
-                         for inter_vars in all_intermediate_vars}
+    all_fused_filters = {
+        inter_vars: []
+        for inter_vars in all_intermediate_vars
+    }
     # group these filters by their intermediate vars
     for process, op in original_filter_group:
         op_name, op_args = list(process.items())[0]
@@ -93,8 +98,10 @@ def fuse_filter_group(original_filter_group):
             defs, ops = zip(*inter_vars_filter)
             # new definition: new name and a definition list of fused op list
             fused_filter_def = {
-                'OpFusion:(%s)' % ','.join([list(process.items())[0][0]
-                                            for process in defs]): list(defs)
+                'OpFusion:(%s)' % ','.join([
+                    list(process.items())[0][0] for process in defs
+                ]):
+                list(defs)
             }
             logger.info(f'Ops are fused into one op '
                         f'{list(fused_filter_def.keys())[0]}.')
@@ -111,8 +118,10 @@ def fuse_filter_group(original_filter_group):
 
     return fused_group_def, fused_group
 
+
 class FusedFilter(Filter):
     """A fused operator for filters."""
+
     def __init__(self, fused_filters: List):
         """
         Initialization method.

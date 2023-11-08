@@ -53,8 +53,7 @@ class UnifyFormatTest(unittest.TestCase):
         ]
         self.run_test(samples[0])
         self.run_test(samples[1], args={'text_keys': ['content']})
-        self.run_test(samples[2],
-                      args={'text_keys': ['input', 'instruction']})
+        self.run_test(samples[2], args={'text_keys': ['input', 'instruction']})
 
     def test_empty_text(self):
         # filter out samples containing None field, but '' is OK

@@ -2,13 +2,13 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.constant import Fields, StatsKeys, InterVars
-from data_juicer.utils.model_utils import prepare_model, get_model
+from data_juicer.utils.constant import Fields, InterVars, StatsKeys
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
-from ..op_fusion import INTER_WORDS
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
+from ..op_fusion import INTER_WORDS
 
 
 @OPERATORS.register_module('words_num_filter')
@@ -57,8 +57,9 @@ class WordNumFilter(Filter):
         if context and words_key in sample[Fields.context]:
             words = sample[Fields.context][words_key]
         else:
-            tokenizer = get_model(self.model_key, lang=self.lang,
-                                            model_type='sentencepiece')
+            tokenizer = get_model(self.model_key,
+                                  lang=self.lang,
+                                  model_type='sentencepiece')
             words = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)
