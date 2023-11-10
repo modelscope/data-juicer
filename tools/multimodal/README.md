@@ -10,20 +10,20 @@ provided several dataset format conversion tools for some popular multimodal
 works.
 
 These tools consist of two types:
-- Other format to Data-Juicer format: These tools are in `ds2dj` directory. They help to convert datasets in other formats to target datasets in Data-Juicer format.
-- Data-Juicer format to other format: These tools are in `dj2ds` directory. They help to convert datasets in Data-Juicer formats to target datasets in target format.
+- Other format to Data-Juicer format: These tools are in `source_format_to_data_juicer_format` directory. They help to convert datasets in other formats to target datasets in Data-Juicer format.
+- Data-Juicer format to other format: These tools are in `data_juicer_format_to_target_format` directory. They help to convert datasets in Data-Juicer formats to target datasets in target format.
 
 For now, dataset formats that are supported by Data-Juicer are listed in the following table.
 
-| Format     | ds2dj                                                                  | dj2ds | Ref.                   |
-|------------|------------------------------------------------------------------------| --- |------------------------|
-| LLaVA-like | `llava2dj.py`                                                           | `dj2llava.py` | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| Format     | source_format_to_data_juicer_format | data_juicer_format_to_target_format | Ref.                                                                                                             |
+|------------|-------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| LLaVA-like | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
 
 For all tools, you can run the following command to find out the usage of them:
 
 ```shell
-# e.g. llava2dj.py
-python tools/multimodal/ds2dj/llava2dj.py --help
+# e.g. llava_to_dj.py
+python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --help
 ```
 
 Before using these tools, you might need to take a glance at the reference 
@@ -46,12 +46,12 @@ and show how these variations influence the dataset format. The table below
 shows the number of different samples between the original dataset and the 
 dataset after processing. There are 665,298 samples in the original dataset.
 
-| process                                                                               | # of diff.  |
-|---------------------------------------------------------------------------------------|-------------|
-| 1. apply `llava2dj.py` and `dj2llava.py`                                              | 113,501     |
-| 2. convert integer ids to string ids in the original dataset                          | 41,361      |
-| 3. strip whitespaces before and after values of conversations in the original dataset | 40,688      |
-| 4. add `'model': ''` fields in the converted dataset                                  | 1           |
+| process                                                                                | # of diff.  |
+|----------------------------------------------------------------------------------------|-------------|
+| 1. apply `llava_to_dj.py` and `dj_to_llava.py`                                         | 113,501     |
+| 2. convert integer ids to string ids in the original dataset                           | 41,361      |
+| 3. strip whitespaces before and after values of conversations in the original dataset  | 40,688      |
+| 4. add `'model': ''` fields in the converted dataset                                   | 1           |
 
 It's worth noticing that processes 2-4 won't influence the semantics of sample conversations in the dataset. 
 Thus we think the dataset after conversion can align with the original dataset. 
