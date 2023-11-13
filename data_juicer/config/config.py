@@ -445,8 +445,9 @@ def config_backup(cfg):
 
 
 def display_config(cfg):
-    from tabulate import tabulate
     import pprint
+
+    from tabulate import tabulate
     table_header = ['key', 'values']
 
     # remove ops outside the process list for better displaying

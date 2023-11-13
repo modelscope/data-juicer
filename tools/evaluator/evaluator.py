@@ -5,7 +5,6 @@ import subprocess
 import time
 
 import yaml
-
 from gpt_eval.gpt_evaluator import GPTEvaluator
 from recorder.wandb_writer import HelmWriter
 

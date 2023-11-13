@@ -26,6 +26,10 @@
 import math
 from typing import List, Optional, Tuple, Union
 
+import torch
+import torch.utils.checkpoint
+from torch import nn
+from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss, MSELoss
 from transformers.activations import ACT2FN
 from transformers.configuration_utils import PretrainedConfig
 from transformers.modeling_outputs import (BaseModelOutputWithPast,
@@ -35,11 +39,6 @@ from transformers.modeling_utils import PreTrainedModel
 from transformers.utils import (add_start_docstrings,
                                 add_start_docstrings_to_model_forward, logging,
                                 replace_return_docstrings)
-
-import torch
-import torch.utils.checkpoint
-from torch import nn
-from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss, MSELoss
 
 logger = logging.get_logger(__name__)
 
