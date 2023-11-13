@@ -176,7 +176,7 @@ class Exporter:
     @staticmethod
     def to_jsonl(dataset, export_path, num_proc=1, **kwargs):
         """
-        Export method for json/jsonl target files.
+        Export method for jsonl target files.
 
         :param dataset: the dataset to export.
         :param export_path: the path to store the exported dataset.
@@ -185,6 +185,19 @@ class Exporter:
         :return:
         """
         dataset.to_json(export_path, force_ascii=False, num_proc=num_proc)
+
+    @staticmethod
+    def to_json(dataset, export_path, num_proc=1, **kwargs):
+        """
+        Export method for json target files.
+
+        :param dataset: the dataset to export.
+        :param export_path: the path to store the exported dataset.
+        :param num_proc: the number of processes used to export the dataset.
+        :param kwargs: extra arguments.
+        :return:
+        """
+        dataset.to_json(export_path, force_ascii=False, num_proc=num_proc, lines=False)
 
     @staticmethod
     def to_parquet(dataset, export_path, **kwargs):
@@ -208,6 +221,6 @@ class Exporter:
         """
         return {
             'jsonl': Exporter.to_jsonl,
-            'json': Exporter.to_jsonl,
+            'json': Exporter.to_json,
             'parquet': Exporter.to_parquet,
         }

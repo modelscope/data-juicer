@@ -81,16 +81,17 @@ class MixtureFormatter(BaseFormatter):
             return dataset
         return dataset.shuffle(seed=seed).select(range(num_samples))
 
-    def load_dataset(self, num_proc: int = 1) -> Dataset:
+    def load_dataset(self, num_proc: int = 1, global_cfg=None) -> Dataset:
         """
         Load a mixed dataset.
 
         :param num_proc: number of processes when loading the dataset
+        :param global_cfg: the global cfg used in consequent processes,
         :return: mixed dataset
         """
         dataset_list = []
         for weight, formatter in zip(self.weights, self.formatters):
-            dataset = formatter.load_dataset(num_proc)
+            dataset = formatter.load_dataset(num_proc, global_cfg)
             sampled = self._random_sample(dataset, weight)
             logger.info(f'sampled {len(sampled)} from '
                         f'{len(dataset)} with weight {weight}')

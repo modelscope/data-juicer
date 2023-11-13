@@ -51,7 +51,9 @@ class LocalFormatter(BaseFormatter):
         self.data_files = find_files_with_suffix(dataset_path, suffixes)
         self.add_suffix = add_suffix
 
-    def load_dataset(self, num_proc: int = 1) -> Dataset:
+    def load_dataset(self,
+                     num_proc: int = 1,
+                     global_cfg=None) -> Dataset:
         """
         Load a dataset from dataset file or dataset directory, and unify its
         format.
@@ -76,7 +78,8 @@ class LocalFormatter(BaseFormatter):
                 concatenate_datasets([ds for _, ds in datasets.items()]))
         ds = unify_format(datasets,
                           text_keys=self.text_keys,
-                          num_proc=num_proc)
+                          num_proc=num_proc,
+                          global_cfg=global_cfg)
         return ds
 
 
@@ -100,7 +103,9 @@ class RemoteFormatter(BaseFormatter):
         self.text_keys = text_keys
         self.kwargs = kwargs
 
-    def load_dataset(self, num_proc: int = 1) -> Dataset:
+    def load_dataset(self,
+                     num_proc: int = 1,
+                     global_cfg=None) -> Dataset:
         """
         Load a dataset from HuggingFace, and unify its format.
 
@@ -112,7 +117,10 @@ class RemoteFormatter(BaseFormatter):
                           split='train',
                           num_proc=num_proc,
                           **self.kwargs)
-        ds = unify_format(ds, text_keys=self.text_keys, num_proc=num_proc)
+        ds = unify_format(ds,
+                          text_keys=self.text_keys,
+                          num_proc=num_proc,
+                          global_cfg=global_cfg)
         return ds
 
 
@@ -137,6 +145,7 @@ def unify_format(
     dataset: Dataset,
     text_keys: Union[List[str], str] = 'text',
     num_proc: int = 1,
+    global_cfg=None,
 ) -> Dataset:
     """
     Get an unified internal format, conduct the following modifications.
@@ -201,12 +210,40 @@ def unify_format(
                              fn_kwargs={'target_keys': text_keys})
     logger.info(f'{len(dataset)} samples left after filtering empty text.')
 
-    # 3. add Fields.stats field
-    # TODO:
-    # this is a temp solution,
-    # it will occur errors when only call mapper ops
-    # dataset = dataset.add_column( \
-    # name=Fields.stats, column=[{}] * dataset.num_rows)
+    # 3. convert relative paths to absolute paths
+    if global_cfg:
+        logger.info('Converting relative paths in the dataset to their '
+                    'absolute version. (Based on the directory of input '
+                    'dataset file)')
+        ds_dir = global_cfg.dataset_dir
+        image_key = global_cfg.image_key
+
+        # function to convert relative paths to absolute paths
+        def rel2abs(sample, path_keys, dataset_dir):
+            for path_key in path_keys:
+                if path_key not in sample:
+                    continue
+                paths = sample[path_key]
+                if not paths:
+                    continue
+                new_paths = [os.path.join(dataset_dir, path)
+                             for path in paths if not os.path.isabs(path)]
+                sample[path_key] = new_paths
+            return sample
+
+        dataset = dataset.map(rel2abs,
+                              num_proc=num_proc,
+                              fn_kwargs={
+                                  'path_keys': [
+                                      image_key,
+                                  ],
+                                  'dataset_dir': ds_dir
+                              })
+    else:
+        logger.warning(f'No global config passed into unify_format function. '
+                       f'Relative paths in the dataset might not be converted '
+                       f'to their absolute versions. Data of other modalities '
+                       f'might not be able to find by Data-Juicer.')
 
     return dataset
 
@@ -262,6 +299,8 @@ def load_formatter(dataset_path,
 
     # no data
     else:
-        raise ValueError('Can not found local data or huggingface '
-                         'dataset-hub for your given path: '
-                         f'{dataset_path} and suffixes: {suffixes}')
+        raise ValueError(f'Unable to load the dataset from [{dataset_path}]. '
+                         f'It might be because Data-Juicer doesn\'t support '
+                         f'the format of this dataset, or the path of this '
+                         f'dataset is incorrect.Please check if it\'s a valid '
+                         f'dataset path and retry.')

@@ -2,7 +2,7 @@
 
 # global parameters
 project_name: 'test_demo'
-dataset_path: './demo/demo-dataset.jsonl'  # path to your dataset directory or file
+dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
 np: 4  # number of subprocess to process your dataset
 
 export_path: './outputs/demo/demo-processed.parquet'

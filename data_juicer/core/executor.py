@@ -94,7 +94,7 @@ class Executor:
             logger.info('Loading dataset from data formatter...')
             if load_data_np is None:
                 load_data_np = self.cfg.np
-            dataset = self.formatter.load_dataset(load_data_np)
+            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
 
         # 2. extract processes
         logger.info('Preparing process operators...')

@@ -11,6 +11,7 @@ from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.logger_utils import setup_logger
+from data_juicer.utils.mm_utils import SpecialTokens
 
 
 def init_configs(args=None):
@@ -102,6 +103,25 @@ def init_configs(args=None):
         'requiring multiple keys, users can specify the op multiple '
         'times.  We will only use the first key of `text_keys` when you '
         'set multiple keys.')
+    parser.add_argument(
+        '--image_key',
+        type=str,
+        default='images',
+        help='Key name of field to store the list of sample image paths.')
+    parser.add_argument(
+        '--image_special_token',
+        type=str,
+        default=SpecialTokens.image,
+        help='The special token that represents an image in the text. In '
+             'default, it\'s "<__dj__image>". You can specify your own special'
+             ' token according to your input dataset.')
+    parser.add_argument(
+        '--eoc_special_token',
+        type=str,
+        default=SpecialTokens.eoc,
+        help='The special token that represents the end of a chunk in the '
+             'text. In default, it\'s "<|__dj__eoc|>". You can specify your '
+             'own special token according to your input dataset.')
     parser.add_argument(
         '--suffixes',
         type=Union[str, List[str], Tuple[str]],
@@ -289,6 +309,19 @@ def init_setup_from_cfg(cfg):
                  filename=logfile_name,
                  redirect=cfg.executor_type == 'default')
 
+    # check and get dataset dir
+    if os.path.exists(cfg.dataset_path):
+        if os.path.isdir(cfg.dataset_path):
+            cfg.dataset_dir = os.path.abspath(cfg.dataset_path)
+        else:
+            cfg.dataset_dir = os.path.abspath(
+                os.path.dirname(cfg.dataset_path))
+    else:
+        logger.error(f'Input dataset_path [{cfg.dataset_path}] is invalid. '
+                     f'Please check and retry.')
+        raise ValueError(f'Input dataset_path [{cfg.dataset_path}] is '
+                         f'invalid. Please check and retry.')
+
     # whether or not to use cache management
     # disabling the cache or using checkpoint explicitly will turn off the
     # cache management.
@@ -334,6 +367,10 @@ def init_setup_from_cfg(cfg):
             cfg.add_suffix = True
             break
 
+    # update special tokens
+    SpecialTokens.image = cfg.image_special_token
+    SpecialTokens.eoc = cfg.eoc_special_token
+
     # Apply text_key modification during initializing configs
     # users can freely specify text_key for different ops using `text_key`
     # otherwise, set arg text_key of each op to text_keys
@@ -345,9 +382,13 @@ def init_setup_from_cfg(cfg):
         for op_name in op:
             args = op[op_name]
             if args is None:
-                args = {'text_key': text_key}
+                args = {
+                    'text_key': text_key,
+                    'image_key': cfg.image_key,
+                }
             elif args['text_key'] is None:
                 args['text_key'] = text_key
+                args['image_key'] = cfg.image_key
             op[op_name] = args
 
     return cfg

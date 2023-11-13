@@ -8,8 +8,15 @@ from data_juicer.utils.registry import Registry
 from .base_op import Filter
 
 # Type of intermediate vars
+# text
 INTER_LINES = Registry(InterVars.lines)
 INTER_WORDS = Registry(InterVars.words)
+
+# images
+LOADED_IMAGES = Registry(InterVars.loaded_images)
+
+# all
+ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_IMAGES]
 
 
 def fuse_operators(process_list, ops):
@@ -62,7 +69,7 @@ def fuse_filter_group(original_filter_group):
     """
     fused_group_def = []
     fused_group = []
-    all_intermediate_vars = [INTER_LINES, INTER_WORDS]
+    all_intermediate_vars = ALL_INTER_VARS
     all_fused_filters = {
         inter_vars: []
         for inter_vars in all_intermediate_vars
