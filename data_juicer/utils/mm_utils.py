@@ -7,7 +7,7 @@ from data_juicer.utils.constant import DEFAULT_PREFIX
 # The tokens in this class can be updated by corresponding arguments in config
 class SpecialTokens(object):
     # modality
-    image = '<%s>' % (DEFAULT_PREFIX + 'image')
+    image = f'<{DEFAULT_PREFIX}image>'
 
     # others
     eoc = f'<|{DEFAULT_PREFIX}eoc|>'
