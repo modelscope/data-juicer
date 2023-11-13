@@ -36,7 +36,7 @@ class Mapper(OP):
                  image_key: str = None,
                  ):
         """
-        Base class that conducts text editing.
+        Base class that conducts data editing.
 
         :param text_key: the key name of field that stores sample texts
             to be processed.

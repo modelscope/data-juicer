@@ -437,7 +437,6 @@ def sort_op_by_types_and_names(op_name_classes):
 
 def config_backup(cfg):
     cfg_path = cfg.config[0].absolute
-    cfg.cfg_path = os.path.dirname(cfg_path)  # record the path of config
     work_dir = cfg.work_dir
     target_path = os.path.join(work_dir, os.path.basename(cfg_path))
     logger.info(f'Back up the input config file [{cfg_path}] into the '
