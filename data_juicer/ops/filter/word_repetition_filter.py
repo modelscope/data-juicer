@@ -17,7 +17,7 @@ from ..op_fusion import INTER_WORDS
 @INTER_WORDS.register_module('word_repetition_filter')
 class WordRepetitionFilter(Filter):
     """Filter to keep samples with word-level n-gram repetition ratio within a
-    \ specific range."""
+    specific range."""
 
     def __init__(self,
                  lang: str = 'en',

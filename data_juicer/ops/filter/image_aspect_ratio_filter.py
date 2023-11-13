@@ -1,13 +1,11 @@
-
 import numpy as np
-
 from jsonargparse.typing import PositiveFloat
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.mm_utils import load_image
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
-from data_juicer.utils.mm_utils import load_image
 
 
 @OPERATORS.register_module('image_aspect_ratio_filter')
@@ -85,7 +83,8 @@ class ImageAspectRatioFilter(Filter):
         aspect_ratios = sample[Fields.stats][StatsKeys.aspect_ratios]
         keep_bools = np.array([
             self.min_ratio <= aspect_ratio <= self.max_ratio
-            for aspect_ratio in aspect_ratios])
+            for aspect_ratio in aspect_ratios
+        ])
         if len(keep_bools) <= 0:
             return True
 
@@ -94,4 +93,3 @@ class ImageAspectRatioFilter(Filter):
             return keep_bools.any()
         else:
             return keep_bools.all()
-

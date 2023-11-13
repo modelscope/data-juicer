@@ -113,15 +113,15 @@ def init_configs(args=None):
         type=str,
         default=SpecialTokens.image,
         help='The special token that represents an image in the text. In '
-             'default, it\'s "<__dj__image>". You can specify your own special'
-             ' token according to your input dataset.')
+        'default, it\'s "<__dj__image>". You can specify your own special'
+        ' token according to your input dataset.')
     parser.add_argument(
         '--eoc_special_token',
         type=str,
         default=SpecialTokens.eoc,
         help='The special token that represents the end of a chunk in the '
-             'text. In default, it\'s "<|__dj__eoc|>". You can specify your '
-             'own special token according to your input dataset.')
+        'text. In default, it\'s "<|__dj__eoc|>". You can specify your '
+        'own special token according to your input dataset.')
     parser.add_argument(
         '--suffixes',
         type=Union[str, List[str], Tuple[str]],
@@ -314,8 +314,8 @@ def init_setup_from_cfg(cfg):
         if os.path.isdir(cfg.dataset_path):
             cfg.dataset_dir = os.path.abspath(cfg.dataset_path)
         else:
-            cfg.dataset_dir = os.path.abspath(
-                os.path.dirname(cfg.dataset_path))
+            cfg.dataset_dir = os.path.abspath(os.path.dirname(
+                cfg.dataset_path))
     else:
         logger.error(f'Input dataset_path [{cfg.dataset_path}] is invalid. '
                      f'Please check and retry.')

@@ -34,4 +34,10 @@ repos:
         exclude: thirdparty/
         args: [ "--fix=lf" ]
 
-exclude: 'docs/.*'
+exclude: |
+  (?x)^(
+    docs/.*|
+    tests/.*|
+    demos/.*|
+    .*\.md
+  )$
