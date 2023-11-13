@@ -1,5 +1,6 @@
 DEFAULT_PREFIX = '__dj__'
 
+
 class Fields(object):
     stats = DEFAULT_PREFIX + 'stats__'
     meta = DEFAULT_PREFIX + 'meta__'

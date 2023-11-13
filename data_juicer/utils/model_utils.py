@@ -169,12 +169,13 @@ def prepare_huggingface_tokenizer(tokenizer_name):
                                               trust_remote_code=True)
     return tokenizer
 
+
 def prepare_huggingface_clip(clip_name):
     """
     Prepare and load a clip and processor from HuggingFace.
 
-    :param tokenizer_name: input tokenizer name
-    :return: a tokenizer instance.
+    :param clip_name: input clip name
+    :return: a pair of clip instance and processor instance.
     """
     from transformers import CLIPProcessor, CLIPModel
 
