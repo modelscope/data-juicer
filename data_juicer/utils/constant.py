@@ -1,6 +1,5 @@
 DEFAULT_PREFIX = '__dj__'
 
-
 class Fields(object):
     stats = DEFAULT_PREFIX + 'stats__'
     meta = DEFAULT_PREFIX + 'meta__'
@@ -28,6 +27,9 @@ class StatsKeys(object):
 
     # image
     aspect_ratios = 'aspect_ratios'
+
+    # multimodal
+    clip_image_text_similarity = 'clip_image_text_similarity'
 
 
 class HashKeys(object):
