@@ -67,8 +67,8 @@ class RayExecutor:
                     dataset = dataset.filter(op.process)
                 else:
                     logger.error(
-                        'Ray executor only support Filter and Mapper OPs for now'
-                    )
+                        'Ray executor only support Filter and Mapper OPs for '
+                        'now')
                     raise NotImplementedError
             except:  # noqa: E722
                 logger.error(f'An error occurred during Op [{op_name}].')

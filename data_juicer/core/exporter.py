@@ -197,7 +197,10 @@ class Exporter:
         :param kwargs: extra arguments.
         :return:
         """
-        dataset.to_json(export_path, force_ascii=False, num_proc=num_proc, lines=False)
+        dataset.to_json(export_path,
+                        force_ascii=False,
+                        num_proc=num_proc,
+                        lines=False)
 
     @staticmethod
     def to_parquet(dataset, export_path, **kwargs):

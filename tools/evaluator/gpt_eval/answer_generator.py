@@ -6,12 +6,11 @@ import time
 from abc import ABC, abstractmethod
 
 import jsonlines
+import openai
 import requests
 import yaml
 from tqdm import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer
-
-import openai
 
 
 def parse_args():
@@ -28,7 +27,7 @@ class AbstractGenerator(ABC):
 
     @abstractmethod
     def generate(self, texts, max_tokens, temperature):
-        raise NotImplementedError(f'GENERATE is not implemented')
+        raise NotImplementedError('GENERATE is not implemented')
 
     def close(self):
         # do nothing

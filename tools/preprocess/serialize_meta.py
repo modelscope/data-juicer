@@ -23,8 +23,8 @@ def meta_serialize(file_name, target_file, text_key, serialized_key):
     :param file_name: path to source jsonl files.
     :param target_file: path to store the converted jsonl files.
     :text_key: the key corresponding to the field that will not be serialized.
-    :param serialized_key: the key corresponding to the field that the serialized
-    info saved. Default it's 'source_info'.
+    :param serialized_key: the key corresponding to the field that the
+        serialized info saved. Default it's 'source_info'.
     """
     with open(target_file, 'w') as fw:
         target = {}
@@ -49,8 +49,8 @@ def main(src_dir,
     :param target_dir: path to save the converted jsonl files.
     :param text_key: the key corresponding to the field that will not be
     serialized. Default it's 'text'.
-    :param serialized_key: the key corresponding to the field that the serialized
-    info saved. Default it's 'source_info'.
+    :param serialized_key: the key corresponding to the field that the
+        serialized info saved. Default it's 'source_info'.
     :param num_proc: number of process worke. Default it's 1.
     """
 
@@ -62,8 +62,8 @@ def main(src_dir,
         text_key = [text_key]
 
     for key in text_key:
-        assert key != serialized_key, "text_key '{}' cannot be the same as serialized_key.".format(
-            key)
+        assert key != serialized_key, "text_key '{}' cannot be the same as " \
+                                      'serialized_key.'.format(key)
 
     # check if the source directory exists
     if not os.path.exists(src_dir):

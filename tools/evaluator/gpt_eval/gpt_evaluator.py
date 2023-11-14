@@ -9,10 +9,9 @@ import time
 from multiprocessing import Pool
 
 import jsonlines
+import openai
 import yaml
 from tqdm import tqdm
-
-import openai
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -96,9 +95,9 @@ class GPTEvaluator():
             if len(sp) == 2:
                 return [float(sp[0]), float(sp[1])]
             else:
-                logger.error(f'Invalid score pair.')
+                logger.error('Invalid score pair.')
                 return [0, 0]
-        except Exception as e:
+        except Exception:
             logger.error('Invalid answer')
             return [0, 0]
 

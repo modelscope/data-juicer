@@ -50,7 +50,8 @@ class SpecialCharactersFilter(Filter):
         return sample
 
     def process(self, sample):
-        if self.min_ratio <= sample[Fields.stats][StatsKeys.special_char_ratio] \
+        if self.min_ratio <= \
+                sample[Fields.stats][StatsKeys.special_char_ratio] \
                 <= self.max_ratio:
             return True
         else:

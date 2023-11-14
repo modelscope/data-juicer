@@ -51,9 +51,7 @@ class LocalFormatter(BaseFormatter):
         self.data_files = find_files_with_suffix(dataset_path, suffixes)
         self.add_suffix = add_suffix
 
-    def load_dataset(self,
-                     num_proc: int = 1,
-                     global_cfg=None) -> Dataset:
+    def load_dataset(self, num_proc: int = 1, global_cfg=None) -> Dataset:
         """
         Load a dataset from dataset file or dataset directory, and unify its
         format.
@@ -103,9 +101,7 @@ class RemoteFormatter(BaseFormatter):
         self.text_keys = text_keys
         self.kwargs = kwargs
 
-    def load_dataset(self,
-                     num_proc: int = 1,
-                     global_cfg=None) -> Dataset:
+    def load_dataset(self, num_proc: int = 1, global_cfg=None) -> Dataset:
         """
         Load a dataset from HuggingFace, and unify its format.
 
@@ -226,8 +222,10 @@ def unify_format(
                 paths = sample[path_key]
                 if not paths:
                     continue
-                new_paths = [os.path.join(dataset_dir, path)
-                             for path in paths if not os.path.isabs(path)]
+                new_paths = [
+                    os.path.join(dataset_dir, path) for path in paths
+                    if not os.path.isabs(path)
+                ]
                 sample[path_key] = new_paths
             return sample
 
@@ -240,10 +238,10 @@ def unify_format(
                                   'dataset_dir': ds_dir
                               })
     else:
-        logger.warning(f'No global config passed into unify_format function. '
-                       f'Relative paths in the dataset might not be converted '
-                       f'to their absolute versions. Data of other modalities '
-                       f'might not be able to find by Data-Juicer.')
+        logger.warning('No global config passed into unify_format function. '
+                       'Relative paths in the dataset might not be converted '
+                       'to their absolute versions. Data of other modalities '
+                       'might not be able to find by Data-Juicer.')
 
     return dataset
 

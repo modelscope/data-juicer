@@ -14,7 +14,7 @@ class RemoveCommentsMapper(Mapper):
     """
     Mapper to remove comments in different kinds of documents.
 
-    Only support 'tex' \ for now.
+    Only support 'tex' for now.
     """
 
     def __init__(self,
