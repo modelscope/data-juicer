@@ -202,7 +202,7 @@ class ClipSimilarityFilterTest(unittest.TestCase):
                                   any_or_all='any',
                                   min_ratio=0.2,
                                   max_ratio=0.9)
-        self._run_filter(dataset, tgt_list, op, num_proc=1)
+        self._run_filter(dataset, tgt_list, op, num_proc=4)
 
 
 if __name__ == '__main__':

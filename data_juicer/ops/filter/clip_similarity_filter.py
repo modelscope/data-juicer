@@ -10,7 +10,7 @@ from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
 # avoid hanging when calling clip in multiprocessing
-torch.get_num_threads()
+torch.set_num_threads(1)
 
 
 @OPERATORS.register_module('clip_similarity_filter')
