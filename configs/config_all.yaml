@@ -109,7 +109,7 @@ process:
       min_ratio: 0.0                                          # the min ratio of filter range
       max_ratio: 0.5                                          # the max ratio of filter range
   - clip_similarity_filter:                                 # filter samples according to the similarity between text and images.
-      hf_clip:                                                # name of used Hugging Face clip
+      hf_clip: openai/clip-vit-base-patch32                   # name of used Hugging Face clip
       min_ratio: 0.24                                         # the min similarity of filter range
       max_ratio: 1.0                                          # the max similarity of filter range
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
