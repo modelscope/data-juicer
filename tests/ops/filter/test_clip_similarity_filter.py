@@ -17,17 +17,17 @@ class ClipSimilarityFilterTest(unittest.TestCase):
     img3_path = os.path.join(data_path, 'img3.jpg')
     hf_clip = 'openai/clip-vit-base-patch32'
 
-    def _run_filter(self, dataset: Dataset, target_list, op):
-         
+    def _run_filter(self, dataset: Dataset, target_list, op, num_proc=1):
+
         if Fields.stats not in dataset.features:
             # TODO:
             # this is a temp solution,
             # only add stats when calling filter op
             dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
-    
-        dataset = dataset.map(op.compute_stats)
-        dataset = dataset.filter(op.process)
+
+        dataset = dataset.map(op.compute_stats, num_proc=num_proc)
+        dataset = dataset.filter(op.process, num_proc=num_proc)
         dataset = dataset.select_columns(column_names=['text', 'images'])
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
@@ -137,7 +137,7 @@ class ClipSimilarityFilterTest(unittest.TestCase):
                                   max_ratio=0.9)
         self._run_filter(dataset, tgt_list, op)
 
-    def xxtest_reduce_max(self):
+    def test_reduce_max(self):
 
         ds_list = [{
             'text': f'{SpecialTokens.image}a photo of a cat '
@@ -181,6 +181,28 @@ class ClipSimilarityFilterTest(unittest.TestCase):
 
         op.min_ratio = 0.2
         self._run_filter(dataset, [], op)
+
+    def test_multi_process(self):
+
+        ds_list = [{
+            'text':
+            f'{SpecialTokens.image}a photo of a cat {SpecialTokens.eoc} '
+            f'{SpecialTokens.image}a photo of a dog {SpecialTokens.eoc}',
+            'images': [self.cat_path, self.cat_path]
+        }] * 10
+        tgt_list = [{
+            'text':
+            f'{SpecialTokens.image}a photo of a cat {SpecialTokens.eoc} '
+            f'{SpecialTokens.image}a photo of a dog {SpecialTokens.eoc}',
+            'images': [self.cat_path, self.cat_path]
+        }] * 10
+        dataset = Dataset.from_list(ds_list)
+        op = ClipSimilarityFilter(hf_clip=self.hf_clip,
+                                  reduce_mode='avg',
+                                  any_or_all='any',
+                                  min_ratio=0.2,
+                                  max_ratio=0.9)
+        self._run_filter(dataset, tgt_list, op, num_proc=4)
 
 
 if __name__ == '__main__':

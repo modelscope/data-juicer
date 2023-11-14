@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 from jsonargparse.typing import PositiveFloat
 
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -7,6 +8,9 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
+
+# avoid hanging when calling clip in multiprocessing
+torch.get_num_threads()
 
 
 @OPERATORS.register_module('clip_similarity_filter')
@@ -43,7 +47,6 @@ class ClipSimilarityFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.image_key = 'images'
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
         if reduce_mode not in ['avg', 'max', 'min']:
@@ -117,20 +120,23 @@ class ClipSimilarityFilter(Filter):
                 inputs = processor(text=text_chunk,
                                    images=image_chunk,
                                    return_tensors='pt',
+                                   truncation=True,
+                                   max_length=model.config.text_config.
+                                   max_position_embeddings,
                                    padding=True)
 
                 outputs = model(**inputs)
                 chunk_logits = outputs.logits_per_text.detach().cpu() / 100.0
+
                 if self.reduce_mode == 'avg':
                     chunk_similarity = chunk_logits.mean()
                 elif self.reduce_mode == 'max':
                     chunk_similarity = chunk_logits.max()
                 else:
                     chunk_similarity = chunk_logits.min()
-                    
-            similarity.append(float(chunk_similarity))
-            offset += count
 
+                similarity.append(float(chunk_similarity))
+            offset += count
         sample[Fields.stats][StatsKeys.clip_image_text_similarity] = similarity
 
         return sample
