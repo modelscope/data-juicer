@@ -1,11 +1,10 @@
-
 import numpy as np
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.mm_utils import get_image_size, size_to_bytes
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
-from data_juicer.utils.mm_utils import get_image_size, size_to_bytes
 
 
 @OPERATORS.register_module('image_size_filter')
@@ -16,8 +15,8 @@ class ImageSizeFilter(Filter):
     """
 
     def __init__(self,
-                 min_size: str = "0",
-                 max_size: str = "1Tb",
+                 min_size: str = '0',
+                 max_size: str = '1Tb',
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -56,8 +55,7 @@ class ImageSizeFilter(Filter):
 
         # for size calculation, no need to load images into memory
         sample[Fields.stats][StatsKeys.image_sizes] = [
-            get_image_size(img_path)
-            for img_path in sample[self.image_key]
+            get_image_size(img_path) for img_path in sample[self.image_key]
         ]
 
         return sample
@@ -65,10 +63,9 @@ class ImageSizeFilter(Filter):
     def process(self, sample):
         image_sizes = sample[Fields.stats][StatsKeys.image_sizes]
         keep_bools = np.array([
-            size_to_bytes(self.min_size)
-            <= image_size <=
-            size_to_bytes(self.max_size)
-            for image_size in image_sizes])
+            size_to_bytes(self.min_size) <= image_size <= size_to_bytes(
+                self.max_size) for image_size in image_sizes
+        ])
         if len(keep_bools) <= 0:
             return True
 
@@ -77,4 +74,3 @@ class ImageSizeFilter(Filter):
             return keep_bools.any()
         else:
             return keep_bools.all()
-

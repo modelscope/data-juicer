@@ -33,7 +33,7 @@ def size_to_bytes(size):
     numbers_list = [char for char in size if char.isdigit()]
 
     if len(numbers_list) == 0:
-        raise ValueError(f"Your input `size` does not contain numbers: {size}")
+        raise ValueError(f'Your input `size` does not contain numbers: {size}')
 
     size_numbers = int(float(''.join(numbers_list)))
 
@@ -61,7 +61,6 @@ def size_to_bytes(size):
     elif suffix == 'yb' or suffix == 'yib':
         return size_numbers << 80
     else:
-        raise ValueError(f"You specified unidentifiable unit: {suffix}, "
-                         f"expected in [KB, MB, GB, TB, PB, EB, ZB, YB, "
-                         f"KiB, MiB, GiB, TiB, PiB, EiB, ZiB, YiB]")
-
+        raise ValueError(f'You specified unidentifiable unit: {suffix}, '
+                         f'expected in [KB, MB, GB, TB, PB, EB, ZB, YB, '
+                         f'KiB, MiB, GiB, TiB, PiB, EiB, ZiB, YiB]')
