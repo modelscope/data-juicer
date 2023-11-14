@@ -10,22 +10,24 @@ from data_juicer.utils.mm_utils import get_image_size, size_to_bytes
 
 @OPERATORS.register_module('image_size_filter')
 @LOADED_IMAGES.register_module('image_size_filter')
-class ImageAspectRatioFilter(Filter):
+class ImageSizeFilter(Filter):
     """Keep data samples whose image size (in bytes/kb/MB/...) within a
     specific range.
     """
 
     def __init__(self,
-                 min_size: str = "10kb",
-                 max_size: str = "1mb",
+                 min_size: str = "0",
+                 max_size: str = "1Tb",
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
         """
         Initialization method.
 
-        :param min_size: The min image size to keep samples.
-        :param max_size: The max image size to keep samples.
+        :param min_size: The min image size to keep samples.  set to be "0" by
+        default for no size constraint
+        :param max_size: The max image size to keep samples.  set to be
+        "1Tb" by default, an approximate for un-limited case
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the

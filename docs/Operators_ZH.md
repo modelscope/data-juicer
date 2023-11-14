@@ -73,6 +73,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | character_repetition_filter    | General | en, zh | 保留 char-level n-gram 重复比率在指定范围内的样本 |
 | flagged_words_filter           | General | en, zh | 保留使标记字比率保持在指定阈值以下的样本               |
 | image_aspect_ratio_filter      | Image   | -      | 保留样本中包含的图片的宽高比在指定范围内的样本            |
+| image_size_filter      | Image   |   -    | 保留样本中包含的图片的大小（bytes）在指定范围内的样本                 |
 | language_id_score_filter       | General | en, zh | 保留特定语言的样本，通过预测的置信度得分来判断            |
 | maximum_line_length_filter     | Code    | en, zh | 保留最大行长度在指定范围内的样本                   |
 | perplexity_filter              | General | en, zh | 保留困惑度低于指定阈值的样本                     |
