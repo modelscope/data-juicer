@@ -27,11 +27,11 @@
 #       },
 #       {
 #         "from": "human",
-#         "value": "Is the bus driving down the street or pulled off to the side?"
+#         "value": "Is the bus driving down the street or pulled off to the side?"  # noqa: E501
 #       },
 #       {
 #         "from": "gpt",
-#         "value": "The bus is driving down the street, which is crowded with people and other vehicles."
+#         "value": "The bus is driving down the street, which is crowded with people and other vehicles."  # noqa: E501
 #       }
 #     ]
 #   },
@@ -56,30 +56,30 @@
 # Reference:
 # https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md
 
-import os
-import fire
-import random
 import json
-import jsonlines as jl
+import os
+import random
 
-from tqdm import tqdm
+import fire
+import jsonlines as jl
 from loguru import logger
+from tqdm import tqdm
 
 from data_juicer.utils.mm_utils import SpecialTokens
 
 
 @logger.catch
 def main(
-        llava_ds_path: str,
-        target_ds_path: str,
-        str_id: bool = True,
-        split_chunk: bool = False,
-        image_broadcast: bool = False,
-        image_broadcast_pos: str = 'random',
-        eoc_special_token: str = SpecialTokens.eoc,
-        image_special_token: str = '<image>',
-        add_eoc_at_last: bool = True,
-        sent_seperator: str = '\n',
+    llava_ds_path: str,
+    target_ds_path: str,
+    str_id: bool = True,
+    split_chunk: bool = False,
+    image_broadcast: bool = False,
+    image_broadcast_pos: str = 'random',
+    eoc_special_token: str = SpecialTokens.eoc,
+    image_special_token: str = '<image>',
+    add_eoc_at_last: bool = True,
+    sent_seperator: str = '\n',
 ):
     """
     Convert a LLaVA-like dataset to the Data-Juicer format.
@@ -122,7 +122,7 @@ def main(
         raise FileNotFoundError(f'Input LLaVA dataset [{llava_ds_path}] can '
                                 f'not be found.')
     if not target_ds_path.endswith('.jsonl'):
-        raise ValueError(f'Only support "jsonl" target dataset file now.')
+        raise ValueError('Only support "jsonl" target dataset file now.')
     if os.path.dirname(target_ds_path) \
             and not os.path.exists(os.path.dirname(target_ds_path)):
         logger.info(f'Create directory [{os.path.dirname(target_ds_path)}] '
@@ -139,18 +139,18 @@ def main(
                              f'given [{image_broadcast_pos}]')
     # check if the default image special token is changed
     if image_special_token != '<image>':
-        logger.warning(f'The image_special_token used in the original LLaVA '
-                       f'dataset is "<image>". It\'s better to align the this '
-                       f'token. There might be some compatibility problem if '
-                       f'you change it.')
+        logger.warning('The image_special_token used in the original LLaVA '
+                       'dataset is "<image>". It\'s better to align the this '
+                       'token. There might be some compatibility problem if '
+                       'you change it.')
     # check whether to add the eoc special token at last
     if not add_eoc_at_last:
-        logger.warning(f'You choose not to add special eoc token at the last, '
-                       f'which might cause some compatibility problems for '
-                       f'other type of datasets (e.g. OpenFlamingo).')
+        logger.warning('You choose not to add special eoc token at the last, '
+                       'which might cause some compatibility problems for '
+                       'other type of datasets (e.g. OpenFlamingo).')
 
     # load LLaVA dataset
-    logger.info(f'Loading original LLaVA dataset.')
+    logger.info('Loading original LLaVA dataset.')
     llava_ds = json.load(open(llava_ds_path, 'r', encoding='utf-8'))
     logger.info(f'Load [{len(llava_ds)}] samples.')
 
@@ -215,8 +215,7 @@ def main(
                             f'[{id}] is neither before nor after the text. '
                             f'The position might be wrong or there is no '
                             f'image_special_token in this sample. Please '
-                            f'check and fix the dataset and retry.'
-                        )
+                            f'check and fix the dataset and retry.')
                     images.append(image)
                 else:
                     # whether broadcast image special token to following
@@ -249,7 +248,7 @@ def main(
 
                 # combine these texts together
                 new_sent = role_human + sent_human + sent_seperator \
-                           + role_robot + sent_robot
+                    + role_robot + sent_robot
                 formatted_conversations.append(new_sent)
 
             join_sep = sent_seperator

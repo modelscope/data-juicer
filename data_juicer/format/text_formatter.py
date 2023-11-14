@@ -96,9 +96,7 @@ class TextFormatter(LocalFormatter):
         self.dataset_path = dataset_path
         self.add_suffix = add_suffix
 
-    def load_dataset(self,
-                     num_proc: int = 1,
-                     global_cfg=None) -> Dataset:
+    def load_dataset(self, num_proc: int = 1, global_cfg=None) -> Dataset:
         """
         Load a dataset from local text-type files.
 
