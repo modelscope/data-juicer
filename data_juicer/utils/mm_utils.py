@@ -63,4 +63,5 @@ def size_to_bytes(size):
     else:
         raise ValueError(f'You specified unidentifiable unit: {suffix}, '
                          f'expected in [KB, MB, GB, TB, PB, EB, ZB, YB, '
-                         f'KiB, MiB, GiB, TiB, PiB, EiB, ZiB, YiB]')
+                         f'KiB, MiB, GiB, TiB, PiB, EiB, ZiB, YiB], '
+                         f'(case insensitive, counted by *Bytes*).')

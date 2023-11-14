@@ -16,7 +16,7 @@ class ImageSizeFilter(Filter):
 
     def __init__(self,
                  min_size: str = '0',
-                 max_size: str = '1Tb',
+                 max_size: str = '1TB',
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -35,8 +35,8 @@ class ImageSizeFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.min_size = min_size
-        self.max_size = max_size
+        self.min_size = size_to_bytes(min_size)
+        self.max_size = size_to_bytes(max_size)
         if any_or_all not in ['any', 'all']:
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
@@ -63,8 +63,8 @@ class ImageSizeFilter(Filter):
     def process(self, sample):
         image_sizes = sample[Fields.stats][StatsKeys.image_sizes]
         keep_bools = np.array([
-            size_to_bytes(self.min_size) <= image_size <= size_to_bytes(
-                self.max_size) for image_size in image_sizes
+            self.min_size <= image_size <= self.max_size
+            for image_size in image_sizes
         ])
         if len(keep_bools) <= 0:
             return True
