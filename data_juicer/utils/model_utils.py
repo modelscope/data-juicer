@@ -177,7 +177,7 @@ def prepare_huggingface_clip(clip_name):
     :param clip_name: input clip name
     :return: a pair of clip instance and processor instance.
     """
-    from transformers import CLIPProcessor, CLIPModel
+    from transformers import CLIPModel, CLIPProcessor
 
     model = CLIPModel.from_pretrained(clip_name)
     processor = CLIPProcessor.from_pretrained(clip_name)
