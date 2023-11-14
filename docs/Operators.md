@@ -12,7 +12,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   21   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   17   | Filters out low-quality samples                 |
-| [ Deduplicator ]( #deduplicator ) |   3    | Detects and removes duplicate samples           |
+| [ Deduplicator ]( #deduplicator ) |   4    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
 
@@ -98,6 +98,7 @@ All the specific operators are listed below, each featured with several capabili
 | document_deduplicator         | General | en, zh | Deduplicate samples at document-level by comparing MD5 hash |
 | document_minhash_deduplicator | General | en, zh | Deduplicate samples at document-level using MinHashLSH      |
 | document_simhash_deduplicator | General | en, zh | Deduplicate samples at document-level using SimHash         |
+| image_deduplicator            | Image   |   -    | Deduplicate samples at document-level using exact matching of images between documents |
 
 
 ## Selector <a name="selector"/>
