@@ -33,7 +33,7 @@ git commit -m "xxxx"
 check in your PR fails, please locally ① ensure that the relevant 
 dependencies of pre-commit are consistent with the project configuration 
 (which can be completed through `pre-commit clean` and `pre-commit install`); 
-and ② execute `pre before push -commit run --all-files`.
+and ② execute `pre-commit run --all-files` before push.
 
 ## Build your own ops
 
