@@ -15,8 +15,8 @@ class ClipSimilarityFilterTest(unittest.TestCase):
 
     cat_path = os.path.join(data_path, 'cat.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
-    hf_clip = 'openai/clip-vit-base-patch32'
-
+    #hf_clip = 'openai/clip-vit-base-patch32'
+    hf_clip = '/Users/mazhijian/Documents/Project_2023/P01_LLM/C04_Data/clip-vit-base-patch32/'
     def _run_filter(self, dataset: Dataset, target_list, op, num_proc=1):
 
         if Fields.stats not in dataset.features:
@@ -202,7 +202,7 @@ class ClipSimilarityFilterTest(unittest.TestCase):
                                   any_or_all='any',
                                   min_ratio=0.2,
                                   max_ratio=0.9)
-        self._run_filter(dataset, tgt_list, op, num_proc=4)
+        self._run_filter(dataset, tgt_list, op, num_proc=1)
 
 
 if __name__ == '__main__':
