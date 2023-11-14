@@ -101,7 +101,8 @@ class HelmWriter(Writer):
         self.leaderboard = leaderboard
         if self.leaderboard:
             self.leaderboard_metrics = self.conf[
-                'leaderboard_metrics'] if 'leaderboard_metrics' in self.conf else DEFAULT_HELM_METRICS
+                'leaderboard_metrics'] if 'leaderboard_metrics' in self.conf \
+                else DEFAULT_HELM_METRICS
             self.excluded_models = self.conf[
                 'excluded_models'] if 'excluded_models' in self.conf else []
             return
@@ -324,7 +325,7 @@ def main():
         else:
             raise NotImplementedError(
                 f"Unsupported type for eval type {eval['eval_type']}")
-    if 'leaderboard' in config and config['leaderboard'] == True:
+    if 'leaderboard' in config and config['leaderboard'] is True:
         HelmWriter(project_name=config['project'],
                    base_url=config['base_url'],
                    leaderboard=True,

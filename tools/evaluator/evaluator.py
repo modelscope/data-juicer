@@ -5,7 +5,6 @@ import subprocess
 import time
 
 import yaml
-
 from gpt_eval.gpt_evaluator import GPTEvaluator
 from recorder.wandb_writer import HelmWriter
 
@@ -25,15 +24,13 @@ def parse_args():
 
 
 def check_args(args):
-    if args.begin_iteration == None:
-        print(
-            f'--begin-iteration is not provided, use the value of --iteration-interval ({args.iteration_interval}).'
-        )
+    if args.begin_iteration is None:
+        print(f'--begin-iteration is not provided, use the value of '
+              f'--iteration-interval ({args.iteration_interval}).')
         args.begin_iteration = args.iteration_interval
-    if args.end_iteration == None:
-        print(
-            f'--end-iteration is not provided, evaluator will monitor the traning process continuously.'
-        )
+    if args.end_iteration is None:
+        print('--end-iteration is not provided, evaluator will monitor the '
+              'training process continuously.')
         args.end_iteration = float('inf')
 
 
@@ -80,8 +77,9 @@ class Evaluator():
                 self.tokenizer_path = None
             else:
                 raise NotImplementedError(
-                    f"tokenizer type: {self.config['megatron']['tokenizer_type']} is not supported"
-                )
+                    f'tokenizer type: '
+                    f"{self.config['megatron']['tokenizer_type']} is not "
+                    f'supported')
             self.megatron_log_path = os.path.join(self.cache_dir,
                                                   'megatron.log')
             if 'log_path' in self.config['megatron']:
@@ -157,9 +155,8 @@ class Evaluator():
             print(f'Wait for megatron checkpoint {iteration}')
             time.sleep(self.check_iterval * 60)
         # setup megatron server
-        print(
-            f'Start megatron text generation server for checkpoint iter_{iteration}'
-        )
+        print(f'Start megatron text generation server for checkpoint '
+              f'iter_{iteration}')
         args = [
             'torchrun', '--master_addr', '127.0.0.1', '--master_port', '5950',
             '--nproc_per_node',
@@ -181,7 +178,7 @@ class Evaluator():
     def stop_megatron_server(self, process, logfile):
         process.terminate()
         logfile.close()
-        print(f'Stop megatron text generation server')
+        print('Stop megatron text generation server')
 
     def run_megatron_inference(self, iteration):
         while not self.megatron_checkpoint_exists(iteration):

@@ -8,7 +8,7 @@ from ..base_op import OPERATORS, Mapper
 @OPERATORS.register_module('punctuation_normalization_mapper')
 class PunctuationNormalizationMapper(Mapper):
     """Mapper to normalize unicode punctuations to English punctuations in text
-    \ samples."""
+    samples."""
 
     def __init__(self, *args, **kwargs):
         """

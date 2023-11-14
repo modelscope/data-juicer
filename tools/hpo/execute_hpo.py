@@ -3,9 +3,9 @@ import sys
 import wandb
 import yaml
 from jsonargparse import namespace_to_dict
+from objects import get_hpo_objective
 
 from data_juicer.config import init_configs, merge_config
-from objects import get_hpo_objective
 
 # 1: load the defined search space
 sweep_cfg_file_path = None

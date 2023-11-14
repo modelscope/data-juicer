@@ -42,11 +42,11 @@
 #       },
 #       {
 #         "from": "human",
-#         "value": "Is the bus driving down the street or pulled off to the side?"
+#         "value": "Is the bus driving down the street or pulled off to the side?"  # noqa: E501
 #       },
 #       {
 #         "from": "gpt",
-#         "value": "The bus is driving down the street, which is crowded with people and other vehicles."
+#         "value": "The bus is driving down the street, which is crowded with people and other vehicles."  # noqa: E501
 #       }
 #     ]
 #   },
@@ -56,27 +56,28 @@
 # Reference:
 # https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md
 
-import os
-import fire
 import json
+import os
+
+import fire
 import jsonlines as jl
 import regex as re
-
-from tqdm import tqdm
 from loguru import logger
+from tqdm import tqdm
 
 from data_juicer.utils.mm_utils import SpecialTokens
 
+
 @logger.catch
 def main(
-        dj_ds_path: str,
-        target_llava_ds_path: str,
-        keep_only_first_image: bool = True,
-        eoc_special_token: str = SpecialTokens.eoc,
-        image_special_token: str = '<image>',
-        sent_seperator: str = '\n',
-        convert_to_relative_paths: bool = False,
-        original_llava_ds_path: str = None,
+    dj_ds_path: str,
+    target_llava_ds_path: str,
+    keep_only_first_image: bool = True,
+    eoc_special_token: str = SpecialTokens.eoc,
+    image_special_token: str = '<image>',
+    sent_seperator: str = '\n',
+    convert_to_relative_paths: bool = False,
+    original_llava_ds_path: str = None,
 ):
     """
     Convert a Data-Juicer-format dataset to a LLaVA-like dataset.
@@ -119,7 +120,7 @@ def main(
             f'Input dataset [{dj_ds_path}] can not be found.')
     if not target_llava_ds_path.endswith('.json'):
         raise ValueError(
-            f'Only support "json" target dataset file for LLaVA now.')
+            'Only support "json" target dataset file for LLaVA now.')
     if os.path.dirname(target_llava_ds_path) \
             and not os.path.exists(os.path.dirname(target_llava_ds_path)):
         logger.info(
@@ -129,19 +130,19 @@ def main(
 
     # check if the default image special token is changed
     if image_special_token != '<image>':
-        logger.warning(f'The image_special_token used in the original LLaVA '
-                       f'dataset is "<image>". It\'s better to align the this '
-                       f'token. There might be some compatibility problem if '
-                       f'you change it.')
+        logger.warning('The image_special_token used in the original LLaVA '
+                       'dataset is "<image>". It\'s better to align the this '
+                       'token. There might be some compatibility problem if '
+                       'you change it.')
 
     # if convert_to_relative_paths is True, check if the original_llava_ds_path
     # is provided as well.
     if convert_to_relative_paths:
         if not original_llava_ds_path:
-            raise ValueError(f'When convert_to_relative_paths is set to True, '
-                             f'the original_llava_ds_path must be provided '
-                             f'for recovering the relative paths. Please '
-                             f'check and retry.')
+            raise ValueError('When convert_to_relative_paths is set to True, '
+                             'the original_llava_ds_path must be provided '
+                             'for recovering the relative paths. Please '
+                             'check and retry.')
         original_llava_ds_path = os.path.abspath(original_llava_ds_path)
         # if provided original_llava_ds_path is the dataset file path, only
         # keep the directory path.
@@ -201,17 +202,11 @@ def main(
                         if sent.endswith(sent_seperator):
                             sent = sent[:-len(sent_seperator)].strip()
 
-                conversation = {
-                    'from': role,
-                    'value': sent
-                }
+                conversation = {'from': role, 'value': sent}
                 conversations.append(conversation)
 
             # make up the new sample
-            new_sample = {
-                'id': id,
-                'conversations': conversations
-            }
+            new_sample = {'id': id, 'conversations': conversations}
             if len(images) == 1:
                 image_path = images[0]
                 if convert_to_relative_paths:

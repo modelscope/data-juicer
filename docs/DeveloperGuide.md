@@ -29,6 +29,12 @@ pre-commit run --all-files
 git commit -m "xxxx"
 ```
 
+**Note**: We have configured pre-commit checks in github workflow. If this 
+check in your PR fails, please locally ① ensure that the relevant 
+dependencies of pre-commit are consistent with the project configuration 
+(which can be completed through `pre-commit clean` and `pre-commit install`); 
+and ② execute `pre-commit run --all-files` before push.
+
 ## Build your own ops
 
 - Data-Juicer allows everybody to build their own ops.

@@ -13,7 +13,7 @@ from ..base_op import OPERATORS, Filter
 @OPERATORS.register_module('character_repetition_filter')
 class CharacterRepetitionFilter(Filter):
     """Filter to keep samples with char-level n-gram repetition ratio within a
-    \ specific range."""
+    specific range."""
 
     def __init__(self,
                  rep_len: PositiveInt = 10,

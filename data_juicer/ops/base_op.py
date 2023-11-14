@@ -2,11 +2,14 @@ from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
 
+
 class OP:
-    def __init__(self,
-                 text_key: str = None,
-                 image_key: str = None,
-                 ):
+
+    def __init__(
+        self,
+        text_key: str = None,
+        image_key: str = None,
+    ):
         """
         Base class of operators.
 
@@ -29,12 +32,14 @@ class OP:
     def process(self, *args, **kwargs):
         raise NotImplementedError
 
+
 class Mapper(OP):
 
-    def __init__(self,
-                 text_key: str = None,
-                 image_key: str = None,
-                 ):
+    def __init__(
+        self,
+        text_key: str = None,
+        image_key: str = None,
+    ):
         """
         Base class that conducts data editing.
 
@@ -63,10 +68,11 @@ class Mapper(OP):
 
 class Filter(OP):
 
-    def __init__(self,
-                 text_key: str = None,
-                 image_key: str = None,
-                 ):
+    def __init__(
+        self,
+        text_key: str = None,
+        image_key: str = None,
+    ):
         """
         Base class that removes specific info.
 
@@ -104,10 +110,11 @@ class Filter(OP):
 
 class Deduplicator(OP):
 
-    def __init__(self,
-                 text_key: str = None,
-                 image_key: str = None,
-                 ):
+    def __init__(
+        self,
+        text_key: str = None,
+        image_key: str = None,
+    ):
         """
         Base class that conducts deduplication.
 
@@ -144,10 +151,11 @@ class Deduplicator(OP):
 
 class Selector(OP):
 
-    def __init__(self,
-                 text_key: str = None,
-                 image_key: str = None,
-                 ):
+    def __init__(
+        self,
+        text_key: str = None,
+        image_key: str = None,
+    ):
         """
         Base class that conducts selection in dataset-level.
 

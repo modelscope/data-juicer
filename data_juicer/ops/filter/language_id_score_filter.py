@@ -57,6 +57,7 @@ class LanguageIDScoreFilter(Filter):
     def process(self, sample):
         if self.lang:
             return sample[Fields.stats][StatsKeys.lang] == self.lang \
-                   and sample[Fields.stats][StatsKeys.lang_score] >= self.min_score
+                   and sample[Fields.stats][StatsKeys.lang_score] >= \
+                   self.min_score
         else:
             return sample[Fields.stats][StatsKeys.lang_score] >= self.min_score

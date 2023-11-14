@@ -28,6 +28,8 @@ pre-commit run --all-files
 git commit -m "<your_commit_message>"
 ```
 
+**注意**：我们在github workflow配置了pre-commit的检查。如果您的PR中该检查没通过，请在本地①确保pre-commit 的相关依赖与项目配置一致（可通过`pre-commit clean`和`pre-commit install`完成）；②push前执行了`pre-commit run --all-files`.
+
 ## 构建自己的算子
 
 - Data-Juicer 支持每个人定义自己的算子。
