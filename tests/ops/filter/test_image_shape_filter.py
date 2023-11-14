@@ -1,14 +1,15 @@
 import os
 import unittest
+import numpy as np
+import PIL.Image
 
-from datasets import Dataset
+from datasets import Dataset, Image
 
-from data_juicer.ops.filter.image_aspect_ratio_filter import \
-    ImageAspectRatioFilter
+from data_juicer.ops.filter.image_shape_filter import ImageShapeFilter
 from data_juicer.utils.constant import Fields
 
 
-class ImageAspectRatioFilterTest(unittest.TestCase):
+class ImageShapeFilterTest(unittest.TestCase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                              '..', 'data')
@@ -16,9 +17,10 @@ class ImageAspectRatioFilterTest(unittest.TestCase):
     img2_path = os.path.join(data_path, 'img2.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
 
-    def _run_image_aspect_ratio_filter(self,
-                                       dataset: Dataset, target_list,
-                                       op):
+    def _run_image_shape_filter(self,
+                                dataset: Dataset,
+                                target_list,
+                                op):
         if Fields.stats not in dataset.features:
             dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
@@ -38,11 +40,12 @@ class ImageAspectRatioFilterTest(unittest.TestCase):
             'images': [self.img3_path]
         }]
         tgt_list = [{
-            'images': [self.img1_path]
+            'images': [self.img2_path]
         }]
         dataset = Dataset.from_list(ds_list)
-        op = ImageAspectRatioFilter(min_ratio=0.8, max_ratio=1.2)
-        self._run_image_aspect_ratio_filter(dataset, tgt_list, op)
+        op = ImageShapeFilter(min_width=400,
+                              min_height=400)
+        self._run_image_shape_filter(dataset, tgt_list, op)
 
     def test_filter2(self):
 
@@ -56,11 +59,12 @@ class ImageAspectRatioFilterTest(unittest.TestCase):
         tgt_list = [{
             'images': [self.img1_path]
         }, {
-            'images': [self.img2_path]
+            'images': [self.img3_path]
         }]
         dataset = Dataset.from_list(ds_list)
-        op = ImageAspectRatioFilter(min_ratio=0.8)
-        self._run_image_aspect_ratio_filter(dataset, tgt_list, op)
+        op = ImageShapeFilter(max_width=500,
+                              max_height=500)
+        self._run_image_shape_filter(dataset, tgt_list, op)
 
     def test_filter3(self):
 
@@ -74,11 +78,13 @@ class ImageAspectRatioFilterTest(unittest.TestCase):
         tgt_list = [{
             'images': [self.img1_path]
         }, {
+            'images': [self.img2_path]
+        }, {
             'images': [self.img3_path]
         }]
         dataset = Dataset.from_list(ds_list)
-        op = ImageAspectRatioFilter(max_ratio=1.2)
-        self._run_image_aspect_ratio_filter(dataset, tgt_list, op)
+        op = ImageShapeFilter()
+        self._run_image_shape_filter(dataset, tgt_list, op)
 
     def test_any(self):
 
@@ -92,13 +98,13 @@ class ImageAspectRatioFilterTest(unittest.TestCase):
         tgt_list = [{
             'images': [self.img1_path, self.img2_path]
         }, {
-            'images': [self.img1_path, self.img3_path]
+            'images': [self.img2_path, self.img3_path]
         }]
         dataset = Dataset.from_list(ds_list)
-        op = ImageAspectRatioFilter(min_ratio=0.8,
-                                    max_ratio=1.2,
-                                    any_or_all='any')
-        self._run_image_aspect_ratio_filter(dataset, tgt_list, op)
+        op = ImageShapeFilter(min_width=400,
+                              min_height=400,
+                              any_or_all='any')
+        self._run_image_shape_filter(dataset, tgt_list, op)
 
     def test_all(self):
 
@@ -111,10 +117,10 @@ class ImageAspectRatioFilterTest(unittest.TestCase):
         }]
         tgt_list = []
         dataset = Dataset.from_list(ds_list)
-        op = ImageAspectRatioFilter(min_ratio=0.8,
-                                    max_ratio=1.2,
-                                    any_or_all='all')
-        self._run_image_aspect_ratio_filter(dataset, tgt_list, op)
+        op = ImageShapeFilter(min_width=400,
+                              min_height=400,
+                              any_or_all='all')
+        self._run_image_shape_filter(dataset, tgt_list, op)
 
 
 if __name__ == '__main__':

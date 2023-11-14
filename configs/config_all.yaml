@@ -1,6 +1,6 @@
 # Process config example including:
 #   - all global arguments
-#   - all ops and their default arguments
+#   - all ops and their arguments
 
 # global parameters
 project_name: 'all'                                         # project name for distinguish your configs
@@ -119,6 +119,12 @@ process:
   - image_aspect_ratio_filter:                              # filter samples according to the aspect ratios of images (a fraction of width by height, r=w/h) in them
       min_ratio: 0.333                                        # the min aspect ratio of filter range
       max_ratio: 3.0                                          # the max aspect ratio of filter range
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_shape_filter:                                     # filter samples according to the widths and heights of images in them
+      min_width: 200                                          # the min width of width filter range
+      max_width: 5000                                         # the max width of width filter range
+      min_height: 200                                         # the min height of height filter range
+      max_height: 5000                                        # the max height of height filter range
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
       lang: en                                                # keep text in what language

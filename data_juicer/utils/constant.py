@@ -28,6 +28,8 @@ class StatsKeys(object):
 
     # image
     aspect_ratios = 'aspect_ratios'
+    image_width = 'image_width'
+    image_height = 'image_height'
 
 
 class HashKeys(object):
