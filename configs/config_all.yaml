@@ -126,6 +126,10 @@ process:
       min_ratio: 0.333                                        # the min aspect ratio of filter range
       max_ratio: 3.0                                          # the max aspect ratio of filter range
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_size_filter:                                      # filter samples according to the size of images (in bytes) within them
+      min_size:  "0"                                            # the min size of filter range
+      max_size: "1TB"                                          # the max size of filter range
+      any_or_all: any                                           # keep this sample when any/all images meet the filter condition
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
       lang: en                                                # keep text in what language
       min_score: 0.8                                          # the min language scores to filter text

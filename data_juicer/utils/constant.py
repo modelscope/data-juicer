@@ -28,6 +28,7 @@ class StatsKeys(object):
 
     # image
     aspect_ratios = 'aspect_ratios'
+    image_sizes = 'image_sizes'
 
     # multimodal
     clip_image_text_similarity = 'clip_image_text_similarity'

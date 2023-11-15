@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   21   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   18   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   19   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   3    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -80,6 +80,7 @@ All the specific operators are listed below, each featured with several capabili
 | clip_similarity_filter      | Multimodal |   -    |  Keeps samples with similarity between text and images within the specified range           |
 | flagged_words_filter           | General | en, zh | Keeps samples with flagged-word ratio below the specified threshold                        |
 | image_aspect_ratio_filter      | Image   |   -    | Keeps samples contains images with aspect ratios within specific range                     |
+| image_size_filter      | Image   |   -    | Keeps samples contains images whose size in bytes are within specific range                     |
 | language_id_score_filter       | General | en, zh | Keeps samples of the specified language, judged by a predicted confidence score            |
 | maximum_line_length_filter     | Code    | en, zh | Keeps samples with maximum line length within the specified range                          |
 | perplexity_filter              | General | en, zh | Keeps samples with perplexity score below the specified threshold                          |
