@@ -1,9 +1,7 @@
 import os
 import unittest
-import numpy as np
-import PIL.Image
 
-from datasets import Dataset, Image
+from datasets import Dataset
 
 from data_juicer.ops.filter.image_aspect_ratio_filter import \
     ImageAspectRatioFilter

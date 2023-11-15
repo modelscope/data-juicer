@@ -11,7 +11,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
 | [ Mapper ]( #mapper )              | 21 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 19  | 过滤低质量样本       |
-| [ Deduplicator ]( #deduplicator )  |  3 | 识别、删除重复样本     |
+| [ Deduplicator ]( #deduplicator )  |  4 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
 
 下面列出所有具体算子，每种算子都通过多个标签来注明其主要功能。
@@ -98,6 +98,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | document_deduplicator          | General  | en, zh  | 通过比较 MD5 哈希值在文档级别对样本去重                        |
 | document_minhash_deduplicator  | General  | en, zh  | 使用 MinHashLSH 在文档级别对样本去重                      |
 | document_simhash_deduplicator  | General  | en, zh  | 使用 SimHash 在文档级别对样本去重                         |
+| image_deduplicator             | Image    |   -     | 使用文档之间图像的精确匹配在文档级别删除重复样本 |
 
 ## Selector <a name="selector"/>
 
