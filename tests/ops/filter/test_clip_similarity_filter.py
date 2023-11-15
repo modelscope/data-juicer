@@ -3,9 +3,9 @@ import unittest
 
 from datasets import Dataset
 
-from data_juicer.ops.filter.clip_similarity_filter import (
-    ClipSimilarityFilter, SpecialTokens)
+from data_juicer.ops.filter.clip_similarity_filter import ClipSimilarityFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.mm_utils import SpecialTokens
 
 
 class ClipSimilarityFilterTest(unittest.TestCase):
@@ -50,8 +50,8 @@ class ClipSimilarityFilterTest(unittest.TestCase):
         op = ClipSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='any',
-                                  min_ratio=0.2,
-                                  max_ratio=0.9)
+                                  min_score=0.2,
+                                  max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
 
     def test_eoc_special_token(self):
@@ -74,8 +74,8 @@ class ClipSimilarityFilterTest(unittest.TestCase):
         op = ClipSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='any',
-                                  min_ratio=0.2,
-                                  max_ratio=0.9)
+                                  min_score=0.2,
+                                  max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
 
     def test_keep_any(self):
@@ -96,8 +96,8 @@ class ClipSimilarityFilterTest(unittest.TestCase):
         op = ClipSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='any',
-                                  min_ratio=0.2,
-                                  max_ratio=0.9)
+                                  min_score=0.2,
+                                  max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
 
     def test_keep_all(self):
@@ -113,8 +113,8 @@ class ClipSimilarityFilterTest(unittest.TestCase):
         op = ClipSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='all',
-                                  min_ratio=0.2,
-                                  max_ratio=0.9)
+                                  min_score=0.2,
+                                  max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
 
     def test_reduce_avg(self):
@@ -133,8 +133,8 @@ class ClipSimilarityFilterTest(unittest.TestCase):
         op = ClipSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='any',
-                                  min_ratio=0.2,
-                                  max_ratio=0.9)
+                                  min_score=0.2,
+                                  max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
 
     def test_reduce_max(self):
@@ -153,8 +153,8 @@ class ClipSimilarityFilterTest(unittest.TestCase):
         op = ClipSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='max',
                                   any_or_all='any',
-                                  min_ratio=0.2,
-                                  max_ratio=0.9)
+                                  min_score=0.2,
+                                  max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
 
     def test_reduce_min(self):
@@ -174,12 +174,12 @@ class ClipSimilarityFilterTest(unittest.TestCase):
         op = ClipSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='min',
                                   any_or_all='any',
-                                  min_ratio=0.1,
-                                  max_ratio=0.9)
+                                  min_score=0.1,
+                                  max_score=0.9)
 
         self._run_filter(dataset, tgt_list, op)
 
-        op.min_ratio = 0.2
+        op.min_score = 0.2
         self._run_filter(dataset, [], op)
 
     def test_multi_process(self):
@@ -200,8 +200,8 @@ class ClipSimilarityFilterTest(unittest.TestCase):
         op = ClipSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='any',
-                                  min_ratio=0.2,
-                                  max_ratio=0.9)
+                                  min_score=0.2,
+                                  max_score=0.9)
         self._run_filter(dataset, tgt_list, op, num_proc=4)
 
 

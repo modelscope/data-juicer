@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from jsonargparse.typing import PositiveFloat
+from jsonargparse.typing import ClosedUnitInterval
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import SpecialTokens, load_image
@@ -21,8 +21,8 @@ class ClipSimilarityFilter(Filter):
 
     def __init__(self,
                  hf_clip='openai/clip-vit-base-patch32',
-                 min_ratio: PositiveFloat = 0.1,
-                 max_ratio: PositiveFloat = 1.0,
+                 min_score: ClosedUnitInterval = 0.1,
+                 max_score: ClosedUnitInterval = 1.0,
                  any_or_all: str = 'any',
                  reduce_mode: str = 'avg',
                  *args,
@@ -32,8 +32,8 @@ class ClipSimilarityFilter(Filter):
 
         :param hf_clip: clip model name on huggingface to compute
             the similarity between image and text.
-        :param min_ratio: The min similarity to keep samples.
-        :param max_ratio: The max similarity to keep samples.
+        :param min_score: The min similarity to keep samples.
+        :param max_score: The max similarity to keep samples.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the
@@ -47,8 +47,8 @@ class ClipSimilarityFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.min_ratio = min_ratio
-        self.max_ratio = max_ratio
+        self.min_score = min_score
+        self.max_score = max_score
         if reduce_mode not in ['avg', 'max', 'min']:
             raise ValueError(f'Reduce mode [{reduce_mode}] is not supported. '
                              f'Can only be one of ["avg", "max", "min"].')
@@ -97,7 +97,7 @@ class ClipSimilarityFilter(Filter):
         offset = 0
 
         def remove_special_token(text):
-            for key, value in special_token_dict.items():
+            for value in special_token_dict.values():
                 text = text.replace(value, '')
             return text
 
@@ -147,7 +147,7 @@ class ClipSimilarityFilter(Filter):
             return True
 
         keep_bools = np.array([
-            self.min_ratio <= sim_value <= self.max_ratio
+            self.min_score <= sim_value <= self.max_score
             for sim_value in similarity
         ])
 
