@@ -235,7 +235,7 @@ class CacheCompressManager:
         self.compressor_extension = '.' + compressor_format
         self.compress_manager = CompressManager(
             compressor_format=compressor_format)
-        self.pattern = re.compile('_\d{5}_of_')  # noqa W605
+        self.pattern = re.compile(r'_\d{5}_of_')
 
     def _get_raw_filename(self, filename: Union[Path, str]):
         """
