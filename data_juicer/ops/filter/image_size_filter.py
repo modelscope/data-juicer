@@ -4,11 +4,9 @@ from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import get_image_size, size_to_bytes
 
 from ..base_op import OPERATORS, Filter
-from ..op_fusion import LOADED_IMAGES
 
 
 @OPERATORS.register_module('image_size_filter')
-@LOADED_IMAGES.register_module('image_size_filter')
 class ImageSizeFilter(Filter):
     """Keep data samples whose image size (in bytes/kb/MB/...) within a
     specific range.
