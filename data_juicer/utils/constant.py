@@ -41,6 +41,9 @@ class HashKeys(object):
     minhash = DEFAULT_PREFIX + 'minhash'
     simhash = DEFAULT_PREFIX + 'simhash'
 
+    # image
+    imagehash = DEFAULT_PREFIX + 'imagehash'
+
 
 class InterVars(object):
     # text
