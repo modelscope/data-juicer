@@ -7,7 +7,7 @@ from imagededup.methods import AHash, DHash, PHash, WHash
 from data_juicer.utils.constant import Fields, HashKeys
 from data_juicer.utils.mm_utils import load_image
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import OPERATORS, Deduplicator
 from ..op_fusion import LOADED_IMAGES
 
 HASH_METHOD = {
@@ -20,7 +20,7 @@ HASH_METHOD = {
 
 @OPERATORS.register_module('image_deduplicator')
 @LOADED_IMAGES.register_module('image_deduplicator')
-class ImageDeduplicator(Filter):
+class ImageDeduplicator(Deduplicator):
     """
     Deduplicator to deduplicate samples at document-level using exact matching
     of images between documents.
@@ -38,7 +38,7 @@ class ImageDeduplicator(Filter):
         if method not in HASH_METHOD.keys():
             raise ValueError(f'Keep strategy [{method}] is not supported. '
                              f'Can only be one of {HASH_METHOD.keys()}.')
-        self.phasher = HASH_METHOD[method]
+        self.hasher = HASH_METHOD[method]
 
     def compute_hash(self, sample, context=False):
         # check if it's computed already
@@ -69,7 +69,7 @@ class ImageDeduplicator(Filter):
 
         # compute hash
         for key in images:
-            sample[HashKeys.imagehash] += self.phasher.encode_image(
+            sample[HashKeys.imagehash] += self.hasher.encode_image(
                 image_array=np.array(images[key]))
         return sample
 

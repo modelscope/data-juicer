@@ -14,9 +14,13 @@ class ImageDeduplicatorTest(unittest.TestCase):
     img1_path = os.path.join(data_path, 'img1.png')
     img2_path = os.path.join(data_path, 'img2.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
+    # img4.png is a duplicate sample of img1.png
     img4_path = os.path.join(data_path, 'img4.png')
+    # img5.jpg is a duplicate sample of img2.jpg
     img5_path = os.path.join(data_path, 'img5.jpg')
+    # img6.jpg is a duplicate sample of img3.jpg
     img6_path = os.path.join(data_path, 'img6.jpg')
+    # img7.jpg is a duplicate sample of img6.jpg
     img7_path = os.path.join(data_path, 'img7.jpg')
  
 
