@@ -5,7 +5,7 @@ Dependencies of Auto Evaluation Toolkit, see [`tools/evaluator/README.md`](../to
 ## Installation
 
 The auto-evaluation toolkit requires customized [Megatron-LM](https://github.com/NVIDIA/Megatron-LM) and [HELM](https://github.com/stanford-crfm/helm).
-To avoid dependency problems when installing those packages, we recommand using NGC's PyTorch container (`nvcr.io/nvidia/pytorch:22.12-py3`).
+To avoid dependency problems when installing those packages, we recommend using NGC's PyTorch container (`nvcr.io/nvidia/pytorch:22.12-py3`).
 Assuming the path to your shared file system (where your data and model checkpoints are saved) is `/mnt/shared`, start the docker container with following commands.
 
 ```shell
