@@ -170,6 +170,22 @@ def prepare_huggingface_tokenizer(tokenizer_name):
     return tokenizer
 
 
+def prepare_huggingface_clip(clip_name):
+    """
+    Prepare and load a clip and processor from HuggingFace.
+
+    :param clip_name: input clip name
+    :return: a pair of clip instance and processor instance.
+    """
+    from transformers import CLIPModel, CLIPProcessor
+
+    model = CLIPModel.from_pretrained(clip_name)
+    processor = CLIPProcessor.from_pretrained(clip_name)
+    logger.info('Loading clip and processor from HuggingFace...')
+
+    return (model, processor)
+
+
 def prepare_diversity_model(model_name, lang):
     """
     Prepare diversity model for specific language.
@@ -222,6 +238,7 @@ def prepare_model(lang='en', model_type='sentencepiece', model_key=None):
         'kenlm': ('%s.arpa.bin', prepare_kenlm_model),
         'nltk': ('punkt.%s.pickle', prepare_nltk_model),
         'huggingface': ('%s', prepare_huggingface_tokenizer),
+        'hf_clip': ('%s', prepare_huggingface_clip),
         'spacy': ('%s_core_web_md-3.5.0', prepare_diversity_model),
     }
     assert model_type in type_to_name.keys(
@@ -236,6 +253,11 @@ def prepare_model(lang='en', model_type='sentencepiece', model_key=None):
             MODEL_ZOO[model_key] = model_func(model_name)
         elif model_type == 'huggingface':
             MODEL_ZOO[model_key] = model_func(model_key)
+        elif model_type == 'hf_clip':
+            new_model_key = model_type + model_key
+            if new_model_key not in MODEL_ZOO.keys():
+                MODEL_ZOO[new_model_key] = model_func(model_key)
+            model_key = new_model_key
         else:
             MODEL_ZOO[model_key] = model_func(model_name, lang)
     return model_key

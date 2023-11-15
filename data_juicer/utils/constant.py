@@ -30,6 +30,10 @@ class StatsKeys(object):
     aspect_ratios = 'aspect_ratios'
     image_width = 'image_width'
     image_height = 'image_height'
+    image_sizes = 'image_sizes'
+
+    # multimodal
+    clip_image_text_similarity = 'clip_image_text_similarity'
 
 
 class HashKeys(object):

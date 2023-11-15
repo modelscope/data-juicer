@@ -10,7 +10,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
 | [ Mapper ]( #mapper )              | 21 | 对数据样本进行编辑和转换  |
-| [ Filter ]( #filter )              | 18  | 过滤低质量样本       |
+| [ Filter ]( #filter )              | 20  | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  3 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
 
@@ -21,6 +21,9 @@ Data-Juicer 中的算子分为以下 5 种类型。
     - LaTeX: 专用于 LaTeX 源文件
     - Code: 专用于编程代码
     - Financial: 与金融领域相关
+    - Image: 专用于图像或多模态
+    - Multimodal: 专用于多模态
+    
 * Language 标签
     - en: 英文
     - zh: 中文
@@ -71,9 +74,11 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | alphanumeric_filter            | General | en, zh | 保留字母数字比例在指定范围内的样本                  |
 | average_line_length_filter     | Code    | en, zh | 保留平均行长度在指定范围内的样本                   |
 | character_repetition_filter    | General | en, zh | 保留 char-level n-gram 重复比率在指定范围内的样本 |
+| clip_similarity_filter         | Multimodal |   -    | 保留文本图像相似度在指定范围内的样本                 |
 | flagged_words_filter           | General | en, zh | 保留使标记字比率保持在指定阈值以下的样本               |
 | image_aspect_ratio_filter      | Image   | -      | 保留样本中包含的图片的宽高比在指定范围内的样本            |
 | image_shape_filter             | Image   |   -    | 保留样本中包含的图片的形状（即宽和高）在指定范围内的样本       |
+| image_size_filter      | Image   |   -    | 保留样本中包含的图片的大小（bytes）在指定范围内的样本                 |
 | language_id_score_filter       | General | en, zh | 保留特定语言的样本，通过预测的置信度得分来判断            |
 | maximum_line_length_filter     | Code    | en, zh | 保留最大行长度在指定范围内的样本                   |
 | perplexity_filter              | General | en, zh | 保留困惑度低于指定阈值的样本                     |
