@@ -29,6 +29,9 @@
 Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM) 提供更高质量、更丰富、更易“消化”的数据。
 本项目在积极更新和维护中，我们将定期强化和新增更多的功能和数据菜谱。欢迎您加入我们推进 LLM 数据的开发和研究工作！
 
+如果Data-Juicer对您的研发有帮助，请引用我们的[工作](#参考文献) 。
+
+
 ----
 
 ## 新消息
@@ -61,6 +64,7 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
   * [演示样例](#演示样例)
   * [开源协议](#开源协议)
   * [贡献](#贡献)
+  * [致谢](#致谢)
   * [参考文献](#参考文献)
 
 ## 特点
@@ -299,9 +303,20 @@ Data-Juicer 在 Apache License 2.0 协议下发布。
 
 ## 贡献
 
-我们非常欢迎贡献新功能、修复漏洞以及讨论。请参考[开发者指南](docs/DeveloperGuide_ZH.md)。
+大模型是一个高速发展的领域，我们非常欢迎贡献新功能、修复漏洞以及文档改善。请参考[开发者指南](docs/DeveloperGuide_ZH.md)。
 
 欢迎加入我们的[Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8275bc8g7ypp), 或[DingDing群](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8275bc8g7ypp&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) 。
+
+## 致谢
+
+Data-Juicer 被各种 LLM产品和研究工作使用，包括来自阿里云-通义的行业大模型，例如点金
+（金融分析），智文（阅读助手），还有阿里云人工智能平台 (PAI)。 我们期待更多您的体验反馈、建议和合作共建！
+
+
+Data-Juicer 感谢并参考了社区开源项目：
+[Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data), [Pile](https://huggingface.co/datasets/EleutherAI/pile), [Alpaca-Cot](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT), [Megatron-LM](https://github.com/NVIDIA/Megatron-LM), [DeepSpeed](https://www.deepspeed.ai/), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), [Beam](https://github.com/apache/beam),  [LM-Harness](https://github.com/EleutherAI/lm-evaluation-harness), [HELM](https://github.com/stanford-crfm/helm), ....
+
+
 
 ## 参考文献
 如果您发现我们的工作对您的研发有帮助，请引用以下[论文](https://arxiv.org/abs/2309.02033) 。

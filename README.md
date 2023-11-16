@@ -30,6 +30,10 @@ Data-Juicer is a one-stop data processing system to make data higher-quality,
 juicier, and more digestible for LLMs.
 This project is being actively updated and maintained, and we will periodically enhance and add more features and data recipes. We welcome you to join us in promoting LLM data development and research!
 
+If you find Data-Juicer useful for your research or development, please kindly 
+cite our [work](#references).
+
+
 ----
 
 ## News
@@ -62,7 +66,8 @@ Table of Contents
    * [Demos](#demos)
    * [License](#license)
    * [Contributing](#contributing)
-   * [References](#references)
+  * [Acknowledgement](#acknowledgement)
+  * [References](#references)
 
 ## Features
 
@@ -315,9 +320,23 @@ docker exec -it <container_id> bash
 Data-Juicer is released under Apache License 2.0.
 
 ## Contributing
-We greatly welcome contributions of new features, bug fixes, and discussions. Please refer to [How-to Guide for Developers](docs/DeveloperGuide.md).
+We are in a rapidly developing field and greatly welcome contributions of new 
+features, bug fixes and better documentations. Please refer to 
+[How-to Guide for Developers](docs/DeveloperGuide.md).
 
 Welcome to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw), or [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) for discussion.
+
+## Acknowledgement
+Data-Juicer is used across various LLM products and research initiatives,
+including industrial LLMs from Alibaba Cloud's Tongyi, such as Dianjin for 
+financial analysis, and Zhiwen for reading assistant, as well as the Alibaba 
+Cloud's platform for AI (PAI).
+We look forward to more of your experience, suggestions and discussions for collaboration!
+
+Data-Juicer thanks and refers to several community projects, such as 
+[Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data), [Pile](https://huggingface.co/datasets/EleutherAI/pile), [Alpaca-Cot](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT), [Megatron-LM](https://github.com/NVIDIA/Megatron-LM), [DeepSpeed](https://www.deepspeed.ai/), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), [Beam](https://github.com/apache/beam),  [LM-Harness](https://github.com/EleutherAI/lm-evaluation-harness), [HELM](https://github.com/stanford-crfm/helm), ....
+
+
 
 ## References
 If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2309.02033).
