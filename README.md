@@ -105,40 +105,46 @@ Table of Contents
 
 ### From Source
 
-- Run the following commands to install the latest `data_juicer` version in
+- Run the following commands to install the latest basic `data_juicer` version in
   editable mode:
 ```shell
 cd <path_to_data_juicer>
-pip install -v -e .[all]
+pip install -v -e .
 ```
 
-- Or install optional dependencies:
+- Some OPs rely on some other too large or low-platform-compatibility third-party libraries. You can install optional dependencies as needed:
+
 ```shell
 cd <path_to_data_juicer>
-pip install -v -e .  # install a minimal dependencies
+pip install -v -e .  # install a minimal dependencies, which support the basic functions
 pip install -v -e .[tools] # install a subset of tools dependencies
 ```
 
 The dependency options are listed below:
 
-| Tag      | Description                                                            |
-|----------|------------------------------------------------------------------------|
-| .        | Install minimal dependencies for basic Data-Juicer.                    |
-| .[all]   | Install all optional dependencies (all of the following)               |
-| .[dev]   | Install dependencies for developing the package as contributors        |
-| .[tools] | Install dependencies for dedicated tools, such as quality classifiers. |
+| Tag          | Description                                                                                  |
+|--------------|----------------------------------------------------------------------------------------------|
+| `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                                          |
+| `.[all]`       | Install all optional dependencies (including minimal dependencies and all of the following). |
+| `.[sci]`       | Install all dependencies for all OPs.                                                        |
+| `.[dist]`      | Install dependencies for distributed data processing. (Experimental)                         |
+| `.[dev]`       | Install dependencies for developing the package as contributors.                             |
+| `.[tools]`     | Install dependencies for dedicated tools, such as quality classifiers.                       |
 
 ### Using pip
 
-- Run the following command to install the latest `data_juicer` using `pip`:
+- Run the following command to install the latest released `data_juicer` using `pip`:
 
 ```shell
 pip install py-data-juicer
 ```
 
-- **Note**: only the basic APIs in `data_juicer` and two basic tools
-  (data [processing](#data-processing) and [analysis](#data-analysis)) are available in this way. If you want customizable
-  and complete functions, we recommend you install `data_juicer` [from source](#from-source).
+- **Note**: 
+  - only the basic APIs in `data_juicer` and two basic tools
+    (data [processing](#data-processing) and [analysis](#data-analysis)) are available in this way. If you want customizable
+    and complete functions, we recommend you install `data_juicer` [from source](#from-source).
+  - The release versions from pypi have a certain lag compared to the latest version from source. 
+    So if you want to follow the latest functions of `data_juicer`, we recommend you install [from source](#from-source).
 
 ### Using Docker
 

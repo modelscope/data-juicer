@@ -28,11 +28,14 @@ def get_install_requirements(require_f_paths, env_dir='environments'):
 # allowing selective installment based on users' needs
 # TODO: The specific taxonomy and dependencies will be determined
 #  after implementing some preliminary operators and detailed discussions
-min_requires = get_install_requirements(
-    ['minimal_requires.txt', 'science_requires.txt'])
+min_requires = get_install_requirements(['minimal_requires.txt'])
 extra_requires = {
     'mini':
     min_requires,
+    'sci':
+    get_install_requirements(['science_requires.txt']),
+    'dist':
+    get_install_requirements(['dist_requires.txt']),
     'dev':
     get_install_requirements(['dev_requires.txt']),
     'tools':

@@ -1,9 +1,14 @@
-import opencc
+from data_juicer.utils.availability_utils import AvailabilityChecking
 
 from ..base_op import OPERATORS, Mapper
 
+OP_NAME = 'chinese_convert_mapper'
 
-@OPERATORS.register_module('chinese_convert_mapper')
+with AvailabilityChecking(['opencc'], OP_NAME):
+    import opencc
+
+
+@OPERATORS.register_module(OP_NAME)
 class ChineseConvertMapper(Mapper):
     """Mapper to convert Chinese between Traditional Chinese, Simplified Chinese
     and Japanese Kanji."""

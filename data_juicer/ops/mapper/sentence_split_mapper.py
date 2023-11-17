@@ -1,10 +1,16 @@
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
 from ..common import get_sentences_from_document
 
+OP_NAME = 'sentence_split_mapper'
 
-@OPERATORS.register_module('sentence_split_mapper')
+with AvailabilityChecking(['nltk'], OP_NAME):
+    import nltk  # noqa: F401
+
+
+@OPERATORS.register_module(OP_NAME)
 class SentenceSplitMapper(Mapper):
     """Mapper to split text samples to sentences."""
 

@@ -1,9 +1,14 @@
-import ftfy
+from data_juicer.utils.availability_utils import AvailabilityChecking
 
 from ..base_op import OPERATORS, Mapper
 
+OP_NAME = 'fix_unicode_mapper'
 
-@OPERATORS.register_module('fix_unicode_mapper')
+with AvailabilityChecking(['ftfy'], OP_NAME):
+    import ftfy
+
+
+@OPERATORS.register_module(OP_NAME)
 class FixUnicodeMapper(Mapper):
     """Mapper to fix unicode errors in text samples."""
 

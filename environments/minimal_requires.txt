@@ -1,15 +1,19 @@
 fsspec==2023.3.0
-pyarrow<=13.0.0
+pyarrow<=12.0.0
 pandas==2.0.0
 datasets==2.11.0
 loguru
+tabulate
 tqdm
 jsonargparse[signatures]
 matplotlib
+emoji==2.2.0
+regex
 requests
 wget
 zstandard
 lz4
+pandas
 pdfplumber
 plotly
 python-docx
@@ -17,4 +21,3 @@ streamlit
 spacy==3.5.0
 multiprocess==0.70.12
 dill==0.3.4
-ray
