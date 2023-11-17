@@ -13,7 +13,6 @@ requests
 wget
 zstandard
 lz4
-pandas
 pdfplumber
 plotly
 python-docx
