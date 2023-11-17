@@ -208,11 +208,16 @@ def unify_format(
 
     # 3. convert relative paths to absolute paths
     if global_cfg:
+        ds_dir = global_cfg.dataset_dir
+        image_key = global_cfg.image_key
+
+        if image_key not in dataset.features:
+            # no image path list in dataset, no need to convert
+            return dataset
+
         logger.info('Converting relative paths in the dataset to their '
                     'absolute version. (Based on the directory of input '
                     'dataset file)')
-        ds_dir = global_cfg.dataset_dir
-        image_key = global_cfg.image_key
 
         # function to convert relative paths to absolute paths
         def rel2abs(sample, path_keys, dataset_dir):
