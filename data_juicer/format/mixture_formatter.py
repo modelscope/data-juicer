@@ -1,3 +1,4 @@
+from itertools import chain, repeat
 from typing import List, Tuple, Union
 
 import numpy as np
@@ -76,7 +77,7 @@ class MixtureFormatter(BaseFormatter):
 
         for i in range(len(data_prefix)):
             try:
-                value = float(data_prefix[i])
+                value = max(float(data_prefix[i]), 0.0)
                 weights.append(value)
             except:  # noqa: E722
                 value = data_prefix[i].strip()
@@ -108,15 +109,13 @@ class MixtureFormatter(BaseFormatter):
         if sample_number == ds_samples:
             return dataset
 
-        num_epochs = int(np.ceil(sample_number / ds_samples)) - 1
+        sample_index = range(sample_number)
 
-        if num_epochs > 0:
-            remain_samples = sample_number - num_epochs * ds_samples
-            sample_index = list(range(ds_samples)) * num_epochs + list(
-                range(remain_samples))
-        else:
-            remain_samples = sample_number
-            sample_index = list(range(remain_samples))
+        n_repeat = int(np.ceil(sample_number / ds_samples)) - 1
+        if n_repeat > 0:
+            remain_samples = sample_number - n_repeat * ds_samples
+            sample_index = chain(*repeat(range(ds_samples), n_repeat),
+                                 range(remain_samples))
 
         return dataset.shuffle(seed=seed).select(sample_index)
 
