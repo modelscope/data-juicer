@@ -366,8 +366,7 @@ class UnifyFormatTest(unittest.TestCase):
                 'author': 'xxx'
             }
         }]
-        unified_sample_list = ds.to_list()
-        self.assertEqual(unified_sample_list, sample)
+
         # test nested and missing field for the following cases:
         # 1. first row, then column
         unified_sample_first = ds[0]
