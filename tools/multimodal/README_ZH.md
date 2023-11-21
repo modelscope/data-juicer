@@ -12,9 +12,10 @@
 
 目前，Data-Juicer 支持的数据集格式在下面表格中列出。
 
-| 格式        | source_format_to_data_juicer_format | data_juicer_format_to_target_format | 格式参考                                                                                               |
-|-----------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
-| 类LLaVA格式  | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| 格式       | source_format_to_data_juicer_format | data_juicer_format_to_target_format | 格式参考                                                                                               |
+|----------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
+| 类LLaVA格式 | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| 类MMC4格式  | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [格式描述](https://github.com/allenai/mmc4#documents) |
 
 对于所有工具，您可以运行以下命令来了解它们的详细用法：
 
@@ -74,3 +75,11 @@ python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --hel
     }
 ]
 ```
+
+#### 类MMC4格式
+
+类MMC4数据集的格式在 [这里](https://github.com/allenai/mmc4#documents) 定义。除了在转换为Data-Juicer格式时使用的`image_info`和`text_list`之外，还有一个重要的字段`similarity_matrix`，即相似度矩阵。相似度矩阵是一个形状为`len(image_info) x len(text_list)`的矩阵，这意味着它高度依赖于图像和文本句子的数量及其顺序。
+
+然而，当使用Data-Juicer处理这些数据集时，图像或句子可能会被Filter算子从样本中移除，并且它们可能会被一些Mapper算子修改。因此，在处理后，这个相似度矩阵可能无法与`image_info`或`text_list`对齐。如果用户在后续使用中需要这个矩阵，那您应该注意到这一点。
+
+除了这些额外字段外，针对类MMC4格式的工具可以完美地将类MMC4格式的数据集转换为Data-Juicer格式的数据集，并将它们转换回去~
