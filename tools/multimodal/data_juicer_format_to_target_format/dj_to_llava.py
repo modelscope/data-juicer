@@ -1,5 +1,5 @@
-# This tool is used to convert multimodal dataset in LLaVA format to a target
-# dataset in Data-Juicer format.
+# This tool is used to convert multimodal dataset in Data-Juicer format to a
+# target dataset in LLaVA-like format.
 #
 # Corresponding Data-Juicer format:
 #   - multi-chunk interleaved image-text sequence
@@ -101,7 +101,7 @@ def main(
         extra argument original_llava_ds_path is required. When the processed
         and converted dataset will be used in another machine, it's better to
         set this argument to True. Default: False.
-    :param original_llava_ds_path: path to the original unprocessed llava
+    :param original_llava_ds_path: path to the original unprocessed LLaVA
         dataset, which is used to help to recover the relative image paths for
         better migration. Default: None.
     """
