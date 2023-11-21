@@ -15,6 +15,7 @@
 | 格式        | source_format_to_data_juicer_format | data_juicer_format_to_target_format | 格式参考                                                                                               |
 |-----------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
 | 类LLaVA格式  | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| 类WavCaps格式  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | - |
 
 对于所有工具，您可以运行以下命令来了解它们的详细用法：
 

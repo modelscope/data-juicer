@@ -18,6 +18,7 @@ For now, dataset formats that are supported by Data-Juicer are listed in the fol
 | Format     | source_format_to_data_juicer_format | data_juicer_format_to_target_format | Ref.                                                                                                             |
 |------------|-------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------|
 | LLaVA-like | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| WavCaps-like  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | - |
 
 For all tools, you can run the following command to find out the usage of them:
 
