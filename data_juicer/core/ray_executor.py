@@ -1,10 +1,13 @@
-import ray
-import ray.data as rd
 from loguru import logger
 
 from data_juicer.config import init_configs
 from data_juicer.ops import Filter, Mapper, load_ops
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
+
+with AvailabilityChecking(['ray'], requires_type='dist'):
+    import ray
+    import ray.data as rd
 
 
 class RayExecutor:

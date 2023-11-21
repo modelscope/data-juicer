@@ -33,6 +33,11 @@ def parse_args():
                         'size of each shard won\'t larger than the '
                         'export_shard_size')
 
+    parser.add_argument('--max_samples',
+                        type=int,
+                        default=None,
+                        help='Number of samples of mixed dataset.')
+
     parser.add_argument('--num_proc',
                         type=int,
                         default=4,
@@ -58,7 +63,7 @@ def run_mixture():
     """
     args = parse_args()
     data_path = ' '.join(args.data_path)
-    formatter = load_formatter(data_path)
+    formatter = load_formatter(data_path, max_samples=args.max_samples)
     dataset = formatter.load_dataset(args.num_proc)
     exporter = Exporter(export_path=args.export_path,
                         export_shard_size=args.export_shard_size,
