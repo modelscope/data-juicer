@@ -7,14 +7,19 @@ from typing import Dict, Set
 
 import numpy as np
 import regex
-import simhash
 from jsonargparse.typing import PositiveInt
 from loguru import logger
 
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
+
+OP_NAME = 'document_simhash_deduplicator'
+
+with AvailabilityChecking(['simhash-py'], OP_NAME):
+    import simhash
 
 
 def local_num_differing_bits(hash_a, hash_b):
@@ -57,10 +62,7 @@ def num_differing_bits_selector():
         return simhash.num_differing_bits
 
 
-num_differing_bits = num_differing_bits_selector()
-
-
-@OPERATORS.register_module('document_simhash_deduplicator')
+@OPERATORS.register_module(OP_NAME)
 class DocumentSimhashDeduplicator(Deduplicator):
     """Deduplicator to deduplicate samples at document-level using SimHash."""
 
@@ -111,6 +113,8 @@ class DocumentSimhashDeduplicator(Deduplicator):
         # about deduplication
         self.num_blocks = num_blocks
         self.hamming_distance = hamming_distance
+
+        self.num_differing_bits = num_differing_bits_selector()
 
     def compute_hash(self, sample):
         """
@@ -185,7 +189,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
         dist = Counter()
         for x, y in matches:
             graph[x][y] = graph[y][x] = True
-            num_diff = num_differing_bits(x, y)
+            num_diff = self.num_differing_bits(x, y)
             dist[num_diff] += 1
         logger.info(f'Hash diff distribution: {dist}')
 

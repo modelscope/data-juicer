@@ -10,13 +10,18 @@ import numpy as np
 import regex
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 from loguru import logger
-from scipy.integrate import quad as integrate
 from tqdm import tqdm
 
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import UnionFind, split_on_whitespace
+
+OP_NAME = 'document_minhash_deduplicator'
+
+with AvailabilityChecking(['scipy'], OP_NAME):
+    from scipy.integrate import quad as integrate
 
 MERSENNE_PRIME = np.uint64((1 << 61) - 1)
 MAX_HASH = np.uint64((1 << 32) - 1)
@@ -89,7 +94,7 @@ def optimal_param(
     return opt
 
 
-@OPERATORS.register_module('document_minhash_deduplicator')
+@OPERATORS.register_module(OP_NAME)
 class DocumentMinhashDeduplicator(Deduplicator):
     """
     Deduplicator to deduplicate samples at document-level using MinHashLSH.

@@ -2,12 +2,17 @@
 # https://github.com/togethercomputer/RedPajama-Data/
 # --------------------------------------------------------
 
-from selectolax.parser import HTMLParser
+from data_juicer.utils.availability_utils import AvailabilityChecking
 
 from ..base_op import OPERATORS, Mapper
 
+OP_NAME = 'clean_html_mapper'
 
-@OPERATORS.register_module('clean_html_mapper')
+with AvailabilityChecking(['selectolax'], OP_NAME):
+    from selectolax.parser import HTMLParser
+
+
+@OPERATORS.register_module(OP_NAME)
 class CleanHtmlMapper(Mapper):
     """Mapper to clean html code in text samples."""
 
