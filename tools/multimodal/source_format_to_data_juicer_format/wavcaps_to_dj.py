@@ -2,8 +2,8 @@
 # dataset in Data-Juicer format.
 #
 # WavCps format:
-# { num_captions_per_audio: 1,
-#   data: [{
+# { 'num_captions_per_audio': 1,
+#   'data': [{
 #       'title': 'Airplane Landing Airport',
 #       'description': 'Large commercial airplane landing at an airport runway.',
 #       'author': 'Daniel Simion',

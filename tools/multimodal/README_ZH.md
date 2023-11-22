@@ -15,7 +15,7 @@
 | 格式        | source_format_to_data_juicer_format | data_juicer_format_to_target_format | 格式参考                                                                                               |
 |-----------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
 | 类LLaVA格式  | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
-| 类WavCaps格式  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | - |
+| 类WavCaps格式  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | [格式描述](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
 
 对于所有工具，您可以运行以下命令来了解它们的详细用法：
 
@@ -74,4 +74,38 @@ python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --hel
         "value":"A 504 error when using the Sentry self-hosted API typically indicates that the API request timed out. This means that the server hosting the API did not receive a response from the client within the expected time frame.\n\nHere are a few possible reasons for a 504 error when using the Sentry self-hosted API:\n\n1. Slow network connection: The API request may be taking longer than expected due to a slow network connection. Check your network connection and try again.\n2. Server overload: The server hosting the API may be overloaded with requests. Try again later when the server load has decreased.\n3. Large dataset: If you are trying to retrieve a large amount of data, the API request may take longer than expected. Try breaking up the request into smaller chunks or optimizing the query to retrieve only the necessary data.\n4. API endpoint issues: There may be issues with the specific API endpoint you are using. Try using a different endpoint or contact the Sentry support team for assistance.\n\nTo resolve a 504 error when using the Sentry self-hosted API, try the following:\n\n1. Check your network connection and ensure that it is stable.\n2. Verify that the server hosting the API is not overloaded with requests.\n3. Optimize the query to retrieve only the necessary data.\n4. Try using a different API endpoint.\n\nIf the issue persists, contact the Sentry support team for assistance."
     }
 ]
+```
+
+#### 类WavCaps格式
+[WavCaps](https://github.com/XinhaoMei/WavCaps#dataset) 数据集由 [FreeSound](https://freesound.org/)，[BBC Sound Effects](https://sound-effects.bbcrewind.co.uk/)，[SoundBible](https://soundbible.com/)，[AudioSet Strongly-labelled Subset](https://research.google.com/audioset/download_strong.html) 四个子数据集组成，每个数据集里都有不同的字段。例如SoundBible里包含了‘description’字段，而该字段在AudioSet里并不存在。为了保证不同子数据集在转换后能够正常合并，在wavcaps_to_dj阶段使用了所有子数据集字段的并集，并在dj_to_wavcaps阶段完整保留了所有字段。
+```json
+# 原始数据集
+{ "num_captions_per_audio": 1,
+  "data": [{
+        "title": "Airplane Landing Airport",
+        "description": "Large commercial airplane landing at an airport runway.",
+        "author": "Daniel Simion",
+        "href": "2219-Airplane-Landing-Airport.html",
+        "caption": "An airplane is landing.",
+        "id": "2219",
+        "duration": 14.1424375,
+        "audio": "wav_path",
+        "download_link": "http://soundbible.com/grab.php?id=2219&type=wav"}]    
+}
+
+# 转换后数据集
+{ "num_captions_per_audio": 1,
+  "data": [{
+        "title": "Airplane Landing Airport",
+        "description": "Large commercial airplane landing at an airport runway.",
+        "author": "Daniel Simion",
+        "href": "2219-Airplane-Landing-Airport.html",
+        "caption": "An airplane is landing.",
+        "id": "2219",
+        "duration": 14.1424375,
+        "audio": "wav_path",
+        "download_link": "http://soundbible.com/grab.php?id=2219&type=wav",
+        "category": "",
+        "tags": "" }]    
+}
 ```
