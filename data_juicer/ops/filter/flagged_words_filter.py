@@ -62,7 +62,6 @@ class FlaggedWordFilter(Filter):
         self.words_aug_group_sizes = words_aug_group_sizes
         self.words_aug_join_char = words_aug_join_char
         self.model_key = None
-        self.lang = lang
 
         self.FLAGGED_WORDS = load_words_asset(words_dir=flagged_words_dir,
                                               words_type='flagged_words')
