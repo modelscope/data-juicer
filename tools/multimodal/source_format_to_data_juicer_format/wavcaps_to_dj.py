@@ -29,8 +29,8 @@
 #
 # Corresponding Data-Juicer format:
 # {'audios': ['./path/to/audio/2219.flac'],
-#  'text': '<audio>\n'
-#          '[[caption]]: An airplane is landing. <|__dj__eoc|>',
+#  'text': '<__dj__audio>\n'
+#          'An airplane is landing. <|__dj__eoc|>',
 #  '__dj__meta__': {
 #       'num_captions_per_audio': 1,
 #       'title': 'Airplane Landing Airport',
@@ -45,8 +45,8 @@
 #       'category': '',
 #       'tags': '' }}
 # {'audios': ['./path/to/audio/2218.flac'],
-#  'text': '<audio>\n'
-#          '[[caption]]: Someone is ringing a bell. <|__dj__eoc|>',
+#  'text': '<__dj__audio>\n'
+#          'Someone is ringing a bell. <|__dj__eoc|>',
 #  '__dj__meta__': {
 #       'num_captions_per_audio': 1,
 #       'title': 'Service Bell Help',
@@ -110,9 +110,9 @@ def main(
     target_ds_path: str,
     target_field: Union[str, List[str]] = 'caption',
     eoc_special_token: str = SpecialTokens.eoc,
-    audio_special_token: str = '<audio>',
+    audio_special_token: str = SpecialTokens.audio,
     add_eoc_at_last: bool = True,
-    add_target_field_token: bool = True,
+    add_target_field_token: bool = False,
     sent_seperator: str = '\n',
 ):
     """
@@ -128,10 +128,7 @@ def main(
         to split conversation chunks explicitly. Default: <|__dj__eoc|> (from
         Data-Juicer).
     :param audio_special_token: the special token for audios. It's used to
-        locate the audios in the text. In typical WavCaps-like datasets,
-        this token always be "<audio>". You can change it to align with your
-        own WavCaps-like datasets but should be careful of possible
-        compatibility problems that come from this change. Default: <audio>.
+        locate the audios in the text.
     :param add_eoc_at_last: whether to add an extra eoc_special_token at the
         end of text. Default: True.
     :param add_target_field_token: whether to add an extra target_field_token
@@ -171,12 +168,6 @@ def main(
                     f'for the target dataset.')
         os.makedirs(os.path.dirname(target_ds_path))
 
-    # check if the default audio special token is changed
-    if audio_special_token != '<audio>':
-        logger.warning('The audio_special_token used in the original WavCaps '
-                       'dataset is "<audio>". It\'s better to align the this '
-                       'token. There might be some compatibility problem if '
-                       'you change it.')
     # check whether to add the eoc special token at last
     if not add_eoc_at_last:
         logger.warning('You choose not to add special eoc token at the last, '

@@ -3,8 +3,8 @@
 #
 # Data-Juicer format:
 # {'audios': ['./path/to/audio/2219.flac'],
-#  'text': '<audio>\n'
-#          '[[caption]]: An airplane is landing. <|__dj__eoc|>',
+#  'text': '<__dj__audio>\n'
+#          'An airplane is landing. <|__dj__eoc|>',
 #  '__dj__meta__': {
 #       'num_captions_per_audio': 1,
 #       'title': 'Airplane Landing Airport',
@@ -19,8 +19,8 @@
 #       'category': '',
 #       'tags': '' }}
 # {'audios': ['./path/to/audio/2218.flac'],
-#  'text': '<audio>\n'
-#          '[[caption]]: Someone is ringing a bell. <|__dj__eoc|>',
+#  'text': '<__dj__audio>\n'
+#          'Someone is ringing a bell. <|__dj__eoc|>',
 #  '__dj__meta__': {
 #       'num_captions_per_audio': 1,
 #       'title': 'Service Bell Help',
