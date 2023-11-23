@@ -63,7 +63,6 @@
 
 import json
 import os
-from typing import List, Union
 
 import fire
 import jsonlines as jl
@@ -156,8 +155,7 @@ def main(
 
     if target_field not in ['caption', 'description', 'title']:
         raise ValueError(
-            "target_field must be in '['caption', 'description', 'title']'"
-        )
+            "target_field must be in '['caption', 'description', 'title']'")
 
     if os.path.dirname(target_ds_path) \
             and not os.path.exists(os.path.dirname(target_ds_path)):
@@ -196,7 +194,8 @@ def main(
             audio = [all_audio_files[audio_name]]
             text = audio_special_token + sent_seperator
             if target_field not in sample.keys():
-                logger.warning(f'{target_field} does not exist in this sample.')
+                logger.warning(
+                    f'{target_field} does not exist in this sample.')
                 continue
 
             if add_target_field_token:

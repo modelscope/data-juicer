@@ -75,7 +75,7 @@ from data_juicer.utils.mm_utils import SpecialTokens
 
 @logger.catch
 def main(
-    dj_ds_path: str, 
+    dj_ds_path: str,
     target_wavcaps_ds_path: str,
     target_field: str = 'caption',
     eoc_special_token: str = SpecialTokens.eoc,
@@ -83,7 +83,7 @@ def main(
     remove_eoc_at_last: bool = True,
     remove_target_field_token: bool = False,
     sent_seperator: str = '\n',
-    ):
+):
     """
     Convert a Data-Juicer-format dataset to a WavCaps-like dataset.
 
@@ -97,10 +97,10 @@ def main(
         Data-Juicer).
     :param audio_special_token: the special token for audios. It's used to
         locate the audios in the text.
-    :param remove_eoc_at_last: whether to remove the extra eoc_special_token at the
-        end of text. Default: True.
-    :param remove_target_field_token: whether to remove the extra target_field_token
-        at text.
+    :param remove_eoc_at_last: whether to remove the extra eoc_special_token at
+        the end of text. Default: True.
+    :param remove_target_field_token: whether to remove the extra
+        target_field_token at text.
     :param sent_seperator: seperator to split different sentences. Default: \n.
     """
     # ----- Constant settings. Better not to change them. -----
@@ -122,8 +122,7 @@ def main(
 
     if target_field not in ['caption', 'description', 'title']:
         raise ValueError(
-            "target_field must be in '['caption', 'description', 'title']'"
-        )
+            "target_field must be in '['caption', 'description', 'title']'")
 
     logger.info('Start to convert.')
     samples = {'num_captions_per_audio': 1, 'data': []}
@@ -134,16 +133,22 @@ def main(
                 continue
 
             if target_field not in sample[Fields.meta].keys():
-                logger.warning(f'{target_field} does not exist in this sample.')
+                logger.warning(
+                    f'{target_field} does not exist in this sample.')
                 continue
-            samples['num_captions_per_audio'] = sample[Fields.meta]['num_captions_per_audio']
+            samples['num_captions_per_audio'] = sample[
+                Fields.meta]['num_captions_per_audio']
             del sample[Fields.meta]['num_captions_per_audio']
 
-            sample[Fields.meta][target_field] = sample['text'].replace(audio_special_token + sent_seperator, "")
+            sample[Fields.meta][target_field] = sample['text'].replace(
+                audio_special_token + sent_seperator, '')
             if remove_eoc_at_last:
-                sample[Fields.meta][target_field] = sample[Fields.meta][target_field].replace(eoc_special_token, "")
+                sample[Fields.meta][target_field] = sample[
+                    Fields.meta][target_field].replace(eoc_special_token, '')
             if remove_target_field_token:
-                sample[Fields.meta][target_field] = sample[Fields.meta][target_field].replace(from_format % target_field, "")         
+                sample[Fields.meta][target_field] = sample[
+                    Fields.meta][target_field].replace(
+                        from_format % target_field, '')
             samples['data'].append(sample[Fields.meta])
 
     logger.info(f'Start to write the converted dataset to '
