@@ -108,7 +108,7 @@ def main(
     wavcaps_json_path: str,
     wavcaps_audio_path: str,
     target_ds_path: str,
-    target_field: Union[str, List[str]] = 'caption',
+    target_field: str = 'caption',
     eoc_special_token: str = SpecialTokens.eoc,
     audio_special_token: str = SpecialTokens.audio,
     add_eoc_at_last: bool = True,
@@ -123,7 +123,7 @@ def main(
     :param target_ds_path: path to store the converted dataset in Data-Juicer
         format.
     :param target_field: the field used to describe audio in the WavCaps-like
-        dataset, which can be one or more of ['caption','title','description'].
+        dataset, which can be one of ['caption','title','description'].
     :param eoc_special_token: the special token for "end of a chunk". It's used
         to split conversation chunks explicitly. Default: <|__dj__eoc|> (from
         Data-Juicer).
@@ -154,13 +154,10 @@ def main(
     if not target_ds_path.endswith('.jsonl'):
         raise ValueError('Only support "jsonl" target dataset file now.')
 
-    if not isinstance(target_field, list):
-        target_field = [target_field]
-    for tag in target_field:
-        if tag not in ['caption', 'description', 'title']:
-            raise ValueError(
-                "target_filed must be in '['caption', 'description', 'title']'"
-            )
+    if target_field not in ['caption', 'description', 'title']:
+        raise ValueError(
+            "target_field must be in '['caption', 'description', 'title']'"
+        )
 
     if os.path.dirname(target_ds_path) \
             and not os.path.exists(os.path.dirname(target_ds_path)):
@@ -173,9 +170,6 @@ def main(
         logger.warning('You choose not to add special eoc token at the last, '
                        'which might cause some compatibility problems for '
                        'other type of datasets (e.g. OpenFlamingo).')
-
-    if isinstance(target_field, str):
-        target_field = [target_field]
 
     # load WavCaps dataset
     logger.info('Loading original WavCaps dataset.')
@@ -200,16 +194,14 @@ def main(
                     f'before converting.')
                 continue
             audio = [all_audio_files[audio_name]]
-            text = audio_special_token
-            for tag in target_field:
-                if tag not in sample.keys():
-                    logger.warning(f'{tag} does not exist in this sample.')
-                    continue
-                if add_target_field_token:
-                    text += sent_seperator + from_format % tag + sample[tag]
-                else:
-                    text += sent_seperator + sample[tag]
+            text = audio_special_token + sent_seperator
+            if target_field not in sample.keys():
+                logger.warning(f'{target_field} does not exist in this sample.')
+                continue
 
+            if add_target_field_token:
+                text += from_format % target_field
+            text += sample[target_field]
             if add_eoc_at_last:
                 text += eoc_special_token
 
