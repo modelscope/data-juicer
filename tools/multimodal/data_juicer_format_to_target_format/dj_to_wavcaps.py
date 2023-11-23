@@ -1,5 +1,5 @@
-# This tool is used to convert multimodal dataset in Data-Juicer format to a target
-# dataset in WavCaps format.
+# This tool is used to convert multimodal dataset in Data-Juicer format to a
+# target dataset in WavCaps format.
 #
 # Data-Juicer format:
 # {'audios': ['./path/to/audio/2219.flac'],
@@ -8,7 +8,7 @@
 #  '__dj__meta__': {
 #       'num_captions_per_audio': 1,
 #       'title': 'Airplane Landing Airport',
-#       'description': 'Large commercial airplane landing at an airport runway.',
+#       'description': 'Large commercial airplane landing at an airport runway.',  # noqa: E501
 #       'author': 'Daniel Simion',
 #       'href': '2219-Airplane-Landing-Airport.html',
 #       'caption': 'An airplane is landing.',
@@ -24,7 +24,7 @@
 #  '__dj__meta__': {
 #       'num_captions_per_audio': 1,
 #       'title': 'Service Bell Help',
-#       'description': 'Customer ringing service bell in need of help in a store.',
+#       'description': 'Customer ringing service bell in need of help in a store.',  # noqa: E501
 #       'author': 'Daniel Simion',
 #       'href': '2218-Service-Bell-Help.html',
 #       'caption': 'Someone is ringing a bell.',
@@ -39,17 +39,17 @@
 # { 'num_captions_per_audio': 1,
 #   'data': [{
 #       'title': 'Airplane Landing Airport',
-#       'description': 'Large commercial airplane landing at an airport runway.',
+#       'description': 'Large commercial airplane landing at an airport runway.',  # noqa: E501
 #       'author': 'Daniel Simion',
 #       'href': '2219-Airplane-Landing-Airport.html',
 #       'caption': 'An airplane is landing.',
 #       'id': '2219',
 #       'duration': 14.1424375,
 #       'audio': 'wav_path',
-#       'download_link': 'http://soundbible.com/grab.php?id=2219&type=wav'    
+#       'download_link': 'http://soundbible.com/grab.php?id=2219&type=wav'
 #   },  {
 #       'title': 'Service Bell Help',
-#       'description': 'Customer ringing service bell in need of help in a store.',
+#       'description': 'Customer ringing service bell in need of help in a store.',  # noqa: E501
 #       'author': 'Daniel Simion',
 #       'href': '2218-Service-Bell-Help.html',
 #       'caption': 'Someone is ringing a bell.',
@@ -73,16 +73,13 @@ from data_juicer.utils.constant import Fields
 
 
 @logger.catch
-def main(
-    dj_ds_path: str,
-    target_wavcaps_ds_path: str
-):
+def main(dj_ds_path: str, target_wavcaps_ds_path: str):
     """
     Convert a Data-Juicer-format dataset to a WavCaps-like dataset.
 
     :param dj_ds_path: path to the input dataset in Data-Juicer format.
-    :param target_wavcaps_ds_path: path to store the converted dataset in WavCaps
-        format.
+    :param target_wavcaps_ds_path: path to store the converted dataset in
+        WavCaps format.
     """
 
     if not os.path.exists(dj_ds_path):
@@ -94,22 +91,20 @@ def main(
     if os.path.dirname(target_wavcaps_ds_path) \
             and not os.path.exists(os.path.dirname(target_wavcaps_ds_path)):
         logger.info(
-            f'Create directory [{os.path.dirname(target_wavcaps_ds_path)}] for '
-            f'the target dataset.')
+            f'Create directory [{os.path.dirname(target_wavcaps_ds_path)}] '
+            f'for the target dataset.')
         os.makedirs(os.path.dirname(target_wavcaps_ds_path))
 
     logger.info('Start to convert.')
-    samples = {'num_captions_per_audio': 1, 
-               'data': []}
+    samples = {'num_captions_per_audio': 1, 'data': []}
     with jl.open(dj_ds_path, 'r') as reader:
         for sample in tqdm(reader):
-            if not Fields.meta in sample:
-                logger.info(
-                    f'Create directory [{os.path.dirname(target_wavcaps_ds_path)}] for '
-                    f'the target dataset.')   
+            if Fields.meta not in sample:
+                logger.warning(f'{Fields.meta} does not exist in this sample.')
                 continue
             else:
-                samples['num_captions_per_audio'] = sample[Fields.meta]['num_captions_per_audio']
+                samples['num_captions_per_audio'] = sample[
+                    Fields.meta]['num_captions_per_audio']
                 del sample[Fields.meta]['num_captions_per_audio']
                 samples['data'].append(sample[Fields.meta])
 

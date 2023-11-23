@@ -1,4 +1,4 @@
-from datasets import Image, Audio
+from datasets import Audio, Image
 
 from data_juicer.utils.constant import DEFAULT_PREFIX
 
@@ -32,7 +32,7 @@ def load_audio(path, sampling_rate=None):
     aud_feature = Audio(sampling_rate)
     aud = aud_feature.decode_example(aud_feature.encode_example(path))
     return (aud['array'], aud['sampling_rate'])
-    
+
 
 def get_image_size(path, ):
     import os

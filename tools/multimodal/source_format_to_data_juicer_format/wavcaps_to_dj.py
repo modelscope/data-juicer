@@ -5,17 +5,17 @@
 # { 'num_captions_per_audio': 1,
 #   'data': [{
 #       'title': 'Airplane Landing Airport',
-#       'description': 'Large commercial airplane landing at an airport runway.',
+#       'description': 'Large commercial airplane landing at an airport runway.',  # noqa: E501
 #       'author': 'Daniel Simion',
 #       'href': '2219-Airplane-Landing-Airport.html',
 #       'caption': 'An airplane is landing.',
 #       'id': '2219',
 #       'duration': 14.1424375,
 #       'audio': 'wav_path',
-#       'download_link': 'http://soundbible.com/grab.php?id=2219&type=wav'    
+#       'download_link': 'http://soundbible.com/grab.php?id=2219&type=wav'
 #   },  {
 #       'title': 'Service Bell Help',
-#       'description': 'Customer ringing service bell in need of help in a store.',
+#       'description': 'Customer ringing service bell in need of help in a store.',  # noqa: E501
 #       'author': 'Daniel Simion',
 #       'href': '2218-Service-Bell-Help.html',
 #       'caption': 'Someone is ringing a bell.',
@@ -34,7 +34,7 @@
 #  '__dj__meta__': {
 #       'num_captions_per_audio': 1,
 #       'title': 'Airplane Landing Airport',
-#       'description': 'Large commercial airplane landing at an airport runway.',
+#       'description': 'Large commercial airplane landing at an airport runway.',  # noqa: E501
 #       'author': 'Daniel Simion',
 #       'href': '2219-Airplane-Landing-Airport.html',
 #       'caption': 'An airplane is landing.',
@@ -50,7 +50,7 @@
 #  '__dj__meta__': {
 #       'num_captions_per_audio': 1,
 #       'title': 'Service Bell Help',
-#       'description': 'Customer ringing service bell in need of help in a store.',
+#       'description': 'Customer ringing service bell in need of help in a store.',  # noqa: E501
 #       'author': 'Daniel Simion',
 #       'href': '2218-Service-Bell-Help.html',
 #       'caption': 'Someone is ringing a bell.',
@@ -63,31 +63,31 @@
 
 import json
 import os
+from typing import List, Union
 
 import fire
 import jsonlines as jl
 from loguru import logger
 from tqdm import tqdm
-from typing import List, Union
 
-from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.mm_utils import SpecialTokens
 
 
 def creat_meta_filed(num_captions_per_audio, source_meta):
     meta_dict = {
-      'num_captions_per_audio': num_captions_per_audio,
-      'title': '',
-      'description': '',
-      'author': '',
-      'href': '',
-      'caption': '',
-      'id': '',
-      'duration': '',
-      'audio': '',
-      'download_link': '',
-      'category': '',
-      'tags': ''
+        'num_captions_per_audio': num_captions_per_audio,
+        'title': '',
+        'description': '',
+        'author': '',
+        'href': '',
+        'caption': '',
+        'id': '',
+        'duration': '',
+        'audio': '',
+        'download_link': '',
+        'category': '',
+        'tags': ''
     }
     for key in source_meta:
         meta_dict[key] = source_meta[key]
@@ -119,23 +119,23 @@ def main(
     Convert a WavCaps-like dataset to the Data-Juicer format.
 
     :param wavcaps_json_path: path to the json files of WavCaps-like dataset.
-    :param wavcaps_audio_path: path to the audio files of WavCaps-like dataset.  
+    :param wavcaps_audio_path: path to the audio files of WavCaps-like dataset.
     :param target_ds_path: path to store the converted dataset in Data-Juicer
         format.
-    :param target_field: the field used to describe audio in the WavCaps-like 
-        dataset, which can be one or more of ['caption', 'title', 'description'].
+    :param target_field: the field used to describe audio in the WavCaps-like
+        dataset, which can be one or more of ['caption','title','description'].
     :param eoc_special_token: the special token for "end of a chunk". It's used
         to split conversation chunks explicitly. Default: <|__dj__eoc|> (from
         Data-Juicer).
     :param audio_special_token: the special token for audios. It's used to
         locate the audios in the text. In typical WavCaps-like datasets,
         this token always be "<audio>". You can change it to align with your
-        own WavCaps-like datasets but should be careful of possible compatibility
-        problems that come from this change. Default: <audio>.
+        own WavCaps-like datasets but should be careful of possible
+        compatibility problems that come from this change. Default: <audio>.
     :param add_eoc_at_last: whether to add an extra eoc_special_token at the
         end of text. Default: True.
-    :param add_target_field_token: whether to add an extra target_field_token into
-        text.
+    :param add_target_field_token: whether to add an extra target_field_token
+        into text.
     :param sent_seperator: seperator to split different sentences. Default: \n.
     """
     # ----- Constant settings. Better not to change them. -----
@@ -147,11 +147,13 @@ def main(
     # check arguments
     # check paths
     if not os.path.exists(wavcaps_json_path):
-        raise FileNotFoundError(f'Input WavCaps json path [{wavcaps_json_path}] can '
-                                f'not be found.')
+        raise FileNotFoundError(
+            f'Input WavCaps json path [{wavcaps_json_path}] can '
+            f'not be found.')
     if not os.path.exists(wavcaps_audio_path):
-        raise FileNotFoundError(f'Input WavCaps audio path [{wavcaps_audio_path}] can '
-                                f'not be found.')
+        raise FileNotFoundError(
+            f'Input WavCaps audio path [{wavcaps_audio_path}] can '
+            f'not be found.')
     if not target_ds_path.endswith('.jsonl'):
         raise ValueError('Only support "jsonl" target dataset file now.')
 
@@ -159,7 +161,9 @@ def main(
         target_field = [target_field]
     for tag in target_field:
         if tag not in ['caption', 'description', 'title']:
-            raise ValueError("target_filed must be in '['caption', 'description', 'title']'")
+            raise ValueError(
+                "target_filed must be in '['caption', 'description', 'title']'"
+            )
 
     if os.path.dirname(target_ds_path) \
             and not os.path.exists(os.path.dirname(target_ds_path)):
@@ -178,7 +182,7 @@ def main(
         logger.warning('You choose not to add special eoc token at the last, '
                        'which might cause some compatibility problems for '
                        'other type of datasets (e.g. OpenFlamingo).')
-    
+
     if isinstance(target_field, str):
         target_field = [target_field]
 
@@ -195,13 +199,14 @@ def main(
             # id
             audio_name = sample['id'].strip().split('.')[0] + '.flac'
             target_meta = creat_meta_filed(num_captions_per_audio, sample)
-           
+
             # audio and text
             if audio_name not in all_audio_files:
-                logger.warning(f'No audios in the sample with id [{audio_name}], '
-                               f'which means this sample is not a multimodal '
-                               f'sample. You\'d better remove this sample '
-                               f'before converting.')
+                logger.warning(
+                    f'No audios in the sample with id [{audio_name}], '
+                    f'which means this sample is not a multimodal '
+                    f'sample. You\'d better remove this sample '
+                    f'before converting.')
                 continue
             audio = [all_audio_files[audio_name]]
             text = audio_special_token
@@ -216,7 +221,7 @@ def main(
 
             if add_eoc_at_last:
                 text += eoc_special_token
-            
+
             # get the new sample with Data-Juicer format
             new_sample = {
                 text_key: text,
