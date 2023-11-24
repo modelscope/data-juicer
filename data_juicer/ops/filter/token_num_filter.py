@@ -2,14 +2,20 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 from ..common import get_words_from_document
 
+OP_NAME = 'token_num_filter'
 
-@OPERATORS.register_module('token_num_filter')
+with AvailabilityChecking(['transformers'], OP_NAME):
+    import transformers  # noqa: F401
+
+
+@OPERATORS.register_module(OP_NAME)
 class TokenNumFilter(Filter):
     """Filter to keep samples with total token number within a specific
     range."""

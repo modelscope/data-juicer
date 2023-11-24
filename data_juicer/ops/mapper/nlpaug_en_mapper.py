@@ -1,15 +1,21 @@
 from copy import deepcopy
 
-import nlpaug.augmenter.char as nac
-import nlpaug.augmenter.word as naw
-import nlpaug.flow as naf
 from loguru import logger
-from nlpaug.util import Action
+
+from data_juicer.utils.availability_utils import AvailabilityChecking
 
 from ..base_op import OPERATORS, Mapper
 
+OP_NAME = 'nlpaug_en_mapper'
 
-@OPERATORS.register_module('nlpaug_en_mapper')
+with AvailabilityChecking(['nlpaug'], OP_NAME):
+    import nlpaug.augmenter.char as nac
+    import nlpaug.augmenter.word as naw
+    import nlpaug.flow as naf
+    from nlpaug.util import Action
+
+
+@OPERATORS.register_module(OP_NAME)
 class NlpaugEnMapper(Mapper):
     """Mapper to simply augment samples in English based on nlpaug library."""
 

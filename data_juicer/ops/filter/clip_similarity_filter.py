@@ -1,7 +1,7 @@
 import numpy as np
-import torch
 from jsonargparse.typing import ClosedUnitInterval
 
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import SpecialTokens, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -9,12 +9,18 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-# avoid hanging when calling clip in multiprocessing
-torch.set_num_threads(1)
+OP_NAME = 'clip_similarity_filter'
+
+with AvailabilityChecking(['torch'], OP_NAME):
+    import torch
+    import transformers  # noqa: F401
+
+    # avoid hanging when calling clip in multiprocessing
+    torch.set_num_threads(1)
 
 
-@OPERATORS.register_module('clip_similarity_filter')
-@LOADED_IMAGES.register_module('clip_similarity_filter')
+@OPERATORS.register_module(OP_NAME)
+@LOADED_IMAGES.register_module(OP_NAME)
 class ClipSimilarityFilter(Filter):
     """Filter to keep samples those similarity between image and text
     within a specific range."""

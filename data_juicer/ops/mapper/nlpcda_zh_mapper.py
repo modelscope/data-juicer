@@ -2,12 +2,18 @@ from copy import deepcopy
 
 from loguru import logger
 
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import OPERATORS, Mapper
 
+OP_NAME = 'nlpcda_zh_mapper'
 
-@OPERATORS.register_module('nlpcda_zh_mapper')
+with AvailabilityChecking(['nlpcda'], OP_NAME), HiddenPrints():
+    import nlpcda
+
+
+@OPERATORS.register_module(OP_NAME)
 class NlpcdaZhMapper(Mapper):
     """Mapper to simply augment samples in Chinese based on nlpcda library."""
 
@@ -71,7 +77,6 @@ class NlpcdaZhMapper(Mapper):
             import warnings
             warnings.filterwarnings('ignore')
 
-            import nlpcda
             self.aug_pipeline = []
             # sample level
 

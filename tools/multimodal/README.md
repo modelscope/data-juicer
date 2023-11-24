@@ -19,6 +19,7 @@ For now, dataset formats that are supported by Data-Juicer are listed in the fol
 |------------|-------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------|
 | LLaVA-like | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
 | MMC4-like  | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [Format Description](https://github.com/allenai/mmc4#documents)                                                  |
+| WavCaps-like  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | [Format Description](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
 
 For all tools, you can run the following command to find out the usage of them:
 
@@ -105,3 +106,39 @@ modified by some Mappers. Thus, after processing, this similarity matrix might b
 Users should be cautious about this point if you need this matrix in later usages.
 
 Despite these extra fields, tools for MMC4 can perfectly convert MMC4-like datasets to Data-Juicer-format datasets and convert them back~
+
+### WavCaps-like
+
+The [WavCaps](https://github.com/XinhaoMei/WavCaps#dataset) is composed of four sub-datasets: [FreeSound](https://freesound.org/), [BBC Sound Effects](https://sound-effects.bbcrewind.co.uk/),[SoundBible](https://soundbible.com/) and [AudioSet Strongly-labelled Subset](https://research.google.com/audioset/download_strong.html). Each sub-dataset has different fields. For example, the 'description' field is included in SoundBible, but does not exist in AudioSet. To ensure that the different sub-datasets can be properly merged after conversion, the union of all fields from the sub-datasets is used during the wavcaps_to_dj stage, and all fields are fully retained during the dj_to_wavcaps stage.
+
+```json
+# original dataset
+{ "num_captions_per_audio": 1,
+  "data": [{
+        "title": "Airplane Landing Airport",
+        "description": "Large commercial airplane landing at an airport runway.",
+        "author": "Daniel Simion",
+        "href": "2219-Airplane-Landing-Airport.html",
+        "caption": "An airplane is landing.",
+        "id": "2219",
+        "duration": 14.1424375,
+        "audio": "wav_path",
+        "download_link": "http://soundbible.com/grab.php?id=2219&type=wav"}]    
+}
+
+# converted dataset
+{ "num_captions_per_audio": 1,
+  "data": [{
+        "title": "Airplane Landing Airport",
+        "description": "Large commercial airplane landing at an airport runway.",
+        "author": "Daniel Simion",
+        "href": "2219-Airplane-Landing-Airport.html",
+        "caption": "An airplane is landing.",
+        "id": "2219",
+        "duration": 14.1424375,
+        "audio": "wav_path",
+        "download_link": "http://soundbible.com/grab.php?id=2219&type=wav",
+        "category": "",
+        "tags": "" }]    
+}
+```

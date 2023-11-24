@@ -2,24 +2,29 @@ from collections import defaultdict
 from typing import Dict, Set
 
 import numpy as np
-from imagededup.methods import AHash, DHash, PHash, WHash
 
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, HashKeys
 from data_juicer.utils.mm_utils import load_image
 
 from ..base_op import OPERATORS, Deduplicator
 from ..op_fusion import LOADED_IMAGES
 
-HASH_METHOD = {
-    'phash': PHash(),
-    'dhash': DHash(),
-    'whash': WHash(),
-    'ahash': AHash()
-}
+OP_NAME = 'image_deduplicator'
+
+with AvailabilityChecking(['imagededup'], OP_NAME):
+    from imagededup.methods import AHash, DHash, PHash, WHash
+
+    HASH_METHOD = {
+        'phash': PHash,
+        'dhash': DHash,
+        'whash': WHash,
+        'ahash': AHash
+    }
 
 
-@OPERATORS.register_module('image_deduplicator')
-@LOADED_IMAGES.register_module('image_deduplicator')
+@OPERATORS.register_module(OP_NAME)
+@LOADED_IMAGES.register_module(OP_NAME)
 class ImageDeduplicator(Deduplicator):
     """
     Deduplicator to deduplicate samples at document-level using exact matching
@@ -38,7 +43,7 @@ class ImageDeduplicator(Deduplicator):
         if method not in HASH_METHOD.keys():
             raise ValueError(f'Keep strategy [{method}] is not supported. '
                              f'Can only be one of {HASH_METHOD.keys()}.')
-        self.hasher = HASH_METHOD[method]
+        self.hasher = HASH_METHOD[method]()
 
     def compute_hash(self, sample, context=False):
         # check if it's computed already

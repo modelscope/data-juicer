@@ -16,6 +16,7 @@
 |----------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
 | 类LLaVA格式 | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
 | 类MMC4格式  | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [格式描述](https://github.com/allenai/mmc4#documents) |
+| 类WavCaps格式  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | [格式描述](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
 
 对于所有工具，您可以运行以下命令来了解它们的详细用法：
 
@@ -83,3 +84,37 @@ python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --hel
 然而，当使用Data-Juicer处理这些数据集时，图像或句子可能会被Filter算子从样本中移除，并且它们可能会被一些Mapper算子修改。因此，在处理后，这个相似度矩阵可能无法与`image_info`或`text_list`对齐。如果用户在后续使用中需要这个矩阵，那您应该注意到这一点。
 
 除了这些额外字段外，针对类MMC4格式的工具可以完美地将类MMC4格式的数据集转换为Data-Juicer格式的数据集，并将它们转换回去~
+
+#### 类WavCaps格式
+[WavCaps](https://github.com/XinhaoMei/WavCaps#dataset) 数据集由 [FreeSound](https://freesound.org/)，[BBC Sound Effects](https://sound-effects.bbcrewind.co.uk/)，[SoundBible](https://soundbible.com/)，[AudioSet Strongly-labelled Subset](https://research.google.com/audioset/download_strong.html) 四个子数据集组成，每个数据集里都有不同的字段。例如SoundBible里包含了‘description’字段，而该字段在AudioSet里并不存在。为了保证不同子数据集在转换后能够正常合并，在wavcaps_to_dj阶段使用了所有子数据集字段的并集，并在dj_to_wavcaps阶段完整保留了所有字段。
+```json
+# 原始数据集
+{ "num_captions_per_audio": 1,
+  "data": [{
+        "title": "Airplane Landing Airport",
+        "description": "Large commercial airplane landing at an airport runway.",
+        "author": "Daniel Simion",
+        "href": "2219-Airplane-Landing-Airport.html",
+        "caption": "An airplane is landing.",
+        "id": "2219",
+        "duration": 14.1424375,
+        "audio": "wav_path",
+        "download_link": "http://soundbible.com/grab.php?id=2219&type=wav"}]    
+}
+
+# 转换后数据集
+{ "num_captions_per_audio": 1,
+  "data": [{
+        "title": "Airplane Landing Airport",
+        "description": "Large commercial airplane landing at an airport runway.",
+        "author": "Daniel Simion",
+        "href": "2219-Airplane-Landing-Airport.html",
+        "caption": "An airplane is landing.",
+        "id": "2219",
+        "duration": 14.1424375,
+        "audio": "wav_path",
+        "download_link": "http://soundbible.com/grab.php?id=2219&type=wav",
+        "category": "",
+        "tags": "" }]    
+}
+```

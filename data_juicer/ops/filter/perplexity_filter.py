@@ -4,6 +4,7 @@
 
 from jsonargparse.typing import PositiveFloat
 
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -11,9 +12,15 @@ from ..base_op import OPERATORS, Filter
 from ..common import get_words_from_document
 from ..op_fusion import INTER_WORDS
 
+OP_NAME = 'perplexity_filter'
 
-@OPERATORS.register_module('perplexity_filter')
-@INTER_WORDS.register_module('perplexity_filter')
+with AvailabilityChecking(['sentencepiece', 'kenlm'], OP_NAME):
+    import kenlm  # noqa: F401
+    import sentencepiece  # noqa: F401
+
+
+@OPERATORS.register_module(OP_NAME)
+@INTER_WORDS.register_module(OP_NAME)
 class PerplexityFilter(Filter):
     """Filter to keep samples with perplexity score less than a specific max
     value."""

@@ -5,6 +5,7 @@
 from jsonargparse.typing import ClosedUnitInterval, List
 
 from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -13,9 +14,14 @@ from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
 from ..op_fusion import INTER_WORDS
 
+OP_NAME = 'stopwords_filter'
 
-@OPERATORS.register_module('stopwords_filter')
-@INTER_WORDS.register_module('stopwords_filter')
+with AvailabilityChecking(['sentencepiece'], OP_NAME):
+    import sentencepiece  # noqa: F401
+
+
+@OPERATORS.register_module(OP_NAME)
+@INTER_WORDS.register_module(OP_NAME)
 class StopWordsFilter(Filter):
     """Filter to keep samples with stopword ratio larger than a specific min
     value."""
