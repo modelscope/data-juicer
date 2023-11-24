@@ -28,7 +28,8 @@
 # }
 #
 # Corresponding Data-Juicer format:
-# {'audios': ['./path/to/audio/2219.flac'],
+# {'id': 2219,
+#  'audios': ['./path/to/audio/2219.flac'],
 #  'text': '<__dj__audio>\n'
 #          'An airplane is landing. <|__dj__eoc|>',
 #  '__dj__meta__': {
@@ -44,7 +45,8 @@
 #       'download_link': 'http://soundbible.com/grab.php?id=2219&type=wav',
 #       'category': '',
 #       'tags': '' }}
-# {'audios': ['./path/to/audio/2218.flac'],
+# {'id': 2218,
+#  'audios': ['./path/to/audio/2218.flac'],
 #  'text': '<__dj__audio>\n'
 #          'Someone is ringing a bell. <|__dj__eoc|>',
 #  '__dj__meta__': {
@@ -107,6 +109,7 @@ def main(
     wavcaps_json_path: str,
     wavcaps_audio_path: str,
     target_ds_path: str,
+    str_id: bool = True,
     target_field: str = 'caption',
     eoc_special_token: str = SpecialTokens.eoc,
     audio_special_token: str = SpecialTokens.audio,
@@ -180,22 +183,26 @@ def main(
     with jl.open(target_ds_path, 'w') as writer:
         for sample in tqdm(wavcaps_ds):
             # id
-            audio_name = sample['id'].strip().split('.')[0] + '.flac'
+            id = sample['id']
+            if str_id:
+                id = str(id)
+
+            audio_name = id.strip().split('.')[0] + '.flac'
             target_meta = creat_meta_filed(num_captions_per_audio, sample)
 
             # audio and text
             if audio_name not in all_audio_files:
-                logger.warning(
-                    f'No audios in the sample with id [{audio_name}], '
-                    f'which means this sample is not a multimodal '
-                    f'sample. You\'d better remove this sample '
-                    f'before converting.')
+                logger.warning(f'No audios in the sample with id [{id}], '
+                               f'which means this sample is not a multimodal '
+                               f'sample. You\'d better remove this sample '
+                               f'before converting.')
                 continue
             audio = [all_audio_files[audio_name]]
             text = audio_special_token + sent_seperator
             if target_field not in sample.keys():
                 logger.warning(
-                    f'{target_field} does not exist in this sample.')
+                    f'{target_field} does not exist in this sample with '
+                    f'id [{id}].')
                 continue
 
             if add_target_field_token:
@@ -206,6 +213,7 @@ def main(
 
             # get the new sample with Data-Juicer format
             new_sample = {
+                'id': id,
                 text_key: text,
                 audio_key: audio,
                 Fields.meta: target_meta

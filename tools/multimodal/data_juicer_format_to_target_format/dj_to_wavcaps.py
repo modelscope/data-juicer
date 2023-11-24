@@ -2,7 +2,8 @@
 # target dataset in WavCaps format.
 #
 # Data-Juicer format:
-# {'audios': ['./path/to/audio/2219.flac'],
+# {'id': 2219,
+#  'audios': ['./path/to/audio/2219.flac'],
 #  'text': '<__dj__audio>\n'
 #          'An airplane is landing. <|__dj__eoc|>',
 #  '__dj__meta__': {
@@ -18,7 +19,8 @@
 #       'download_link': 'http://soundbible.com/grab.php?id=2219&type=wav',
 #       'category': '',
 #       'tags': '' }}
-# {'audios': ['./path/to/audio/2218.flac'],
+# {'id': 2218,
+#  'audios': ['./path/to/audio/2218.flac'],
 #  'text': '<__dj__audio>\n'
 #          'Someone is ringing a bell. <|__dj__eoc|>',
 #  '__dj__meta__': {
@@ -128,13 +130,17 @@ def main(
     samples = {'num_captions_per_audio': 1, 'data': []}
     with jl.open(dj_ds_path, 'r') as reader:
         for sample in tqdm(reader):
+            id = sample['id']
             if Fields.meta not in sample:
-                logger.warning(f'{Fields.meta} does not exist in this sample.')
+                logger.warning(
+                    f'{Fields.meta} does not exist in this sample with '
+                    f'id [{id}].')
                 continue
 
             if target_field not in sample[Fields.meta].keys():
                 logger.warning(
-                    f'{target_field} does not exist in this sample.')
+                    f'{target_field} does not exist in this sample with '
+                    f'id [{id}].')
                 continue
             samples['num_captions_per_audio'] = sample[
                 Fields.meta]['num_captions_per_audio']
