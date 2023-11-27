@@ -14,6 +14,7 @@ OP_NAME = 'image_text_matching_filter'
 with AvailabilityChecking(['torch'], OP_NAME):
     import torch
     import transformers  # noqa: F401
+    from PIL import ImageOps
 
     # avoid hanging when calling blip in multiprocessing
     torch.set_num_threads(1)
@@ -27,8 +28,10 @@ class ImageTextMatchingFilter(Filter):
 
     def __init__(self,
                  hf_blip='Salesforce/blip-itm-base-coco',
-                 min_score: ClosedUnitInterval = 0.1,
+                 min_score: ClosedUnitInterval = 0.003,
                  max_score: ClosedUnitInterval = 1.0,
+                 horizontal_flip: bool = False,
+                 vertical_flip: bool = False,
                  any_or_all: str = 'any',
                  reduce_mode: str = 'avg',
                  *args,
@@ -37,9 +40,11 @@ class ImageTextMatchingFilter(Filter):
         Initialization method.
 
         :param hf_blip: blip model name on huggingface to compute
-            the similarity between image and text.
-        :param min_score: The min similarity to keep samples.
-        :param max_score: The max similarity to keep samples.
+            the matching score between image and text.
+        :param min_score: The min matching score to keep samples.
+        :param max_score: The max matching score to keep samples.
+        :param horizontal_flip: Flip image horizontally (left to right).
+        :param vertical_flip: Flip the image vertically (top to bottom).
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the
@@ -64,6 +69,8 @@ class ImageTextMatchingFilter(Filter):
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(model_type='hf_blip', model_key=hf_blip)
         self.reduce_mode = reduce_mode
+        self.horizontal_flip = horizontal_flip
+        self.vertical_flip = vertical_flip
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
@@ -118,10 +125,14 @@ class ImageTextMatchingFilter(Filter):
                 continue
             else:
                 text_chunk = remove_special_token(chunk)
-                image_chunk = [
-                    images[image_key]
-                    for image_key in loaded_image_keys[offset:offset + count]
-                ]
+                image_chunk = []
+                for image_key in loaded_image_keys[offset:offset + count]:
+                    image = images[image_key]
+                    if self.horizontal_flip:
+                        image = ImageOps.mirror(image)
+                    if self.vertical_flip:
+                        image = ImageOps.flip(image)
+                    image_chunk.append(image)
 
                 inputs = processor(text=text_chunk,
                                    images=image_chunk,

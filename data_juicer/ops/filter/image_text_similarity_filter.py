@@ -12,8 +12,10 @@ from ..op_fusion import LOADED_IMAGES
 OP_NAME = 'image_text_similarity_filter'
 
 with AvailabilityChecking(['torch'], OP_NAME):
+
     import torch
     import transformers  # noqa: F401
+    from PIL import ImageOps
 
     # avoid hanging when calling clip in multiprocessing
     torch.set_num_threads(1)
@@ -29,6 +31,8 @@ class ImageTextSimilarityFilter(Filter):
                  hf_clip='openai/clip-vit-base-patch32',
                  min_score: ClosedUnitInterval = 0.1,
                  max_score: ClosedUnitInterval = 1.0,
+                 horizontal_flip: bool = True,
+                 vertical_flip: bool = False,
                  any_or_all: str = 'any',
                  reduce_mode: str = 'avg',
                  *args,
@@ -40,6 +44,8 @@ class ImageTextSimilarityFilter(Filter):
             the similarity between image and text.
         :param min_score: The min similarity to keep samples.
         :param max_score: The max similarity to keep samples.
+        :param horizontal_flip: Flip image horizontally (left to right).
+        :param vertical_flip: Flip the image vertically (top to bottom).
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the
@@ -64,17 +70,18 @@ class ImageTextSimilarityFilter(Filter):
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(model_type='hf_clip', model_key=hf_clip)
         self.reduce_mode = reduce_mode
+        self.horizontal_flip = horizontal_flip
+        self.vertical_flip = vertical_flip
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
-        if StatsKeys.clip_image_text_similarity in sample[Fields.stats]:
+        if StatsKeys.image_text_similarity in sample[Fields.stats]:
             return sample
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][
-                StatsKeys.clip_image_text_similarity] = np.array(
-                    [], dtype=np.float64)
+            sample[Fields.stats][StatsKeys.image_text_similarity] = np.array(
+                [], dtype=np.float64)
             return sample
 
         # load images
@@ -118,10 +125,14 @@ class ImageTextSimilarityFilter(Filter):
                 continue
             else:
                 text_chunk = remove_special_token(chunk)
-                image_chunk = [
-                    images[image_key]
-                    for image_key in loaded_image_keys[offset:offset + count]
-                ]
+                image_chunk = []
+                for image_key in loaded_image_keys[offset:offset + count]:
+                    image = images[image_key]
+                    if self.horizontal_flip:
+                        image = ImageOps.mirror(image)
+                    if self.vertical_flip:
+                        image = ImageOps.flip(image)
+                    image_chunk.append(image)
 
                 inputs = processor(text=text_chunk,
                                    images=image_chunk,
@@ -143,12 +154,12 @@ class ImageTextSimilarityFilter(Filter):
 
                 similarity.append(float(chunk_similarity))
             offset += count
-        sample[Fields.stats][StatsKeys.clip_image_text_similarity] = similarity
+        sample[Fields.stats][StatsKeys.image_text_similarity] = similarity
 
         return sample
 
     def process(self, sample):
-        similarity = sample[Fields.stats][StatsKeys.clip_image_text_similarity]
+        similarity = sample[Fields.stats][StatsKeys.image_text_similarity]
         if len(similarity) <= 0:
             return True
 

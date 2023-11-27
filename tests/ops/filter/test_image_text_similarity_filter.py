@@ -50,11 +50,39 @@ class ImageTextSimilarityFilterTest(unittest.TestCase):
         op = ImageTextSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='any',
+                                  horizontal_flip=False,
+                                  vertical_flip=False,
                                   min_score=0.2,
                                   max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
 
     def test_eoc_special_token(self):
+
+        ds_list = [{
+            'text':
+            f'{SpecialTokens.image}a photo of a cat{SpecialTokens.eoc}',
+            'images': [self.cat_path]
+        }, {
+            'text': f'{SpecialTokens.image}a photo of a dog{SpecialTokens.eoc}',
+            'images': [self.cat_path]
+        }]
+        tgt_list = [{
+            'text':
+            f'{SpecialTokens.image}a photo of a cat{SpecialTokens.eoc}',
+            'images': [self.cat_path]
+        }]
+
+        dataset = Dataset.from_list(ds_list)
+        op = ImageTextSimilarityFilter(hf_clip=self.hf_clip,
+                                  reduce_mode='avg',
+                                  any_or_all='any',
+                                  horizontal_flip=False,
+                                  vertical_flip=False,
+                                  min_score=0.2,
+                                  max_score=0.9)
+        self._run_filter(dataset, tgt_list, op)
+
+    def test_horizontal_flip(self):
 
         ds_list = [{
             'text':
@@ -74,6 +102,34 @@ class ImageTextSimilarityFilterTest(unittest.TestCase):
         op = ImageTextSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='any',
+                                  horizontal_flip=True,
+                                  vertical_flip=False,
+                                  min_score=0.24,
+                                  max_score=0.9)
+        self._run_filter(dataset, tgt_list, op)
+
+    def test_vertical_flip(self):
+
+        ds_list = [{
+            'text':
+            f'{SpecialTokens.image}a photo of a cat{SpecialTokens.eoc}',
+            'images': [self.cat_path]
+        }, {
+            'text': f'{SpecialTokens.image}a photo of a dog',
+            'images': [self.cat_path]
+        }]
+        tgt_list = [{
+            'text':
+            f'{SpecialTokens.image}a photo of a cat{SpecialTokens.eoc}',
+            'images': [self.cat_path]
+        }]
+
+        dataset = Dataset.from_list(ds_list)
+        op = ImageTextSimilarityFilter(hf_clip=self.hf_clip,
+                                  reduce_mode='avg',
+                                  any_or_all='any',
+                                  horizontal_flip=False,
+                                  vertical_flip=True,
                                   min_score=0.2,
                                   max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
@@ -96,6 +152,8 @@ class ImageTextSimilarityFilterTest(unittest.TestCase):
         op = ImageTextSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='any',
+                                  horizontal_flip=False,
+                                  vertical_flip=False,
                                   min_score=0.2,
                                   max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
@@ -113,6 +171,8 @@ class ImageTextSimilarityFilterTest(unittest.TestCase):
         op = ImageTextSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='all',
+                                  horizontal_flip=False,
+                                  vertical_flip=False,
                                   min_score=0.2,
                                   max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
@@ -133,6 +193,8 @@ class ImageTextSimilarityFilterTest(unittest.TestCase):
         op = ImageTextSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='any',
+                                  horizontal_flip=False,
+                                  vertical_flip=False,
                                   min_score=0.2,
                                   max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
@@ -153,6 +215,8 @@ class ImageTextSimilarityFilterTest(unittest.TestCase):
         op = ImageTextSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='max',
                                   any_or_all='any',
+                                  horizontal_flip=False,
+                                  vertical_flip=False,
                                   min_score=0.2,
                                   max_score=0.9)
         self._run_filter(dataset, tgt_list, op)
@@ -174,6 +238,8 @@ class ImageTextSimilarityFilterTest(unittest.TestCase):
         op = ImageTextSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='min',
                                   any_or_all='any',
+                                  horizontal_flip=False,
+                                  vertical_flip=False,
                                   min_score=0.1,
                                   max_score=0.9)
 
@@ -200,6 +266,8 @@ class ImageTextSimilarityFilterTest(unittest.TestCase):
         op = ImageTextSimilarityFilter(hf_clip=self.hf_clip,
                                   reduce_mode='avg',
                                   any_or_all='any',
+                                  horizontal_flip=False,
+                                  vertical_flip=False,
                                   min_score=0.2,
                                   max_score=0.9)
         self._run_filter(dataset, tgt_list, op, num_proc=4)

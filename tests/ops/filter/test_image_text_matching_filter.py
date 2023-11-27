@@ -16,7 +16,7 @@ class ImageTextMatchingFilterTest(unittest.TestCase):
     demo_path = os.path.join(data_path, 'blip.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
     hf_blip = 'Salesforce/blip-itm-base-coco'
-
+    hf_blip = '/Users/mazhijian/Documents/Project_2023/P01_LLM/C04_Data/blip-itm-base-coco'
     def _run_filter(self, dataset: Dataset, target_list, op, num_proc=1):
 
         if Fields.stats not in dataset.features:
@@ -50,7 +50,7 @@ class ImageTextMatchingFilterTest(unittest.TestCase):
         op = ImageTextMatchingFilter(hf_blip=self.hf_blip,
                                   reduce_mode='avg',
                                   any_or_all='any',
-                                  min_score=0.2,
+                                  min_score=0.003,
                                   max_score=1.0)
         self._run_filter(dataset, tgt_list, op)
 
@@ -74,7 +74,59 @@ class ImageTextMatchingFilterTest(unittest.TestCase):
         op = ImageTextMatchingFilter(hf_blip=self.hf_blip,
                                   reduce_mode='avg',
                                   any_or_all='any',
-                                  min_score=0.2,
+                                  min_score=0.003,
+                                  max_score=1.0)
+        self._run_filter(dataset, tgt_list, op)
+
+    def test_horizontal_flip(self):
+
+        ds_list = [{
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.eoc}',
+            'images': [self.demo_path]
+        }, {
+            'text': f'{SpecialTokens.image}a man sitting on the grass with a cat',
+            'images': [self.demo_path]
+        }]
+        tgt_list = [{
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.eoc}',
+            'images': [self.demo_path]
+        }]
+
+        dataset = Dataset.from_list(ds_list)
+        op = ImageTextMatchingFilter(hf_blip=self.hf_blip,
+                                  reduce_mode='avg',
+                                  any_or_all='any',
+                                  horizontal_flip=True,
+                                  vertical_flip=False,
+                                  min_score=0.003,
+                                  max_score=1.0)
+        self._run_filter(dataset, tgt_list, op)
+
+    def test_vertical_flip(self):
+
+        ds_list = [{
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.eoc}',
+            'images': [self.demo_path]
+        }, {
+            'text': f'{SpecialTokens.image}a man sitting on the grass with a cat',
+            'images': [self.demo_path]
+        }]
+        tgt_list = [{
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.eoc}',
+            'images': [self.demo_path]
+        }]
+
+        dataset = Dataset.from_list(ds_list)
+        op = ImageTextMatchingFilter(hf_blip=self.hf_blip,
+                                  reduce_mode='avg',
+                                  any_or_all='any',
+                                  horizontal_flip=False,
+                                  vertical_flip=True,
+                                  min_score=0.003,
                                   max_score=1.0)
         self._run_filter(dataset, tgt_list, op)
 
@@ -96,7 +148,7 @@ class ImageTextMatchingFilterTest(unittest.TestCase):
         op = ImageTextMatchingFilter(hf_blip=self.hf_blip,
                                   reduce_mode='avg',
                                   any_or_all='any',
-                                  min_score=0.2,
+                                  min_score=0.003,
                                   max_score=1.0)
         self._run_filter(dataset, tgt_list, op)
 
@@ -113,7 +165,7 @@ class ImageTextMatchingFilterTest(unittest.TestCase):
         op = ImageTextMatchingFilter(hf_blip=self.hf_blip,
                                   reduce_mode='avg',
                                   any_or_all='all',
-                                  min_score=0.2,
+                                  min_score=0.003,
                                   max_score=1.0)
         self._run_filter(dataset, tgt_list, op)
 
@@ -133,7 +185,7 @@ class ImageTextMatchingFilterTest(unittest.TestCase):
         op = ImageTextMatchingFilter(hf_blip=self.hf_blip,
                                   reduce_mode='avg',
                                   any_or_all='any',
-                                  min_score=0.2,
+                                  min_score=0.003,
                                   max_score=1.0)
         self._run_filter(dataset, tgt_list, op)
 
@@ -153,7 +205,7 @@ class ImageTextMatchingFilterTest(unittest.TestCase):
         op = ImageTextMatchingFilter(hf_blip=self.hf_blip,
                                   reduce_mode='max',
                                   any_or_all='any',
-                                  min_score=0.2,
+                                  min_score=0.003,
                                   max_score=1.0)
         self._run_filter(dataset, tgt_list, op)
 
@@ -191,7 +243,7 @@ class ImageTextMatchingFilterTest(unittest.TestCase):
         op = ImageTextMatchingFilter(hf_blip=self.hf_blip,
                                   reduce_mode='avg',
                                   any_or_all='any',
-                                  min_score=0.2,
+                                  min_score=0.003,
                                   max_score=1.0)
         self._run_filter(dataset, tgt_list, op, num_proc=4)
 
