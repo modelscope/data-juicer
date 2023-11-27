@@ -33,7 +33,8 @@ class StatsKeys(object):
     image_sizes = 'image_sizes'
 
     # multimodal
-    clip_image_text_similarity = 'clip_image_text_similarity'
+    image_text_similarity = 'image_text_similarity'
+    image_text_matching_score = 'image_text_matching_score'
 
 
 class HashKeys(object):

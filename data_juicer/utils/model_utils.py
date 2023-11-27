@@ -164,7 +164,7 @@ def prepare_huggingface_tokenizer(tokenizer_name):
     :return: a tokenizer instance.
     """
     from transformers import AutoTokenizer
-    logger.info('Loading tokenizer from HuggingFace...')
+    logger.info(f'Loading tokenizer {tokenizer_name} from HuggingFace...')
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name,
                                               trust_remote_code=True)
     return tokenizer
@@ -181,10 +181,24 @@ def prepare_huggingface_clip(clip_name):
 
     model = CLIPModel.from_pretrained(clip_name)
     processor = CLIPProcessor.from_pretrained(clip_name)
-    logger.info('Loading clip and processor from HuggingFace...')
+    logger.info(f'Loading clip and processor {clip_name} from HuggingFace...')
 
     return (model, processor)
 
+def prepare_huggingface_blip(blip_name):
+    """
+    Prepare and load a blip and processor from HuggingFace.
+
+    :param blip_name: input blip name
+    :return: a pair of blip instance and processor instance.
+    """
+    from transformers import BlipForImageTextRetrieval, BlipProcessor
+
+    model = BlipForImageTextRetrieval.from_pretrained(blip_name)
+    processor = BlipProcessor.from_pretrained(blip_name)
+    logger.info(f'Loading blip and processor {blip_name} from HuggingFace...')
+
+    return (model, processor)
 
 def prepare_diversity_model(model_name, lang):
     """
@@ -239,6 +253,7 @@ def prepare_model(lang='en', model_type='sentencepiece', model_key=None):
         'nltk': ('punkt.%s.pickle', prepare_nltk_model),
         'huggingface': ('%s', prepare_huggingface_tokenizer),
         'hf_clip': ('%s', prepare_huggingface_clip),
+        'hf_blip': ('%s', prepare_huggingface_blip),
         'spacy': ('%s_core_web_md-3.5.0', prepare_diversity_model),
     }
     assert model_type in type_to_name.keys(
@@ -254,10 +269,9 @@ def prepare_model(lang='en', model_type='sentencepiece', model_key=None):
         elif model_type == 'huggingface':
             MODEL_ZOO[model_key] = model_func(model_key)
         elif model_type == 'hf_clip':
-            new_model_key = model_type + model_key
-            if new_model_key not in MODEL_ZOO.keys():
-                MODEL_ZOO[new_model_key] = model_func(model_key)
-            model_key = new_model_key
+            MODEL_ZOO[model_key] = model_func(model_key)
+        elif model_type == 'hf_blip':
+            MODEL_ZOO[model_key] = model_func(model_key)
         else:
             MODEL_ZOO[model_key] = model_func(model_name, lang)
     return model_key
