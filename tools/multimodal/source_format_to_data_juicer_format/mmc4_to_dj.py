@@ -44,7 +44,7 @@
 #          'as shown to lock or unlock all doors and the tailgate. '
 #          '<|__dj__eoc|> <__dj__image> When you lock/unlock the driver’s '
 #          'door and tailgate using the master lock switch, all the other '
-#          'doors lock/ unlock at the same time.',
+#          'doors lock/ unlock at the same time. <|__dj__eoc|>',
 #  'images': ['db1c21bc8474.jpg', 'b9040a0dbb22.jpg'],
 #  'image_info': [{'face_detections': None,
 #                  'image_name': 'b9040a0dbb22.jpg',
