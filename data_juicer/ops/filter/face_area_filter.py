@@ -58,14 +58,6 @@ class FaceAreaFilter(Filter):
         :param args: Extra positional arguments.
         :param kwargs: Extra keyword arguments.
         """
-        super().__init__(*args, **kwargs)
-        self.min_ratio = min_ratio
-        self.max_ratio = max_ratio
-
-        if any_or_all not in ['any', 'all']:
-            raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
-                             f'Can only be one of ["any", "all"].')
-        self.any = (any_or_all == 'any')
 
         # Extract face detector arguments from kwargs
         detector_keys = [
@@ -75,6 +67,16 @@ class FaceAreaFilter(Filter):
             key: kwargs.pop(key)
             for key in detector_keys if key in kwargs
         }
+
+        super().__init__(*args, **kwargs)
+        self.min_ratio = min_ratio
+        self.max_ratio = max_ratio
+
+        if any_or_all not in ['any', 'all']:
+            raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
+                             f'Can only be one of ["any", "all"].')
+        self.any = (any_or_all == 'any')
+
         # Initialize face detector
         # prepare_detector()
         # self.classifier_conf = 'haarcascade_frontalface_default.xml'
