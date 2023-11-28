@@ -34,8 +34,8 @@ class LazyCascadeClassifier:
         return cv2.CascadeClassifier(cv2.data.haarcascades + self.file_path)
 
 
-@OPERATORS.register_module('face_area_filter')
-@LOADED_IMAGES.register_module('face_area_filter')
+@OPERATORS.register_module(OP_NAME)
+@LOADED_IMAGES.register_module(OP_NAME)
 class FaceAreaFilter(Filter):
     """Filter to keep samples with face area ratio within a specific range.
     """
