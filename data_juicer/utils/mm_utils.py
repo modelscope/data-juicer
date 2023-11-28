@@ -1,4 +1,4 @@
-from datasets import Image
+from datasets import Audio, Image
 
 from data_juicer.utils.constant import DEFAULT_PREFIX
 
@@ -8,6 +8,7 @@ from data_juicer.utils.constant import DEFAULT_PREFIX
 class SpecialTokens(object):
     # modality
     image = f'<{DEFAULT_PREFIX}image>'
+    audio = f'<{DEFAULT_PREFIX}audio>'
 
     # others
     eoc = f'<|{DEFAULT_PREFIX}eoc|>'
@@ -17,13 +18,23 @@ def load_images(paths):
     return [load_image(path) for path in paths]
 
 
+def load_audios(paths):
+    return [load_audio(path) for path in paths]
+
+
 def load_image(path):
     img_feature = Image()
     img = img_feature.decode_example(img_feature.encode_example(path))
     return img
 
 
-def get_image_size(path):
+def load_audio(path, sampling_rate=None):
+    aud_feature = Audio(sampling_rate)
+    aud = aud_feature.decode_example(aud_feature.encode_example(path))
+    return (aud['array'], aud['sampling_rate'])
+
+
+def get_image_size(path, ):
     import os
     return os.path.getsize(path)
 

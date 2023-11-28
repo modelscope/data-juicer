@@ -26,6 +26,8 @@ cache_compress: null                                        # The compression me
 # for multimodal data processing
 image_key: 'images'                                         # Key name of field to store the list of sample image paths.
 image_special_token: '<__dj__image>'                        # The special token that represents an image in the text. In default, it's "<__dj__image>". You can specify your own special token according to your input dataset.
+audio_key: 'audios'                                         # Key name of field to store the list of sample audio paths.
+audio_special_token: '<__dj__audio>'                        # The special token that represents an audio in the text. In default, it's "<__dj__audio>". You can specify your own special token according to your input dataset.
 
 eoc_special_token: '<|__dj__eoc|>'                          # The special token that represents the end of a chunk in the text. In default, it's "<|__dj__eoc|>". You can specify your own special token according to your input dataset.
 

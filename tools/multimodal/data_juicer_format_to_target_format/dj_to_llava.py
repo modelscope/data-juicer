@@ -1,5 +1,5 @@
-# This tool is used to convert multimodal dataset in LLaVA format to a target
-# dataset in Data-Juicer format.
+# This tool is used to convert multimodal dataset in Data-Juicer format to a
+# target dataset in LLaVA format.
 #
 # Corresponding Data-Juicer format:
 #   - multi-chunk interleaved image-text sequence
