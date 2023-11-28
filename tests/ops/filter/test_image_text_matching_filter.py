@@ -16,7 +16,7 @@ class ImageTextMatchingFilterTest(unittest.TestCase):
     demo_path = os.path.join(data_path, 'blip.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
     hf_blip = 'Salesforce/blip-itm-base-coco'
-    hf_blip = '/Users/mazhijian/Documents/Project_2023/P01_LLM/C04_Data/blip-itm-base-coco'
+    
     def _run_filter(self, dataset: Dataset, target_list, op, num_proc=1):
 
         if Fields.stats not in dataset.features:
