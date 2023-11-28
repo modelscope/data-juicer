@@ -185,6 +185,7 @@ def prepare_huggingface_clip(clip_name):
 
     return (model, processor)
 
+
 def prepare_huggingface_blip(blip_name):
     """
     Prepare and load a blip and processor from HuggingFace.
@@ -199,6 +200,7 @@ def prepare_huggingface_blip(blip_name):
     logger.info(f'Loading blip and processor {blip_name} from HuggingFace...')
 
     return (model, processor)
+
 
 def prepare_diversity_model(model_name, lang):
     """
