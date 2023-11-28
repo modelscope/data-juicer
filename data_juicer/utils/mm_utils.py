@@ -1,3 +1,4 @@
+import numpy as np
 from datasets import Audio, Image
 
 from data_juicer.utils.constant import DEFAULT_PREFIX
@@ -32,6 +33,18 @@ def load_audio(path, sampling_rate=None):
     aud_feature = Audio(sampling_rate)
     aud = aud_feature.decode_example(aud_feature.encode_example(path))
     return (aud['array'], aud['sampling_rate'])
+
+
+def pil_to_opencv(pil_image, grayscale=False):
+    mode = 'L' if grayscale else 'RGB'
+    if pil_image.mode != mode:
+        pil_image = pil_image.convert(mode)
+    numpy_image = np.array(pil_image)
+    # Note: cv2.cvtColor with num_proc > 1 can cause a deadlock,
+    # manual RGB to BGR
+    if mode == 'RGB':
+        numpy_image = numpy_image[:, :, -1]
+    return numpy_image
 
 
 def get_image_size(path, ):
