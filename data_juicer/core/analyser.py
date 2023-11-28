@@ -120,7 +120,7 @@ class Analyser:
 
         logger.info('Applying overall analysis on stats...')
         overall_analysis = OverallAnalysis(dataset, self.analysis_path)
-        self.overall_result = overall_analysis.analyse()
+        self.overall_result = overall_analysis.analyse(num_proc=self.cfg.np)
 
         logger.info('Applying column-wise analysis on stats...')
         column_wise_analysis = ColumnWiseAnalysis(
