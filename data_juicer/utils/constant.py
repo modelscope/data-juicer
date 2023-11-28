@@ -31,6 +31,8 @@ class StatsKeys(object):
     image_width = 'image_width'
     image_height = 'image_height'
     image_sizes = 'image_sizes'
+    face_ratios = 'face_ratios'
+    face_detections = 'face_detections'
 
     # multimodal
     clip_image_text_similarity = 'clip_image_text_similarity'
