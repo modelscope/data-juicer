@@ -25,6 +25,7 @@ class StatsKeys(object):
     num_token = 'num_token'
     num_words = 'num_words'
     word_rep_ratio = 'word_rep_ratio'
+    num_action = 'num_action'
 
     # image
     aspect_ratios = 'aspect_ratios'
