@@ -69,7 +69,7 @@ class LocalFormatter(BaseFormatter):
                                 **self.kwargs)
         if self.add_suffix:
             logger.info('Add suffix info into dataset...')
-            datasets = add_suffixes(datasets)
+            datasets = add_suffixes(datasets, num_proc)
         else:
             from data_juicer.core.data import NestedDataset
             datasets = NestedDataset(
@@ -120,18 +120,25 @@ class RemoteFormatter(BaseFormatter):
         return ds
 
 
-def add_suffixes(datasets: DatasetDict) -> Dataset:
+def add_suffixes(datasets: DatasetDict, num_proc: int = 1) -> Dataset:
     """
     Add suffix filed to datasets.
 
     :param datasets: a DatasetDict object
+    :param num_proc: number of processes to add suffixes
     :return: datasets with suffix features.
     """
     logger.info('Add suffix column for dataset')
+    from data_juicer.core.data import add_same_content_to_new_column
     for key, ds in datasets.items():
         if Fields.suffix not in ds.features:
-            datasets[key] = ds.add_column(name=Fields.suffix,
-                                          column=['.' + key] * ds.num_rows)
+            datasets[key] = ds.map(add_same_content_to_new_column,
+                                   fn_kwargs={
+                                       'new_column_name': Fields.suffix,
+                                       'initial_value': '.' + key
+                                   },
+                                   num_proc=num_proc,
+                                   desc='Adding new column for suffix')
     datasets = concatenate_datasets([ds for _, ds in datasets.items()])
     from data_juicer.core.data import NestedDataset
     return NestedDataset(datasets)
