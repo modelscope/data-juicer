@@ -102,11 +102,18 @@ class Analyser:
                            'the process list in configs.')
             return dataset
 
-        # 3. analysis and output result to the export path
-        # 3.1. Only consider fields in Fields.stats
-        # 3.2. For string fields, only consider its histogram
-        # 3.3. For numeric fields, consider its histogram and box
-        # 3.4. Otherwise, DO NOT analyse
+        # 3. data export
+        logger.info('Exporting dataset to disk...')
+        self.exporter.export(dataset)
+        if self.cfg.use_cache and self.cfg.cache_compress:
+            from data_juicer.utils.compress import compress
+            compress(dataset)
+
+        # 4. analysis and output result to the export path
+        # 4.1. Only consider fields in Fields.stats
+        # 4.2. For string fields, only consider its histogram
+        # 4.3. For numeric fields, consider its histogram and box
+        # 4.4. Otherwise, DO NOT analyse
 
         logger.info('Applying overall analysis on stats...')
         overall_analysis = OverallAnalysis(dataset, self.analysis_path)
@@ -120,10 +127,4 @@ class Analyser:
             save_stats_in_one_file=self.cfg.save_stats_in_one_file)
         column_wise_analysis.analyse()
 
-        # 4. data export
-        logger.info('Exporting dataset to disk...')
-        self.exporter.export(dataset)
-        if self.cfg.use_cache and self.cfg.cache_compress:
-            from data_juicer.utils.compress import compress
-            compress(dataset)
         return dataset
