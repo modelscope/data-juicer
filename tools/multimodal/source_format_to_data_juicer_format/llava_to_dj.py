@@ -136,7 +136,7 @@ def main(
         if image_broadcast_pos not in ['random', 'before', 'after', 'follow']:
             raise ValueError(f'Arg image_broadcast_pos should be one of ['
                              f'"random", "before", "after", "follow"], but '
-                             f'given [{image_broadcast_pos}]')
+                             f'given [{image_broadcast_pos}].')
     # check if the default image special token is changed
     if image_special_token != '<image>':
         logger.warning('The image_special_token used in the original LLaVA '
@@ -254,7 +254,7 @@ def main(
             join_sep = sent_seperator
             if split_chunk:
                 # split (human, robot) pairs into several chunks
-                join_sep = f' {eoc_special_token} ' + join_sep
+                join_sep = f' {eoc_special_token}' + join_sep
             text = join_sep.join(formatted_conversations)
             if add_eoc_at_last:
                 # add an extra eoc token after the whole sample text
