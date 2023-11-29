@@ -89,6 +89,20 @@ def init_configs(args=None):
         'due to the IO blocking, especially for very large datasets. '
         'When this happens, False is a better choice, although it takes '
         'more time.')
+    parser.add_argument(
+        '--keep_stats_in_res_ds',
+        type=bool,
+        default=False,
+        help='Whether to keep the computed stats in the result dataset. If '
+        'it\'s False, the intermediate fields to store the stats '
+        'computed by Filters will be removed. Default: False.')
+    parser.add_argument(
+        '--keep_hashes_in_res_ds',
+        type=bool,
+        default=False,
+        help='Whether to keep the computed hashes in the result dataset. If '
+        'it\'s False, the intermediate fields to store the hashes '
+        'computed by Deduplicators will be removed. Default: False.')
     parser.add_argument('--np',
                         type=PositiveInt,
                         default=4,

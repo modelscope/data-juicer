@@ -66,9 +66,13 @@ class Executor:
 
         # prepare exporter and check export path suffix
         logger.info('Preparing exporter...')
-        self.exporter = Exporter(self.cfg.export_path,
-                                 self.cfg.export_shard_size,
-                                 self.cfg.export_in_parallel, self.cfg.np)
+        self.exporter = Exporter(
+            self.cfg.export_path,
+            self.cfg.export_shard_size,
+            self.cfg.export_in_parallel,
+            self.cfg.np,
+            keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
+            keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds)
 
         # setup tracer
         self.open_tracer = self.cfg.open_tracer
