@@ -112,7 +112,8 @@ class ColumnWiseAnalysis:
             fig = plt.figure(figsize=(rec_width, rec_height),
                              layout='constrained')
             subfigs = fig.subfigures(rec_row, rec_col, wspace=0.01)
-        for i, column_name in tqdm(enumerate(columns), desc='Column'):
+        for i, column_name in tqdm(enumerate(columns.to_list()),
+                                   desc='Column'):
             data = self.stats[column_name]
             # explode data to flatten inner list
             data = data.explode().infer_objects()
