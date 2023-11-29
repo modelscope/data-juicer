@@ -3,6 +3,7 @@ import os
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from tqdm import tqdm
 
 from data_juicer.utils.constant import Fields
 
@@ -111,8 +112,10 @@ class ColumnWiseAnalysis:
             fig = plt.figure(figsize=(rec_width, rec_height),
                              layout='constrained')
             subfigs = fig.subfigures(rec_row, rec_col, wspace=0.01)
-        for i, column_name in enumerate(columns):
+        for i, column_name in tqdm(enumerate(columns), desc='Column'):
             data = self.stats[column_name]
+            # explode data to flatten inner list
+            data = data.explode().infer_objects()
             grid = grid_indexes[i]
             if self.save_stats_in_one_file:
                 if rec_col == 1:
@@ -128,7 +131,8 @@ class ColumnWiseAnalysis:
 
             # numeric or string via nan. Apply different plot method for them.
             if pd.isna(self.overall_result[column_name].get('top')):
-                # numeric -- draw histogram and box plot for this stat
+                # numeric or numeric list -- draw histogram and box plot for
+                # this stat
                 percentiles = self.overall_result[column_name] \
                     if show_percentiles else None
 
@@ -152,7 +156,8 @@ class ColumnWiseAnalysis:
                                            f'{column_name}-box.png'),
                               percentiles=percentiles)
             else:
-                # object (string) -- only draw histogram for this stat
+                # object (string) or string list -- only draw histogram for
+                # this stat
                 if self.save_stats_in_one_file:
                     axes = subfig.subplots(1, 1)
                 else:
