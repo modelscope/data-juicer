@@ -317,3 +317,17 @@ def nested_query(root_obj: Union[NestedDatasetDict, NestedDataset,
                 return None
 
     return None
+
+
+def add_same_content_to_new_column(sample,
+                                   new_column_name,
+                                   initial_value=None):
+    """
+    A helper function to speed up add_column function. Apply map on this
+    function in parallel instead of using add_column.
+    :param sample: a single sample to add this new column/field.
+    :param new_column_name: the name of this new column/field.
+    :param initial_value: the initial value of this new column/field.
+    """
+    sample[new_column_name] = initial_value
+    return sample
