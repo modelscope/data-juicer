@@ -35,16 +35,13 @@ def load_audio(path, sampling_rate=None):
     return (aud['array'], aud['sampling_rate'])
 
 
-def pil_to_opencv(pil_image, grayscale=False):
-    mode = 'L' if grayscale else 'RGB'
-    if pil_image.mode != mode:
-        pil_image = pil_image.convert(mode)
+def pil_to_opencv(pil_image):
+    if pil_image.mode != 'RGB':
+        pil_image = pil_image.convert('RGB')
     numpy_image = np.array(pil_image)
-    # Note: cv2.cvtColor with num_proc > 1 can cause a deadlock,
-    # manual RGB to BGR
-    if mode == 'RGB':
-        numpy_image = numpy_image[:, :, -1]
-    return numpy_image
+    # RGB to BGR
+    opencv_image = numpy_image[:, :, ::-1]
+    return opencv_image
 
 
 def get_image_size(path, ):

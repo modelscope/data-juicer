@@ -121,23 +121,23 @@ class FaceAreaFilterTest(unittest.TestCase):
                             any_or_all='all')
         self._run_face_area_filter(dataset, tgt_list, op)
 
-    # def test_filter_multi_process(self):
+    def test_filter_multi_process(self):
 
-    #     ds_list = [{
-    #         'images': [self.img1_path]
-    #     }, {
-    #         'images': [self.img2_path]
-    #     }, {
-    #         'images': [self.img3_path]
-    #     }]
-    #     tgt_list = [{
-    #         'images': [self.img1_path]
-    #     }, {
-    #         'images': [self.img2_path]
-    #     }]
-    #     dataset = Dataset.from_list(ds_list)
-    #     op = FaceAreaFilter()
-    #     self._run_face_area_filter(dataset, tgt_list, op, num_proc=2)
+        ds_list = [{
+            'images': [self.img1_path]
+        }, {
+            'images': [self.img2_path]
+        }, {
+            'images': [self.img3_path]
+        }]
+        tgt_list = [{
+            'images': [self.img1_path]
+        }, {
+            'images': [self.img2_path]
+        }]
+        dataset = Dataset.from_list(ds_list)
+        op = FaceAreaFilter()
+        self._run_face_area_filter(dataset, tgt_list, op, num_proc=3)
 
 
 if __name__ == '__main__':

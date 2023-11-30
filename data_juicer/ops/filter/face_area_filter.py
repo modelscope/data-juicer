@@ -11,10 +11,10 @@ from ..op_fusion import LOADED_IMAGES
 OP_NAME = 'face_area_filter'
 
 with AvailabilityChecking(['cv2'], OP_NAME):
+    # avoid hanging of detectMultiScale with num_proc>1
+    import multiprocess.context as ctx
+    ctx._force_start_method('spawn')
     import cv2  # noqa: F401
-
-    # avoid hanging of some functions in multiprocessing
-    cv2.setNumThreads(1)
 
 
 class LazyCascadeClassifier:
@@ -78,8 +78,6 @@ class FaceAreaFilter(Filter):
         self.any = (any_or_all == 'any')
 
         # Initialize face detector
-        # prepare_detector()
-        # self.classifier_conf = 'haarcascade_frontalface_default.xml'
         self.pickable_detector = LazyCascadeClassifier(
             'haarcascade_frontalface_default.xml')
 
@@ -116,11 +114,10 @@ class FaceAreaFilter(Filter):
             detector = self.pickable_detector.get_classifier()
             face_detections = {}
             for key, image in images.items():
-                # convert into grayscale opencv format
-                opencv_img = pil_to_opencv(image, grayscale=True)
-                # detect faces
-                detected_faces = detector.detectMultiScale(
-                    opencv_img, **self.detector_kwargs)
+                img = pil_to_opencv(image)
+                # The detection works only on grayscale images
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                faces = detector.detectMultiScale(gray, **self.detector_kwargs)
                 # the rectangles may be partially outside the original image
                 # right-closed and right-open
                 face_detections[key] = [[
@@ -128,7 +125,7 @@ class FaceAreaFilter(Filter):
                     max(0, min(y, image.height - 1)),
                     max(1, min(x + w, image.width)),
                     max(1, min(y + h, image.height))
-                ] for (x, y, w, h) in detected_faces]
+                ] for (x, y, w, h) in faces]
 
             sample[Fields.stats][StatsKeys.face_detections] = [
                 face_detections[key] for key in loaded_image_keys
