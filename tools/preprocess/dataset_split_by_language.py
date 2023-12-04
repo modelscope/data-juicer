@@ -7,6 +7,7 @@ import fire
 import pandas as pd
 from loguru import logger
 
+from data_juicer.core.data import add_same_content_to_new_column
 from data_juicer.format import load_formatter
 from data_juicer.ops.filter.language_id_score_filter import \
     LanguageIDScoreFilter
@@ -52,11 +53,14 @@ def main(src_dir, target_dir, text_key=None, suffixes=[], num_proc=1):
     op = LanguageIDScoreFilter(text_key=text_key)
 
     if Fields.stats not in dataset.features:
-        # TODO:
-        # this is a temp solution,
         # only add stats when calling filter op
-        dataset = dataset.add_column(name=Fields.stats,
-                                     column=[{}] * dataset.num_rows)
+        dataset = dataset.map(add_same_content_to_new_column,
+                              fn_kwargs={
+                                  'new_column_name': Fields.stats,
+                                  'initial_value': {}
+                              },
+                              num_proc=num_proc,
+                              desc='Adding new column for stats')
 
     # identify language
     dataset = dataset.map(op.compute_stats, num_proc=num_proc)
