@@ -1,44 +1,45 @@
 import numpy as np
-import string
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.model_utils import prepare_model, get_model
 from data_juicer.utils.mm_utils import SpecialTokens
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 
 OP_NAME = 'text_object_dependency_filter'
 
+
 @OPERATORS.register_module(OP_NAME)
 class TextObjectDependencyFilter(Filter):
     """
-    Identify the objects in the text which are independent with other token, and filter them.
-    The text containing no objects will be omitted.
+    Identify the objects in the text which are independent with other token,
+    and filter them. The text containing no objects will be omitted.
     """
 
     def __init__(self,
-                 lang: str='en',
-                 min_dependency_num: int=1,
+                 lang: str = 'en',
+                 min_dependency_num: int = 1,
                  any_or_all: str = 'all',
                  *args,
                  **kwargs):
         """
         Initialization method.
 
-        :param lang: language of the text in the samples. 'en' for detection of 
+        :param lang: language of the text in the samples. 'en' for detection of
             actions in English an'zh' for detection of actions in Chinese.
-        :param mini_dependency_num: The min token number in the filtering. Objects
-            is independent if their number of edges in the dependency tree is below 
-            this parameter.
-        :param any_or_all: keep this sample with 'any' or 'all' strategy. 
-            'any': keep this sample if any objet is dependent. 'all': keep this 
+        :param mini_dependency_num: The min token number in the filtering.
+            Objects is independent if their number of edges in the dependency
+            tree is below this parameter.
+        :param any_or_all: keep this sample with 'any' or 'all' strategy.
+            'any': keep this sample if any objet is dependent. 'all': keep this
             sample only if all images are dependent.
         """
         super().__init__(*args, **kwargs)
 
         if lang not in ['en', 'zh']:
-            raise ValueError(f'Language [{lang}] is not supported in action detection. '
-                             f'Can only be one of ["en", "zh"].')
+            raise ValueError(
+                f'Language [{lang}] is not supported in action detection.'
+                f'Can only be one of ["en", "zh"].')
         self.lang = lang
         self.model_key = prepare_model(model_type='spacy', lang=lang)
         self.object_poss = ['NOUN', 'PROPN', 'PRON']
@@ -60,18 +61,21 @@ class TextObjectDependencyFilter(Filter):
             for key, value in SpecialTokens.__dict__.items()
             if not key.startswith('__')
         }
+
         def remove_special_token(text):
             for value in special_token_dict.values():
                 text = text.replace(value, '')
             return text
+
         text = remove_special_token(sample[self.text_key])
-            
+
         # identify objects
         model = get_model(self.model_key)
         doc = model(text)
         object_to_dependency_nums = {}
         for token in doc:
-            if token.pos_ in self.object_poss and token.tag_ in self.object_tags:
+            if token.pos_ in self.object_poss \
+             and token.tag_ in self.object_tags:
                 object_to_dependency_nums[token] = 0
 
         # count the edges of each object in dependency tree
@@ -79,10 +83,12 @@ class TextObjectDependencyFilter(Filter):
             if obj.dep_ != 'ROOT':
                 object_to_dependency_nums[obj] += 1
         for token in doc:
-            ## the punctation mark such as ',', '.'
+            # the punctation mark such as ',', '.'
             if token.pos_ == 'PUNCT':
                 continue
-            if token.head in object_to_dependency_nums.keys() and token.dep_ != 'ROOT':
+
+            if token.head in object_to_dependency_nums.keys(
+            ) and token.dep_ != 'ROOT':
                 object_to_dependency_nums[token.head] += 1
 
         sample[Fields.stats][StatsKeys.num_dependency_edges] = [
@@ -92,7 +98,8 @@ class TextObjectDependencyFilter(Filter):
         return sample
 
     def process(self, sample):
-        num_dependency_edges = sample[Fields.stats][StatsKeys.num_dependency_edges]
+        num_dependency_edges = sample[Fields.stats][
+            StatsKeys.num_dependency_edges]
         keep_bools = np.array([
             self.min_dependency_num <= num_edge
             for num_edge in num_dependency_edges
