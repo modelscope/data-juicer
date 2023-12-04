@@ -3,12 +3,12 @@ import os
 
 from datasets import Dataset
 
-from data_juicer.ops.filter.text_object_dependency_filter import TextObjectDependencyFilter
+from data_juicer.ops.filter.text_entity_dependency_filter import TextEntityDependencyFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
 
 
-class TextObjectDependencyFilterTest(unittest.TestCase):
+class TextEntityDependencyFilterTest(unittest.TestCase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
@@ -49,7 +49,7 @@ class TextObjectDependencyFilterTest(unittest.TestCase):
             'text': 'a green tree',
         }]
         dataset = Dataset.from_list(ds_list)
-        op = TextObjectDependencyFilter(lang='en', any_or_all='any')
+        op = TextEntityDependencyFilter(lang='en', any_or_all='any')
         self._run_text_action_filter(dataset, tgt_list, op, ['text'])
 
     def test_zh_text_case(self):
@@ -75,7 +75,7 @@ class TextObjectDependencyFilterTest(unittest.TestCase):
             'text': '一只会上树的猫'
         }]
         dataset = Dataset.from_list(ds_list)
-        op = TextObjectDependencyFilter(lang='zh', any_or_all='all')
+        op = TextEntityDependencyFilter(lang='zh', any_or_all='all')
         self._run_text_action_filter(dataset, tgt_list, op, ['text'])
 
     def test_image_text_case(self):
@@ -101,7 +101,7 @@ class TextObjectDependencyFilterTest(unittest.TestCase):
         }]
 
         dataset = Dataset.from_list(ds_list)
-        op = TextObjectDependencyFilter(lang='zh', any_or_all='any')
+        op = TextEntityDependencyFilter(lang='zh', any_or_all='any')
         self._run_text_action_filter(dataset, tgt_list, op, ['text', 'images'])
 
 if __name__ == '__main__':

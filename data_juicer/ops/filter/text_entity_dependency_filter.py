@@ -6,14 +6,14 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 
-OP_NAME = 'text_object_dependency_filter'
+OP_NAME = 'text_entity_dependency_filter'
 
 
 @OPERATORS.register_module(OP_NAME)
-class TextObjectDependencyFilter(Filter):
+class TextEntityDependencyFilter(Filter):
     """
-    Identify the objects in the text which are independent with other token,
-    and filter them. The text containing no objects will be omitted.
+    Identify the entities in the text which are independent with other token,
+    and filter them. The text containing no entities will be omitted.
     """
 
     def __init__(self,
@@ -42,8 +42,8 @@ class TextObjectDependencyFilter(Filter):
                 f'Can only be one of ["en", "zh"].')
         self.lang = lang
         self.model_key = prepare_model(model_type='spacy', lang=lang)
-        self.object_poss = ['NOUN', 'PROPN', 'PRON']
-        self.object_tags = ['NN', 'NR', 'PN', 'NNS', 'NNP', 'NNPS', 'PRP']
+        self.entity_poss = ['NOUN', 'PROPN', 'PRON']
+        self.entity_tags = ['NN', 'NR', 'PN', 'NNS', 'NNP', 'NNPS', 'PRP']
         self.min_dependency_num = min_dependency_num
         if any_or_all not in ['any', 'all']:
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
@@ -69,30 +69,30 @@ class TextObjectDependencyFilter(Filter):
 
         text = remove_special_token(sample[self.text_key])
 
-        # identify objects
+        # identify entities
         model = get_model(self.model_key)
         doc = model(text)
-        object_to_dependency_nums = {}
+        entity_to_dependency_nums = {}
         for token in doc:
-            if token.pos_ in self.object_poss \
-             and token.tag_ in self.object_tags:
-                object_to_dependency_nums[token] = 0
+            if token.pos_ in self.entity_poss \
+             and token.tag_ in self.entity_tags:
+                entity_to_dependency_nums[token] = 0
 
-        # count the edges of each object in dependency tree
-        for obj in object_to_dependency_nums:
+        # count the edges of each entity in dependency tree
+        for obj in entity_to_dependency_nums:
             if obj.dep_ != 'ROOT':
-                object_to_dependency_nums[obj] += 1
+                entity_to_dependency_nums[obj] += 1
         for token in doc:
             # the punctation mark such as ',', '.'
             if token.pos_ == 'PUNCT':
                 continue
 
-            if token.head in object_to_dependency_nums.keys(
+            if token.head in entity_to_dependency_nums.keys(
             ) and token.dep_ != 'ROOT':
-                object_to_dependency_nums[token.head] += 1
+                entity_to_dependency_nums[token.head] += 1
 
         sample[Fields.stats][StatsKeys.num_dependency_edges] = [
-            n for _, n in object_to_dependency_nums.items()
+            n for _, n in entity_to_dependency_nums.items()
         ]
 
         return sample
@@ -104,7 +104,7 @@ class TextObjectDependencyFilter(Filter):
             self.min_dependency_num <= num_edge
             for num_edge in num_dependency_edges
         ])
-        # omit the samples without object
+        # omit the samples without entity
         if len(keep_bools) <= 0:
             return False
 
