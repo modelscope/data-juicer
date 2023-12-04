@@ -12,8 +12,8 @@ OP_NAME = 'text_object_dependency_filter'
 @OPERATORS.register_module(OP_NAME)
 class TextObjectDependencyFilter(Filter):
     """
-    Identify the objects which are independent with outher token, and filter them.
-    The text containing no objects will be omited.
+    Identify the objects in the text which are independent with other token, and filter them.
+    The text containing no objects will be omitted.
     """
 
     def __init__(self,
