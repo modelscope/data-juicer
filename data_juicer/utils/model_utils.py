@@ -285,4 +285,8 @@ def get_model(model_key, lang='en', model_type='sentencepiece'):
 
     :param model_key: name of the model or tokenzier
     """
+    if model_key is None:
+        return None
+    if model_key not in MODEL_ZOO:
+        prepare_model(lang=lang, model_type=model_type, model_key=model_key)
     return MODEL_ZOO.get(model_key, None)
