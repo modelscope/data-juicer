@@ -10,6 +10,8 @@ from data_juicer.utils.constant import Fields
 
 class FaceAreaFilterTest(unittest.TestCase):
 
+    maxDiff = None
+
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                              '..', 'data')
     img1_path = os.path.join(data_path, 'cat.jpg')
