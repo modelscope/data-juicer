@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   21   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   20   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   22   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   4    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -47,7 +47,7 @@ All the specific operators are listed below, each featured with several capabili
 
 | Operator                                            | Domain             | Lang   | Description                                                                                                    |
 |-----------------------------------------------------|--------------------|--------|----------------------------------------------------------------------------------------------------------------|
-| chinese_convert_mapper                              | General            | zh     | Convert Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji (by [opencc](https://github.com/BYVoid/OpenCC))                 |
+| chinese_convert_mapper                              | General            | zh     | Converts Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji (by [opencc](https://github.com/BYVoid/OpenCC))                 |
 | clean_copyright_mapper                              | Code               | en, zh | Removes copyright notice at the beginning of code files (:warning: must contain the word *copyright*)          |
 | clean_email_mapper                                  | General            | en, zh | Removes email information                                                                                      |
 | clean_html_mapper                                   | General            | en, zh | Removes HTML tags and returns plain text of all the nodes                                                      |
@@ -55,8 +55,8 @@ All the specific operators are listed below, each featured with several capabili
 | clean_links_mapper                                  | General, Code      | en, zh | Removes links, such as those starting with http or ftp                                                         |
 | expand_macro_mapper                                 | LaTeX              | en, zh | Expands macros usually defined at the top of TeX documents                                                     |
 | fix_unicode_mapper                                  | General            | en, zh | Fixes broken Unicodes (by [ftfy](https://ftfy.readthedocs.io/))                                                |
-| nlpaug_en_mapper                                    | General            | en     | Simply augment texts in English based on the `nlpaug` library                                                  | 
-| nlpcda_zh_mapper                                    | General            | zh     | Simply augment texts in Chinese based on the `nlpcda` library                                                  | 
+| nlpaug_en_mapper                                    | General            | en     | Simply augments texts in English based on the `nlpaug` library                                                 | 
+| nlpcda_zh_mapper                                    | General            | zh     | Simply augments texts in Chinese based on the `nlpcda` library                                                 | 
 | punctuation_normalization_mapper                    | General            | en, zh | Normalizes various Unicode punctuations to their ASCII equivalents                                             |
 | remove_bibliography_mapper                          | LaTeX              | en, zh | Removes the bibliography of TeX documents                                                                      |
 | remove_comments_mapper                              | LaTeX              | en, zh | Removes the comments of TeX documents                                                                          |
@@ -77,11 +77,13 @@ All the specific operators are listed below, each featured with several capabili
 | alphanumeric_filter            | General | en, zh | Keeps samples with alphanumeric ratio within the specified range                           |
 | average_line_length_filter     | Code    | en, zh | Keeps samples with average line length within the specified range                          |
 | character_repetition_filter    | General | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range           |
-| clip_similarity_filter      | Multimodal |   -    |  Keeps samples with similarity between text and images within the specified range           |
+| face_area_filter               | Image   |   -    | Keeps samples contains images with face area ratios within the specified range             |
 | flagged_words_filter           | General | en, zh | Keeps samples with flagged-word ratio below the specified threshold                        |
-| image_aspect_ratio_filter      | Image   |   -    | Keeps samples contains images with aspect ratios within specific range                     |
-| image_shape_filter             | Image   |   -    | Keeps samples contains images with widths and heights within specific ranges               |
-| image_size_filter      | Image   |   -    | Keeps samples contains images whose size in bytes are within specific range                     |
+| image_aspect_ratio_filter      | Image   |   -    | Keeps samples contains images with aspect ratios within the specified range                |
+| image_shape_filter             | Image   |   -    | Keeps samples contains images with widths and heights within the specified range           |
+| image_size_filter              | Image   |   -    | Keeps samples contains images whose size in bytes are within the specified range                     |
+| image_text_matching_filter     | Multimodal |   -    |  Keeps samples with image-text classification matching score within the specified range based on a BLIP model          |
+| image_text_similarity_filter   | Multimodal |   -    |  Keeps samples with image-text feature cosine similarity within the specified range based on a CLIP model          |
 | language_id_score_filter       | General | en, zh | Keeps samples of the specified language, judged by a predicted confidence score            |
 | maximum_line_length_filter     | Code    | en, zh | Keeps samples with maximum line length within the specified range                          |
 | perplexity_filter              | General | en, zh | Keeps samples with perplexity score below the specified threshold                          |
@@ -98,12 +100,12 @@ All the specific operators are listed below, each featured with several capabili
 
 ## Deduplicator <a name="deduplicator"/>
 
-| Operator                      | Domain  | Lang   | Description                                                 |
-|-------------------------------|---------|--------|-------------------------------------------------------------|
-| document_deduplicator         | General | en, zh | Deduplicate samples at document-level by comparing MD5 hash |
-| document_minhash_deduplicator | General | en, zh | Deduplicate samples at document-level using MinHashLSH      |
-| document_simhash_deduplicator | General | en, zh | Deduplicate samples at document-level using SimHash         |
-| image_deduplicator            | Image   |   -    | Deduplicate samples at document-level using exact matching of images between documents |
+| Operator                      | Domain  | Lang   | Description                                                  |
+|-------------------------------|---------|--------|--------------------------------------------------------------|
+| document_deduplicator         | General | en, zh | Deduplicates samples at document-level by comparing MD5 hash |
+| document_minhash_deduplicator | General | en, zh | Deduplicates samples at document-level using MinHashLSH      |
+| document_simhash_deduplicator | General | en, zh | Deduplicates samples at document-level using SimHash         |
+| image_deduplicator            | Image   |   -    | Deduplicates samples at document-level using exact matching of images between documents |
 
 
 ## Selector <a name="selector"/>

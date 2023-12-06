@@ -22,19 +22,23 @@ class StatsKeys(object):
     special_char_ratio = 'special_char_ratio'
     stopwords_ratio = 'stopwords_ratio'
     text_len = 'text_len'
+    num_action = 'num_action'
+    num_dependency_edges = 'num_dependency_edges'
     num_token = 'num_token'
     num_words = 'num_words'
     word_rep_ratio = 'word_rep_ratio'
-    num_action = 'num_action'
 
     # image
     aspect_ratios = 'aspect_ratios'
     image_width = 'image_width'
     image_height = 'image_height'
     image_sizes = 'image_sizes'
+    face_ratios = 'face_ratios'
+    face_detections = 'face_detections'
 
     # multimodal
-    clip_image_text_similarity = 'clip_image_text_similarity'
+    image_text_similarity = 'image_text_similarity'
+    image_text_matching_score = 'image_text_matching_score'
 
 
 class HashKeys(object):

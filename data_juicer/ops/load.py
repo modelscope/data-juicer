@@ -17,15 +17,17 @@ def load_ops(process_list, op_fusion=False):
     :return: The op instance list.
     """
     ops = []
+    new_process_list = []
     for process in process_list:
         op_name, args = list(process.items())[0]
         if op_name in UNAVAILABLE_OPERATORS:
             logger.warning(UNAVAILABLE_OPERATORS[op_name].get_warning_msg())
             continue
         ops.append(OPERATORS.modules[op_name](**args))
+        new_process_list.append(process)
 
     # detect filter groups
     if op_fusion:
-        process_list, ops = fuse_operators(process_list, ops)
+        new_process_list, ops = fuse_operators(new_process_list, ops)
 
-    return process_list, ops
+    return new_process_list, ops
