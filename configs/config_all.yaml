@@ -110,6 +110,10 @@ process:
       rep_len: 10                                             # repetition length for char-level n-gram
       min_ratio: 0.0                                          # the min ratio of filter range
       max_ratio: 0.5                                          # the max ratio of filter range
+  - face_area_filter:                                       # filter samples according to the face area ratios in images (r=face_area/image_area). If multiple faces are available, we use the largest one.
+      min_ratio: 0.0                                          # the min face area ratio of filter range
+      max_ratio: 0.4                                          # the max face area ratio of filter range
+      upsample_num_times: 0                                   # optional argument passing to the underlying dlib face detector
   - flagged_words_filter:                                   # filter text with the flagged-word ratio larger than a specific max value
       lang: en                                                # consider flagged words in what language
       tokenization: false                                     # whether to use model to tokenize documents

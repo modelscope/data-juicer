@@ -63,10 +63,10 @@ class FaceAreaFilter(Filter):
         if StatsKeys.face_ratios in sample[Fields.stats]:
             return sample
 
-        # there is no image in this sample, still default ratio 0.0
+        # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.face_ratios] = np.empty(0,
-                                                                   dtype=float)
+            sample[Fields.stats][StatsKeys.face_ratios] = np.array(
+                [], dtype=np.float64)
             return sample
 
         # load images
@@ -86,38 +86,29 @@ class FaceAreaFilter(Filter):
                     # store the image data into context
                     sample[Fields.context][loaded_image_key] = image
 
-        # check if faces detected already
-        if StatsKeys.face_detections not in sample[Fields.stats]:
-            face_detections = {}
-            for key, image in images.items():
-                img = pil_to_opencv(image)
-                dets = self.detector(img, **self.detector_kwargs)
-                dets_formatted = [[
-                    det.left(),
-                    det.top(),
-                    det.width(),
-                    det.height()
-                ] for det in dets] if dets else [[0, 0, 0, 0]]
-                face_detections[key] = dets_formatted
-            sample[Fields.stats][StatsKeys.face_detections] = [
-                face_detections[key] for key in loaded_image_keys
-            ]
+        # detect faces
+        face_detections = {}
+        for key, image in images.items():
+            img = pil_to_opencv(image)
+            dets = self.detector(img, **self.detector_kwargs)
+            face_detections[key] = [[
+                det.left(), det.top(),
+                det.width(), det.height()
+            ] for det in dets]
 
-        max_face_ratios = []
-        for key, dets in zip(loaded_image_keys,
-                             sample[Fields.stats][StatsKeys.face_detections]):
-            img_area = images[key].width * images[key].height
-            # Calculate the max face ratio for the current image
-            max_face_ratios.append(
-                max([w * h / img_area for _, _, w, h in dets], default=0.0))
-        sample[Fields.stats][StatsKeys.face_ratios] = max_face_ratios
+        # compute face area ratios for each image considering the largest face
+        face_area_ratios = {}
+        for key, dets in face_detections.items():
+            image_area = images[key].width * images[key].height
+            face_area_ratios[key] = max(
+                [w * h / image_area for _, _, w, h in dets], default=0.0)
 
+        sample[Fields.stats][StatsKeys.face_ratios] = [
+            face_area_ratios[key] for key in loaded_image_keys
+        ]
         return sample
 
     def process(self, sample):
-        if self.image_key not in sample or not sample[self.image_key]:
-            return True
-
         face_ratios = sample[Fields.stats][StatsKeys.face_ratios]
         if len(face_ratios) <= 0:
             return True

@@ -2,7 +2,6 @@ import os
 import unittest
 
 from datasets import Dataset
-# from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.face_area_filter import FaceAreaFilter
 from data_juicer.utils.constant import Fields
