@@ -25,7 +25,7 @@ class FaceAreaFilterTest(unittest.TestCase):
                                          column=[{}] * dataset.num_rows)
         dataset = dataset.map(op.compute_stats, num_proc=num_proc)
         dataset = dataset.filter(op.process, num_proc=num_proc)
-        dataset = dataset.remove_columns('__dj__stats__')
+        dataset = dataset.remove_columns(Fields.stats)
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
 

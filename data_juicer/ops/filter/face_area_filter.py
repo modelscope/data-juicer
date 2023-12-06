@@ -65,7 +65,8 @@ class FaceAreaFilter(Filter):
 
         # there is no image in this sample, still default ratio 0.0
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.face_ratios] = [0.0]
+            sample[Fields.stats][StatsKeys.face_ratios] = np.empty(0,
+                                                                   dtype=float)
             return sample
 
         # load images
@@ -108,7 +109,7 @@ class FaceAreaFilter(Filter):
             img_area = images[key].width * images[key].height
             # Calculate the max face ratio for the current image
             max_face_ratios.append(
-                max([w * h / img_area for _, _, w, h in dets]))
+                max([w * h / img_area for _, _, w, h in dets], default=0.0))
         sample[Fields.stats][StatsKeys.face_ratios] = max_face_ratios
 
         return sample
