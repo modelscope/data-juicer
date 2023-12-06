@@ -2,7 +2,8 @@
 
 * [How-to Guide for Developers](#how-to-guide-for-developers)
    * [Coding Style](#coding-style)
-   * [Build your own ops](#build-your-own-ops)
+   * [Build your own OPs](#build-your-own-ops)
+      * [(Optional) Make your OP fusible](#optional-make-your-op-fusible)
    * [Build your own configs](#build-your-own-configs)
       * [Fruitful config sources &amp; Type hints](#fruitful-config-sources--type-hints)
       * [Hierarchical configs and helps](#hierarchical-configs-and-helps)
@@ -35,13 +36,13 @@ dependencies of pre-commit are consistent with the project configuration
 (which can be completed through `pre-commit clean` and `pre-commit install`); 
 and ② execute `pre-commit run --all-files` before push.
 
-## Build your own ops
+## Build your own OPs
 
-- Data-Juicer allows everybody to build their own ops.
-- Before implementing a new op, please refer to [Operators](Operators.md) to avoid unnecessary duplication.
+- Data-Juicer allows everybody to build their own OPs.
+- Before implementing a new OP, please refer to [Operators](Operators.md) to avoid unnecessary duplication.
 - Assuming we want to add a new Filter operator called "TextLengthFilter" to get corpus of expected text length, we can follow these steps to build it.
 
-1. (Optional) Add a new StatsKeys in `data_juicer/utils/constant.py` to store the statistical variable of the new op.
+1. (Optional) Add a new StatsKeys in `data_juicer/utils/constant.py` to store the statistical variable of the new OP.
 
 ```python
 class StatsKeys(object):
@@ -49,8 +50,8 @@ class StatsKeys(object):
     text_len = 'text_len'
 ```
 
-2. Create a new op file `text_length_filter.py` in the corresponding `data_juicer/ops/filter/` directory as follows.
-   - Because it's a Filter op, so the new op needs to inherit from the basic `Filter` class in the `base_op.py`, and be decorated with `OPERATORS` to register itself automatically.
+2. Create a new OP file `text_length_filter.py` in the corresponding `data_juicer/ops/filter/` directory as follows.
+   - Because it's a Filter OP, so the new OP needs to inherit from the basic `Filter` class in the `base_op.py`, and be decorated with `OPERATORS` to register itself automatically.
 
 ```python
 import sys
@@ -103,14 +104,14 @@ class TextLengthFilter(Filter):
             return False
 ```
 
-3. After implemention, add it to the op dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
+3. After implemention, add it to the OP dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
 
 ```python
-from . import (...,              # other ops
-               text_length_filter)  # import this new op module
+from . import (...,              # other OPs
+               text_length_filter)  # import this new OP module
 ```
 
-4. Now you can use this new op with custom arguments in your own config files!
+4. Now you can use this new OP with custom arguments in your own config files!
 
 ```yaml
 # other configs
@@ -118,12 +119,12 @@ from . import (...,              # other ops
 
 # process configs
 process:
-  - text_length_filter:  # add this op to your process list and set the parameters
+  - text_length_filter:  # add this OP to your process list and set the parameters
       min_len: 10
       max_len: 1000
 ```
 
-5. (Strongly Recommend) It's better to add corresponding tests for your own ops. For `TextLengthFilter` above, you would like to add `test_text_length_filter.py` into `tests/ops/filter/` directory as below.
+5. (Strongly Recommend) It's better to add corresponding tests for your own OPs. For `TextLengthFilter` above, you would like to add `test_text_length_filter.py` into `tests/ops/filter/` directory as below.
 
 ```python
 import unittest
@@ -139,6 +140,142 @@ class TextLengthFilterTest(unittest.TestCase):
 
     def test_func3(self):
         pass
+```
+
+6. (Strongly Recommend) In order to facilitate the use of other users, we also need to update this new OP information to
+the corresponding documents, including the following docs:
+   1. `configs/config_all.yaml`: this complete config file contains a list of all OPs and their arguments, serving as an
+   important document for users to refer to all available OPs. Therefore, after adding the new OP, we need to add it to the process
+   list (grouped by the OP type and sorted in alphabetical order):
+   
+   ```yaml
+   ...
+   - stopwords_filter:                                       # filter text with stopword ratio smaller than a specific min value
+       lang: en                                                # consider stopwords in what language
+       tokenization: false                                     # whether to use model to tokenize documents
+       min_ratio: 0.3                                          # the min ratio to filter text
+       stopwords_dir: ./assets                                 # directory to store stopwords dictionaries
+       use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
+       words_aug_group_sizes: [2]                              # the group size of words to augment
+       words_aug_join_char: ""                                 # the join char between words to augment
+   - text_length_filter:                                     # filter text with length out of specific range
+       min_len: 10                                             # the min length of filter range
+       max_len: 10000                                          # the max length of filter range
+   - token_num_filter:                                       # filter text with total token number out of specific range
+       hf_tokenizer: EleutherAI/pythia-6.9b-deduped            # name of used Hugging Face tokenizer
+       min_num: 10                                             # the min number of filter range
+       max_num: 10000                                          # the max number of filter range
+   ...
+   ```
+   
+   2. `docs/Operators.md`: this doc maintains categorized lists of available OPs. We can add the information of new OP to the list
+   of corresponding type of OPs (sorted in alphabetical order). At the same time, in the Overview section at the top of this doc,
+   we also need to update the number of OPs for the corresponding OP type:
+
+   ```markdown
+   ## Overview
+   ...
+   | [ Filter ]( #filter )             |   21 (+1 HERE)   | Filters out low-quality samples                 |
+   ...
+   ## Filter <a name="filter"/>
+   ...
+   | suffix_filter                  | General | en, zh | Keeps samples with specified suffixes                                                      |
+   | text_length_filter             | General | en, zh | Keeps samples with total text length within the specified range                            |
+   | token_num_filter               | General | en, zh | Keeps samples with token count within the specified range                                  |
+   ...
+   ```
+
+   3. `docs/Operators_ZH.md`: this doc is the Chinese version of the doc in 6.ii, so we need to update the Chinese content at
+   the same positions.
+
+### (Optional) Make your OP fusible
+
+- If the calculation process of some intermediate variables in the new OP is reused in other existing OPs, this new OP can be
+added to the fusible OPs to accelerate the whole data processing with OP fusion technology. (e.g. both the `word_num_filter`
+and `word_repetition_filter` need to split the input text into words)
+- When opening OP fusion, these reused calculation processes and intermediate variables can be shared in the `context` between
+OPs, thus reducing repeated calculations.
+- OPs that contain common intermediate variables can be fused in OP fusion through the following steps:
+
+1. (Optional) If a new intermediate variable is generated in the new OP, we need to add this new intermediate variable name to 
+the `InterVars` class in `utils/constant.py`. In general, we need to add a prefix `DEFAULT_PREFIX` before the name.
+
+```python
+class InterVars(object):
+    # text
+    lines = DEFAULT_PREFIX + 'lines'
+    words = DEFAULT_PREFIX + 'words'  # add the new intermediate variable here
+    ...
+```
+
+2. (Optional) We need to define a registry group in `ops/op_fusion.py` for the new intermediate variable in the 1st step, and add
+this registry group to the registry group list that stores all groups of intermediate variables. This facilitates the OP Fusion module
+to track OPs involving these intermediate variables.
+
+```python
+...
+# Type of intermediate vars
+# text
+INTER_LINES = Registry(InterVars.lines)
+INTER_WORDS = Registry(InterVars.words)  # define registry group for the new intermediate variable
+
+# images
+LOADED_IMAGES = Registry(InterVars.loaded_images)
+
+# all
+ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_IMAGES]  # and add it to the registry group list
+...
+```
+
+3. Before the OP class definition that involves the intermediate variable, register this OP in the registry group corresponding
+to this intermediate variable, indicating that the intermediate variable may be calculated and used in this OP.
+
+```python
+...
+@OPERATORS.register_module(OP_NAME)
+@INTER_WORDS.register_module(OP_NAME)  # 将该算子注册到注册组中
+class WordNumFilter(Filter):
+...
+```
+
+4. In the calculation process of this intermediate variable of the new OP, we can modify the calculation logic to:
+   1. If the argument `context` is True, it means the OP fusion is opening, so we get the value of this intermediate variable 
+   from `context` first, which has been calculated by the previous OPs.
+   2. If this intermediate variable doesn't exist in the `context`, it means it's the first time to calculate this variable in this
+   OP, so we need to define a unique key and use it to store the intermediate variable in the `context` for subsequent OPs after
+   it's calculated by this new OP.
+   3. If the argument `context` is False, just follow the normal calculation process.
+
+```python
+# before modification
+...
+tokenizer = get_model(self.model_key,
+                      lang=self.lang,
+                      model_type='sentencepiece')
+words = get_words_from_document(
+    sample[self.text_key],
+    token_func=tokenizer.encode_as_pieces if tokenizer else None)
+...        
+
+# after modification
+...
+words_key = f'{InterVars.words}-{self.model_key}'
+if context and words_key in sample[Fields.context]:
+    # get the value of intermediate variable from context directly
+    words = sample[Fields.context][words_key]
+else:
+    # normal calculation process
+    tokenizer = get_model(self.model_key,
+                          lang=self.lang,
+                          model_type='sentencepiece')
+    words = get_words_from_document(
+        sample[self.text_key],
+        token_func=tokenizer.encode_as_pieces if tokenizer else None)
+    if context:
+        # After calculating the intermediate variable for the first time,
+        # store it in the context for subsequent OPs.
+        sample[Fields.context][words_key] = words
+...
 ```
 
 ## Build your own configs
