@@ -14,6 +14,21 @@ class SpecialTokens(object):
     eoc = f'<|{DEFAULT_PREFIX}eoc|>'
 
 
+def get_special_tokens():
+    special_token_dict = {
+        key: value
+        for key, value in SpecialTokens.__dict__.items()
+        if not key.startswith('__')
+    }
+    return special_token_dict
+
+
+def remove_special_tokens(text):
+    for value in get_special_tokens().values():
+        text = text.replace(value, '')
+    return text
+
+
 def load_images(paths):
     return [load_image(path) for path in paths]
 

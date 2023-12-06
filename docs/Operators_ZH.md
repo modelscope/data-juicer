@@ -78,8 +78,8 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | image_aspect_ratio_filter      | Image   | -      | 保留样本中包含的图片的宽高比在指定范围内的样本            |
 | image_shape_filter             | Image   |   -    | 保留样本中包含的图片的形状（即宽和高）在指定范围内的样本       |
 | image_size_filter              | Image   |   -    | 保留样本中包含的图片的大小（bytes）在指定范围内的样本                 |
-| image_text_matching_filter     | Multimodal |   -    | 保留文本图像匹配度在指定范围内的样本                 |
-| image_text_similarity_filter   | Multimodal |   -    | 保留文本图像相似度在指定范围内的样本                 |
+| image_text_matching_filter     | Multimodal |   -    | 保留图像-文本的分类匹配分(基于BLIP模型)在指定范围内的样本                 |
+| image_text_similarity_filter   | Multimodal |   -    | 保留图像-文本的特征余弦相似度(基于CLIP模型)在指定范围内的样本                 |
 | language_id_score_filter       | General | en, zh | 保留特定语言的样本，通过预测的置信度得分来判断            |
 | maximum_line_length_filter     | Code    | en, zh | 保留最大行长度在指定范围内的样本                   |
 | perplexity_filter              | General | en, zh | 保留困惑度低于指定阈值的样本                     |

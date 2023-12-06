@@ -1,9 +1,11 @@
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
+from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import SpecialTokens, load_image
+from data_juicer.utils.mm_utils import (SpecialTokens, load_image,
+                                        remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -11,11 +13,10 @@ from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_text_similarity_filter'
 
-with AvailabilityChecking(['torch'], OP_NAME):
+with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
 
     import torch
     import transformers  # noqa: F401
-    from PIL import ImageOps
 
     # avoid hanging when calling clip in multiprocessing
     torch.set_num_threads(1)
@@ -102,18 +103,7 @@ class ImageTextSimilarityFilter(Filter):
                         sample[Fields.context][loaded_image_key] = image
 
         text = sample[self.text_key]
-        special_token_dict = {
-            key: value
-            for key, value in SpecialTokens.__dict__.items()
-            if not key.startswith('__')
-        }
         offset = 0
-
-        def remove_special_token(text):
-            for value in special_token_dict.values():
-                text = text.replace(value, '')
-            return text
-
         similarity = []
         model, processor = get_model(self.model_key)
 
@@ -124,7 +114,7 @@ class ImageTextSimilarityFilter(Filter):
             if count == 0 or len(chunk) == 0:
                 continue
             else:
-                text_chunk = remove_special_token(chunk)
+                text_chunk = remove_special_tokens(chunk)
                 image_chunk = []
                 for image_key in loaded_image_keys[offset:offset + count]:
                     image = images[image_key]
