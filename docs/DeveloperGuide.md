@@ -233,7 +233,7 @@ to this intermediate variable, indicating that the intermediate variable may be 
 ```python
 ...
 @OPERATORS.register_module(OP_NAME)
-@INTER_WORDS.register_module(OP_NAME)  # 将该算子注册到注册组中
+@INTER_WORDS.register_module(OP_NAME)  # register this new OP into the registry group
 class WordNumFilter(Filter):
 ...
 ```
