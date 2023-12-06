@@ -11,6 +11,7 @@ from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.constant import Fields
 
+from .data import add_same_content_to_new_column
 from .exporter import Exporter
 from .tracer import Tracer
 
@@ -65,9 +66,13 @@ class Executor:
 
         # prepare exporter and check export path suffix
         logger.info('Preparing exporter...')
-        self.exporter = Exporter(self.cfg.export_path,
-                                 self.cfg.export_shard_size,
-                                 self.cfg.export_in_parallel, self.cfg.np)
+        self.exporter = Exporter(
+            self.cfg.export_path,
+            self.cfg.export_shard_size,
+            self.cfg.export_in_parallel,
+            self.cfg.np,
+            keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
+            keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds)
 
         # setup tracer
         self.open_tracer = self.cfg.open_tracer
@@ -125,12 +130,15 @@ class Executor:
                                                      op.text_key)
                 elif isinstance(op, Filter):
                     if Fields.stats not in dataset.features:
-                        # TODO:
-                        # this is a temp solution,
                         # only add stats when calling filter op
-                        dataset = dataset.add_column(name=Fields.stats,
-                                                     column=[{}] *
-                                                     dataset.num_rows)
+                        dataset = dataset.map(
+                            add_same_content_to_new_column,
+                            fn_kwargs={
+                                'new_column_name': Fields.stats,
+                                'initial_value': {}
+                            },
+                            num_proc=self.cfg.np,
+                            desc='Adding new column for stats')
                         if self.cfg.use_checkpoint:
                             prev = dataset
                     dataset = dataset.map(op.compute_stats,

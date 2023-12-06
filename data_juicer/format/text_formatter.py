@@ -150,7 +150,7 @@ class TextFormatter(LocalFormatter):
         # whether to add file suffix to datase meta info
         if self.add_suffix:
             logger.info('Add suffix info into dataset...')
-            datasets = add_suffixes(datasets)
+            datasets = add_suffixes(datasets, num_proc)
         else:
             datasets = concatenate_datasets([ds for _, ds in datasets.items()])
         return unify_format(datasets,

@@ -18,6 +18,7 @@ For now, dataset formats that are supported by Data-Juicer are listed in the fol
 | Format     | source_format_to_data_juicer_format | data_juicer_format_to_target_format | Ref.                                                                                                             |
 |------------|-------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------|
 | LLaVA-like | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| MMC4-like  | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [Format Description](https://github.com/allenai/mmc4#documents)                                                  |
 | WavCaps-like  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | [Format Description](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
 
 For all tools, you can run the following command to find out the usage of them:
@@ -92,6 +93,19 @@ and converted datasets, so we can regard this sample is aligned with the origina
     }
 ]
 ```
+
+#### MMC4-like
+
+The format of MMC4-like datasets are defined [here](https://github.com/allenai/mmc4#documents). Except `image_info` and `text_list`,
+which are used when converting them to Data-Juicer format, there is an important field `similarity_matrix`. Similarity matrix is
+a matrix of shape `len(image_info) x len(text_list)`, which means it highly depends on the numbers of images and text sentences and their 
+orders.
+
+However, when processing such datasets with Data-Juicer, images or sentences might be removed from a sample by Filters, and they could be
+modified by some Mappers. Thus, after processing, this similarity matrix might be no longer aligned with `image_info` or `text_list`.
+Users should be cautious about this point if you need this matrix in later usages.
+
+Despite these extra fields, tools for MMC4 can perfectly convert MMC4-like datasets to Data-Juicer-format datasets and convert them back~
 
 ### WavCaps-like
 
