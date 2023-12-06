@@ -32,7 +32,7 @@ class ImageTextSimilarityFilter(Filter):
                  hf_clip='openai/clip-vit-base-patch32',
                  min_score: ClosedUnitInterval = 0.1,
                  max_score: ClosedUnitInterval = 1.0,
-                 horizontal_flip: bool = True,
+                 horizontal_flip: bool = False,
                  vertical_flip: bool = False,
                  any_or_all: str = 'any',
                  reduce_mode: str = 'avg',
@@ -46,7 +46,7 @@ class ImageTextSimilarityFilter(Filter):
         :param min_score: The min similarity to keep samples.
         :param max_score: The max similarity to keep samples.
         :param horizontal_flip: Flip image horizontally (left to right).
-        :param vertical_flip: Flip the image vertically (top to bottom).
+        :param vertical_flip: Flip image vertically (top to bottom).
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the

@@ -132,20 +132,20 @@ process:
       min_size:  "0"                                            # the min size of filter range
       max_size: "1TB"                                          # the max size of filter range
       any_or_all: any                                           # keep this sample when any/all images meet the filter condition
-  - image_text_matching_filter:                             # filter samples according to the matching between text and images.
+  - image_text_matching_filter:                             # filter samples according to the matching score between image and text.
       hf_blip: Salesforce/blip-itm-base-coco                  # name of used Hugging Face blip
       min_score: 0.003                                        # the min matching score of filter range
       max_score: 1.0                                          # the max matching score of filter range
-      horizontal_flip: false                                   # Flip image horizontally (left to right).
-      vertical_flip: false                                    # Flip the image vertically (top to bottom).
+      horizontal_flip: false                                  # Flip image horizontally (left to right).
+      vertical_flip: false                                    # Flip image vertically (top to bottom).
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
-  - image_text_similarity_filter:                           # filter samples according to the similarity between text and images.
+  - image_text_similarity_filter:                           # filter samples according to the similarity between image and text.
       hf_clip: openai/clip-vit-base-patch32                   # name of used Hugging Face clip
       min_score: 0.1                                          # the min similarity of filter range
       max_score: 1.0                                          # the max similarity of filter range
-      horizontal_flip: true                                   # Flip image horizontally (left to right).
-      vertical_flip: false                                    # Flip the image vertically (top to bottom).
+      horizontal_flip: false                                  # Flip image horizontally (left to right).
+      vertical_flip: false                                    # Flip image vertically (top to bottom).
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value

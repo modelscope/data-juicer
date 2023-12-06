@@ -45,7 +45,7 @@ class ImageTextMatchingFilter(Filter):
         :param min_score: The min matching score to keep samples.
         :param max_score: The max matching score to keep samples.
         :param horizontal_flip: Flip image horizontally (left to right).
-        :param vertical_flip: Flip the image vertically (top to bottom).
+        :param vertical_flip: Flip image vertically (top to bottom).
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the
