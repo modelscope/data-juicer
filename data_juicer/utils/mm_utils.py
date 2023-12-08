@@ -1,3 +1,4 @@
+import numpy as np
 from datasets import Audio, Image
 
 from data_juicer.utils.constant import DEFAULT_PREFIX
@@ -12,6 +13,21 @@ class SpecialTokens(object):
 
     # others
     eoc = f'<|{DEFAULT_PREFIX}eoc|>'
+
+
+def get_special_tokens():
+    special_token_dict = {
+        key: value
+        for key, value in SpecialTokens.__dict__.items()
+        if not key.startswith('__')
+    }
+    return special_token_dict
+
+
+def remove_special_tokens(text):
+    for value in get_special_tokens().values():
+        text = text.replace(value, '')
+    return text
 
 
 def load_images(paths):
@@ -32,6 +48,15 @@ def load_audio(path, sampling_rate=None):
     aud_feature = Audio(sampling_rate)
     aud = aud_feature.decode_example(aud_feature.encode_example(path))
     return (aud['array'], aud['sampling_rate'])
+
+
+def pil_to_opencv(pil_image):
+    if pil_image.mode != 'RGB':
+        pil_image = pil_image.convert('RGB')
+    numpy_image = np.array(pil_image)
+    # RGB to BGR
+    opencv_image = numpy_image[:, :, ::-1]
+    return opencv_image
 
 
 def get_image_size(path, ):
