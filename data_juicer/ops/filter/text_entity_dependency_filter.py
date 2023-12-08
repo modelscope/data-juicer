@@ -26,7 +26,7 @@ class TextEntityDependencyFilter(Filter):
         Initialization method.
 
         :param lang: language of the text in the samples. 'en' for detection of
-            actions in English an'zh' for detection of actions in Chinese.
+            entities in English and 'zh' for detection of entities in Chinese.
         :param mini_dependency_num: The min token number in the filtering.
             Objects is independent if their number of edges in the dependency
             tree is below this parameter.
@@ -38,7 +38,7 @@ class TextEntityDependencyFilter(Filter):
 
         if lang not in ['en', 'zh']:
             raise ValueError(
-                f'Language [{lang}] is not supported in action detection.'
+                f'Language [{lang}] is not supported in entities detection.'
                 f'Can only be one of ["en", "zh"].')
         self.lang = lang
         self.model_key = prepare_model(model_type='spacy', lang=lang)
