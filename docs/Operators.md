@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   21   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   22   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   24   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   4    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -77,11 +77,11 @@ All the specific operators are listed below, each featured with several capabili
 | alphanumeric_filter            | General | en, zh | Keeps samples with alphanumeric ratio within the specified range                           |
 | average_line_length_filter     | Code    | en, zh | Keeps samples with average line length within the specified range                          |
 | character_repetition_filter    | General | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range           |
-| face_area_filter               | Image   |   -    | Keeps samples contains images with face area ratios within the specified range             |
+| face_area_filter               | Image   |   -    | Keeps samples containing images with face area ratios within the specified range             |
 | flagged_words_filter           | General | en, zh | Keeps samples with flagged-word ratio below the specified threshold                        |
-| image_aspect_ratio_filter      | Image   |   -    | Keeps samples contains images with aspect ratios within the specified range                |
-| image_shape_filter             | Image   |   -    | Keeps samples contains images with widths and heights within the specified range           |
-| image_size_filter              | Image   |   -    | Keeps samples contains images whose size in bytes are within the specified range                     |
+| image_aspect_ratio_filter      | Image   |   -    | Keeps samples containing images with aspect ratios within the specified range                |
+| image_shape_filter             | Image   |   -    | Keeps samples containing images with widths and heights within the specified range           |
+| image_size_filter              | Image   |   -    | Keeps samples containing images whose size in bytes are within the specified range                     |
 | image_text_matching_filter     | Multimodal |   -    |  Keeps samples with image-text classification matching score within the specified range based on a BLIP model          |
 | image_text_similarity_filter   | Multimodal |   -    |  Keeps samples with image-text feature cosine similarity within the specified range based on a CLIP model          |
 | language_id_score_filter       | General | en, zh | Keeps samples of the specified language, judged by a predicted confidence score            |
@@ -92,6 +92,8 @@ All the specific operators are listed below, each featured with several capabili
 | specified_numeric_field_filter | General | en, zh | Filters samples based on field, with value lies in the specified range (for numeric types) |
 | stopwords_filter               | General | en, zh | Keeps samples with stopword ratio above the specified threshold                            |
 | suffix_filter                  | General | en, zh | Keeps samples with specified suffixes                                                      |
+| text_action_filter             | General | en, zh | Keeps samples containing action verbs in their texts                                            |
+| text_entity_dependency_filter  | General | en, zh | Keeps samples containing entity nouns related to other tokens in the dependency tree of the texts |
 | text_length_filter             | General | en, zh | Keeps samples with total text length within the specified range                            |
 | token_num_filter               | General | en, zh | Keeps samples with token count within the specified range                                  |
 | word_num_filter                | General | en, zh | Keeps samples with word count within the specified range                                   |
