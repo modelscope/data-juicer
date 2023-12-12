@@ -65,7 +65,8 @@ class GenerateCaptionMapper(Mapper):
                 f'Can only be one of '
                 f'["random_any", "similar_one_simhash", "all"].')
         self.model_key = prepare_model(model_type='hf_blip',
-                                       model_key=hf_blip2)
+                                       model_key=hf_blip2,
+                                       usage="conditional_generation")
         self.model_in_ctx = None
         self.img_processor_in_ctx = None
         self.caption_num = caption_num

@@ -215,7 +215,7 @@ def prepare_huggingface_blip(
 
     if model is None or processor is None:
         raise NotImplementedError('Unsupported model preparing behavior for '
-                                  f'your given blip_name={blip_name} and'
+                                  f'your given blip_name={blip_name} and '
                                   f'usage={usage}')
 
     logger.info(f'Loaded blip and processor {blip_name} from HuggingFace...')
