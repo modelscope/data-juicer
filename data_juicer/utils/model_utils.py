@@ -257,14 +257,19 @@ def prepare_diversity_model(model_name, lang):
     return diversity_model
 
 
-def prepare_model(lang='en', model_type='sentencepiece', model_key=None):
+def prepare_model(lang='en',
+                  model_type='sentencepiece',
+                  model_key=None,
+                  usage=None):
     """
     Prepare and load a model or a tokenizer from MODEL_ZOO.
 
     :param lang: which lang model to load
     :param model_type: model or tokenizer type
-    :param model_key: tokenizer name, only used when prepare HuggingFace
-        tokenizer
+    :param model_key: tokenizer name, only used when
+        prepare HuggingFace tokenizer
+    :param usage: detailed usage to indicate some specific type
+        of the model or the tokenizer
     :return: a model or tokenizer instance
     """
 
@@ -288,14 +293,16 @@ def prepare_model(lang='en', model_type='sentencepiece', model_key=None):
         model_name, model_func = type_to_name[model_type]
         if model_type in ['fasttext']:
             MODEL_ZOO[model_key] = model_func(model_name)
-        elif model_type in ['fasttext', 'huggingface', 'hf_clip', 'hf_blip']:
+        elif model_type in ['huggingface', 'hf_clip']:
             MODEL_ZOO[model_key] = model_func(model_key)
+        elif model_type in ['hf_blip']:
+            MODEL_ZOO[model_key] = model_func(model_key, usage)
         else:
             MODEL_ZOO[model_key] = model_func(model_name, lang)
     return model_key
 
 
-def get_model(model_key, lang='en', model_type='sentencepiece'):
+def get_model(model_key, lang='en', model_type='sentencepiece', usage=None):
     """
     Get a model or a tokenizer from MODEL_ZOO.
 
@@ -304,5 +311,8 @@ def get_model(model_key, lang='en', model_type='sentencepiece'):
     if model_key is None:
         return None
     if model_key not in MODEL_ZOO:
-        prepare_model(lang=lang, model_type=model_type, model_key=model_key)
+        prepare_model(lang=lang,
+                      model_type=model_type,
+                      model_key=model_key,
+                      usage=usage)
     return MODEL_ZOO.get(model_key, None)

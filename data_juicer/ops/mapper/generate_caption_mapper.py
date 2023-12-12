@@ -99,7 +99,8 @@ class GenerateCaptionMapper(Mapper):
 
         # load model and processor for context re-using
         if context and self.model_in_ctx is None:
-            model, img_processor = get_model(self.model_key)
+            model, img_processor = get_model(model_key=self.model_key,
+                                             usage='conditional_generation')
             self.model_in_ctx = model
             self.img_processor_in_ctx = img_processor
 
