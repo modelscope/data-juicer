@@ -3,6 +3,7 @@
 * [开发者指南](#开发者指南)
    * [编码规范](#编码规范)
    * [构建自己的算子](#构建自己的算子)
+      * [（可选）使新算子可以进行算子融合](#可选使新算子可以进行算子融合)
    * [构建自己的配置](#构建自己的配置)
       * [丰富的配置源和类型提示](#丰富的配置源和类型提示)
       * [层次化的配置和帮助](#层次化的配置和帮助)
@@ -136,6 +137,127 @@ class TextLengthFilterTest(unittest.TestCase):
     def test_func3(self):
         pass
 ```
+
+6. （强烈推荐）为了方便其他用户使用，我们还需要将新增的算子信息更新到相应的文档中，具体包括如下文档：
+   1. `configs/config_all.yaml`：该全集配置文件保存了所有算子及参数的一个列表，作为用户参考可用算子的一个重要文档。因此，在新增算子后，需要将其添加到该文档process列表里（按算子类型分组并按字母序排序）：
+   
+   ```yaml
+   ...
+   - stopwords_filter:                                       # filter text with stopword ratio smaller than a specific min value
+       lang: en                                                # consider stopwords in what language
+       tokenization: false                                     # whether to use model to tokenize documents
+       min_ratio: 0.3                                          # the min ratio to filter text
+       stopwords_dir: ./assets                                 # directory to store stopwords dictionaries
+       use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
+       words_aug_group_sizes: [2]                              # the group size of words to augment
+       words_aug_join_char: ""                                 # the join char between words to augment
+   - text_length_filter:                                     # filter text with length out of specific range
+       min_len: 10                                             # the min length of filter range
+       max_len: 10000                                          # the max length of filter range
+   - token_num_filter:                                       # filter text with total token number out of specific range
+       hf_tokenizer: EleutherAI/pythia-6.9b-deduped            # name of used Hugging Face tokenizer
+       min_num: 10                                             # the min number of filter range
+       max_num: 10000                                          # the max number of filter range
+   ...
+   ```
+   
+   2. `docs/Operators.md`：该文档维护了可用算子的分类列表。我们可以把新增算子的信息添加到对应类别算子的列表中（算子按字母排序）。同时，在文档最上方Overview章节，我们也需要更新对应类别的可用算子数目：
+   
+   ```markdown
+   ## Overview
+   ...
+   | [ Filter ]( #filter )             |   21 (+1 HERE)   | Filters out low-quality samples                 |
+   ...
+   ## Filter <a name="filter"/>
+   ...
+   | suffix_filter                  | General | en, zh | Keeps samples with specified suffixes                                                      |
+   | text_length_filter             | General | en, zh | Keeps samples with total text length within the specified range                            |
+   | token_num_filter               | General | en, zh | Keeps samples with token count within the specified range                                  |
+   ...
+   ```
+
+   3. `docs/Operators_ZH.md`：该文档为6.ii中`docs/Operators.md`文档的中文版，需要更新相同位置处的中文内容。
+
+### （可选）使新算子可以进行算子融合
+
+- 如果我们的新算子中的部分中间变量的计算过程与已有的算子重复，那么可以将其添加到可融合算子中，以在数据处理时利用算子融合进行加速。（如`word_num_filter`与`word_repetition_filter`都需要对输入文本进行分词）
+- 当算子融合（OP Fusion）功能开启时，这些重复的计算过程和中间变量是可以在算子之间的`context`中共享的，从而可以减少重复计算。
+- 可通过如下步骤使包含共有中间变量的算子可进行算子融合（以`word_num_filter`算子为例）。
+
+1. （可选）如果新算子中产生了新的中间变量，需要在`utils/constant.py`中的`InterVars`类中添加新的中间变量名称。通常需要在名称前加上`DEFAULT_PREFIX`前缀。
+
+```python
+class InterVars(object):
+    # text
+    lines = DEFAULT_PREFIX + 'lines'
+    words = DEFAULT_PREFIX + 'words'  # 在这里添加新的中间变量
+    ...
+```
+
+2. （可选）第1步中添加的新的中间变量还需在`ops/op_fusion.py`中为其定义一个注册组，并添加到保存了所有注册组的列表中，方便算子融合模块追踪涉及到这些中间变量的算子。
+
+```python
+...
+# Type of intermediate vars
+# text
+INTER_LINES = Registry(InterVars.lines)
+INTER_WORDS = Registry(InterVars.words)  # 为新的中间变量定义注册组
+
+# images
+LOADED_IMAGES = Registry(InterVars.loaded_images)
+
+# all
+ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_IMAGES]  # 并添加到注册组列表中
+...
+```
+
+3. 在涉及到该中间变量的算子前，将该算子注册到中间变量对应的注册组中，表示该算子中可能对该中间变量进行了计算与使用。
+
+```python
+...
+@OPERATORS.register_module(OP_NAME)
+@INTER_WORDS.register_module(OP_NAME)  # 将该算子注册到注册组中
+class WordNumFilter(Filter):
+...
+```
+
+4. 在算子计算该中间变量的过程中，可将计算逻辑修改为：
+   1. 如果`context`参数为True，则表示已开启了算子融合，优先从`context`中获取前序算子已经计算过的该中间变量的值
+   2. 如果中间变量在`context`中不存在，则表示在该算子中首次对该中间变量进行计算，在计算完成后，定义一个唯一的key并将其存放到`context`中，以供后续算子使用
+   3. 如果`context`参数为False，则按照正常计算流程进行
+
+```python
+# 修改计算逻辑前
+...
+tokenizer = get_model(self.model_key,
+                      lang=self.lang,
+                      model_type='sentencepiece')
+words = get_words_from_document(
+    sample[self.text_key],
+    token_func=tokenizer.encode_as_pieces if tokenizer else None)
+...        
+
+# 修改计算逻辑后
+...
+words_key = f'{InterVars.words}-{self.model_key}'
+if context and words_key in sample[Fields.context]:
+    # 直接使用context中已有的中间变量值
+    words = sample[Fields.context][words_key]
+else:
+    # 正常计算流程
+    tokenizer = get_model(self.model_key,
+                          lang=self.lang,
+                          model_type='sentencepiece')
+    words = get_words_from_document(
+        sample[self.text_key],
+        token_func=tokenizer.encode_as_pieces if tokenizer else None)
+    if context:
+        # 第一次计算该中间变量后，放入context供后续算子使用
+        sample[Fields.context][words_key] = words
+...
+```
+
+- 至此，该算子已经能够在算子融合功能开启后，自动地与其他算子进行融合并共享共有的中间变量，减少重复计算，加快整体的数据处理速度
 
 ## 构建自己的配置
 

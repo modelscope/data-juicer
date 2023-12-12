@@ -13,3 +13,4 @@ opencc==1.1.6
 imagededup
 torch
 dlib
+spacy-pkuseg==0.0.32
