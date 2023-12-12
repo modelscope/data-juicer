@@ -183,23 +183,43 @@ def prepare_huggingface_clip(clip_name):
     processor = CLIPProcessor.from_pretrained(clip_name)
     logger.info(f'Loading clip and processor {clip_name} from HuggingFace...')
 
-    return (model, processor)
+    return model, processor
 
 
-def prepare_huggingface_blip(blip_name):
+def prepare_huggingface_blip(
+    blip_name,
+    usage=None,
+):
     """
     Prepare and load a blip and processor from HuggingFace.
 
-    :param blip_name: input blip name
+    :param blip_name: input blip name in huggingface hup
+    :param usage: a string indicating the type for processor and model wrapper
     :return: a pair of blip instance and processor instance.
     """
-    from transformers import BlipForImageTextRetrieval, BlipProcessor
+    model = None
+    processor = None
+    if usage is None:
+        usage = 'image_text_retrieval'
+    if 'blip2' in blip_name:
+        if usage == 'conditional_generation':
+            from transformers import (Blip2ForConditionalGeneration,
+                                      Blip2Processor)
+            model = Blip2ForConditionalGeneration.from_pretrained(blip_name)
+            processor = Blip2Processor.from_pretrained(blip_name)
+    elif 'blip' in blip_name:
+        if usage == 'image_text_retrieval':
+            from transformers import BlipForImageTextRetrieval, BlipProcessor
+            model = BlipForImageTextRetrieval.from_pretrained(blip_name)
+            processor = BlipProcessor.from_pretrained(blip_name)
 
-    model = BlipForImageTextRetrieval.from_pretrained(blip_name)
-    processor = BlipProcessor.from_pretrained(blip_name)
-    logger.info(f'Loading blip and processor {blip_name} from HuggingFace...')
+    if model is None or processor is None:
+        raise NotImplementedError('Unsupported model preparing behavior for '
+                                  f'your given blip_name={blip_name} and'
+                                  f'usage={usage}')
 
-    return (model, processor)
+    logger.info(f'Loaded blip and processor {blip_name} from HuggingFace...')
+    return model, processor
 
 
 def prepare_diversity_model(model_name, lang):
@@ -266,13 +286,9 @@ def prepare_model(lang='en', model_type='sentencepiece', model_key=None):
         model_key = model_type + '_' + lang
     if model_key not in MODEL_ZOO.keys():
         model_name, model_func = type_to_name[model_type]
-        if model_type == 'fasttext':
+        if model_type in ['fasttext']:
             MODEL_ZOO[model_key] = model_func(model_name)
-        elif model_type == 'huggingface':
-            MODEL_ZOO[model_key] = model_func(model_key)
-        elif model_type == 'hf_clip':
-            MODEL_ZOO[model_key] = model_func(model_key)
-        elif model_type == 'hf_blip':
+        elif model_type in ['fasttext', 'huggingface', 'hf_clip', 'hf_blip']:
             MODEL_ZOO[model_key] = model_func(model_key)
         else:
             MODEL_ZOO[model_key] = model_func(model_name, lang)
