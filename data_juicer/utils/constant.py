@@ -37,6 +37,7 @@ class StatsKeys(object):
     # multimodal
     image_text_similarity = 'image_text_similarity'
     image_text_matching_score = 'image_text_matching_score'
+    phrase_grounding_recall = 'phrase_grounding_recall'
 
 
 class HashKeys(object):

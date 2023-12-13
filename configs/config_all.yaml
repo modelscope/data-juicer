@@ -161,6 +161,17 @@ process:
   - perplexity_filter:                                      # filter text with perplexity score out of specific range
       lang: en                                                # compute perplexity in what language
       max_ppl: 1500                                           # the max perplexity score to filter text
+  - phrase_grounding_recall_filter:                         # filter samples according to the locating recall of phrases extracted from text in the images.
+      hf_clip: openai/clip-vit-base-patch32                   # name of used Hugging Face Owl-ViT
+      min_recall: 0.1                                         # the min phrase grounding recall of filter range
+      max_recall: 1.0                                         # the max phrase grounding recall of filter range
+      horizontal_flip: false                                  # Flip image horizontally (left to right).
+      vertical_flip: false                                    # Flip image vertically (top to bottom).
+      iou_thr: 0.5                                            # the IoU threshold for NMS-like post-process
+      large_area_ratio_thr: 0.95                              # the area ratio threshold for filtering out large predicted bboxes
+      conf_thr: 0.0                                           # the confidence score threshold for removing low-confidence bboxes
+      reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - special_characters_filter:                              # filter text with special-char ratio out of specific range
       min_ratio: 0.0                                          # the min ratio of filter range
       max_ratio: 0.25                                         # the max ratio of filter range

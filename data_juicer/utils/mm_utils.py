@@ -30,24 +30,15 @@ def remove_special_tokens(text):
     return text
 
 
+# Image
 def load_images(paths):
     return [load_image(path) for path in paths]
-
-
-def load_audios(paths):
-    return [load_audio(path) for path in paths]
 
 
 def load_image(path):
     img_feature = Image()
     img = img_feature.decode_example(img_feature.encode_example(path))
     return img
-
-
-def load_audio(path, sampling_rate=None):
-    aud_feature = Audio(sampling_rate)
-    aud = aud_feature.decode_example(aud_feature.encode_example(path))
-    return (aud['array'], aud['sampling_rate'])
 
 
 def pil_to_opencv(pil_image):
@@ -64,6 +55,32 @@ def get_image_size(path, ):
     return os.path.getsize(path)
 
 
+def iou(box1, box2):
+    x1_min, y1_min, x1_max, y1_max = box1
+    x2_min, y2_min, x2_max, y2_max = box2
+    area1 = (x1_max - x1_min) * (y1_max - y1_min)
+    area2 = (x2_max - x2_min) * (y2_max - y2_min)
+    ix_min = max(x1_min, x2_min)
+    ix_max = min(x1_max, x2_max)
+    iy_min = max(y1_min, y2_min)
+    iy_max = min(y1_max, y2_max)
+    intersection = max(0, (ix_max - ix_min) * (iy_max - iy_min))
+    union = area1 + area2 - intersection
+    return 1.0 * intersection / union
+
+
+# Audio
+def load_audios(paths):
+    return [load_audio(path) for path in paths]
+
+
+def load_audio(path, sampling_rate=None):
+    aud_feature = Audio(sampling_rate)
+    aud = aud_feature.decode_example(aud_feature.encode_example(path))
+    return aud['array'], aud['sampling_rate']
+
+
+# Others
 def size_to_bytes(size):
     alphabets_list = [char for char in size if char.isalpha()]
     numbers_list = [char for char in size if char.isdigit()]
