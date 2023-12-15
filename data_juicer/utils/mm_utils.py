@@ -26,7 +26,7 @@ def get_special_tokens():
 
 def remove_special_tokens(text):
     for value in get_special_tokens().values():
-        text = text.replace(value, '')
+        text = text.replace(value, '').strip()
     return text
 
 

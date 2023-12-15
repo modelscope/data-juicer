@@ -137,25 +137,39 @@ def main(
 
     # if convert_to_relative_paths is True, check if the original_llava_ds_path
     # is provided as well.
-    if convert_to_relative_paths:
-        if not original_llava_ds_path:
-            raise ValueError('When convert_to_relative_paths is set to True, '
-                             'the original_llava_ds_path must be provided '
-                             'for recovering the relative paths. Please '
-                             'check and retry.')
-        original_llava_ds_path = os.path.abspath(original_llava_ds_path)
-        # if provided original_llava_ds_path is the dataset file path, only
-        # keep the directory path.
-        if os.path.isfile(original_llava_ds_path):
-            original_llava_ds_path = os.path.dirname(original_llava_ds_path)
+    if not original_llava_ds_path:
+        raise ValueError('When convert_to_relative_paths is set to True, '
+                         'the original_llava_ds_path must be provided '
+                         'for recovering the relative paths. Please '
+                         'check and retry.')
+    original_llava_ds_path = os.path.abspath(original_llava_ds_path)
+    # prepare id2idx dict
+    ori_ds = json.load(open(original_llava_ds_path, 'r', encoding='utf-8'))
+    id2idx = {str(s['id']): idx for idx, s in enumerate(ori_ds)}
+    # if provided original_llava_ds_path is the dataset file path, only
+    # keep the directory path.
+    if os.path.isfile(original_llava_ds_path):
+        original_llava_ds_path = os.path.dirname(original_llava_ds_path)
 
     logger.info('Start to convert.')
     samples = []
     with jl.open(dj_ds_path, 'r') as reader:
         for sample in tqdm(reader):
-            id = sample['id']
+            sid = sample['id']
+            if sid in id2idx:
+                id = ori_ds[id2idx[sid]]['id']
+            elif str(sid) in id2idx:
+                id = ori_ds[id2idx[str(sid)]]['id']
+            else:
+                raise ValueError(f'The id [{sid}] in the sample cannot be '
+                                 f'aligned with any samples in the original '
+                                 f'dataset. Please check and fix it and '
+                                 f'retry.')
             images = list(set(sample.get(image_key, [])))
             text = sample[text_key]
+            # if there are only caption in this sample, we need to restore its
+            # question
+            restore_questions = sample['only_caption']
 
             if len(images) > 1:
                 raise ValueError(f'There are more than 1 distinct images in '
@@ -163,47 +177,60 @@ def main(
                                  f'compatible with LLaVA dataset format. '
                                  f'Please check and fix it and retry.')
 
-            # convert dj text format to LLaVA conversation format
-            # split the text into a list of:
-            # [role1, sent1, role2, sent2, role1, sent3, role2, sent4, ...]
-            parts = from_pattern.split(text)
-            if parts[0] == '':
-                parts = parts[1:]
-            if len(parts) % 4 != 0:
-                raise ValueError(f'The conversations in the sample text with '
-                                 f'id [{id}] contains unbalance (human, '
-                                 f'robot) conversation round (number of '
-                                 f'conversation is [{len(parts)}]). Please '
-                                 f'check and fix the dataset and retry.')
-
-            conversations = []
-            # the number of sentences
-            num_sent = len(parts) // 2
-            for i in range(num_sent):
-                # get role and its sentence
-                role = parts[2 * i]
-                sent = parts[2 * i + 1].strip()
+            def clean_sentence(sentence, round):
+                sentence = sentence.strip()
 
                 # remove sentence seperator
-                if sent.endswith(sent_seperator):
-                    sent = sent[:-len(sent_seperator)].strip()
+                if sentence.endswith(sent_seperator):
+                    sentence = sentence[:-len(sent_seperator)].strip()
                 # remove possible eoc_special_tokens
-                if sent.endswith(eoc_special_token):
-                    sent = sent[:-len(eoc_special_token)].strip()
+                if sentence.endswith(eoc_special_token):
+                    sentence = sentence[:-len(eoc_special_token)].strip()
                 # remove possible image_special_tokens when only keeping it in
                 # the first conversation round
-                if i > 0 and keep_only_first_image:
-                    if sent.startswith(image_special_token):
-                        sent = sent[len(image_special_token):].strip()
-                        if sent.startswith(sent_seperator):
-                            sent = sent[len(sent_seperator):].strip()
-                    if sent.endswith(image_special_token):
-                        sent = sent[:-len(image_special_token)].strip()
-                        if sent.endswith(sent_seperator):
-                            sent = sent[:-len(sent_seperator)].strip()
+                if round > 0 and keep_only_first_image:
+                    if sentence.startswith(image_special_token):
+                        sentence = sentence[len(image_special_token):].strip()
+                        if sentence.startswith(sent_seperator):
+                            sentence = sentence[len(sent_seperator):].strip()
+                    if sentence.endswith(image_special_token):
+                        sentence = sentence[:-len(image_special_token)].strip()
+                        if sentence.endswith(sent_seperator):
+                            sentence = sentence[:-len(sent_seperator)].strip()
+                return sentence
 
-                conversation = {'from': role, 'value': sent}
-                conversations.append(conversation)
+            conversations = []
+            if restore_questions:
+                # need to restore questions for samples with only captions
+                ori_convs = ori_ds[id2idx[str(id)]]['conversations']
+                conversations.append(ori_convs[0])  # add question
+                conversations.append({
+                    'from': ori_convs[1]['from'],
+                    'value': clean_sentence(text, 1)
+                })
+            else:
+                # convert dj text format to LLaVA conversation format
+                # split the text into a list of:
+                # [role1, sent1, role2, sent2, role1, sent3, role2, sent4, ...]
+                parts = from_pattern.split(text)
+                if parts[0] == '':
+                    parts = parts[1:]
+                if len(parts) % 4 != 0:
+                    raise ValueError(f'The conversations in the sample text '
+                                     f'with id [{id}] contains unbalance '
+                                     f'(human, robot) conversation round '
+                                     f'(number of conversation is '
+                                     f'[{len(parts)}]). Please check and fix '
+                                     f'the dataset and retry.')
+
+                # the number of sentences
+                num_sent = len(parts) // 2
+                for i in range(num_sent):
+                    # get role and its sentence
+                    role = parts[2 * i]
+                    sent = clean_sentence(parts[2 * i + 1], i)
+                    conversation = {'from': role, 'value': sent}
+                    conversations.append(conversation)
 
             # make up the new sample
             new_sample = {'id': id, 'conversations': conversations}

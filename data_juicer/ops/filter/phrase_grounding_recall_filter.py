@@ -21,8 +21,7 @@ with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
     import transformers  # noqa: F401
 
     # avoid hanging when calling clip in multiprocessing
-    # torch.set_num_threads(1)
-    torch.set_num_interop_threads(1)
+    torch.set_num_threads(1)
 
     import nltk
 
@@ -128,7 +127,8 @@ class PhraseGroundingRecallFilter(Filter):
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
-        self.model_key = prepare_model(model_type='hf_owlvit',
+        self.model_type = 'hf_owlvit'
+        self.model_key = prepare_model(model_type=self.model_type,
                                        model_key=hf_owlvit)
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
@@ -165,12 +165,12 @@ class PhraseGroundingRecallFilter(Filter):
                     if context:
                         # store the image data into context
                         sample[Fields.context][loaded_image_key] = image
-        print('Num of Images: %d' % len(images))
 
         text = sample[self.text_key]
         offset = 0
         recalls = []
-        model, processor = get_model(self.model_key)
+        model, processor = get_model(self.model_key,
+                                     model_type=self.model_type)
 
         for chunk in text.split(SpecialTokens.eoc):
             count = chunk.count(SpecialTokens.image)
@@ -195,16 +195,12 @@ class PhraseGroundingRecallFilter(Filter):
                         image = ImageOps.flip(image)
                     images_this_chunk.append(image)
 
-                print('Num of chunk images: %d' % len(images_this_chunk))
-                print('Num of NERs: %d' % num_ners)
-
-                inputs = processor(text=ners_this_chunk,
+                ners_batch = [ners_this_chunk] * len(images_this_chunk)
+                inputs = processor(text=ners_batch,
                                    images=images_this_chunk,
                                    return_tensors='pt',
                                    padding=True,
                                    truncation=True)
-
-                print('GOT INPUT')
 
                 with torch.no_grad():
                     outputs = model(**inputs)
@@ -215,8 +211,6 @@ class PhraseGroundingRecallFilter(Filter):
                         threshold=self.conf_thr,
                         target_sizes=target_sizes)
 
-                print('GOT OUTPUT')
-
                 image_recalls = []
                 for idx, result in enumerate(results):
                     scores = result['scores']
@@ -226,12 +220,13 @@ class PhraseGroundingRecallFilter(Filter):
                     # sort by the confidence scores
                     # and only keep the first num_ners predictions
                     order_idx = scores.argsort(descending=True)
+                    scores = scores[order_idx].tolist()[:num_ners]
                     labels = labels[order_idx].tolist()[:num_ners]
                     boxes = boxes[order_idx].tolist()[:num_ners]
 
                     image_area = target_sizes[idx].prod()
                     hit = {}
-                    for box, label in zip(boxes, labels):
+                    for box, label, score in zip(boxes, labels, scores):
                         # this ner is already hit
                         if ners_this_chunk[label] in hit:
                             continue
@@ -244,14 +239,14 @@ class PhraseGroundingRecallFilter(Filter):
                         # skip overlapped boxes with nms-like method
                         suppressed = False
                         for ner in hit:
-                            if iou(box, hit[ner]) > self.iou_thr:
+                            if iou(box, hit[ner][0]) > self.iou_thr:
                                 suppressed = True
                                 break
                         if suppressed:
                             continue
 
                         # record the new hit box
-                        hit[ners_this_chunk[label]] = box
+                        hit[ners_this_chunk[label]] = (box, score)
 
                     recall = 1.0 * len(hit) / num_ners
                     image_recalls.append(recall)
