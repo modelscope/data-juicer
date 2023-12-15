@@ -311,6 +311,7 @@ def init_setup_from_cfg(cfg):
     :param cfg: a updated cfg
     """
 
+    cfg.export_path = os.path.abspath(cfg.export_path)
     export_path = cfg.export_path
     cfg.work_dir = os.path.dirname(export_path)
     log_dir = os.path.join(cfg.work_dir, 'log')
@@ -325,16 +326,15 @@ def init_setup_from_cfg(cfg):
 
     # check and get dataset dir
     if os.path.exists(cfg.dataset_path):
+        cfg.dataset_path = os.path.abspath(cfg.dataset_path)
         if os.path.isdir(cfg.dataset_path):
-            cfg.dataset_dir = os.path.abspath(cfg.dataset_path)
+            cfg.dataset_dir = cfg.dataset_path
         else:
-            cfg.dataset_dir = os.path.abspath(os.path.dirname(
-                cfg.dataset_path))
+            cfg.dataset_dir = os.path.dirname(cfg.dataset_path)
     else:
-        logger.error(f'Input dataset_path [{cfg.dataset_path}] is invalid. '
-                     f'Please check and retry.')
-        raise ValueError(f'Input dataset_path [{cfg.dataset_path}] is '
-                         f'invalid. Please check and retry.')
+        logger.warning(f'dataset_path [{cfg.dataset_path}] not found in local.'
+                       'Please check and retry, otherwise we will treat it '
+                       'as a remote dataset.')
 
     # whether or not to use cache management
     # disabling the cache or using checkpoint explicitly will turn off the

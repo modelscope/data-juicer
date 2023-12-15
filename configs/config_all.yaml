@@ -183,6 +183,13 @@ process:
       use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
       words_aug_group_sizes: [2]                              # the group size of words to augment
       words_aug_join_char: ""                                 # the join char between words to augment
+  - text_action_filter:                                     # filter text according the number of action verb
+      lang: en                                                # consider the words in what language
+      min_action_num: 1                                       # text will be filtered whose verbs less the min action number
+  - text_entity_dependency_filter:                          # filter text without non independent entity nouns
+      lang: en                                                # consider the words in what language
+      min_dependency_num: 1                                   # the min number of adjacent edges of a non independent noun in dependency tree
+      any_or_all: any                                         # keep this sample when any/all entity nouns are non independent
   - text_length_filter:                                     # filter text with length out of specific range
       min_len: 10                                             # the min length of filter range
       max_len: 10000                                          # the max length of filter range

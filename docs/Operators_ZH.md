@@ -10,7 +10,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
 | [ Mapper ]( #mapper )              | 21 | 对数据样本进行编辑和转换  |
-| [ Filter ]( #filter )              | 22 | 过滤低质量样本       |
+| [ Filter ]( #filter )              | 24 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  4 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
 
@@ -89,6 +89,8 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | specified_numeric_field_filter | General | en, zh | 根据字段过滤样本，要求字段的值处于指定范围（针对数字类型）      |
 | stopwords_filter               | General | en, zh | 保留停用词比率高于指定阈值的样本                   |
 | suffix_filter                  | General | en, zh | 保留包含特定后缀的样本                        |
+| text_action_filter             | General | en, zh | 保留文本部分包含动作的样本                     |
+| text_entity_dependency_filter  | General | en, zh | 保留文本部分的依存树中具有非独立实体的样本        |
 | text_length_filter             | General | en, zh | 保留总文本长度在指定范围内的样本                   |
 | token_num_filter               | General | en, zh | 保留token数在指定范围内的样本                  |
 | word_num_filter                | General | en, zh | 保留字数在指定范围内的样本                      |
