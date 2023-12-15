@@ -2,6 +2,7 @@ from typing import List
 
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
+from loguru import logger
 from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -15,7 +16,7 @@ from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'phrase_grounding_recall_filter'
 
-with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
+with AvailabilityChecking(['torch', 'transformers', 'nltk'], OP_NAME):
 
     import torch
     import transformers  # noqa: F401
@@ -137,6 +138,11 @@ class PhraseGroundingRecallFilter(Filter):
         self.iou_thr = iou_thr
         self.large_area_ratio_thr = large_area_ratio_thr
         self.conf_thr = conf_thr
+
+        requires_nltk_data = ['punkt', 'averaged_perceptron_tagger']
+        logger.info(f'Downloading nltk data of {requires_nltk_data}...')
+        for nltk_data_pkg in requires_nltk_data:
+            nltk.download(nltk_data_pkg)
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
