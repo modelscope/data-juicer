@@ -6,9 +6,9 @@ from datasets import Dataset
 from data_juicer.ops.filter.phrase_grounding_recall_filter import PhraseGroundingRecallFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-
-class PhraseGroundingRecallFilterTest(unittest.TestCase):
+class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
@@ -20,6 +20,10 @@ class PhraseGroundingRecallFilterTest(unittest.TestCase):
     img3_path = os.path.join(data_path, 'img3.jpg')
     face_path = os.path.join(data_path, 'lena-face.jpg')
     hf_owlvit = 'google/owlvit-base-patch32'
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        super().tearDownClass(cls.hf_owlvit)
     
     def _run_filter(self, dataset: Dataset, target_list, op, num_proc=1):
 
