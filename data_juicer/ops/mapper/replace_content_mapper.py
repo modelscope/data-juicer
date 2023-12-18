@@ -5,11 +5,11 @@ from ..base_op import OPERATORS, Mapper
 
 @OPERATORS.register_module('replace_content_mapper')
 class ReplaceContentMapper(Mapper):
-    """Mapper to replace all content in the text that matches 
-    a specific regular expression pattern with a designated 
+    """Mapper to replace all content in the text that matches
+    a specific regular expression pattern with a designated
     replacement string."""
 
-    def __init__(self, pattern: str=None, repl: str='', *args, **kwargs):
+    def __init__(self, pattern: str = None, repl: str = '', *args, **kwargs):
         """
         Initialization method.
 
@@ -19,11 +19,10 @@ class ReplaceContentMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-
         self.pattern = pattern
         if pattern is not None and len(pattern) > 0:
-            if (pattern.startswith("r'") and pattern.endswith("'") 
-                    or  pattern.startswith('r"') and pattern.endswith('"')):
+            if (pattern.startswith("r'") and pattern.endswith("'")
+                    or pattern.startswith('r"') and pattern.endswith('"')):
                 self.pattern = pattern[2:-1]
         self.repl = repl
 
