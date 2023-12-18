@@ -13,6 +13,9 @@ from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.logger_utils import setup_logger
 from data_juicer.utils.mm_utils import SpecialTokens
 
+global_cfg = None
+global_parser = None
+
 
 def init_configs(args=None):
     """
@@ -36,6 +39,11 @@ def init_configs(args=None):
         '--hpo_config',
         type=str,
         help='Path to a configuration file when using auto-HPO tool.',
+        required=False)
+    parser.add_argument(
+        '--path_3sigma_recipe',
+        type=str,
+        help='Path to save a configuration file when using 3-sigma tool.',
         required=False)
 
     # basic global paras with extended type hints
@@ -294,6 +302,10 @@ def init_configs(args=None):
         # show the final config tables before the process started
         display_config(cfg)
 
+        global global_cfg, global_parser
+        global_cfg = cfg
+        global_parser = parser
+
         return cfg
     except ArgumentError:
         logger.error('Config initialization failed')
@@ -371,7 +383,7 @@ def init_setup_from_cfg(cfg):
                        f'variable HF_DATASETS_CACHE.')
         config.HF_DATASETS_CACHE = cfg.ds_cache_dir
     else:
-        cfg.ds_cache_dir = config.HF_DATASETS_CACHE
+        cfg.ds_cache_dir = str(config.HF_DATASETS_CACHE)
 
     # if there is suffix_filter op, turn on the add_suffix flag
     cfg.add_suffix = False
@@ -476,6 +488,37 @@ def display_config(cfg):
 
     logger.info('Configuration table: ')
     print(table)
+
+
+def export_config(cfg, path, format='yaml', skip_none=True, skip_check=True,
+                  overwrite=False, multifile=True, branch=None):
+    """
+        save the config object, some params are from jsonargparse
+    :param cfg: cfg object to save (Namespace type)
+    :param path: the save path
+    :param format: 'yaml', 'json', 'json_indented', 'parser_mode'
+    :param skip_none: Whether to exclude entries whose value is None.
+    :param skip_check: Whether to skip parser checking.
+    :param overwrite: Whether to overwrite existing files.
+    :param multifile: Whether to save multiple config files
+        by using the __path__ metas.
+    :param branch:
+    :return:
+    """
+    # remove ops outside the process list for better displaying
+    cfg_to_export = cfg.clone()
+    for op in OPERATORS.modules.keys():
+        _ = cfg_to_export.pop(op)
+
+    global global_parser
+    if not global_parser:
+        init_configs()  # enable the customized type parser
+    global_parser.save(
+        cfg=cfg_to_export, path=path, format=format, skip_none=skip_none,
+        skip_check=skip_check, overwrite=overwrite, multifile=multifile,
+        branch=branch)
+
+    logger.info(f'Saved the configuration in {path}')
 
 
 def merge_config(ori_cfg, new_cfg: Dict):
