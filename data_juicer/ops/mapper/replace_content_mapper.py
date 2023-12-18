@@ -3,11 +3,13 @@ import regex as re
 from ..base_op import OPERATORS, Mapper
 
 
-@OPERATORS.register_module('clean_email_mapper')
-class CleanEmailMapper(Mapper):
-    """Mapper to clean email in text samples."""
+@OPERATORS.register_module('replace_content_mapper')
+class ReplaceContentMapper(Mapper):
+    """Mapper to replace all content in the text that matches 
+    a specific regular expression pattern with a designated 
+    replacement string."""
 
-    def __init__(self, pattern: str = None, repl: str = '', *args, **kwargs):
+    def __init__(self, pattern: str=None, repl: str='', *args, **kwargs):
         """
         Initialization method.
 
@@ -17,16 +19,17 @@ class CleanEmailMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        if pattern is None:
-            self.pattern = r'[A-Za-z0-9.\-+_]+@[a-z0-9.\-+_]+\.[a-z]+'
-        else:
-            self.pattern = pattern
 
+        self.pattern = pattern
+        if pattern is not None and len(pattern) > 0:
+            if (pattern.startswith("r'") and pattern.endswith("'") 
+                    or  pattern.startswith('r"') and pattern.endswith('"')):
+                self.pattern = pattern[2:-1]
         self.repl = repl
 
     def process(self, sample):
 
-        if not re.search(self.pattern, sample[self.text_key], flags=re.DOTALL):
+        if self.pattern is None:
             return sample
 
         sample[self.text_key] = re.sub(pattern=self.pattern,
