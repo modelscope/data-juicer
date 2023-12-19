@@ -35,6 +35,9 @@ def main():
     for process in cfg.process:
         op_name, args = list(process.items())[0]
         temp_args = copy.deepcopy(args)
+        if op_name not in op_name_to_stats_key:
+            # skip the op such as `clean_email_mapper`
+            continue
         stats_keys = op_name_to_stats_key[op_name]
         for stats_key in stats_keys:
             if stats_key in stats_key_to_mean:
