@@ -21,6 +21,10 @@ class CleanEmailMapper(Mapper):
             self.pattern = r'[A-Za-z0-9.\-+_]+@[a-z0-9.\-+_]+\.[a-z]+'
         else:
             self.pattern = pattern
+            if pattern is not None and len(pattern) > 2:
+                if (pattern.startswith("r'") and pattern.endswith("'")
+                        or pattern.startswith('r"') and pattern.endswith('"')):
+                    self.pattern = pattern[2:-1]
 
         self.repl = repl
 
