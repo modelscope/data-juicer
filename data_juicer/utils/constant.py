@@ -2,6 +2,7 @@ import copy
 import inspect
 import os
 
+import zstandard as zstd
 from loguru import logger
 
 DEFAULT_PREFIX = '__dj__'
@@ -43,16 +44,38 @@ class StatsKeysMeta(type):
             # the access has been skipped due to the use of cache
             # we will using a temp data sample to get the access log
             if os.path.exists(dj_cfg.dataset_path) and \
-                    'jsonl' in dj_cfg.dataset_path:
+                    ('jsonl' in dj_cfg.dataset_path or
+                     'jsonl.zst' in dj_cfg.dataset_path):
                 logger.info(
                     'Begin to track the usage of ops with a dummy data sample')
 
                 # load the first line as tmp_data
-                tmp_f_name = dj_cfg.dataset_path.\
-                    replace('.jsonl', '.tmp.jsonl')
-                with open(dj_cfg.dataset_path, 'r') as orig_file, \
-                        open(tmp_f_name, 'w') as tmp_file:
-                    first_line = orig_file.readline()
+                tmp_f_name = None
+                first_line = None
+                if 'jsonl.zst' in dj_cfg.dataset_path:
+                    tmp_f_name = dj_cfg.dataset_path. \
+                        replace('.jsonl.zst', '.tmp.jsonl')
+                    # Open the file in binary mode and
+                    # create a Zstandard decompression context
+                    with open(dj_cfg.dataset_path, 'rb') as compressed_file:
+                        dctx = zstd.ZstdDecompressor()
+                        # Create a stream reader for the file and decode the
+                        # first line
+                        with dctx.stream_reader(compressed_file) as reader:
+                            first_line_bytes = reader.readline()
+                            # Assuming the file is encoded in UTF-8
+                            first_line = first_line_bytes.decode('utf-8')
+                elif 'jsonl' in dj_cfg.dataset_path:
+                    tmp_f_name = dj_cfg.dataset_path. \
+                        replace('.jsonl', '.tmp.jsonl')
+                    with open(dj_cfg.dataset_path, 'r') as orig_file:
+                        first_line = orig_file.readline()
+
+                assert tmp_f_name is not None and first_line is not None, \
+                    'error when loading the first line, when ' \
+                    f'dj_cfg.dataset_path={dj_cfg.dataset_path}'
+
+                with open(tmp_f_name, 'w') as tmp_file:
                     tmp_file.write(first_line)
 
                 tmp_dj_cfg.dataset_path = tmp_f_name
