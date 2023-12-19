@@ -26,10 +26,10 @@ class CleanIpMapper(Mapper):
             self.pattern += r'([\da-fA-F]{1,4}:){7}[\da-fA-F]{1,4}'  # ipv6
         else:
             self.pattern = pattern
-            if pattern is not None and len(pattern) > 2:
-                if (pattern.startswith("r'") and pattern.endswith("'")
-                        or pattern.startswith('r"') and pattern.endswith('"')):
-                    self.pattern = pattern[2:-1]
+            if (len(pattern) > 2
+                    and pattern.startswith("r'") and pattern.endswith("'")
+                    or pattern.startswith('r"') and pattern.endswith('"')):
+                self.pattern = pattern[2:-1]
         self.repl = repl
 
     def process(self, sample):
