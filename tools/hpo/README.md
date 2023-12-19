@@ -11,10 +11,15 @@ $$P(|x-\mu| > 3\sigma) \leq 0.003$$
 To automate this process, we provide the tool which can be used as follows:
 ```shell
 # cd tools/hpo
-python execute_hpo_3sigma.py --config <data-process-cfg-file-path>
+# usage 1: do not save the refined recipe 
+python execute_hpo_3sigma.py --config <data-process-cfg-file-path> 
+# usage 2: save the refined recipe at the given path
+python execute_hpo_3sigma.py --config <data-process-cfg-file-path> --path_3sigma_recipe <data-process-cfg-file-after-refined-path> 
 
-#e.g.,
-python execute_hpo_3sigma.py --config configs/process.yaml
+# e.g., usage 1
+python execute_hpo_3sigma.py --config configs/process.yaml 
+# e.g., usage 2
+python execute_hpo_3sigma.py --config configs/process.yaml --path_3sigma_recipe configs/process_3sigma.yaml 
 ```
 
 ## Auto-HPO with WandB

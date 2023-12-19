@@ -58,7 +58,8 @@ class ColumnWiseAnalysis:
                  dataset,
                  output_path,
                  overall_result=None,
-                 save_stats_in_one_file=True):
+                 save_stats_in_one_file=True,
+                 ):
         """
         Initialization method
         :param dataset: the dataset to be analysed
@@ -80,7 +81,7 @@ class ColumnWiseAnalysis:
 
         self.save_stats_in_one_file = save_stats_in_one_file
 
-    def analyse(self, show_percentiles=False, show=False):
+    def analyse(self, show_percentiles=False, show=False, skip_export=False):
         """
         Apply analysis and draw the analysis figure for stats.
 
@@ -88,6 +89,7 @@ class ColumnWiseAnalysis:
             each sub-figure. If it's true, there will be several red
             lines to indicate the quantiles of the stats distributions
         :param show: whether to show in a single window after drawing
+        :param skip_export: whether save the results into disk
         :return:
         """
         # number of sub-figures for each stat. There are histogram and box plot
@@ -164,9 +166,10 @@ class ColumnWiseAnalysis:
                 else:
                     axes = None
 
-                self.draw_hist(
-                    axes, data,
-                    os.path.join(self.output_path, f'{column_name}-hist.png'))
+                if not skip_export:
+                    self.draw_hist(
+                        axes, data, os.path.join(
+                            self.output_path, f'{column_name}-hist.png'))
 
             # add a title to the figure of this stat
             if self.save_stats_in_one_file:
@@ -176,7 +179,8 @@ class ColumnWiseAnalysis:
 
         if self.save_stats_in_one_file:
             fig = plt.gcf()
-            fig.savefig(os.path.join(self.output_path, 'all-stats.png'))
+            if not skip_export:
+                fig.savefig(os.path.join(self.output_path, 'all-stats.png'))
             if show:
                 plt.show()
             else:

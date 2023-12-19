@@ -491,7 +491,7 @@ def display_config(cfg):
 
 
 def export_config(cfg, path, format='yaml', skip_none=True, skip_check=True,
-                  overwrite=False, multifile=True, branch=None):
+                  overwrite=False, multifile=True):
     """
         save the config object, some params are from jsonargparse
     :param cfg: cfg object to save (Namespace type)
@@ -502,7 +502,7 @@ def export_config(cfg, path, format='yaml', skip_none=True, skip_check=True,
     :param overwrite: Whether to overwrite existing files.
     :param multifile: Whether to save multiple config files
         by using the __path__ metas.
-    :param branch:
+
     :return:
     """
     # remove ops outside the process list for better displaying
@@ -515,8 +515,7 @@ def export_config(cfg, path, format='yaml', skip_none=True, skip_check=True,
         init_configs()  # enable the customized type parser
     global_parser.save(
         cfg=cfg_to_export, path=path, format=format, skip_none=skip_none,
-        skip_check=skip_check, overwrite=overwrite, multifile=multifile,
-        branch=branch)
+        skip_check=skip_check, overwrite=overwrite, multifile=multifile)
 
     logger.info(f'Saved the configuration in {path}')
 

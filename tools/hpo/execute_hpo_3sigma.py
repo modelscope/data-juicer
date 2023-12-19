@@ -49,8 +49,9 @@ def main():
                     if 'max' in arg_name:
                         new_val = stats_key_to_mean[stats_key] + \
                                   3 * stats_key_to_std[stats_key]
-                    if new_val is not None:
-                        logger.info(f'Using 3-sigma rule, changed para '
+                    if new_val is not None and str(new_val) != 'nan':
+                        logger.info(f'Using 3-sigma rule, for op {op_name}, '
+                                    f'changed its para '
                                     f'{arg_name}={args[arg_name]} into '
                                     f'{arg_name}={new_val}')
                         args[arg_name] = new_val
