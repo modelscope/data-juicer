@@ -1,5 +1,6 @@
 import copy
 import inspect
+import io
 import os
 
 import zstandard as zstd
@@ -62,9 +63,9 @@ class StatsKeysMeta(type):
                         # Create a stream reader for the file and decode the
                         # first line
                         with dctx.stream_reader(compressed_file) as reader:
-                            first_line_bytes = reader.readline()
-                            # Assuming the file is encoded in UTF-8
-                            first_line = first_line_bytes.decode('utf-8')
+                            text_stream = io.TextIOWrapper(
+                                reader, encoding='utf-8')
+                            first_line = text_stream.readline()
                 elif 'jsonl' in dj_cfg.dataset_path:
                     tmp_f_name = dj_cfg.dataset_path. \
                         replace('.jsonl', '.tmp.jsonl')
