@@ -49,7 +49,7 @@ class AverageLineLengthFilter(Filter):
                 sample[Fields.context][context_key] = lines
         sample[Fields.stats][StatsKeys.avg_line_length] = \
             len(sample[self.text_key]) / len(lines) \
-            if len(lines) != 0 else 0.0
+            if len(lines) != 0 else 0
         return sample
 
     def process(self, sample):

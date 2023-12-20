@@ -331,7 +331,7 @@ def init_setup_from_cfg(cfg):
         os.makedirs(log_dir, exist_ok=True)
     timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
     cfg.timestamp = timestamp
-    logfile_name = timestamp + '.txt'
+    logfile_name = f'export_{export_path}_time_{timestamp}.txt'
     setup_logger(save_dir=log_dir,
                  filename=logfile_name,
                  redirect=cfg.executor_type == 'default')
