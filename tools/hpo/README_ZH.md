@@ -1,6 +1,27 @@
 # 数据菜谱的自动化超参优化
 
-## Auto-HPO
+## 基于3-Sigma原则进行Auto-HPO
+一种简单的数据菜谱自动调参方法是假设outlier数据对训练有害，那么我们可以引入3-sigma原则来自动确定超参，过滤数据。具体来说，假设原始数据的某个分析维度服从正态分布且存在随机误差，我们可以基于Analyzer产出的stats，在该维度上
+把算子过滤的上下界设为三倍标准差。
+
+$$P(|x-\mu| > 3\sigma) \leq 0.003$$
+
+为了自动化该过程，我们提供了相应工具：
+```shell
+# cd tools/hpo
+# usage 1: do not save the refined recipe 
+python execute_hpo_3sigma.py --config <data-process-cfg-file-path> 
+# usage 2: save the refined recipe at the given path
+python execute_hpo_3sigma.py --config <data-process-cfg-file-path> --path_3sigma_recipe <data-process-cfg-file-after-refined-path> 
+
+# e.g., usage 1
+python execute_hpo_3sigma.py --config configs/process.yaml 
+# e.g., usage 2
+python execute_hpo_3sigma.py --config configs/process.yaml --path_3sigma_recipe configs/process_3sigma.yaml 
+```
+
+
+## 基于WandB进行Auto-HPO 
 
 我们将自动化 HPO (hyper-parameters optimization) 工具 WandB [Sweep](https://docs.wandb.ai/guides/sweeps) 结合到
 Data-Juicer 中，以简化改良数据处理超参数的过程。
@@ -11,7 +32,7 @@ Data-Juicer 中，以简化改良数据处理超参数的过程。
 并通过新的 PR 做出贡献！
 
 
-## 前置条件
+### 前置条件
 您需要先安装 data-juicer。
 此外，该工具利用了 WandB，通过`pip install wandb`安装它。
 在使用此工具之前，您需要运行`wandb login`并输入您的 WandB
@@ -25,17 +46,17 @@ wandb login --host <URL of your wandb instance>
 
 
 
-## 使用和定制化
+### 使用和定制化
 
-给定一个数据配方，以指定的配置文件所定义`<data-process-cfg-file-path>`，您可以使用 `execute_hpo.py` 来搜索
+给定一个数据配方，以指定的配置文件所定义`<data-process-cfg-file-path>`，您可以使用 `execute_hpo_wandb.py` 来搜索
 由`<hpo-cfg-file-path>`定义的超参数空间。
 
 ```shell
 # cd tools/hpo
-python execute_hpo.py --config <data-process-cfg-file-path> --hpo_config <hpo-cfg-file-path>
+python execute_hpo_wandb.py --config <data-process-cfg-file-path> --hpo_config <hpo-cfg-file-path>
 
 # e.g.,
-python execute_hpo.py --config configs/process.yaml --hpo_config configs/quality_score_hpo.yaml
+python execute_hpo_wandb.py --config configs/process.yaml --hpo_config configs/quality_score_hpo.yaml
 ```
 
 对于数据菜谱的配置，即`<data-process-cfg-file-path>`，

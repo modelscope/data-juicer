@@ -1,3 +1,11 @@
+import copy
+import inspect
+import io
+import os
+
+import zstandard as zstd
+from loguru import logger
+
 DEFAULT_PREFIX = '__dj__'
 
 
@@ -8,7 +16,89 @@ class Fields(object):
     suffix = DEFAULT_PREFIX + 'suffix__'
 
 
-class StatsKeys(object):
+class StatsKeysMeta(type):
+    """
+    a helper class to track the mapping from OP's name to its used stats_keys
+
+    e.g., # once the AlphanumericFilter's compute_stats method has been called
+    res = TrackingDescriptor.get_access_log()
+    print(res) # {"AlphanumericFilter": ["alnum_ratio", "alpha_token_ratio"]}
+    """
+    _accessed_by = {}
+
+    def __getattr__(cls, attr):
+        caller_class = inspect.currentframe().f_back.f_globals['__name__']
+        # no need to track the parent classes
+        caller_class = caller_class.split('.')[-1]
+        stat_key = getattr(cls._constants_class, attr)
+        if caller_class not in cls._accessed_by:
+            cls._accessed_by[caller_class] = set()
+        if stat_key not in cls._accessed_by[caller_class]:
+            cls._accessed_by[caller_class].add(stat_key)
+        return stat_key
+
+    def get_access_log(cls, dj_cfg=None):
+        if cls._accessed_by:
+            return cls._accessed_by
+        elif dj_cfg:
+            tmp_dj_cfg = copy.deepcopy(dj_cfg)
+            # the access has been skipped due to the use of cache
+            # we will using a temp data sample to get the access log
+            if os.path.exists(dj_cfg.dataset_path) and \
+                    ('jsonl' in dj_cfg.dataset_path or
+                     'jsonl.zst' in dj_cfg.dataset_path):
+                logger.info(
+                    'Begin to track the usage of ops with a dummy data sample')
+
+                # load the first line as tmp_data
+                tmp_f_name = None
+                first_line = None
+                if 'jsonl.zst' in dj_cfg.dataset_path:
+                    tmp_f_name = dj_cfg.dataset_path. \
+                        replace('.jsonl.zst', '.tmp.jsonl')
+                    # Open the file in binary mode and
+                    # create a Zstandard decompression context
+                    with open(dj_cfg.dataset_path, 'rb') as compressed_file:
+                        dctx = zstd.ZstdDecompressor()
+                        # Create a stream reader for the file and decode the
+                        # first line
+                        with dctx.stream_reader(compressed_file) as reader:
+                            text_stream = io.TextIOWrapper(
+                                reader, encoding='utf-8')
+                            first_line = text_stream.readline()
+                elif 'jsonl' in dj_cfg.dataset_path:
+                    tmp_f_name = dj_cfg.dataset_path. \
+                        replace('.jsonl', '.tmp.jsonl')
+                    with open(dj_cfg.dataset_path, 'r') as orig_file:
+                        first_line = orig_file.readline()
+
+                assert tmp_f_name is not None and first_line is not None, \
+                    'error when loading the first line, when ' \
+                    f'dj_cfg.dataset_path={dj_cfg.dataset_path}'
+
+                with open(tmp_f_name, 'w') as tmp_file:
+                    tmp_file.write(first_line)
+
+                tmp_dj_cfg.dataset_path = tmp_f_name
+                tmp_dj_cfg.use_cache = False
+                tmp_dj_cfg.use_checkpoint = False
+
+                from data_juicer.core import Analyser
+                tmp_analyzer = Analyser(tmp_dj_cfg)
+                # do not overwrite the true analysis results
+                tmp_analyzer.run(skip_export=True)
+
+                os.remove(tmp_f_name)
+            else:
+                raise NotImplementedError(
+                    f'For now, the dummy data is supported for only jsonl type'
+                    f'. Please check your config as {dj_cfg.dataset_path} is '
+                    f'either not existed or in jsonl type.')
+
+        return cls._accessed_by
+
+
+class StatsKeysConstant(object):
     # text
     alpha_token_ratio = 'alpha_token_ratio'
     alnum_ratio = 'alnum_ratio'
@@ -39,6 +129,10 @@ class StatsKeys(object):
     # multimodal
     image_text_similarity = 'image_text_similarity'
     image_text_matching_score = 'image_text_matching_score'
+
+
+class StatsKeys(object, metaclass=StatsKeysMeta):
+    _constants_class = StatsKeysConstant
 
 
 class HashKeys(object):
