@@ -165,7 +165,9 @@ def init_configs(args=None):
         'as the environment variable `HF_DATASETS_CACHE`, whose default '
         'value is usually "~/.cache/huggingface/datasets". If this '
         'argument is set to a valid path by users, it will override the '
-        'default cache dir.')
+        'default cache dir. Modifying this arg might also affect the other two'
+        ' paths to store downloaded and extracted datasets that depend on '
+        '`HF_DATASETS_CACHE`')
     parser.add_argument(
         '--cache_compress',
         type=str,
@@ -311,6 +313,28 @@ def init_configs(args=None):
         logger.error('Config initialization failed')
 
 
+def update_ds_cache_dir_and_related_vars(new_ds_cache_path):
+    from pathlib import Path
+
+    from datasets import config
+
+    # update the HF_DATASETS_CACHE
+    config.HF_DATASETS_CACHE = Path(new_ds_cache_path)
+    # and two more PATHS that depend on HF_DATASETS_CACHE
+    # - path to store downloaded datasets (e.g. remote datasets)
+    config.DEFAULT_DOWNLOADED_DATASETS_PATH = os.path.join(
+        config.HF_DATASETS_CACHE, config.DOWNLOADED_DATASETS_DIR
+    )
+    config.DOWNLOADED_DATASETS_PATH = Path(
+        config.DEFAULT_DOWNLOADED_DATASETS_PATH)
+    # - path to store extracted datasets (e.g. xxx.jsonl.zst)
+    config.DEFAULT_EXTRACTED_DATASETS_PATH = os.path.join(
+        config.DEFAULT_DOWNLOADED_DATASETS_PATH, config.EXTRACTED_DATASETS_DIR
+    )
+    config.EXTRACTED_DATASETS_PATH = Path(
+        config.DEFAULT_EXTRACTED_DATASETS_PATH)
+
+
 def init_setup_from_cfg(cfg):
     """
     Do some extra setup tasks after parsing config file or command line.
@@ -348,6 +372,17 @@ def init_setup_from_cfg(cfg):
                        'Please check and retry, otherwise we will treat it '
                        'as a remote dataset.')
 
+    # check number of processes np
+    sys_cpu_count = os.cpu_count()
+    if cfg.np > sys_cpu_count:
+        logger.warning(f'Number of processes `np` is set as [{cfg.np}], which '
+                       f'is larger than the cpu count [{sys_cpu_count}]. Due '
+                       f'to the data processing of Data-Juicer is a '
+                       f'computation-intensive task, we recommend to set it to'
+                       f' a value <= cpu count. Set it to [{sys_cpu_count}] '
+                       f'here.')
+        cfg.np = sys_cpu_count
+
     # whether or not to use cache management
     # disabling the cache or using checkpoint explicitly will turn off the
     # cache management.
@@ -381,7 +416,7 @@ def init_setup_from_cfg(cfg):
                        f'using the ds_cache_dir argument, which is '
                        f'{config.HF_DATASETS_CACHE} before based on the env '
                        f'variable HF_DATASETS_CACHE.')
-        config.HF_DATASETS_CACHE = cfg.ds_cache_dir
+        update_ds_cache_dir_and_related_vars(cfg.ds_cache_dir)
     else:
         cfg.ds_cache_dir = str(config.HF_DATASETS_CACHE)
 
