@@ -49,7 +49,7 @@ class MaximumLineLengthFilter(Filter):
                 sample[Fields.context][context_key] = lines
         line_lengths = list(map(len, lines))
         sample[Fields.stats][StatsKeys.max_line_length] = max(
-            line_lengths) if line_lengths else 0.0
+            line_lengths) if line_lengths else 0
         return sample
 
     def process(self, sample):
