@@ -9,7 +9,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 类型                                 | 数量 | 描述            |
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
-| [ Mapper ]( #mapper )              | 21 | 对数据样本进行编辑和转换  |
+| [ Mapper ]( #mapper )              | 22 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 24 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  4 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
@@ -60,7 +60,8 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | remove_comments_mapper                              | LaTeX                 | en, zh    | 删除 TeX 文档中的注释                                          |
 | remove_header_mapper                                | LaTeX                 | en, zh    | 删除 TeX 文档头，例如标题、章节数字/名称等                               |
 | remove_long_words_mapper                            | General               | en, zh    | 删除长度超出指定范围的单词                                          |
-| remove_non_chinese_character_mapper                 | General               | en, zh    | 删除样本中的非中文字符
+| remove_non_chinese_character_mapper                 | General               | en, zh    | 删除样本中的非中文字符                                              |
+| remove_repeat_sentences_mapper                      | General               | en, zh    | 删除样本中的重复句子                                                |
 | remove_specific_chars_mapper                        | General               | en, zh    | 删除任何用户指定的字符或子字符串                                       |
 | remove_table_text_mapper                            | General, Financial    | en        | 检测并删除可能的表格内容（:warning: 依赖正则表达式匹配，因此很脆弱）                |
 | remove_words_with_incorrect_<br />substrings_mapper | General               | en, zh    | 删除包含指定子字符串的单词                                          |
