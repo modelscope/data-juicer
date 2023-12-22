@@ -4,7 +4,57 @@
 
 ## 数据集格式转换
 
-由于不同多模态数据集和工作之间的数据集格式差异较大，Data-Juicer 提出了一种新颖的多模态数据集中间格式，并为一些流行的多模态工作提供了若干数据集格式转换工具。
+由于不同多模态数据集和工作之间的数据集格式差异较大， Data-Juicer 提出了一种新颖的、中间的、
+基于文本的、交替的多模态数据格式，其是基于一些按块（chunk）组织的格式，如MMC4数据集格式。
+
+在 Data-Juicer 的格式中，一个多模态样本或者文档基于一段文本组织，其由若干个文本块组成。
+每个文本块是一个语义单元，单个文本块中包括的所有多模态信息都应该在谈论同样的事情，并且它们彼此语义上是对齐的。
+
+下面这里是一个 Data-Juicer 格式的多模态样本示例。
+- 它包括4个文本块，它们由特殊token `<|__dj__eoc|>` 分割开。
+- 除了文本，这个样本还包括3种其他模态：图像（images），音频（audios），视频（videos）。
+它们保存在硬盘上，而它们的硬盘路径列举在了样本中对应的一级字段的列表里。
+- 在文本中，其他模态被表示为了特殊token（例如，图像 -- `<__dj__image>`）。
+每种模态的特殊token所表示的数据按照它们在文本中出现的顺序对应到列表中的路径上。
+（例如，第3个文本块中的2个图像token分别对应了图像路径列表中的antarctica_map图像和europe_map图像）
+- 在单个文本块中，可以由多种模态的数据以及多个模态特殊token，它们彼此是语义上对齐的，而且它们与该文本块中的文本也是语义对齐的。
+这些模态特殊token在文本块中可以处于任意位置（通常处于文本前或者文本后）
+- 不同于纯文本样本，对于多模态样本来说，为其他模态计算的stats可能为针对多模态数据列表的一个stats列表（如例子中的image_widths）。
+
+```python
+{
+  "text": "<__dj__image> Antarctica is Earth's southernmost and least-populated continent. <|__dj__eoc|> "
+          "<__dj__video> <__dj__audio> Situated almost entirely south of the Antarctic Circle and surrounded by the "
+          "Southern Ocean (also known as the Antarctic Ocean), it contains the geographic South Pole. <|__dj__eoc|> "
+          "Antarctica is the fifth-largest continent, being about 40% larger than Europe, "
+          "and has an area of 14,200,000 km2 (5,500,000 sq mi). <__dj__image> <__dj__image> <|__dj__eoc|> "
+          "Most of Antarctica is covered by the Antarctic ice sheet, "
+          "with an average thickness of 1.9 km (1.2 mi). <|__dj__eoc|>",
+  "images": [
+    "path/to/the/image/of/antarctica_snowfield",
+    "path/to/the/image/of/antarctica_map",
+    "path/to/the/image/of/europe_map"
+  ],
+  "audios": [
+    "path/to/the/audio/of/sound_of_waves_in_Antarctic_Ocean"
+  ],
+  "videos": [
+    "path/to/the/video/of/remote_sensing_view_of_antarctica"
+  ],
+  "meta": {
+    "src": "customized",
+    "version": "0.1",
+    "author": "xxx"
+  },
+  "stats": {
+    "lang": "en",
+    "image_widths": [224, 336, 512],
+    ...
+  }
+}
+```
+
+根据这个格式，Data-Juicer 为一些流行的多模态工作提供了若干数据集格式转换工具。
 
 这些工具分为两种类型：
 - 其他格式到 Data-Juicer 格式的转换：这些工具在 `source_format_to_data_juicer_format` 目录中。它们可以帮助将其他格式的数据集转换为 Data-Juicer 格式的目标数据集。

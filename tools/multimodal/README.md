@@ -5,8 +5,62 @@ This folder contains some scripts and tools for multimodal datasets before and a
 ## Dataset Format Conversion
 
 Due to large format diversity among different multimodal datasets and works, 
-Data-Juicer propose a novel intermediate format for multimodal dataset and 
-provided several dataset format conversion tools for some popular multimodal 
+Data-Juicer propose a novel intermediate text-based interleaved data format for multimodal dataset, which 
+is based on chunk-wise formats such MMC4 dataset.
+
+In the Data-Juicer format, a multimodal sample or document is based on a text, 
+which consists of several text chunks. Each chunk is a semantic unit, and all the
+multimodal information in a chunk should talk about the same thing and be aligned
+with each other.
+
+Here is a multimodal sample example in Data-Juicer format below.
+- It includes 4 chunks split by the special token `<|__dj__eoc|>`.
+- In addition to texts, there are 3 other modalities: images, audios, videos. 
+They are stored on the disk and their paths are
+listed in the corresponding first-level fields in the sample.
+- Other modalities are represented as special tokens in the text (e.g. image -- `<__dj__image>`). 
+The special tokens of each modality correspond to the paths in the order of appearance. 
+(e.g. the two image tokens in the third chunk are images of antarctica_map and europe_map respectively)
+- There could be multiple types of modalities and multiple modality special tokens in a single chunk, 
+and they are semantically aligned with each other and text in this chunk. 
+The position of special tokens can be random in a chunk. (In general, they are usually before or after the text.)
+- For multimodal samples, unlike text-only samples, the computed stats for other 
+modalities could be a list of stats for the list of multimodal data (e.g. image_widths in this sample).
+
+```python
+{
+  "text": "<__dj__image> Antarctica is Earth's southernmost and least-populated continent. <|__dj__eoc|> "
+          "<__dj__video> <__dj__audio> Situated almost entirely south of the Antarctic Circle and surrounded by the "
+          "Southern Ocean (also known as the Antarctic Ocean), it contains the geographic South Pole. <|__dj__eoc|> "
+          "Antarctica is the fifth-largest continent, being about 40% larger than Europe, "
+          "and has an area of 14,200,000 km2 (5,500,000 sq mi). <__dj__image> <__dj__image> <|__dj__eoc|> "
+          "Most of Antarctica is covered by the Antarctic ice sheet, "
+          "with an average thickness of 1.9 km (1.2 mi). <|__dj__eoc|>",
+  "images": [
+    "path/to/the/image/of/antarctica_snowfield",
+    "path/to/the/image/of/antarctica_map",
+    "path/to/the/image/of/europe_map"
+  ],
+  "audios": [
+    "path/to/the/audio/of/sound_of_waves_in_Antarctic_Ocean"
+  ],
+  "videos": [
+    "path/to/the/video/of/remote_sensing_view_of_antarctica"
+  ],
+  "meta": {
+    "src": "customized",
+    "version": "0.1",
+    "author": "xxx"
+  },
+  "stats": {
+    "lang": "en",
+    "image_widths": [224, 336, 512],
+    ...
+  }
+}
+```
+
+According to this format, Data-Juicer provided several dataset format conversion tools for some popular multimodal 
 works.
 
 These tools consist of two types:

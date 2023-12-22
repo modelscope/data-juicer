@@ -86,7 +86,7 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
 
 ## 前置条件
 
-* 推荐 Python==3.8
+* 推荐 Python>=3.7,<=3.10
 * gcc >= 5 (at least C++14 support)
 
 ## 安装
