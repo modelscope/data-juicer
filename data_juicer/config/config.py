@@ -324,14 +324,14 @@ def init_setup_from_cfg(cfg):
     """
 
     cfg.export_path = os.path.abspath(cfg.export_path)
-    export_path = cfg.export_path
-    cfg.work_dir = os.path.dirname(export_path)
+    cfg.work_dir = os.path.dirname(cfg.export_path)
+    export_rel_path = os.path.relpath(cfg.export_path, start=cfg.work_dir)
     log_dir = os.path.join(cfg.work_dir, 'log')
     if not os.path.exists(log_dir):
         os.makedirs(log_dir, exist_ok=True)
     timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
     cfg.timestamp = timestamp
-    logfile_name = timestamp + '.txt'
+    logfile_name = f'export_{export_rel_path}_time_{timestamp}.txt'
     setup_logger(save_dir=log_dir,
                  filename=logfile_name,
                  redirect=cfg.executor_type == 'default')

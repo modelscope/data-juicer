@@ -67,6 +67,7 @@ All the specific operators are listed below, each featured with several capabili
 | remove_specific_chars_mapper                        | General            | en, zh | Removes any user-specified characters or substrings                                                            |
 | remove_table_text_mapper                            | General, Financial | en     | Detects and removes possible table contents (:warning: relies on regular expression matching and thus fragile) |
 | remove_words_with_incorrect_<br />substrings_mapper | General            | en, zh | Removes words containing specified substrings                                                                  |
+| replace_content_mapper | General            | en, zh | Replace all content in the text that matches a specific regular expression pattern with a designated replacement string.                                                                 |
 | sentence_split_mapper                               | General            | en     | Splits and reorganizes sentences according to semantics                                                        |
 | whitespace_normalization_mapper                     | General            | en, zh | Normalizes various Unicode whitespaces to the normal ASCII space (U+0020)                                      |
 

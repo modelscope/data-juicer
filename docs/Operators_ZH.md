@@ -65,6 +65,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | remove_specific_chars_mapper                        | General               | en, zh    | 删除任何用户指定的字符或子字符串                                       |
 | remove_table_text_mapper                            | General, Financial    | en        | 检测并删除可能的表格内容（:warning: 依赖正则表达式匹配，因此很脆弱）                |
 | remove_words_with_incorrect_<br />substrings_mapper | General               | en, zh    | 删除包含指定子字符串的单词                                          |
+| replace_content_mapper                              | General            | en, zh | 使用一个指定的替换字符串替换文本中满足特定正则表达式模版的所有内容             |
 | sentence_split_mapper                               | General               | en        | 根据语义拆分和重组句子                                            |
 | whitespace_normalization_mapper                     | General               | en, zh    | 将各种 Unicode 空白标准化为常规 ASCII 空格 (U+0020)                 |
 

@@ -8,4 +8,5 @@ from . import (chinese_convert_mapper, clean_copyright_mapper,
                remove_repeat_sentences_mapper, remove_specific_chars_mapper,
                remove_table_text_mapper,
                remove_words_with_incorrect_substrings_mapper,
-               sentence_split_mapper, whitespace_normalization_mapper)
+               replace_content_mapper, sentence_split_mapper,
+               whitespace_normalization_mapper)
