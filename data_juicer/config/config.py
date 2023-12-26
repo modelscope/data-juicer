@@ -57,6 +57,10 @@ def init_configs(args=None):
                         type=str,
                         default='hello_world',
                         help='Name of your data process project.')
+    parser.add_argument('--conf_path',
+                        type=str,
+                        default=None,
+                        help='Path of your oss.conf')
     parser.add_argument(
         '--executor_type',
         type=str,

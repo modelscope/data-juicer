@@ -4,7 +4,7 @@
 project_name: 'demo-process'
 dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
 np: 4  # number of subprocess to process your dataset
-
+conf_path: 'conf/aoss.conf'   #like this, your oss conf path
 export_path: './outputs/demo-process/demo-processed.jsonl'
 
 # process schedule

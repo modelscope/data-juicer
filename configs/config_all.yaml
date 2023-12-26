@@ -106,6 +106,8 @@ process:
   - average_line_length_filter:                             # filter text with the average length of lines out of specific range.
       min_len: 10                                             # the min length of filter range
       max_len: 10000                                          # the max length of filter range
+  - random_sample_filter:                                   # filter text with random sample
+      sample_percentage: 0.1                                  # the percentage of random sample
   - character_repetition_filter:                            # filter text with the character repetition ratio out of specific range
       rep_len: 10                                             # repetition length for char-level n-gram
       min_ratio: 0.0                                          # the min ratio of filter range

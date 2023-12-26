@@ -1,9 +1,11 @@
 import os
 from typing import List, Tuple, Union
-
+from aoss_client.client import Client
 from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 from loguru import logger
-
+import io
+import json
+from tqdm import tqdm
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (find_files_with_suffix,
                                           is_absolute_path)
@@ -119,6 +121,89 @@ class RemoteFormatter(BaseFormatter):
                           global_cfg=global_cfg)
         return ds
 
+class OssFormatter(BaseFormatter):
+    """The class is used to load a dataset from repository of oss."""
+
+    def __init__(self,
+                 dataset_path: str,
+                 text_keys: List[str] = None,
+                 conf_path: str = None,
+                 **kwargs):
+        """
+        Initialization method.
+
+        :param dataset_path: a dataset file or a dataset directory
+        :param text_keys: key names of field that stores sample
+            text.
+        :param kwargs: your oss conf path.
+        :param kwargs: extra args
+        """
+        self.path = dataset_path
+        self.text_keys = text_keys
+        self.kwargs = kwargs
+        self.conf_path = conf_path
+    
+    def data_generator(self, data_objects):
+        conf_path = self.conf_path  # 更新为你的 aoss.conf 实际路径
+        client = Client(conf_path)
+        # for data in client.list(folder_path):
+        #     data_directory_path_2 = os.path.join(folder_path,data)
+        #                 # folder_paths.append(data_directory_path_2)
+        #     folder_sub_path = data_directory_path_2.strip('/')
+        # for folder_path in folder_paths:   1111
+        for data_object in data_objects:
+            data = client.get(data_object).decode('utf-8')    
+            file = io.StringIO(data)
+            for line in file:
+                item = json.loads(line)   
+                yield item    
+                        
+
+    def load_dataset(self, num_proc: int = 1, global_cfg=None) -> Dataset:
+        """
+        Load a dataset from your oss , and unify its format. Maybe somewhere need your own modify.
+        This version can accept a directory like this:[
+            - folder1
+              - file1
+              - file2
+            - folder2
+              - file3
+              - file4
+            - file5
+        ]
+        :param num_proc: number of processes when loading the dataset
+        :param global_cfg: the global cfg used in consequent processes,
+        :return: formatted dataset
+        """
+        if self.path.startswith('s3://'):   
+            conf_path = self.conf_path  # 更新为你的 aoss.conf 实际路径
+            client = Client(conf_path)
+            url = self.path
+            if not client.isdir(url):
+                print("The path is not unuseful, please check your config")
+            else:
+                contents = client.list(url)
+                data_objects = []
+                folder_paths = []
+                for content in contents:
+                    if content.endswith('/'):
+                        folder_path = os.path.join(self.path,content)
+                        folder_path_contents = client.list(folder_path)
+                        for folder_path_content in folder_path_contents:
+                            data_object = os.path.join(folder_path,folder_path_content)
+                            data_objects.append(data_object)
+                        folder_paths.append(folder_path)
+                    
+                    else:
+                        data_object = os.path.join(self.path,content)
+                        data_objects.append(data_object)
+
+        ds = Dataset.from_generator(self.data_generator,gen_kwargs = {"data_objects": data_objects})
+        ds = unify_format(ds,
+                          text_keys=self.text_keys,
+                          num_proc=num_proc,
+                          global_cfg=global_cfg)
+        return ds
 
 def add_suffixes(datasets: DatasetDict, num_proc: int = 1) -> Dataset:
     """
@@ -262,6 +347,7 @@ def load_formatter(dataset_path,
                    text_keys=None,
                    suffixes=None,
                    add_suffix=False,
+                   conf_path = None,
                    **kwargs) -> BaseFormatter:
     """
     Load the appropriate formatter for different types of data formats.
@@ -302,6 +388,10 @@ def load_formatter(dataset_path,
                                              suffixes=target_suffixes,
                                              add_suffix=add_suffix,
                                              **kwargs)
+
+    # try oss datasets
+    elif dataset_path.startswith('s3://') or dataset_path.count('/') >= 2:
+        return OssFormatter(dataset_path, text_keys=text_keys, conf_path = conf_path, **kwargs)
 
     # try huggingface dataset hub
     elif not is_absolute_path(dataset_path) and dataset_path.count('/') <= 1:

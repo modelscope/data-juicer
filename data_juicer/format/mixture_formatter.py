@@ -19,6 +19,7 @@ class MixtureFormatter(BaseFormatter):
                  text_keys=None,
                  add_suffix=False,
                  max_samples=None,
+                 conf_path = str,
                  **kwargs):
         """
         Initialization method.
@@ -60,6 +61,7 @@ class MixtureFormatter(BaseFormatter):
                            suffixes=suffixes,
                            text_keys=text_keys,
                            add_suffix=add_suffix,
+                           conf_path = conf_path,
                            **kwargs) for data_prefix in data_prefixes
         ]
 
