@@ -368,9 +368,11 @@ def init_setup_from_cfg(cfg):
         else:
             cfg.dataset_dir = os.path.dirname(cfg.dataset_path)
     else:
-        logger.warning(f'dataset_path [{cfg.dataset_path}] not found in local.'
-                       'Please check and retry, otherwise we will treat it '
-                       'as a remote dataset.')
+        logger.warning(f'dataset_path [{cfg.dataset_path}] is not a valid '
+                       f'local path. Please check and retry, otherwise we '
+                       f'will treat it as a remote dataset or a mixture of '
+                       f'several datasets.')
+        cfg.dataset_dir = ''
 
     # check number of processes np
     sys_cpu_count = os.cpu_count()
