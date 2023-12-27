@@ -10,7 +10,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
-| [ Mapper ]( #mapper )             |   22   | Edits and transforms samples                    |
+| [ Mapper ]( #mapper )             |   23   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   25   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   4    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
@@ -63,6 +63,7 @@ All the specific operators are listed below, each featured with several capabili
 | remove_header_mapper                                | LaTeX              | en, zh | Removes the running headers of TeX documents, e.g., titles, chapter or section numbers/names                   |
 | remove_long_words_mapper                            | General            | en, zh | Removes words with length outside the specified range                                                          |
 | remove_non_chinese_character_mapper                 | General            | en, zh | Remove non Chinese character in text samples. |
+| remove_repeat_sentences_mapper                      | General            | en, zh | Remove repeat sentences in text samples. |
 | remove_specific_chars_mapper                        | General            | en, zh | Removes any user-specified characters or substrings                                                            |
 | remove_table_text_mapper                            | General, Financial | en     | Detects and removes possible table contents (:warning: relies on regular expression matching and thus fragile) |
 | remove_words_with_incorrect_<br />substrings_mapper | General            | en, zh | Removes words containing specified substrings                                                                  |
