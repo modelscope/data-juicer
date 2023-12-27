@@ -58,13 +58,14 @@ class OverallAnalysis:
             col = col.explode().infer_objects()
             return col
 
-    def analyse(self, percentiles=[], num_proc=1):
+    def analyse(self, percentiles=[], num_proc=1, skip_export=False):
         """
         Apply overall analysis on the whole dataset based on the describe
         method of pandas.
 
         :param percentiles: percentiles to analyse
         :param num_proc: number of processes to analyse the dataset
+        :param skip_export: whether export the results to disk
         :return: the overall analysis result.
         """
         # merge default and customized percentiles and get overall information
@@ -87,7 +88,8 @@ class OverallAnalysis:
         overall = pd.DataFrame(result_cols).T
 
         # export to result report file
-        overall.to_csv(os.path.join(self.output_path, 'overall.csv'))
-        overall.to_markdown(os.path.join(self.output_path, 'overall.md'))
+        if not skip_export:
+            overall.to_csv(os.path.join(self.output_path, 'overall.csv'))
+            overall.to_markdown(os.path.join(self.output_path, 'overall.md'))
 
         return overall

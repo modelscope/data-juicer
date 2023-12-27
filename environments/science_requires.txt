@@ -3,7 +3,7 @@ kenlm
 sentencepiece
 scipy
 ftfy
-simhash-py
+simhash-pybind
 selectolax
 nlpaug
 nlpcda

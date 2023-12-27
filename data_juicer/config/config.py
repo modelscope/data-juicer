@@ -13,6 +13,9 @@ from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.logger_utils import setup_logger
 from data_juicer.utils.mm_utils import SpecialTokens
 
+global_cfg = None
+global_parser = None
+
 
 def init_configs(args=None):
     """
@@ -36,6 +39,11 @@ def init_configs(args=None):
         '--hpo_config',
         type=str,
         help='Path to a configuration file when using auto-HPO tool.',
+        required=False)
+    parser.add_argument(
+        '--path_3sigma_recipe',
+        type=str,
+        help='Path to save a configuration file when using 3-sigma tool.',
         required=False)
 
     # basic global paras with extended type hints
@@ -157,7 +165,9 @@ def init_configs(args=None):
         'as the environment variable `HF_DATASETS_CACHE`, whose default '
         'value is usually "~/.cache/huggingface/datasets". If this '
         'argument is set to a valid path by users, it will override the '
-        'default cache dir.')
+        'default cache dir. Modifying this arg might also affect the other two'
+        ' paths to store downloaded and extracted datasets that depend on '
+        '`HF_DATASETS_CACHE`')
     parser.add_argument(
         '--cache_compress',
         type=str,
@@ -294,9 +304,35 @@ def init_configs(args=None):
         # show the final config tables before the process started
         display_config(cfg)
 
+        global global_cfg, global_parser
+        global_cfg = cfg
+        global_parser = parser
+
         return cfg
     except ArgumentError:
         logger.error('Config initialization failed')
+
+
+def update_ds_cache_dir_and_related_vars(new_ds_cache_path):
+    from pathlib import Path
+
+    from datasets import config
+
+    # update the HF_DATASETS_CACHE
+    config.HF_DATASETS_CACHE = Path(new_ds_cache_path)
+    # and two more PATHS that depend on HF_DATASETS_CACHE
+    # - path to store downloaded datasets (e.g. remote datasets)
+    config.DEFAULT_DOWNLOADED_DATASETS_PATH = os.path.join(
+        config.HF_DATASETS_CACHE, config.DOWNLOADED_DATASETS_DIR
+    )
+    config.DOWNLOADED_DATASETS_PATH = Path(
+        config.DEFAULT_DOWNLOADED_DATASETS_PATH)
+    # - path to store extracted datasets (e.g. xxx.jsonl.zst)
+    config.DEFAULT_EXTRACTED_DATASETS_PATH = os.path.join(
+        config.DEFAULT_DOWNLOADED_DATASETS_PATH, config.EXTRACTED_DATASETS_DIR
+    )
+    config.EXTRACTED_DATASETS_PATH = Path(
+        config.DEFAULT_EXTRACTED_DATASETS_PATH)
 
 
 def init_setup_from_cfg(cfg):
@@ -312,14 +348,14 @@ def init_setup_from_cfg(cfg):
     """
 
     cfg.export_path = os.path.abspath(cfg.export_path)
-    export_path = cfg.export_path
-    cfg.work_dir = os.path.dirname(export_path)
+    cfg.work_dir = os.path.dirname(cfg.export_path)
+    export_rel_path = os.path.relpath(cfg.export_path, start=cfg.work_dir)
     log_dir = os.path.join(cfg.work_dir, 'log')
     if not os.path.exists(log_dir):
         os.makedirs(log_dir, exist_ok=True)
     timestamp = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
     cfg.timestamp = timestamp
-    logfile_name = timestamp + '.txt'
+    logfile_name = f'export_{export_rel_path}_time_{timestamp}.txt'
     setup_logger(save_dir=log_dir,
                  filename=logfile_name,
                  redirect=cfg.executor_type == 'default')
@@ -332,9 +368,22 @@ def init_setup_from_cfg(cfg):
         else:
             cfg.dataset_dir = os.path.dirname(cfg.dataset_path)
     else:
-        logger.warning(f'dataset_path [{cfg.dataset_path}] not found in local.'
-                       'Please check and retry, otherwise we will treat it '
-                       'as a remote dataset.')
+        logger.warning(f'dataset_path [{cfg.dataset_path}] is not a valid '
+                       f'local path. Please check and retry, otherwise we '
+                       f'will treat it as a remote dataset or a mixture of '
+                       f'several datasets.')
+        cfg.dataset_dir = ''
+
+    # check number of processes np
+    sys_cpu_count = os.cpu_count()
+    if cfg.np > sys_cpu_count:
+        logger.warning(f'Number of processes `np` is set as [{cfg.np}], which '
+                       f'is larger than the cpu count [{sys_cpu_count}]. Due '
+                       f'to the data processing of Data-Juicer is a '
+                       f'computation-intensive task, we recommend to set it to'
+                       f' a value <= cpu count. Set it to [{sys_cpu_count}] '
+                       f'here.')
+        cfg.np = sys_cpu_count
 
     # whether or not to use cache management
     # disabling the cache or using checkpoint explicitly will turn off the
@@ -369,9 +418,9 @@ def init_setup_from_cfg(cfg):
                        f'using the ds_cache_dir argument, which is '
                        f'{config.HF_DATASETS_CACHE} before based on the env '
                        f'variable HF_DATASETS_CACHE.')
-        config.HF_DATASETS_CACHE = cfg.ds_cache_dir
+        update_ds_cache_dir_and_related_vars(cfg.ds_cache_dir)
     else:
-        cfg.ds_cache_dir = config.HF_DATASETS_CACHE
+        cfg.ds_cache_dir = str(config.HF_DATASETS_CACHE)
 
     # if there is suffix_filter op, turn on the add_suffix flag
     cfg.add_suffix = False
@@ -476,6 +525,36 @@ def display_config(cfg):
 
     logger.info('Configuration table: ')
     print(table)
+
+
+def export_config(cfg, path, format='yaml', skip_none=True, skip_check=True,
+                  overwrite=False, multifile=True):
+    """
+        save the config object, some params are from jsonargparse
+    :param cfg: cfg object to save (Namespace type)
+    :param path: the save path
+    :param format: 'yaml', 'json', 'json_indented', 'parser_mode'
+    :param skip_none: Whether to exclude entries whose value is None.
+    :param skip_check: Whether to skip parser checking.
+    :param overwrite: Whether to overwrite existing files.
+    :param multifile: Whether to save multiple config files
+        by using the __path__ metas.
+
+    :return:
+    """
+    # remove ops outside the process list for better displaying
+    cfg_to_export = cfg.clone()
+    for op in OPERATORS.modules.keys():
+        _ = cfg_to_export.pop(op)
+
+    global global_parser
+    if not global_parser:
+        init_configs()  # enable the customized type parser
+    global_parser.save(
+        cfg=cfg_to_export, path=path, format=format, skip_none=skip_none,
+        skip_check=skip_check, overwrite=overwrite, multifile=multifile)
+
+    logger.info(f'Saved the configuration in {path}')
 
 
 def merge_config(ori_cfg, new_cfg: Dict):
