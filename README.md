@@ -330,7 +330,9 @@ We are in a rapidly developing field and greatly welcome contributions of new
 features, bug fixes and better documentations. Please refer to 
 [How-to Guide for Developers](docs/DeveloperGuide.md).
 
-Welcome to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw), or [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) for discussion.
+Welcome to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw), [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11), or WeChat group (scan the QR code below with WeChat) for discussion.
+
+ <img src="https://img.alicdn.com/imgextra/i3/O1CN01Iz2y4x25BYeUl7GP5_!!6000000007488-2-tps-322-320.png" width = "100" height = "100" alt="QR Code for WeChat group" align=center />
 
 ## Acknowledgement
 Data-Juicer is used across various LLM products and research initiatives,
