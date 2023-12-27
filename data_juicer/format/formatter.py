@@ -222,6 +222,9 @@ def unify_format(
             # no image path list in dataset, no need to convert
             return dataset
 
+        if ds_dir == '':
+            return dataset
+
         logger.info('Converting relative paths in the dataset to their '
                     'absolute version. (Based on the directory of input '
                     'dataset file)')
