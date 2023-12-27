@@ -311,7 +311,7 @@ Data-Juicer 在 Apache License 2.0 协议下发布。
 
 欢迎加入我们的[Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8275bc8g7ypp) ，[DingDing群](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8275bc8g7ypp&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) ，或微信群（扫描下方二维码加入）。
 
- <img src="https://img.alicdn.com/imgextra/i3/O1CN01Iz2y4x25BYeUl7GP5_!!6000000007488-2-tps-322-320.png" width = "100" height = "100" alt="QR Code for WeChat group" align=center />
+ <img src="https://img.alicdn.com/imgextra/i3/O1CN01QbwHJa1EV5uZwmU9c_!!6000000000356-2-tps-400-400.png" width = "100" height = "100" alt="QR Code for WeChat group" align=center />
 
 
 ## 致谢
