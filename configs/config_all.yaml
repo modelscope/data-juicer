@@ -89,6 +89,10 @@ process:
       keep_alphabet: true                                     # whether to keep alpabet
       keep_number: true                                       # whether to keep number
       keep_punc: true                                         # whether to keep punctuation
+  - remove_repeat_sentences_mapper:                         # remove repeat sentences in text samples.
+      lowercase: false                                        # whether to convert sample text to lower case
+      ignore_special_character: true                          # whether to ignore special characters when judging repeated sentences. Special characters are all characters except Chinese characters, letters and numbers
+      min_repeat_sentence_length: 2                           # sentences shorter than this length will not be deduplicated. If ignore_special_character is set to True, then special characters are not included in this length
   - remove_specific_chars_mapper:                           # remove characters specified by users
       chars_to_remove: '◆●■►▼▲▴∆▻▷❖♡□'                        # a string or a list including those characters that need to be removed
   - remove_table_text_mapper:                               # remove possible table texts from text.
