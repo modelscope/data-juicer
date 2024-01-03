@@ -34,7 +34,6 @@ class FixUnicodeMapper(Mapper):
                              '["NFC", "NFKC", "NFD", "NFKD"]')
 
     def process(self, sample):
-        sample[self.text_key] = ftfy.fix_text(
-                                    sample[self.text_key],
-                                    normalization=self.normalization)
+        sample[self.text_key] = ftfy.fix_text(sample[self.text_key],
+                                              normalization=self.normalization)
         return sample
