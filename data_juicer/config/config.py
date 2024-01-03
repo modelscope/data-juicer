@@ -272,14 +272,12 @@ def update_ds_cache_dir_and_related_vars(new_ds_cache_path):
     # and two more PATHS that depend on HF_DATASETS_CACHE
     # - path to store downloaded datasets (e.g. remote datasets)
     config.DEFAULT_DOWNLOADED_DATASETS_PATH = os.path.join(
-        config.HF_DATASETS_CACHE, config.DOWNLOADED_DATASETS_DIR
-    )
+        config.HF_DATASETS_CACHE, config.DOWNLOADED_DATASETS_DIR)
     config.DOWNLOADED_DATASETS_PATH = Path(
         config.DEFAULT_DOWNLOADED_DATASETS_PATH)
     # - path to store extracted datasets (e.g. xxx.jsonl.zst)
     config.DEFAULT_EXTRACTED_DATASETS_PATH = os.path.join(
-        config.DEFAULT_DOWNLOADED_DATASETS_PATH, config.EXTRACTED_DATASETS_DIR
-    )
+        config.DEFAULT_DOWNLOADED_DATASETS_PATH, config.EXTRACTED_DATASETS_DIR)
     config.EXTRACTED_DATASETS_PATH = Path(
         config.DEFAULT_EXTRACTED_DATASETS_PATH)
 
@@ -529,8 +527,13 @@ def display_config(cfg):
     print(table)
 
 
-def export_config(cfg, path, format='yaml', skip_none=True, skip_check=True,
-                  overwrite=False, multifile=True):
+def export_config(cfg,
+                  path,
+                  format='yaml',
+                  skip_none=True,
+                  skip_check=True,
+                  overwrite=False,
+                  multifile=True):
     """
         save the config object, some params are from jsonargparse
     :param cfg: cfg object to save (Namespace type)
@@ -552,9 +555,13 @@ def export_config(cfg, path, format='yaml', skip_none=True, skip_check=True,
     global global_parser
     if not global_parser:
         init_configs()  # enable the customized type parser
-    global_parser.save(
-        cfg=cfg_to_export, path=path, format=format, skip_none=skip_none,
-        skip_check=skip_check, overwrite=overwrite, multifile=multifile)
+    global_parser.save(cfg=cfg_to_export,
+                       path=path,
+                       format=format,
+                       skip_none=skip_none,
+                       skip_check=skip_check,
+                       overwrite=overwrite,
+                       multifile=multifile)
 
     logger.info(f'Saved the configuration in {path}')
 

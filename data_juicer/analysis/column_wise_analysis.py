@@ -54,12 +54,13 @@ def get_row_col(total_num, factor=2):
 class ColumnWiseAnalysis:
     """Apply analysis on each column of stats respectively."""
 
-    def __init__(self,
-                 dataset,
-                 output_path,
-                 overall_result=None,
-                 save_stats_in_one_file=True,
-                 ):
+    def __init__(
+        self,
+        dataset,
+        output_path,
+        overall_result=None,
+        save_stats_in_one_file=True,
+    ):
         """
         Initialization method
         :param dataset: the dataset to be analysed
@@ -168,8 +169,9 @@ class ColumnWiseAnalysis:
 
                 if not skip_export:
                     self.draw_hist(
-                        axes, data, os.path.join(
-                            self.output_path, f'{column_name}-hist.png'))
+                        axes, data,
+                        os.path.join(self.output_path,
+                                     f'{column_name}-hist.png'))
 
             # add a title to the figure of this stat
             if self.save_stats_in_one_file:
