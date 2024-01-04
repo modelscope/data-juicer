@@ -1,3 +1,4 @@
+# yapf: disable
 from . import (alphanumeric_filter, average_line_length_filter,
                character_repetition_filter, face_area_filter,
                flagged_words_filter, image_aspect_ratio_filter,
@@ -10,3 +11,5 @@ from . import (alphanumeric_filter, average_line_length_filter,
                text_action_filter, text_entity_dependency_filter,
                text_length_filter, token_num_filter, word_num_filter,
                word_repetition_filter)
+
+# yapf: enable
