@@ -5,7 +5,7 @@
 ## 数据集格式转换
 
 由于不同多模态数据集和工作之间的数据集格式差异较大， Data-Juicer 提出了一种新颖的、中间的、
-基于文本的、交替的多模态数据格式，其是基于一些按块（chunk）组织的格式，如MMC4数据集格式。
+基于文本的、交替的多模态数据格式，主要基于一些按块（chunk）组织的格式，如MMC4数据集格式。
 
 在 Data-Juicer 的格式中，一个多模态样本或者文档基于一段文本组织，其由若干个文本块组成。
 每个文本块是一个语义单元，单个文本块中包括的所有多模态信息都应该在谈论同样的事情，并且它们彼此语义上是对齐的。
@@ -62,11 +62,11 @@
 
 目前，Data-Juicer 支持的数据集格式在下面表格中列出。
 
-| 格式       | source_format_to_data_juicer_format | data_juicer_format_to_target_format | 格式参考                                                                                               |
-|----------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
-| 类LLaVA格式 | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
-| 类MMC4格式  | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [格式描述](https://github.com/allenai/mmc4#documents) |
-| 类WavCaps格式  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | [格式描述](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
+| 格式       | 类型    | source_format_to_data_juicer_format | data_juicer_format_to_target_format | 格式参考                                                                                               |
+|----------|-------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
+| 类LLaVA格式 | 图像-文本 | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| 类MMC4格式  | 图像-文本 | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [格式描述](https://github.com/allenai/mmc4#documents) |
+| 类WavCaps格式  | 音频-文本 | `wavcaps_to_dj.py` | `dj_to_wavcaps.py`                  | [格式描述](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
 
 对于所有工具，您可以运行以下命令来了解它们的详细用法：
 

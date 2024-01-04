@@ -69,11 +69,11 @@ These tools consist of two types:
 
 For now, dataset formats that are supported by Data-Juicer are listed in the following table.
 
-| Format     | source_format_to_data_juicer_format | data_juicer_format_to_target_format | Ref.                                                                                                             |
-|------------|-------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| LLaVA-like | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
-| MMC4-like  | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [Format Description](https://github.com/allenai/mmc4#documents)                                                  |
-| WavCaps-like  | `wavcaps_to_dj.py`                    | `dj_to_wavcaps.py`                    | [Format Description](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
+| Format     | Type       | source_format_to_data_juicer_format | data_juicer_format_to_target_format | Ref.                                                                                                             |
+|------------|------------|-------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| LLaVA-like | image-text | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| MMC4-like  | image-text | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [Format Description](https://github.com/allenai/mmc4#documents)                                                  |
+| WavCaps-like  | audio-text | `wavcaps_to_dj.py` | `dj_to_wavcaps.py`                  | [Format Description](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
 
 For all tools, you can run the following command to find out the usage of them:
 
