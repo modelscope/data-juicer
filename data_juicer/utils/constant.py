@@ -63,8 +63,8 @@ class StatsKeysMeta(type):
                         # Create a stream reader for the file and decode the
                         # first line
                         with dctx.stream_reader(compressed_file) as reader:
-                            text_stream = io.TextIOWrapper(
-                                reader, encoding='utf-8')
+                            text_stream = io.TextIOWrapper(reader,
+                                                           encoding='utf-8')
                             first_line = text_stream.readline()
                 elif 'jsonl' in dj_cfg.dataset_path:
                     tmp_f_name = dj_cfg.dataset_path. \

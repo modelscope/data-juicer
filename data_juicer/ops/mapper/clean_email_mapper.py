@@ -23,7 +23,7 @@ class CleanEmailMapper(Mapper):
             self.pattern = pattern
             if ((len(pattern) > 2) and
                 (pattern.startswith("r'") and pattern.endswith("'")
-                    or pattern.startswith('r"') and pattern.endswith('"'))):
+                 or pattern.startswith('r"') and pattern.endswith('"'))):
                 self.pattern = pattern[2:-1]
 
         self.repl = repl

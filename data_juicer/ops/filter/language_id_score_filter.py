@@ -1,3 +1,5 @@
+from typing import List, Tuple, Union
+
 from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
@@ -19,23 +21,31 @@ class LanguageIDScoreFilter(Filter):
     larger than a specific min value."""
 
     def __init__(self,
-                 lang: str = '',
+                 lang: Union[str, List[str], Tuple[str]] = '',
                  min_score: ClosedUnitInterval = 0.8,
                  *args,
                  **kwargs):
         """
         Initialization method.
 
-        :param lang: Samples in which language to keep.
+        :param lang: Samples in which languages to keep.
         :param min_score: The min language identification confidence
             scores of samples to keep.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.lang = lang
+        if not lang:
+            # lang is [], '' or None
+            self.lang = None
+        elif isinstance(lang, str):
+            # lang is a single language string
+            self.lang = [lang]
+        else:
+            # lang is a list of multiple languages
+            self.lang = lang
         self.min_score = min_score
-        self.model_key = prepare_model(lang=lang, model_type='fasttext')
+        self.model_key = prepare_model(model_type='fasttext')
 
     def compute_stats(self, sample):
         # check if it's computed already
@@ -44,9 +54,7 @@ class LanguageIDScoreFilter(Filter):
             return sample
 
         text = sample[self.text_key].lower().replace('\n', ' ')
-        ft_model = get_model(self.model_key,
-                             lang=self.lang,
-                             model_type='fasttext')
+        ft_model = get_model(self.model_key, model_type='fasttext')
         if ft_model is None:
             err_msg = 'Model not loaded. Please retry later.'
             logger.error(err_msg)
@@ -62,7 +70,7 @@ class LanguageIDScoreFilter(Filter):
 
     def process(self, sample):
         if self.lang:
-            return sample[Fields.stats][StatsKeys.lang] == self.lang \
+            return sample[Fields.stats][StatsKeys.lang] in self.lang \
                    and sample[Fields.stats][StatsKeys.lang_score] >= \
                    self.min_score
         else:
