@@ -5,34 +5,34 @@
 # global parameters
 project_name: 'all'                                         # project name for distinguish your configs
 dataset_path: '/path/to/your/dataset'                       # path to your dataset directory or file with weights(0.0-1.0), 1.0 as default.
-                                                            # Accepted format: 'weight1(optional) dataset1-path weight2(optional) dataset2-path'
+                                                            # accepted format: 'weight1(optional) dataset1-path weight2(optional) dataset2-path'
 export_path: '/path/to/result/dataset.jsonl'                # path to processed result dataset. Supported suffixes include ['jsonl', 'json', 'parquet']
-export_shard_size: 0                                        # Shard size of exported dataset in Byte. In default, it's 0, which means export the whole dataset into only one file. If it's set a positive number, the exported dataset will be split into several dataset shards, and the max size of each shard won't larger than the export_shard_size
-export_in_parallel: false                                   # Whether to export the result dataset in parallel to a single file, which usually takes less time. It only works when export_shard_size is 0, and its default number of processes is the same as the argument np. **Notice**: If it's True, sometimes exporting in parallel might require much more time due to the IO blocking, especially for very large datasets. When this happens, False is a better choice, although it takes more time.
+export_shard_size: 0                                        # shard size of exported dataset in Byte. In default, it's 0, which means export the whole dataset into only one file. If it's set a positive number, the exported dataset will be split into several dataset shards, and the max size of each shard won't larger than the export_shard_size
+export_in_parallel: false                                   # whether to export the result dataset in parallel to a single file, which usually takes less time. It only works when export_shard_size is 0, and its default number of processes is the same as the argument np. **Notice**: If it's True, sometimes exporting in parallel might require much more time due to the IO blocking, especially for very large datasets. When this happens, False is a better choice, although it takes more time.
 np: 4                                                       # number of subprocess to process your dataset
 text_keys: 'content'                                        # the key name of field where the sample texts to be processed, e.g., `text`, `instruction`, `output`, ...
                                                             # Note: currently, we support specify only ONE key for each op, for cases requiring multiple keys, users can specify the op multiple times. We will only use the first key of `text_keys` when you set multiple keys.
 suffixes: []                                                # the suffix of files that will be read. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
 use_cache: true                                             # whether to use the cache management of Hugging Face datasets. It might take up lots of disk space when using cache
-ds_cache_dir: null                                          # cache dir for Hugging Face datasets. In default it\'s the same as the environment variable `HF_DATASETS_CACHE`, whose default value is usually "~/.cache/huggingface/datasets". If this argument is set to a valid path by users, it will override the default cache dir
+ds_cache_dir: null                                          # cache dir for Hugging Face datasets. In default, it\'s the same as the environment variable `HF_DATASETS_CACHE`, whose default value is usually "~/.cache/huggingface/datasets". If this argument is set to a valid path by users, it will override the default cache dir
 use_checkpoint: false                                       # whether to use the checkpoint management to save the latest version of dataset to work dir when processing. Rerun the same config will reload the checkpoint and skip ops before it. Cache will be disabled when using checkpoint. If args of ops before the checkpoint are changed, all ops will be rerun from the beginning.
 temp_dir: null                                              # the path to the temp directory to store intermediate caches when cache is disabled, these cache files will be removed on-the-fly. In default, it's None, so the temp dir will be specified by system. NOTICE: you should be caution when setting this argument because it might cause unexpected program behaviors when this path is set to an unsafe directory.
 open_tracer: false                                          # whether to open the tracer to trace the changes during process. It might take more time when opening tracer
 op_list_to_trace: []                                        # only ops in this list will be traced by tracer. If it's empty, all ops will be traced. Only available when tracer is opened.
 trace_num: 10                                               # number of samples to show the differences between datasets before and after each op. Only available when tracer is opened.
 op_fusion: false                                            # whether to fuse operators that share the same intermediate variables automatically. Op fusion might reduce the memory requirements slightly but speed up the whole process.
-cache_compress: null                                        # The compression method of the cache file, which can be specified in ['gzip', 'zstd', 'lz4']. If this parameter is None, the cache file will not be compressed. We recommend you turn on this argument when your input dataset is larger than tens of GB and your disk space is not enough.
+cache_compress: null                                        # the compression method of the cache file, which can be specified in ['gzip', 'zstd', 'lz4']. If this parameter is None, the cache file will not be compressed. We recommend you turn on this argument when your input dataset is larger than tens of GB and your disk space is not enough.
 
 # for multimodal data processing
-image_key: 'images'                                         # Key name of field to store the list of sample image paths.
-image_special_token: '<__dj__image>'                        # The special token that represents an image in the text. In default, it's "<__dj__image>". You can specify your own special token according to your input dataset.
-audio_key: 'audios'                                         # Key name of field to store the list of sample audio paths.
-audio_special_token: '<__dj__audio>'                        # The special token that represents an audio in the text. In default, it's "<__dj__audio>". You can specify your own special token according to your input dataset.
+image_key: 'images'                                         # key name of field to store the list of sample image paths.
+image_special_token: '<__dj__image>'                        # the special token that represents an image in the text. In default, it's "<__dj__image>". You can specify your own special token according to your input dataset.
+audio_key: 'audios'                                         # key name of field to store the list of sample audio paths.
+audio_special_token: '<__dj__audio>'                        # the special token that represents an audio in the text. In default, it's "<__dj__audio>". You can specify your own special token according to your input dataset.
 
-eoc_special_token: '<|__dj__eoc|>'                          # The special token that represents the end of a chunk in the text. In default, it's "<|__dj__eoc|>". You can specify your own special token according to your input dataset.
+eoc_special_token: '<|__dj__eoc|>'                          # the special token that represents the end of a chunk in the text. In default, it's "<|__dj__eoc|>". You can specify your own special token according to your input dataset.
 
 # for distributed processing
-executor_type: default                                      # Type of executor, support "default" or "ray" for now.
+executor_type: default                                      # type of executor, support "default" or "ray" for now.
 ray_address: auto                                           # The address of the Ray cluster.
 
 # only for data analysis
@@ -42,7 +42,7 @@ save_stats_in_one_file: false                               # whether to store a
 process:
   # Mapper ops. Most of these ops need no arguments.
   - chinese_convert_mapper:                                 # convert Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji.
-      mode: 's2t'                                             # Choose the mode to convert Chinese: ['s2t', 't2s', 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 'jp2t']
+      mode: 's2t'                                             # choose the mode to convert Chinese: ['s2t', 't2s', 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 'jp2t']
   - clean_email_mapper:                                     # remove emails from text.
   - clean_html_mapper:                                      # remove html formats form text.
   - clean_ip_mapper:                                        # remove ip addresses from text.
@@ -81,8 +81,8 @@ process:
   - remove_long_words_mapper:                               # remove much too long words from text.
       min_len: 1                                              # the min word length to keep words.
       max_len: 128                                            # the max word length to keep words.
-  - remove_non_chinese_character_mapper:                    # remove non Chinese character in text samples.
-      keep_alphabet: true                                     # whether to keep alpabet
+  - remove_non_chinese_character_mapper:                    # remove non-Chinese character in text samples.
+      keep_alphabet: true                                     # whether to keep alphabet
       keep_number: true                                       # whether to keep number
       keep_punc: true                                         # whether to keep punctuation
   - remove_repeat_sentences_mapper:                         # remove repeat sentences in text samples.
@@ -137,23 +137,23 @@ process:
       max_height: 5000                                        # the max height of height filter range
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - image_size_filter:                                      # filter samples according to the size of images (in bytes) within them
-      min_size:  "0"                                            # the min size of filter range
-      max_size: "1TB"                                          # the max size of filter range
-      any_or_all: any                                           # keep this sample when any/all images meet the filter condition
+      min_size:  "0"                                          # the min size of filter range
+      max_size: "1TB"                                         # the max size of filter range
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - image_text_matching_filter:                             # filter samples according to the matching score between image and text.
       hf_blip: Salesforce/blip-itm-base-coco                  # name of used Hugging Face blip
       min_score: 0.003                                        # the min matching score of filter range
       max_score: 1.0                                          # the max matching score of filter range
-      horizontal_flip: false                                  # Flip image horizontally (left to right).
-      vertical_flip: false                                    # Flip image vertically (top to bottom).
+      horizontal_flip: false                                  # flip image horizontally (left to right).
+      vertical_flip: false                                    # flip image vertically (top to bottom).
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - image_text_similarity_filter:                           # filter samples according to the similarity between image and text.
       hf_clip: openai/clip-vit-base-patch32                   # name of used Hugging Face clip
       min_score: 0.1                                          # the min similarity of filter range
       max_score: 1.0                                          # the max similarity of filter range
-      horizontal_flip: false                                  # Flip image horizontally (left to right).
-      vertical_flip: false                                    # Flip image vertically (top to bottom).
+      horizontal_flip: false                                  # flip image horizontally (left to right).
+      vertical_flip: false                                    # flip image vertically (top to bottom).
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
@@ -169,8 +169,8 @@ process:
       hf_clip: openai/clip-vit-base-patch32                   # name of used Hugging Face Owl-ViT
       min_recall: 0.1                                         # the min phrase grounding recall of filter range
       max_recall: 1.0                                         # the max phrase grounding recall of filter range
-      horizontal_flip: false                                  # Flip image horizontally (left to right).
-      vertical_flip: false                                    # Flip image vertically (top to bottom).
+      horizontal_flip: false                                  # flip image horizontally (left to right).
+      vertical_flip: false                                    # flip image vertically (top to bottom).
       iou_thr: 0.5                                            # the IoU threshold for NMS-like post-process
       large_area_ratio_thr: 0.95                              # the area ratio threshold for filtering out large predicted bboxes
       conf_thr: 0.0                                           # the confidence score threshold for removing low-confidence bboxes
@@ -190,10 +190,10 @@ process:
   - text_action_filter:                                     # filter text according the number of action verb
       lang: en                                                # consider the words in what language
       min_action_num: 1                                       # text will be filtered whose verbs less the min action number
-  - text_entity_dependency_filter:                          # filter text without non independent entity nouns
+  - text_entity_dependency_filter:                          # filter text without non-independent entity nouns
       lang: en                                                # consider the words in what language
-      min_dependency_num: 1                                   # the min number of adjacent edges of a non independent noun in dependency tree
-      any_or_all: any                                         # keep this sample when any/all entity nouns are non independent
+      min_dependency_num: 1                                   # the min number of adjacent edges of a non-independent noun in dependency tree
+      any_or_all: any                                         # keep this sample when any/all entity nouns are non-independent
   - text_length_filter:                                     # filter text with length out of specific range
       min_len: 10                                             # the min length of filter range
       max_len: 10000                                          # the max length of filter range
