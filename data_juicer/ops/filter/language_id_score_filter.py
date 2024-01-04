@@ -54,8 +54,7 @@ class LanguageIDScoreFilter(Filter):
             return sample
 
         text = sample[self.text_key].lower().replace('\n', ' ')
-        ft_model = get_model(self.model_key,
-                             model_type='fasttext')
+        ft_model = get_model(self.model_key, model_type='fasttext')
         if ft_model is None:
             err_msg = 'Model not loaded. Please retry later.'
             logger.error(err_msg)

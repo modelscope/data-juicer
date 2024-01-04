@@ -121,8 +121,8 @@ class Analyser:
 
         logger.info('Applying overall analysis on stats...')
         overall_analysis = OverallAnalysis(dataset, self.analysis_path)
-        self.overall_result = overall_analysis.analyse(
-            num_proc=self.cfg.np, skip_export=skip_export)
+        self.overall_result = overall_analysis.analyse(num_proc=self.cfg.np,
+                                                       skip_export=skip_export)
 
         logger.info(f'The overall analysis results are: {self.overall_result}')
 
