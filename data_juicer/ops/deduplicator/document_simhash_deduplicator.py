@@ -2,7 +2,7 @@
 # https://github.com/bigscience-workshop/data-preparation
 # --------------------------------------------------------
 
-from collections import Counter, defaultdict, deque
+from collections import defaultdict, deque
 from typing import Dict, Set
 
 import numpy as np
@@ -156,8 +156,8 @@ class DocumentSimhashDeduplicator(Deduplicator):
                 f'Unimplemented tokenization method [{self.tokenization}]')
 
         # compute simhash
-        sample[HashKeys.simhash] = np.uint64(
-            simhash.compute(map(simhash.unsigned_hash, tokens)))
+        sample[HashKeys.simhash] = str(
+            np.uint64(simhash.compute(map(simhash.unsigned_hash, tokens))))
         return sample
 
     def process(self, dataset, show_num=0):
@@ -176,7 +176,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
         # find matches
         logger.info(f'Start querying {len(dataset)} samples.')
         matches = simhash.find_all(
-            dataset[HashKeys.simhash],
+            np.uint64(dataset[HashKeys.simhash]),
             self.num_blocks,
             self.hamming_distance,
         )
@@ -184,17 +184,15 @@ class DocumentSimhashDeduplicator(Deduplicator):
 
         # compute hash diff distribution
         graph = defaultdict(dict)
-        dist = Counter()
         for x, y in matches:
+            x = str(x)
+            y = str(y)
             graph[x][y] = graph[y][x] = True
-            num_diff = num_differing_bits(x, y)
-            dist[num_diff] += 1
-        logger.info(f'Hash diff distribution: {dist}')
 
-        hash2ids: Dict[int, Set[str]] = defaultdict(set)
-        hashes: Set[int] = set(dataset[HashKeys.simhash])
-        hash2cluster: Dict[int, int] = {}
-        visited: Set[int] = set()
+        hash2ids: Dict[str, Set[str]] = defaultdict(set)
+        hashes: Set[str] = set(dataset[HashKeys.simhash])
+        hash2cluster: Dict[str, int] = {}
+        visited: Set[str] = set()
         cluster_id: int = 0
 
         for sid, hash_val in enumerate(dataset[HashKeys.simhash]):
