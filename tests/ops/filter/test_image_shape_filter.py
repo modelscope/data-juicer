@@ -1,9 +1,7 @@
 import os
 import unittest
-import numpy as np
-import PIL.Image
 
-from datasets import Dataset, Image
+from datasets import Dataset
 
 from data_juicer.ops.filter.image_shape_filter import ImageShapeFilter
 from data_juicer.utils.constant import Fields
