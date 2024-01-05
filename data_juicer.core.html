@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.core &mdash; data_juicer 0.1.2 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>data_juicer.core &mdash; data_juicer 0.1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b0099a1c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=14711e05"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -33,7 +35,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -56,6 +58,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.NestedDataset"><code class="docutils literal notranslate"><span class="pre">NestedDataset</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.NestedDatasetDict"><code class="docutils literal notranslate"><span class="pre">NestedDatasetDict</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.NestedQueryDict"><code class="docutils literal notranslate"><span class="pre">NestedQueryDict</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.add_same_content_to_new_column"><code class="docutils literal notranslate"><span class="pre">add_same_content_to_new_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.nested_obj_factory"><code class="docutils literal notranslate"><span class="pre">nested_obj_factory()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.nested_query"><code class="docutils literal notranslate"><span class="pre">nested_query()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.data.wrap_func_with_nested_access"><code class="docutils literal notranslate"><span class="pre">wrap_func_with_nested_access()</span></code></a></li>
@@ -69,10 +72,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.exporter.Exporter"><code class="docutils literal notranslate"><span class="pre">Exporter</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.core.ray_executor">data_juicer.core.ray_executor</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.ray_executor.RayExecutor"><code class="docutils literal notranslate"><span class="pre">RayExecutor</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#data-juicer-core-ray-executor">data_juicer.core.ray_executor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.core.tracer">data_juicer.core.tracer</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.core.tracer.Tracer"><code class="docutils literal notranslate"><span class="pre">Tracer</span></code></a></li>
 </ul>
@@ -139,11 +139,14 @@ dataset better.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.analyser.Analyser.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load_data_np</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/analyser.html#Analyser.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.analyser.Analyser.run" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load_data_np</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/analyser.html#Analyser.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.analyser.Analyser.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Running the dataset analysis pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>load_data_np</strong> – number of workers when loading the dataset.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>load_data_np</strong> – number of workers when loading the dataset.</p></li>
+<li><p><strong>skip_export</strong> – whether export the results into disk</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>analysed dataset.</p>
@@ -257,6 +260,16 @@ such that the processed samples can be accessed by nested manner.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.core.data.add_same_content_to_new_column">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.</span></span><span class="sig-name descname"><span class="pre">add_same_content_to_new_column</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_column_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#add_same_content_to_new_column"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.add_same_content_to_new_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>A helper function to speed up add_column function. Apply map on this
+function in parallel instead of using add_column.
+:param sample: a single sample to add this new column/field.
+:param new_column_name: the name of this new column/field.
+:param initial_value: the initial value of this new column/field.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.core.data.nested_obj_factory">
 <span class="sig-prename descclassname"><span class="pre">data_juicer.core.data.</span></span><span class="sig-name descname"><span class="pre">nested_obj_factory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#nested_obj_factory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.data.nested_obj_factory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use nested classes to wrap the input object.</p>
@@ -346,7 +359,7 @@ ops in the config file in order and generate a processed dataset.</p>
 <span id="data-juicer-core-exporter"></span><h2>data_juicer.core.exporter<a class="headerlink" href="#module-data_juicer.core.exporter" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.exporter.</span></span><span class="sig-name descname"><span class="pre">Exporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_in_parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.exporter.</span></span><span class="sig-name descname"><span class="pre">Exporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_in_parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>The Exporter class is used to export a dataset to files of specific
 format.</p>
@@ -372,7 +385,7 @@ format.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_in_parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_in_parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_stats_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_hashes_in_res_ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -383,6 +396,10 @@ dataset. In default, it’s 0, which means export the dataset
 to a single file.</p></li>
 <li><p><strong>num_proc</strong> – number of process to export the dataset.</p></li>
 <li><p><strong>export_ds</strong> – whether to export the dataset contents.</p></li>
+<li><p><strong>keep_stats_in_res_ds</strong> – whether to keep stats in the result
+dataset.</p></li>
+<li><p><strong>keep_hashes_in_res_ds</strong> – whether to keep hashes in the result
+dataset.</p></li>
 <li><p><strong>export_stats</strong> – whether to export the stats of dataset.</p></li>
 </ul>
 </dd>
@@ -404,9 +421,28 @@ to a single file.</p></li>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter.to_json">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter.to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Export method for json target files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – the dataset to export.</p></li>
+<li><p><strong>export_path</strong> – the path to store the exported dataset.</p></li>
+<li><p><strong>num_proc</strong> – the number of processes used to export the dataset.</p></li>
+<li><p><strong>kwargs</strong> – extra arguments.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.exporter.Exporter.to_jsonl">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_jsonl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/exporter.html#Exporter.to_jsonl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.exporter.Exporter.to_jsonl" title="Permalink to this definition">¶</a></dt>
-<dd><p>Export method for json/jsonl target files.</p>
+<dd><p>Export method for jsonl target files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -443,48 +479,8 @@ to a single file.</p></li>
 </dd></dl>
 
 </section>
-<section id="module-data_juicer.core.ray_executor">
-<span id="data-juicer-core-ray-executor"></span><h2>data_juicer.core.ray_executor<a class="headerlink" href="#module-data_juicer.core.ray_executor" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.ray_executor.RayExecutor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.ray_executor.</span></span><span class="sig-name descname"><span class="pre">RayExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_executor.html#RayExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.ray_executor.RayExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Executor based on Ray [Experimental].</p>
-<dl>
-<dt>Run Data-Juicer data processing in a distributed cluster.</dt><dd><ol class="arabic simple">
-<li><p>Only support Filter and Mapper operators for now.</p></li>
-</ol>
-<p>2. Only support loading <cite>.json</cite> files.
-2. Advanced functions such as checkpoint, tracer are not supported.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.ray_executor.RayExecutor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_executor.html#RayExecutor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.ray_executor.RayExecutor.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>cfg</strong> – optional config dict.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.ray_executor.RayExecutor.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load_data_np</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/ray_executor.html#RayExecutor.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.ray_executor.RayExecutor.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Running the dataset process pipeline.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>load_data_np</strong> – number of workers when loading the dataset.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>processed dataset.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+<section id="data-juicer-core-ray-executor">
+<h2>data_juicer.core.ray_executor<a class="headerlink" href="#data-juicer-core-ray-executor" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-data_juicer.core.tracer">
 <span id="data-juicer-core-tracer"></span><h2>data_juicer.core.tracer<a class="headerlink" href="#module-data_juicer.core.tracer" title="Permalink to this heading">¶</a></h2>

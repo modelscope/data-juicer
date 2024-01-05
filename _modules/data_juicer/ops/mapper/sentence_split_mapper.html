@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.mapper.sentence_split_mapper &mdash; data_juicer 0.1.2 documentation</title>
-      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <title>data_juicer.ops.mapper.sentence_split_mapper &mdash; data_juicer 0.1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=14711e05"></script>
         <script src="../../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -30,7 +32,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -69,13 +71,19 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.ops.mapper.sentence_split_mapper</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">prepare_model</span><span class="p">,</span> <span class="n">get_model</span>
+<span></span><span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
 
 <span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 <span class="kn">from</span> <span class="nn">..common</span> <span class="kn">import</span> <span class="n">get_sentences_from_document</span>
 
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;sentence_split_mapper&#39;</span>
 
-<div class="viewcode-block" id="SentenceSplitMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.sentence_split_mapper.SentenceSplitMapper">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s1">&#39;sentence_split_mapper&#39;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">AvailabilityChecking</span><span class="p">([</span><span class="s1">&#39;nltk&#39;</span><span class="p">],</span> <span class="n">OP_NAME</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">nltk</span>  <span class="c1"># noqa: F401</span>
+
+
+<div class="viewcode-block" id="SentenceSplitMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.sentence_split_mapper.SentenceSplitMapper">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">SentenceSplitMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to split text samples to sentences.&quot;&quot;&quot;</span>
 
@@ -93,7 +101,9 @@
 
 <div class="viewcode-block" id="SentenceSplitMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.sentence_split_mapper.SentenceSplitMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
 
-        <span class="n">nltk_model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;nltk&#39;</span><span class="p">)</span>
+        <span class="n">nltk_model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span>
+                               <span class="n">lang</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">,</span>
+                               <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;nltk&#39;</span><span class="p">)</span>
         <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_sentences_from_document</span><span class="p">(</span>
             <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">],</span>
             <span class="n">model_func</span><span class="o">=</span><span class="n">nltk_model</span><span class="o">.</span><span class="n">tokenize</span> <span class="k">if</span> <span class="n">nltk_model</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>

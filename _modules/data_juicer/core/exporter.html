@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.core.exporter &mdash; data_juicer 0.1.2 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>data_juicer.core.exporter &mdash; data_juicer 0.1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=14711e05"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -30,7 +32,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -74,7 +76,7 @@
 
 <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
 
-<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">HashKeys</span>
 
 
 <div class="viewcode-block" id="Exporter"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.exporter.Exporter">[docs]</a><span class="k">class</span> <span class="nc">Exporter</span><span class="p">:</span>
@@ -92,6 +94,8 @@
                  <span class="n">export_in_parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">num_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                  <span class="n">export_ds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">keep_stats_in_res_ds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">keep_hashes_in_res_ds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">export_stats</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
@@ -102,12 +106,18 @@
 <span class="sd">            to a single file.</span>
 <span class="sd">        :param num_proc: number of process to export the dataset.</span>
 <span class="sd">        :param export_ds: whether to export the dataset contents.</span>
+<span class="sd">        :param keep_stats_in_res_ds: whether to keep stats in the result</span>
+<span class="sd">            dataset.</span>
+<span class="sd">        :param keep_hashes_in_res_ds: whether to keep hashes in the result</span>
+<span class="sd">            dataset.</span>
 <span class="sd">        :param export_stats: whether to export the stats of dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">export_path</span> <span class="o">=</span> <span class="n">export_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">=</span> <span class="n">export_shard_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">export_in_parallel</span> <span class="o">=</span> <span class="n">export_in_parallel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">export_ds</span> <span class="o">=</span> <span class="n">export_ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_stats_in_res_ds</span> <span class="o">=</span> <span class="n">keep_stats_in_res_ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_hashes_in_res_ds</span> <span class="o">=</span> <span class="n">keep_hashes_in_res_ds</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">export_stats</span> <span class="o">=</span> <span class="n">export_stats</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_suffix</span><span class="p">(</span><span class="n">export_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="n">num_proc</span>
@@ -169,8 +179,31 @@
 <span class="sd">        :param export_stats: whether to export stats of dataset.</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">stats</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span> <span class="ow">and</span> <span class="n">export_stats</span><span class="p">:</span>
+            <span class="c1"># export stats of datasets into a single file.</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Exporting computed stats into a single file...&#39;</span><span class="p">)</span>
+            <span class="n">ds_stats</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span>
+            <span class="n">stats_file</span> <span class="o">=</span> <span class="n">export_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">,</span> <span class="s1">&#39;_stats.jsonl&#39;</span><span class="p">)</span>
+            <span class="n">Exporter</span><span class="o">.</span><span class="n">to_jsonl</span><span class="p">(</span>
+                <span class="n">ds_stats</span><span class="p">,</span>
+                <span class="n">stats_file</span><span class="p">,</span>
+                <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_in_parallel</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_ds</span><span class="p">:</span>
             <span class="c1"># fetch the corresponding export method according to the suffix</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_stats_in_res_ds</span><span class="p">:</span>
+                <span class="n">extra_fields</span> <span class="o">=</span> <span class="p">{</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">}</span>
+                <span class="n">feature_fields</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">removed_fields</span> <span class="o">=</span> <span class="n">extra_fields</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">feature_fields</span><span class="p">)</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span><span class="n">removed_fields</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_hashes_in_res_ds</span><span class="p">:</span>
+                <span class="n">extra_fields</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">HashKeys</span><span class="o">.</span><span class="n">hash</span><span class="p">,</span> <span class="n">HashKeys</span><span class="o">.</span><span class="n">minhash</span><span class="p">,</span> <span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">,</span>
+                    <span class="n">HashKeys</span><span class="o">.</span><span class="n">imagehash</span>
+                <span class="p">}</span>
+                <span class="n">feature_fields</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">removed_fields</span> <span class="o">=</span> <span class="n">extra_fields</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">feature_fields</span><span class="p">)</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span><span class="n">removed_fields</span><span class="p">)</span>
             <span class="n">export_method</span> <span class="o">=</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">_router</span><span class="p">()[</span><span class="n">suffix</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_shard_size</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># export the whole dataset into one single file.</span>
@@ -225,16 +258,6 @@
                 <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
                 <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">stats</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span> <span class="ow">and</span> <span class="n">export_stats</span><span class="p">:</span>
-            <span class="c1"># export stats of datasets into a single file.</span>
-            <span class="n">ds_stats</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">)</span>
-            <span class="n">stats_file</span> <span class="o">=</span> <span class="n">export_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">,</span> <span class="s1">&#39;_stats.jsonl&#39;</span><span class="p">)</span>
-            <span class="n">Exporter</span><span class="o">.</span><span class="n">to_jsonl</span><span class="p">(</span>
-                <span class="n">ds_stats</span><span class="p">,</span>
-                <span class="n">stats_file</span><span class="p">,</span>
-                <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_in_parallel</span> <span class="k">else</span> <span class="mi">1</span>
-            <span class="p">)</span>
-
 <div class="viewcode-block" id="Exporter.export"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.exporter.Exporter.export">[docs]</a>    <span class="k">def</span> <span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Export method for a dataset.</span>
@@ -248,7 +271,7 @@
 <div class="viewcode-block" id="Exporter.to_jsonl"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.exporter.Exporter.to_jsonl">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">to_jsonl</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Export method for json/jsonl target files.</span>
+<span class="sd">        Export method for jsonl target files.</span>
 
 <span class="sd">        :param dataset: the dataset to export.</span>
 <span class="sd">        :param export_path: the path to store the exported dataset.</span>
@@ -257,6 +280,22 @@
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">dataset</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">export_path</span><span class="p">,</span> <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Exporter.to_json"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.exporter.Exporter.to_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export method for json target files.</span>
+
+<span class="sd">        :param dataset: the dataset to export.</span>
+<span class="sd">        :param export_path: the path to store the exported dataset.</span>
+<span class="sd">        :param num_proc: the number of processes used to export the dataset.</span>
+<span class="sd">        :param kwargs: extra arguments.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">export_path</span><span class="p">,</span>
+                        <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
+                        <span class="n">lines</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Exporter.to_parquet"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.exporter.Exporter.to_parquet">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">to_parquet</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -280,7 +319,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s1">&#39;jsonl&#39;</span><span class="p">:</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">to_jsonl</span><span class="p">,</span>
-            <span class="s1">&#39;json&#39;</span><span class="p">:</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">to_jsonl</span><span class="p">,</span>
+            <span class="s1">&#39;json&#39;</span><span class="p">:</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">to_json</span><span class="p">,</span>
             <span class="s1">&#39;parquet&#39;</span><span class="p">:</span> <span class="n">Exporter</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">,</span>
         <span class="p">}</span></div>
 </pre></div>

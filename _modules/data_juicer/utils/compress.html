@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.utils.compress &mdash; data_juicer 0.1.2 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>data_juicer.utils.compress &mdash; data_juicer 0.1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=14711e05"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -30,7 +32,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -73,9 +75,9 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
 
 <span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">datasets.utils.extract</span> <span class="kn">import</span> <span class="n">Extractor</span> <span class="k">as</span> <span class="n">HF_Extractor</span>
@@ -306,7 +308,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">compressor_extension</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">compressor_format</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compress_manager</span> <span class="o">=</span> <span class="n">CompressManager</span><span class="p">(</span>
             <span class="n">compressor_format</span><span class="o">=</span><span class="n">compressor_format</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;_\d</span><span class="si">{5}</span><span class="s1">_of_&#39;</span><span class="p">)</span>  <span class="c1"># noqa W605</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;_\d</span><span class="si">{5}</span><span class="s1">_of_&#39;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_raw_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -414,7 +416,10 @@
                         <span class="sa">f</span><span class="s1">&#39;Compressing cache file to </span><span class="si">{</span><span class="n">formatted_cache_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">num_proc</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compress_manager</span><span class="o">.</span><span class="n">compress</span><span class="p">,</span>
-                                     <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">full_name</span><span class="p">,</span> <span class="n">compress_filename</span><span class="p">,))</span>
+                                     <span class="n">args</span><span class="o">=</span><span class="p">(</span>
+                                         <span class="n">full_name</span><span class="p">,</span>
+                                         <span class="n">compress_filename</span><span class="p">,</span>
+                                     <span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">compress_manager</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">full_name</span><span class="p">,</span>
                                                    <span class="n">compress_filename</span><span class="p">)</span>
@@ -470,7 +475,10 @@
                     <span class="n">files_printed</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">formatted_cache_name</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">num_proc</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compress_manager</span><span class="o">.</span><span class="n">decompress</span><span class="p">,</span>
-                                     <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">full_name</span><span class="p">,</span> <span class="n">raw_filename</span><span class="p">,))</span>
+                                     <span class="n">args</span><span class="o">=</span><span class="p">(</span>
+                                         <span class="n">full_name</span><span class="p">,</span>
+                                         <span class="n">raw_filename</span><span class="p">,</span>
+                                     <span class="p">))</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">compress_manager</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">full_name</span><span class="p">,</span> <span class="n">raw_filename</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -518,8 +526,10 @@
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">full_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">f_names</span><span class="p">)</span></div></div>
 
+
 <div class="viewcode-block" id="CompressionOff"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.compress.CompressionOff">[docs]</a><span class="k">class</span> <span class="nc">CompressionOff</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a range that turn off the cache compression temporarily.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Record the original cache compression method and turn it off.</span>
@@ -534,6 +544,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">cache_utils</span>
         <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">original_cache_compress</span></div>
+
 
 <div class="viewcode-block" id="compress"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.compress.compress">[docs]</a><span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="n">prev_ds</span><span class="p">,</span> <span class="n">this_ds</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span><span class="p">:</span>

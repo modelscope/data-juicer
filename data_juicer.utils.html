@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.utils &mdash; data_juicer 0.1.2 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>data_juicer.utils &mdash; data_juicer 0.1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b0099a1c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=14711e05"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -32,7 +34,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -81,6 +83,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.constant.HashKeys"><code class="docutils literal notranslate"><span class="pre">HashKeys</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.constant.InterVars"><code class="docutils literal notranslate"><span class="pre">InterVars</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.constant.StatsKeys"><code class="docutils literal notranslate"><span class="pre">StatsKeys</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.constant.StatsKeysConstant"><code class="docutils literal notranslate"><span class="pre">StatsKeysConstant</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.constant.StatsKeysMeta"><code class="docutils literal notranslate"><span class="pre">StatsKeysMeta</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.file_utils">data_juicer.utils.file_utils</a><ul>
@@ -108,6 +112,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.get_model"><code class="docutils literal notranslate"><span class="pre">get_model()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_diversity_model"><code class="docutils literal notranslate"><span class="pre">prepare_diversity_model()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_fasttext_model"><code class="docutils literal notranslate"><span class="pre">prepare_fasttext_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_huggingface_blip"><code class="docutils literal notranslate"><span class="pre">prepare_huggingface_blip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_huggingface_clip"><code class="docutils literal notranslate"><span class="pre">prepare_huggingface_clip()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_huggingface_owlvit"><code class="docutils literal notranslate"><span class="pre">prepare_huggingface_owlvit()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_huggingface_tokenizer"><code class="docutils literal notranslate"><span class="pre">prepare_huggingface_tokenizer()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_kenlm_model"><code class="docutils literal notranslate"><span class="pre">prepare_kenlm_model()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_model"><code class="docutils literal notranslate"><span class="pre">prepare_model()</span></code></a></li>
@@ -559,6 +566,11 @@ remove lock file automatically.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.HashKeys.imagehash">
+<span class="sig-name descname"><span class="pre">imagehash</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__imagehash'</span></em><a class="headerlink" href="#data_juicer.utils.constant.HashKeys.imagehash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.utils.constant.HashKeys.minhash">
 <span class="sig-name descname"><span class="pre">minhash</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__minhash'</span></em><a class="headerlink" href="#data_juicer.utils.constant.HashKeys.minhash" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -580,6 +592,11 @@ remove lock file automatically.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.InterVars.loaded_images">
+<span class="sig-name descname"><span class="pre">loaded_images</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__loaded_images'</span></em><a class="headerlink" href="#data_juicer.utils.constant.InterVars.loaded_images" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.utils.constant.InterVars.refined_words">
 <span class="sig-name descname"><span class="pre">refined_words</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__refined_words'</span></em><a class="headerlink" href="#data_juicer.utils.constant.InterVars.refined_words" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -595,79 +612,155 @@ remove lock file automatically.</p>
 <dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.constant.</span></span><span class="sig-name descname"><span class="pre">StatsKeys</span></span><a class="reference internal" href="_modules/data_juicer/utils/constant.html#StatsKeys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.constant.</span></span><span class="sig-name descname"><span class="pre">StatsKeysConstant</span></span><a class="reference internal" href="_modules/data_juicer/utils/constant.html#StatsKeysConstant"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.alnum_ratio">
-<span class="sig-name descname"><span class="pre">alnum_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'alnum_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.alnum_ratio" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.alnum_ratio">
+<span class="sig-name descname"><span class="pre">alnum_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'alnum_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.alnum_ratio" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.alpha_token_ratio">
-<span class="sig-name descname"><span class="pre">alpha_token_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'alpha_token_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.alpha_token_ratio" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.alpha_token_ratio">
+<span class="sig-name descname"><span class="pre">alpha_token_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'alpha_token_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.alpha_token_ratio" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.avg_line_length">
-<span class="sig-name descname"><span class="pre">avg_line_length</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'avg_line_length'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.avg_line_length" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.aspect_ratios">
+<span class="sig-name descname"><span class="pre">aspect_ratios</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'aspect_ratios'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.aspect_ratios" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.char_rep_ratio">
-<span class="sig-name descname"><span class="pre">char_rep_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'char_rep_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.char_rep_ratio" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.avg_line_length">
+<span class="sig-name descname"><span class="pre">avg_line_length</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'avg_line_length'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.avg_line_length" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.flagged_words_ratio">
-<span class="sig-name descname"><span class="pre">flagged_words_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'flagged_words_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.flagged_words_ratio" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.char_rep_ratio">
+<span class="sig-name descname"><span class="pre">char_rep_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'char_rep_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.char_rep_ratio" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.lang">
-<span class="sig-name descname"><span class="pre">lang</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lang'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.lang" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.face_detections">
+<span class="sig-name descname"><span class="pre">face_detections</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'face_detections'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.face_detections" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.lang_score">
-<span class="sig-name descname"><span class="pre">lang_score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lang_score'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.lang_score" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.face_ratios">
+<span class="sig-name descname"><span class="pre">face_ratios</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'face_ratios'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.face_ratios" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.max_line_length">
-<span class="sig-name descname"><span class="pre">max_line_length</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'max_line_length'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.max_line_length" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.flagged_words_ratio">
+<span class="sig-name descname"><span class="pre">flagged_words_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'flagged_words_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.flagged_words_ratio" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.num_token">
-<span class="sig-name descname"><span class="pre">num_token</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'num_token'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.num_token" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.image_height">
+<span class="sig-name descname"><span class="pre">image_height</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'image_height'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.image_height" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.num_words">
-<span class="sig-name descname"><span class="pre">num_words</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'num_words'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.num_words" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.image_sizes">
+<span class="sig-name descname"><span class="pre">image_sizes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'image_sizes'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.image_sizes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.perplexity">
-<span class="sig-name descname"><span class="pre">perplexity</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'perplexity'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.perplexity" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.image_text_matching_score">
+<span class="sig-name descname"><span class="pre">image_text_matching_score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'image_text_matching_score'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.image_text_matching_score" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.special_char_ratio">
-<span class="sig-name descname"><span class="pre">special_char_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'special_char_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.special_char_ratio" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.image_text_similarity">
+<span class="sig-name descname"><span class="pre">image_text_similarity</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'image_text_similarity'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.image_text_similarity" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.stopwords_ratio">
-<span class="sig-name descname"><span class="pre">stopwords_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'stopwords_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.stopwords_ratio" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.image_width">
+<span class="sig-name descname"><span class="pre">image_width</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'image_width'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.image_width" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.text_len">
-<span class="sig-name descname"><span class="pre">text_len</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'text_len'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.text_len" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.lang">
+<span class="sig-name descname"><span class="pre">lang</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lang'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.lang" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeys.word_rep_ratio">
-<span class="sig-name descname"><span class="pre">word_rep_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'word_rep_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeys.word_rep_ratio" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.lang_score">
+<span class="sig-name descname"><span class="pre">lang_score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lang_score'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.lang_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.max_line_length">
+<span class="sig-name descname"><span class="pre">max_line_length</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'max_line_length'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.max_line_length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.num_action">
+<span class="sig-name descname"><span class="pre">num_action</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'num_action'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.num_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.num_dependency_edges">
+<span class="sig-name descname"><span class="pre">num_dependency_edges</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'num_dependency_edges'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.num_dependency_edges" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.num_token">
+<span class="sig-name descname"><span class="pre">num_token</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'num_token'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.num_token" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.num_words">
+<span class="sig-name descname"><span class="pre">num_words</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'num_words'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.num_words" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.perplexity">
+<span class="sig-name descname"><span class="pre">perplexity</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'perplexity'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.perplexity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.phrase_grounding_recall">
+<span class="sig-name descname"><span class="pre">phrase_grounding_recall</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'phrase_grounding_recall'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.phrase_grounding_recall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.special_char_ratio">
+<span class="sig-name descname"><span class="pre">special_char_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'special_char_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.special_char_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.stopwords_ratio">
+<span class="sig-name descname"><span class="pre">stopwords_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'stopwords_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.stopwords_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.text_len">
+<span class="sig-name descname"><span class="pre">text_len</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'text_len'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.text_len" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.word_rep_ratio">
+<span class="sig-name descname"><span class="pre">word_rep_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'word_rep_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.word_rep_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.constant.</span></span><span class="sig-name descname"><span class="pre">StatsKeysMeta</span></span><a class="reference internal" href="_modules/data_juicer/utils/constant.html#StatsKeysMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysMeta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></p>
+<p>a helper class to track the mapping from OP’s name to its used stats_keys</p>
+<p>e.g., # once the AlphanumericFilter’s compute_stats method has been called
+res = TrackingDescriptor.get_access_log()
+print(res) # {“AlphanumericFilter”: [“alnum_ratio”, “alpha_token_ratio”]}</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysMeta.get_access_log">
+<span class="sig-name descname"><span class="pre">get_access_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dj_cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/constant.html#StatsKeysMeta.get_access_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysMeta.get_access_log" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -924,6 +1017,48 @@ download again forcefully.</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>model instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_huggingface_blip">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_huggingface_blip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blip_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_huggingface_blip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_huggingface_blip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare and load a blip and processor from HuggingFace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>blip_name</strong> – input blip name</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a pair of blip instance and processor instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_huggingface_clip">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_huggingface_clip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clip_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_huggingface_clip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_huggingface_clip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare and load a clip and processor from HuggingFace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>clip_name</strong> – input clip name</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a pair of clip instance and processor instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_huggingface_owlvit">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_huggingface_owlvit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">owlvit_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_huggingface_owlvit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_huggingface_owlvit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare and load an OwlViT and processor from HuggingFace.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>owlvit_name</strong> – input OwlViT name</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a pair of OwlViT instance and processor instance.</p>
 </dd>
 </dl>
 </dd></dl>

@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.deduplicator &mdash; data_juicer 0.1.2 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>data_juicer.ops.deduplicator &mdash; data_juicer 0.1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b0099a1c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=14711e05"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -33,7 +35,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -339,41 +341,6 @@ open.</p></li>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.document_simhash_deduplicator.local_num_differing_bits">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.deduplicator.document_simhash_deduplicator.</span></span><span class="sig-name descname"><span class="pre">local_num_differing_bits</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hash_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hash_b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/document_simhash_deduplicator.html#local_num_differing_bits"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.document_simhash_deduplicator.local_num_differing_bits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Local implementation of calculating the number of different bits between
-two integers.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>hash_a</strong> – integer hash value a</p></li>
-<li><p><strong>hash_b</strong> – integer hash value b</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>number of different bits between input hashes.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.document_simhash_deduplicator.num_differing_bits_selector">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.deduplicator.document_simhash_deduplicator.</span></span><span class="sig-name descname"><span class="pre">num_differing_bits_selector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/document_simhash_deduplicator.html#num_differing_bits_selector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.document_simhash_deduplicator.num_differing_bits_selector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Select a num_differing_bits method according to the Python version
-installed.</p>
-<p>When Python &gt;= 3.9, the original simhash library cannot be compiled
-correctly due to some changes in cython. After fixing this
-incompatibility, RecursionError occurs sometimes when calling
-simhash.num_differing_bits. So we use our implementation when Python
-&gt;= 3.9. Otherwise, we use implementation of simhash.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>an available num_differing_bits function.</p>
-</dd>
-</dl>
 </dd></dl>
 
 </section>

@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.utils.constant &mdash; data_juicer 0.1.2 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <title>data_juicer.utils.constant &mdash; data_juicer 0.1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=14711e05"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -30,7 +32,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -69,7 +71,15 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.utils.constant</h1><div class="highlight"><pre>
-<span></span><span class="n">DEFAULT_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;__dj__&#39;</span>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">zstandard</span> <span class="k">as</span> <span class="nn">zstd</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="n">DEFAULT_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;__dj__&#39;</span>
 
 
 <div class="viewcode-block" id="Fields"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.Fields">[docs]</a><span class="k">class</span> <span class="nc">Fields</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -79,7 +89,90 @@
     <span class="n">suffix</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;suffix__&#39;</span></div>
 
 
-<div class="viewcode-block" id="StatsKeys"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeys">[docs]</a><span class="k">class</span> <span class="nc">StatsKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="StatsKeysMeta"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeysMeta">[docs]</a><span class="k">class</span> <span class="nc">StatsKeysMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    a helper class to track the mapping from OP&#39;s name to its used stats_keys</span>
+
+<span class="sd">    e.g., # once the AlphanumericFilter&#39;s compute_stats method has been called</span>
+<span class="sd">    res = TrackingDescriptor.get_access_log()</span>
+<span class="sd">    print(res) # {&quot;AlphanumericFilter&quot;: [&quot;alnum_ratio&quot;, &quot;alpha_token_ratio&quot;]}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_accessed_by</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="n">caller_class</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_back</span><span class="o">.</span><span class="n">f_globals</span><span class="p">[</span><span class="s1">&#39;__name__&#39;</span><span class="p">]</span>
+        <span class="c1"># no need to track the parent classes</span>
+        <span class="n">caller_class</span> <span class="o">=</span> <span class="n">caller_class</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">stat_key</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_constants_class</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">caller_class</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span><span class="p">[</span><span class="n">caller_class</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">stat_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span><span class="p">[</span><span class="n">caller_class</span><span class="p">]:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span><span class="p">[</span><span class="n">caller_class</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">stat_key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">stat_key</span>
+
+<div class="viewcode-block" id="StatsKeysMeta.get_access_log"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeysMeta.get_access_log">[docs]</a>    <span class="k">def</span> <span class="nf">get_access_log</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dj_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span>
+        <span class="k">elif</span> <span class="n">dj_cfg</span><span class="p">:</span>
+            <span class="n">tmp_dj_cfg</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dj_cfg</span><span class="p">)</span>
+            <span class="c1"># the access has been skipped due to the use of cache</span>
+            <span class="c1"># we will using a temp data sample to get the access log</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="p">(</span><span class="s1">&#39;jsonl&#39;</span> <span class="ow">in</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="ow">or</span>
+                     <span class="s1">&#39;jsonl.zst&#39;</span> <span class="ow">in</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s1">&#39;Begin to track the usage of ops with a dummy data sample&#39;</span><span class="p">)</span>
+
+                <span class="c1"># load the first line as tmp_data</span>
+                <span class="n">tmp_f_name</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">first_line</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s1">&#39;jsonl.zst&#39;</span> <span class="ow">in</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">:</span>
+                    <span class="n">tmp_f_name</span> <span class="o">=</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="o">.</span> \
+                        <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.jsonl.zst&#39;</span><span class="p">,</span> <span class="s1">&#39;.tmp.jsonl&#39;</span><span class="p">)</span>
+                    <span class="c1"># Open the file in binary mode and</span>
+                    <span class="c1"># create a Zstandard decompression context</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">compressed_file</span><span class="p">:</span>
+                        <span class="n">dctx</span> <span class="o">=</span> <span class="n">zstd</span><span class="o">.</span><span class="n">ZstdDecompressor</span><span class="p">()</span>
+                        <span class="c1"># Create a stream reader for the file and decode the</span>
+                        <span class="c1"># first line</span>
+                        <span class="k">with</span> <span class="n">dctx</span><span class="o">.</span><span class="n">stream_reader</span><span class="p">(</span><span class="n">compressed_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+                            <span class="n">text_stream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span>
+                                                           <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                            <span class="n">first_line</span> <span class="o">=</span> <span class="n">text_stream</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="s1">&#39;jsonl&#39;</span> <span class="ow">in</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">:</span>
+                    <span class="n">tmp_f_name</span> <span class="o">=</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="o">.</span> \
+                        <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.jsonl&#39;</span><span class="p">,</span> <span class="s1">&#39;.tmp.jsonl&#39;</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">orig_file</span><span class="p">:</span>
+                        <span class="n">first_line</span> <span class="o">=</span> <span class="n">orig_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+                <span class="k">assert</span> <span class="n">tmp_f_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">first_line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+                    <span class="s1">&#39;error when loading the first line, when &#39;</span> \
+                    <span class="sa">f</span><span class="s1">&#39;dj_cfg.dataset_path=</span><span class="si">{</span><span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="si">}</span><span class="s1">&#39;</span>
+
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp_f_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_file</span><span class="p">:</span>
+                    <span class="n">tmp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">first_line</span><span class="p">)</span>
+
+                <span class="n">tmp_dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="o">=</span> <span class="n">tmp_f_name</span>
+                <span class="n">tmp_dj_cfg</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">tmp_dj_cfg</span><span class="o">.</span><span class="n">use_checkpoint</span> <span class="o">=</span> <span class="kc">False</span>
+
+                <span class="kn">from</span> <span class="nn">data_juicer.core</span> <span class="kn">import</span> <span class="n">Analyser</span>
+                <span class="n">tmp_analyzer</span> <span class="o">=</span> <span class="n">Analyser</span><span class="p">(</span><span class="n">tmp_dj_cfg</span><span class="p">)</span>
+                <span class="c1"># do not overwrite the true analysis results</span>
+                <span class="n">tmp_analyzer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">skip_export</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tmp_f_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;For now, the dummy data is supported for only jsonl type&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;. Please check your config as </span><span class="si">{</span><span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="si">}</span><span class="s1"> is &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;either not existed or in jsonl type.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span></div></div>
+
+
+<div class="viewcode-block" id="StatsKeysConstant"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant">[docs]</a><span class="k">class</span> <span class="nc">StatsKeysConstant</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c1"># text</span>
     <span class="n">alpha_token_ratio</span> <span class="o">=</span> <span class="s1">&#39;alpha_token_ratio&#39;</span>
     <span class="n">alnum_ratio</span> <span class="o">=</span> <span class="s1">&#39;alnum_ratio&#39;</span>
     <span class="n">avg_line_length</span> <span class="o">=</span> <span class="s1">&#39;avg_line_length&#39;</span>
@@ -92,20 +185,47 @@
     <span class="n">special_char_ratio</span> <span class="o">=</span> <span class="s1">&#39;special_char_ratio&#39;</span>
     <span class="n">stopwords_ratio</span> <span class="o">=</span> <span class="s1">&#39;stopwords_ratio&#39;</span>
     <span class="n">text_len</span> <span class="o">=</span> <span class="s1">&#39;text_len&#39;</span>
+    <span class="n">num_action</span> <span class="o">=</span> <span class="s1">&#39;num_action&#39;</span>
+    <span class="n">num_dependency_edges</span> <span class="o">=</span> <span class="s1">&#39;num_dependency_edges&#39;</span>
     <span class="n">num_token</span> <span class="o">=</span> <span class="s1">&#39;num_token&#39;</span>
     <span class="n">num_words</span> <span class="o">=</span> <span class="s1">&#39;num_words&#39;</span>
-    <span class="n">word_rep_ratio</span> <span class="o">=</span> <span class="s1">&#39;word_rep_ratio&#39;</span></div>
+    <span class="n">word_rep_ratio</span> <span class="o">=</span> <span class="s1">&#39;word_rep_ratio&#39;</span>
+
+    <span class="c1"># image</span>
+    <span class="n">aspect_ratios</span> <span class="o">=</span> <span class="s1">&#39;aspect_ratios&#39;</span>
+    <span class="n">image_width</span> <span class="o">=</span> <span class="s1">&#39;image_width&#39;</span>
+    <span class="n">image_height</span> <span class="o">=</span> <span class="s1">&#39;image_height&#39;</span>
+    <span class="n">image_sizes</span> <span class="o">=</span> <span class="s1">&#39;image_sizes&#39;</span>
+    <span class="n">face_ratios</span> <span class="o">=</span> <span class="s1">&#39;face_ratios&#39;</span>
+    <span class="n">face_detections</span> <span class="o">=</span> <span class="s1">&#39;face_detections&#39;</span>
+
+    <span class="c1"># multimodal</span>
+    <span class="n">image_text_similarity</span> <span class="o">=</span> <span class="s1">&#39;image_text_similarity&#39;</span>
+    <span class="n">image_text_matching_score</span> <span class="o">=</span> <span class="s1">&#39;image_text_matching_score&#39;</span>
+    <span class="n">phrase_grounding_recall</span> <span class="o">=</span> <span class="s1">&#39;phrase_grounding_recall&#39;</span></div>
+
+
+<div class="viewcode-block" id="StatsKeys"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeys">[docs]</a><span class="k">class</span> <span class="nc">StatsKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">StatsKeysMeta</span><span class="p">):</span>
+    <span class="n">_constants_class</span> <span class="o">=</span> <span class="n">StatsKeysConstant</span></div>
 
 
 <div class="viewcode-block" id="HashKeys"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.HashKeys">[docs]</a><span class="k">class</span> <span class="nc">HashKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="nb">hash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;hash&#39;</span>
     <span class="n">minhash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;minhash&#39;</span>
-    <span class="n">simhash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;simhash&#39;</span></div>
+    <span class="n">simhash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;simhash&#39;</span>
+
+    <span class="c1"># image</span>
+    <span class="n">imagehash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;imagehash&#39;</span></div>
+
 
 <div class="viewcode-block" id="InterVars"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.InterVars">[docs]</a><span class="k">class</span> <span class="nc">InterVars</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c1"># text</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;lines&#39;</span>
     <span class="n">words</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;words&#39;</span>
-    <span class="n">refined_words</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;refined_words&#39;</span></div>
+    <span class="n">refined_words</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;refined_words&#39;</span>
+
+    <span class="c1"># image</span>
+    <span class="n">loaded_images</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;loaded_images&#39;</span></div>
 </pre></div>
 
            </div>

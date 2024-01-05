@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.deduplicator.document_simhash_deduplicator &mdash; data_juicer 0.1.2 documentation</title>
-      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <title>data_juicer.ops.deduplicator.document_simhash_deduplicator &mdash; data_juicer 0.1.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=b0099a1c"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=14711e05"></script>
         <script src="../../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../../_static/js/theme.js"></script>
@@ -30,7 +32,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
@@ -73,65 +75,67 @@
 <span class="c1"># https://github.com/bigscience-workshop/data-preparation</span>
 <span class="c1"># --------------------------------------------------------</span>
 
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Set</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">regex</span>
-<span class="kn">import</span> <span class="nn">simhash</span>
 <span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
 <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
 
+<span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">HashKeys</span>
 
 <span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Deduplicator</span>
 <span class="kn">from</span> <span class="nn">..common.helper_func</span> <span class="kn">import</span> <span class="n">split_on_whitespace</span>
 
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;document_simhash_deduplicator&#39;</span>
 
-<div class="viewcode-block" id="local_num_differing_bits"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.local_num_differing_bits">[docs]</a><span class="k">def</span> <span class="nf">local_num_differing_bits</span><span class="p">(</span><span class="n">hash_a</span><span class="p">,</span> <span class="n">hash_b</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Local implementation of calculating the number of different bits between</span>
-<span class="sd">    two integers.</span>
+<span class="k">with</span> <span class="n">AvailabilityChecking</span><span class="p">([</span><span class="s1">&#39;simhash-py&#39;</span><span class="p">],</span> <span class="n">OP_NAME</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">simhash</span>
 
-<span class="sd">    :param hash_a: integer hash value a</span>
-<span class="sd">    :param hash_b: integer hash value b</span>
-<span class="sd">    :return: number of different bits between input hashes.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">hash_a</span> <span class="o">^</span> <span class="n">hash_b</span>
-    <span class="k">while</span> <span class="n">n</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">cnt</span></div>
+    <span class="k">def</span> <span class="nf">local_num_differing_bits</span><span class="p">(</span><span class="n">hash_a</span><span class="p">,</span> <span class="n">hash_b</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Local implementation of calculating the number of different bits</span>
+<span class="sd">        between two integers.</span>
+
+<span class="sd">        :param hash_a: integer hash value a</span>
+<span class="sd">        :param hash_b: integer hash value b</span>
+<span class="sd">        :return: number of different bits between input hashes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">hash_a</span> <span class="o">^</span> <span class="n">hash_b</span>
+        <span class="k">while</span> <span class="n">n</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="n">n</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cnt</span>
+
+    <span class="k">def</span> <span class="nf">num_differing_bits_selector</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select a num_differing_bits method according to the Python version</span>
+<span class="sd">        installed.</span>
+
+<span class="sd">        When Python &gt;= 3.9, the original simhash library cannot be compiled</span>
+<span class="sd">        correctly due to some changes in cython. After fixing this</span>
+<span class="sd">        incompatibility, RecursionError occurs sometimes when calling</span>
+<span class="sd">        simhash.num_differing_bits. So we use our implementation when Python</span>
+<span class="sd">        &gt;= 3.9. Otherwise, we use implementation of simhash.</span>
+
+<span class="sd">        :return: an available num_differing_bits function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">platform</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="s1">&#39;3&#39;</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">9</span><span class="p">:</span>
+            <span class="c1"># for &gt;= 3.9, use local implementation</span>
+            <span class="k">return</span> <span class="n">local_num_differing_bits</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># for &lt; 3.9, use simhash version</span>
+            <span class="k">return</span> <span class="n">simhash</span><span class="o">.</span><span class="n">num_differing_bits</span>
+
+    <span class="n">num_differing_bits</span> <span class="o">=</span> <span class="n">num_differing_bits_selector</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="num_differing_bits_selector"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.num_differing_bits_selector">[docs]</a><span class="k">def</span> <span class="nf">num_differing_bits_selector</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Select a num_differing_bits method according to the Python version</span>
-<span class="sd">    installed.</span>
-
-<span class="sd">    When Python &gt;= 3.9, the original simhash library cannot be compiled</span>
-<span class="sd">    correctly due to some changes in cython. After fixing this</span>
-<span class="sd">    incompatibility, RecursionError occurs sometimes when calling</span>
-<span class="sd">    simhash.num_differing_bits. So we use our implementation when Python</span>
-<span class="sd">    &gt;= 3.9. Otherwise, we use implementation of simhash.</span>
-
-<span class="sd">    :return: an available num_differing_bits function.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">platform</span>
-    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">a</span> <span class="o">==</span> <span class="s1">&#39;3&#39;</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">9</span><span class="p">:</span>
-        <span class="c1"># for &gt;= 3.9, use local implementation</span>
-        <span class="k">return</span> <span class="n">local_num_differing_bits</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># for &lt; 3.9, use simhash version</span>
-        <span class="k">return</span> <span class="n">simhash</span><span class="o">.</span><span class="n">num_differing_bits</span></div>
-
-
-<span class="n">num_differing_bits</span> <span class="o">=</span> <span class="n">num_differing_bits_selector</span><span class="p">()</span>
-
-
-<div class="viewcode-block" id="DocumentSimhashDeduplicator"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s1">&#39;document_simhash_deduplicator&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="DocumentSimhashDeduplicator"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">DocumentSimhashDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicator to deduplicate samples at document-level using SimHash.&quot;&quot;&quot;</span>
 
@@ -225,8 +229,8 @@
                 <span class="sa">f</span><span class="s1">&#39;Unimplemented tokenization method [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
 
         <span class="c1"># compute simhash</span>
-        <span class="n">sample</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span>
-            <span class="n">simhash</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">simhash</span><span class="o">.</span><span class="n">unsigned_hash</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)))</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="n">simhash</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">simhash</span><span class="o">.</span><span class="n">unsigned_hash</span><span class="p">,</span> <span class="n">tokens</span><span class="p">))))</span>
         <span class="k">return</span> <span class="n">sample</span></div>
 
 <div class="viewcode-block" id="DocumentSimhashDeduplicator.process"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">show_num</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
@@ -245,7 +249,7 @@
         <span class="c1"># find matches</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Start querying </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">simhash</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span>
-            <span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">],</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]),</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">num_blocks</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">hamming_distance</span><span class="p">,</span>
         <span class="p">)</span>
@@ -253,17 +257,15 @@
 
         <span class="c1"># compute hash diff distribution</span>
         <span class="n">graph</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
-        <span class="n">dist</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
             <span class="n">graph</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">graph</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">num_diff</span> <span class="o">=</span> <span class="n">num_differing_bits</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-            <span class="n">dist</span><span class="p">[</span><span class="n">num_diff</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Hash diff distribution: </span><span class="si">{</span><span class="n">dist</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="n">hash2ids</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
-        <span class="n">hashes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">])</span>
-        <span class="n">hash2cluster</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">hash2ids</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+        <span class="n">hashes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">])</span>
+        <span class="n">hash2cluster</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="n">cluster_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">hash_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]):</span>
