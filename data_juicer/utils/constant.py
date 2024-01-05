@@ -129,6 +129,7 @@ class StatsKeysConstant(object):
     # multimodal
     image_text_similarity = 'image_text_similarity'
     image_text_matching_score = 'image_text_matching_score'
+    phrase_grounding_recall = 'phrase_grounding_recall'
 
 
 class StatsKeys(object, metaclass=StatsKeysMeta):
