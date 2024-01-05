@@ -35,7 +35,7 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
 ----
 
 ## 新消息
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-01-04] 现在，我们发布了 Data-Juicer v0.1.3 版本！ 
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-01-05] 现在，我们发布了 Data-Juicer v0.1.3 版本！ 
 在这个新版本中，我们支持了更多Python版本（3.7-3.10），同时支持了多模态数据集的[转换](tools/multimodal/README_ZH.md)和[处理](docs/Operators_ZH.md)（包括文本、图像和音频。更多模态也将会在之后支持）。
 此外，我们的论文也更新到了[第三版](https://arxiv.org/abs/2309.02033) 。
 
