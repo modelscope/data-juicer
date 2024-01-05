@@ -4,10 +4,10 @@ from ..base_op import OPERATORS, Mapper
 
 
 def split_sentence(text):
-    text = re.sub('([.。！!？\?])([^’”])',r'\1\n\2',text)                # noqa
-    text = re.sub('(\.{6})([^’”])',r'\1\n\2',text)                      # noqa
-    text = re.sub('(\…{2})([^’”])',r'\1\n\2',text)                      # noqa
-    text = re.sub('([.。!！？\?\.{6}\…{2}][’”])([^’”])',r'\1\n\2',text)  # noqa
+    text = re.sub('([.。！!？\?])([^’”])', r'\1\n\2', text)  # noqa
+    text = re.sub('(\.{6})([^’”])', r'\1\n\2', text)  # noqa
+    text = re.sub('(\…{2})([^’”])', r'\1\n\2', text)  # noqa
+    text = re.sub('([.。!！？\?\.{6}\…{2}][’”])([^’”])', r'\1\n\2', text)  # noqa
     return text.split('\n')
 
 
@@ -40,9 +40,8 @@ class RemoveRepeatSentencesMapper(Mapper):
         super().__init__(*args, **kwargs)
         self.lowercase = lowercase
         self.min_repeat_sentence_length = min_repeat_sentence_length
-        self.remove_regex = re.compile(
-            r'[^a-zA-Z0-9\u4e00-\u9fa5\n\t ]'
-        ) if ignore_special_character else None
+        self.remove_regex = re.compile(r'[^a-zA-Z0-9\u4e00-\u9fa5\n\t ]'
+                                       ) if ignore_special_character else None
 
     def process(self, sample):
 

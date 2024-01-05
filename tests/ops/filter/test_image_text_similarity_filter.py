@@ -6,9 +6,9 @@ from datasets import Dataset
 from data_juicer.ops.filter.image_text_similarity_filter import ImageTextSimilarityFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-
-class ImageTextSimilarityFilterTest(unittest.TestCase):
+class ImageTextSimilarityFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
@@ -16,6 +16,10 @@ class ImageTextSimilarityFilterTest(unittest.TestCase):
     cat_path = os.path.join(data_path, 'cat.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
     hf_clip = 'openai/clip-vit-base-patch32'
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        super().tearDownClass(cls.hf_clip)
 
     def _run_filter(self, dataset: Dataset, target_list, op, num_proc=1):
 

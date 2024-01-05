@@ -20,9 +20,9 @@ class ReplaceContentMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self.pattern = pattern
-        if ((pattern is not None and len(pattern) > 2) and
-            (pattern.startswith("r'") and pattern.endswith("'") or
-                pattern.startswith('r"') and pattern.endswith('"'))):
+        if ((pattern is not None and len(pattern) > 2)
+                and (pattern.startswith("r'") and pattern.endswith("'")
+                     or pattern.startswith('r"') and pattern.endswith('"'))):
             self.pattern = pattern[2:-1]
         self.repl = repl
 
