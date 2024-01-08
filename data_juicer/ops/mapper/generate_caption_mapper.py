@@ -69,7 +69,7 @@ class GenerateCaptionMapper(Mapper):
         super().__init__(*args, **kwargs)
         self.is_batched_op = True
         if keep_candidate_mode not in [
-            'random_any', 'similar_one_simhash', 'all'
+                'random_any', 'similar_one_simhash', 'all'
         ]:
             raise ValueError(
                 f'Keep strategy [{keep_candidate_mode}] is not supported. '
@@ -106,8 +106,10 @@ class GenerateCaptionMapper(Mapper):
             return []
 
         # the generated results
-        generated_samples = [copy.deepcopy(ori_sample)
-                             for _ in range(self.num_newly_generated_samples)]
+        generated_samples = [
+            copy.deepcopy(ori_sample)
+            for _ in range(self.num_newly_generated_samples)
+        ]
         for generated_sample in generated_samples:
             generated_sample[self.text_key] = ''
 
@@ -187,13 +189,12 @@ class GenerateCaptionMapper(Mapper):
 
         return generated_samples
 
-    def _reduce_captions_per_image(self,
-                                   chunk,
+    def _reduce_captions_per_image(self, chunk,
                                    generated_text_candidates_single_chunk):
         new_generated_text_per_chunk = []
         if self.keep_candidate_mode == 'random_any':
-            new_generated_text_per_chunk.append(random.choice(
-                generated_text_candidates_single_chunk))
+            new_generated_text_per_chunk.append(
+                random.choice(generated_text_candidates_single_chunk))
         elif self.keep_candidate_mode == 'all':
             new_generated_text_per_chunk.extend(new_generated_text_per_chunk)
         elif self.keep_candidate_mode == 'similar_one_simhash':

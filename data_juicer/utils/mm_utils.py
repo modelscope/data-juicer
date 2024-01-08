@@ -40,7 +40,7 @@ def remove_non_special_tokens(text):
 
     return text_with_only_special_tokens
 
-  
+
 # Image
 def load_images(paths):
     return [load_image(path) for path in paths]
