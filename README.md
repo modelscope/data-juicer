@@ -33,12 +33,20 @@ This project is being actively updated and maintained, and we will periodically 
 If you find Data-Juicer useful for your research or development, please kindly 
 cite our [work](#references).
 
+Welcome to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw), [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11), or WeChat group (scan the QR code below with WeChat) for discussion.
+
+ <img src="https://img.alicdn.com/imgextra/i3/O1CN01QbwHJa1EV5uZwmU9c_!!6000000000356-2-tps-400-400.png" width = "100" height = "100" alt="QR Code for WeChat group" align=center />
+
 
 ----
 
 ## News
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2023-10-13] Our first data-centric LLM competition begins! Please
-  visit the competition's official websites, **FT-Data Ranker** ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), for more information.
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-01-05] We release **Data-Juicer v0.1.3** now! 
+In this new version, we support **more Python versions** (3.7-3.10), and support **multimodal** dataset [converting](tools/multimodal/README.md)/[processing](docs/Operators.md) (Including texts, images, and audios. More modalities will be supported in the future).
+Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
+
+- [2023-10-13] Our first data-centric LLM competition begins! Please
+  visit the competition's official websites, FT-Data Ranker ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), for more information.
 
 - [2023-10-8] We update our paper to the 2nd version and release the corresponding version 0.1.2 of Data-Juicer!
 
@@ -98,7 +106,7 @@ Table of Contents
 
 ## Prerequisites
 
-- Recommend Python==3.8
+- Recommend Python>=3.7,<=3.10
 - gcc >= 5 (at least C++14 support)
 
 ## Installation
@@ -330,7 +338,7 @@ We are in a rapidly developing field and greatly welcome contributions of new
 features, bug fixes and better documentations. Please refer to 
 [How-to Guide for Developers](docs/DeveloperGuide.md).
 
-Welcome to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw), or [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) for discussion.
+If you have any questions, please join our [discussion groups](README.md).
 
 ## Acknowledgement
 Data-Juicer is used across various LLM products and research initiatives,

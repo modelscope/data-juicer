@@ -51,7 +51,8 @@
 #          '[[human]]: Is the bus driving down the street or pulled off to'
 #          'the side?\n'
 #          '[[gpt]]: The bus is driving down the street, which is crowded '
-#          'with people and other vehicles. <|__dj__eoc|>'}
+#          'with people and other vehicles. <|__dj__eoc|>',
+#   'only_caption': False,}
 #
 # Reference:
 # https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md
@@ -80,6 +81,7 @@ def main(
     image_special_token: str = '<image>',
     add_eoc_at_last: bool = True,
     sent_seperator: str = '\n',
+    only_keep_caption: bool = False,
 ):
     """
     Convert a LLaVA-like dataset to the Data-Juicer format.
@@ -109,6 +111,14 @@ def main(
     :param add_eoc_at_last: whether to add an extra eoc_special_token at the
         end of text. Default: True.
     :param sent_seperator: seperator to split different sentences. Default: \n.
+    :param only_keep_caption: only keep the caption in the single-turn dialog
+        or not. This argument is mainly for the pretrain-type dataset of LLaVA,
+        which only covers a limited number of questions and the corresponding
+        answers are the captions of images. For fine-tuning dataset, there
+        are some multi-turn dialogs which might not be suitable for setting
+        this argument to True. This argument will be added to the converted
+        samples as an extra meta field for restoring the questions in the
+        llava_to_dj tool. Default: False.
     """
     # ----- Constant settings. Better not to change them. -----
     text_key = 'text'  # default key of field to store the sample text
@@ -180,6 +190,14 @@ def main(
                                  f'is [{len(conversations)}]). Please check '
                                  f'and fix the dataset and retry.')
 
+            if len(conversations) > 2 and only_keep_caption:
+                logger.warning(f'There are multi-turn-dialog sample with id '
+                               f'[{id}] in this dataset. So this dataset '
+                               f'might be a fine-tuning dataset and we set '
+                               f'only_keep_caption to False for the rest of '
+                               f'dataset.')
+                only_keep_caption = False
+
             # image list
             images = []
             # record the image token position in the first conversation round
@@ -247,8 +265,12 @@ def main(
                         images.append(image)
 
                 # combine these texts together
-                new_sent = role_human + sent_human + sent_seperator \
-                    + role_robot + sent_robot
+                if only_keep_caption:
+                    new_sent = image_special_token + sent_seperator \
+                               + sent_robot
+                else:
+                    new_sent = role_human + sent_human + sent_seperator \
+                        + role_robot + sent_robot
                 formatted_conversations.append(new_sent)
 
             join_sep = sent_seperator
@@ -265,6 +287,7 @@ def main(
                 'id': id,
                 text_key: text,
                 image_key: images,
+                'only_caption': only_keep_caption,
             }
             writer.write(new_sample)
     logger.info(f'Store the target dataset into [{target_ds_path}].')

@@ -1,3 +1,4 @@
+# yapf: disable
 from . import (chinese_convert_mapper, clean_copyright_mapper,
                clean_email_mapper, clean_html_mapper, clean_ip_mapper,
                clean_links_mapper, expand_macro_mapper, fix_unicode_mapper,
@@ -10,3 +11,5 @@ from . import (chinese_convert_mapper, clean_copyright_mapper,
                remove_words_with_incorrect_substrings_mapper,
                replace_content_mapper, sentence_split_mapper,
                whitespace_normalization_mapper)
+
+# yapf: enable

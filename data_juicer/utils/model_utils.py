@@ -222,6 +222,23 @@ def prepare_huggingface_blip(
     return model, processor
 
 
+def prepare_huggingface_owlvit(owlvit_name):
+    """
+    Prepare and load an OwlViT and processor from HuggingFace.
+
+    :param owlvit_name: input OwlViT name
+    :return: a pair of OwlViT instance and processor instance.
+    """
+    from transformers import OwlViTForObjectDetection, OwlViTProcessor
+
+    model = OwlViTForObjectDetection.from_pretrained(owlvit_name)
+    processor = OwlViTProcessor.from_pretrained(owlvit_name)
+    logger.info(f'Loading OwlViT and processor {owlvit_name} from '
+                f'HuggingFace...')
+
+    return (model, processor)
+
+
 def prepare_diversity_model(model_name, lang):
     """
     Prepare diversity model for specific language.
@@ -281,6 +298,7 @@ def prepare_model(lang='en',
         'huggingface': ('%s', prepare_huggingface_tokenizer),
         'hf_clip': ('%s', prepare_huggingface_clip),
         'hf_blip': ('%s', prepare_huggingface_blip),
+        'hf_owlvit': ('%s', prepare_huggingface_owlvit),
         'spacy': ('%s_core_web_md-3.5.0', prepare_diversity_model),
     }
     assert model_type in type_to_name.keys(
@@ -297,6 +315,8 @@ def prepare_model(lang='en',
             MODEL_ZOO[model_key] = model_func(model_key)
         elif model_type in ['hf_blip']:
             MODEL_ZOO[model_key] = model_func(model_key, usage)
+        elif model_type == 'hf_owlvit':
+            MODEL_ZOO[model_key] = model_func(model_key)
         else:
             MODEL_ZOO[model_key] = model_func(model_name, lang)
     return model_key
