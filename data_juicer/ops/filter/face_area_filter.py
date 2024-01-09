@@ -1,5 +1,6 @@
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
+from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -97,6 +98,7 @@ class FaceAreaFilter(Filter):
                 min(det.right(), image.width),
                 min(det.bottom(), image.height)
             ] for det in dets]
+        logger.debug(f'detections: {face_detections}')
 
         # compute face area ratios for each image considering the largest face
         face_area_ratios = {}
@@ -105,6 +107,7 @@ class FaceAreaFilter(Filter):
             face_area_ratios[key] = max([(x2 - x1) * (y2 - y1)
                                          for x1, y1, x2, y2 in dets],
                                         default=0.0) / image_area
+        logger.debug(f'ratios: {face_area_ratios}')
 
         sample[Fields.stats][StatsKeys.face_ratios] = [
             face_area_ratios[key] for key in loaded_image_keys
