@@ -67,7 +67,7 @@ class GenerateCaptionMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.is_batched_op = True
+        self._batched_op = True
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'
         ]:

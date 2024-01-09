@@ -149,6 +149,7 @@ def insert_texts_after_placeholders(original_string,
         # Insert new_text at the found index position
         modified_string = \
             modified_string[:index + len(placeholder)] + \
+            delimiter_in_insert_pos + \
             new_text + \
             delimiter_in_insert_pos + \
             modified_string[index + len(placeholder):]
