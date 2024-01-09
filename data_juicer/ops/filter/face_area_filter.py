@@ -92,16 +92,19 @@ class FaceAreaFilter(Filter):
             img = pil_to_opencv(image)
             dets = self.detector(img, **self.detector_kwargs)
             face_detections[key] = [[
-                det.left(), det.top(),
-                det.width(), det.height()
+                max(det.left(), 0),
+                max(det.top(), 0),
+                min(det.right(), image.width),
+                min(det.bottom(), image.height)
             ] for det in dets]
 
         # compute face area ratios for each image considering the largest face
         face_area_ratios = {}
         for key, dets in face_detections.items():
             image_area = images[key].width * images[key].height
-            face_area_ratios[key] = max(
-                [w * h / image_area for _, _, w, h in dets], default=0.0)
+            face_area_ratios[key] = max([(x2 - x1) * (y2 - y1)
+                                         for x1, y1, x2, y2 in dets],
+                                        default=0.0) / image_area
 
         sample[Fields.stats][StatsKeys.face_ratios] = [
             face_area_ratios[key] for key in loaded_image_keys
