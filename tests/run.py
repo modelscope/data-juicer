@@ -11,6 +11,8 @@ import os
 import sys
 import unittest
 
+from data_juicer.utils.unittest_utils import SKIPPED_TESTS
+
 file_dir = os.path.join(os.path.dirname(__file__), '..')
 sys.path.append(file_dir)
 
@@ -28,9 +30,20 @@ def gather_test_cases(test_dir, pattern, list_tests):
     discover = unittest.defaultTestLoader.discover(test_dir,
                                                    pattern=pattern,
                                                    top_level_dir=None)
+    print(f'These tests will be skipped due to some reasons: '
+          f'{SKIPPED_TESTS.modules}')
     for suite_discovered in discover:
 
         for test_case in suite_discovered:
+            # filter out those tests that need to be skipped
+            filtered_test_suite = unittest.TestSuite()
+            for tc in test_case:
+                if type(tc) in SKIPPED_TESTS.modules.values():
+                    continue
+                filtered_test_suite.addTest(tc)
+            if filtered_test_suite.countTestCases() == 0:
+                continue
+
             test_suite.addTest(test_case)
             if hasattr(test_case, '__iter__'):
                 for subcase in test_case:

@@ -5,7 +5,7 @@ import numpy as np
 from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.mm_utils import (SpecialTokens,
                                         insert_texts_after_placeholders,
                                         load_image, remove_non_special_tokens,
@@ -13,8 +13,8 @@ from data_juicer.utils.mm_utils import (SpecialTokens,
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
-from ..deduplicator.document_simhash_deduplicator import \
-    DocumentSimhashDeduplicator
+from ..deduplicator.document_simhash_deduplicator import (
+    DocumentSimhashDeduplicator, num_differing_bits)
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'generate_caption_mapper'
@@ -25,12 +25,6 @@ with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
 
     # avoid hanging when calling blip2 in multiprocessing
     torch.set_num_threads(1)
-
-
-def jaccard_similarity_np(hash_val1, hash_val2):
-    equal_hashes = np.sum(hash_val1 == hash_val2)
-    total_hashes = len(hash_val1)  # Assume both vectors are the same length
-    return equal_hashes / total_hashes
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -117,12 +111,8 @@ class GenerateCaptionMapper(Mapper):
         loaded_image_keys = ori_sample[self.image_key]
         images = {}
         for loaded_image_key in loaded_image_keys:
-            # load from context
-            if loaded_image_key in ori_sample[Fields.context]:
-                images[loaded_image_key] = \
-                    ori_sample[Fields.context][loaded_image_key]
-            elif loaded_image_key not in images:
-                # avoid load the same images
+            if loaded_image_key not in images:
+                # avoid loading the same images
                 image = load_image(loaded_image_key)
                 images[loaded_image_key] = image
 
@@ -137,6 +127,10 @@ class GenerateCaptionMapper(Mapper):
 
         # do generation for each image chunk by chunk
         for chunk in ori_sample[self.text_key].split(SpecialTokens.eoc):
+            # skip empty chunks or contents after the last eoc token
+            if not chunk.strip():
+                continue
+
             img_count = chunk.count(SpecialTokens.image)
             text_with_only_special_tokens = remove_non_special_tokens(chunk)
             image_chunk = []
@@ -146,12 +140,13 @@ class GenerateCaptionMapper(Mapper):
 
             # 2. generate candidate caption(s) in batch manner
             generated_text_candidates_single_chunk = \
-                [[] for _ in range(img_count)]
+                [[] for _ in range(self.caption_num)]
             # an assistant 2-D array,
             # generated_text_candidates_single_chunk[i][j] indicates
             # the $i$-th generated candidate for the $j$-th image
 
-            inputs = self.img_processor_in_ctx(images=image_chunk, )
+            inputs = self.img_processor_in_ctx(images=image_chunk,
+                                               return_tensors='pt')
             for i in range(self.caption_num):
                 generated_ids = self.model_in_ctx.generate(**inputs)
                 generated_text = self.img_processor_in_ctx.batch_decode(
@@ -162,17 +157,20 @@ class GenerateCaptionMapper(Mapper):
             # subsequent placeholders in the original string
             new_generated_text_all_images = \
                 [[] for _ in range(self.num_newly_generated_samples)]
-            # new_generated_text_all_images is an helper array, element [i][j]
+            # new_generated_text_all_images is a helper array, element [i][j]
             # denotes the reduced $i$-th result for the $j$-th image
 
             # reduce the captions according to given mode image by image
             for j in range(img_count):
                 new_generated_text_per_image = self._reduce_captions_per_image(
-                    chunk, generated_text_candidates_single_chunk[j])
+                    chunk, [
+                        captions[j]
+                        for captions in generated_text_candidates_single_chunk
+                    ])
                 assert self.num_newly_generated_samples == \
                        len(new_generated_text_per_image)
                 for i in range(len(new_generated_text_per_image)):
-                    new_generated_text_all_images[i].extend(
+                    new_generated_text_all_images[i].append(
                         new_generated_text_per_image[i])
 
             # insert the captions according to given mode
@@ -196,22 +194,28 @@ class GenerateCaptionMapper(Mapper):
             new_generated_text_per_chunk.append(
                 random.choice(generated_text_candidates_single_chunk))
         elif self.keep_candidate_mode == 'all':
-            new_generated_text_per_chunk.extend(new_generated_text_per_chunk)
+            new_generated_text_per_chunk.extend(
+                generated_text_candidates_single_chunk)
         elif self.keep_candidate_mode == 'similar_one_simhash':
             ori_normal_text = remove_special_tokens(chunk)
             # using a simhash OP to calculate their similarity
             op_simhash = DocumentSimhashDeduplicator(**self.extra_args)
-            ori_text_hash = op_simhash.compute_hash(ori_normal_text)
+            ori_text_hash = np.uint64(
+                op_simhash.compute_hash({op_simhash.text_key:
+                                         ori_normal_text})[HashKeys.simhash])
             generated_text_hashes = [
-                op_simhash.compute_hash(candidate_text)
+                np.uint64(
+                    op_simhash.compute_hash(
+                        {op_simhash.text_key:
+                         candidate_text})[HashKeys.simhash])
                 for candidate_text in generated_text_candidates_single_chunk
             ]
-            similarity_scores = [
-                jaccard_similarity_np(ori_text_hash, generated_text_hash)
+            hamming_distances = [
+                num_differing_bits(ori_text_hash, generated_text_hash)
                 for generated_text_hash in generated_text_hashes
             ]
-            max_index = max(range(len(similarity_scores)),
-                            key=similarity_scores.__getitem__)
+            max_index = min(range(len(hamming_distances)),
+                            key=hamming_distances.__getitem__)
             new_generated_text_per_chunk.append(
                 generated_text_candidates_single_chunk[max_index])
         return new_generated_text_per_chunk
@@ -227,12 +231,23 @@ class GenerateCaptionMapper(Mapper):
         :param samples:
         :return:
         """
+        # reconstruct samples from "dict of lists" to "list of dicts"
+        reconstructed_samples = []
+        for i in range(len(samples[self.text_key])):
+            reconstructed_samples.append(
+                {key: samples[key][i]
+                 for key in samples})
         samples_after_generation = []
         # do generation for each sample within the batch
-        for ori_sample in samples:
+        for ori_sample in reconstructed_samples:
             samples_after_generation.append(ori_sample)
             generated_samples = self._process_single_sample(ori_sample)
             if len(generated_samples) != 0:
                 samples_after_generation.extend(generated_samples)
+        # reconstruct samples from "list of dicts" to "dict of lists"
+        keys = samples_after_generation[0].keys()
+        res_samples = {}
+        for key in keys:
+            res_samples[key] = [s[key] for s in samples_after_generation]
 
-        return samples_after_generation
+        return res_samples
