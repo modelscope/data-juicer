@@ -48,14 +48,14 @@ class GenerateCaptionMapper(Mapper):
         :param keep_candidate_mode: retain strategy for the generated
         $caption_num$ candidates.
             'random_any': Retain the random one from generated captions
-            'similar_one': Retain the generated one that is most similar to the
-                original caption
+            'similar_one_simhash': Retain the generated one that is most
+                similar to the original caption
             'all': Retain all generated captions by concatenation
         Note: This is a batched_OP, whose input and output type are
             both list. Suppose there are $N$ list of input samples, whose batch
             size is $b$, and denote caption_num as $M$.
             The number of total samples after generation is $2Nb$
-            for 'random_any' and 'similar_one' mode,
+            for 'random_any' and 'similar_one_simhash' mode,
              and $(1+M)Nb$ for 'all' mode.
         :param args: extra args
         :param kwargs: extra args
@@ -148,7 +148,8 @@ class GenerateCaptionMapper(Mapper):
             inputs = self.img_processor_in_ctx(images=image_chunk,
                                                return_tensors='pt')
             for i in range(self.caption_num):
-                generated_ids = self.model_in_ctx.generate(**inputs)
+                generated_ids = self.model_in_ctx.generate(**inputs,
+                                                           do_sample=True)
                 generated_text = self.img_processor_in_ctx.batch_decode(
                     generated_ids, skip_special_tokens=True)
                 generated_text_candidates_single_chunk[i] = generated_text
@@ -199,7 +200,11 @@ class GenerateCaptionMapper(Mapper):
         elif self.keep_candidate_mode == 'similar_one_simhash':
             ori_normal_text = remove_special_tokens(chunk)
             # using a simhash OP to calculate their similarity
-            op_simhash = DocumentSimhashDeduplicator(**self.extra_args)
+            # NOTE: simhash is just one method to calculate the similarities
+            # between texts, but not the most accurate one. More methods (e.g.
+            # embedding-based, ...) will be added.
+            op_simhash = DocumentSimhashDeduplicator(window_size=2,
+                                                     **self.extra_args)
             ori_text_hash = np.uint64(
                 op_simhash.compute_hash({op_simhash.text_key:
                                          ori_normal_text})[HashKeys.simhash])
