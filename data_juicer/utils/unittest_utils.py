@@ -2,6 +2,10 @@ import os
 import shutil
 import unittest
 
+from data_juicer.utils.registry import Registry
+
+SKIPPED_TESTS = Registry('SkippedTests')
+
 
 class DataJuicerTestCaseBase(unittest.TestCase):
 
