@@ -8,7 +8,6 @@ from data_juicer.utils.mm_utils import load_image
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
-BLUR_KERNEL = {'MEAN'}
 
 @OPERATORS.register_module('image_blur_mapper')
 @LOADED_IMAGES.register_module('image_blur_mapper')
@@ -78,10 +77,9 @@ class ImageBlurMapper(Mapper):
                 continue
             else:
                 blured_image_key = os.path.join(os.path.dirname(value), '_blured.'.join(os.path.basename(value).split('.')))
-                if not os.path.exists(blured_image_key):
-                    img_mode = images[value].mode
+                if not os.path.exists(blured_image_key) or blured_image_key not in images:
                     blured_image = images[value].convert('RGB').filter(self.blur)
-                    blured_image = blured_image.convert(img_mode)
+                    images[blured_image_key] = blured_image
                     blured_image.save(blured_image_key)
                     if context:
                         sample[Fields.context][blured_image_key] = blured_image

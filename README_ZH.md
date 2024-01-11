@@ -31,12 +31,22 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
 
 如果Data-Juicer对您的研发有帮助，请引用我们的[工作](#参考文献) 。
 
+欢迎加入我们的[Slack频道](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8275bc8g7ypp) ，[钉钉群](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8275bc8g7ypp&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) ，或微信群（扫描下方二维码加入）进行讨论。
+
+ <img src="https://img.alicdn.com/imgextra/i3/O1CN01QbwHJa1EV5uZwmU9c_!!6000000000356-2-tps-400-400.png" width = "100" height = "100" alt="QR Code for WeChat group" align=center />
+
 
 ----
 
 ## 新消息
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2023-10-13] 我们的第一届以数据为中心的 LLM 竞赛开始了！
-  请访问大赛官网，**FT-Data Ranker**（[1B赛道](https://tianchi.aliyun.com/competition/entrance/532157) 、[7B赛道](https://tianchi.aliyun.com/competition/entrance/532158) ) ，了解更多信息。
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-01-10] 开启“数据混合”新视界——第二届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532174)，了解赛事详情。
+
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-01-05] 现在，我们发布了 **Data-Juicer v0.1.3** 版本！ 
+在这个新版本中，我们支持了**更多Python版本**（3.7-3.10），同时支持了**多模态**数据集的[转换](tools/multimodal/README_ZH.md)和[处理](docs/Operators_ZH.md)（包括文本、图像和音频。更多模态也将会在之后支持）。
+此外，我们的论文也更新到了[第三版](https://arxiv.org/abs/2309.02033) 。
+
+- [2023-10-13] 我们的第一届以数据为中心的 LLM 竞赛开始了！
+  请访问大赛官网，FT-Data Ranker（[1B赛道](https://tianchi.aliyun.com/competition/entrance/532157) 、[7B赛道](https://tianchi.aliyun.com/competition/entrance/532158) ) ，了解更多信息。
 
 - [2023-10-8] 我们的论文更新至第二版，并发布了对应的Data-Juicer v0.1.2版本！
 
@@ -86,7 +96,7 @@ Data-Juicer 是一个一站式数据处理系统，旨在为大语言模型 (LLM
 
 ## 前置条件
 
-* 推荐 Python==3.8
+* 推荐 Python>=3.7,<=3.10
 * gcc >= 5 (at least C++14 support)
 
 ## 安装
@@ -309,7 +319,7 @@ Data-Juicer 在 Apache License 2.0 协议下发布。
 
 大模型是一个高速发展的领域，我们非常欢迎贡献新功能、修复漏洞以及文档改善。请参考[开发者指南](docs/DeveloperGuide_ZH.md)。
 
-欢迎加入我们的[Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8275bc8g7ypp), 或[DingDing群](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8275bc8g7ypp&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) 。
+如果您有任何问题，欢迎加入我们的[讨论群](README_ZH.md) 。
 
 ## 致谢
 
