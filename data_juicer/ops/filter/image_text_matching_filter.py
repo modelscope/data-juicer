@@ -4,7 +4,7 @@ from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (SpecialTokens, load_image,
+from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -87,20 +87,8 @@ class ImageTextMatchingFilter(Filter):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        images = {}
-        for loaded_image_key in loaded_image_keys:
-            if context and loaded_image_key in sample[Fields.context]:
-                # load from context
-                images[loaded_image_key] = sample[
-                    Fields.context][loaded_image_key]
-            else:
-                if loaded_image_key not in images:
-                    # avoid load the same images
-                    image = load_image(loaded_image_key)
-                    images[loaded_image_key] = image
-                    if context:
-                        # store the image data into context
-                        sample[Fields.context][loaded_image_key] = image
+        sample, images = load_data_with_context(sample, context,
+                                                loaded_image_keys)
 
         text = sample[self.text_key]
         offset = 0

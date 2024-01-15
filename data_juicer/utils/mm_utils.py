@@ -41,6 +41,26 @@ def remove_non_special_tokens(text):
     return text_with_only_special_tokens
 
 
+def load_data_with_context(sample, context, loaded_data_keys):
+    """
+    The unified loading function with contexts for multimodal data.
+    """
+    data = {}
+    for loaded_data_key in loaded_data_keys:
+        if context and loaded_data_key in sample[Fields.context]:
+            # load from context
+            data[loaded_data_key] = sample[Fields.context][loaded_data_key]
+        else:
+            if loaded_data_key not in data:
+                # avoid load the same data
+                data_item = load_audio(loaded_data_key)
+                data[loaded_data_key] = data_item
+                if context:
+                    # store the data into context
+                    sample[Fields.context][loaded_data_key] = data_item
+    return sample, data
+
+
 # Image
 def load_images(paths):
     return [load_image(path) for path in paths]
@@ -155,23 +175,3 @@ def insert_texts_after_placeholders(original_string,
             modified_string[index + len(placeholder):]
 
     return modified_string
-
-
-def load_data_with_context(sample, context, loaded_data_keys):
-    """
-    The unified loading function with contexts for multimodal data.
-    """
-    data = {}
-    for loaded_data_key in loaded_data_keys:
-        if context and loaded_data_key in sample[Fields.context]:
-            # load from context
-            data[loaded_data_key] = sample[Fields.context][loaded_data_key]
-        else:
-            if loaded_data_key not in data:
-                # avoid load the same data
-                data_item = load_audio(loaded_data_key)
-                data[loaded_data_key] = data_item
-                if context:
-                    # store the data into context
-                    sample[Fields.context][loaded_data_key] = data_item
-    return sample, data
