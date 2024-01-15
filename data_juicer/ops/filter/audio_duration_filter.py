@@ -5,7 +5,7 @@ import numpy as np
 from jsonargparse.typing import NonNegativeInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import load_data_with_context
+from data_juicer.utils.mm_utils import load_audio, load_data_with_context
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_AUDIOS
@@ -61,7 +61,7 @@ class AudioDurationFilter(Filter):
         # load audios
         loaded_audio_keys = sample[self.audio_key]
         sample, audios = load_data_with_context(sample, context,
-                                                loaded_audio_keys)
+                                                loaded_audio_keys, load_audio)
 
         audio_durations = {
             audio_key: librosa.get_duration(y=audio[0], sr=audio[1])

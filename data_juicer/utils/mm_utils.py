@@ -41,7 +41,7 @@ def remove_non_special_tokens(text):
     return text_with_only_special_tokens
 
 
-def load_data_with_context(sample, context, loaded_data_keys):
+def load_data_with_context(sample, context, loaded_data_keys, load_func):
     """
     The unified loading function with contexts for multimodal data.
     """
@@ -53,7 +53,7 @@ def load_data_with_context(sample, context, loaded_data_keys):
         else:
             if loaded_data_key not in data:
                 # avoid load the same data
-                data_item = load_audio(loaded_data_key)
+                data_item = load_func(loaded_data_key)
                 data[loaded_data_key] = data_item
                 if context:
                     # store the data into context

@@ -4,7 +4,7 @@ import numpy as np
 from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import load_data_with_context
+from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
@@ -65,7 +65,7 @@ class ImageShapeFilter(Filter):
         # load images
         loaded_image_keys = sample[self.image_key]
         sample, images = load_data_with_context(sample, context,
-                                                loaded_image_keys)
+                                                loaded_image_keys, load_image)
 
         # get width and height for each image
         whs = {key: (images[key].width, images[key].height) for key in images}
