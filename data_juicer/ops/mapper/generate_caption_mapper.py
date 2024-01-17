@@ -255,7 +255,7 @@ class GenerateCaptionMapper(Mapper):
         samples_after_generation = []
         # do generation for each sample within the batch
         for ori_sample in reconstructed_samples:
-            if not self.keep_original_sample:
+            if self.keep_original_sample:
                 samples_after_generation.append(ori_sample)
             generated_samples = self._process_single_sample(ori_sample)
             if len(generated_samples) != 0:
