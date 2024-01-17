@@ -126,7 +126,11 @@ class StatsKeysConstant(object):
     face_ratios = 'face_ratios'
     face_detections = 'face_detections'
 
+    # audios
+    audio_duration = 'audio_duration'
+
     # multimodal
+    # image-text
     image_text_similarity = 'image_text_similarity'
     image_text_matching_score = 'image_text_matching_score'
     phrase_grounding_recall = 'phrase_grounding_recall'
@@ -152,4 +156,7 @@ class InterVars(object):
     refined_words = DEFAULT_PREFIX + 'refined_words'
 
     # image
-    loaded_images = DEFAULT_PREFIX + 'loaded_images'
+    loaded_images = DEFAULT_PREFIX + 'loaded_images'  # Image
+
+    # audios
+    loaded_audios = DEFAULT_PREFIX + 'loaded_audios'  # (data, sampling_rate)

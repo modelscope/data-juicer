@@ -39,6 +39,7 @@ class ConfigTest(unittest.TestCase):
                 {'whitespace_normalization_mapper': {
                     'text_key': 'text',
                     'image_key': 'images',
+                    'audio_key': 'audios',
                 }}, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
                 cfg.process[1], {
@@ -47,6 +48,7 @@ class ConfigTest(unittest.TestCase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'audio_key': 'audios',
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
@@ -78,6 +80,7 @@ class ConfigTest(unittest.TestCase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'audio_key': 'audios',
                     }
                 })
             self.assertDictEqual(
@@ -87,6 +90,7 @@ class ConfigTest(unittest.TestCase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'audio_key': 'audios',
                     }
                 })
             self.assertDictEqual(
@@ -96,6 +100,7 @@ class ConfigTest(unittest.TestCase):
                         'min_score': 0.8,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'audio_key': 'audios',
                     }
                 })
             self.assertDictEqual(
@@ -105,6 +110,7 @@ class ConfigTest(unittest.TestCase):
                         'min_score': 0.6,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'audio_key': 'audios',
                     }
                 })
             self.assertDictEqual(
@@ -114,6 +120,7 @@ class ConfigTest(unittest.TestCase):
                         'min_score': 0.5,
                         'text_key': 'text',
                         'image_key': 'images',
+                        'audio_key': 'audios',
                     }
                 })
 
