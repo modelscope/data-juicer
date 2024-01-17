@@ -23,22 +23,24 @@ class ImageBlurMapper(Mapper):
                  **kwargs):
         """
         Initialization method.
-        
+
         :param p: Probability of the image being blured.
-        :param blur_type: Type of blur kernel, including ['mean', 'box', 'gaussian'].
+        :param blur_type: Type of blur kernel, including
+        ['mean', 'box', 'gaussian'].
         :param radius: Radius of blur kernel.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
         if blur_type not in ['mean', 'box', 'gaussian']:
-            raise ValueError(f'Blur_type [{blur_type}] is not supported. '
-                             f'Can only be one of ["mean", "box", "gaussian"].')
+            raise ValueError(
+                f'Blur_type [{blur_type}] is not supported. '
+                f'Can only be one of ["mean", "box", "gaussian"]. ')
         if radius < 0:
-            raise ValueError(f'Radius must be >= 0.')
-        
-        self.p = p   
-    
+            raise ValueError('Radius must be >= 0. ')
+
+        self.p = p
+
         from PIL import ImageFilter
         if blur_type == 'mean':
             self.blur = ImageFilter.BLUR
@@ -73,9 +75,13 @@ class ImageBlurMapper(Mapper):
             if self.p < np.random.rand():
                 continue
             else:
-                blured_image_key = os.path.join(os.path.dirname(value), '_blured.'.join(os.path.basename(value).split('.')))
-                if not os.path.exists(blured_image_key) or blured_image_key not in images:
-                    blured_image = images[value].convert('RGB').filter(self.blur)
+                blured_image_key = os.path.join(
+                    os.path.dirname(value),
+                    '_blured.'.join(os.path.basename(value).split('.')))
+                if not os.path.exists(
+                        blured_image_key) or blured_image_key not in images:
+                    blured_image = images[value].convert('RGB').filter(
+                        self.blur)
                     images[blured_image_key] = blured_image
                     blured_image.save(blured_image_key)
                     if context:
