@@ -81,7 +81,7 @@ def pil_to_opencv(pil_image):
     return opencv_image
 
 
-def get_image_size(path, ):
+def get_file_size(path):
     import os
     return os.path.getsize(path)
 
