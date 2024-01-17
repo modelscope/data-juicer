@@ -9,6 +9,7 @@ class OP:
         self,
         text_key: str = None,
         image_key: str = None,
+        audio_key: str = None,
     ):
         """
         Base class of operators.
@@ -16,6 +17,8 @@ class OP:
         :param text_key: the key name of field that stores sample texts
             to be processed.
         :param image_key: the key name of field that stores sample image list
+            to be processed
+        :param audio_key: the key name of field that stores sample audio list
             to be processed
         """
         # init data keys
@@ -25,6 +28,9 @@ class OP:
         if image_key is None:
             image_key = 'images'
         self.image_key = image_key
+        if audio_key is None:
+            audio_key = 'audios'
+        self.audio_key = audio_key
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.process = wrap_func_with_nested_access(self.process)
@@ -39,6 +45,7 @@ class Mapper(OP):
         self,
         text_key: str = None,
         image_key: str = None,
+        audio_key: str = None,
     ):
         """
         Base class that conducts data editing.
@@ -47,8 +54,10 @@ class Mapper(OP):
             to be processed.
         :param image_key: the key name of field that stores sample image list
             to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
         """
-        super(Mapper, self).__init__(text_key, image_key)
+        super(Mapper, self).__init__(text_key, image_key, audio_key)
 
         # In default, it's a normal OP instead of batched OP
         self._batched_op = False
@@ -72,6 +81,7 @@ class Filter(OP):
         self,
         text_key: str = None,
         image_key: str = None,
+        audio_key: str = None,
     ):
         """
         Base class that removes specific info.
@@ -80,8 +90,10 @@ class Filter(OP):
             to be processed
         :param image_key: the key name of field that stores sample image list
             to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
         """
-        super(Filter, self).__init__(text_key, image_key)
+        super(Filter, self).__init__(text_key, image_key, audio_key)
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.compute_stats = wrap_func_with_nested_access(self.compute_stats)
@@ -114,6 +126,7 @@ class Deduplicator(OP):
         self,
         text_key: str = None,
         image_key: str = None,
+        audio_key: str = None,
     ):
         """
         Base class that conducts deduplication.
@@ -122,8 +135,10 @@ class Deduplicator(OP):
             to be processed
         :param image_key: the key name of field that stores sample image list
             to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
         """
-        super(Deduplicator, self).__init__(text_key, image_key)
+        super(Deduplicator, self).__init__(text_key, image_key, audio_key)
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.compute_hash = wrap_func_with_nested_access(self.compute_hash)
@@ -155,6 +170,7 @@ class Selector(OP):
         self,
         text_key: str = None,
         image_key: str = None,
+        audio_key: str = None,
     ):
         """
         Base class that conducts selection in dataset-level.
@@ -163,8 +179,10 @@ class Selector(OP):
             to be processed
         :param image_key: the key name of field that stores sample image list
             to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
         """
-        super(Selector, self).__init__(text_key, image_key)
+        super(Selector, self).__init__(text_key, image_key, audio_key)
 
     def process(self, dataset):
         """

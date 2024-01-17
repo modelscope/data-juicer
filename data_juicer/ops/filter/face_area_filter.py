@@ -3,7 +3,8 @@ from jsonargparse.typing import ClosedUnitInterval
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import load_image, pil_to_opencv
+from data_juicer.utils.mm_utils import (load_data_with_context, load_image,
+                                        pil_to_opencv)
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
@@ -71,20 +72,8 @@ class FaceAreaFilter(Filter):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        images = {}
-        for loaded_image_key in loaded_image_keys:
-            if context and loaded_image_key in sample[Fields.context]:
-                # load from context
-                images[loaded_image_key] = sample[
-                    Fields.context][loaded_image_key]
-            else:
-                if loaded_image_key not in images:
-                    # avoid load the same images
-                    image = load_image(loaded_image_key)
-                    images[loaded_image_key] = image
-                if context:
-                    # store the image data into context
-                    sample[Fields.context][loaded_image_key] = image
+        sample, images = load_data_with_context(sample, context,
+                                                loaded_image_keys, load_image)
 
         # detect faces
         face_detections = {}
