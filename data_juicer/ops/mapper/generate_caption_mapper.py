@@ -13,13 +13,13 @@ from data_juicer.utils.mm_utils import (SpecialTokens,
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
-from ..deduplicator.document_simhash_deduplicator import (
-    DocumentSimhashDeduplicator, num_differing_bits)
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'generate_caption_mapper'
 
-with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
+with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
+                          OP_NAME):
+    import simhash  # noqa: F401
     import torch
     import transformers  # noqa: F401
 
@@ -198,6 +198,8 @@ class GenerateCaptionMapper(Mapper):
             new_generated_text_per_chunk.extend(
                 generated_text_candidates_single_chunk)
         elif self.keep_candidate_mode == 'similar_one_simhash':
+            from ..deduplicator.document_simhash_deduplicator import (
+                DocumentSimhashDeduplicator, num_differing_bits)
             ori_normal_text = remove_special_tokens(chunk)
             # using a simhash OP to calculate their similarity
             # NOTE: simhash is just one method to calculate the similarities

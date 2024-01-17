@@ -18,7 +18,7 @@ from ..common.helper_func import split_on_whitespace
 
 OP_NAME = 'document_simhash_deduplicator'
 
-with AvailabilityChecking(['simhash-py'], OP_NAME):
+with AvailabilityChecking(['simhash-pybind'], OP_NAME):
     import simhash
 
     def local_num_differing_bits(hash_a, hash_b):
