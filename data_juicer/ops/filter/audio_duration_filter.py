@@ -28,10 +28,10 @@ class AudioDurationFilter(Filter):
         """
         Initialization method.
 
-        :param min_duration: The min audio duration to keep samples. It's 0 by
-            default.
-        :param max_duration: The max audio duration to keep samples. It's
-            sys.maxsize by default.
+        :param min_duration: The min audio duration to keep samples in seconds.
+            It's 0 by default.
+        :param max_duration: The max audio duration to keep samples in seconds.
+            It's sys.maxsize by default.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all audios. 'any': keep this sample if any audios meet the
             condition. 'all': keep this sample only if all audios meet the
