@@ -138,6 +138,18 @@ def init_configs(args=None):
         'default, it\'s "<__dj__image>". You can specify your own special'
         ' token according to your input dataset.')
     parser.add_argument(
+        '--audio_key',
+        type=str,
+        default='audios',
+        help='Key name of field to store the list of sample audio paths.')
+    parser.add_argument(
+        '--audio_special_token',
+        type=str,
+        default=SpecialTokens.audio,
+        help='The special token that represents an audio in the text. In '
+        'default, it\'s "<__dj__audio>". You can specify your own special'
+        ' token according to your input dataset.')
+    parser.add_argument(
         '--eoc_special_token',
         type=str,
         default=SpecialTokens.eoc,
@@ -395,10 +407,12 @@ def init_setup_from_cfg(cfg):
                 args = {
                     'text_key': text_key,
                     'image_key': cfg.image_key,
+                    'audio_key': cfg.audio_key,
                 }
             elif args['text_key'] is None:
                 args['text_key'] = text_key
                 args['image_key'] = cfg.image_key
+                args['audio_key'] = cfg.audio_key
             op[op_name] = args
 
     return cfg

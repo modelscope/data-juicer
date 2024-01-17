@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   25   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   25   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   26   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   4    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -23,7 +23,8 @@ All the specific operators are listed below, each featured with several capabili
     - LaTeX: specific to LaTeX source files
     - Code: specific to programming codes
     - Financial: closely related to financial sector
-    - Image: specific to image or multimodal
+    - Image: specific to images or multimodal
+    - Audio: specific to audios or multimodal
     - Multimodal: specific to multimodal
 * Language Tags
     - en: English
@@ -79,6 +80,7 @@ All the specific operators are listed below, each featured with several capabili
 | Operator                       | Domain     | Lang   | Description                                                                                                    |
 |--------------------------------|------------|--------|----------------------------------------------------------------------------------------------------------------|
 | alphanumeric_filter            | General    | en, zh | Keeps samples with alphanumeric ratio within the specified range                                               |
+| audio_duration_filter          | Audio      | -      | Keep data samples whose audios' durations are within a specified range                                         |
 | average_line_length_filter     | Code       | en, zh | Keeps samples with average line length within the specified range                                              |
 | character_repetition_filter    | General    | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range                               |
 | face_area_filter               | Image      | -      | Keeps samples containing images with face area ratios within the specified range                               |
@@ -91,7 +93,7 @@ All the specific operators are listed below, each featured with several capabili
 | language_id_score_filter       | General    | en, zh | Keeps samples of the specified language, judged by a predicted confidence score                                |
 | maximum_line_length_filter     | Code       | en, zh | Keeps samples with maximum line length within the specified range                                              |
 | perplexity_filter              | General    | en, zh | Keeps samples with perplexity score below the specified threshold                                              |
-| phrase_grounding_recall_filter              | Multimodal | -      | Keeps samples whose locating recalls of phrases extracted from text in the images are within a specified range |
+| phrase_grounding_recall_filter | Multimodal | -      | Keeps samples whose locating recalls of phrases extracted from text in the images are within a specified range |
 | special_characters_filter      | General    | en, zh | Keeps samples with special-char ratio within the specified range                                               |
 | specified_field_filter         | General    | en, zh | Filters samples based on field, with value lies in the specified targets                                       |
 | specified_numeric_field_filter | General    | en, zh | Filters samples based on field, with value lies in the specified range (for numeric types)                     |

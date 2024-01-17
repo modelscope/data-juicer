@@ -3,7 +3,7 @@ import re
 import numpy as np
 from datasets import Audio, Image
 
-from data_juicer.utils.constant import DEFAULT_PREFIX
+from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 
 
 # A class to keep special tokens for multimodal information in the texts
@@ -39,6 +39,26 @@ def remove_non_special_tokens(text):
     text_with_only_special_tokens = ''.join(special_tokens_found)
 
     return text_with_only_special_tokens
+
+
+def load_data_with_context(sample, context, loaded_data_keys, load_func):
+    """
+    The unified loading function with contexts for multimodal data.
+    """
+    data = {}
+    for loaded_data_key in loaded_data_keys:
+        if context and loaded_data_key in sample[Fields.context]:
+            # load from context
+            data[loaded_data_key] = sample[Fields.context][loaded_data_key]
+        else:
+            if loaded_data_key not in data:
+                # avoid load the same data
+                data_item = load_func(loaded_data_key)
+                data[loaded_data_key] = data_item
+                if context:
+                    # store the data into context
+                    sample[Fields.context][loaded_data_key] = data_item
+    return sample, data
 
 
 # Image
