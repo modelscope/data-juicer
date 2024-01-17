@@ -238,8 +238,8 @@ def unify_format(
                 if not paths:
                     continue
                 new_paths = [
-                    os.path.join(dataset_dir, path) for path in paths
-                    if not os.path.isabs(path)
+                    path if os.path.isabs(path) else os.path.join(
+                        dataset_dir, path) for path in paths
                 ]
                 sample[path_key] = new_paths
             return sample
