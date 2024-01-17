@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 
-from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import load_image
 
 from ..base_op import OPERATORS, Mapper
@@ -27,9 +27,6 @@ class ImageBlurMapper(Mapper):
         :param p: Probability of the image being blured.
         :param blur_type: Type of blur kernel, including ['mean', 'box', 'gaussian'].
         :param radius: Radius of blur kernel.
-        :param cover: Whether the blurred image covers the original image. If set to
-             false, the blurred image will be added with the suffix '_blur' and then
-             saved in the same directory.
         :param args: extra args
         :param kwargs: extra args
         """
