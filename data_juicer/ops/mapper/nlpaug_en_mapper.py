@@ -22,6 +22,7 @@ class NlpaugEnMapper(Mapper):
     def __init__(self,
                  sequential: bool = False,
                  aug_num: int = 1,
+                 keep_original_sample: bool = True,
                  delete_random_word: bool = False,
                  swap_random_word: bool = False,
                  spelling_error_word: bool = False,
@@ -48,6 +49,10 @@ class NlpaugEnMapper(Mapper):
             `sequential` is True, there will be total aug_num augmented samples
             generated. If it's False, there will be (aug_num *
             #opened_aug_method) augmented samples generated.
+        :param keep_original_sample: whether to keep the original sample. If
+            it's set to False, there will be only generated captions in the
+            final datasets and the original captions will be removed. It's True
+            in default.
         :param delete_random_word: whether to open the augmentation method of
             deleting random words from the original texts. e.g. "I love LLM"
             --> "I LLM"
@@ -87,6 +92,7 @@ class NlpaugEnMapper(Mapper):
                            f' might generate large number of new samples and '
                            f'requires more memory and disk space.')
         self.sequential = sequential
+        self.keep_original_sample = keep_original_sample
 
         aug_pipeline = []
         # word level
@@ -119,7 +125,10 @@ class NlpaugEnMapper(Mapper):
     def process(self, samples):
         # no augmentation methods are opened
         if len(self.aug) == 0:
-            return samples
+            if self.keep_original_sample:
+                return samples
+            else:
+                return {key: [] for key in samples}
 
         texts_to_aug = samples[self.text_key][0]  # batch_size = 1
         res_samples = deepcopy(samples)
@@ -134,7 +143,10 @@ class NlpaugEnMapper(Mapper):
                 aug_texts += aug_method.augment(texts_to_aug, n=self.aug_num)
 
         # add augmented samples to the batch with other replicate fields
-        res_samples[self.text_key] += aug_texts
+        if self.keep_original_sample:
+            res_samples[self.text_key] += aug_texts
+        else:
+            res_samples[self.text_key] = aug_texts
         # add other replicate fields
         for key in res_samples:
             if key != self.text_key:

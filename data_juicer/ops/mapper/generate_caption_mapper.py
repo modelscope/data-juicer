@@ -37,6 +37,7 @@ class GenerateCaptionMapper(Mapper):
                  hf_blip2='Salesforce/blip2-opt-2.7b',
                  caption_num: PositiveInt = 1,
                  keep_candidate_mode: str = 'random_any',
+                 keep_original_sample: bool = True,
                  *args,
                  **kwargs):
         """
@@ -54,9 +55,15 @@ class GenerateCaptionMapper(Mapper):
         Note: This is a batched_OP, whose input and output type are
             both list. Suppose there are $N$ list of input samples, whose batch
             size is $b$, and denote caption_num as $M$.
-            The number of total samples after generation is $2Nb$
-            for 'random_any' and 'similar_one_simhash' mode,
-             and $(1+M)Nb$ for 'all' mode.
+            The number of total samples after generation is $2Nb$ when
+            keep_original_sample is True and $Nb$ when keep_original_sample is
+            False. For 'random_any' and 'similar_one_simhash' mode,
+             it's $(1+M)Nb$ for 'all' mode when keep_original_sample is True
+             and $MNb$ when keep_original_sample is False.
+        :param keep_original_sample: whether to keep the original sample. If
+            it's set to False, there will be only generated captions in the
+            final datasets and the original captions will be removed. It's True
+            in default.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -79,6 +86,7 @@ class GenerateCaptionMapper(Mapper):
         self.img_processor_in_ctx = img_processor
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode
+        self.keep_original_sample = keep_original_sample
         self.extra_args = kwargs
 
         if keep_candidate_mode in ['random_any', 'similar_one_simhash']:
@@ -247,7 +255,8 @@ class GenerateCaptionMapper(Mapper):
         samples_after_generation = []
         # do generation for each sample within the batch
         for ori_sample in reconstructed_samples:
-            samples_after_generation.append(ori_sample)
+            if not self.keep_original_sample:
+                samples_after_generation.append(ori_sample)
             generated_samples = self._process_single_sample(ori_sample)
             if len(generated_samples) != 0:
                 samples_after_generation.extend(generated_samples)
