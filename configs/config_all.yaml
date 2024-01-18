@@ -114,9 +114,14 @@ process:
       tokenization: false                                     # Whether to count the ratio of alphanumeric to the total number of tokens.
       min_ratio: 0.0                                          # the min ratio of filter range
       max_ratio: 0.9                                          # the max ratio of filter range
-  - audio_duration_filter:                                  # Keep data samples whose audios' durations are within a specified range.
+  - audio_duration_filter:                                  # keep data samples whose audios' durations are within a specified range.
       min_duration: 0                                         # the min audio duration of filter range (in seconds)
       max_duration: 3600                                      # the max audio duration of filter range (in seconds)
+      any_or_all: any                                         # keep this sample when any/all audios meet the filter condition
+  - audio_nmf_snr_filter:                                   # keep data samples whose audios' SNRs (computed based on NMF) are within a specified range.
+      min_snr: 0                                              # The min audio SNR to keep samples in dB. It's 0 by default.
+      max_snr: 1000                                           # The max audio SNR to keep samples in dB. It's sys.maxsize by default.
+      nmf_iter_num: 500                                       # The max number of iterations to run NMF. It's 500 in default.
       any_or_all: any                                         # keep this sample when any/all audios meet the filter condition
   - average_line_length_filter:                             # filter text with the average length of lines out of specific range.
       min_len: 10                                             # the min length of filter range
