@@ -91,7 +91,8 @@ def predict_score(dataset_path,
     :param overall_stats: whether to output an overall stats report on
         predicted document scores. It's False in default
     :return:
-        average quality score of the document
+        None if overall_stats is False
+        average quality score of the document if overall_stats is True
     """
     # set default tokenizers for default models
     if model == 'chinese':
@@ -127,6 +128,7 @@ def predict_score(dataset_path,
         # export to result report file
         overall.to_csv(os.path.join(result_path, 'overall.csv'))
         overall.to_markdown(os.path.join(result_path, 'overall.md'))
+        return overall
 
 
 if __name__ == '__main__':
