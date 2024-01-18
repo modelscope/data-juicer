@@ -123,6 +123,103 @@ class GenerateCaptionMapperTest(DataJuicerTestCaseBase):
                                    keep_candidate_mode='random_any')
         self._run_mapper(dataset, op, num_proc=4, caption_num=len(dataset) * 2)
 
+    def test_no_eoc_special_token_remove_original_sample(self):
+
+        ds_list = [{
+            'text': f'{SpecialTokens.image}a photo of a cat',
+            'images': [self.cat_path]
+        }, {
+            'text': f'{SpecialTokens.image}a photo, a women with an umbrella',
+            'images': [self.img3_path]
+        }]
+        caption_num = 1
+        dataset = NestedDataset.from_list(ds_list)
+        op = GenerateCaptionMapper(hf_blip2=self.hf_blip2,
+                                   caption_num=caption_num,
+                                   keep_candidate_mode='random_any',
+                                   keep_original_sample=False)
+        self._run_mapper(dataset, op, caption_num=len(dataset))
+
+    def test_eoc_special_token_remove_original_sample(self):
+
+        ds_list = [{
+            'text': f'{SpecialTokens.image}a photo of a cat{SpecialTokens.eoc}',
+            'images': [self.cat_path]
+        }, {
+            'text': f'{SpecialTokens.image}a photo, a women with an umbrella{SpecialTokens.eoc}',
+            'images': [self.img3_path]
+        }]
+        caption_num = 1
+        dataset = NestedDataset.from_list(ds_list)
+        op = GenerateCaptionMapper(hf_blip2=self.hf_blip2,
+                                   caption_num=caption_num,
+                                   keep_candidate_mode='random_any',
+                                   keep_original_sample=False)
+        self._run_mapper(dataset, op, caption_num=len(dataset))
+
+    def test_multi_candidate_keep_random_any_remove_original_sample(self):
+
+        ds_list = [{
+            'text': f'{SpecialTokens.image}a photo of a cat',
+            'images': [self.cat_path]
+        }, {
+            'text': f'{SpecialTokens.image}a photo, a women with an umbrella',
+            'images': [self.img3_path]
+        }]
+        caption_num = 4
+        dataset = NestedDataset.from_list(ds_list)
+        op = GenerateCaptionMapper(hf_blip2=self.hf_blip2,
+                                   caption_num=caption_num,
+                                   keep_candidate_mode='random_any',
+                                   keep_original_sample=False)
+        self._run_mapper(dataset, op, caption_num=len(dataset))
+
+    def test_multi_candidate_keep_all_remove_original_sample(self):
+
+        ds_list = [{
+            'text': f'{SpecialTokens.image}a photo of a cat',
+            'images': [self.cat_path]
+        }, {
+            'text': f'{SpecialTokens.image}a photo, a women with an umbrella',
+            'images': [self.img3_path]
+        }]
+        caption_num = 4
+        dataset = NestedDataset.from_list(ds_list)
+        op = GenerateCaptionMapper(hf_blip2=self.hf_blip2,
+                                   caption_num=caption_num,
+                                   keep_candidate_mode='all',
+                                   keep_original_sample=False)
+        self._run_mapper(dataset, op, caption_num=caption_num * len(dataset))
+
+    def test_multi_candidate_keep_similar_one_remove_original_sample(self):
+        ds_list = [{
+            'text': f'{SpecialTokens.image}a photo of a cat',
+            'images': [self.cat_path]
+        }, {
+            'text': f'{SpecialTokens.image}a photo, a women with an umbrella',
+            'images': [self.img3_path]
+        }]
+        caption_num = 4
+        dataset = NestedDataset.from_list(ds_list)
+        op = GenerateCaptionMapper(hf_blip2=self.hf_blip2,
+                                   caption_num=caption_num,
+                                   keep_candidate_mode='similar_one_simhash',
+                                   keep_original_sample=False)
+        self._run_mapper(dataset, op, caption_num=len(dataset))
+
+    def test_multi_process_remove_original_sample(self):
+        ds_list = [{
+            'text': f'{SpecialTokens.image}a photo of a cat',
+            'images': [self.cat_path]
+        }] * 10
+        caption_num = 1
+        dataset = NestedDataset.from_list(ds_list)
+        op = GenerateCaptionMapper(hf_blip2=self.hf_blip2,
+                                   caption_num=caption_num,
+                                   keep_candidate_mode='random_any',
+                                   keep_original_sample=False)
+        self._run_mapper(dataset, op, num_proc=4, caption_num=len(dataset))
+
 
 if __name__ == '__main__':
     unittest.main()
