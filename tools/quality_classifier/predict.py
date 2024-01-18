@@ -121,14 +121,12 @@ def predict_score(dataset_path,
     # export prediction result to specific path
     export_result(pred, result_path)
 
-    # generate overall statistics on doc scores
-    overall = pred.select('doc_score').toPandas().describe(include='all')
     if overall_stats:
+        # generate overall statistics on doc scores
+        overall = pred.select('doc_score').toPandas().describe(include='all')
         # export to result report file
         overall.to_csv(os.path.join(result_path, 'overall.csv'))
         overall.to_markdown(os.path.join(result_path, 'overall.md'))
-
-    return overall
 
 
 if __name__ == '__main__':
