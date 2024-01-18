@@ -50,10 +50,11 @@ process:
   - clean_copyright_mapper:                                 # remove copyright comments.
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
   - fix_unicode_mapper:                                     # fix unicode errors in text.
-  - generate_caption_mapper:
-      hf_blip2: 'Salesforce/blip2-opt-2.7b'                 # blip2 model name on huggingface to generate caption
-      caption_num: 1                                        # how many candidate captions to generate for each image
-      keep_candidate_mode: 'random_any'                     # retain strategy for the generated $caption_num$ candidates. should be in ["random_any", "similar_one_simhash", "all"].
+  - generate_caption_mapper:                                # generate captions for images to augment datasets
+      hf_blip2: 'Salesforce/blip2-opt-2.7b'                   # blip2 model name on huggingface to generate caption
+      caption_num: 1                                          # how many candidate captions to generate for each image
+      keep_candidate_mode: 'random_any'                       # retain strategy for the generated $caption_num$ candidates. should be in ["random_any", "similar_one_simhash", "all"].
+      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True in default.
   - image_blur_mapper:                                      # mapper to blur images.
       p: 0.2                                                # probability of the image being blured
       blur_type: 'gaussian'                                 # type of blur kernel, including ['mean', 'box', 'gaussian']
@@ -61,6 +62,7 @@ process:
   - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library
       sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
       aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.
+      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated texts in the final datasets and the original texts will be removed. It's True in default.
       delete_random_word: false                               # whether to open the augmentation method of deleting random words from the original texts. e.g. "I love LLM" --> "I LLM"
       swap_random_word: false                                 # whether to open the augmentation method of swapping random contiguous words in the original texts. e.g. "I love LLM" --> "Love I LLM"
       spelling_error_word: false                              # whether to open the augmentation method of simulating the spelling error for words in the original texts. e.g. "I love LLM" --> "Ai love LLM"
@@ -73,6 +75,7 @@ process:
   - nlpcda_zh_mapper:                                       # simply augment texts in Chinese based on the nlpaug library
       sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
       aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.
+      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated texts in the final datasets and the original texts will be removed. It's True in default.
       replace_similar_word: false                             # whether to open the augmentation method of replacing random words with their similar words in the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这边一共有5种不同的数据增强方法"
       replace_homophone_char: false                           # whether to open the augmentation method of replacing random characters with their homophones in the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的濖据增强方法"
       delete_random_char: false                               # whether to open the augmentation method of deleting random characters from the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的数据增强"
