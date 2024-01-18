@@ -53,7 +53,7 @@ class AudioSizeFilter(Filter):
 
         # for size calculation, no need to load audios into memory
         sample[Fields.stats][StatsKeys.audio_sizes] = [
-            get_file_size(img_path) for img_path in sample[self.audio_key]
+            get_file_size(aud_path) for aud_path in sample[self.audio_key]
         ]
 
         return sample
