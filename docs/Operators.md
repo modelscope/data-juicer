@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   24   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   26   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   27   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   4    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -80,6 +80,7 @@ All the specific operators are listed below, each featured with several capabili
 |--------------------------------|------------|--------|----------------------------------------------------------------------------------------------------------------|
 | alphanumeric_filter            | General    | en, zh | Keeps samples with alphanumeric ratio within the specified range                                               |
 | audio_duration_filter          | Audio      | -      | Keep data samples whose audios' durations are within a specified range                                         |
+| audio_size_filter              | Audio      | -      | Keep data samples whose audios' sizes are within a specified range                                         |
 | average_line_length_filter     | Code       | en, zh | Keeps samples with average line length within the specified range                                              |
 | character_repetition_filter    | General    | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range                               |
 | face_area_filter               | Image      | -      | Keeps samples containing images with face area ratios within the specified range                               |
