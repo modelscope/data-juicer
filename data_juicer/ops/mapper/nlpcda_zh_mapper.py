@@ -20,6 +20,7 @@ class NlpcdaZhMapper(Mapper):
     def __init__(self,
                  sequential: bool = False,
                  aug_num: int = 1,
+                 keep_original_sample: bool = True,
                  replace_similar_word: bool = False,
                  replace_homophone_char: bool = False,
                  delete_random_char: bool = False,
@@ -43,6 +44,10 @@ class NlpcdaZhMapper(Mapper):
             `sequential` is True, there will be total aug_num augmented samples
             generated. If it's False, there will be (aug_num *
             #opened_aug_method) augmented samples generated.
+        :param keep_original_sample: whether to keep the original sample. If
+            it's set to False, there will be only generated texts in the final
+            datasets and the original texts will be removed. It's True in
+            default.
         :param replace_similar_word: whether to open the augmentation method of
             replacing random words with their similar words in the original
             texts. e.g. "这里一共有5种不同的数据增强方法" --> "这边一共有5种不同的数据增强方法"
@@ -71,6 +76,7 @@ class NlpcdaZhMapper(Mapper):
                            f' might generate large number of new samples and '
                            f'requires more memory and disk space.')
         self.sequential = sequential
+        self.keep_original_sample = keep_original_sample
 
         # hide the redundant outputs from nlpcda library
         with HiddenPrints():
@@ -125,7 +131,10 @@ class NlpcdaZhMapper(Mapper):
     def process(self, samples):
         # no augmentation methods are opened
         if len(self.aug_pipeline) == 0:
-            return samples
+            if self.keep_original_sample:
+                return samples
+            else:
+                return {key: [] for key in samples}
 
         texts_to_aug = samples[self.text_key]
         res_samples = deepcopy(samples)
@@ -149,7 +158,10 @@ class NlpcdaZhMapper(Mapper):
                 aug_texts += aug_method.replace(texts_to_aug[0])[1:]
 
         # add augmented samples to the batch with other replicate fields
-        res_samples[self.text_key] += aug_texts
+        if self.keep_original_sample:
+            res_samples[self.text_key] += aug_texts
+        else:
+            res_samples[self.text_key] = aug_texts
         # add other replicate fields
         for key in res_samples:
             if key != self.text_key:
