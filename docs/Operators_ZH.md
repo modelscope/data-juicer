@@ -77,7 +77,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 |--------------------------------|------------|--------|---------------------------------------------|
 | alphanumeric_filter            | General    | en, zh | 保留字母数字比例在指定范围内的样本                           |
 | audio_duration_filter          | Audio      | -      | 保留样本中包含的音频的时长在指定范围内的样本                      |
-| audio_nmf_snr_filter           | Audio      | -      | 保留样本中包含的音频信噪比SNR(基于非负矩阵分解方法NMF计算)在指定范围内的样本. |
+| audio_nmf_snr_filter           | Audio      | -      | 保留样本中包含的音频信噪比SNR（基于非负矩阵分解方法NMF计算）在指定范围内的样本. |
 | average_line_length_filter     | Code       | en, zh | 保留平均行长度在指定范围内的样本                            |
 | character_repetition_filter    | General    | en, zh | 保留 char-level n-gram 重复比率在指定范围内的样本          |
 | face_area_filter               | Image      | -      | 保留样本中包含的图片的最大脸部区域在指定范围内的样本                  |
