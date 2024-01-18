@@ -50,9 +50,9 @@ class NlpaugEnMapper(Mapper):
             generated. If it's False, there will be (aug_num *
             #opened_aug_method) augmented samples generated.
         :param keep_original_sample: whether to keep the original sample. If
-            it's set to False, there will be only generated captions in the
-            final datasets and the original captions will be removed. It's True
-            in default.
+            it's set to False, there will be only generated texts in the final
+            datasets and the original texts will be removed. It's True in
+            default.
         :param delete_random_word: whether to open the augmentation method of
             deleting random words from the original texts. e.g. "I love LLM"
             --> "I LLM"

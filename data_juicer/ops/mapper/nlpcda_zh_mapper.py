@@ -45,9 +45,9 @@ class NlpcdaZhMapper(Mapper):
             generated. If it's False, there will be (aug_num *
             #opened_aug_method) augmented samples generated.
         :param keep_original_sample: whether to keep the original sample. If
-            it's set to False, there will be only generated captions in the
-            final datasets and the original captions will be removed. It's True
-            in default.
+            it's set to False, there will be only generated texts in the final
+            datasets and the original texts will be removed. It's True in
+            default.
         :param replace_similar_word: whether to open the augmentation method of
             replacing random words with their similar words in the original
             texts. e.g. "这里一共有5种不同的数据增强方法" --> "这边一共有5种不同的数据增强方法"
