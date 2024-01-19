@@ -128,6 +128,7 @@ class StatsKeysConstant(object):
 
     # audios
     audio_duration = 'audio_duration'
+    audio_sizes = 'audio_sizes'
 
     # multimodal
     # image-text
