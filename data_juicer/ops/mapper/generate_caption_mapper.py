@@ -39,6 +39,7 @@ class GenerateCaptionMapper(Mapper):
                  keep_candidate_mode: str = 'random_any',
                  keep_original_sample: bool = True,
                  prompt: str = None,
+                 prompt_key: str = None,
                  *args,
                  **kwargs):
         """
@@ -65,8 +66,13 @@ class GenerateCaptionMapper(Mapper):
             it's set to False, there will be only generated captions in the
             final datasets and the original captions will be removed. It's True
             in default.
-        :param prompt: a string prompt to guide the generation of blip2 model.
-            It's None in default, which means no prompt provided.
+        :param prompt: a string prompt to guide the generation of blip2 model
+            for all samples globally. It's None in default, which means no
+            prompt provided.
+        :param prompt_key: the key name of fields in samples to store prompts
+            for each sample. It's used for set different prompts for different
+            samples. If it's none, use prompt in parameter "prompt". It's None
+            in default.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -91,6 +97,7 @@ class GenerateCaptionMapper(Mapper):
         self.keep_candidate_mode = keep_candidate_mode
         self.keep_original_sample = keep_original_sample
         self.prompt = prompt
+        self.prompt_key = prompt_key
         self.extra_args = kwargs
 
         if keep_candidate_mode in ['random_any', 'similar_one_simhash']:
@@ -157,9 +164,19 @@ class GenerateCaptionMapper(Mapper):
             # generated_text_candidates_single_chunk[i][j] indicates
             # the $i$-th generated candidate for the $j$-th image
 
+            # construct prompts
+            if self.prompt_key \
+                    and isinstance(ori_sample[self.prompt_key], str):
+                # check prompt_key is not None, and it's a str in the sample
+                prompt_texts = [ori_sample[self.prompt_key]] * len(image_chunk)
+            elif self.prompt and isinstance(self.prompt, str):
+                # check prompt is not None, and it's a str
+                prompt_texts = [self.prompt] * len(image_chunk)
+            else:
+                prompt_texts = None
+
             inputs = self.img_processor_in_ctx(images=image_chunk,
-                                               text=[self.prompt] *
-                                               len(image_chunk),
+                                               text=prompt_texts,
                                                return_tensors='pt')
             for i in range(self.caption_num):
                 generated_ids = self.model_in_ctx.generate(**inputs,
