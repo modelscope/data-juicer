@@ -3,6 +3,7 @@ import random
 
 import numpy as np
 from jsonargparse.typing import PositiveInt
+from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
@@ -106,6 +107,12 @@ class GenerateCaptionMapper(Mapper):
             self.num_newly_generated_samples = self.caption_num
         else:
             self.num_newly_generated_samples = 0
+
+        # report a warning when both prompt and prompt_key are set
+        if self.prompt and self.prompt_key:
+            logger.warning(
+                'Both the parameter `prompt` and `prompt_key` are '
+                'set. Data-Juicer will consider `prompt_key` first.')
 
     def _process_single_sample(self, ori_sample):
         """
