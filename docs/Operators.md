@@ -81,6 +81,7 @@ All the specific operators are listed below, each featured with several capabili
 |--------------------------------|------------|--------|----------------------------------------------------------------------------------------------------------------|
 | alphanumeric_filter            | General    | en, zh | Keeps samples with alphanumeric ratio within the specified range                                               |
 | audio_duration_filter          | Audio      | -      | Keep data samples whose audios' durations are within a specified range                                         |
+| audio_size_filter              | Audio      | -      | Keep data samples whose audios' sizes are within a specified range                                         |
 | average_line_length_filter     | Code       | en, zh | Keeps samples with average line length within the specified range                                              |
 | character_repetition_filter    | General    | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range                               |
 | face_area_filter               | Image      | -      | Keeps samples containing images with face area ratios within the specified range                               |
