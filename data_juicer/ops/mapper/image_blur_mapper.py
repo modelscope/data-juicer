@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.mm_utils import load_image
+from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
@@ -56,20 +56,8 @@ class ImageBlurMapper(Mapper):
 
         # load images
         loaded_image_keys = sample[self.image_key]
-        images = {}
-        for loaded_image_key in loaded_image_keys:
-            if context and loaded_image_key in sample[Fields.context]:
-                # load from context
-                images[loaded_image_key] = sample[
-                    Fields.context][loaded_image_key]
-            else:
-                if loaded_image_key not in images:
-                    # avoid load the same images
-                    image = load_image(loaded_image_key)
-                    images[loaded_image_key] = image
-                    if context:
-                        # store the image data into context
-                        sample[Fields.context][loaded_image_key] = image
+        sample, images = load_data_with_context(sample, context,
+                                                loaded_image_keys, load_image)
 
         for index, value in enumerate(loaded_image_keys):
             if self.p < np.random.rand():
