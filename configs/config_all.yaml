@@ -123,6 +123,10 @@ process:
       max_snr: 1000                                           # The max audio SNR to keep samples in dB. It's sys.maxsize by default.
       nmf_iter_num: 500                                       # The max number of iterations to run NMF. It's 500 in default.
       any_or_all: any                                         # keep this sample when any/all audios meet the filter condition
+  - audio_size_filter:                                      # Keep data samples whose audios' sizes are within a specified range.
+      min_duration: "0"                                       # the min audio size of filter range
+      max_duration: "1TB"                                     # the max audio size of filter range
+      any_or_all: any                                         # keep this sample when any/all audios meet the filter condition
   - average_line_length_filter:                             # filter text with the average length of lines out of specific range.
       min_len: 10                                             # the min length of filter range
       max_len: 10000                                          # the max length of filter range
