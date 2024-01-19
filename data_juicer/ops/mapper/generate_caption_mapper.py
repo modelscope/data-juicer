@@ -38,6 +38,7 @@ class GenerateCaptionMapper(Mapper):
                  caption_num: PositiveInt = 1,
                  keep_candidate_mode: str = 'random_any',
                  keep_original_sample: bool = True,
+                 prompt: str = None,
                  *args,
                  **kwargs):
         """
@@ -64,6 +65,8 @@ class GenerateCaptionMapper(Mapper):
             it's set to False, there will be only generated captions in the
             final datasets and the original captions will be removed. It's True
             in default.
+        :param prompt: a string prompt to guide the generation of blip2 model.
+            It's None in default, which means no prompt provided.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -87,6 +90,7 @@ class GenerateCaptionMapper(Mapper):
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode
         self.keep_original_sample = keep_original_sample
+        self.prompt = prompt
         self.extra_args = kwargs
 
         if keep_candidate_mode in ['random_any', 'similar_one_simhash']:
@@ -154,6 +158,8 @@ class GenerateCaptionMapper(Mapper):
             # the $i$-th generated candidate for the $j$-th image
 
             inputs = self.img_processor_in_ctx(images=image_chunk,
+                                               text=[self.prompt] *
+                                               len(image_chunk),
                                                return_tensors='pt')
             for i in range(self.caption_num):
                 generated_ids = self.model_in_ctx.generate(**inputs,
