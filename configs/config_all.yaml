@@ -33,7 +33,7 @@ eoc_special_token: '<|__dj__eoc|>'                          # the special token 
 
 # for distributed processing
 executor_type: default                                      # type of executor, support "default" or "ray" for now.
-ray_address: auto                                           # The address of the Ray cluster.
+ray_address: auto                                           # the address of the Ray cluster.
 
 # only for data analysis
 save_stats_in_one_file: false                               # whether to store all stats result into one file
@@ -115,7 +115,7 @@ process:
 
   # Filter ops
   - alphanumeric_filter:                                    # filter text with alphabet/numeric ratio out of specific range.
-      tokenization: false                                     # Whether to count the ratio of alphanumeric to the total number of tokens.
+      tokenization: false                                     # whether to count the ratio of alphanumeric to the total number of tokens.
       min_ratio: 0.0                                          # the min ratio of filter range
       max_ratio: 0.9                                          # the max ratio of filter range
   - audio_duration_filter:                                  # keep data samples whose audios' durations are within a specified range.
@@ -123,11 +123,11 @@ process:
       max_duration: 3600                                      # the max audio duration of filter range (in seconds)
       any_or_all: any                                         # keep this sample when any/all audios meet the filter condition
   - audio_nmf_snr_filter:                                   # keep data samples whose audios' SNRs (computed based on NMF) are within a specified range.
-      min_snr: 0                                              # The min audio SNR to keep samples in dB. It's 0 by default.
-      max_snr: 1000                                           # The max audio SNR to keep samples in dB. It's sys.maxsize by default.
-      nmf_iter_num: 500                                       # The max number of iterations to run NMF. It's 500 in default.
+      min_snr: 0                                              # the min audio SNR to keep samples in dB. It's 0 by default.
+      max_snr: 1000                                           # the max audio SNR to keep samples in dB. It's sys.maxsize by default.
+      nmf_iter_num: 500                                       # the max number of iterations to run NMF. It's 500 in default.
       any_or_all: any                                         # keep this sample when any/all audios meet the filter condition
-  - audio_size_filter:                                      # Keep data samples whose audios' sizes are within a specified range.
+  - audio_size_filter:                                      # keep data samples whose audios' sizes are within a specified range.
       min_duration: "0"                                       # the min audio size of filter range
       max_duration: "1TB"                                     # the max audio size of filter range
       any_or_all: any                                         # keep this sample when any/all audios meet the filter condition
