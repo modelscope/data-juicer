@@ -163,7 +163,7 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
     assert lang in nltk_to_punkt.keys(
     ), 'lang must be one of the following: {}'.format(
         list(nltk_to_punkt.keys()))
-    model_name = name_pattern.format(lang)
+    model_name = name_pattern.format(nltk_to_punkt[lang])
 
     logger.info('Loading nltk punkt split model...')
     try:
