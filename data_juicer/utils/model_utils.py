@@ -1,7 +1,7 @@
 import fnmatch
 import os
+from functools import partial
 
-import partial
 import wget
 from loguru import logger
 
