@@ -44,14 +44,14 @@ class TokenNumFilter(Filter):
         self.max_num = max_num
         self.hf_tokenizer = hf_tokenizer
         self.model_key = prepare_model(model_type='huggingface',
-                                       model_key=hf_tokenizer)
+                                       model_name_or_path=hf_tokenizer)
 
     def compute_stats(self, sample):
         # check if it's computed already
         if StatsKeys.num_token in sample[Fields.stats]:
             return sample
 
-        tokenizer = get_model(self.model_key, model_type='huggingface')
+        tokenizer = get_model(self.model_key)
         tokens = get_words_from_document(
             sample[self.text_key],
             token_func=tokenizer.tokenize if tokenizer else None)

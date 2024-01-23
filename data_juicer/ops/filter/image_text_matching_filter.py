@@ -68,7 +68,8 @@ class ImageTextMatchingFilter(Filter):
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
-        self.model_key = prepare_model(model_type='hf_blip', model_key=hf_blip)
+        self.model_key = prepare_model(model_type='huggingface',
+                                       model_name_or_path=hf_blip)
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
@@ -118,7 +119,7 @@ class ImageTextMatchingFilter(Filter):
                                    truncation=True,
                                    max_length=model.config.text_config.
                                    max_position_embeddings,
-                                   padding=True)
+                                   padding=True).to(model.device)
 
                 outputs = model(**inputs)
                 itm_scores = outputs.itm_score.detach().cpu().softmax(
