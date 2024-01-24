@@ -11,8 +11,9 @@ some OPs work well on some datasets but might be useless on others.
 
 ## Table of Contents
 
+- [Involved OPs](#involved-ops)
 - [Multimodal Datasets](#multimodal-datasets)
-  - [LLaVA-1.5 pretrain dataset](#llava-15-pretrain-dataset)
+  - [LCS-558K](#lcs-558k)
 - [Text-only Datasets](#text-only-datasets)
   - [Wikipedia](#wikipedia)
   - [Books](#books)
@@ -22,14 +23,31 @@ some OPs work well on some datasets but might be useless on others.
 
 ## Involved OPs
 
-| OP | Datasets                  |
-|---|---------------------------|
-| `average_line_length_filter`| [Github Code](#github-code) |
-| `image_aspect_ratio_filter` | [LCS-558K](#llava-15-pretrain-dataset)              |
+| OP                            | Datasets                                                                                                            |
+|-------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| `alphanumeric_filter`         | [LCS-558K](#llava-15-pretrain-dataset), [Wikipedia](#wikipedia), [Books](#books)                                    |
+| `average_line_length_filter`  | [Github Code](#github-code)                                                                                         |
+| `character_repetition_filter` | [LCS-558K](#llava-15-pretrain-dataset), [Wikipedia](#wikipedia), [Books](#books), [Stack Exchange](#stack-exchange) |
+| `flagged_words_filter`        | [LCS-558K](#llava-15-pretrain-dataset)                                                                              |
+| `image_aspect_ratio_filter`   | [LCS-558K](#llava-15-pretrain-dataset)                                                                              |
+| `image_deduplicator`          | [LCS-558K](#llava-15-pretrain-dataset)                                                                              |
+| `image_shape_filter`          | [LCS-558K](#llava-15-pretrain-dataset)                                                                              |
+| `image_size_filter`           | [LCS-558K](#llava-15-pretrain-dataset)                                                                              |
+| `image_text_matching_filter`  | [LCS-558K](#llava-15-pretrain-dataset)                                                                              |
+| `languge_id_score_filter`     | [Books](#books)                                                                                                     |
+| `perplexity_filter`           | [LCS-558K](#llava-15-pretrain-dataset), [Books](#books), [ArXiv](#arxiv)                                            |
+| `special_characters_filter`   | [Wikipedia](#wikipedia), [Books](#books)                                                                            |
+| `text_length_filter`          | [Wikipedia](#wikipedia), [ArXiv](#arxiv), [Github Code](#github-code)                                               |
+| `word_num_filter`             | [Stack Exchange](#stack-exchange)                                                                                   |
+| `word_repetition_filter`      | [Wikipedia](#wikipedia)                                                                                             |
+
+- Everyone from community is welcome to continue to add examples to this table.
 
 ## Multimodal Datasets
 
-### LLaVA-1.5 pretrain dataset
+### LCS-558K
+
+The pretraining dataset of LLaVA-1.5
 
 <details>
 <summary> LCS-558K </summary>
