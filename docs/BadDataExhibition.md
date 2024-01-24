@@ -4,10 +4,10 @@ This document is a exhibition that shows those so-called "bad" data from diverse
 to process them. The motivations of this exhibition include:
 - It can help users to better understand how each OP in Data-juicer finds these "bad" data 
 to improve the "quality" of datasets.
-- We want to show that there might be non-negligible differences between diverse datasets. So 
+- There might be non-negligible differences between diverse datasets. So 
 some OPs work well on some datasets but might be useless on others.
-- We want to tell users that no matter how high-quality people consider 
-a dataset to be (e.g. Wikipedia, Books, ...), there are always some "bad" data hidden in it.
+- No matter how high-quality people consider a dataset to be 
+(e.g. Wikipedia, Books, ...), there are always some "bad" data hidden in it.
 
 ## Table of Contents
 
@@ -20,6 +20,12 @@ a dataset to be (e.g. Wikipedia, Books, ...), there are always some "bad" data h
   - [ArXiv](#arxiv)
   - [Github Code](#github-code)
 
+## Involved OPs
+
+| OP | Datasets      |
+|---|---------------|
+| `image_aspect_ratio_filter` | [LCS-558K](#lcs-558k-image-aspect-ratio-filter) |
+
 ## Multimodal Datasets
 
 ### LLaVA-1.5 pretrain dataset
@@ -27,6 +33,7 @@ a dataset to be (e.g. Wikipedia, Books, ...), there are always some "bad" data h
 <details>
 <summary> LCS-558K </summary>
 
+####<a name="lcs-558k-image-aspect-ratio-filter"/>
 | item         | value                                                                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 | from OP      | `image_aspect_ratio_filter`                                                                                                                      |
