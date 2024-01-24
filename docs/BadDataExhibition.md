@@ -33,7 +33,8 @@ some OPs work well on some datasets but might be useless on others.
 <details>
 <summary> LCS-558K </summary>
 
-####<a name="lcs-558k-image-aspect-ratio-filter"/>
+#### <a name="lcs-558k-image-aspect-ratio-filter"/>
+
 | item         | value                                                                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
 | from OP      | `image_aspect_ratio_filter`                                                                                                                      |
