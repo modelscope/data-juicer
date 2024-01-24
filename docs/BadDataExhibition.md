@@ -22,10 +22,10 @@ some OPs work well on some datasets but might be useless on others.
 
 ## Involved OPs
 
-| OP | Datasets                                        |
-|---|-------------------------------------------------|
-| `average_line_length_filter`| [Github Code](#github-code-average-line-length-filter)                                |
-| `image_aspect_ratio_filter` | [LCS-558K](#lcs-558k-image-aspect-ratio-filter) |
+| OP | Datasets                  |
+|---|---------------------------|
+| `average_line_length_filter`| [Github Code](#github-code) |
+| `image_aspect_ratio_filter` | [LCS-558K](#llava-15-pretrain-dataset)              |
 
 ## Multimodal Datasets
 
@@ -33,8 +33,6 @@ some OPs work well on some datasets but might be useless on others.
 
 <details>
 <summary> LCS-558K </summary>
-
-#### <a name="lcs-558k-image-aspect-ratio-filter"/>
 
 | item         | value                                                                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -275,8 +273,6 @@ some OPs work well on some datasets but might be useless on others.
 | text_len | 10                                                                |
 | text     | <details><summary>text</summary> <pre>new Date<A</pre> </details> |
 | comments | Code with too short content might be missing/meaningless content  |
-
-#### <a name="github-code-average-line-length-filter"/>
 
 | item            | value                                                                                                |
 |-----------------|------------------------------------------------------------------------------------------------------|
