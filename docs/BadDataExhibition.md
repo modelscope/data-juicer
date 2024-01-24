@@ -22,8 +22,9 @@ some OPs work well on some datasets but might be useless on others.
 
 ## Involved OPs
 
-| OP | Datasets      |
-|---|---------------|
+| OP | Datasets                                        |
+|---|-------------------------------------------------|
+| `average_line_length_filter`| [Github Code](#github-code-average-line-length-filter)                                |
 | `image_aspect_ratio_filter` | [LCS-558K](#lcs-558k-image-aspect-ratio-filter) |
 
 ## Multimodal Datasets
@@ -274,6 +275,8 @@ some OPs work well on some datasets but might be useless on others.
 | text_len | 10                                                                |
 | text     | <details><summary>text</summary> <pre>new Date<A</pre> </details> |
 | comments | Code with too short content might be missing/meaningless content  |
+
+#### <a name="github-code-average-line-length-filter"/>
 
 | item            | value                                                                                                |
 |-----------------|------------------------------------------------------------------------------------------------------|
