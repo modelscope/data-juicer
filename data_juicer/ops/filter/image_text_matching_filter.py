@@ -73,8 +73,9 @@ class ImageTextMatchingFilter(Filter):
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
+        self._accelerator = 'cuda'
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_text_matching_score in sample[Fields.stats]:
             return sample
@@ -139,7 +140,7 @@ class ImageTextMatchingFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process(self, sample, rank=None):
         itm_scores = sample[Fields.stats][StatsKeys.image_text_matching_score]
         if len(itm_scores) <= 0:
             return True

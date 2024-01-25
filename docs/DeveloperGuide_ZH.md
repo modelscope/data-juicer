@@ -229,9 +229,7 @@ class WordNumFilter(Filter):
 ```python
 # 修改计算逻辑前
 ...
-tokenizer = get_model(self.model_key,
-                      lang=self.lang,
-                      model_type='sentencepiece')
+tokenizer = get_model(self.model_key)
 words = get_words_from_document(
     sample[self.text_key],
     token_func=tokenizer.encode_as_pieces if tokenizer else None)
@@ -245,9 +243,7 @@ if context and words_key in sample[Fields.context]:
     words = sample[Fields.context][words_key]
 else:
     # 正常计算流程
-    tokenizer = get_model(self.model_key,
-                          lang=self.lang,
-                          model_type='sentencepiece')
+    tokenizer = get_model(self.model_key)
     words = get_words_from_document(
         sample[self.text_key],
         token_func=tokenizer.encode_as_pieces if tokenizer else None)

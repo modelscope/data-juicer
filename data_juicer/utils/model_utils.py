@@ -2,8 +2,11 @@ import fnmatch
 import os
 from functools import partial
 
+import multiprocess as mp
 import wget
 from loguru import logger
+
+from data_juicer import use_cuda
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 
@@ -275,11 +278,32 @@ def prepare_model(model_type, **model_kwargs):
     return model_key
 
 
-def get_model(model_key=None):
-    global MODEL_ZOO
+def move_to_cuda(model, rank):
+    # Assuming model can be either a single module or a tuple of modules
+    if not isinstance(model, tuple):
+        model = (model, )
+
+    for module in model:
+        if callable(getattr(module, 'to', None)):
+            logger.info(
+                f'Moving {module.__class__.__name__} to CUDA device {rank}')
+            module.to(f'cuda:{rank}')
+            # Optionally, verify the device assignment
+            logger.debug(f'{module.__class__.__name__} is on device \
+                    {next(module.parameters()).device}')
+
+
+def get_model(model_key=None, rank=None):
     if model_key is None:
-        logger.warning('Please specify model_key to get models')
         return None
+
+    global MODEL_ZOO
     if model_key not in MODEL_ZOO:
+        logger.debug(
+            f'{model_key} not found in MODEL_ZOO ({mp.current_process().name})'
+        )
         MODEL_ZOO[model_key] = model_key()
+        if use_cuda():
+            rank = 0 if rank is None else rank
+            move_to_cuda(MODEL_ZOO[model_key], rank)
     return MODEL_ZOO[model_key]

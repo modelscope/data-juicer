@@ -89,6 +89,7 @@ class GenerateCaptionMapper(Mapper):
 
         self.model_key = prepare_model(model_type='huggingface',
                                        model_name_or_path=hf_blip2)
+        self._accelerator = 'cuda'
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode
         self.keep_original_sample = keep_original_sample

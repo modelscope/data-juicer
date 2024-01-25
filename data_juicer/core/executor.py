@@ -3,6 +3,7 @@ from time import time
 
 from loguru import logger
 
+from data_juicer import cuda_device_count, use_cuda
 from data_juicer.config import init_configs
 from data_juicer.format.load import load_formatter
 from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
@@ -115,10 +116,17 @@ class Executor:
         for op_cfg, op in zip(self.process_list, self.ops):
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
+            if use_cuda() and op._accelerator == 'cuda':
+                with_rank = True
+                op_proc = min(cuda_device_count(), self.cfg.np)
+            else:
+                with_rank = False
+                op_proc = self.cfg.np
             try:
                 if isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,
-                                      num_proc=self.cfg.np,
+                                      with_rank=with_rank,
+                                      num_proc=op_proc,
                                       desc=op_name + '_process')
                     if self.open_tracer and \
                             op_name in self.op_list_to_trace:
@@ -142,12 +150,14 @@ class Executor:
                         if self.cfg.use_checkpoint:
                             prev = dataset
                     dataset = dataset.map(op.compute_stats,
-                                          num_proc=self.cfg.np,
+                                          with_rank=with_rank,
+                                          num_proc=op_proc,
                                           desc=op_name + '_compute_stats')
                     if self.cfg.use_checkpoint:
                         prev = dataset
                     tmp = dataset.filter(op.process,
-                                         num_proc=self.cfg.np,
+                                         with_rank=with_rank,
+                                         num_proc=op_proc,
                                          desc=op_name + '_process')
                     if self.open_tracer and op_name in self.op_list_to_trace:
                         self.tracer.trace_filter(op_name, dataset, tmp)
@@ -157,7 +167,8 @@ class Executor:
                         self.tracer.trace_filter(op_name, dataset, tmp)
                 elif isinstance(op, Deduplicator):
                     dataset = dataset.map(op.compute_hash,
-                                          num_proc=self.cfg.np,
+                                          with_rank=with_rank,
+                                          num_proc=op_proc,
                                           desc=op_name + '_compute_hash')
                     if self.cfg.use_checkpoint:
                         prev = dataset
