@@ -117,16 +117,16 @@ class Executor:
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
             if use_cuda() and op._accelerator == 'cuda':
-                with_rank = True
                 op_proc = min(cuda_device_count(), self.cfg.np)
+                with_rank = True
             else:
-                with_rank = False
                 op_proc = self.cfg.np
+                with_rank = False
             try:
                 if isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,
-                                      with_rank=with_rank,
                                       num_proc=op_proc,
+                                      with_rank=with_rank,
                                       desc=op_name + '_process')
                     if self.open_tracer and \
                             op_name in self.op_list_to_trace:
@@ -150,14 +150,13 @@ class Executor:
                         if self.cfg.use_checkpoint:
                             prev = dataset
                     dataset = dataset.map(op.compute_stats,
-                                          with_rank=with_rank,
                                           num_proc=op_proc,
+                                          with_rank=with_rank,
                                           desc=op_name + '_compute_stats')
                     if self.cfg.use_checkpoint:
                         prev = dataset
                     tmp = dataset.filter(op.process,
-                                         with_rank=with_rank,
-                                         num_proc=op_proc,
+                                         num_proc=self.cfg.np,
                                          desc=op_name + '_process')
                     if self.open_tracer and op_name in self.op_list_to_trace:
                         self.tracer.trace_filter(op_name, dataset, tmp)
@@ -167,8 +166,8 @@ class Executor:
                         self.tracer.trace_filter(op_name, dataset, tmp)
                 elif isinstance(op, Deduplicator):
                     dataset = dataset.map(op.compute_hash,
-                                          with_rank=with_rank,
                                           num_proc=op_proc,
+                                          with_rank=with_rank,
                                           desc=op_name + '_compute_hash')
                     if self.cfg.use_checkpoint:
                         prev = dataset

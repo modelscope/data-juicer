@@ -145,7 +145,7 @@ class PhraseGroundingRecallFilter(Filter):
         for nltk_data_pkg in requires_nltk_data:
             nltk.download(nltk_data_pkg)
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.phrase_grounding_recall in sample[Fields.stats]:
             return sample
@@ -164,7 +164,7 @@ class PhraseGroundingRecallFilter(Filter):
         text = sample[self.text_key]
         offset = 0
         recalls = []
-        model, processor = get_model(self.model_key)
+        model, processor = get_model(self.model_key, rank=rank)
 
         for chunk in text.split(SpecialTokens.eoc):
             count = chunk.count(SpecialTokens.image)

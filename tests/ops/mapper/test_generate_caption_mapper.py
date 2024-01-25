@@ -26,7 +26,7 @@ class GenerateCaptionMapperTest(DataJuicerTestCaseBase):
 
     def _run_mapper(self, dataset: NestedDataset, op, num_proc=1, caption_num=0):
 
-        dataset = dataset.map(op.process, num_proc=num_proc)
+        dataset = dataset.map(op.process, num_proc=num_proc, with_rank=True)
         dataset_list = dataset.select_columns(column_names=['text']).to_list()
         # assert the caption is generated successfully in terms of not_none
         # as the generated content is not deterministic
