@@ -42,7 +42,8 @@ def setup_cuda():
         __USE_CUDA = True
     else:
         __USE_CUDA = False
-    logger.debug(f'__USE_CUDA: {__USE_CUDA} ({mp.current_process().name})')
+    logger.debug(f'__USE_CUDA: {__USE_CUDA} | MP: {method} '
+                 f'({mp.current_process().name})')
 
     if __USE_CUDA:
         __CUDA_COUNT = torch.cuda.device_count()

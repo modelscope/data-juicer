@@ -198,8 +198,9 @@ class PhraseGroundingRecallFilter(Filter):
 
                 with torch.no_grad():
                     outputs = model(**inputs)
-                    target_sizes = torch.tensor(
-                        [img.size[::-1] for img in images_this_chunk])
+                    target_sizes = torch.tensor([
+                        img.size[::-1] for img in images_this_chunk
+                    ]).to(model.device)
                     results = processor.post_process_object_detection(
                         outputs,
                         threshold=self.conf_thr,
