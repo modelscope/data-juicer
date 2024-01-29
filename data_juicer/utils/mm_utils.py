@@ -2,6 +2,7 @@ import re
 
 import numpy as np
 from datasets import Audio, Image
+from PIL import Image as PIL_Image
 
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 
@@ -69,6 +70,15 @@ def load_images(paths):
 def load_image(path):
     img_feature = Image()
     img = img_feature.decode_example(img_feature.encode_example(path))
+    return img
+
+
+def load_pil_images(paths):
+    return [load_pil_image(path) for path in paths]
+
+
+def load_pil_image(path):
+    img = PIL_Image.open(path).convert('RGB')
     return img
 
 

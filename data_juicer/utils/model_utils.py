@@ -222,6 +222,26 @@ def prepare_huggingface_blip(
     return model, processor
 
 
+def prepare_huggingface_diffusion(diffusion_name):
+    """
+        Prepare and load an Diffusion model from HuggingFace.
+
+        :param diffusion_name: input Diffusion model name
+        :return: a Diffusion model.
+    """
+    import torch
+    from diffusers import StableDiffusionImg2ImgPipeline
+
+    # NOTE: It can be loaded as revision="fp16" and torch_dtype=torch.float16 when using cuda
+    model = StableDiffusionImg2ImgPipeline.from_pretrained(
+        diffusion_name,
+        use_auth_token=True,
+        revision='fp32',
+        torch_dtype=torch.float32)
+
+    return model
+
+
 def prepare_huggingface_owlvit(owlvit_name):
     """
     Prepare and load an OwlViT and processor from HuggingFace.
@@ -298,6 +318,7 @@ def prepare_model(lang='en',
         'huggingface': ('%s', prepare_huggingface_tokenizer),
         'hf_clip': ('%s', prepare_huggingface_clip),
         'hf_blip': ('%s', prepare_huggingface_blip),
+        'hf_diffusion': ('%s', prepare_huggingface_diffusion),
         'hf_owlvit': ('%s', prepare_huggingface_owlvit),
         'spacy': ('%s_core_web_md-3.5.0', prepare_diversity_model),
     }
@@ -311,7 +332,7 @@ def prepare_model(lang='en',
         model_name, model_func = type_to_name[model_type]
         if model_type in ['fasttext']:
             MODEL_ZOO[model_key] = model_func(model_name)
-        elif model_type in ['huggingface', 'hf_clip']:
+        elif model_type in ['huggingface', 'hf_clip', 'hf_diffusion']:
             MODEL_ZOO[model_key] = model_func(model_key)
         elif model_type in ['hf_blip']:
             MODEL_ZOO[model_key] = model_func(model_key, usage)

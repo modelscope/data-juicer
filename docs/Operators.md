@@ -58,6 +58,7 @@ All the specific operators are listed below, each featured with several capabili
 | fix_unicode_mapper                                  | General            | en, zh | Fixes broken Unicodes (by [ftfy](https://ftfy.readthedocs.io/))                                                |
 | generate_caption_mapper                             | Multimodal         |  -     | generate samples whose captions are generated based on another model (such as blip2) and the figure within the original sample |
 | image_blur_mapper                                   | Multimodal         |  -     | Blur images |
+| image_diffusion_mapper                              | Multimodal         |  -     | Generate and augment images by stable diffusion model |
 | nlpaug_en_mapper                                    | General            | en     | Simply augments texts in English based on the `nlpaug` library                                                 | 
 | nlpcda_zh_mapper                                    | General            | zh     | Simply augments texts in Chinese based on the `nlpcda` library                                                 | 
 | punctuation_normalization_mapper                    | General            | en, zh | Normalizes various Unicode punctuations to their ASCII equivalents                                             |
