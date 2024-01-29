@@ -142,6 +142,114 @@ class NlpaugEnMapperTest(unittest.TestCase):
         self.assertGreaterEqual(len(result['text']), len(self.samples['text']))
         self.assertEqual(len(result['meta']), len(result['text']))
 
+    def test_number_of_generated_samples_with_sequential_on_remove_original_sample(self):
+        aug_num = 3
+        aug_method_num = 3
+        op = NlpcdaZhMapper(
+            sequential=True,
+            aug_num=aug_num,
+            keep_original_sample=False,
+            replace_similar_word=True,
+            replace_homophone_char=True,
+            delete_random_char=True,
+        )
+        self.assertEqual(len(op.aug_pipeline), aug_method_num)
+        result = self.samples.map(op.process)
+        self.assertLessEqual(len(result['text']),
+                             aug_num * len(self.samples['text']))
+        self.assertGreaterEqual(len(result['text']), len(self.samples['text']))
+        self.assertEqual(len(result['meta']), len(result['text']))
+
+    def test_number_of_generated_samples_with_sequential_off_remove_original_sample(self):
+        aug_num = 3
+        aug_method_num = 3
+        op = NlpcdaZhMapper(
+            sequential=False,
+            aug_num=aug_num,
+            keep_original_sample=False,
+            replace_similar_word=True,
+            replace_homophone_char=True,
+            delete_random_char=True,
+        )
+        self.assertEqual(len(op.aug_pipeline), aug_method_num)
+        result = self.samples.map(op.process)
+        self.assertLessEqual(len(result['text']),
+                             aug_num * aug_method_num *
+                             len(self.samples['text']))
+        self.assertGreaterEqual(len(result['text']), len(self.samples['text']))
+        self.assertEqual(len(result['meta']), len(result['text']))
+
+    def test_zero_aug_methods_with_sequential_on_remove_original_sample(self):
+        aug_num = 3
+        aug_method_num = 0
+        # sequential on
+        op = NlpcdaZhMapper(
+            sequential=True,
+            aug_num=aug_num,
+            keep_original_sample=False,
+        )
+        self.assertEqual(len(op.aug_pipeline), aug_method_num)
+        result = self.samples.map(op.process)
+        self.assertEqual(len(result['text']), 0)
+        self.assertEqual(len(result['meta']), len(result['text']))
+
+    def test_zero_aug_methods_with_sequential_off_remove_original_sample(self):
+        aug_num = 3
+        aug_method_num = 0
+        # sequential off
+        op = NlpcdaZhMapper(
+            sequential=False,
+            aug_num=aug_num,
+            keep_original_sample=False,
+        )
+        self.assertEqual(len(op.aug_pipeline), aug_method_num)
+        result = self.samples.map(op.process)
+        self.assertEqual(len(result['text']), 0)
+        self.assertEqual(len(result['meta']), len(result['text']))
+
+    def test_all_aug_methods_with_sequential_on_remove_original_sample(self):
+        aug_num = 3
+        aug_method_num = 5
+        # sequential on
+        op = NlpcdaZhMapper(
+            sequential=True,
+            aug_num=aug_num,
+            keep_original_sample=False,
+            replace_similar_word=True,
+            replace_homophone_char=True,
+            delete_random_char=True,
+            swap_random_char=True,
+            replace_equivalent_num=True,
+        )
+        self.assertEqual(len(op.aug_pipeline), aug_method_num)
+        result = self.samples.map(op.process)
+        self.assertLessEqual(len(result['text']),
+                             aug_num * len(self.samples['text']))
+        self.assertGreaterEqual(len(result['text']), len(self.samples['text']))
+        self.assertEqual(len(result['meta']), len(result['text']))
+
+    def test_all_aug_methods_with_sequential_off_remove_original_sample(self):
+        aug_num = 3
+        aug_method_num = 5
+        # sequential off
+        op = NlpcdaZhMapper(
+            sequential=False,
+            aug_num=aug_num,
+            keep_original_sample=False,
+            replace_similar_word=True,
+            replace_homophone_char=True,
+            delete_random_char=True,
+            swap_random_char=True,
+            replace_equivalent_num=True,
+        )
+        self.assertEqual(len(op.aug_pipeline), aug_method_num)
+        result = self.samples.map(op.process)
+        self.assertLessEqual(len(result['text']),
+                             aug_num * aug_method_num *
+                             len(self.samples['text']))
+        self.assertGreaterEqual(len(result['text']), len(self.samples['text']))
+        self.assertEqual(len(result['meta']), len(result['text']))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -217,9 +217,18 @@ def unify_format(
     if global_cfg:
         ds_dir = global_cfg.dataset_dir
         image_key = global_cfg.image_key
+        audio_key = global_cfg.audio_key
 
-        if image_key not in dataset.features:
-            # no image path list in dataset, no need to convert
+        data_path_keys = []
+        if image_key in dataset.features:
+            data_path_keys.append(image_key)
+        if audio_key in dataset.features:
+            data_path_keys.append(audio_key)
+        if len(data_path_keys) == 0:
+            # no image/audios path list in dataset, no need to convert
+            return dataset
+
+        if ds_dir == '':
             return dataset
 
         logger.info('Converting relative paths in the dataset to their '
@@ -235,8 +244,8 @@ def unify_format(
                 if not paths:
                     continue
                 new_paths = [
-                    os.path.join(dataset_dir, path) for path in paths
-                    if not os.path.isabs(path)
+                    path if os.path.isabs(path) else os.path.join(
+                        dataset_dir, path) for path in paths
                 ]
                 sample[path_key] = new_paths
             return sample
@@ -244,9 +253,7 @@ def unify_format(
         dataset = dataset.map(rel2abs,
                               num_proc=num_proc,
                               fn_kwargs={
-                                  'path_keys': [
-                                      image_key,
-                                  ],
+                                  'path_keys': data_path_keys,
                                   'dataset_dir': ds_dir
                               })
     else:

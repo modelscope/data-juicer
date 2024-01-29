@@ -10,8 +10,8 @@ The operators in Data-Juicer are categorized into 5 types.
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
-| [ Mapper ]( #mapper )             |   21   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   24   | Filters out low-quality samples                 |
+| [ Mapper ]( #mapper )             |   25   | Edits and transforms samples                    |
+| [ Filter ]( #filter )             |   28   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   4    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -23,7 +23,8 @@ All the specific operators are listed below, each featured with several capabili
     - LaTeX: specific to LaTeX source files
     - Code: specific to programming codes
     - Financial: closely related to financial sector
-    - Image: specific to image or multimodal
+    - Image: specific to images or multimodal
+    - Audio: specific to audios or multimodal
     - Multimodal: specific to multimodal
 * Language Tags
     - en: English
@@ -55,6 +56,8 @@ All the specific operators are listed below, each featured with several capabili
 | clean_links_mapper                                  | General, Code      | en, zh | Removes links, such as those starting with http or ftp                                                         |
 | expand_macro_mapper                                 | LaTeX              | en, zh | Expands macros usually defined at the top of TeX documents                                                     |
 | fix_unicode_mapper                                  | General            | en, zh | Fixes broken Unicodes (by [ftfy](https://ftfy.readthedocs.io/))                                                |
+| generate_caption_mapper                             | Multimodal         |  -     | generate samples whose captions are generated based on another model (such as blip2) and the figure within the original sample |
+| image_blur_mapper                                   | Multimodal         |  -     | Blur images |
 | nlpaug_en_mapper                                    | General            | en     | Simply augments texts in English based on the `nlpaug` library                                                 | 
 | nlpcda_zh_mapper                                    | General            | zh     | Simply augments texts in Chinese based on the `nlpcda` library                                                 | 
 | punctuation_normalization_mapper                    | General            | en, zh | Normalizes various Unicode punctuations to their ASCII equivalents                                             |
@@ -63,41 +66,47 @@ All the specific operators are listed below, each featured with several capabili
 | remove_header_mapper                                | LaTeX              | en, zh | Removes the running headers of TeX documents, e.g., titles, chapter or section numbers/names                   |
 | remove_long_words_mapper                            | General            | en, zh | Removes words with length outside the specified range                                                          |
 | remove_non_chinese_character_mapper                 | General            | en, zh | Remove non Chinese character in text samples. |
+| remove_repeat_sentences_mapper                      | General            | en, zh | Remove repeat sentences in text samples. |
 | remove_specific_chars_mapper                        | General            | en, zh | Removes any user-specified characters or substrings                                                            |
 | remove_table_text_mapper                            | General, Financial | en     | Detects and removes possible table contents (:warning: relies on regular expression matching and thus fragile) |
 | remove_words_with_incorrect_<br />substrings_mapper | General            | en, zh | Removes words containing specified substrings                                                                  |
+| replace_content_mapper | General            | en, zh | Replace all content in the text that matches a specific regular expression pattern with a designated replacement string.                                                                 |
 | sentence_split_mapper                               | General            | en     | Splits and reorganizes sentences according to semantics                                                        |
 | whitespace_normalization_mapper                     | General            | en, zh | Normalizes various Unicode whitespaces to the normal ASCII space (U+0020)                                      |
 
 
 ## Filter <a name="filter"/>
 
-| Operator                       | Domain  | Lang   | Description                                                                                |
-|--------------------------------|---------|--------|--------------------------------------------------------------------------------------------|
-| alphanumeric_filter            | General | en, zh | Keeps samples with alphanumeric ratio within the specified range                           |
-| average_line_length_filter     | Code    | en, zh | Keeps samples with average line length within the specified range                          |
-| character_repetition_filter    | General | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range           |
-| face_area_filter               | Image   |   -    | Keeps samples containing images with face area ratios within the specified range             |
-| flagged_words_filter           | General | en, zh | Keeps samples with flagged-word ratio below the specified threshold                        |
-| image_aspect_ratio_filter      | Image   |   -    | Keeps samples containing images with aspect ratios within the specified range                |
-| image_shape_filter             | Image   |   -    | Keeps samples containing images with widths and heights within the specified range           |
-| image_size_filter              | Image   |   -    | Keeps samples containing images whose size in bytes are within the specified range                     |
-| image_text_matching_filter     | Multimodal |   -    |  Keeps samples with image-text classification matching score within the specified range based on a BLIP model          |
-| image_text_similarity_filter   | Multimodal |   -    |  Keeps samples with image-text feature cosine similarity within the specified range based on a CLIP model          |
-| language_id_score_filter       | General | en, zh | Keeps samples of the specified language, judged by a predicted confidence score            |
-| maximum_line_length_filter     | Code    | en, zh | Keeps samples with maximum line length within the specified range                          |
-| perplexity_filter              | General | en, zh | Keeps samples with perplexity score below the specified threshold                          |
-| special_characters_filter      | General | en, zh | Keeps samples with special-char ratio within the specified range                           |
-| specified_field_filter         | General | en, zh | Filters samples based on field, with value lies in the specified targets                   |
-| specified_numeric_field_filter | General | en, zh | Filters samples based on field, with value lies in the specified range (for numeric types) |
-| stopwords_filter               | General | en, zh | Keeps samples with stopword ratio above the specified threshold                            |
-| suffix_filter                  | General | en, zh | Keeps samples with specified suffixes                                                      |
-| text_action_filter             | General | en, zh | Keeps samples containing action verbs in their texts                                            |
-| text_entity_dependency_filter  | General | en, zh | Keeps samples containing entity nouns related to other tokens in the dependency tree of the texts |
-| text_length_filter             | General | en, zh | Keeps samples with total text length within the specified range                            |
-| token_num_filter               | General | en, zh | Keeps samples with token count within the specified range                                  |
-| word_num_filter                | General | en, zh | Keeps samples with word count within the specified range                                   |
-| word_repetition_filter         | General | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range           |
+| Operator                       | Domain     | Lang   | Description                                                                                                                                           |
+|--------------------------------|------------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
+| alphanumeric_filter            | General    | en, zh | Keeps samples with alphanumeric ratio within the specified range                                                                                      |
+| audio_duration_filter          | Audio      | -      | Keep data samples whose audios' durations are within a specified range                                                                                |
+| audio_nmf_snr_filter           | Audio      | -      | Keep data samples whose audios' Signal-to-Noise Ratios (SNRs, computed based on Non-Negative Matrix Factorization, NMF) are within a specified range. |
+| audio_size_filter              | Audio      | -      | Keep data samples whose audios' sizes are within a specified range                                         |
+| average_line_length_filter     | Code       | en, zh | Keeps samples with average line length within the specified range                                                                                     |
+| character_repetition_filter    | General    | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range                                                                      |
+| face_area_filter               | Image      | -      | Keeps samples containing images with face area ratios within the specified range                                                                      |
+| flagged_words_filter           | General    | en, zh | Keeps samples with flagged-word ratio below the specified threshold                                                                                   |
+| image_aspect_ratio_filter      | Image      | -      | Keeps samples containing images with aspect ratios within the specified range                                                                         |
+| image_shape_filter             | Image      | -      | Keeps samples containing images with widths and heights within the specified range                                                                    |
+| image_size_filter              | Image      | -      | Keeps samples containing images whose size in bytes are within the specified range                                                                    |
+| image_text_matching_filter     | Multimodal | -      | Keeps samples with image-text classification matching score within the specified range based on a BLIP model                                          |
+| image_text_similarity_filter   | Multimodal | -      | Keeps samples with image-text feature cosine similarity within the specified range based on a CLIP model                                              |
+| language_id_score_filter       | General    | en, zh | Keeps samples of the specified language, judged by a predicted confidence score                                                                       |
+| maximum_line_length_filter     | Code       | en, zh | Keeps samples with maximum line length within the specified range                                                                                     |
+| perplexity_filter              | General    | en, zh | Keeps samples with perplexity score below the specified threshold                                                                                     |
+| phrase_grounding_recall_filter | Multimodal | -      | Keeps samples whose locating recalls of phrases extracted from text in the images are within a specified range                                        |
+| special_characters_filter      | General    | en, zh | Keeps samples with special-char ratio within the specified range                                                                                      |
+| specified_field_filter         | General    | en, zh | Filters samples based on field, with value lies in the specified targets                                                                              |
+| specified_numeric_field_filter | General    | en, zh | Filters samples based on field, with value lies in the specified range (for numeric types)                                                            |
+| stopwords_filter               | General    | en, zh | Keeps samples with stopword ratio above the specified threshold                                                                                       |
+| suffix_filter                  | General    | en, zh | Keeps samples with specified suffixes                                                                                                                 |
+| text_action_filter             | General    | en, zh | Keeps samples containing action verbs in their texts                                                                                                  |
+| text_entity_dependency_filter  | General    | en, zh | Keeps samples containing entity nouns related to other tokens in the dependency tree of the texts                                                     |
+| text_length_filter             | General    | en, zh | Keeps samples with total text length within the specified range                                                                                       |
+| token_num_filter               | General    | en, zh | Keeps samples with token count within the specified range                                                                                             |
+| word_num_filter                | General    | en, zh | Keeps samples with word count within the specified range                                                                                              |
+| word_repetition_filter         | General    | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range                                                                      |
 
 
 ## Deduplicator <a name="deduplicator"/>

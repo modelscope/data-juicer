@@ -15,6 +15,9 @@ INTER_WORDS = Registry(InterVars.words)
 # images
 LOADED_IMAGES = Registry(InterVars.loaded_images)
 
+# audios
+LOADED_AUDIOS = Registry(InterVars.loaded_audios)
+
 # all
 ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_IMAGES]
 
