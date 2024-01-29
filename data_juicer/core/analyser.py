@@ -63,11 +63,12 @@ class Analyser:
         self.overall_single_plot_path = None
         self.analysis_path = os.path.join(self.cfg.work_dir, 'analysis')
 
-    def run(self, load_data_np=None):
+    def run(self, load_data_np=None, skip_export=False):
         """
         Running the dataset analysis pipeline.
 
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_export: whether export the results into disk
         :return: analysed dataset.
         """
         # 1. format data
@@ -120,14 +121,18 @@ class Analyser:
 
         logger.info('Applying overall analysis on stats...')
         overall_analysis = OverallAnalysis(dataset, self.analysis_path)
-        self.overall_result = overall_analysis.analyse(num_proc=self.cfg.np)
+        self.overall_result = overall_analysis.analyse(num_proc=self.cfg.np,
+                                                       skip_export=skip_export)
+
+        logger.info(f'The overall analysis results are: {self.overall_result}')
 
         logger.info('Applying column-wise analysis on stats...')
         column_wise_analysis = ColumnWiseAnalysis(
             dataset,
             self.analysis_path,
             overall_result=self.overall_result,
-            save_stats_in_one_file=self.cfg.save_stats_in_one_file)
-        column_wise_analysis.analyse()
+            save_stats_in_one_file=self.cfg.save_stats_in_one_file,
+        )
+        column_wise_analysis.analyse(skip_export=skip_export)
 
         return dataset

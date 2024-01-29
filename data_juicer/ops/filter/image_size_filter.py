@@ -1,7 +1,7 @@
 import numpy as np
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import get_image_size, size_to_bytes
+from data_juicer.utils.mm_utils import get_file_size, size_to_bytes
 
 from ..base_op import OPERATORS, Filter
 
@@ -53,7 +53,7 @@ class ImageSizeFilter(Filter):
 
         # for size calculation, no need to load images into memory
         sample[Fields.stats][StatsKeys.image_sizes] = [
-            get_image_size(img_path) for img_path in sample[self.image_key]
+            get_file_size(img_path) for img_path in sample[self.image_key]
         ]
 
         return sample

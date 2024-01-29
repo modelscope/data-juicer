@@ -6,9 +6,9 @@ from datasets import Dataset
 from data_juicer.ops.filter.image_text_matching_filter import ImageTextMatchingFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-
-class ImageTextMatchingFilterTest(unittest.TestCase):
+class ImageTextMatchingFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
@@ -16,6 +16,10 @@ class ImageTextMatchingFilterTest(unittest.TestCase):
     demo_path = os.path.join(data_path, 'blip.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
     hf_blip = 'Salesforce/blip-itm-base-coco'
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        super().tearDownClass(cls.hf_blip)
     
     def _run_filter(self, dataset: Dataset, target_list, op, num_proc=1):
 
