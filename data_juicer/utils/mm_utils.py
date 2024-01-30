@@ -2,7 +2,6 @@ import re
 
 import numpy as np
 from datasets import Audio, Image
-from PIL import Image as PIL_Image
 
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 
