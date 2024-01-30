@@ -1,5 +1,5 @@
 # Some code here has been modified from:
-# https://github.com/togethercomputer/RedPajama-Data/blob/main/data_prep/arxiv/arxiv_cleaner.py
+# https://github.com/togethercomputer/RedPajama-Data/blob/rp_v1/data_prep/arxiv/arxiv_cleaner.py
 # --------------------------------------------------------
 
 import regex as re
