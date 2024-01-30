@@ -234,8 +234,10 @@ class GenerateCaptionMapper(Mapper):
             new_generated_text_per_chunk.extend(
                 generated_text_candidates_single_chunk)
         elif self.keep_candidate_mode == 'similar_one_simhash':
-            from ..deduplicator.document_simhash_deduplicator import (
-                DocumentSimhashDeduplicator, num_differing_bits)
+            from simhash import num_differing_bits
+
+            from ..deduplicator.document_simhash_deduplicator import \
+                DocumentSimhashDeduplicator
             ori_normal_text = remove_special_tokens(chunk)
             # using a simhash OP to calculate their similarity
             # NOTE: simhash is just one method to calculate the similarities
