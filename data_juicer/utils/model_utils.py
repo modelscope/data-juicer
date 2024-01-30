@@ -176,13 +176,13 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
     return nltk_model
 
 
-def prepare_huggingface_model(model_name_or_path,
+def prepare_huggingface_model(pretrained_model_name_or_path,
                               return_model=True,
                               trust_remote_code=False):
     """
     Prepare and load a HuggingFace model with the correspoding processor.
 
-    :param model_name: model name or path
+    :param pretrained_model_name_or_path: model name or path
     :param return_model: return model or not
     :param trust_remote_code: passed to transformers
     :return: a tuple (model, input processor) if `return_model` is True;
@@ -198,25 +198,25 @@ def prepare_huggingface_model(model_name_or_path,
     from transformers.models.auto.tokenization_auto import \
         TOKENIZER_MAPPING_NAMES
 
-    config = AutoConfig.from_pretrained(model_name_or_path)
+    config = AutoConfig.from_pretrained(pretrained_model_name_or_path)
     # TODO: What happens when there are more than one?
     arch = config.architectures[0]
     model_class = getattr(transformers, arch)
     model_type = config.model_type
     if model_type in PROCESSOR_MAPPING_NAMES:
         processor = AutoProcessor.from_pretrained(
-            model_name_or_path, trust_remote_code=trust_remote_code)
+            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
     elif model_type in IMAGE_PROCESSOR_MAPPING_NAMES:
         processor = AutoImageProcessor.from_pretrained(
-            model_name_or_path, trust_remote_code=trust_remote_code)
+            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
     elif model_type in TOKENIZER_MAPPING_NAMES:
         processor = AutoTokenizer.from_pretrained(
-            model_name_or_path, trust_remote_code=trust_remote_code)
+            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
     else:
         processor = None
 
     if return_model:
-        model = model_class.from_pretrained(model_name_or_path)
+        model = model_class.from_pretrained(pretrained_model_name_or_path)
     return (model, processor) if return_model else processor
 
 
