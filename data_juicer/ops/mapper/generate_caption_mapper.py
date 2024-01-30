@@ -88,7 +88,7 @@ class GenerateCaptionMapper(Mapper):
                 f'["random_any", "similar_one_simhash", "all"].')
 
         self.model_key = prepare_model(model_type='huggingface',
-                                       model_name_or_path=hf_blip2)
+                                       pretrained_model_name_or_path=hf_blip2)
         self._accelerator = 'cuda'
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode

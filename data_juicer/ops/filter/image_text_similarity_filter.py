@@ -70,7 +70,7 @@ class ImageTextSimilarityFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(model_type='huggingface',
-                                       model_name_or_path=hf_clip)
+                                       pretrained_model_name_or_path=hf_clip)
         self._accelerator = 'cuda'
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
