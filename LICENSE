@@ -251,7 +251,7 @@ Code in data_juicer/ops/mapper/clean_copyright_mapper.py, data_juicer/ops/mapper
 data_juicer/ops/mapper/expand_macro_mapper.py, data_juicer/ops/mapper/remove_bibliography_mapper.py,
 data_juicer/ops/mapper/remove_comments_mapper.py, data_juicer/ops/mapper/remove_header_mapper.py,
 is adapted from
-https://github.com/togethercomputer/RedPajama-Data
+https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/
 
    Copyright 2023 RedPajama authors.
 

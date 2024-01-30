@@ -51,7 +51,8 @@ class AlphanumericFilter(Filter):
         if tokenization:
             self.model_key = prepare_model(
                 model_type='huggingface',
-                model_key='EleutherAI/pythia-6.9b-deduped')
+                model_name_or_path='EleutherAI/pythia-6.9b-deduped',
+                return_model=False)
 
     def compute_stats(self, sample):
         if self.tokenization:
@@ -60,7 +61,7 @@ class AlphanumericFilter(Filter):
             alpha_count = sum(
                 map(lambda char: 1
                     if char.isalpha() else 0, sample[self.text_key]))
-            tokenizer = get_model(self.model_key, model_type='huggingface')
+            tokenizer = get_model(self.model_key)
             token_count = len(
                 get_words_from_document(
                     sample[self.text_key],

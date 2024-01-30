@@ -1,9 +1,9 @@
 # Redpajama Config Files
 
-This folder contains example configuration files to easily and quickly reproduce the processing flow of [Redpajama](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep).
+This folder contains example configuration files to easily and quickly reproduce the processing flow of [Redpajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep).
 
 ## arXiv
-The raw data files can be downloaded from the same AWS link as in [Redpajama/arXiv](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/arxiv).
+The raw data files can be downloaded from the same AWS link as in [Redpajama/arXiv](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/arxiv).
 
 Once downloaded, use [raw_arxiv_to_jsonl.py](../../tools/preprocess/raw_arxiv_to_jsonl.py) to convert from the original format to `jsonl` that Data-Juicer can handle easily:
 
@@ -30,7 +30,7 @@ python tools/process_data.py --config configs/reproduced_redpajama/redpajama-arx
 
 ## Books
 
-The raw data files can be downloaded from the same HuggingFace datasets as in [Redpajama/Books](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/book).
+The raw data files can be downloaded from the same HuggingFace datasets as in [Redpajama/Books](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/book).
 
 Once downloaded, modify the path configurations in [redpajama-books.yaml](redpajama-books.yaml) and execute the following command to reproduce the processing flow of RedPajama.
 
@@ -47,7 +47,7 @@ python tools/process_data.py --config configs/reproduced_redpajama/redpajama-boo
 
 ## Code
 
-The raw data files can be downloaded from Google BigQuery as in [Redpajama/Code](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/github).
+The raw data files can be downloaded from Google BigQuery as in [Redpajama/Code](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/github).
 
 Once downloaded, unzip and delete files whose extensions are not in the following whitelist:
 
@@ -70,7 +70,7 @@ python tools/process_data.py --config configs/redpajama/redpajama-code.yaml
 
 ## StackExchange
 
-The raw data files can be downloaded from the same Archive link as in [Redpajama/Stack_exchange](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/stack_exchange).
+The raw data files can be downloaded from the same Archive link as in [Redpajama/Stack_exchange](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/stack_exchange).
 
 Once downloaded, use [raw_stackexchange_to_jsonl.py](../../tools/preprocess/raw_stackexchange_to_jsonl.py) to convert from the original format to `jsonl` that Data-Juicer can handle easily:
 

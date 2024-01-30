@@ -5,7 +5,7 @@ from PIL import Image
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
-                                        load_pil_image, remove_special_tokens)
+                                        load_image, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
@@ -84,8 +84,8 @@ class ImageDiffusionMapper(Mapper):
                 keep_original_sample=False,
                 prompt='A photo of a ')
 
-        self.model_key = prepare_model(model_type='hf_diffusion',
-                                       model_key=hf_diffusion)
+        self.model_key = prepare_model(model_type='diffusion',
+                                       model_name_or_path=hf_diffusion)
         self.diffusion_model = get_model(model_key=self.model_key)
 
     def _real_guidance(self, caption: str, image: Image.Image):
@@ -123,7 +123,7 @@ class ImageDiffusionMapper(Mapper):
         loaded_image_keys = ori_sample[self.image_key]
         ori_sample, images = load_data_with_context(ori_sample, context,
                                                     loaded_image_keys,
-                                                    load_pil_image)
+                                                    load_image)
 
         # load captions
         if self.caption_key:

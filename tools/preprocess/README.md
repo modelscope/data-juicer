@@ -49,7 +49,7 @@ python tools/preprocess/raw_arxiv_to_jsonl.py  --help
 
 **Note:**
 
-* For downloading process, please refer to [here](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/arxiv).
+* For downloading process, please refer to [here](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/arxiv).
 
 * Before you downloading, converting or processing, you might make sure that your drive space is large enough to store the raw data (over 3TB), converted data (over 3TB), at least processed data (about 500-600GB), and even more cache data during processing.
 
@@ -71,7 +71,7 @@ python tools/preprocess/raw_arxiv_stackexchange_to_jsonl.py           \
 # get help
 python tools/preprocess/raw_stackexchange_to_jsonl.py  --help
 ```
-- `src_dir`: if you download raw Stack Exchange data as Redpajama did, you will get a directory src which includes hundreds of 7z files whose filenames are like `*.*.com.7z `. You need to unzip these files and rename the POSTs.xml to the corresponding compressed package name and place it in that dir. For more details, please refer to [here](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/stack_exchange).
+- `src_dir`: if you download raw Stack Exchange data as Redpajama did, you will get a directory src which includes hundreds of 7z files whose filenames are like `*.*.com.7z `. You need to unzip these files and rename the POSTs.xml to the corresponding compressed package name and place it in that dir. For more details, please refer to [here](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/stack_exchange).
 - `target_dir`: result directory to store the converted jsonl files.
 - `topk` (optional): select the topk sites with the most content. Default it's 28.
 - `num_proc` (optional): number of process workers. Default it's 1.

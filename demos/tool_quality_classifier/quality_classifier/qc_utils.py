@@ -127,13 +127,7 @@ def get_keep_method_udf(keep_method):
 
 
 def tokenize_dataset(ds, tokenizer):
-    if os.path.exists(tokenizer):
-        # if it's a local model
-        tkn = spm.SentencePieceProcessor()
-        tkn.load(tokenizer)
-    else:
-        # else, try to load it from our remote model list
-        tkn = prepare_sentencepiece_model(tokenizer, ())
+    tkn = prepare_sentencepiece_model('', tokenizer)
     tokenizer_udf = udf(lambda text: tkn.encode_as_pieces(text),
                         ArrayType(StringType()))
     logger.info('Tokenize texts using specific tokenizer...')

@@ -87,13 +87,8 @@ class GenerateCaptionMapper(Mapper):
                 f'Can only be one of '
                 f'["random_any", "similar_one_simhash", "all"].')
 
-        self.model_key = prepare_model(model_type='hf_blip',
-                                       model_key=hf_blip2,
-                                       usage='conditional_generation')
-        model, img_processor = get_model(model_key=self.model_key,
-                                         usage='conditional_generation')
-        self.model_in_ctx = model
-        self.img_processor_in_ctx = img_processor
+        self.model_key = prepare_model(model_type='huggingface',
+                                       model_name_or_path=hf_blip2)
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode
         self.keep_original_sample = keep_original_sample
@@ -151,6 +146,8 @@ class GenerateCaptionMapper(Mapper):
         # the generated text will be placed following each SpecialTokens.img
         # and the original special tokens are kept in an order-preserving way.
 
+        model, processor = get_model(self.model_key)
+
         # do generation for each image chunk by chunk
         for chunk in ori_sample[self.text_key].split(SpecialTokens.eoc):
             # skip empty chunks or contents after the last eoc token
@@ -182,13 +179,13 @@ class GenerateCaptionMapper(Mapper):
             else:
                 prompt_texts = None
 
-            inputs = self.img_processor_in_ctx(images=image_chunk,
-                                               text=prompt_texts,
-                                               return_tensors='pt')
+            inputs = processor(images=image_chunk,
+                               text=prompt_texts,
+                               return_tensors='pt').to(model.device)
             for i in range(self.caption_num):
-                generated_ids = self.model_in_ctx.generate(**inputs,
-                                                           do_sample=True)
-                generated_text = self.img_processor_in_ctx.batch_decode(
+                generated_ids = model.generate(**inputs,
+                                               do_sample=True).to(model.device)
+                generated_text = processor.batch_decode(
                     generated_ids, skip_special_tokens=True)
                 generated_text_candidates_single_chunk[i] = generated_text
 

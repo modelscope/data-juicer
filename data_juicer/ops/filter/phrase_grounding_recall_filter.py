@@ -129,9 +129,8 @@ class PhraseGroundingRecallFilter(Filter):
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
-        self.model_type = 'hf_owlvit'
-        self.model_key = prepare_model(model_type=self.model_type,
-                                       model_key=hf_owlvit)
+        self.model_key = prepare_model(model_type='huggingface',
+                                       model_name_or_path=hf_owlvit)
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
@@ -164,8 +163,7 @@ class PhraseGroundingRecallFilter(Filter):
         text = sample[self.text_key]
         offset = 0
         recalls = []
-        model, processor = get_model(self.model_key,
-                                     model_type=self.model_type)
+        model, processor = get_model(self.model_key)
 
         for chunk in text.split(SpecialTokens.eoc):
             count = chunk.count(SpecialTokens.image)
@@ -195,7 +193,7 @@ class PhraseGroundingRecallFilter(Filter):
                                    images=images_this_chunk,
                                    return_tensors='pt',
                                    padding=True,
-                                   truncation=True)
+                                   truncation=True).to(model.device)
 
                 with torch.no_grad():
                     outputs = model(**inputs)

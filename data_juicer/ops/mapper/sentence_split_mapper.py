@@ -24,13 +24,11 @@ class SentenceSplitMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self.lang = lang
-        self.model_key = prepare_model(lang=lang, model_type='nltk')
+        self.model_key = prepare_model(model_type='nltk', lang=lang)
 
     def process(self, sample):
 
-        nltk_model = get_model(self.model_key,
-                               lang=self.lang,
-                               model_type='nltk')
+        nltk_model = get_model(self.model_key)
         sample[self.text_key] = get_sentences_from_document(
             sample[self.text_key],
             model_func=nltk_model.tokenize if nltk_model else None)
