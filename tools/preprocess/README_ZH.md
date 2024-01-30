@@ -48,7 +48,7 @@ python tools/preprocess/raw_arxiv_to_jsonl.py  --help
 
 **注意事项：**
 
-* 下载过程请参考[这里](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/arxiv)。
+* 下载过程请参考[这里](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/arxiv)。
 
 * 在下载、转换或处理之前，您需要确保您的硬盘空间足够大，可以存储原始数据（超过 3TB）、转换后的数据（超过 3TB）、最小处理后的数据（大约 500-600GB），以及处理期间的缓存数据。
 
@@ -69,7 +69,7 @@ python tools/preprocess/raw_arxiv_stackexchange_to_jsonl.py           \
 python tools/preprocess/raw_stackexchange_to_jsonl.py  --help
 ```
 
-- `src_dir`: 如果像 Redpajama 一样下载原始 Stack Exchange 数据，你将得到一个目录 src，其中包含数百个 7z 文件，其文件名类似于 `*.*.com.7z`。 您需要解压这些文件并将 POSTs.xml 重命名为相应的压缩包名称并将其放在该目录中。更多详情请参考[这里](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/stack_exchange)。
+- `src_dir`: 如果像 Redpajama 一样下载原始 Stack Exchange 数据，你将得到一个目录 src，其中包含数百个 7z 文件，其文件名类似于 `*.*.com.7z`。 您需要解压这些文件并将 POSTs.xml 重命名为相应的压缩包名称并将其放在该目录中。更多详情请参考[这里](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/stack_exchange)。
 - `target_dir`: 用于存储转换后的 jsonl 文件的结果目录。
 - `topk` (可选): 选择内容最多的 k 个站点，默认为 28.
 - `num_proc` (可选): worker 进程数量，默认为 1。

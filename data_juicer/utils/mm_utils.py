@@ -73,15 +73,6 @@ def load_image(path):
     return img
 
 
-def load_pil_images(paths):
-    return [load_pil_image(path) for path in paths]
-
-
-def load_pil_image(path):
-    img = PIL_Image.open(path).convert('RGB')
-    return img
-
-
 def pil_to_opencv(pil_image):
     if pil_image.mode != 'RGB':
         pil_image = pil_image.convert('RGB')

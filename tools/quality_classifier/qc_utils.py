@@ -2,7 +2,6 @@ import os
 import zipfile
 
 import numpy as np
-import sentencepiece as spm
 import wget
 from loguru import logger
 from pyspark.ml import Pipeline, PipelineModel
@@ -193,13 +192,7 @@ def tokenize_dataset(ds, tokenizer):
     :return: a dataset with an extra column "words" that stores the tokenized
         texts
     """
-    if os.path.exists(tokenizer):
-        # if it's a local model
-        tkn = spm.SentencePieceProcessor()
-        tkn.load(tokenizer)
-    else:
-        # else, try to load it from our remote model list
-        tkn = prepare_sentencepiece_model(tokenizer, ())
+    tkn = prepare_sentencepiece_model('', tokenizer)
     # create a PySpark udf to tokenize the dataset
     tokenizer_udf = udf(lambda text: tkn.encode_as_pieces(text),
                         ArrayType(StringType()))
