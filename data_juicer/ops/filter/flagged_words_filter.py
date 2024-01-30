@@ -71,8 +71,8 @@ class FlaggedWordFilter(Filter):
                 val for vals in self.FLAGGED_WORDS.values() for val in vals
             ]
         if tokenization:
-            self.model_key = prepare_model(lang=lang,
-                                           model_type='sentencepiece')
+            self.model_key = prepare_model(model_type='sentencepiece',
+                                           lang=lang)
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
@@ -84,9 +84,7 @@ class FlaggedWordFilter(Filter):
         if context and words_key in sample[Fields.context]:
             words = sample[Fields.context][words_key]
         else:
-            tokenizer = get_model(self.model_key,
-                                  lang=self.lang,
-                                  model_type='sentencepiece')
+            tokenizer = get_model(self.model_key)
             words = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)

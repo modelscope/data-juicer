@@ -40,8 +40,8 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
         self.substrings = substrings
         self.lang = lang
         if tokenization:
-            self.model_key = prepare_model(lang=lang,
-                                           model_type='sentencepiece')
+            self.model_key = prepare_model(model_type='sentencepiece',
+                                           lang=lang)
 
     def should_keep_word_with_incorrect_substrings(self, word, substrings):
         word = strip(word, SPECIAL_CHARACTERS)
@@ -50,9 +50,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
 
     def process(self, sample):
         if self.tokenization:
-            tokenizer = get_model(self.model_key,
-                                  lang=self.lang,
-                                  model_type='sentencepiece')
+            tokenizer = get_model(self.model_key)
             sentences = get_words_from_document(
                 sample[self.text_key],
                 token_func=tokenizer.encode_as_pieces if tokenizer else None)

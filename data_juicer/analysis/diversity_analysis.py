@@ -4,7 +4,7 @@ import pandas as pd
 import spacy
 from loguru import logger
 
-from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 
 # Modify from self_instruct, please refer to
@@ -110,8 +110,8 @@ class DiversityAnalysis:
         # load diversity model
         lang_or_model = lang_or_model if lang_or_model else self.lang_or_model
         if isinstance(lang_or_model, str):
-            diversity_model = MODEL_ZOO.get(
-                prepare_model(lang_or_model, 'spacy'))
+            model_key = prepare_model('spacy', lang=lang_or_model)
+            diversity_model = get_model(model_key)
         else:
             diversity_model = lang_or_model
 
