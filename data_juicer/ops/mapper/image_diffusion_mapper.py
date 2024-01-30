@@ -1,7 +1,6 @@
 import copy
 import os
 
-import numpy as np
 from PIL import Image
 
 from data_juicer.utils.constant import Fields
@@ -35,10 +34,21 @@ class ImageDiffusionMapper(Mapper):
         """
         Initialization method.
 
-        :param hf_diffusion: diffusion model name on huggingface to generate the image.
-        :param strength: Indicates extent to transform the reference image. Must be between 0 and 1. image is used as a starting point and more noise is added the higher the strength. The number of denoising steps depends on the amount of noise initially added. When strength is 1, added noise is maximum and the denoising process runs for the full number of iterations specified in num_inference_steps. A value of 1 essentially ignores image.
-        :param guidance_scale: A higher guidance scale value encourages the model to generate images closely linked to the text prompt at the expense of lower image quality. Guidance scale is enabled when guidance_scale > 1.
-        :param aug_num: The image number to be produced by stable-diffusion model.
+        :param hf_diffusion: diffusion model name on huggingface to generate
+            the image.
+        :param strength: Indicates extent to transform the reference image.
+            Must be between 0 and 1. image is used as a starting point and
+            more noise is added the higher the strength. The number of
+            denoising steps depends on the amount of noise initially added.
+            When strength is 1, added noise is maximum and the denoising
+            process runs for the full number of iterations specified in
+            num_inference_steps. A value of 1 essentially ignores image.
+        :param guidance_scale: A higher guidance scale value encourages the
+            model to generate images closely linked to the text prompt at the
+            expense of lower image quality. Guidance scale is enabled when
+            guidance_scale > 1.
+        :param aug_num: The image number to be produced by stable-diffusion
+            model.
         :param keep_candidate_mode: retain strategy for the generated
         $caption_num$ candidates.
             'random_any': Retain the random one from generated captions
@@ -54,9 +64,11 @@ class ImageDiffusionMapper(Mapper):
              it's $(1+M)Nb$ for 'all' mode when keep_original_sample is True
              and $MNb$ when keep_original_sample is False.
         :param caption_key: the key name of fields in samples to store captions
-            for each images. It can be a string if there is only one image in each sample.
-            Otherwise, it should be a list. If it's none, ImageDiffusionMapper will produce captions for each images.
-        :param hf_blip2: blip2 model name on huggingface to generate caption if caption_key is None.
+            for each images. It can be a string if there is only one image in
+            each sample. Otherwise, it should be a list. If it's none,
+            ImageDiffusionMapper will produce captions for each images.
+        :param hf_blip2: blip2 model name on huggingface to generate caption if
+            caption_key is None.
         """
         super().__init__(*args, **kwargs)
         self._batched_op = True
@@ -141,7 +153,7 @@ class ImageDiffusionMapper(Mapper):
                     os.path.dirname(value), (f'_diffusion_{aug_id}.').join(
                         os.path.basename(value).split('.')))
                 diffusion_image_keys.append(diffusion_image_key)
-                # TODO: duplicated generation if image is reused, need global record
+                # TODO: duplicated generation if image is reused
                 if not os.path.exists(diffusion_image_key
                                       ) or diffusion_image_key not in images:
                     diffusion_image = self._real_guidance(

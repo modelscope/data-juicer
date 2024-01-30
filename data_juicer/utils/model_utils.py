@@ -232,7 +232,8 @@ def prepare_huggingface_diffusion(diffusion_name):
     import torch
     from diffusers import StableDiffusionImg2ImgPipeline
 
-    # NOTE: It can be loaded as revision="fp16" and torch_dtype=torch.float16 when using cuda
+    # NOTE: It can be loaded as revision="fp16" and
+    # torch_dtype=torch.float16 when using cuda
     model = StableDiffusionImg2ImgPipeline.from_pretrained(
         diffusion_name,
         use_auth_token=True,
