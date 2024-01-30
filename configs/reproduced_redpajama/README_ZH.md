@@ -1,10 +1,10 @@
 # Redpajama 配置文件
 
-此文件夹包含的配置文件用于轻松复现 [Redpajama](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep) 的处理流程。
+此文件夹包含的配置文件用于轻松复现 [Redpajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep) 的处理流程。
 
 ## arXiv
 
-原始数据文件从 [Redpajama/arXiv](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/arxiv) 中相同的 AWS 链接下载。
+原始数据文件从 [Redpajama/arXiv](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/arxiv) 中相同的 AWS 链接下载。
 
 下载完成后，使用 [raw_arxiv_to_jsonl.py](../../tools/preprocess/raw_arxiv_to_jsonl.py) 将原始格式转换为 Data-Juicer 易于处理的格式：
 
@@ -31,7 +31,7 @@ python tools/process_data.py --config configs/reproduced_redpajama/redpajama-arx
 
 ## Books
 
-原始数据文件从 [Redpajama/Books](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/book) 中相同的 HuggingFace 链接下载。
+原始数据文件从 [Redpajama/Books](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/book) 中相同的 HuggingFace 链接下载。
 
 下载完成后，修改 [redpajama-books.yaml](redpajama-books.yaml) 中的数据路径，执行以下命令复现 RedPajama 的处理流程：
 
@@ -48,7 +48,7 @@ python tools/process_data.py --config configs/reproduced_redpajama/redpajama-boo
 
 ## Code
 
-原始数据文件从 [Redpajama/Code](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/github) 中相同的 Google BigQuery 获取。
+原始数据文件从 [Redpajama/Code](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/github) 中相同的 Google BigQuery 获取。
 
 下载完成后，解压缩并删除扩展名不在以下白名单中的其他文件：
 
@@ -71,7 +71,7 @@ python tools/process_data.py --config configs/redpajama/redpajama-code.yaml
 
 ## StackExchange
 
-原始数据文件从 [Redpajama/Stack_exchange](https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/stack_exchange) 中相同的 Archive 链接获取。
+原始数据文件从 [Redpajama/Stack_exchange](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/stack_exchange) 中相同的 Archive 链接获取。
 
 下载完成后，使用 [raw_stackexchange_to_jsonl.py](../../tools/preprocess/raw_stackexchange_to_jsonl.py) 将原始格式转换为 Data-Juicer 易于处理的格式：
 
