@@ -141,8 +141,9 @@ class ImageDiffusionMapper(Mapper):
             }
             caption_samples = self.op_generate_caption.process(caption_samples)
             captions = caption_samples[self.text_key]
-            captions = [self.prompt + remove_special_tokens(c) for c in captions]
-        
+            captions = [
+                self.prompt + remove_special_tokens(c) for c in captions
+            ]
 
         # the generated results
         generated_samples = [
