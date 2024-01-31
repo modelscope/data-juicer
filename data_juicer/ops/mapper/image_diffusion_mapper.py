@@ -77,12 +77,13 @@ class ImageDiffusionMapper(Mapper):
         self.aug_num = aug_num
         self.keep_original_sample = keep_original_sample
         self.caption_key = caption_key
+        self.prompt = 'A photo of a '
         if not self.caption_key:
             from .generate_caption_mapper import GenerateCaptionMapper
             self.op_generate_caption = GenerateCaptionMapper(
                 hf_blip2=hf_blip2,
                 keep_original_sample=False,
-                prompt='A photo of a ')
+                prompt=self.prompt)
 
         self.model_key = prepare_model(model_type='diffusion',
                                        model_name_or_path=hf_diffusion)
@@ -132,6 +133,7 @@ class ImageDiffusionMapper(Mapper):
                 captions = [captions]
             assert len(captions) == len(
                 images), 'The num of captions must match the num of images.'
+            captions = [remove_special_tokens(c) for c in captions]
         else:
             caption_samples = {
                 self.text_key: [SpecialTokens.image] * len(images),
@@ -139,7 +141,8 @@ class ImageDiffusionMapper(Mapper):
             }
             caption_samples = self.op_generate_caption.process(caption_samples)
             captions = caption_samples[self.text_key]
-        captions = [remove_special_tokens(c) for c in captions]
+            captions = [self.prompt + remove_special_tokens(c) for c in captions]
+        
 
         # the generated results
         generated_samples = [
