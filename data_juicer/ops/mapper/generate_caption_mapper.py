@@ -3,6 +3,7 @@ import random
 
 import numpy as np
 from jsonargparse.typing import PositiveInt
+from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
@@ -38,6 +39,8 @@ class GenerateCaptionMapper(Mapper):
                  caption_num: PositiveInt = 1,
                  keep_candidate_mode: str = 'random_any',
                  keep_original_sample: bool = True,
+                 prompt: str = None,
+                 prompt_key: str = None,
                  *args,
                  **kwargs):
         """
@@ -64,6 +67,13 @@ class GenerateCaptionMapper(Mapper):
             it's set to False, there will be only generated captions in the
             final datasets and the original captions will be removed. It's True
             in default.
+        :param prompt: a string prompt to guide the generation of blip2 model
+            for all samples globally. It's None in default, which means no
+            prompt provided.
+        :param prompt_key: the key name of fields in samples to store prompts
+            for each sample. It's used for set different prompts for different
+            samples. If it's none, use prompt in parameter "prompt". It's None
+            in default.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -77,16 +87,13 @@ class GenerateCaptionMapper(Mapper):
                 f'Can only be one of '
                 f'["random_any", "similar_one_simhash", "all"].')
 
-        self.model_key = prepare_model(model_type='hf_blip',
-                                       model_key=hf_blip2,
-                                       usage='conditional_generation')
-        model, img_processor = get_model(model_key=self.model_key,
-                                         usage='conditional_generation')
-        self.model_in_ctx = model
-        self.img_processor_in_ctx = img_processor
+        self.model_key = prepare_model(model_type='huggingface',
+                                       model_name_or_path=hf_blip2)
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode
         self.keep_original_sample = keep_original_sample
+        self.prompt = prompt
+        self.prompt_key = prompt_key
         self.extra_args = kwargs
 
         if keep_candidate_mode in ['random_any', 'similar_one_simhash']:
@@ -95,6 +102,12 @@ class GenerateCaptionMapper(Mapper):
             self.num_newly_generated_samples = self.caption_num
         else:
             self.num_newly_generated_samples = 0
+
+        # report a warning when both prompt and prompt_key are set
+        if self.prompt and self.prompt_key:
+            logger.warning(
+                'Both the parameter `prompt` and `prompt_key` are '
+                'set. Data-Juicer will consider `prompt_key` first.')
 
     def _process_single_sample(self, ori_sample):
         """
@@ -133,6 +146,8 @@ class GenerateCaptionMapper(Mapper):
         # the generated text will be placed following each SpecialTokens.img
         # and the original special tokens are kept in an order-preserving way.
 
+        model, processor = get_model(self.model_key)
+
         # do generation for each image chunk by chunk
         for chunk in ori_sample[self.text_key].split(SpecialTokens.eoc):
             # skip empty chunks or contents after the last eoc token
@@ -153,12 +168,24 @@ class GenerateCaptionMapper(Mapper):
             # generated_text_candidates_single_chunk[i][j] indicates
             # the $i$-th generated candidate for the $j$-th image
 
-            inputs = self.img_processor_in_ctx(images=image_chunk,
-                                               return_tensors='pt')
+            # construct prompts
+            if self.prompt_key \
+                    and isinstance(ori_sample[self.prompt_key], str):
+                # check prompt_key is not None, and it's a str in the sample
+                prompt_texts = [ori_sample[self.prompt_key]] * len(image_chunk)
+            elif self.prompt and isinstance(self.prompt, str):
+                # check prompt is not None, and it's a str
+                prompt_texts = [self.prompt] * len(image_chunk)
+            else:
+                prompt_texts = None
+
+            inputs = processor(images=image_chunk,
+                               text=prompt_texts,
+                               return_tensors='pt').to(model.device)
             for i in range(self.caption_num):
-                generated_ids = self.model_in_ctx.generate(**inputs,
-                                                           do_sample=True)
-                generated_text = self.img_processor_in_ctx.batch_decode(
+                generated_ids = model.generate(**inputs,
+                                               do_sample=True).to(model.device)
+                generated_text = processor.batch_decode(
                     generated_ids, skip_special_tokens=True)
                 generated_text_candidates_single_chunk[i] = generated_text
 

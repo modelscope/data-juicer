@@ -1,5 +1,6 @@
 # yapf: disable
-from . import (alphanumeric_filter, audio_duration_filter, audio_size_filter,
+from . import (alphanumeric_filter, audio_duration_filter,
+               audio_nmf_snr_filter, audio_size_filter,
                average_line_length_filter, character_repetition_filter,
                face_area_filter, flagged_words_filter,
                image_aspect_ratio_filter, image_shape_filter,

@@ -128,6 +128,7 @@ class StatsKeysConstant(object):
 
     # audios
     audio_duration = 'audio_duration'
+    audio_nmf_snr = 'audio_nmf_snr'
     audio_sizes = 'audio_sizes'
 
     # multimodal

@@ -109,8 +109,7 @@ class ImageSizeFilterTest(unittest.TestCase):
         }]
         tgt_list = []
         dataset = Dataset.from_list(ds_list)
-        op = ImageSizeFilter(min_size="120kb", max_size="180KB",
-                                    any_or_all='all')
+        op = ImageSizeFilter(min_size="120kb", max_size="180KB", any_or_all='all')
         self._run_image_size_filter(dataset, tgt_list, op)
 
 

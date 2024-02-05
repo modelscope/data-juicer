@@ -1,5 +1,5 @@
 # Some code here has been modified from:
-# https://github.com/togethercomputer/RedPajama-Data/
+# https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/
 # --------------------------------------------------------
 
 from data_juicer.utils.availability_utils import AvailabilityChecking

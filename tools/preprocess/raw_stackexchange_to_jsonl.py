@@ -1,5 +1,5 @@
 # Part of the code here has been modified from:
-# https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/stack_exchange
+# https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/stack_exchange
 # --------------------------------------------------------
 #
 # This tool is used for converting the raw Stack Exchange data downloaded from
@@ -7,7 +7,7 @@
 # jsonl files.
 #
 # For downloading process, please refer to:
-# https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/stack_exchange
+# https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/stack_exchange
 #
 # Notice: before you downloading, converting or processing, you might make sure
 # that your drive space is large enough to store the raw data (over 100GB),
