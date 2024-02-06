@@ -26,6 +26,10 @@ jobs:
         python-version: "3.8"
         cache: 'pip'
         cache-dependency-path: 'environments/**_requires.txt'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -v -e .[all]
     - name: Increase swapfile
       run: |
         df -h
@@ -36,10 +40,6 @@ jobs:
         sudo mkswap /swapfile
         sudo swapon /swapfile
         sudo swapon --show
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -v -e .[all]
     - name: Run the test
       run: |
         python tests/run.py
