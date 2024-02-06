@@ -51,5 +51,5 @@ jobs:
         sudo swapon --show
     - name: Run the test
       run: |
-        sudo export TRANSFORMERS_CACHE=/mnt/hf_model_cache/
+        export TRANSFORMERS_CACHE=/mnt/hf_model_cache/
         sudo python tests/run.py
