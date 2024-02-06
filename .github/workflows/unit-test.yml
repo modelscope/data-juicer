@@ -44,10 +44,10 @@ jobs:
         df -h
         free -h
         sudo swapoff -a
-        sudo fallocate -l 12G /swapfile
-        sudo chmod 600 /swapfile
-        sudo mkswap /swapfile
-        sudo swapon /swapfile
+        sudo fallocate -l 12G /mnt/swapfile
+        sudo chmod 600 /mnt/swapfile
+        sudo mkswap /mnt/swapfile
+        sudo swapon /mnt/swapfile
         sudo swapon --show
     - name: Run the test
       run: |
