@@ -37,8 +37,8 @@ jobs:
         df -h
     - name: Install dependencies
       run: |
-        sudo python -m pip install --upgrade pip
-        sudo pip install -v -e .[all]
+        python -m pip install --upgrade pip
+        pip install -v -e .[all]
     - name: Increase swapfile
       run: |
         df -h
@@ -51,5 +51,4 @@ jobs:
         sudo swapon --show
     - name: Run the test
       run: |
-        export TRANSFORMERS_CACHE=/mnt/hf_model_cache/
-        sudo python tests/run.py
+        python tests/run.py
