@@ -37,8 +37,8 @@ jobs:
         df -h
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -v -e .[all]
+        sudo python -m pip install --upgrade pip
+        sudo pip install -v -e .[all]
     - name: Increase swapfile
       run: |
         df -h
