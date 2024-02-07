@@ -192,7 +192,7 @@ process:
       lang: en                                                # compute perplexity in what language
       max_ppl: 1500                                           # the max perplexity score to filter text
   - phrase_grounding_recall_filter:                         # filter samples according to the locating recall of phrases extracted from text in the images.
-      hf_clip: openai/clip-vit-base-patch32                   # name of used Hugging Face Owl-ViT
+      hf_owlvit: openai/clip-vit-base-patch32                   # name of used Hugging Face Owl-ViT
       min_recall: 0.1                                         # the min phrase grounding recall of filter range
       max_recall: 1.0                                         # the max phrase grounding recall of filter range
       horizontal_flip: false                                  # flip image horizontally (left to right).
