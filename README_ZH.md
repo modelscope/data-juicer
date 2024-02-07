@@ -152,7 +152,7 @@ pip install py-data-juicer
   - 或者运行如下命令用我们提供的 [Dockerfile](Dockerfile) 来构建包括最新版本的 `data-juicer` 的 docker 镜像：
 
     ```shell
-    docker build -t data-juicer:<version_tag> .
+    docker build -t datajuicer/data-juicer:<version_tag> .
     ```
 
 ### 安装校验
@@ -252,7 +252,7 @@ docker run --rm \  # 在处理结束后将容器移除
   --name dj \  # 容器名称
   -v <host_data_path>:<image_data_path> \  # 将本地的数据或者配置目录挂载到容器中
   -v ~/.cache/:/root/.cache/ \  # 将 cache 目录挂载到容器以复用 cache 和模型资源（推荐）
-  data-juicer:<version_tag> \  # 运行的镜像
+  datajuicer/data-juicer:<version_tag> \  # 运行的镜像
   dj-process --config /path/to/config.yaml  # 类似的数据处理命令
 ```
 
@@ -265,7 +265,7 @@ docker run -dit \  # 在后台启动容器
   --name dj \
   -v <host_data_path>:<image_data_path> \
   -v ~/.cache/:/root/.cache/ \
-  data-juicer:latest /bin/bash
+  datajuicer/data-juicer:latest /bin/bash
 
 # 进入这个容器，然后您可以在编辑模式下使用 data-juicer
 docker exec -it <container_id> bash
