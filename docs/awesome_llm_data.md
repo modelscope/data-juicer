@@ -22,11 +22,12 @@ Dataset and Data Type
 - Data_Usage_Evaluation
 - Data_Domain_Text
 - Data_Domain_Multimodal
-- Data_Domain_Audio
 - Data_Domain_Vision
+- Data_Domain_Audio
+- Data_Domain_Video
+- Data_Domain_Code
 - Data_Domain_Web
 - Data_Domain_Prompt
-- Data_Domain_Code
 
 Data Understanding 
 - Data_Quality
@@ -70,6 +71,7 @@ Data Management
 | The Flan Collection: Designing Data and Methods for Effective Instruction Tuning                                        | `ICML'23`, `Data_Usage_FineTune`, `Data_Domain_Text`, `Data_Alignment`, `Data_Generalization`                                                                                         |
 | Data-Juicer: A One-Stop Data Processing System for Large Language Models                                                | `SIGMOD'24`, `Tool_Resource`, `Framework_Development` `Data_Usage_Pretrain`, `Data_Usage_FineTune`, `Data_Domain_Text`, `Data_Processing_Enhancement`, `Data_Scaling`, `Data_Quality` |
 | From Quantity to Quality: Boosting LLM Performance with Self-Guided Data Selection for Instruction Tuning               | `arXiv'2308`, `Data_Usage_FineTune`, `Data_Domain_Text`, `Data_Alignment`, `Data_Quality`, `Data_Generalization`                                                                      |
+| InternVid: A Large-scale Video-Text Dataset for Multimodal Understanding and Generation                                 | `ICLR'24`, `Data_Usage_Pretrain`, `Data_Domain_Video`, `Data_Domain_Multimodal`, `Data_Quality`, `Data_Curation_ModelBased`                                                           |
 | What Makes Good Data for Alignment? A Comprehensive Study of Automatic Data Selection in Instruction Tuning             | `ICLR'24`, `Data_Usage_FineTune`, `Data_Domain_Text`, `Data_Alignment`, `Data_Quality`, `Data_Diversity`                                                                              |
 | Alpagasus: Training a Better Alpaca Model with Fewer Data                                                               | `ICLR'24`, `Data_Usage_FineTune`, `Data_Domain_Text`, `Data_Alignment`, `Data_Quality`                                                                                                |
 | WaveCoder: Widespread And Versatile Enhanced Instruction Tuning with Refined Data Generation                            | `arXiv'2312`, `Framework_Development`, `Data_Usage_FineTune`, `Data_Domain_Code`, `Data_Alignment`, `Data_Generalization`                                                             |
