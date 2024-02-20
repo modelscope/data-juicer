@@ -300,6 +300,7 @@ docker exec -it <container_id> bash
 - [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
 - [Configs](configs/README.md) | [配置系统](configs/README_ZH.md)
 - [Developer Guide](docs/DeveloperGuide.md) | [开发者指南](docs/DeveloperGuide_ZH.md)
+- ["Bad" Data Exhibition](docs/BadDataExhibition.md) | [“坏”数据展览](docs/BadDataExhibition_ZH.md)
 - Dedicated Toolkits | 专用工具箱
   - [Quality Classifier](tools/quality_classifier/README.md) | [质量分类器](tools/quality_classifier/README_ZH.md)
   - [Auto Evaluation](tools/evaluator/README.md) | [自动评测](tools/evaluator/README_ZH.md)
