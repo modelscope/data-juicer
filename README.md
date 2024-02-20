@@ -41,9 +41,10 @@ Welcome to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_
 ----
 
 ## News
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-01-10] Discover new horizons in "Data Mixture"—Our second data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532174) for more information.
-
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-01-05] We release **Data-Juicer v0.1.3** now! 
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-02-20] We have actively maintained an awesome list of LLM-Data, welcome to [visit](docs/awesome_llm_data.md) and contribute!
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
+- [2024-01-10] Discover new horizons in "Data Mixture"—Our second data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532174) for more information.
+- [2024-01-05] We release **Data-Juicer v0.1.3** now! 
 In this new version, we support **more Python versions** (3.7-3.10), and support **multimodal** dataset [converting](tools/multimodal/README.md)/[processing](docs/Operators.md) (Including texts, images, and audios. More modalities will be supported in the future).
 Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 
@@ -308,6 +309,7 @@ docker exec -it <container_id> bash
   - [Postprocess](tools/postprocess/README.md) | [后处理](tools/postprocess/README_ZH.md)
 - [Third-parties (LLM Ecosystems)](thirdparty/README.md) | [第三方库（大语言模型生态）](thirdparty/README_ZH.md)
 - [API references](https://alibaba.github.io/data-juicer/)
+- [Awesome LLM-Data](docs/awesome_llm_data.md)
 
 ## Data Recipes
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
@@ -358,12 +360,10 @@ Data-Juicer thanks and refers to several community projects, such as
 ## References
 If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2309.02033).
 ```
-@misc{chen2023datajuicer,
+@inproceedings{chen2024datajuicer,
 title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
 author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
-year={2023},
-eprint={2309.02033},
-archivePrefix={arXiv},
-primaryClass={cs.LG}
+  booktitle={International Conference on Management of Data},
+  year={2024}
 }
 ```
