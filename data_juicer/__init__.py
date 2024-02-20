@@ -1,30 +1,53 @@
 __version__ = '0.1.3'
 
 import os
+import subprocess
 
 import multiprocess as mp
 from loguru import logger
 
-__USE_CUDA = False
-__CUDA_COUNT = 0
+
+def _cuda_device_count():
+    try:
+        nvidia_smi_output = subprocess.check_output(['nvidia-smi', '-L'],
+                                                    text=True)
+        all_devices = nvidia_smi_output.strip().split('\n')
+
+        cuda_visible_devices = os.getenv('CUDA_VISIBLE_DEVICES')
+
+        if cuda_visible_devices:
+            visible_devices = cuda_visible_devices.split(',')
+            visible_devices = [int(dev.strip()) for dev in visible_devices]
+            num_visible_devices = sum(1 for dev in visible_devices
+                                      if 0 <= dev < len(all_devices))
+        else:
+            num_visible_devices = len(all_devices)
+
+        return num_visible_devices
+    except Exception:
+        # nvidia-smi not found or other error
+        return 0
+
+
+_USE_CUDA = False
+_CUDA_COUNT = _cuda_device_count()
 
 
 def use_cuda():
-    return __USE_CUDA
+    return _USE_CUDA
 
 
 def cuda_device_count():
-    return __CUDA_COUNT
+    return _CUDA_COUNT
 
 
 def setup_mp():
     method = os.getenv('MP_START_METHOD', 'auto').lower()
     if method == 'auto':
-        import torch
-        if torch.cuda.is_available():
+        if _CUDA_COUNT > 0:
             # forkserver is more lightweight
-            method = 'forkserver' if 'forkserver' in mp.get_all_start_methods(
-            ) else 'spawn'
+            method = ('forkserver' if 'forkserver'
+                      in mp.get_all_start_methods() else 'spawn')
         else:
             method = 'fork'
     try:
@@ -35,18 +58,15 @@ def setup_mp():
 
 
 def setup_cuda():
-    global __USE_CUDA, __CUDA_COUNT
-    method = mp.get_start_method()
-    import torch
-    if method != 'fork' and torch.cuda.is_available():
-        __USE_CUDA = True
-    else:
-        __USE_CUDA = False
-    logger.debug(f'__USE_CUDA: {__USE_CUDA} | MP: {method} '
-                 f'({mp.current_process().name})')
+    global _USE_CUDA
 
-    if __USE_CUDA:
-        __CUDA_COUNT = torch.cuda.device_count()
+    method = mp.get_start_method()
+    if method != 'fork' and _CUDA_COUNT > 0:
+        _USE_CUDA = True
+    else:
+        _USE_CUDA = False
+    logger.debug(f'_USE_CUDA: {_USE_CUDA} | MP: {method} '
+                 f'({mp.current_process().name})')
 
 
 def initialize():
