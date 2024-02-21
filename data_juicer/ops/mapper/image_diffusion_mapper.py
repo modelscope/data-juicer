@@ -14,9 +14,9 @@ from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_diffusion_mapper'
 
-with AvailabilityChecking(
-    ['diffusers', 'torch', 'transformers', 'simhash-pybind'], OP_NAME):
-    import diffusers
+check_list = ['diffusers', 'torch', 'transformers', 'simhash-pybind']
+with AvailabilityChecking(check_list, OP_NAME):
+    import diffusers  # noqa: F401
     import simhash  # noqa: F401
     import torch
     import transformers  # noqa: F401
