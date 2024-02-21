@@ -210,24 +210,30 @@ def main(
                 img_idx = 0
                 new_sents = []
                 for sent_idx, sent in enumerate(sentences):
-                    if img_idx < len(image_infos) and image_infos[img_idx][
+                    # find the matched sentence of the current image
+                    image_num_this_sent = 0
+                    while img_idx < len(image_infos) and image_infos[img_idx][
                             'matched_text_index'] == sent_idx:
-                        # find the matched sentence of the current image,
-                        # insert a image_special_token to specific position.
+                        image_num_this_sent += 1
+                        img_idx += 1
+
+                    if image_num_this_sent > 0:
+                        # insert several image_special_tokens to specific
+                        # position.
+                        image_special_tokens = sent_seperator.join(
+                            [image_special_token] * image_num_this_sent)
                         if image_special_token_insert_pos == 'before':
-                            sent = image_special_token + sent_seperator + sent
+                            sent = image_special_tokens + sent_seperator + sent
                         elif image_special_token_insert_pos == 'after':
-                            sent += sent_seperator + image_special_token
+                            sent += sent_seperator + image_special_tokens
                         else:
                             if random.random() < 0.5:
                                 # before
-                                sent = image_special_token + sent_seperator \
+                                sent = image_special_tokens + sent_seperator \
                                        + sent
                             else:
                                 # after
-                                sent += sent_seperator + image_special_token
-                        # check the next img_idx
-                        img_idx += 1
+                                sent += sent_seperator + image_special_tokens
                     new_sents.append(sent)
 
                 join_sep = f' {eoc_special_token}{sent_seperator}'
