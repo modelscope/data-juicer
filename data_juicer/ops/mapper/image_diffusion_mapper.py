@@ -3,6 +3,7 @@ import os
 
 from PIL import Image
 
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
@@ -12,6 +13,16 @@ from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_diffusion_mapper'
+
+with AvailabilityChecking(
+    ['diffusers', 'torch', 'transformers', 'simhash-pybind'], OP_NAME):
+    import diffusers
+    import simhash  # noqa: F401
+    import torch
+    import transformers  # noqa: F401
+
+    # avoid hanging when calling stable diffusion in multiprocessing
+    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -134,7 +145,8 @@ class ImageDiffusionMapper(Mapper):
                 captions = [captions] * len(images)
             else:
                 assert len(captions) == len(
-                    images), 'The num of captions must match the num of images.'
+                    images
+                ), 'The num of captions must match the num of images.'
             captions = [remove_special_tokens(c) for c in captions]
         else:
             caption_samples = {
