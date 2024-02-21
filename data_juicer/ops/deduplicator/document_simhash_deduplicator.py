@@ -21,46 +21,6 @@ OP_NAME = 'document_simhash_deduplicator'
 with AvailabilityChecking(['simhash-pybind'], OP_NAME):
     import simhash
 
-    def local_num_differing_bits(hash_a, hash_b):
-        """
-        Local implementation of calculating the number of different bits
-        between two integers.
-
-        :param hash_a: integer hash value a
-        :param hash_b: integer hash value b
-        :return: number of different bits between input hashes.
-        """
-        cnt = 0
-        n = hash_a ^ hash_b
-        while n != 0:
-            cnt += 1
-            n = n & (n - 1)
-        return cnt
-
-    def num_differing_bits_selector():
-        """
-        Select a num_differing_bits method according to the Python version
-        installed.
-
-        When Python >= 3.9, the original simhash library cannot be compiled
-        correctly due to some changes in cython. After fixing this
-        incompatibility, RecursionError occurs sometimes when calling
-        simhash.num_differing_bits. So we use our implementation when Python
-        >= 3.9. Otherwise, we use implementation of simhash.
-
-        :return: an available num_differing_bits function.
-        """
-        import platform
-        a, b, _ = platform.python_version().split('.')
-        if a == '3' and int(b) >= 9:
-            # for >= 3.9, use local implementation
-            return local_num_differing_bits
-        else:
-            # for < 3.9, use simhash version
-            return simhash.num_differing_bits
-
-    num_differing_bits = num_differing_bits_selector()
-
 
 @OPERATORS.register_module(OP_NAME)
 class DocumentSimhashDeduplicator(Deduplicator):

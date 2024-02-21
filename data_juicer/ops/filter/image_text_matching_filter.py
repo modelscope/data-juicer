@@ -69,12 +69,13 @@ class ImageTextMatchingFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(model_type='huggingface',
-                                       model_name_or_path=hf_blip)
+                                       pretrained_model_name_or_path=hf_blip)
+        self._accelerator = 'cuda'
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_text_matching_score in sample[Fields.stats]:
             return sample
@@ -94,7 +95,7 @@ class ImageTextMatchingFilter(Filter):
         text = sample[self.text_key]
         offset = 0
         matching_scores = []
-        model, processor = get_model(self.model_key)
+        model, processor = get_model(self.model_key, rank=rank)
 
         for chunk in text.split(SpecialTokens.eoc):
             count = chunk.count(SpecialTokens.image)
@@ -139,7 +140,7 @@ class ImageTextMatchingFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process(self, sample, rank=None):
         itm_scores = sample[Fields.stats][StatsKeys.image_text_matching_score]
         if len(itm_scores) <= 0:
             return True

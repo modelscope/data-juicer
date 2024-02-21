@@ -31,6 +31,7 @@ class OP:
         if audio_key is None:
             audio_key = 'audios'
         self.audio_key = audio_key
+        self._accelerator = 'cpu'
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.process = wrap_func_with_nested_access(self.process)

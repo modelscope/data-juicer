@@ -130,7 +130,8 @@ class PhraseGroundingRecallFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(model_type='huggingface',
-                                       model_name_or_path=hf_owlvit)
+                                       pretrained_model_name_or_path=hf_owlvit)
+        self._accelerator = 'cuda'
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
@@ -144,7 +145,7 @@ class PhraseGroundingRecallFilter(Filter):
         for nltk_data_pkg in requires_nltk_data:
             nltk.download(nltk_data_pkg)
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.phrase_grounding_recall in sample[Fields.stats]:
             return sample
@@ -163,7 +164,7 @@ class PhraseGroundingRecallFilter(Filter):
         text = sample[self.text_key]
         offset = 0
         recalls = []
-        model, processor = get_model(self.model_key)
+        model, processor = get_model(self.model_key, rank=rank)
 
         for chunk in text.split(SpecialTokens.eoc):
             count = chunk.count(SpecialTokens.image)
@@ -197,8 +198,9 @@ class PhraseGroundingRecallFilter(Filter):
 
                 with torch.no_grad():
                     outputs = model(**inputs)
-                    target_sizes = torch.tensor(
-                        [img.size[::-1] for img in images_this_chunk])
+                    target_sizes = torch.tensor([
+                        img.size[::-1] for img in images_this_chunk
+                    ]).to(model.device)
                     results = processor.post_process_object_detection(
                         outputs,
                         threshold=self.conf_thr,
