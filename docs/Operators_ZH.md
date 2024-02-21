@@ -56,7 +56,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | fix_unicode_mapper                                  | General               | en, zh    | 修复损坏的 Unicode（借助 [ftfy](https://ftfy.readthedocs.io/)） |
 | generate_caption_mapper                             | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（例如 blip2）和原始样本中的图形生成的。                                             |
 | image_blur_mapper                                   | Multimodal            |  -        | 对图像进行模糊处理                                              ｜
-| image_diffusion_mapper                              | Multimodal            |  -        | 用stable diffusion对生成图像，对图像进行增强                       ｜
+| image_diffusion_mapper                              | Multimodal            |  -        | 用stable diffusion生成图像，对图像进行增强                       ｜
 | nlpaug_en_mapper                                    | General               | en        | 使用`nlpaug`库对英语文本进行简单增强                                 | 
 | nlpcda_zh_mapper                                    | General               | zh        | 使用`nlpcda`库对中文文本进行简单增强                                 | 
 | punctuation_normalization_mapper                    | General               | en, zh    | 将各种 Unicode 标点符号标准化为其 ASCII 等效项                        |
