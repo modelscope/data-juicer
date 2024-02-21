@@ -74,6 +74,7 @@ def load_images_byte(paths):
 def load_image(path):
     img_feature = Image()
     img = img_feature.decode_example(img_feature.encode_example(path))
+    img = img.convert('RGB')
     return img
 
 
