@@ -15,32 +15,39 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Check disk space
+      run: |
+        df -h
     - name: Cache data-juicer assets and models
       uses: actions/cache@v3
       with:
         path: ~/.cache/data_juicer
         key: dj-assets-models
+    - name: Check disk space
+      run: |
+        df -h
     - name: Set up Python 3.8
       uses: actions/setup-python@v3
       with:
         python-version: "3.8"
         cache: 'pip'
         cache-dependency-path: 'environments/**_requires.txt'
+    - name: Check disk space
+      run: |
+        df -h
     - name: Install dependencies
       run: |
-        pip cache purge
-        python -m pip install --upgrade --no-cache-dir pip
-        pip install --no-cache-dir -v -e .[all]
-        pip cache purge
+        python -m pip install --upgrade pip
+        pip install -v -e .[all]
     - name: Increase swapfile
       run: |
         df -h
         free -h
         sudo swapoff -a
-        sudo fallocate -l 14G /swapfile
-        sudo chmod 600 /swapfile
-        sudo mkswap /swapfile
-        sudo swapon /swapfile
+        sudo fallocate -l 12G /mnt/swapfile
+        sudo chmod 600 /mnt/swapfile
+        sudo mkswap /mnt/swapfile
+        sudo swapon /mnt/swapfile
         sudo swapon --show
     - name: Run the test
       run: |
