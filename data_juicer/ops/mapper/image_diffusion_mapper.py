@@ -130,9 +130,11 @@ class ImageDiffusionMapper(Mapper):
         if self.caption_key:
             captions = ori_sample[self.caption_key]
             if not isinstance(captions, list):
-                captions = [captions]
-            assert len(captions) == len(
-                images), 'The num of captions must match the num of images.'
+                # one caption for all images
+                captions = [captions] * len(images)
+            else:
+                assert len(captions) == len(
+                    images), 'The num of captions must match the num of images.'
             captions = [remove_special_tokens(c) for c in captions]
         else:
             caption_samples = {
