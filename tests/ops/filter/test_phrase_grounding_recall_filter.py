@@ -34,7 +34,7 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
             dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
 
-        dataset = dataset.map(op.compute_stats, num_proc=num_proc)
+        dataset = dataset.map(op.compute_stats, num_proc=num_proc, with_rank=True)
         dataset = dataset.filter(op.process, num_proc=num_proc)
         dataset = dataset.select_columns(column_names=['text', 'images'])
         res_list = dataset.to_list()

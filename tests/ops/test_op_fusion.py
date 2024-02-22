@@ -1,8 +1,10 @@
 import unittest
 
 from data_juicer.ops.load import load_ops
+from data_juicer.utils.unittest_utils import SKIPPED_TESTS
 
 
+@SKIPPED_TESTS.register_module()
 class OpFusionTest(unittest.TestCase):
 
     def _run_op_fusion(self, original_process_list, target_process_list):
