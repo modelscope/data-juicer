@@ -43,9 +43,10 @@ class TokenNumFilter(Filter):
         self.min_num = min_num
         self.max_num = max_num
         self.hf_tokenizer = hf_tokenizer
-        self.model_key = prepare_model(model_type='huggingface',
-                                       model_name_or_path=hf_tokenizer,
-                                       return_model=False)
+        self.model_key = prepare_model(
+            model_type='huggingface',
+            pretrained_model_name_or_path=hf_tokenizer,
+            return_model=False)
 
     def compute_stats(self, sample):
         # check if it's computed already

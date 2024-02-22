@@ -51,7 +51,7 @@ class AlphanumericFilter(Filter):
         if tokenization:
             self.model_key = prepare_model(
                 model_type='huggingface',
-                model_name_or_path='EleutherAI/pythia-6.9b-deduped',
+                pretrained_model_name_or_path='EleutherAI/pythia-6.9b-deduped',
                 return_model=False)
 
     def compute_stats(self, sample):

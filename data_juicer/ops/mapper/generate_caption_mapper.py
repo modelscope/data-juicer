@@ -88,7 +88,8 @@ class GenerateCaptionMapper(Mapper):
                 f'["random_any", "similar_one_simhash", "all"].')
 
         self.model_key = prepare_model(model_type='huggingface',
-                                       model_name_or_path=hf_blip2)
+                                       pretrained_model_name_or_path=hf_blip2)
+        self._accelerator = 'cuda'
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode
         self.keep_original_sample = keep_original_sample
@@ -109,7 +110,7 @@ class GenerateCaptionMapper(Mapper):
                 'Both the parameter `prompt` and `prompt_key` are '
                 'set. Data-Juicer will consider `prompt_key` first.')
 
-    def _process_single_sample(self, ori_sample):
+    def _process_single_sample(self, ori_sample, rank=None):
         """
 
         :param ori_sample: a single data sample before applying generation
@@ -146,7 +147,7 @@ class GenerateCaptionMapper(Mapper):
         # the generated text will be placed following each SpecialTokens.img
         # and the original special tokens are kept in an order-preserving way.
 
-        model, processor = get_model(self.model_key)
+        model, processor = get_model(self.model_key, rank=rank)
 
         # do generation for each image chunk by chunk
         for chunk in ori_sample[self.text_key].split(SpecialTokens.eoc):
@@ -233,8 +234,10 @@ class GenerateCaptionMapper(Mapper):
             new_generated_text_per_chunk.extend(
                 generated_text_candidates_single_chunk)
         elif self.keep_candidate_mode == 'similar_one_simhash':
-            from ..deduplicator.document_simhash_deduplicator import (
-                DocumentSimhashDeduplicator, num_differing_bits)
+            from simhash import num_differing_bits
+
+            from ..deduplicator.document_simhash_deduplicator import \
+                DocumentSimhashDeduplicator
             ori_normal_text = remove_special_tokens(chunk)
             # using a simhash OP to calculate their similarity
             # NOTE: simhash is just one method to calculate the similarities
@@ -262,7 +265,7 @@ class GenerateCaptionMapper(Mapper):
                 generated_text_candidates_single_chunk[max_index])
         return new_generated_text_per_chunk
 
-    def process(self, samples):
+    def process(self, samples, rank=None):
         """
         Note: This is a batched_OP, whose the input and output type are
             both list. Suppose there are $N$ input sample list with batch
@@ -284,7 +287,8 @@ class GenerateCaptionMapper(Mapper):
         for ori_sample in reconstructed_samples:
             if self.keep_original_sample:
                 samples_after_generation.append(ori_sample)
-            generated_samples = self._process_single_sample(ori_sample)
+            generated_samples = self._process_single_sample(ori_sample,
+                                                            rank=rank)
             if len(generated_samples) != 0:
                 samples_after_generation.extend(generated_samples)
         # reconstruct samples from "list of dicts" to "dict of lists"
