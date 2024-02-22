@@ -176,8 +176,9 @@ class ImageDiffusionMapper(Mapper):
                 # TODO: duplicated generation if image is reused
                 if not os.path.exists(diffusion_image_key
                                       ) or diffusion_image_key not in images:
-                    diffusion_image = self._real_guidance(
-                        captions[index], images[value], rank=rank)
+                    diffusion_image = self._real_guidance(captions[index],
+                                                          images[value],
+                                                          rank=rank)
                     images[diffusion_image_key] = diffusion_image
                     diffusion_image.save(diffusion_image_key)
                     if context:
@@ -208,7 +209,8 @@ class ImageDiffusionMapper(Mapper):
         for ori_sample in reconstructed_samples:
             if self.keep_original_sample:
                 samples_after_generation.append(ori_sample)
-            generated_samples = self._process_single_sample(ori_sample, rank=rank)
+            generated_samples = self._process_single_sample(ori_sample,
+                                                            rank=rank)
             if len(generated_samples) != 0:
                 samples_after_generation.extend(generated_samples)
 
