@@ -18,14 +18,6 @@ jobs:
     - name: Check disk space
       run: |
         df -h
-    - name: Cache data-juicer assets and models
-      uses: actions/cache@v3
-      with:
-        path: /mnt/.cache/data_juicer
-        key: dj-assets-models
-    - name: Check disk space
-      run: |
-        df -h
     - name: Set up Python 3.8
       uses: actions/setup-python@v3
       with:
@@ -49,7 +41,14 @@ jobs:
         sudo mkswap /mnt/swapfile
         sudo swapon /mnt/swapfile
         sudo swapon --show
+    - name: Cache data-juicer assets and models
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/data_juicer
+        key: dj-assets-models
+    - name: Check disk space
+      run: |
+        df -h
     - name: Run the test
       run: |
-        export DATA_JUICER_CACHE_HOME="/mnt/.cache/data_juicer"
         python tests/run.py
