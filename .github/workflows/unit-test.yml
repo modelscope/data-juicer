@@ -18,10 +18,13 @@ jobs:
     - name: Check disk space
       run: |
         df -h
+    - name: Set data-juicer cache home to mnt
+      run: |
+        export DATA_JUICER_CACHE_HOME="/mnt/.cache/data_juicer"
     - name: Cache data-juicer assets and models
       uses: actions/cache@v3
       with:
-        path: ~/.cache/data_juicer
+        path: /mnt/.cache/data_juicer
         key: dj-assets-models
     - name: Check disk space
       run: |
