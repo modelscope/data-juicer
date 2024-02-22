@@ -16,7 +16,7 @@ class RemoveNonChineseCharacterlMapper(Mapper):
         """
         Initialization method.
 
-        :param keep_alphabet: whether to keep alpabet
+        :param keep_alphabet: whether to keep alphabet
         :param keep_number: whether to keep number
         :param keep_punc: whether to keep punctuation
         :param args: extra args
