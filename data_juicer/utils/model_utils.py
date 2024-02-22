@@ -312,8 +312,8 @@ def move_to_cuda(model, rank):
                 f'Moving {module.__class__.__name__} to CUDA device {rank}')
             module.to(f'cuda:{rank}')
             # Optionally, verify the device assignment
-            # logger.debug(f'{module.__class__.__name__} is on device '
-            #              f'{next(module.parameters()).device}')
+            logger.debug(
+                f'{module.__class__.__name__} is on device {module.device}')
 
 
 def get_model(model_key=None, rank=None):
