@@ -83,6 +83,7 @@ class ImageDiffusionMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._batched_op = True
+        self._accelerator = 'cuda'
         self.strength = strength
         self.guidance_scale = guidance_scale
         self.aug_num = aug_num
@@ -98,12 +99,13 @@ class ImageDiffusionMapper(Mapper):
 
         self.model_key = prepare_model(model_type='diffusion',
                                        model_name_or_path=hf_diffusion)
-        self.diffusion_model = get_model(model_key=self.model_key)
 
-    def _real_guidance(self, caption: str, image: Image.Image):
+    def _real_guidance(self, caption: str, image: Image.Image, rank=None):
 
         canvas = image.resize((512, 512), Image.BILINEAR)
         prompt = caption
+
+        diffusion_model = get_model(model_key=self.model_key, rank=rank)
 
         kwargs = dict(image=canvas,
                       prompt=[prompt],
@@ -112,16 +114,16 @@ class ImageDiffusionMapper(Mapper):
 
         has_nsfw_concept = True
         while has_nsfw_concept:
-            outputs = self.diffusion_model(**kwargs)
+            outputs = diffusion_model(**kwargs)
 
-            has_nsfw_concept = (self.diffusion_model.safety_checker is not None
+            has_nsfw_concept = (diffusion_model.safety_checker is not None
                                 and outputs.nsfw_content_detected[0])
 
         canvas = outputs.images[0].resize(image.size, Image.BILINEAR)
 
         return canvas
 
-    def _process_single_sample(self, ori_sample, context=False):
+    def _process_single_sample(self, ori_sample, rank=None, context=False):
         """
         :param ori_sample: a single data sample before applying generation
         :return: batched results after generation
@@ -175,7 +177,7 @@ class ImageDiffusionMapper(Mapper):
                 if not os.path.exists(diffusion_image_key
                                       ) or diffusion_image_key not in images:
                     diffusion_image = self._real_guidance(
-                        captions[index], images[value])
+                        captions[index], images[value], rank=rank)
                     images[diffusion_image_key] = diffusion_image
                     diffusion_image.save(diffusion_image_key)
                     if context:
@@ -185,7 +187,7 @@ class ImageDiffusionMapper(Mapper):
 
         return generated_samples
 
-    def process(self, samples, context=False):
+    def process(self, samples, rank=None, context=False):
         """
             Note: This is a batched_OP, whose the input and output type are
                 both list. Suppose there are $N$ input sample list with batch
@@ -206,7 +208,7 @@ class ImageDiffusionMapper(Mapper):
         for ori_sample in reconstructed_samples:
             if self.keep_original_sample:
                 samples_after_generation.append(ori_sample)
-            generated_samples = self._process_single_sample(ori_sample)
+            generated_samples = self._process_single_sample(ori_sample, rank=rank)
             if len(generated_samples) != 0:
                 samples_after_generation.extend(generated_samples)
 
