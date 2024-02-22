@@ -32,7 +32,7 @@ def strip(document, strip_characters):
     emojis).
 
     :param document: document to be processed
-    :param strip_characters: characters uesd for stripping document
+    :param strip_characters: characters used for stripping document
     :return: stripped document
     """
     if not document:
@@ -76,7 +76,7 @@ def split_on_newline_tab_whitespace(document):
 
     First split on "\\\\n", then on "\\\\t", then on " ".
     :param document: document to be splited
-    :return: setence list obtained after splitting document
+    :return: sentence list obtained after splitting document
     """
     sentences = document.split('\n')
     sentences = [sentence.split('\t') for sentence in sentences]
