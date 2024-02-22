@@ -18,9 +18,6 @@ jobs:
     - name: Check disk space
       run: |
         df -h
-    - name: Set data-juicer cache home to mnt
-      run: |
-        export DATA_JUICER_CACHE_HOME="/mnt/.cache/data_juicer"
     - name: Cache data-juicer assets and models
       uses: actions/cache@v3
       with:
@@ -54,4 +51,5 @@ jobs:
         sudo swapon --show
     - name: Run the test
       run: |
+        export DATA_JUICER_CACHE_HOME="/mnt/.cache/data_juicer"
         python tests/run.py
