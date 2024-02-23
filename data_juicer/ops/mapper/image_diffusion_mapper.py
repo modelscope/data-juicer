@@ -100,10 +100,11 @@ class ImageDiffusionMapper(Mapper):
                 keep_original_sample=False,
                 prompt=self.prompt)
 
-        self.model_key = prepare_model(model_type='diffusion',
-                                       pretrained_model_name_or_path=hf_diffusion,
-                                       diffusion_type='image2image',
-                                       floating_point=floating_point)
+        self.model_key = prepare_model(
+            model_type='diffusion',
+            pretrained_model_name_or_path=hf_diffusion,
+            diffusion_type='image2image',
+            floating_point=floating_point)
 
     def _real_guidance(self, caption: str, image: Image.Image, rank=None):
 
