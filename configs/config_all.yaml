@@ -71,6 +71,15 @@ process:
       p: 0.2                                                  # probability of the image being blured
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
+  - image_diffusion_mapper:                                 # generate images by diffusion model
+      floating_point: 'fp32'                                  # the floating point used to load the diffusion model.
+      hf_diffusion: 'CompVis/stable-diffusion-v1-4'           # stable diffusion model name on huggingface to generate image
+      strength: 0.8                                           # parameter of stable diffusion model, indicates extent to transform the reference image. will ignore the input image if it equals to 1
+      guidance_scale: 7.5                                     # parameter of stable diffusion model, a higher guidance scale value encourages the model to generate images closely linked to the text prompt at the expense of lower image quality
+      aug_num: 1                                              # the number of images to generate
+      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
+      caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
+      hf_blip2: 'Salesforce/blip2-opt-2.7b'                   # blip2 model name on huggingface to generate caption if caption_key is null
   - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library
       sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
       aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.

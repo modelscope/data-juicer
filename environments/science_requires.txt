@@ -14,3 +14,4 @@ imagededup
 torch
 dlib
 spacy-pkuseg==0.0.32
+diffusers

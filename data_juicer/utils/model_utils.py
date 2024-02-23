@@ -255,6 +255,59 @@ def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
     return diversity_model
 
 
+def prepare_diffusion_model(pretrained_model_name_or_path,
+                            diffusion_type,
+                            floating_point='fp32'):
+    """
+        Prepare and load an Diffusion model from HuggingFace.
+
+        :param pretrained_model_name_or_path: input Diffusion model name
+            or local path to the model
+        :param diffusion_type: the use of the diffusion model. It can be
+            'image2image', 'text2image', 'inpainting'
+        :param floating_point: the floating point to load the diffusion
+            model. It can be 'fp16', 'fp32'
+        :return: a Diffusion model.
+    """
+    import torch
+    from diffusers import (AutoPipelineForImage2Image,
+                           AutoPipelineForInpainting,
+                           AutoPipelineForText2Image)
+
+    diffusion_type_to_pipeline = {
+        'image2image': AutoPipelineForImage2Image,
+        'text2image': AutoPipelineForText2Image,
+        'inpainting': AutoPipelineForInpainting
+    }
+
+    if diffusion_type not in diffusion_type_to_pipeline.keys():
+        raise ValueError(
+            f'Not support {diffusion_type} diffusion_type for diffusion '
+            'model. Can only be one of '
+            '["image2image", "text2image", "inpainting"].')
+
+    if floating_point not in ['fp32', 'fp16']:
+        raise ValueError(
+            f'Not support {floating_point} floating_point for diffusion '
+            'model. Can only be one of '
+            '["fp32", "fp16"].')
+
+    if not use_cuda() and floating_point == 'fp16':
+        raise ValueError(
+            'In cpu mode, only fp32 floating_point can be used for diffusion'
+            ' model.')
+
+    pipeline = diffusion_type_to_pipeline[diffusion_type]
+    revision = floating_point
+    torch_dtype = torch.float32 if floating_point == 'fp32' else torch.float16
+
+    model = pipeline.from_pretrained(pretrained_model_name_or_path,
+                                     revision=revision,
+                                     torch_dtype=torch_dtype)
+
+    return model
+
+
 MODEL_FUNCTION_MAPPING = {
     'fasttext': prepare_fasttext_model,
     'sentencepiece': prepare_sentencepiece_model,
@@ -262,6 +315,7 @@ MODEL_FUNCTION_MAPPING = {
     'nltk': prepare_nltk_model,
     'huggingface': prepare_huggingface_model,
     'spacy': prepare_spacy_model,
+    'diffusion': prepare_diffusion_model
 }
 
 
