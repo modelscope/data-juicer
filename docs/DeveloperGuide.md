@@ -126,6 +126,27 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
+    - If the operator processes data in batches rather than a single sample, it is necessary to declare `self._batched_op = True`.
+    ```python
+    # ... (same as above)
+
+    @OPERATORS.register_module('text_length_filter')
+    class TextLengthFilter(Filter):
+        def __init__(self,
+                    min_len: PositiveInt = 10,
+                    max_len: PositiveInt = sys.maxsize,
+                    *args,
+                    **kwargs):
+            # ... (same as above)
+            self._batched_op = True
+
+        def compute_stats(self, sample, rank=None):
+            # ... (same as above)
+
+        def process(self, sample, rank=None):
+            # ... (same as above)
+    ```
+
 3. After implemention, add it to the OP dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
 
 ```python

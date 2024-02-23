@@ -121,6 +121,27 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
+    - 如果算子批量处理数据，输入不是一个样本而是一个batch，需要声明`self._batched_op = True`。
+     ```python
+    # ... (same as above)
+
+    @OPERATORS.register_module('text_length_filter')
+    class TextLengthFilter(Filter):
+        def __init__(self,
+                    min_len: PositiveInt = 10,
+                    max_len: PositiveInt = sys.maxsize,
+                    *args,
+                    **kwargs):
+            # ... (same as above)
+            self._batched_op = True
+
+        def compute_stats(self, sample, rank=None):
+            # ... (same as above)
+
+        def process(self, sample, rank=None):
+            # ... (same as above)
+    ```
+
 3. 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
 
 ```python
