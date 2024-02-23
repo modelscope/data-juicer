@@ -1,3 +1,4 @@
+import base64
 import re
 
 import numpy as np
@@ -66,11 +67,30 @@ def load_images(paths):
     return [load_image(path) for path in paths]
 
 
+def load_images_byte(paths):
+    return [load_image_byte(path) for path in paths]
+
+
 def load_image(path):
     img_feature = Image()
     img = img_feature.decode_example(img_feature.encode_example(path))
     img = img.convert('RGB')
     return img
+
+
+def load_image_byte(path):
+    with open(path, 'rb') as image_file:
+        image_data = image_file.read()
+    return image_data
+
+
+def image_path_to_base64(image_path):
+    with open(image_path, 'rb') as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+
+def image_byte_to_base64(image_byte):
+    return base64.b64encode(image_byte).decode('utf-8')
 
 
 def pil_to_opencv(pil_image):

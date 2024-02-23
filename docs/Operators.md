@@ -57,6 +57,7 @@ All the specific operators are listed below, each featured with several capabili
 | expand_macro_mapper                                 | LaTeX              | en, zh | Expands macros usually defined at the top of TeX documents                                                     |
 | fix_unicode_mapper                                  | General            | en, zh | Fixes broken Unicodes (by [ftfy](https://ftfy.readthedocs.io/))                                                |
 | generate_caption_mapper                             | Multimodal         |  -     | generate samples whose captions are generated based on another model (such as blip2) and the figure within the original sample |
+| gpt4v_generate_mapper                               | Multimodal         |  -     | generate samples whose texts are generated based on gpt-4-visison and the image                                |
 | image_blur_mapper                                   | Multimodal         |  -     | Blur images |
 | image_diffusion_mapper                              | Multimodal         |  -     | Generate and augment images by stable diffusion model |
 | nlpaug_en_mapper                                    | General            | en     | Simply augments texts in English based on the `nlpaug` library                                                 | 
