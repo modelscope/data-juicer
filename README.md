@@ -169,7 +169,7 @@ pip install py-data-juicer
     latest `data-juicer` with provided [Dockerfile](Dockerfile):
 
     ```shell
-    docker build -t data-juicer:<version_tag> .
+    docker build -t datajuicer/data-juicer:<version_tag> .
     ```
 
 ### Installation check
@@ -276,7 +276,7 @@ docker run --rm \  # remove container after the processing
   --name dj \  # name of the container
   -v <host_data_path>:<image_data_path> \  # mount data or config directory into the container
   -v ~/.cache/:/root/.cache/ \  # mount the cache directory into the container to reuse caches and models (recommended)
-  data-juicer:<version_tag> \  # image to run
+  datajuicer/data-juicer:<version_tag> \  # image to run
   dj-process --config /path/to/config.yaml  # similar data processing commands
 ```
 
@@ -289,7 +289,7 @@ docker run -dit \  # run the container in the background
   --name dj \
   -v <host_data_path>:<image_data_path> \
   -v ~/.cache/:/root/.cache/ \
-  data-juicer:latest /bin/bash
+  datajuicer/data-juicer:latest /bin/bash
 
 # enter into this container and then you can use data-juicer in editable mode
 docker exec -it <container_id> bash
