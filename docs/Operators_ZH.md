@@ -55,6 +55,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | expand_macro_mapper                                 | LaTeX                 | en, zh    | 扩展通常在 TeX 文档顶部定义的宏                                     |
 | fix_unicode_mapper                                  | General               | en, zh    | 修复损坏的 Unicode（借助 [ftfy](https://ftfy.readthedocs.io/)） |
 | generate_caption_mapper                             | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（例如 blip2）和原始样本中的图形生成的。                                             |
+| gpt4v_generate_mapper                               | Multimodal            |  -     | 基于gpt-4-vision和图像生成文本                                |
 | image_blur_mapper                                   | Multimodal            |  -        | 对图像进行模糊处理                                              ｜
 | image_diffusion_mapper                              | Multimodal            |  -        | 用stable diffusion生成图像，对图像进行增强                       ｜
 | nlpaug_en_mapper                                    | General               | en        | 使用`nlpaug`库对英语文本进行简单增强                                 | 
