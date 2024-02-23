@@ -313,7 +313,7 @@ docker exec -it <container_id> bash
 
 ## Data Recipes
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
-- [Recipes for data process in RedPajama](configs/redpajama/README.md)
+- [Recipes for data process in RedPajama](configs/reproduced_redpajama/README.md)
 - [Refined recipes for pre-training data](configs/data_juicer_recipes/README.md)
 - [Refined recipes for fine-tuning data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
 
