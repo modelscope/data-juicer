@@ -62,6 +62,7 @@ process:
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
   - image_diffusion_mapper:                                 # generate images by diffusion model
+      floating_point: 'fp32'                                  # the floating point used to load the diffusion model.
       hf_diffusion: 'CompVis/stable-diffusion-v1-4'           # stable diffusion model name on huggingface to generate image
       strength: 0.8                                           # parameter of stable diffusion model, indicates extent to transform the reference image. will ignore the input image if it equals to 1
       guidance_scale: 7.5                                     # parameter of stable diffusion model, a higher guidance scale value encourages the model to generate images closely linked to the text prompt at the expense of lower image quality

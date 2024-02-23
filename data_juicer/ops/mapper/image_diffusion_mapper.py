@@ -34,6 +34,7 @@ class ImageDiffusionMapper(Mapper):
 
     def __init__(self,
                  hf_diffusion: str = 'CompVis/stable-diffusion-v1-4',
+                 floating_point: str = 'fp32',
                  strength: float = 0.8,
                  guidance_scale: float = 7.5,
                  aug_num: int = 1,
@@ -47,6 +48,8 @@ class ImageDiffusionMapper(Mapper):
 
         :param hf_diffusion: diffusion model name on huggingface to generate
             the image.
+        :param floating_point: the floating point used to load the diffusion
+            model.
         :param strength: Indicates extent to transform the reference image.
             Must be between 0 and 1. image is used as a starting point and
             more noise is added the higher the strength. The number of
@@ -98,7 +101,9 @@ class ImageDiffusionMapper(Mapper):
                 prompt=self.prompt)
 
         self.model_key = prepare_model(model_type='diffusion',
-                                       model_name_or_path=hf_diffusion)
+                                       pretrained_model_name_or_path=hf_diffusion,
+                                       diffusion_type='image2image',
+                                       floating_point=floating_point)
 
     def _real_guidance(self, caption: str, image: Image.Image, rank=None):
 

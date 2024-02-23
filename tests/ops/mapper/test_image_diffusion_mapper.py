@@ -32,7 +32,7 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
 
     def _run_mapper(self, dataset: NestedDataset, op, move_to_dir, num_proc=1, total_num=1):
 
-        dataset = dataset.map(op.process, num_proc=num_proc)
+        dataset = dataset.map(op.process, num_proc=num_proc, with_rank=True)
         dataset_list = dataset.select_columns(column_names=['images']).to_list()
 
         self.assertEqual(len(dataset_list), total_num)
@@ -40,7 +40,8 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
             os.makedirs(move_to_dir)
         for data in dataset_list:
             for image_path in data['images']:
-                if str(image_path) != str(self.cat_path) and str(image_path) != str(self.img3_path):
+                if str(image_path) != str(self.cat_path) \
+                 and str(image_path) != str(self.img3_path):
                     move_to_path = os.path.join(move_to_dir, os.path.basename(image_path))
                     shutil.move(image_path, move_to_path)
 
@@ -59,7 +60,10 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
             keep_original_sample=True,
             caption_key='caption'
         )
-        self._run_mapper(dataset, op, os.path.join(self.output_dir, 'test_for_strength'), total_num=(aug_num+1)*len(ds_list))
+        self._run_mapper(
+            dataset, op, 
+            os.path.join(self.output_dir, 'test_for_strength'), 
+            total_num=(aug_num+1)*len(ds_list))
 
 
     def test_for_given_caption_list(self):
@@ -78,7 +82,10 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
             keep_original_sample=False,
             caption_key='captions'
         )
-        self._run_mapper(dataset, op, os.path.join(self.output_dir, 'test_for_given_caption_list'), total_num=aug_num*len(ds_list))
+        self._run_mapper(
+            dataset, op, 
+            os.path.join(self.output_dir, 'test_for_given_caption_list'), 
+            total_num=aug_num*len(ds_list))
 
     def test_for_given_caption_string(self):
 
@@ -98,7 +105,10 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
             keep_original_sample=False,
             caption_key='text'
         )
-        self._run_mapper(dataset, op, os.path.join(self.output_dir, 'test_for_given_caption_string'), total_num=aug_num*len(ds_list))
+        self._run_mapper(
+            dataset, op, 
+            os.path.join(self.output_dir, 'test_for_given_caption_string'), 
+            total_num=aug_num*len(ds_list))
 
     def test_for_no_given_caption(self):
 
@@ -118,7 +128,58 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
             keep_original_sample=False,
             hf_blip2=self.hf_blip2
         )
-        self._run_mapper(dataset, op, os.path.join(self.output_dir, 'test_for_no_given_caption'), total_num=aug_num*len(ds_list))
+        self._run_mapper(
+            dataset, op, 
+            os.path.join(self.output_dir, 'test_for_no_given_caption'), 
+            total_num=aug_num*len(ds_list))
+
+    def test_for_fp16_given_caption_string(self):
+
+        ds_list = [{
+            'text': f'{SpecialTokens.image}a photo of a cat',
+            'images': [self.cat_path]
+        }, {
+            'text': f'{SpecialTokens.image}a photo, a women with an umbrella',
+            'images': [self.img3_path]
+        }]
+
+        aug_num = 1
+        dataset = NestedDataset.from_list(ds_list)
+        op = ImageDiffusionMapper(
+            hf_diffusion=self.hf_diffusion,
+            floating_point='fp16',
+            aug_num=aug_num,
+            keep_original_sample=False,
+            caption_key='text'
+        )
+        self._run_mapper(
+            dataset, op, 
+            os.path.join(self.output_dir, 'test_for_fp16_given_caption_string'), 
+            total_num=aug_num*len(ds_list))
+
+    def test_for_multi_process_given_caption_string(self):
+
+        ds_list = [{
+            'text': f'{SpecialTokens.image}a photo of a cat',
+            'images': [self.cat_path]
+        }, {
+            'text': f'{SpecialTokens.image}a photo, a women with an umbrella',
+            'images': [self.img3_path]
+        }]
+
+        aug_num = 1
+        dataset = NestedDataset.from_list(ds_list)
+        op = ImageDiffusionMapper(
+            hf_diffusion=self.hf_diffusion,
+            aug_num=aug_num,
+            keep_original_sample=False,
+            caption_key='text'
+        )
+        self._run_mapper(
+            dataset, op, 
+            os.path.join(self.output_dir, 'test_for_given_caption_string'), 
+            num_proc=2, 
+            total_num=aug_num*len(ds_list))
 
 if __name__ == '__main__':
     unittest.main()
