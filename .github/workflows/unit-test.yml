@@ -29,10 +29,8 @@ jobs:
         df -h
     - name: Install dependencies
       run: |
-        pip cache purge
-        python -m pip install --upgrade --no-cache-dir pip
-        pip install --no-cache-dir -v -e .[all]
-        pip cache purge
+        python -m pip install --upgrade pip
+        pip install -v -e .[all]
     - name: Increase swapfile
       run: |
         df -h
@@ -43,6 +41,10 @@ jobs:
         sudo mkswap /mnt/swapfile
         sudo swapon /mnt/swapfile
         sudo swapon --show
+    - name: Clean data-juicer assets and models after cached
+      uses: webiny/action-post-run@3.1.0
+      with:
+        run: rm -rf ~/.cache/data_juicer
     - name: Cache data-juicer assets and models
       uses: actions/cache@v3
       with:
