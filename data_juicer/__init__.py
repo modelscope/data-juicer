@@ -15,7 +15,7 @@ def _cuda_device_count():
 
         cuda_visible_devices = os.getenv('CUDA_VISIBLE_DEVICES')
 
-        if cuda_visible_devices:
+        if cuda_visible_devices is not None:
             visible_devices = cuda_visible_devices.split(',')
             visible_devices = [int(dev.strip()) for dev in visible_devices]
             num_visible_devices = sum(1 for dev in visible_devices
