@@ -1,4 +1,4 @@
-import importlib.util
+import importlib
 from typing import Tuple, Union
 
 from loguru import logger
