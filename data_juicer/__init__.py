@@ -6,24 +6,28 @@ import subprocess
 import multiprocess as mp
 from loguru import logger
 
+from data_juicer.utils.availability_utils import _is_package_available
+
 
 def _cuda_device_count():
+    _torch_available = _is_package_available('torch')
+
+    if _torch_available:
+        import torch
+        return torch.cuda.device_count()
+
     try:
         nvidia_smi_output = subprocess.check_output(['nvidia-smi', '-L'],
                                                     text=True)
         all_devices = nvidia_smi_output.strip().split('\n')
 
         cuda_visible_devices = os.getenv('CUDA_VISIBLE_DEVICES')
+        if cuda_visible_devices is not None:
+            logger.warning(
+                'CUDA_VISIBLE_DEVICES is ignored when torch is unavailable. '
+                'All detected GPUs will be used.')
 
-        if cuda_visible_devices:
-            visible_devices = cuda_visible_devices.split(',')
-            visible_devices = [int(dev.strip()) for dev in visible_devices]
-            num_visible_devices = sum(1 for dev in visible_devices
-                                      if 0 <= dev < len(all_devices))
-        else:
-            num_visible_devices = len(all_devices)
-
-        return num_visible_devices
+        return len(all_devices)
     except Exception:
         # nvidia-smi not found or other error
         return 0
