@@ -1,4 +1,4 @@
-[[中文主页]](README_ZH.md) | [[Docs]](README.md#documentation-index--文档索引-a-namedocumentationindex) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
+[[中文主页]](README_ZH.md) | [[Docs]](README.md#documents) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
 
 # Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
@@ -111,7 +111,7 @@ Table of Contents
 
 
 
-## Documentation <a name="documentationindex"/>
+## Documentation <a name="documents"/>
 
 - [Overview](README.md) | [概览](README_ZH.md)
 - [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
