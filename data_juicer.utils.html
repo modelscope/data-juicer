@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.utils &mdash; data_juicer 0.1.3 documentation</title>
+  <title>data_juicer.utils &mdash; data_juicer 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -13,7 +13,7 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=14711e05"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b1f64a84"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -34,7 +34,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.3
+                0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -88,8 +88,12 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.file_utils">data_juicer.utils.file_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.file_utils.add_suffix_to_filename"><code class="docutils literal notranslate"><span class="pre">add_suffix_to_filename()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.file_utils.create_directory_if_not_exists"><code class="docutils literal notranslate"><span class="pre">create_directory_if_not_exists()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.file_utils.dict_to_hash"><code class="docutils literal notranslate"><span class="pre">dict_to_hash()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.file_utils.find_files_with_suffix"><code class="docutils literal notranslate"><span class="pre">find_files_with_suffix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.file_utils.is_absolute_path"><code class="docutils literal notranslate"><span class="pre">is_absolute_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.file_utils.transfer_filename"><code class="docutils literal notranslate"><span class="pre">transfer_filename()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.fingerprint_utils">data_juicer.utils.fingerprint_utils</a><ul>
@@ -109,17 +113,20 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.model_utils">data_juicer.utils.model_utils</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.check_model"><code class="docutils literal notranslate"><span class="pre">check_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.get_backup_model_link"><code class="docutils literal notranslate"><span class="pre">get_backup_model_link()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.get_model"><code class="docutils literal notranslate"><span class="pre">get_model()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_diversity_model"><code class="docutils literal notranslate"><span class="pre">prepare_diversity_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.move_to_cuda"><code class="docutils literal notranslate"><span class="pre">move_to_cuda()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_diffusion_model"><code class="docutils literal notranslate"><span class="pre">prepare_diffusion_model()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_fasttext_model"><code class="docutils literal notranslate"><span class="pre">prepare_fasttext_model()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_huggingface_blip"><code class="docutils literal notranslate"><span class="pre">prepare_huggingface_blip()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_huggingface_clip"><code class="docutils literal notranslate"><span class="pre">prepare_huggingface_clip()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_huggingface_owlvit"><code class="docutils literal notranslate"><span class="pre">prepare_huggingface_owlvit()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_huggingface_tokenizer"><code class="docutils literal notranslate"><span class="pre">prepare_huggingface_tokenizer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_huggingface_model"><code class="docutils literal notranslate"><span class="pre">prepare_huggingface_model()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_kenlm_model"><code class="docutils literal notranslate"><span class="pre">prepare_kenlm_model()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_model"><code class="docutils literal notranslate"><span class="pre">prepare_model()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_nltk_model"><code class="docutils literal notranslate"><span class="pre">prepare_nltk_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_recognizeAnything_model"><code class="docutils literal notranslate"><span class="pre">prepare_recognizeAnything_model()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_sentencepiece_model"><code class="docutils literal notranslate"><span class="pre">prepare_sentencepiece_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_simple_aesthetics_model"><code class="docutils literal notranslate"><span class="pre">prepare_simple_aesthetics_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_spacy_model"><code class="docutils literal notranslate"><span class="pre">prepare_spacy_model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.prepare_video_blip_model"><code class="docutils literal notranslate"><span class="pre">prepare_video_blip_model()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.registry">data_juicer.utils.registry</a><ul>
@@ -554,6 +561,16 @@ remove lock file automatically.</p>
 <span class="sig-name descname"><span class="pre">suffix</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__suffix__'</span></em><a class="headerlink" href="#data_juicer.utils.constant.Fields.suffix" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.Fields.video_audio_tags">
+<span class="sig-name descname"><span class="pre">video_audio_tags</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__video_audio_tags__'</span></em><a class="headerlink" href="#data_juicer.utils.constant.Fields.video_audio_tags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.Fields.video_frame_tags">
+<span class="sig-name descname"><span class="pre">video_frame_tags</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__video_frame_tags__'</span></em><a class="headerlink" href="#data_juicer.utils.constant.Fields.video_frame_tags" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -580,6 +597,11 @@ remove lock file automatically.</p>
 <span class="sig-name descname"><span class="pre">simhash</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__simhash'</span></em><a class="headerlink" href="#data_juicer.utils.constant.HashKeys.simhash" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.HashKeys.videohash">
+<span class="sig-name descname"><span class="pre">videohash</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__videohash'</span></em><a class="headerlink" href="#data_juicer.utils.constant.HashKeys.videohash" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -592,8 +614,18 @@ remove lock file automatically.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.InterVars.loaded_audios">
+<span class="sig-name descname"><span class="pre">loaded_audios</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__loaded_audios'</span></em><a class="headerlink" href="#data_juicer.utils.constant.InterVars.loaded_audios" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.utils.constant.InterVars.loaded_images">
 <span class="sig-name descname"><span class="pre">loaded_images</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__loaded_images'</span></em><a class="headerlink" href="#data_juicer.utils.constant.InterVars.loaded_images" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.InterVars.loaded_videos">
+<span class="sig-name descname"><span class="pre">loaded_videos</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__loaded_videos'</span></em><a class="headerlink" href="#data_juicer.utils.constant.InterVars.loaded_videos" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -634,6 +666,21 @@ remove lock file automatically.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.audio_duration">
+<span class="sig-name descname"><span class="pre">audio_duration</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'audio_duration'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.audio_duration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.audio_nmf_snr">
+<span class="sig-name descname"><span class="pre">audio_nmf_snr</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'audio_nmf_snr'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.audio_nmf_snr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.audio_sizes">
+<span class="sig-name descname"><span class="pre">audio_sizes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'audio_sizes'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.audio_sizes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.avg_line_length">
 <span class="sig-name descname"><span class="pre">avg_line_length</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'avg_line_length'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.avg_line_length" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -656,6 +703,11 @@ remove lock file automatically.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.flagged_words_ratio">
 <span class="sig-name descname"><span class="pre">flagged_words_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'flagged_words_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.flagged_words_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.image_aesthetics_scores">
+<span class="sig-name descname"><span class="pre">image_aesthetics_scores</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'image_aesthetics_scores'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.image_aesthetics_scores" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -744,6 +796,51 @@ remove lock file automatically.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_aesthetic_score">
+<span class="sig-name descname"><span class="pre">video_aesthetic_score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_aesthetic_score'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_aesthetic_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_aspect_ratios">
+<span class="sig-name descname"><span class="pre">video_aspect_ratios</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_aspect_ratios'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_aspect_ratios" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_duration">
+<span class="sig-name descname"><span class="pre">video_duration</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_duration'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_duration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_frames_aesthetics_score">
+<span class="sig-name descname"><span class="pre">video_frames_aesthetics_score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_frames_aesthetics_score'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_frames_aesthetics_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_frames_text_matching_score">
+<span class="sig-name descname"><span class="pre">video_frames_text_matching_score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_frames_text_matching_score'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_frames_text_matching_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_height">
+<span class="sig-name descname"><span class="pre">video_height</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_height'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_motion_score">
+<span class="sig-name descname"><span class="pre">video_motion_score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_motion_score'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_motion_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_ocr_area_ratio">
+<span class="sig-name descname"><span class="pre">video_ocr_area_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_ocr_area_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_ocr_area_ratio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_width">
+<span class="sig-name descname"><span class="pre">video_width</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_width'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.word_rep_ratio">
 <span class="sig-name descname"><span class="pre">word_rep_ratio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'word_rep_ratio'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.word_rep_ratio" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -768,6 +865,48 @@ print(res) # {“AlphanumericFilter”: [“alnum_ratio”, “alpha_token_ratio
 </section>
 <section id="module-data_juicer.utils.file_utils">
 <span id="data-juicer-utils-file-utils"></span><h2>data_juicer.utils.file_utils<a class="headerlink" href="#module-data_juicer.utils.file_utils" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.add_suffix_to_filename">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">add_suffix_to_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#add_suffix_to_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.add_suffix_to_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a suffix to the filename. Only regard the content after the last dot
+as the file extension.
+E.g.
+1. abc.jpg + “_resized” –&gt; abc_resized.jpg
+2. edf.xyz.csv + “_processed” –&gt; edf.xyz_processed.csv
+3. /path/to/file.json + “_suf” –&gt; /path/to/file_suf.json
+4. ds.tar.gz + “_whoops” –&gt; ds.tar_whoops.gz (maybe unexpected)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – input filename</p></li>
+<li><p><strong>suffix</strong> – suffix string to be added</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.create_directory_if_not_exists">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">create_directory_if_not_exists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#create_directory_if_not_exists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.create_directory_if_not_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a directory if not exists, this function is process safe</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>directory_path</strong> – directory path to be create</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.dict_to_hash">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">dict_to_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hash_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#dict_to_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.dict_to_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>hash a dict to a string with length hash_length</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_dict</strong> – the given dict</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.file_utils.find_files_with_suffix">
 <span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">find_files_with_suffix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffixes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#find_files_with_suffix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.find_files_with_suffix" title="Permalink to this definition">¶</a></dt>
@@ -799,6 +938,32 @@ etc</p></li>
 path is a relative path.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.file_utils.transfer_filename">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">transfer_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">op_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#transfer_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.transfer_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>According to the op and hashing its parameters ‘op_kwargs’ addition
+to the process id and current time as the ‘hash_val’, map the
+original_filepath to another unique file path.
+E.g.
+1. abc.jpg –&gt;</p>
+<blockquote>
+<div><p>{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><dl class="simple">
+<dt>./abc.jpg –&gt;</dt><dd><p>./{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
+</dd>
+</dl>
+</li>
+<li><p>/path/to/abc.jpg –&gt;
+/path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</p></li>
+<li><p>/path/to/{op_name}/abc.jpg –&gt;
+/path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</p></li>
+<li><p>/path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg –&gt;
+/path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg</p></li>
+</ol>
 </dd></dl>
 
 </section>
@@ -962,14 +1127,14 @@ Default value: (apex, pycocotools).</p></li>
 <span id="data-juicer-utils-model-utils"></span><h2>data_juicer.utils.model_utils<a class="headerlink" href="#module-data_juicer.utils.model_utils" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.model_utils.check_model">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">check_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#check_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.check_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check whether a model exists in MODEL_PATH. If exists, return its full path
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">check_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#check_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.check_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether a model exists in DATA_JUICER_MODELS_CACHE.
+If exists, return its full path.
 Else, download it from cached models links.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>model_name</strong> – a specified model name</p></li>
-<li><p><strong>args</strong> – optional extra args of model.</p></li>
 <li><p><strong>force</strong> – Whether to download model forcefully or not, Sometimes
 the model file maybe incomplete for some reason, so need to
 download again forcefully.</p></li>
@@ -979,37 +1144,44 @@ download again forcefully.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.utils.model_utils.get_model">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">get_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sentencepiece'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#get_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.get_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get a model or a tokenizer from MODEL_ZOO.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>model_key</strong> – name of the model or tokenzier</p>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.get_backup_model_link">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">get_backup_model_link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#get_backup_model_link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.get_backup_model_link" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_diversity_model">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_diversity_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_diversity_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_diversity_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prepare diversity model for specific language.</p>
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.get_model">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">get_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#get_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.get_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.move_to_cuda">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">move_to_cuda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#move_to_cuda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.move_to_cuda" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_diffusion_model">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_diffusion_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model_name_or_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diffusion_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">floating_point</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fp32'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_diffusion_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_diffusion_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare and load an Diffusion model from HuggingFace.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model_name</strong> – the model name to be loaded.</p></li>
-<li><p><strong>lang</strong> – language of diversity model. Should be one of [“zh”,
-“en”]</p></li>
+<li><p><strong>pretrained_model_name_or_path</strong> – input Diffusion model name
+or local path to the model</p></li>
+<li><p><strong>diffusion_type</strong> – the use of the diffusion model. It can be
+‘image2image’, ‘text2image’, ‘inpainting’</p></li>
+<li><p><strong>floating_point</strong> – the floating point to load the diffusion
+model. It can be ‘fp16’, ‘fp32’</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>corresponding diversity model</p>
+<dd class="field-even"><p>a Diffusion model.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_fasttext_model">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_fasttext_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_fasttext_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_fasttext_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_fasttext_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lid.176.bin'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_fasttext_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_fasttext_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare and load a fasttext model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1022,64 +1194,27 @@ download again forcefully.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_huggingface_blip">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_huggingface_blip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blip_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_huggingface_blip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_huggingface_blip" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prepare and load a blip and processor from HuggingFace.</p>
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_huggingface_model">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_huggingface_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model_name_or_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trust_remote_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_huggingface_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_huggingface_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare and load a HuggingFace model with the correspoding processor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>blip_name</strong> – input blip name</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pretrained_model_name_or_path</strong> – model name or path</p></li>
+<li><p><strong>return_model</strong> – return model or not</p></li>
+<li><p><strong>trust_remote_code</strong> – passed to transformers</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a pair of blip instance and processor instance.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_huggingface_clip">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_huggingface_clip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clip_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_huggingface_clip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_huggingface_clip" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prepare and load a clip and processor from HuggingFace.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>clip_name</strong> – input clip name</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a pair of clip instance and processor instance.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_huggingface_owlvit">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_huggingface_owlvit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">owlvit_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_huggingface_owlvit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_huggingface_owlvit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prepare and load an OwlViT and processor from HuggingFace.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>owlvit_name</strong> – input OwlViT name</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a pair of OwlViT instance and processor instance.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_huggingface_tokenizer">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_huggingface_tokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_huggingface_tokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_huggingface_tokenizer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prepare and load a tokenizer from HuggingFace.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>tokenizer_name</strong> – input tokenizer name</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a tokenizer instance.</p>
+<dd class="field-even"><p>a tuple (model, input processor) if <cite>return_model</cite> is True;
+otherwise, only the processor is returned.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_kenlm_model">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_kenlm_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_kenlm_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_kenlm_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_kenlm_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{}.arpa.bin'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_kenlm_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_kenlm_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare and load a kenlm model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1096,26 +1231,12 @@ download again forcefully.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_model">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sentencepiece'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Prepare and load a model or a tokenizer from MODEL_ZOO.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>lang</strong> – which lang model to load</p></li>
-<li><p><strong>model_type</strong> – model or tokenizer type</p></li>
-<li><p><strong>model_key</strong> – tokenizer name, only used when prepare HuggingFace
-tokenizer</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a model or tokenizer instance</p>
-</dd>
-</dl>
-</dd></dl>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_type</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">model_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_nltk_model">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_nltk_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_nltk_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_nltk_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_nltk_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'punkt.{}.pickle'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_nltk_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_nltk_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare and load a nltk punkt model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1131,8 +1252,22 @@ tokenizer</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_recognizeAnything_model">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_recognizeAnything_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model_name_or_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ram_plus_swin_large_14m.pth'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">384</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_recognizeAnything_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_recognizeAnything_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare and load recognizeAnything model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_name</strong> – input model name.</p></li>
+<li><p><strong>input_size</strong> – the input size of the model.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_sentencepiece_model">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_sentencepiece_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_sentencepiece_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_sentencepiece_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_sentencepiece_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{}.sp.model'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_sentencepiece_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_sentencepiece_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prepare and load a sentencepiece model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1143,6 +1278,58 @@ tokenizer</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>model instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_simple_aesthetics_model">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_simple_aesthetics_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model_name_or_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_simple_aesthetics_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_simple_aesthetics_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare and load a simple aesthetics model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pretrained_model_name_or_path</strong> – model name or path</p></li>
+<li><p><strong>return_model</strong> – return model or not</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a tuple (model, input processor) if <cite>return_model</cite> is True;
+otherwise, only the processor is returned.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_spacy_model">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_spacy_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name_pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{}_core_web_md-3.5.0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_spacy_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_spacy_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare spacy model for specific language.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lang</strong> – language of sapcy model. Should be one of [“zh”,
+“en”]</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>corresponding spacy model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.model_utils.prepare_video_blip_model">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.model_utils.</span></span><span class="sig-name descname"><span class="pre">prepare_video_blip_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model_name_or_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trust_remote_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/model_utils.html#prepare_video_blip_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.model_utils.prepare_video_blip_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare and load a video-clip model with the correspoding processor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pretrained_model_name_or_path</strong> – model name or path</p></li>
+<li><p><strong>return_model</strong> – return model or not</p></li>
+<li><p><strong>trust_remote_code</strong> – passed to transformers</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a tuple (model, input processor) if <cite>return_model</cite> is True;
+otherwise, only the processor is returned.</p>
 </dd>
 </dl>
 </dd></dl>

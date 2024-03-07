@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.base_op &mdash; data_juicer 0.1.3 documentation</title>
+  <title>data_juicer.ops.base_op &mdash; data_juicer 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -12,7 +12,7 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=14711e05"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b1f64a84"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -32,7 +32,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.3
+                0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -71,7 +71,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.ops.base_op</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">data_juicer.utils.registry</span> <span class="kn">import</span> <span class="n">Registry</span>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.registry</span> <span class="kn">import</span> <span class="n">Registry</span>
 
 <span class="n">OPERATORS</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="s1">&#39;Operators&#39;</span><span class="p">)</span>
 
@@ -82,6 +84,8 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">image_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">audio_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">video_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base class of operators.</span>
@@ -89,6 +93,10 @@
 <span class="sd">        :param text_key: the key name of field that stores sample texts</span>
 <span class="sd">            to be processed.</span>
 <span class="sd">        :param image_key: the key name of field that stores sample image list</span>
+<span class="sd">            to be processed</span>
+<span class="sd">        :param audio_key: the key name of field that stores sample audio list</span>
+<span class="sd">            to be processed</span>
+<span class="sd">        :param video_key: the key name of field that stores sample video list</span>
 <span class="sd">            to be processed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># init data keys</span>
@@ -98,21 +106,56 @@
         <span class="k">if</span> <span class="n">image_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">image_key</span> <span class="o">=</span> <span class="s1">&#39;images&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="o">=</span> <span class="n">image_key</span>
+        <span class="k">if</span> <span class="n">audio_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">audio_key</span> <span class="o">=</span> <span class="s1">&#39;audios&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">audio_key</span> <span class="o">=</span> <span class="n">audio_key</span>
+        <span class="k">if</span> <span class="n">video_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">video_key</span> <span class="o">=</span> <span class="s1">&#39;videos&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="o">=</span> <span class="n">video_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cpu&#39;</span>
 
         <span class="kn">from</span> <span class="nn">data_juicer.core.data</span> <span class="kn">import</span> <span class="n">wrap_func_with_nested_access</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="OP.process"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.OP.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="OP.remove_extra_parameters"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.OP.remove_extra_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">remove_extra_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_dict</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            at the begining of the init of the mapper op, call</span>
+<span class="sd">            self.remove_extra_parameters(locals())</span>
+<span class="sd">            to get the init parameter dict of the op for convenience</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">param_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">param_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="n">param_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;self&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">param_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">param_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">param_dict</span></div>
+
+<div class="viewcode-block" id="OP.add_parameters"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.OP.add_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_parameter_dict</span><span class="p">,</span> <span class="o">**</span><span class="n">extra_param_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            add parameters for each sample, need to keep extra_param_dict</span>
+<span class="sd">            and init_parameter_dict unchanged.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">related_parameters</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">init_parameter_dict</span><span class="p">)</span>
+        <span class="n">related_parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra_param_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">related_parameters</span></div></div>
 
 
 <div class="viewcode-block" id="Mapper"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Mapper">[docs]</a><span class="k">class</span> <span class="nc">Mapper</span><span class="p">(</span><span class="n">OP</span><span class="p">):</span>
 
-<div class="viewcode-block" id="Mapper.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Mapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">image_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+<div class="viewcode-block" id="Mapper.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Mapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">image_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">audio_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">video_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base class that conducts data editing.</span>
 
@@ -120,8 +163,12 @@
 <span class="sd">            to be processed.</span>
 <span class="sd">        :param image_key: the key name of field that stores sample image list</span>
 <span class="sd">            to be processed</span>
+<span class="sd">        :param audio_key: the key name of field that stores sample audio list</span>
+<span class="sd">            to be processed</span>
+<span class="sd">        :param video_key: the key name of field that stores sample video list</span>
+<span class="sd">            to be processed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Mapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text_key</span><span class="p">,</span> <span class="n">image_key</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Mapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text_key</span><span class="p">,</span> <span class="n">image_key</span><span class="p">,</span> <span class="n">audio_key</span><span class="p">,</span> <span class="n">video_key</span><span class="p">)</span>
 
         <span class="c1"># In default, it&#39;s a normal OP instead of batched OP</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">False</span></div>
@@ -141,11 +188,13 @@
 
 <div class="viewcode-block" id="Filter"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Filter">[docs]</a><span class="k">class</span> <span class="nc">Filter</span><span class="p">(</span><span class="n">OP</span><span class="p">):</span>
 
-<div class="viewcode-block" id="Filter.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Filter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">image_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+<div class="viewcode-block" id="Filter.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Filter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">image_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">audio_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">video_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base class that removes specific info.</span>
 
@@ -153,8 +202,12 @@
 <span class="sd">            to be processed</span>
 <span class="sd">        :param image_key: the key name of field that stores sample image list</span>
 <span class="sd">            to be processed</span>
+<span class="sd">        :param audio_key: the key name of field that stores sample audio list</span>
+<span class="sd">            to be processed</span>
+<span class="sd">        :param video_key: the key name of field that stores sample video list</span>
+<span class="sd">            to be processed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Filter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text_key</span><span class="p">,</span> <span class="n">image_key</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Filter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text_key</span><span class="p">,</span> <span class="n">image_key</span><span class="p">,</span> <span class="n">audio_key</span><span class="p">,</span> <span class="n">video_key</span><span class="p">)</span>
 
         <span class="kn">from</span> <span class="nn">data_juicer.core.data</span> <span class="kn">import</span> <span class="n">wrap_func_with_nested_access</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compute_stats</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">)</span></div>
@@ -183,11 +236,13 @@
 
 <div class="viewcode-block" id="Deduplicator"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator">[docs]</a><span class="k">class</span> <span class="nc">Deduplicator</span><span class="p">(</span><span class="n">OP</span><span class="p">):</span>
 
-<div class="viewcode-block" id="Deduplicator.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">image_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+<div class="viewcode-block" id="Deduplicator.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">image_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">audio_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">video_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base class that conducts deduplication.</span>
 
@@ -195,8 +250,13 @@
 <span class="sd">            to be processed</span>
 <span class="sd">        :param image_key: the key name of field that stores sample image list</span>
 <span class="sd">            to be processed</span>
+<span class="sd">        :param audio_key: the key name of field that stores sample audio list</span>
+<span class="sd">            to be processed</span>
+<span class="sd">        :param video_key: the key name of field that stores sample video list</span>
+<span class="sd">            to be processed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text_key</span><span class="p">,</span> <span class="n">image_key</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text_key</span><span class="p">,</span> <span class="n">image_key</span><span class="p">,</span> <span class="n">audio_key</span><span class="p">,</span>
+                                           <span class="n">video_key</span><span class="p">)</span>
 
         <span class="kn">from</span> <span class="nn">data_juicer.core.data</span> <span class="kn">import</span> <span class="n">wrap_func_with_nested_access</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compute_hash</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_hash</span><span class="p">)</span></div>
@@ -224,11 +284,13 @@
 
 <div class="viewcode-block" id="Selector"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Selector">[docs]</a><span class="k">class</span> <span class="nc">Selector</span><span class="p">(</span><span class="n">OP</span><span class="p">):</span>
 
-<div class="viewcode-block" id="Selector.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Selector.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">image_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+<div class="viewcode-block" id="Selector.__init__"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Selector.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">image_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">audio_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">video_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Base class that conducts selection in dataset-level.</span>
 
@@ -236,8 +298,13 @@
 <span class="sd">            to be processed</span>
 <span class="sd">        :param image_key: the key name of field that stores sample image list</span>
 <span class="sd">            to be processed</span>
+<span class="sd">        :param audio_key: the key name of field that stores sample audio list</span>
+<span class="sd">            to be processed</span>
+<span class="sd">        :param video_key: the key name of field that stores sample video list</span>
+<span class="sd">            to be processed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Selector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text_key</span><span class="p">,</span> <span class="n">image_key</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Selector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text_key</span><span class="p">,</span> <span class="n">image_key</span><span class="p">,</span> <span class="n">audio_key</span><span class="p">,</span>
+                                       <span class="n">video_key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Selector.process"><a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.base_op.Selector.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

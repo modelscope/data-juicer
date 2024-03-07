@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Index &mdash; data_juicer 0.1.3 documentation</title>
+  <title>Index &mdash; data_juicer 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -12,7 +12,7 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=14711e05"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b1f64a84"></script>
         <script src="_static/doctools.js?v=888ff710"></script>
         <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/js/theme.js"></script>
@@ -32,7 +32,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.3
+                0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -94,6 +94,7 @@
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  | <a href="#Z"><strong>Z</strong></a>
  
@@ -253,7 +254,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDataset.add_column">add_column() (data_juicer.core.data.NestedDataset method)</a>
 </li>
+      <li><a href="data_juicer.ops.html#data_juicer.ops.base_op.OP.add_parameters">add_parameters() (data_juicer.ops.base_op.OP method)</a>
+</li>
       <li><a href="data_juicer.core.html#data_juicer.core.data.add_same_content_to_new_column">add_same_content_to_new_column() (in module data_juicer.core.data)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.file_utils.add_suffix_to_filename">add_suffix_to_filename() (in module data_juicer.utils.file_utils)</a>
 </li>
       <li><a href="data_juicer.format.html#data_juicer.format.formatter.add_suffixes">add_suffixes() (in module data_juicer.format.formatter)</a>
 </li>
@@ -263,8 +268,6 @@
 </li>
       <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter">AlphanumericFilter (class in data_juicer.ops.filter.alphanumeric_filter)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis.analyse">analyse() (data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis method)</a>
 
       <ul>
@@ -273,9 +276,17 @@
         <li><a href="data_juicer.analysis.html#data_juicer.analysis.overall_analysis.OverallAnalysis.analyse">(data_juicer.analysis.overall_analysis.OverallAnalysis method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_juicer.core.html#data_juicer.core.analyser.Analyser">Analyser (class in data_juicer.core.analyser)</a>
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.aspect_ratios">aspect_ratios (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.audio_duration">audio_duration (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.audio_nmf_snr">audio_nmf_snr (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.audio_sizes">audio_sizes (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
 </li>
       <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.average_line_length_filter.AverageLineLengthFilter">AverageLineLengthFilter (class in data_juicer.ops.filter.average_line_length_filter)</a>
 </li>
@@ -414,6 +425,8 @@
       <li><a href="data_juicer.config.html#data_juicer.config.config.config_backup">config_backup() (in module data_juicer.config.config)</a>
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.constant.Fields.context">context (data_juicer.utils.constant.Fields attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.file_utils.create_directory_if_not_exists">create_directory_if_not_exists() (in module data_juicer.utils.file_utils)</a>
 </li>
       <li><a href="data_juicer.format.html#data_juicer.format.csv_formatter.CsvFormatter">CsvFormatter (class in data_juicer.format.csv_formatter)</a>
 </li>
@@ -939,6 +952,8 @@
       </ul></li>
       <li><a href="data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator">Deduplicator (class in data_juicer.ops.base_op)</a>
 </li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.file_utils.dict_to_hash">dict_to_hash() (in module data_juicer.utils.file_utils)</a>
+</li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.fingerprint_utils.Hasher.dispatch">dispatch (data_juicer.utils.fingerprint_utils.Hasher attribute)</a>
 </li>
       <li><a href="data_juicer.config.html#data_juicer.config.config.display_config">display_config() (in module data_juicer.config.config)</a>
@@ -1041,6 +1056,8 @@
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysMeta.get_access_log">get_access_log() (data_juicer.utils.constant.StatsKeysMeta method)</a>
 </li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.get_backup_model_link">get_backup_model_link() (in module data_juicer.utils.model_utils)</a>
+</li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.logger_utils.get_caller_name">get_caller_name() (in module data_juicer.utils.logger_utils)</a>
 </li>
       <li><a href="data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.get_diversity">get_diversity() (in module data_juicer.analysis.diversity_analysis)</a>
@@ -1093,6 +1110,8 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.image_aesthetics_scores">image_aesthetics_scores (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.image_height">image_height (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.image_sizes">image_sizes (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
@@ -1103,10 +1122,10 @@
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.image_width">image_width (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
 </li>
-      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.HashKeys.imagehash">imagehash (data_juicer.utils.constant.HashKeys attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.HashKeys.imagehash">imagehash (data_juicer.utils.constant.HashKeys attribute)</a>
+</li>
       <li><a href="data_juicer.config.html#data_juicer.config.config.init_configs">init_configs() (in module data_juicer.config.config)</a>
 </li>
       <li><a href="data_juicer.config.html#data_juicer.config.config.init_setup_from_cfg">init_setup_from_cfg() (in module data_juicer.config.config)</a>
@@ -1177,7 +1196,11 @@
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.asset_utils.load_words_asset">load_words_asset() (in module data_juicer.utils.asset_utils)</a>
 </li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.InterVars.loaded_audios">loaded_audios (data_juicer.utils.constant.InterVars attribute)</a>
+</li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.constant.InterVars.loaded_images">loaded_images (data_juicer.utils.constant.InterVars attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.InterVars.loaded_videos">loaded_videos (data_juicer.utils.constant.InterVars attribute)</a>
 </li>
       <li><a href="data_juicer.format.html#data_juicer.format.formatter.LocalFormatter">LocalFormatter (class in data_juicer.format.formatter)</a>
 </li>
@@ -1366,6 +1389,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_juicer.utils.html#data_juicer.utils.registry.Registry.modules">modules (data_juicer.utils.registry.Registry property)</a>
 </li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.move_to_cuda">move_to_cuda() (in module data_juicer.utils.model_utils)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -1426,17 +1451,11 @@
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.phrase_grounding_recall">phrase_grounding_recall (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
 </li>
-      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_diversity_model">prepare_diversity_model() (in module data_juicer.utils.model_utils)</a>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_diffusion_model">prepare_diffusion_model() (in module data_juicer.utils.model_utils)</a>
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_fasttext_model">prepare_fasttext_model() (in module data_juicer.utils.model_utils)</a>
 </li>
-      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_huggingface_blip">prepare_huggingface_blip() (in module data_juicer.utils.model_utils)</a>
-</li>
-      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_huggingface_clip">prepare_huggingface_clip() (in module data_juicer.utils.model_utils)</a>
-</li>
-      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_huggingface_owlvit">prepare_huggingface_owlvit() (in module data_juicer.utils.model_utils)</a>
-</li>
-      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_huggingface_tokenizer">prepare_huggingface_tokenizer() (in module data_juicer.utils.model_utils)</a>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_huggingface_model">prepare_huggingface_model() (in module data_juicer.utils.model_utils)</a>
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_kenlm_model">prepare_kenlm_model() (in module data_juicer.utils.model_utils)</a>
 </li>
@@ -1444,7 +1463,15 @@
 </li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_nltk_model">prepare_nltk_model() (in module data_juicer.utils.model_utils)</a>
 </li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_recognizeAnything_model">prepare_recognizeAnything_model() (in module data_juicer.utils.model_utils)</a>
+</li>
       <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_sentencepiece_model">prepare_sentencepiece_model() (in module data_juicer.utils.model_utils)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_simple_aesthetics_model">prepare_simple_aesthetics_model() (in module data_juicer.utils.model_utils)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_spacy_model">prepare_spacy_model() (in module data_juicer.utils.model_utils)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.model_utils.prepare_video_blip_model">prepare_video_blip_model() (in module data_juicer.utils.model_utils)</a>
 </li>
       <li><a href="data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator.process">process() (data_juicer.ops.base_op.Deduplicator method)</a>
 
@@ -1565,6 +1592,8 @@
       <li><a href="data_juicer.format.html#data_juicer.format.formatter.RemoteFormatter">RemoteFormatter (class in data_juicer.format.formatter)</a>
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.data.NestedDataset.remove_columns">remove_columns() (data_juicer.core.data.NestedDataset method)</a>
+</li>
+      <li><a href="data_juicer.ops.html#data_juicer.ops.base_op.OP.remove_extra_parameters">remove_extra_parameters() (data_juicer.ops.base_op.OP method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -1700,6 +1729,8 @@
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.tracer.Tracer">Tracer (class in data_juicer.core.tracer)</a>
 </li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.file_utils.transfer_filename">transfer_filename() (in module data_juicer.utils.file_utils)</a>
+</li>
       <li><a href="data_juicer.format.html#data_juicer.format.tsv_formatter.TsvFormatter">TsvFormatter (class in data_juicer.format.tsv_formatter)</a>
 </li>
   </ul></td>
@@ -1723,6 +1754,38 @@
       <li><a href="data_juicer.utils.html#data_juicer.utils.fingerprint_utils.update_fingerprint">update_fingerprint() (in module data_juicer.utils.fingerprint_utils)</a>
 </li>
       <li><a href="data_juicer.config.html#data_juicer.config.config.update_op_process">update_op_process() (in module data_juicer.config.config)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.video_aesthetic_score">video_aesthetic_score (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.video_aspect_ratios">video_aspect_ratios (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.Fields.video_audio_tags">video_audio_tags (data_juicer.utils.constant.Fields attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.video_duration">video_duration (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.Fields.video_frame_tags">video_frame_tags (data_juicer.utils.constant.Fields attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.video_frames_aesthetics_score">video_frames_aesthetics_score (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.video_frames_text_matching_score">video_frames_text_matching_score (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.video_height">video_height (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.video_motion_score">video_motion_score (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.video_ocr_area_ratio">video_ocr_area_ratio (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant.video_width">video_width (data_juicer.utils.constant.StatsKeysConstant attribute)</a>
+</li>
+      <li><a href="data_juicer.utils.html#data_juicer.utils.constant.HashKeys.videohash">videohash (data_juicer.utils.constant.HashKeys attribute)</a>
 </li>
   </ul></td>
 </tr></table>

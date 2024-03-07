@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.utils.file_utils &mdash; data_juicer 0.1.3 documentation</title>
+  <title>data_juicer.utils.file_utils &mdash; data_juicer 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -12,7 +12,7 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=14711e05"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b1f64a84"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -32,7 +32,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.3
+                0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -71,10 +71,17 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.utils.file_utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">datasets.utils.extract</span> <span class="kn">import</span> <span class="n">ZstdExtractor</span> <span class="k">as</span> <span class="n">Extractor</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">DEFAULT_PREFIX</span>
 
 
 <div class="viewcode-block" id="find_files_with_suffix"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.file_utils.find_files_with_suffix">[docs]</a><span class="k">def</span> <span class="nf">find_files_with_suffix</span><span class="p">(</span>
@@ -140,6 +147,108 @@
 <span class="sd">        path is a relative path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="add_suffix_to_filename"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.file_utils.add_suffix_to_filename">[docs]</a><span class="k">def</span> <span class="nf">add_suffix_to_filename</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add a suffix to the filename. Only regard the content after the last dot</span>
+<span class="sd">    as the file extension.</span>
+<span class="sd">    E.g.</span>
+<span class="sd">    1. abc.jpg + &quot;_resized&quot; --&gt; abc_resized.jpg</span>
+<span class="sd">    2. edf.xyz.csv + &quot;_processed&quot; --&gt; edf.xyz_processed.csv</span>
+<span class="sd">    3. /path/to/file.json + &quot;_suf&quot; --&gt; /path/to/file_suf.json</span>
+<span class="sd">    4. ds.tar.gz + &quot;_whoops&quot; --&gt; ds.tar_whoops.gz (maybe unexpected)</span>
+
+<span class="sd">    :param filename: input filename</span>
+<span class="sd">    :param suffix: suffix string to be added</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">new_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">suffix</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">return</span> <span class="n">new_name</span></div>
+
+
+<div class="viewcode-block" id="dict_to_hash"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.file_utils.dict_to_hash">[docs]</a><span class="k">def</span> <span class="nf">dict_to_hash</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">hash_length</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        hash a dict to a string with length hash_length</span>
+
+<span class="sd">        :param input_dict: the given dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sorted_items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="n">dict_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sorted_items</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="n">hasher</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+    <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dict_string</span><span class="p">)</span>
+    <span class="n">hash_value</span> <span class="o">=</span> <span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">hash_length</span><span class="p">:</span>
+        <span class="n">hash_value</span> <span class="o">=</span> <span class="n">hash_value</span><span class="p">[:</span><span class="n">hash_length</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">hash_value</span></div>
+
+
+<div class="viewcode-block" id="create_directory_if_not_exists"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.file_utils.create_directory_if_not_exists">[docs]</a><span class="k">def</span> <span class="nf">create_directory_if_not_exists</span><span class="p">(</span><span class="n">directory_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        create a directory if not exists, this function is process safe</span>
+
+<span class="sd">        :param directory_path: directory path to be create</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">directory_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">FileExistsError</span><span class="p">:</span>
+        <span class="c1"># We ignore the except from multi processes or threads.</span>
+        <span class="c1"># Just make sure the directory exists.</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="transfer_filename"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.file_utils.transfer_filename">[docs]</a><span class="k">def</span> <span class="nf">transfer_filename</span><span class="p">(</span><span class="n">original_filepath</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">op_name</span><span class="p">,</span>
+                      <span class="o">**</span><span class="n">op_kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        According to the op and hashing its parameters &#39;op_kwargs&#39; addition</span>
+<span class="sd">        to the process id and current time as the &#39;hash_val&#39;, map the</span>
+<span class="sd">        original_filepath to another unique file path.</span>
+<span class="sd">        E.g.</span>
+<span class="sd">        1. abc.jpg --&gt;</span>
+<span class="sd">            {op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
+<span class="sd">        2. ./abc.jpg --&gt;</span>
+<span class="sd">            ./{op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
+<span class="sd">        3. /path/to/abc.jpg --&gt;</span>
+<span class="sd">           /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
+<span class="sd">        4. /path/to/{op_name}/abc.jpg --&gt;</span>
+<span class="sd">           /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
+<span class="sd">        5. /path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg --&gt;</span>
+<span class="sd">           /path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># produce the directory</span>
+    <span class="n">original_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">original_filepath</span><span class="p">)</span>
+    <span class="n">parent_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">original_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">parent_dir</span> <span class="o">==</span> <span class="n">op_name</span><span class="p">:</span>
+        <span class="n">new_dir</span> <span class="o">=</span> <span class="n">original_dir</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">new_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">original_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">create_directory_if_not_exists</span><span class="p">(</span><span class="n">new_dir</span><span class="p">)</span>
+
+    <span class="c1"># produce the unique hash code</span>
+    <span class="n">unique_parameters</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">op_kwargs</span><span class="p">)</span>
+    <span class="n">unique_parameters</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s1">pid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+    <span class="n">unique_parameters</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">DEFAULT_PREFIX</span><span class="si">}</span><span class="s1">timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+        <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">))</span>
+    <span class="n">unique_hash</span> <span class="o">=</span> <span class="n">dict_to_hash</span><span class="p">(</span><span class="n">unique_parameters</span><span class="p">)</span>
+
+    <span class="c1"># if the input data is produced by data-juicer, replace the hash code</span>
+    <span class="c1"># else append hash value to filename</span>
+    <span class="k">def</span> <span class="nf">add_hash_value</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">new_hash_value</span><span class="p">):</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;__dj_hash_#(.*?)#&#39;</span>
+
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="c1"># draw the string produced by data-juicer</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span><span class="n">match</span><span class="o">.</span><span class="n">start</span><span class="p">()]</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">text</span><span class="si">}</span><span class="s1">__dj_hash_#</span><span class="si">{</span><span class="n">new_hash_value</span><span class="si">}</span><span class="s1">#&#39;</span>
+
+    <span class="n">original_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">original_filepath</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">original_filename</span><span class="p">)</span>
+    <span class="n">new_name</span> <span class="o">=</span> <span class="n">add_hash_value</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">unique_hash</span><span class="p">)</span>
+    <span class="n">new_filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">new_name</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">new_filepath</span></div>
 </pre></div>
 
            </div>

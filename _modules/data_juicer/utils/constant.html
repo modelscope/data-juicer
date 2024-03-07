@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.utils.constant &mdash; data_juicer 0.1.3 documentation</title>
+  <title>data_juicer.utils.constant &mdash; data_juicer 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -12,7 +12,7 @@
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=14711e05"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b1f64a84"></script>
         <script src="../../../_static/doctools.js?v=888ff710"></script>
         <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/js/theme.js"></script>
@@ -32,7 +32,7 @@
             data_juicer
           </a>
               <div class="version">
-                0.1.3
+                0.2.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
@@ -86,7 +86,11 @@
     <span class="n">stats</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;stats__&#39;</span>
     <span class="n">meta</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;meta__&#39;</span>
     <span class="n">context</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;context__&#39;</span>
-    <span class="n">suffix</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;suffix__&#39;</span></div>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;suffix__&#39;</span>
+
+    <span class="c1"># video_frame_tags</span>
+    <span class="n">video_frame_tags</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;video_frame_tags__&#39;</span>
+    <span class="n">video_audio_tags</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;video_audio_tags__&#39;</span></div>
 
 
 <div class="viewcode-block" id="StatsKeysMeta"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeysMeta">[docs]</a><span class="k">class</span> <span class="nc">StatsKeysMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
@@ -198,11 +202,31 @@
     <span class="n">image_sizes</span> <span class="o">=</span> <span class="s1">&#39;image_sizes&#39;</span>
     <span class="n">face_ratios</span> <span class="o">=</span> <span class="s1">&#39;face_ratios&#39;</span>
     <span class="n">face_detections</span> <span class="o">=</span> <span class="s1">&#39;face_detections&#39;</span>
+    <span class="n">image_aesthetics_scores</span> <span class="o">=</span> <span class="s1">&#39;image_aesthetics_scores&#39;</span>
+
+    <span class="c1"># audios</span>
+    <span class="n">audio_duration</span> <span class="o">=</span> <span class="s1">&#39;audio_duration&#39;</span>
+    <span class="n">audio_nmf_snr</span> <span class="o">=</span> <span class="s1">&#39;audio_nmf_snr&#39;</span>
+    <span class="n">audio_sizes</span> <span class="o">=</span> <span class="s1">&#39;audio_sizes&#39;</span>
+
+    <span class="c1"># videos</span>
+    <span class="n">video_duration</span> <span class="o">=</span> <span class="s1">&#39;video_duration&#39;</span>
+    <span class="n">video_aspect_ratios</span> <span class="o">=</span> <span class="s1">&#39;video_aspect_ratios&#39;</span>
+    <span class="n">video_width</span> <span class="o">=</span> <span class="s1">&#39;video_width&#39;</span>
+    <span class="n">video_height</span> <span class="o">=</span> <span class="s1">&#39;video_height&#39;</span>
+    <span class="n">video_ocr_area_ratio</span> <span class="o">=</span> <span class="s1">&#39;video_ocr_area_ratio&#39;</span>
+    <span class="n">video_aesthetic_score</span> <span class="o">=</span> <span class="s1">&#39;video_aesthetic_score&#39;</span>
+    <span class="n">video_frames_aesthetics_score</span> <span class="o">=</span> <span class="s1">&#39;video_frames_aesthetics_score&#39;</span>
+    <span class="n">video_motion_score</span> <span class="o">=</span> <span class="s1">&#39;video_motion_score&#39;</span>
 
     <span class="c1"># multimodal</span>
+    <span class="c1"># image-text</span>
     <span class="n">image_text_similarity</span> <span class="o">=</span> <span class="s1">&#39;image_text_similarity&#39;</span>
     <span class="n">image_text_matching_score</span> <span class="o">=</span> <span class="s1">&#39;image_text_matching_score&#39;</span>
-    <span class="n">phrase_grounding_recall</span> <span class="o">=</span> <span class="s1">&#39;phrase_grounding_recall&#39;</span></div>
+    <span class="n">phrase_grounding_recall</span> <span class="o">=</span> <span class="s1">&#39;phrase_grounding_recall&#39;</span>
+
+    <span class="c1"># video-text</span>
+    <span class="n">video_frames_text_matching_score</span> <span class="o">=</span> <span class="s1">&#39;video_frames_text_matching_score&#39;</span></div>
 
 
 <div class="viewcode-block" id="StatsKeys"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeys">[docs]</a><span class="k">class</span> <span class="nc">StatsKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">StatsKeysMeta</span><span class="p">):</span>
@@ -215,7 +239,10 @@
     <span class="n">simhash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;simhash&#39;</span>
 
     <span class="c1"># image</span>
-    <span class="n">imagehash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;imagehash&#39;</span></div>
+    <span class="n">imagehash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;imagehash&#39;</span>
+
+    <span class="c1"># video</span>
+    <span class="n">videohash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;videohash&#39;</span></div>
 
 
 <div class="viewcode-block" id="InterVars"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.InterVars">[docs]</a><span class="k">class</span> <span class="nc">InterVars</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -225,7 +252,13 @@
     <span class="n">refined_words</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;refined_words&#39;</span>
 
     <span class="c1"># image</span>
-    <span class="n">loaded_images</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;loaded_images&#39;</span></div>
+    <span class="n">loaded_images</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;loaded_images&#39;</span>  <span class="c1"># Image</span>
+
+    <span class="c1"># audios</span>
+    <span class="n">loaded_audios</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;loaded_audios&#39;</span>  <span class="c1"># (data, sampling_rate)</span>
+
+    <span class="c1"># videos</span>
+    <span class="n">loaded_videos</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;loaded_videos&#39;</span>  <span class="c1"># InputContainer from av</span></div>
 </pre></div>
 
            </div>
