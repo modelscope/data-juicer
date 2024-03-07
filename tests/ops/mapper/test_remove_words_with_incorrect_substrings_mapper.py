@@ -2,9 +2,10 @@ import unittest
 
 from data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper import \
     RemoveWordsWithIncorrectSubstringsMapper  # noqa: E501
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class RemoveWordsWithIncorrectSubstringsMapperTest(unittest.TestCase):
+class RemoveWordsWithIncorrectSubstringsMapperTest(DataJuicerTestCaseBase):
 
     def _run_remove_words_with_incorrect_sbstrings(self, samples, op):
         for sample in samples:

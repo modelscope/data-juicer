@@ -2,9 +2,10 @@ import unittest
 
 from data_juicer.ops.mapper.remove_table_text_mapper import \
     RemoveTableTextMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class RemoveTableTextMapperTest(unittest.TestCase):
+class RemoveTableTextMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = RemoveTableTextMapper()

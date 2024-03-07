@@ -2,9 +2,10 @@ import unittest
 
 from data_juicer.ops.mapper.remove_bibliography_mapper import \
     RemoveBibliographyMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class RemoveBibliographyMapperTest(unittest.TestCase):
+class RemoveBibliographyMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = RemoveBibliographyMapper()

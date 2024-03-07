@@ -18,8 +18,11 @@ LOADED_IMAGES = Registry(InterVars.loaded_images)
 # audios
 LOADED_AUDIOS = Registry(InterVars.loaded_audios)
 
+# videos
+LOADED_VIDEOS = Registry(InterVars.loaded_videos)
+
 # all
-ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_IMAGES]
+ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_IMAGES, LOADED_VIDEOS]
 
 
 def fuse_operators(process_list, ops):
@@ -135,12 +138,19 @@ class FusedFilter(Filter):
         self.fused_filters = fused_filters
 
     def compute_stats(self, sample):
+        import av
+
         # context for the intermediate vars
         sample[Fields.context] = {}
         for op in self.fused_filters:
             # open the context for these fused ops
             sample = op.compute_stats(sample, context=True)
         # clean up the contexts after processing
+        # check if there are containers that need to be closed
+        for context_key in sample[Fields.context]:
+            if isinstance(sample[Fields.context][context_key],
+                          av.container.InputContainer):
+                sample[Fields.context][context_key].close()
         _ = sample.pop(Fields.context)
         return sample
 

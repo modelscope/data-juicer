@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.selector.frequency_specified_field_selector import \
     FrequencySpecifiedFieldSelector
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class FrequencySpecifiedFieldSelectorTest(unittest.TestCase):
+class FrequencySpecifiedFieldSelectorTest(DataJuicerTestCaseBase):
 
     def _run_frequency_selector(self, dataset: Dataset, target_list, op):
         dataset = op.process(dataset)

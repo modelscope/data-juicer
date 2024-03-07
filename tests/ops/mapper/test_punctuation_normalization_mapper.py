@@ -2,9 +2,10 @@ import unittest
 
 from data_juicer.ops.mapper.punctuation_normalization_mapper import \
     PunctuationNormalizationMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class PunctuationNormalizationMapperTest(unittest.TestCase):
+class PunctuationNormalizationMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = PunctuationNormalizationMapper()

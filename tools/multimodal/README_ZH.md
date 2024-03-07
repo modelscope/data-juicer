@@ -62,11 +62,14 @@
 
 目前，Data-Juicer 支持的数据集格式在下面表格中列出。
 
-| 格式       | 类型    | source_format_to_data_juicer_format | data_juicer_format_to_target_format | 格式参考                                                                                               |
-|----------|-------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
-| 类LLaVA格式 | 图像-文本 | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
-| 类MMC4格式  | 图像-文本 | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [格式描述](https://github.com/allenai/mmc4#documents) |
-| 类WavCaps格式  | 音频-文本 | `wavcaps_to_dj.py` | `dj_to_wavcaps.py`                  | [格式描述](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
+| 格式               | 类型    | source_format_to_data_juicer_format | data_juicer_format_to_target_format | 格式参考                                                                                               |
+|------------------|-------|-------------------------------------|-------------------------------------|----------------------------------------------------------------------------------------------------|
+| 类LLaVA格式         | 图像-文本 | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [格式描述](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| 类MMC4格式          | 图像-文本 | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [格式描述](https://github.com/allenai/mmc4#documents)                                                  |
+| 类WavCaps格式       | 音频-文本 | `wavcaps_to_dj.py` | `dj_to_wavcaps.py`                  | [格式描述](https://github.com/XinhaoMei/WavCaps#table-of-contents)                                     |
+| 类Video-ChatGPT格式 |视频-文本 | `video_chatgpt_to_dj.py`            | `dj_to_video_chatgpt.py`                | [格式描述]( https://github.com/mbzuai-oryx/Video-ChatGPT/tree/main/data)                               |                                                                                          |
+| 类Youku-mPLUG格式   | 视频-文本 | `youku_to_dj.py`                    | `dj_to_youku.py`                    | [格式描述](https://modelscope.cn/datasets/modelscope/Youku-AliceMind/summary)                          |                                                                                          |
+| 类InternVid格式     | 视频-文本 | `internvid_to_dj.py`                | `dj_to_internvid.py`                | [格式描述](https://huggingface.co/datasets/OpenGVLab/InternVid)                                        |                                                                                          |
 
 对于所有工具，您可以运行以下命令来了解它们的详细用法：
 
@@ -168,3 +171,27 @@ python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --hel
         "tags": "" }]    
 }
 ```
+
+#### 类Video-ChatGPT格式
+Video-ChatGPT数据集包含3种统一格式的数据：
+- 视频摘要主题
+- 基于描述的问题答案（探索空间、时间、关系和推理概念）；
+- 以及创意/生成性问题解答。
+它们都遵循“<question,answer,video_id>”格式，其中“video_id”表示为YouTube视频的id：“v_youtube_id”。 我们假设用户已经下载了这些视频，在使用转换工具时需要指定相应的存储目录。
+#### 类Youku-mPLUG格式
+
+Youku-mPLUG数据集中一共有4种类型的格式：pretrain，classification，
+retrieval，captioning。它们在字段名称或者其他属性上会有轻微的差异，但是所有类型都遵从 `<video, caption>` 的格式。
+
+#### 类InternVid格式
+
+InternVid数据集包括4个字段：
+- `YoutubeID`: 样本中使用的视频的Youtube ID。我们假设用户已经下载了这些视频，
+并且这个字段已经被替换为了视频的存储路径。
+- `Start_timestamp`: 与caption对应的视频片段的开始时间戳字符串。
+- `End_timestamp`: 与caption对应的视频片段的结束时间戳字符串
+- `Caption`: 与视频片段对应的caption。
+
+正如我们看到，该数据集中的caption对应到了一段由开始/结束时间戳指定的视频片段，而非整段视频。
+因此，如果 `cut_videos` 参数设置为 True，针对该数据集的转换工具会为您剪辑出指定的视频片段。
+您也可以在转换前自行对下载的视频进行剪辑。

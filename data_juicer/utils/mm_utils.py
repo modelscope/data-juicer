@@ -1,10 +1,19 @@
 import base64
+import datetime
+import os
 import re
+from typing import List, Union
 
+import av
 import numpy as np
 from datasets import Audio, Image
+from loguru import logger
 
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
+from data_juicer.utils.file_utils import add_suffix_to_filename
+
+# suppress most warnings from av
+av.logging.set_level(av.logging.PANIC)
 
 
 # A class to keep special tokens for multimodal information in the texts
@@ -13,9 +22,20 @@ class SpecialTokens(object):
     # modality
     image = f'<{DEFAULT_PREFIX}image>'
     audio = f'<{DEFAULT_PREFIX}audio>'
+    video = f'<{DEFAULT_PREFIX}video>'
 
     # others
     eoc = f'<|{DEFAULT_PREFIX}eoc|>'
+
+
+AV_STREAM_THREAD_TYPE = 'AUTO'
+"""
+av stream thread type support "SLICE", "FRAME", "AUTO".
+    "SLICE": Decode more than one part of a single frame at once
+    "FRAME": Decode more than one frame at once
+    "AUTO": Using both "FRAME" and "SLICE"
+    AUTO is faster when there are no video latency.
+"""
 
 
 def get_special_tokens():
@@ -62,7 +82,7 @@ def load_data_with_context(sample, context, loaded_data_keys, load_func):
     return sample, data
 
 
-# Image
+# Images
 def load_images(paths):
     return [load_image(path) for path in paths]
 
@@ -121,7 +141,7 @@ def iou(box1, box2):
     return 1.0 * intersection / union
 
 
-# Audio
+# Audios
 def load_audios(paths):
     return [load_audio(path) for path in paths]
 
@@ -130,6 +150,432 @@ def load_audio(path, sampling_rate=None):
     aud_feature = Audio(sampling_rate)
     aud = aud_feature.decode_example(aud_feature.encode_example(path))
     return aud['array'], aud['sampling_rate']
+
+
+# Videos
+def load_videos(paths):
+    return [load_video(path) for path in paths]
+
+
+def load_video(path):
+    """
+    Load a video using its path.
+
+    :param path: the path to this video.
+    :return: a container object form PyAv library, which contains all streams
+        in this video (video/audio/...) and can be used to decode these streams
+        to frames.
+    """
+    container = av.open(path)
+    return container
+
+
+def get_video_duration(input_video: Union[str, av.container.InputContainer],
+                       video_stream_index=0):
+    """
+    Get the video's duration from the container
+    :param input_video: the container object form PyAv library, which
+        contains all streams in this video (video/audio/...) and can be used
+        to decode these streams to frames.
+    :param video_stream_index: the video stream index to decode,
+        default set to 0.
+    :return: duration of the video in second
+    """
+    if isinstance(input_video, str):
+        container = av.open(input_video)
+    elif isinstance(input_video, av.container.InputContainer):
+        container = input_video
+    else:
+        raise ValueError(f'Unsupported type of input_video. Should be one of '
+                         f'[str, av.container.InputContainer], but given '
+                         f'[{type(input_video)}].')
+
+    input_video_stream = container.streams.video[video_stream_index]
+    duration = input_video_stream.duration * input_video_stream.time_base
+    return float(duration)
+
+
+def get_decoded_frames_from_video(
+        input_video: Union[str, av.container.InputContainer],
+        video_stream_index=0):
+    """
+    Get the video's frames from the container
+    :param input_video: the container object form PyAv library, which
+        contains all streams in this video (video/audio/...) and can be used
+        to decode these streams to frames.
+    :param video_stream_index: the video stream index to decode,
+        default set to 0.
+    :return: an iterator of all the frames of the video
+    """
+    if isinstance(input_video, str):
+        container = av.open(input_video)
+    elif isinstance(input_video, av.container.InputContainer):
+        container = input_video
+    stream = container.streams.video[video_stream_index]
+    # use "AUTO" thread_type for faster decode
+    stream.thread_type = AV_STREAM_THREAD_TYPE
+    return container.decode(stream)
+
+
+def cut_video_by_seconds(
+    input_video: Union[str, av.container.InputContainer],
+    output_video: str,
+    start_seconds: float,
+    end_seconds: float = None,
+):
+    """
+    Cut a video into several segments by times in second.
+
+    :param input_video: the path to input video or the video container.
+    :param output_video: the path to output video.
+    :param start_seconds: the start time in second.
+    :param end_seconds: the end time in second. If it's None, this function
+        will cut the video from the start_seconds to the end of the video.
+    """
+    # open the original video
+    if isinstance(input_video, str):
+        container = av.open(input_video)
+    else:
+        container = input_video
+
+    # create the output video
+    output_container = av.open(output_video, 'w')
+
+    # add the video stream into the output video according to input video
+    input_video_stream = container.streams.video[0]
+    codec_name = input_video_stream.codec_context.name
+    fps = input_video_stream.base_rate
+    output_video_stream = output_container.add_stream(codec_name,
+                                                      rate=str(fps))
+    output_video_stream.width = input_video_stream.codec_context.width
+    output_video_stream.height = input_video_stream.codec_context.height
+    output_video_stream.pix_fmt = input_video_stream.codec_context.pix_fmt
+
+    # add the audio stream into the output video with template of input audio
+    if len(container.streams.audio) == 0:
+        input_audio_stream = None
+    else:
+        input_audio_stream = container.streams.audio[0]
+        output_container.add_stream(template=input_audio_stream)
+
+    # seek to the start time, time must be in microsecond if no
+    # stream is specified
+    container.seek(int(start_seconds * 1000000),
+                   any_frame=False,
+                   backward=True)
+
+    # copy the video and audio streams until the end time
+    # NOTICE: for different streams, the time have to be converted to be
+    # in the corresponding time base.
+    video_at_the_end = False
+    # compute the start/end pts for video/audio streams
+    video_start_pts = int(start_seconds / input_video_stream.time_base)
+    video_end_pts = (end_seconds / input_video_stream.time_base
+                     if end_seconds else input_video_stream.duration)
+    if input_audio_stream is not None:
+        audio_start_pts = int(start_seconds / input_audio_stream.time_base)
+        audio_end_pts = (end_seconds / input_audio_stream.time_base
+                         if end_seconds else input_audio_stream.duration)
+    for packet in container.demux(input_video_stream, input_audio_stream):
+        if packet.stream.type == 'video':
+            for frame in packet.decode():
+                if frame.pts < video_start_pts:
+                    continue
+                if frame.pts > video_end_pts:
+                    # continue to check until the next P/I frame
+                    if frame.pict_type in {'P', 'I'}:
+                        video_at_the_end = True
+                        break
+                    continue
+                frame.pts -= video_start_pts  # timestamp alignment
+                for inter_packet in output_video_stream.encode(frame):
+                    output_container.mux(inter_packet)
+        elif packet.stream.type == 'audio':
+            if packet.pts is None or packet.dts is None:
+                continue
+            if packet.pts < audio_start_pts or packet.pts > audio_end_pts:
+                continue
+            packet.pts -= audio_start_pts
+            packet.dts -= audio_start_pts
+            output_container.mux(packet)
+        if video_at_the_end:
+            break
+
+    # flush all packets
+    for packet in output_video_stream.encode():
+        output_container.mux(packet)
+
+    # close the output videos
+    if isinstance(input_video, str):
+        container.close()
+    output_container.close()
+
+
+def extract_key_frames(input_video: Union[str, av.container.InputContainer]):
+    """
+    Extract key frames from the input video.
+
+    :param input_video: input video path or container.
+    :return: a list of key frames.
+    """
+    # load the input video
+    if isinstance(input_video, str):
+        container = av.open(input_video)
+    elif isinstance(input_video, av.container.InputContainer):
+        container = input_video
+    else:
+        raise ValueError(f'Unsupported type of input_video. Should be one of '
+                         f'[str, av.container.InputContainer], but given '
+                         f'[{type(input_video)}].')
+
+    key_frames = []
+    input_video_stream = container.streams.video[0]
+    ori_skip_method = input_video_stream.codec_context.skip_frame
+    input_video_stream.codec_context.skip_frame = 'NONKEY'
+    # restore to the beginning of the video
+    container.seek(0, backward=False, any_frame=False)
+    for frame in container.decode(input_video_stream):
+        key_frames.append(frame)
+    # restore to the original skip_type
+    input_video_stream.codec_context.skip_frame = ori_skip_method
+
+    if isinstance(input_video, str):
+        container.close()
+    return key_frames
+
+
+def get_key_frame_seconds(input_video: Union[str,
+                                             av.container.InputContainer]):
+    """
+    Get seconds of key frames in the input video.
+    """
+    key_frames = extract_key_frames(input_video)
+    ts = [float(f.pts * f.time_base) for f in key_frames]
+    ts.sort()
+    return ts
+
+
+def extract_video_frames_uniformly(
+    input_video: Union[str, av.container.InputContainer],
+    frame_num: int,
+):
+    """
+    Extract a number of video frames uniformly within the video duration.
+
+    :param input_video: input video path or container.
+    :param frame_num: The number of frames to be extracted. If it's 1, only the
+        middle frame will be extracted. If it's 2, only the first and the last
+        frames will be extracted. If it's larger than 2, in addition to the
+        first and the last frames, other frames will be extracted uniformly
+        within the video duration.
+    :return: a list of extracted frames.
+    """
+    # load the input video
+    if isinstance(input_video, str):
+        container = av.open(input_video)
+    elif isinstance(input_video, av.container.InputContainer):
+        container = input_video
+    else:
+        raise ValueError(f'Unsupported type of input_video. Should be one of '
+                         f'[str, av.container.InputContainer], but given '
+                         f'[{type(input_video)}].')
+
+    input_video_stream = container.streams.video[0]
+    total_frame_num = input_video_stream.frames
+    if total_frame_num < frame_num:
+        logger.warning('Number of frames to be extracted is larger than the '
+                       'total number of frames in this video. Set it to the '
+                       'total number of frames.')
+        frame_num = total_frame_num
+    # calculate the frame seconds to be extracted
+    duration = input_video_stream.duration * input_video_stream.time_base
+    if frame_num == 1:
+        extract_seconds = [duration / 2]
+    else:
+        step = duration / (frame_num - 1)
+        extract_seconds = [step * i for i in range(0, frame_num)]
+
+    # group durations according to the seconds of key frames
+    key_frame_seconds = get_key_frame_seconds(container)
+    if 0.0 not in key_frame_seconds:
+        key_frame_seconds = [0.0] + key_frame_seconds
+    if len(key_frame_seconds) == 1:
+        second_groups = [extract_seconds]
+    else:
+        second_groups = []
+        idx = 0
+        group_id = 0
+        curr_group = []
+        curr_upper_bound_ts = key_frame_seconds[group_id + 1]
+        while idx < len(extract_seconds):
+            curr_ts = extract_seconds[idx]
+            if curr_ts < curr_upper_bound_ts:
+                curr_group.append(curr_ts)
+                idx += 1
+            else:
+                second_groups.append(curr_group)
+                group_id += 1
+                curr_group = []
+                if group_id >= len(key_frame_seconds) - 1:
+                    break
+                curr_upper_bound_ts = key_frame_seconds[group_id + 1]
+        if len(curr_group) > 0:
+            second_groups.append(curr_group)
+        if idx < len(extract_seconds):
+            second_groups.append(extract_seconds[idx:])
+
+    # extract frames by their group's key frames
+    extracted_frames = []
+    time_base = input_video_stream.time_base
+    for i, second_group in enumerate(second_groups):
+        key_frame_second = key_frame_seconds[i]
+        if len(second_group) == 0:
+            continue
+        if key_frame_second == 0.0:
+            # search from the beginning
+            container.seek(0, backward=False, any_frame=True)
+            search_idx = 0
+            curr_pts = second_group[search_idx] / time_base
+            for frame in container.decode(input_video_stream):
+                if frame.pts >= curr_pts:
+                    extracted_frames.append(frame)
+                    search_idx += 1
+                    if search_idx >= len(second_group):
+                        break
+                    curr_pts = second_group[search_idx] / time_base
+        else:
+            # search from a key frame
+            container.seek(int(key_frame_second * 1e6))
+            search_idx = 0
+            curr_pts = second_group[search_idx] / time_base
+            find_all = False
+            for packet in container.demux(input_video_stream):
+                for frame in packet.decode():
+                    if frame.pts >= curr_pts:
+                        extracted_frames.append(frame)
+                        search_idx += 1
+                        if search_idx >= len(second_group):
+                            find_all = True
+                            break
+                        curr_pts = second_group[search_idx] / time_base
+                if find_all:
+                    break
+            if not find_all and frame is not None:
+                # add the last frame
+                extracted_frames.append(frame)
+
+    # if the container is opened in this function, close it
+    if isinstance(input_video, str):
+        container.close()
+    return extracted_frames
+
+
+def extract_audio_from_video(
+    input_video: Union[str, av.container.InputContainer],
+    output_audio: str = None,
+    start_seconds: int = 0,
+    end_seconds: int = None,
+    stream_indexes: Union[int, List[int]] = None,
+):
+    """
+    Extract audio data for the given video.
+
+    :param input_video: input video. Can be a video path or an
+        av.container.InputContainer.
+    :param output_audio: output audio path. If it's None, the audio data won't
+        be written to file. If stream_indexes is not None, it will output
+        multiple audio files with original filename and the stream indexes.
+        Default: None.
+    :param start_seconds: the start seconds to extract audio data. Default: 0,
+        which means extract from the start of the video.
+    :param end_seconds: the end seconds to stop extracting audio data. If it's
+        None, the extraction won't stop until the end of the video. Default:
+        None.
+    :param stream_indexes: there might be multiple audio streams in the video,
+        so we need to decide which audio streams with stream_indexes will be
+        extracted. It can be a single index or a list of indexes. If it's None,
+        all audio streams will be extracted. Default: None.
+    """
+    if isinstance(input_video, str):
+        input_container = av.open(input_video)
+    elif isinstance(input_video, av.container.InputContainer):
+        input_container = input_video
+    else:
+        raise ValueError(f'Unsupported type of input_video. Should be one of '
+                         f'[str, av.container.InputContainer], but given '
+                         f'[{type(input_video)}].')
+
+    if output_audio and not output_audio.endswith('mp3'):
+        raise ValueError(f'Now we only support export the audios into `mp3` '
+                         f'format, but given '
+                         f'[{os.path.splitext(output_audio)[1]}')
+
+    # no audios in the video
+    num_audio_streams = len(input_container.streams.audio)
+    if stream_indexes is None:
+        valid_stream_indexes = list(range(num_audio_streams))
+    elif isinstance(stream_indexes, int):
+        valid_stream_indexes = [stream_indexes]
+    else:
+        # remove indexes that are larger than the total number of audio streams
+        valid_stream_indexes = [
+            idx for idx in stream_indexes if idx < num_audio_streams
+        ]
+    # no valid expected audio streams
+    if len(valid_stream_indexes) == 0:
+        return [], [], valid_stream_indexes
+
+    audio_data_list = []
+    audio_sampling_rate_list = []
+    for idx in valid_stream_indexes:
+        # read the current audio stream
+        input_audio_stream = input_container.streams.audio[idx]
+        # get the sampling rate
+        audio_sampling_rate_list.append(float(1 /
+                                              input_audio_stream.time_base))
+
+        if output_audio:
+            # if the output_audio is not None, prepare the output audio file
+            this_output_audio = add_suffix_to_filename(output_audio, f'_{idx}')
+            output_container = av.open(this_output_audio, 'w')
+            output_stream = output_container.add_stream('mp3')
+
+        # get the start/end pts
+        start_pts = int(start_seconds / input_audio_stream.time_base)
+        end_pts = (end_seconds /
+                   input_audio_stream.time_base if end_seconds else None)
+
+        audio_data = []
+        for frame in input_container.decode(input_audio_stream):
+            if frame.pts is None or frame.dts is None:
+                continue
+            if frame.pts < start_pts:
+                continue
+            if end_pts and frame.pts > end_pts:
+                break
+            # get frame data
+            array = frame.to_ndarray()[0]
+            audio_data.append(array)
+
+            if output_audio:
+                # compute the right pts when writing an audio file
+                frame.pts -= start_pts
+                frame.dts -= start_pts
+                for packet in output_stream.encode(frame):
+                    output_container.mux(packet)
+
+        # flush
+        if output_audio:
+            for packet in output_stream.encode(None):
+                output_container.mux(packet)
+
+        if isinstance(input_video, str):
+            input_container.close()
+        if output_audio:
+            output_container.close()
+        audio_data_list.append(np.concatenate(audio_data))
+
+    return audio_data_list, audio_sampling_rate_list, valid_stream_indexes
 
 
 # Others
@@ -196,3 +642,18 @@ def insert_texts_after_placeholders(original_string,
             modified_string[index + len(placeholder):]
 
     return modified_string
+
+
+def timecode_string_to_seconds(timecode: str):
+    """
+    Convert a timecode string to the float seconds.
+
+    :param timecode: the input timecode string. Must in "HH:MM:SS.fff(fff)"
+        format.
+    """
+    # parse the timecode string
+    dt = datetime.datetime.strptime(timecode, '%H:%M:%S.%f')
+
+    # compute the start/end time in second
+    pts = dt.hour * 3600 + dt.minute * 60 + dt.second + dt.microsecond / 1e6
+    return pts

@@ -3,30 +3,31 @@ import unittest
 
 from datasets import Dataset
 
-from data_juicer.ops.deduplicator.image_deduplicator import \
-    ImageDeduplicator
+from data_juicer.ops.deduplicator.image_deduplicator import ImageDeduplicator
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class ImageDeduplicatorTest(unittest.TestCase):
+class ImageDeduplicatorTest(DataJuicerTestCaseBase):
 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                             '..', 'data')
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
+                             'data')
     img1_path = os.path.join(data_path, 'img1.png')
     img2_path = os.path.join(data_path, 'img2.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
-    # img4.png is a duplicate sample of img1.png
-    img4_path = os.path.join(data_path, 'img4.png')
-    # img5.jpg is a duplicate sample of img2.jpg
-    img5_path = os.path.join(data_path, 'img5.jpg')
-    # img6.jpg is a duplicate sample of img3.jpg
-    img6_path = os.path.join(data_path, 'img6.jpg')
-    # img7.jpg is a duplicate sample of img6.jpg
-    img7_path = os.path.join(data_path, 'img7.jpg')
- 
+    # img1_dup.png is a duplicate sample of img1.png
+    img4_path = os.path.join(data_path, 'img1_dup.png')
+    os.symlink(img1_path, img4_path)
+    # img2_dup.jpg is a duplicate sample of img2.jpg
+    img5_path = os.path.join(data_path, 'img2_dup.jpg')
+    os.symlink(img2_path, img5_path)
+    # img3_dup.jpg is a duplicate sample of img3.jpg
+    img6_path = os.path.join(data_path, 'img3_dup.jpg')
+    os.symlink(img3_path, img6_path)
+    # img3_dup_dup.jpg is a duplicate sample of img6.jpg
+    img7_path = os.path.join(data_path, 'img3_dup_dup.jpg')
+    os.symlink(img6_path, img7_path)
 
-    def _run_image_deduplicator(self,
-                                dataset: Dataset, target_list,
-                                op):
+    def _run_image_deduplicator(self, dataset: Dataset, target_list, op):
 
         dataset = dataset.map(op.compute_hash)
         dataset, _ = op.process(dataset)
@@ -63,11 +64,7 @@ class ImageDeduplicatorTest(unittest.TestCase):
         }, {
             'images': [self.img2_path]
         }]
-        tgt_list = [{
-            'images': [self.img1_path]
-        }, {
-            'images': [self.img2_path]
-        }]
+        tgt_list = [{'images': [self.img1_path]}, {'images': [self.img2_path]}]
         dataset = Dataset.from_list(ds_list)
         op = ImageDeduplicator()
         self._run_image_deduplicator(dataset, tgt_list, op)
@@ -215,6 +212,7 @@ class ImageDeduplicatorTest(unittest.TestCase):
         dataset = Dataset.from_list(ds_list)
         op = ImageDeduplicator(method='ahash')
         self._run_image_deduplicator(dataset, tgt_list, op)
+
 
 if __name__ == '__main__':
     unittest.main()

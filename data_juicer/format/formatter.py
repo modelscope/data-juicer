@@ -218,12 +218,15 @@ def unify_format(
         ds_dir = global_cfg.dataset_dir
         image_key = global_cfg.image_key
         audio_key = global_cfg.audio_key
+        video_key = global_cfg.video_key
 
         data_path_keys = []
         if image_key in dataset.features:
             data_path_keys.append(image_key)
         if audio_key in dataset.features:
             data_path_keys.append(audio_key)
+        if video_key in dataset.features:
+            data_path_keys.append(video_key)
         if len(data_path_keys) == 0:
             # no image/audios path list in dataset, no need to convert
             return dataset

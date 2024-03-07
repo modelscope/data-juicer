@@ -10,6 +10,12 @@ SKIPPED_TESTS = Registry('SkippedTests')
 class DataJuicerTestCaseBase(unittest.TestCase):
 
     @classmethod
+    def setUpClass(cls):
+        # Set maxDiff for all test cases based on an environment variable
+        max_diff = os.getenv('TEST_MAX_DIFF', 'None')
+        cls.maxDiff = None if max_diff == 'None' else int(max_diff)
+
+    @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
         # clean the huggingface model cache files
         import transformers

@@ -142,6 +142,52 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
+    - 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式为`{ORIGINAL_DATAPATH}/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`，其中`HASH_VALUE`是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。为了方便，可以在OP类初始化开头调用`self.remove_extra_parameters(locals())`获取算子初始化参数，同时可以调用`self.add_parameters`添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：
+    ```python
+    # ... (import some library)
+    OP_NAME = 'image_diffusion_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_IMAGES.register_module(OP_NAME)
+    class ImageDiffusionMapper(Mapper):
+        def __init__(self,
+                 # ... (OP parameters)
+                 *args,
+                 **kwargs):
+            super().__init__(*args, **kwargs)
+            self._init_parameters = self.remove_extra_parameters(locals())
+
+        def process(self, sample, rank=None):
+            # ... (some codes)
+            # captions[index] is the prompt for diffusion model
+            related_parameters = self.add_parameters(
+                    self._init_parameters, caption=captions[index])
+            new_image_path = transfer_filename(
+                    origin_image_path, OP_NAME, **related_parameters)
+            # ... (some codes)
+    ```
+    针对一个数据源衍生出多个额外数据的情况，我们允许在生成的存储路径后面再加后缀。比如，根据关键帧将视频拆分成多个视频：
+    ```python
+    # ... (import some library)
+    OP_NAME = 'video_split_by_key_frame_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_VIDEOS.register_module(OP_NAME)
+    class VideoSplitByKeyFrameMapper(Mapper):
+        def __init__(self,
+                 # ... (OP parameters)
+                 *args,
+                 **kwargs):
+            super().__init__(*args, **kwargs)
+            self._init_parameters = self.remove_extra_parameters(locals())
+
+        def process(self, sample, rank=None):
+            # ... (some codes)
+            split_video_path = transfer_filename(
+                        original_video_path, OP_NAME, **self._init_parameters)
+            suffix = '_split-by-key-frame-' + str(count)
+            split_video_path = add_suffix_to_filename(split_video_path, suffix)
+            # ... (some codes)
+    ```
+
 3. 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
 
 ```python
@@ -168,8 +214,10 @@ process:
 ```python
 import unittest
 from data_juicer.ops.filter.text_length_filter import TextLengthFilter
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-class TextLengthFilterTest(unittest.TestCase):
+
+class TextLengthFilterTest(DataJuicerTestCaseBase):
 
     def test_func1(self):
         pass
@@ -179,6 +227,9 @@ class TextLengthFilterTest(unittest.TestCase):
 
     def test_func3(self):
         pass
+        
+if __name__ == '__main__':
+    unittest.main()
 ```
 
 6. （强烈推荐）为了方便其他用户使用，我们还需要将新增的算子信息更新到相应的文档中，具体包括如下文档：

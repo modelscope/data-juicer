@@ -5,9 +5,10 @@ from datasets import Dataset
 from data_juicer.ops.filter.language_id_score_filter import \
     LanguageIDScoreFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class LanguageIDScoreFilterTest(unittest.TestCase):
+class LanguageIDScoreFilterTest(DataJuicerTestCaseBase):
 
     def _run_language_id_score_filter(self, dataset: Dataset, target_list, op):
         if Fields.stats not in dataset.features:

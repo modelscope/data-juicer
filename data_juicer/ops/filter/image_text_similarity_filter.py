@@ -25,7 +25,7 @@ with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageTextSimilarityFilter(Filter):
-    """Filter to keep samples those similarity between image and text
+    """Filter to keep samples those similarities between image and text
     within a specific range."""
 
     def __init__(self,

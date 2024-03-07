@@ -1,12 +1,16 @@
+# flake8: noqa: E501
+
 import os
 import unittest
 
 from datasets import Dataset
 
-from data_juicer.ops.filter.phrase_grounding_recall_filter import PhraseGroundingRecallFilter
+from data_juicer.ops.filter.phrase_grounding_recall_filter import \
+    PhraseGroundingRecallFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+
 
 class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
 
@@ -24,7 +28,7 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
     @classmethod
     def tearDownClass(cls) -> None:
         super().tearDownClass(cls.hf_owlvit)
-    
+
     def _run_filter(self, dataset: Dataset, target_list, op, num_proc=1):
 
         if Fields.stats not in dataset.features:
@@ -34,7 +38,9 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
             dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
 
-        dataset = dataset.map(op.compute_stats, num_proc=num_proc, with_rank=True)
+        dataset = dataset.map(op.compute_stats,
+                              num_proc=num_proc,
+                              with_rank=True)
         dataset = dataset.filter(op.process, num_proc=num_proc)
         dataset = dataset.select_columns(column_names=['text', 'images'])
         res_list = dataset.to_list()
@@ -43,35 +49,45 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
     def test_general(self):
 
         ds_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog',
             'images': [self.demo_path]
         }, {
-            'text': f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
+            'text':
+            f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
             'images': [self.cat_path]
         }, {
-            'text': f'{SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
             'images': [self.img1_path]
         }, {
-            'text': f'{SpecialTokens.image} A bus with red advertisements is running on the street. {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} A bus with red advertisements is running on the street. {SpecialTokens.eoc}',
             'images': [self.img2_path]
         }, {
-            'text': f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
             'images': [self.img3_path]
         }]
         tgt_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog',
             'images': [self.demo_path]
         }, {
-            'text': f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
+            'text':
+            f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
             'images': [self.cat_path]
         }, {
-            'text': f'{SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
             'images': [self.img1_path]
         }, {
-            'text': f'{SpecialTokens.image} A bus with red advertisements is running on the street. {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} A bus with red advertisements is running on the street. {SpecialTokens.eoc}',
             'images': [self.img2_path]
         }, {
-            'text': f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
             'images': [self.img3_path]
         }]
 
@@ -88,29 +104,37 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
     def test_high_recall(self):
 
         ds_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog',
             'images': [self.demo_path]
         }, {
-            'text': f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
+            'text':
+            f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
             'images': [self.cat_path]
         }, {
-            'text': f'{SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
             'images': [self.img1_path]
         }, {
-            'text': f'{SpecialTokens.image} A bus with red advertisements is running on the street. {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} A bus with red advertisements is running on the street. {SpecialTokens.eoc}',
             'images': [self.img2_path]
         }, {
-            'text': f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
             'images': [self.img3_path]
         }]
         tgt_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog',
             'images': [self.demo_path]
         }, {
-            'text': f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
+            'text':
+            f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
             'images': [self.cat_path]
         }, {
-            'text': f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
             'images': [self.img3_path]
         }]
 
@@ -127,14 +151,17 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
     def test_high_conf_thr(self):
 
         ds_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog',
             'images': [self.demo_path]
         }, {
-            'text': f'{SpecialTokens.image}a man sitting on the grass with a cat',
+            'text':
+            f'{SpecialTokens.image}a man sitting on the grass with a cat',
             'images': [self.demo_path]
         }]
         tgt_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog',
             'images': [self.demo_path]
         }]
 
@@ -152,17 +179,21 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
     def test_low_conf_thr(self):
         # some similar but different objects might be detected incorrectly
         ds_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog',
             'images': [self.demo_path]
         }, {
-            'text': f'{SpecialTokens.image}a man sitting on the grass with a cat',
+            'text':
+            f'{SpecialTokens.image}a man sitting on the grass with a cat',
             'images': [self.demo_path]
         }]
         tgt_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog',
             'images': [self.demo_path]
         }, {
-            'text': f'{SpecialTokens.image}a man sitting on the grass with a cat',
+            'text':
+            f'{SpecialTokens.image}a man sitting on the grass with a cat',
             'images': [self.demo_path]
         }]
 
@@ -183,7 +214,8 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
             'text': f'{SpecialTokens.image} a photo of a woman\'s face',
             'images': [self.face_path]
         }, {
-            'text': f'{SpecialTokens.image}A bus with red advertisements is running on the street.',
+            'text':
+            f'{SpecialTokens.image}A bus with red advertisements is running on the street.',
             'images': [self.img2_path]
         }]
         tgt_list = []
@@ -205,11 +237,13 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
             'text': f'{SpecialTokens.image} a photo of a woman\'s face',
             'images': [self.face_path]
         }, {
-            'text': f'{SpecialTokens.image}A bus with red advertisements is running on the street.',
+            'text':
+            f'{SpecialTokens.image}A bus with red advertisements is running on the street.',
             'images': [self.img2_path]
         }]
         tgt_list = [{
-            'text': f'{SpecialTokens.image}A bus with red advertisements is running on the street.',
+            'text':
+            f'{SpecialTokens.image}A bus with red advertisements is running on the street.',
             'images': [self.img2_path]
         }]
 
@@ -227,17 +261,21 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
     def test_reduce_avg(self):
 
         ds_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.image}',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.image}',
             'images': [self.demo_path, self.cat_path]
         }, {
-            'text': f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
             'images': [self.img1_path, self.img2_path]
         }]
         tgt_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.image}',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.image}',
             'images': [self.demo_path, self.cat_path]
         }, {
-            'text': f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
             'images': [self.img1_path, self.img2_path]
         }]
 
@@ -254,14 +292,17 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
     def test_reduce_max(self):
 
         ds_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.image}',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.image}',
             'images': [self.demo_path, self.cat_path]
         }, {
-            'text': f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
             'images': [self.img1_path, self.img2_path]
         }]
         tgt_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.image}',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.image}',
             'images': [self.demo_path, self.cat_path]
         }]
 
@@ -278,10 +319,12 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
     def test_reduce_min(self):
 
         ds_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.image}',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog{SpecialTokens.image}',
             'images': [self.demo_path, self.cat_path]
         }, {
-            'text': f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
             'images': [self.img1_path, self.img2_path]
         }]
         tgt_list = []
@@ -300,8 +343,8 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
 
         ds_list = [{
             'text':
-                f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}'
-                f'{SpecialTokens.image} a woman sitting on the beach with a dog',
+            f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}'
+            f'{SpecialTokens.image} a woman sitting on the beach with a dog',
             'images': [self.img1_path, self.cat_path, self.demo_path]
         }]
         tgt_list = []
@@ -320,14 +363,14 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
 
         ds_list = [{
             'text':
-                f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}'
-                f'{SpecialTokens.image} a woman sitting on the beach with a dog',
+            f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}'
+            f'{SpecialTokens.image} a woman sitting on the beach with a dog',
             'images': [self.img1_path, self.cat_path, self.demo_path]
         }]
         tgt_list = [{
             'text':
-                f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}'
-                f'{SpecialTokens.image} a woman sitting on the beach with a dog',
+            f'{SpecialTokens.image} {SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}'
+            f'{SpecialTokens.image} a woman sitting on the beach with a dog',
             'images': [self.img1_path, self.cat_path, self.demo_path]
         }]
 
@@ -344,29 +387,37 @@ class PhraseGroundingRecallFilterTest(DataJuicerTestCaseBase):
     def test_process_in_parallel(self):
 
         ds_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog',
             'images': [self.demo_path]
         }, {
-            'text': f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
+            'text':
+            f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
             'images': [self.cat_path]
         }, {
-            'text': f'{SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} select luxury furniture 3 - inch gel memory foam mattress topper {SpecialTokens.eoc}',
             'images': [self.img1_path]
         }, {
-            'text': f'{SpecialTokens.image} A bus with red advertisements is running on the street. {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} A bus with red advertisements is running on the street. {SpecialTokens.eoc}',
             'images': [self.img2_path]
         }, {
-            'text': f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
             'images': [self.img3_path]
         }]
         tgt_list = [{
-            'text': f'{SpecialTokens.image}a woman sitting on the beach with a dog',
+            'text':
+            f'{SpecialTokens.image}a woman sitting on the beach with a dog',
             'images': [self.demo_path]
         }, {
-            'text': f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
+            'text':
+            f'Two cats are sleeping on the couch with two remote controls{SpecialTokens.image}',
             'images': [self.cat_path]
         }, {
-            'text': f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
+            'text':
+            f'{SpecialTokens.image} A woman carrying a bag is walking in a rainy alley holding an umbrella {SpecialTokens.eoc}',
             'images': [self.img3_path]
         }]
 

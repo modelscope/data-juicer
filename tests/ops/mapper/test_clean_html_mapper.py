@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.clean_html_mapper import CleanHtmlMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class CleanHtmlMapperTest(unittest.TestCase):
+class CleanHtmlMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = CleanHtmlMapper()

@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.remove_header_mapper import RemoveHeaderMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class RemoveHeaderMapperTest(unittest.TestCase):
+class RemoveHeaderMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = RemoveHeaderMapper()

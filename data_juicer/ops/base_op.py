@@ -1,3 +1,5 @@
+import copy
+
 from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
@@ -10,6 +12,7 @@ class OP:
         text_key: str = None,
         image_key: str = None,
         audio_key: str = None,
+        video_key: str = None,
     ):
         """
         Base class of operators.
@@ -19,6 +22,8 @@ class OP:
         :param image_key: the key name of field that stores sample image list
             to be processed
         :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
             to be processed
         """
         # init data keys
@@ -31,6 +36,9 @@ class OP:
         if audio_key is None:
             audio_key = 'audios'
         self.audio_key = audio_key
+        if video_key is None:
+            video_key = 'videos'
+        self.video_key = video_key
         self._accelerator = 'cpu'
 
         from data_juicer.core.data import wrap_func_with_nested_access
@@ -39,15 +47,42 @@ class OP:
     def process(self, *args, **kwargs):
         raise NotImplementedError
 
+    def remove_extra_parameters(self, param_dict, keys=None):
+        """
+            at the begining of the init of the mapper op, call
+            self.remove_extra_parameters(locals())
+            to get the init parameter dict of the op for convenience
+
+        """
+        if keys is None:
+            param_dict = {
+                k: v
+                for k, v in param_dict.items() if not k.startswith('_')
+            }
+            param_dict.pop('self', None)
+        else:
+            param_dict = {k: v for k, v in param_dict.items() if k not in keys}
+        return param_dict
+
+    def add_parameters(self, init_parameter_dict, **extra_param_dict):
+        """
+            add parameters for each sample, need to keep extra_param_dict
+            and init_parameter_dict unchanged.
+        """
+        related_parameters = copy.deepcopy(init_parameter_dict)
+        related_parameters.update(extra_param_dict)
+        return related_parameters
+
 
 class Mapper(OP):
 
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        audio_key: str = None,
-    ):
+    def __init__(self,
+                 text_key: str = None,
+                 image_key: str = None,
+                 audio_key: str = None,
+                 video_key: str = None,
+                 *args,
+                 **kwargs):
         """
         Base class that conducts data editing.
 
@@ -57,8 +92,10 @@ class Mapper(OP):
             to be processed
         :param audio_key: the key name of field that stores sample audio list
             to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
         """
-        super(Mapper, self).__init__(text_key, image_key, audio_key)
+        super(Mapper, self).__init__(text_key, image_key, audio_key, video_key)
 
         # In default, it's a normal OP instead of batched OP
         self._batched_op = False
@@ -78,12 +115,13 @@ class Mapper(OP):
 
 class Filter(OP):
 
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        audio_key: str = None,
-    ):
+    def __init__(self,
+                 text_key: str = None,
+                 image_key: str = None,
+                 audio_key: str = None,
+                 video_key: str = None,
+                 *args,
+                 **kwargs):
         """
         Base class that removes specific info.
 
@@ -93,8 +131,10 @@ class Filter(OP):
             to be processed
         :param audio_key: the key name of field that stores sample audio list
             to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
         """
-        super(Filter, self).__init__(text_key, image_key, audio_key)
+        super(Filter, self).__init__(text_key, image_key, audio_key, video_key)
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.compute_stats = wrap_func_with_nested_access(self.compute_stats)
@@ -123,12 +163,13 @@ class Filter(OP):
 
 class Deduplicator(OP):
 
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        audio_key: str = None,
-    ):
+    def __init__(self,
+                 text_key: str = None,
+                 image_key: str = None,
+                 audio_key: str = None,
+                 video_key: str = None,
+                 *args,
+                 **kwargs):
         """
         Base class that conducts deduplication.
 
@@ -138,8 +179,11 @@ class Deduplicator(OP):
             to be processed
         :param audio_key: the key name of field that stores sample audio list
             to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
         """
-        super(Deduplicator, self).__init__(text_key, image_key, audio_key)
+        super(Deduplicator, self).__init__(text_key, image_key, audio_key,
+                                           video_key)
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.compute_hash = wrap_func_with_nested_access(self.compute_hash)
@@ -167,12 +211,13 @@ class Deduplicator(OP):
 
 class Selector(OP):
 
-    def __init__(
-        self,
-        text_key: str = None,
-        image_key: str = None,
-        audio_key: str = None,
-    ):
+    def __init__(self,
+                 text_key: str = None,
+                 image_key: str = None,
+                 audio_key: str = None,
+                 video_key: str = None,
+                 *args,
+                 **kwargs):
         """
         Base class that conducts selection in dataset-level.
 
@@ -182,8 +227,11 @@ class Selector(OP):
             to be processed
         :param audio_key: the key name of field that stores sample audio list
             to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
         """
-        super(Selector, self).__init__(text_key, image_key, audio_key)
+        super(Selector, self).__init__(text_key, image_key, audio_key,
+                                       video_key)
 
     def process(self, dataset):
         """

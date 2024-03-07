@@ -128,7 +128,7 @@ def main(
         Data-Juicer, such as "images", "text", ... Default: False.
     :param convert_to_relative_paths: whether convert the image paths in this
         dataset to relative paths to the original dataset. If it's True, an
-        extra argument original_llava_ds_path is required. When the processed
+        extra argument original_mmc4_ds_path is required. When the processed
         and converted dataset will be used in another machine, it's better to
         set this argument to True. Default: False.
     :param original_mmc4_ds_path: path to the original unprocessed MMC4
@@ -157,7 +157,7 @@ def main(
             f'the target dataset.')
         os.makedirs(os.path.dirname(target_mmc4_ds_path))
 
-    # if convert_to_relative_paths is True, check if the original_llava_ds_path
+    # if convert_to_relative_paths is True, check if the original_mmc4_ds_path
     # is provided as well.
     if convert_to_relative_paths:
         if not original_mmc4_ds_path:

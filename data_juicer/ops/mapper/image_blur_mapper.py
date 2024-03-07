@@ -3,14 +3,17 @@ import os
 import numpy as np
 
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
+OP_NAME = 'image_blur_mapper'
 
-@OPERATORS.register_module('image_blur_mapper')
-@LOADED_IMAGES.register_module('image_blur_mapper')
+
+@OPERATORS.register_module(OP_NAME)
+@LOADED_IMAGES.register_module(OP_NAME)
 class ImageBlurMapper(Mapper):
     """Mapper to blur images.
     """
@@ -32,6 +35,7 @@ class ImageBlurMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
         if blur_type not in ['mean', 'box', 'gaussian']:
             raise ValueError(
                 f'Blur_type [{blur_type}] is not supported. '
@@ -63,9 +67,8 @@ class ImageBlurMapper(Mapper):
             if self.p < np.random.rand():
                 continue
             else:
-                blured_image_key = os.path.join(
-                    os.path.dirname(value),
-                    '_blured.'.join(os.path.basename(value).split('.')))
+                blured_image_key = transfer_filename(value, OP_NAME,
+                                                     **self._init_parameters)
                 if not os.path.exists(
                         blured_image_key) or blured_image_key not in images:
                     blured_image = images[value].convert('RGB').filter(

@@ -5,9 +5,10 @@ from datasets import Dataset
 from data_juicer.ops.filter.maximum_line_length_filter import \
     MaximumLineLengthFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class MaximumLineLengthFilterTest(unittest.TestCase):
+class MaximumLineLengthFilterTest(DataJuicerTestCaseBase):
 
     def _run_maximum_line_length_filter(self, dataset: Dataset, target_list,
                                         op):

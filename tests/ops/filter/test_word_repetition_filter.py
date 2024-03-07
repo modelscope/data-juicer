@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.word_repetition_filter import WordRepetitionFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class WordRepetitionFilterTest(unittest.TestCase):
+class WordRepetitionFilterTest(DataJuicerTestCaseBase):
 
     def _run_word_repetition_filter(self, dataset: Dataset, target_list, op):
         if Fields.stats not in dataset.features:

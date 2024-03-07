@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.alphanumeric_filter import AlphanumericFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class AlphanumericFilterTest(unittest.TestCase):
+class AlphanumericFilterTest(DataJuicerTestCaseBase):
 
     def _run_alphanumeric_filter(self, dataset: Dataset, target_list, op):
         if Fields.stats not in dataset.features:

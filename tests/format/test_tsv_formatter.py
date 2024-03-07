@@ -2,9 +2,10 @@ import os
 import unittest
 
 from data_juicer.format.tsv_formatter import TsvFormatter
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class TsvFormatterTest(unittest.TestCase):
+class TsvFormatterTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self._path = os.path.join(os.path.dirname(os.path.realpath(__file__)),

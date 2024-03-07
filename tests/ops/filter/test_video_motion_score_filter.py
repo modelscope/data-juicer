@@ -1,0 +1,140 @@
+import os
+import unittest
+
+from datasets import Dataset
+
+from data_juicer.ops.filter.video_motion_score_filter import \
+    VideoMotionScoreFilter
+from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+
+
+class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
+
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
+                             'data')
+    vid1_path = os.path.join(data_path, 'video1.mp4')  # 1.8210126
+    vid2_path = os.path.join(data_path, 'video2.mp4')  # 3.600746
+    vid3_path = os.path.join(data_path, 'video3.mp4')  # 1.1822891
+
+    def _run_helper(self, op, source_list, target_list, np=1):
+        dataset = Dataset.from_list(source_list)
+        if Fields.stats not in dataset.features:
+            dataset = dataset.add_column(name=Fields.stats,
+                                         column=[{}] * dataset.num_rows)
+        dataset = dataset.map(op.compute_stats, num_proc=np)
+        dataset = dataset.filter(op.process, num_proc=np)
+        dataset = dataset.select_columns(column_names=[op.video_key])
+        res_list = dataset.to_list()
+        self.assertEqual(res_list, target_list)
+
+    def test_default(self):
+
+        ds_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }, {
+            'videos': [self.vid3_path]
+        }]
+        tgt_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }, {
+            'videos': [self.vid3_path]
+        }]
+        op = VideoMotionScoreFilter()
+        self._run_helper(op, ds_list, tgt_list)
+
+    def test_high(self):
+
+        ds_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }, {
+            'videos': [self.vid3_path]
+        }]
+        tgt_list = [{'videos': [self.vid2_path]}]
+        op = VideoMotionScoreFilter(min_score=3.0)
+        self._run_helper(op, ds_list, tgt_list)
+
+    def test_low(self):
+
+        ds_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }, {
+            'videos': [self.vid3_path]
+        }]
+        tgt_list = [{'videos': [self.vid3_path]}]
+        op = VideoMotionScoreFilter(min_score=0.0, max_score=1.50)
+        self._run_helper(op, ds_list, tgt_list)
+
+    def test_middle(self):
+
+        ds_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }, {
+            'videos': [self.vid3_path]
+        }]
+        tgt_list = [{'videos': [self.vid1_path]}]
+        op = VideoMotionScoreFilter(min_score=1.5, max_score=3.0)
+        self._run_helper(op, ds_list, tgt_list)
+
+    def test_any(self):
+
+        ds_list = [{
+            'videos': [self.vid1_path, self.vid2_path]
+        }, {
+            'videos': [self.vid2_path, self.vid3_path]
+        }, {
+            'videos': [self.vid1_path, self.vid3_path]
+        }]
+        tgt_list = [{
+            'videos': [self.vid1_path, self.vid2_path]
+        }, {
+            'videos': [self.vid1_path, self.vid3_path]
+        }]
+        op = VideoMotionScoreFilter(min_score=1.5,
+                                    max_score=3.0,
+                                    any_or_all='any')
+        self._run_helper(op, ds_list, tgt_list)
+
+    def test_all(self):
+
+        ds_list = [{
+            'videos': [self.vid1_path, self.vid2_path]
+        }, {
+            'videos': [self.vid2_path, self.vid3_path]
+        }, {
+            'videos': [self.vid1_path, self.vid3_path]
+        }]
+        tgt_list = []
+        op = VideoMotionScoreFilter(min_score=1.5,
+                                    max_score=3.0,
+                                    any_or_all='all')
+        self._run_helper(op, ds_list, tgt_list)
+
+    def test_parallel(self):
+        import multiprocess as mp
+        mp.set_start_method('forkserver', force=True)
+
+        ds_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }, {
+            'videos': [self.vid3_path]
+        }]
+        tgt_list = [{'videos': [self.vid1_path]}]
+        op = VideoMotionScoreFilter(min_score=1.5, max_score=3.0)
+        self._run_helper(op, ds_list, tgt_list, np=2)
+
+
+if __name__ == '__main__':
+    unittest.main()

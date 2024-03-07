@@ -1,12 +1,12 @@
 import unittest
 
-from data_juicer.ops.mapper.replace_content_mapper import \
-    ReplaceContentMapper
+from data_juicer.ops.mapper.replace_content_mapper import ReplaceContentMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class ReplaceContentMapperTest(unittest.TestCase):
+class ReplaceContentMapperTest(DataJuicerTestCaseBase):
 
-    def _run_helper(self,op, samples):
+    def _run_helper(self, op, samples):
         for sample in samples:
             result = op.process(sample)
             self.assertEqual(result['text'], result['target'])
@@ -34,7 +34,6 @@ class ReplaceContentMapperTest(unittest.TestCase):
         op = ReplaceContentMapper(pattern='●■', repl='<SPEC>')
         self._run_helper(op, samples)
 
-
     def test_raw_digit_pattern_text(self):
 
         samples = [
@@ -45,7 +44,7 @@ class ReplaceContentMapperTest(unittest.TestCase):
         ]
         op = ReplaceContentMapper(pattern=r'\d+(?:,\d+)*', repl='<DIGIT>')
         self._run_helper(op, samples)
-    
+
     def test_regular_digit_pattern_text(self):
 
         samples = [
@@ -56,6 +55,7 @@ class ReplaceContentMapperTest(unittest.TestCase):
         ]
         op = ReplaceContentMapper(pattern='\\d+(?:,\\d+)*', repl='<DIGIT>')
         self._run_helper(op, samples)
+
 
 if __name__ == '__main__':
     unittest.main()

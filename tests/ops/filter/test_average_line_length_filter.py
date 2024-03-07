@@ -5,9 +5,10 @@ from datasets import Dataset
 from data_juicer.ops.filter.average_line_length_filter import \
     AverageLineLengthFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class AverageLineLengthFilterTest(unittest.TestCase):
+class AverageLineLengthFilterTest(DataJuicerTestCaseBase):
 
     def _run_average_line_length_filter(self, dataset: Dataset, target_list,
                                         op):

@@ -2,9 +2,10 @@ import os
 import unittest
 
 from data_juicer.format.mixture_formatter import MixtureFormatter
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class MixtureFormatterTest(unittest.TestCase):
+class MixtureFormatterTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self._path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
@@ -33,19 +34,13 @@ class MixtureFormatterTest(unittest.TestCase):
 
     def test_sample_number_weight(self):
         max_samples = 2
-        formatter = MixtureFormatter('0.5 ' + self._file, max_samples=max_samples)
+        formatter = MixtureFormatter('0.5 ' + self._file,
+                                     max_samples=max_samples)
         ds = formatter.load_dataset()
         self.assertEqual(len(ds), max_samples)
         self.assertEqual(list(ds.features.keys()), ['text', 'meta'])
 
     def test_multi_datasets_without_weight(self):
-        data_path = self._file + ' ' + self._file2
-        formatter = MixtureFormatter(data_path)
-        ds = formatter.load_dataset()
-        self.assertEqual(len(ds), 12)
-        self.assertEqual(list(ds.features.keys()), ['text', 'meta'])
-
-    def test_multi_datasets_with_weight(self):
         data_path = self._file + ' ' + self._file2
         formatter = MixtureFormatter(data_path)
         ds = formatter.load_dataset()
@@ -73,6 +68,7 @@ class MixtureFormatterTest(unittest.TestCase):
         ds = formatter.load_dataset()
         self.assertEqual(len(ds), max_samples)
         self.assertEqual(list(ds.features.keys()), ['text', 'meta'])
+
 
 if __name__ == '__main__':
     unittest.main()

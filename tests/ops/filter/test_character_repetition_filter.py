@@ -5,9 +5,10 @@ from datasets import Dataset
 from data_juicer.ops.filter.character_repetition_filter import \
     CharacterRepetitionFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class CharacterRepetitionFilterTest(unittest.TestCase):
+class CharacterRepetitionFilterTest(DataJuicerTestCaseBase):
 
     def _run_character_repetition_filter(self, dataset: Dataset, target_list,
                                          op):

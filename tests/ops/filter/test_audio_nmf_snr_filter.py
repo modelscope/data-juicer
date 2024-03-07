@@ -5,12 +5,13 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.audio_nmf_snr_filter import AudioNMFSNRFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class AudioNMFSNRFilterTest(unittest.TestCase):
+class AudioNMFSNRFilterTest(DataJuicerTestCaseBase):
 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                             '..', 'data')
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
+                             'data')
     aud1_path = os.path.join(data_path, 'audio1.wav')  # about -7dB
     aud2_path = os.path.join(data_path, 'audio2.wav')  # about 6dB
     aud3_path = os.path.join(data_path, 'audio3.ogg')  # about 3dB
@@ -58,11 +59,7 @@ class AudioNMFSNRFilterTest(unittest.TestCase):
         }, {
             'audios': [self.aud3_path]
         }]
-        tgt_list = [{
-            'audios': [self.aud2_path]
-        }, {
-            'audios': [self.aud3_path]
-        }]
+        tgt_list = [{'audios': [self.aud2_path]}, {'audios': [self.aud3_path]}]
         dataset = Dataset.from_list(ds_list)
         op = AudioNMFSNRFilter(min_snr=0)
         self._run_audio_nmf_snr_filter(dataset, tgt_list, op)
@@ -76,11 +73,7 @@ class AudioNMFSNRFilterTest(unittest.TestCase):
         }, {
             'audios': [self.aud3_path]
         }]
-        tgt_list = [{
-            'audios': [self.aud1_path]
-        }, {
-            'audios': [self.aud3_path]
-        }]
+        tgt_list = [{'audios': [self.aud1_path]}, {'audios': [self.aud3_path]}]
         dataset = Dataset.from_list(ds_list)
         op = AudioNMFSNRFilter(min_snr=-1000, max_snr=5)
         self._run_audio_nmf_snr_filter(dataset, tgt_list, op)
@@ -94,9 +87,7 @@ class AudioNMFSNRFilterTest(unittest.TestCase):
         }, {
             'audios': [self.aud3_path]
         }]
-        tgt_list = [{
-            'audios': [self.aud3_path]
-        }]
+        tgt_list = [{'audios': [self.aud3_path]}]
         dataset = Dataset.from_list(ds_list)
         op = AudioNMFSNRFilter(min_snr=0, max_snr=5)
         self._run_audio_nmf_snr_filter(dataset, tgt_list, op)
@@ -142,9 +133,7 @@ class AudioNMFSNRFilterTest(unittest.TestCase):
         }, {
             'audios': [self.aud3_path]
         }]
-        tgt_list = [{
-            'audios': [self.aud3_path]
-        }]
+        tgt_list = [{'audios': [self.aud3_path]}]
         dataset = Dataset.from_list(ds_list)
         op = AudioNMFSNRFilter(min_snr=0, max_snr=5, any_or_all='any')
         self._run_audio_nmf_snr_filter(dataset, tgt_list, op, np=2)

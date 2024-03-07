@@ -2,9 +2,10 @@ import unittest
 
 from data_juicer.ops.mapper.remove_non_chinese_character_mapper import \
     RemoveNonChineseCharacterlMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class RemoveNonChineseCharacterlMapperrTest(unittest.TestCase):
+class RemoveNonChineseCharacterlMapperrTest(DataJuicerTestCaseBase):
 
     def setUp(self, keep_alphabet=True, keep_number=True, keep_punc=True):
         self.op = RemoveNonChineseCharacterlMapper(keep_alphabet, keep_number,

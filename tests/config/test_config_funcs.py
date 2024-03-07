@@ -7,12 +7,13 @@ from jsonargparse import Namespace
 
 from data_juicer.config import init_configs
 from data_juicer.ops import load_ops
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 test_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                               'demo_4_test.yaml')
 
 
-class ConfigTest(unittest.TestCase):
+class ConfigTest(DataJuicerTestCaseBase):
 
     def test_help_info(self):
         out = StringIO()
@@ -35,12 +36,13 @@ class ConfigTest(unittest.TestCase):
             self.assertIsInstance(cfg, Namespace)
             self.assertEqual(cfg.project_name, 'test_demo')
             self.assertDictEqual(
-                cfg.process[0],
-                {'whitespace_normalization_mapper': {
-                    'text_key': 'text',
-                    'image_key': 'images',
-                    'audio_key': 'audios',
-                }}, 'nested dict load fail, for nonparametric op')
+                cfg.process[0], {
+                    'whitespace_normalization_mapper': {
+                        'text_key': 'text',
+                        'image_key': 'images',
+                        'audio_key': 'audios',
+                    }
+                }, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
                 cfg.process[1], {
                     'language_id_score_filter': {

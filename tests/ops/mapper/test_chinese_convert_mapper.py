@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.chinese_convert_mapper import ChineseConvertMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class ChineseConvertMapperTest(unittest.TestCase):
+class ChineseConvertMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self, mode='s2t'):
         self.op = ChineseConvertMapper(mode)

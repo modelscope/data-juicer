@@ -1,10 +1,13 @@
+# flake8: noqa: E501
+
 import unittest
 
 from data_juicer.core import NestedDataset
 from data_juicer.ops.mapper.nlpaug_en_mapper import NlpaugEnMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class NlpaugEnMapperTest(unittest.TestCase):
+class NlpaugEnMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.samples = NestedDataset.from_dict({
@@ -119,7 +122,8 @@ class NlpaugEnMapperTest(unittest.TestCase):
                          (aug_num * aug_method_num + 1) * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
-    def test_number_of_generated_samples_with_sequential_on_remove_original_sample(self):
+    def test_number_of_generated_samples_with_sequential_on_remove_original_sample(
+            self):
         aug_num = 3
         aug_method_num = 3
         op = NlpaugEnMapper(
@@ -132,11 +136,11 @@ class NlpaugEnMapperTest(unittest.TestCase):
         )
         self.assertEqual(len(op.aug), aug_method_num)
         result = self.samples.map(op.process)
-        self.assertEqual(len(result['text']),
-                         aug_num * len(self.samples))
+        self.assertEqual(len(result['text']), aug_num * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
-    def test_number_of_generated_samples_with_sequential_off_remove_original_sample(self):
+    def test_number_of_generated_samples_with_sequential_off_remove_original_sample(
+            self):
         aug_num = 3
         aug_method_num = 3
         op = NlpaugEnMapper(
@@ -201,8 +205,7 @@ class NlpaugEnMapperTest(unittest.TestCase):
         )
         self.assertEqual(len(op.aug), aug_method_num)
         result = self.samples.map(op.process)
-        self.assertEqual(len(result['text']),
-                         aug_num * len(self.samples))
+        self.assertEqual(len(result['text']), aug_num * len(self.samples))
         self.assertEqual(len(result['meta']), len(result['text']))
 
     def test_all_aug_methods_with_sequential_off_remove_original_sample(self):

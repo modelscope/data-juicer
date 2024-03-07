@@ -1,3 +1,4 @@
+easyocr
 fasttext-wheel
 kenlm
 sentencepiece
@@ -8,10 +9,18 @@ selectolax
 nlpaug
 nlpcda
 nltk
-transformers
+transformers>=4.37
+transformers_stream_generator
+einops
+accelerate
+tiktoken
 opencc==1.1.6
 imagededup
 torch
+torchaudio
 dlib
 spacy-pkuseg==0.0.32
 diffusers
+simple-aesthetics-predictor
+scenedetect[opencv]
+ffmpeg-python
