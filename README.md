@@ -111,7 +111,7 @@ Table of Contents
 
 
 
-## Documentation Index | 文档索引 <a name="documentationindex"/>
+## Documentation <a name="documentationindex"/>
 
 - [Overview](README.md) | [概览](README_ZH.md)
 - [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
