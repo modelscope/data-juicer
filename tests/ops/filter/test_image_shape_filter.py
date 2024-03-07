@@ -5,20 +5,18 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.image_shape_filter import ImageShapeFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class ImageShapeFilterTest(unittest.TestCase):
+class ImageShapeFilterTest(DataJuicerTestCaseBase):
 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                             '..', 'data')
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
+                             'data')
     img1_path = os.path.join(data_path, 'img1.png')
     img2_path = os.path.join(data_path, 'img2.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
 
-    def _run_image_shape_filter(self,
-                                dataset: Dataset,
-                                target_list,
-                                op):
+    def _run_image_shape_filter(self, dataset: Dataset, target_list, op):
         if Fields.stats not in dataset.features:
             dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
@@ -37,12 +35,9 @@ class ImageShapeFilterTest(unittest.TestCase):
         }, {
             'images': [self.img3_path]
         }]
-        tgt_list = [{
-            'images': [self.img2_path]
-        }]
+        tgt_list = [{'images': [self.img2_path]}]
         dataset = Dataset.from_list(ds_list)
-        op = ImageShapeFilter(min_width=400,
-                              min_height=400)
+        op = ImageShapeFilter(min_width=400, min_height=400)
         self._run_image_shape_filter(dataset, tgt_list, op)
 
     def test_filter2(self):
@@ -54,14 +49,9 @@ class ImageShapeFilterTest(unittest.TestCase):
         }, {
             'images': [self.img3_path]
         }]
-        tgt_list = [{
-            'images': [self.img1_path]
-        }, {
-            'images': [self.img3_path]
-        }]
+        tgt_list = [{'images': [self.img1_path]}, {'images': [self.img3_path]}]
         dataset = Dataset.from_list(ds_list)
-        op = ImageShapeFilter(max_width=500,
-                              max_height=500)
+        op = ImageShapeFilter(max_width=500, max_height=500)
         self._run_image_shape_filter(dataset, tgt_list, op)
 
     def test_filter3(self):
@@ -99,9 +89,7 @@ class ImageShapeFilterTest(unittest.TestCase):
             'images': [self.img2_path, self.img3_path]
         }]
         dataset = Dataset.from_list(ds_list)
-        op = ImageShapeFilter(min_width=400,
-                              min_height=400,
-                              any_or_all='any')
+        op = ImageShapeFilter(min_width=400, min_height=400, any_or_all='any')
         self._run_image_shape_filter(dataset, tgt_list, op)
 
     def test_all(self):
@@ -115,9 +103,7 @@ class ImageShapeFilterTest(unittest.TestCase):
         }]
         tgt_list = []
         dataset = Dataset.from_list(ds_list)
-        op = ImageShapeFilter(min_width=400,
-                              min_height=400,
-                              any_or_all='all')
+        op = ImageShapeFilter(min_width=400, min_height=400, any_or_all='all')
         self._run_image_shape_filter(dataset, tgt_list, op)
 
 

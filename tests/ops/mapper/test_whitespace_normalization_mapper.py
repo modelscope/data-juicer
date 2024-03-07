@@ -2,9 +2,10 @@ import unittest
 
 from data_juicer.ops.mapper.whitespace_normalization_mapper import \
     WhitespaceNormalizationMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class WhitespaceNormalizationMapperTest(unittest.TestCase):
+class WhitespaceNormalizationMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = WhitespaceNormalizationMapper()

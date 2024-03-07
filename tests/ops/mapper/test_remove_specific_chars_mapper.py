@@ -2,9 +2,10 @@ import unittest
 
 from data_juicer.ops.mapper.remove_specific_chars_mapper import \
     RemoveSpecificCharsMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class RemoveSpecificCharsMapperTest(unittest.TestCase):
+class RemoveSpecificCharsMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = RemoveSpecificCharsMapper()

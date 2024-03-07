@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.remove_comments_mapper import RemoveCommentsMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class RemoveCommentsMapperTest(unittest.TestCase):
+class RemoveCommentsMapperTest(DataJuicerTestCaseBase):
 
     def _run_remove_comments(self, samples, op):
         for sample in samples:

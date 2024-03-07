@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.specified_numeric_field_filter import \
     SpecifiedNumericFieldFilter
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class SpecifiedNumericFieldFilterTest(unittest.TestCase):
+class SpecifiedNumericFieldFilterTest(DataJuicerTestCaseBase):
 
     def _run_specified_numeric_field_filter(self, dataset: Dataset,
                                             target_list, op):

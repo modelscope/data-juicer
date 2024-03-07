@@ -5,9 +5,10 @@ from datasets import Dataset
 
 from data_juicer.format.formatter import load_dataset, unify_format
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class UnifyFormatTest(unittest.TestCase):
+class UnifyFormatTest(DataJuicerTestCaseBase):
 
     def run_test(self, sample, args=None):
         if args is None:
@@ -347,26 +348,26 @@ class UnifyFormatTest(unittest.TestCase):
         file_path = os.path.join(cur_dir, 'demo-dataset.jsonl')
         ds = load_dataset('json', data_files=file_path)
         ds = unify_format(ds)
-        import datetime
-        # the 'None' fields are missing fields after merging
-        sample = [{
-            'text': "Today is Sunday and it's a happy day!",
-            'meta': {
-                'src': 'Arxiv',
-                'date': datetime.datetime(2023, 4, 27, 0, 0),
-                'version': '1.0',
-                'author': None
-            }
-        }, {
-            'text': 'Do you need a cup of coffee?',
-            'meta': {
-                'src': 'code',
-                'date': None,
-                'version': None,
-                'author': 'xxx'
-            }
-        }]
+        # import datetime
 
+        # the 'None' fields are missing fields after merging
+        # sample = [{
+        #     'text': "Today is Sunday and it's a happy day!",
+        #     'meta': {
+        #         'src': 'Arxiv',
+        #         'date': datetime.datetime(2023, 4, 27, 0, 0),
+        #         'version': '1.0',
+        #         'author': None
+        #     }
+        # }, {
+        #     'text': 'Do you need a cup of coffee?',
+        #     'meta': {
+        #         'src': 'code',
+        #         'date': None,
+        #         'version': None,
+        #         'author': 'xxx'
+        #     }
+        # }]
         # test nested and missing field for the following cases:
         # 1. first row, then column
         unified_sample_first = ds[0]

@@ -1,11 +1,12 @@
 import unittest
 
 from data_juicer.ops.load import load_ops
-from data_juicer.utils.unittest_utils import SKIPPED_TESTS
+from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
+                                              DataJuicerTestCaseBase)
 
 
 @SKIPPED_TESTS.register_module()
-class OpFusionTest(unittest.TestCase):
+class OpFusionTest(DataJuicerTestCaseBase):
 
     def _run_op_fusion(self, original_process_list, target_process_list):
         new_process_list, _ = load_ops(original_process_list, op_fusion=True)
@@ -165,9 +166,9 @@ class OpFusionTest(unittest.TestCase):
                 }
             },
             {
-                'OpFusion:(words_num_filter,word_repetition_filter,stopwords_filter,flagged_words_filter,perplexity_filter)':
+                'OpFusion:(words_num_filter,word_repetition_filter,stopwords_filter,flagged_words_filter,perplexity_filter)':  # noqa: E501
                 [
-                    {  # noqa: E501
+                    {
                         'words_num_filter': {
                             'lang': 'en',
                             'max_num': 100000,
@@ -622,9 +623,9 @@ class OpFusionTest(unittest.TestCase):
                 }
             },
             {
-                'OpFusion:(words_num_filter,word_repetition_filter,perplexity_filter)':
+                'OpFusion:(words_num_filter,word_repetition_filter,perplexity_filter)':  # noqa: E501
                 [
-                    {  # noqa: E501
+                    {
                         'words_num_filter': {
                             'lang': 'en',
                             'max_num': 100000,
@@ -713,9 +714,9 @@ class OpFusionTest(unittest.TestCase):
             }
         }]
         target_process = [{
-            'OpFusion:(words_num_filter,word_repetition_filter,stopwords_filter,flagged_words_filter,perplexity_filter)':
+            'OpFusion:(words_num_filter,word_repetition_filter,stopwords_filter,flagged_words_filter,perplexity_filter)':  # noqa: E501
             [
-                {  # noqa: E501
+                {
                     'words_num_filter': {
                         'lang': 'en',
                         'max_num': 100000,
@@ -931,9 +932,9 @@ class OpFusionTest(unittest.TestCase):
                 }
             },
             {
-                'OpFusion:(average_line_length_filter,maximum_line_length_filter)':
+                'OpFusion:(average_line_length_filter,maximum_line_length_filter)':  # noqa: E501
                 [
-                    {  # noqa: E501
+                    {
                         'average_line_length_filter': {
                             'min_len': 10,
                             'text_key': 'text',
@@ -948,9 +949,9 @@ class OpFusionTest(unittest.TestCase):
                 ]
             },
             {
-                'OpFusion:(words_num_filter,word_repetition_filter,stopwords_filter,flagged_words_filter,perplexity_filter)':
+                'OpFusion:(words_num_filter,word_repetition_filter,stopwords_filter,flagged_words_filter,perplexity_filter)':  # noqa: E501
                 [
-                    {  # noqa: E501
+                    {
                         'words_num_filter': {
                             'lang': 'en',
                             'max_num': 100000,

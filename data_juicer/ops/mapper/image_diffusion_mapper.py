@@ -5,6 +5,7 @@ from PIL import Image
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -40,7 +41,7 @@ class ImageDiffusionMapper(Mapper):
                  aug_num: int = 1,
                  keep_original_sample: bool = True,
                  caption_key: str = None,
-                 hf_blip2='Salesforce/blip2-opt-2.7b',
+                 hf_img2seq='Salesforce/blip2-opt-2.7b',
                  *args,
                  **kwargs):
         """
@@ -81,10 +82,11 @@ class ImageDiffusionMapper(Mapper):
             for each images. It can be a string if there is only one image in
             each sample. Otherwise, it should be a list. If it's none,
             ImageDiffusionMapper will produce captions for each images.
-        :param hf_blip2: blip2 model name on huggingface to generate caption if
+        :param hf_img2seq: model name on huggingface to generate caption if
             caption_key is None.
         """
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
         self._batched_op = True
         self._accelerator = 'cuda'
         self.strength = strength
@@ -94,9 +96,9 @@ class ImageDiffusionMapper(Mapper):
         self.caption_key = caption_key
         self.prompt = 'A photo of a '
         if not self.caption_key:
-            from .generate_caption_mapper import GenerateCaptionMapper
-            self.op_generate_caption = GenerateCaptionMapper(
-                hf_blip2=hf_blip2,
+            from .image_captioning_mapper import ImageCaptioningMapper
+            self.op_generate_caption = ImageCaptioningMapper(
+                hf_img2seq=hf_img2seq,
                 keep_original_sample=False,
                 prompt=self.prompt)
 
@@ -175,9 +177,10 @@ class ImageDiffusionMapper(Mapper):
         for aug_id in range(self.aug_num):
             diffusion_image_keys = []
             for index, value in enumerate(loaded_image_keys):
-                diffusion_image_key = os.path.join(
-                    os.path.dirname(value), (f'_diffusion_{aug_id}.').join(
-                        os.path.basename(value).split('.')))
+                related_parameters = self.add_parameters(
+                    self._init_parameters, caption=captions[index])
+                diffusion_image_key = transfer_filename(
+                    value, OP_NAME, **related_parameters)
                 diffusion_image_keys.append(diffusion_image_key)
                 # TODO: duplicated generation if image is reused
                 if not os.path.exists(diffusion_image_key

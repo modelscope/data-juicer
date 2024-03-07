@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.expand_macro_mapper import ExpandMacroMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class ExpandMacroMapperTest(unittest.TestCase):
+class ExpandMacroMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = ExpandMacroMapper()

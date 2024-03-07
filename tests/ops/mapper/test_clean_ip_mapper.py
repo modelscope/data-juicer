@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.clean_ip_mapper import CleanIpMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class CleanIpMapperTest(unittest.TestCase):
+class CleanIpMapperTest(DataJuicerTestCaseBase):
 
     def _run_clean_ip(self, op, samples):
         for sample in samples:
@@ -63,5 +64,7 @@ class CleanIpMapperTest(unittest.TestCase):
         }]
         op = CleanIpMapper(repl='<IP>')
         self._run_clean_ip(op, samples)
+
+
 if __name__ == '__main__':
     unittest.main()

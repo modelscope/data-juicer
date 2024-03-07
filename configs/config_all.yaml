@@ -28,6 +28,8 @@ image_key: 'images'                                         # key name of field 
 image_special_token: '<__dj__image>'                        # the special token that represents an image in the text. In default, it's "<__dj__image>". You can specify your own special token according to your input dataset.
 audio_key: 'audios'                                         # key name of field to store the list of sample audio paths.
 audio_special_token: '<__dj__audio>'                        # the special token that represents an audio in the text. In default, it's "<__dj__audio>". You can specify your own special token according to your input dataset.
+video_key: 'videos'                                         # key name of field to store the list of sample video paths.
+video_special_token: '<__dj__video>'                        # the special token that represents a video in the text. In default, it's "<__dj__video>". You can specify your own special token according to your input dataset.
 
 eoc_special_token: '<|__dj__eoc|>'                          # the special token that represents the end of a chunk in the text. In default, it's "<|__dj__eoc|>". You can specify your own special token according to your input dataset.
 
@@ -41,6 +43,7 @@ save_stats_in_one_file: false                               # whether to store a
 # process schedule: a list of several process operators with their arguments
 process:
   # Mapper ops. Most of these ops need no arguments.
+  - audio_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg audio filters
   - chinese_convert_mapper:                                 # convert Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji.
       mode: 's2t'                                             # choose the mode to convert Chinese: ['s2t', 't2s', 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 'jp2t']
   - clean_email_mapper:                                     # remove emails from text.
@@ -50,14 +53,11 @@ process:
   - clean_copyright_mapper:                                 # remove copyright comments.
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
   - fix_unicode_mapper:                                     # fix unicode errors in text.
-  - generate_caption_mapper:                                # generate captions for images to augment datasets
-      hf_blip2: 'Salesforce/blip2-opt-2.7b'                   # blip2 model name on huggingface to generate caption
-      caption_num: 1                                          # how many candidate captions to generate for each image
-      keep_candidate_mode: 'random_any'                       # retain strategy for the generated $caption_num$ candidates. should be in ["random_any", "similar_one_simhash", "all"].
-      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True in default.
-      prompt: null                                            # a string prompt to guide the generation of blip2 model for all samples globally. It's None in default, which means no prompt provided.
-      prompt_key: null                                        # the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default.
-  - gpt4v_generate_mapper:                                  # generate samples whose texts are generated based on gpt-4-visison and the image
+  - image_blur_mapper:                                      # mapper to blur images.
+      p: 0.2                                                  # probability of the image being blured
+      blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
+      radius: 2                                               # radius of blur kernel
+  - image_captioning_from_gpt4v_mapper:                     # generate samples whose texts are generated based on gpt-4-visison and the image
       mode: 'description'                                     # mode of text generated from images, can be one of ['resoning', 'description', 'conversation', 'custom']
       api_key: ''                                             # the API key to authenticate the request
       max_token: 500                                          # the maximum number of tokens to generate. Default is 500.
@@ -67,10 +67,13 @@ process:
       user_prompt_key: null                                   # the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated text in the final datasets and the original text will be removed. It's True in default
       any_or_all: 'any'                                       # keep this sample with 'any' or 'all' strategy of all images. 'any': keep this sample if any images meet the condition. 'all': keep this sample only if all images meet the condition
-  - image_blur_mapper:                                      # mapper to blur images.
-      p: 0.2                                                  # probability of the image being blured
-      blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
-      radius: 2                                               # radius of blur kernel
+  - image_captioning_mapper:                                # generate captions for images to augment datasets
+      hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption
+      caption_num: 1                                          # how many candidate captions to generate for each image
+      keep_candidate_mode: 'random_any'                       # retain strategy for the generated $caption_num$ candidates. should be in ["random_any", "similar_one_simhash", "all"].
+      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True in default.
+      prompt: null                                            # a string prompt to guide the generation of blip2 model for all samples globally. It's None in default, which means no prompt provided.
+      prompt_key: null                                        # the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default.
   - image_diffusion_mapper:                                 # generate images by diffusion model
       floating_point: 'fp32'                                  # the floating point used to load the diffusion model.
       hf_diffusion: 'CompVis/stable-diffusion-v1-4'           # stable diffusion model name on huggingface to generate image
@@ -79,7 +82,7 @@ process:
       aug_num: 1                                              # the number of images to generate
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
       caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
-      hf_blip2: 'Salesforce/blip2-opt-2.7b'                   # blip2 model name on huggingface to generate caption if caption_key is null
+      hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
   - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library
       sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
       aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.
@@ -132,6 +135,47 @@ process:
       substrings: ['http', 'www', '.com', 'href', '//']       # incorrect substrings to remove
   - sentence_split_mapper:                                  # split text to multiple sentences and join them with '\n'
       lang: 'en'                                              # split text in what language
+  - video_captioning_from_audio_mapper:                     # caption a video according to its audio streams based on Qwen-Audio model
+      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only captioned sample in the final datasets and the original sample will be removed. It's True in default.
+  - video_captioning_from_video_mapper:                     # generate captions by frame images extracted from video to augment datasets
+      hf_video_blip: 'kpyu/video-blip-opt-2.7b-ego4d'         # video-blip model name on huggingface to generate caption
+      caption_num: 1                                          # how many candidate captions to generate for each video
+      keep_candidate_mode: 'random_any'                       # retain strategy for the generated $caption_num$ candidates. should be in ["random_any", "similar_one_simhash", "all"].
+      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True in default.
+      prompt: null                                            # a string prompt to guide the generation of video-blip model for all samples globally. It's None in default, which means no prompt provided.
+      prompt_key: null                                        # the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default.
+      frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
+      horizontal_flip: false                                  # flip frame image horizontally (left to right).
+      vertical_flip: false                                    # flip frame image vertically (top to bottom).
+  - video_split_by_scene_mapper:                            # split videos into scene clips
+      detector: 'ContentDetector'                             # PySceneDetect scene detector. Should be one of ['ContentDetector', 'ThresholdDetector', 'AdaptiveDetector`]
+      threshold: 27.0                                         # threshold passed to the detector
+      min_scene_len: 15                                       # minimum length of any scene
+      show_progress: false                                    # whether to show progress from scenedetect
+  - video_resize_aspect_ratio_mapper:                       # resize videos aspect ratios of videos (a fraction of width by height, r=w/h) to a specified range
+      min_ratio: 9/21                                         # the minimum aspect ratio to enforce videos with an aspect ratio below `min_ratio` will be resized to match this minimum ratio. The ratio should be provided as a string in the format "9:21" or "9/21".
+      max_ratio: 21/9                                         # the maximum aspect ratio to enforce videos with an aspect ratio above `max_ratio` will be resized to match this maximum ratio. The ratio should be provided as a string in the format "21:9" or "21/9".
+      strategy:  increase                                     # the resizing strategy to apply when adjusting the video dimensions. It can be either 'decrease' to reduce the dimension or 'increase' to enlarge it. Accepted values are ['decrease', 'increase'].
+  - video_resize_resolution_mapper:                         # map videos to ones with given resolution range
+      min_width: 640                                          # the min horizontal resolution (unit p), videos with width less than 'min_width' will be mapped to videos with equal or bigger width
+      max_width: 1280                                         # the max horizontal resolution (unit p), videos with width more than 'max_width' will be mapped to videos with equal of smaller width
+      min_height: 480                                         # the min vertical resolution (unit p), videos with height less than 'min_height' will be mapped to videos with equal or bigger height
+      max_height: 1080                                        # the max vertical resolution (unit p), videos with height more than 'max_height' will be mapped to videos with equal or smaller height
+      force_original_aspect_ratio: 'increase'                 # Enable decreasing or increasing output video width or height if necessary to keep the original aspect ratio
+      force_divisible_by: 4                                   # Ensures that both the output dimensions, width and height, are divisible by the given integer when used together with force_original_aspect_ratio
+  - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
+  - video_split_by_duration_mapper:                         # Mapper to split video by duration.
+      split_duration: 10                                      # duration of each video split in seconds.
+      min_last_split_duration: 0                              # the minimum allowable duration in seconds for the last video split. If the duration of the last split is less than this value, it will be discarded.
+      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
+  - video_split_by_key_frame_mapper:                        # Mapper to split video by key frame.
+      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
+  - video_tagging_from_audio_mapper:                        # Mapper to generate video tags from audio streams extracted from the video.
+      hf_ast: 'MIT/ast-finetuned-audioset-10-10-0.4593'       # Huggingface model name for the audio classification model.
+  - video_tagging_from_frames_mapper:                       # Mapper to generate video tags from frames extracted from the video.
+      frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
   - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
 
   # Filter ops
@@ -175,6 +219,11 @@ process:
       min_ratio: 0.333                                        # the min aspect ratio of filter range
       max_ratio: 3.0                                          # the max aspect ratio of filter range
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_aesthetics_filter:                                # filter samples according to the aesthetics score of images.
+      hf_scorer_model: shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE # Huggingface model name for the aesthetics predictor
+      min_score: 0.3                                          # the min aesthetics score of filter range
+      max_score: 1.0                                          # the max aesthetics score of filter range
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - image_shape_filter:                                     # filter samples according to the widths and heights of images in them
       min_width: 200                                          # the min width of width filter range
       max_width: 5000                                         # the max width of width filter range
@@ -211,7 +260,7 @@ process:
       lang: en                                                # compute perplexity in what language
       max_ppl: 1500                                           # the max perplexity score to filter text
   - phrase_grounding_recall_filter:                         # filter samples according to the locating recall of phrases extracted from text in the images.
-      hf_owlvit: openai/clip-vit-base-patch32                   # name of used Hugging Face Owl-ViT
+      hf_owlvit: openai/clip-vit-base-patch32                 # name of used Hugging Face Owl-ViT
       min_recall: 0.1                                         # the min phrase grounding recall of filter range
       max_recall: 1.0                                         # the max phrase grounding recall of filter range
       horizontal_flip: false                                  # flip image horizontally (left to right).
@@ -224,6 +273,13 @@ process:
   - special_characters_filter:                              # filter text with special-char ratio out of specific range
       min_ratio: 0.0                                          # the min ratio of filter range
       max_ratio: 0.25                                         # the max ratio of filter range
+  - specified_field_filter:                                 # filter text with the specified field info out of specific range
+      field_key: ''                                           # the target key corresponding to multi-level field information need to be separated by '.'
+      target_value: []                                        # the range of specified field information corresponding to the samples that need to be retained
+  - specified_numeric_field_filter:                         # filter text with the specified numeric field info out of specific range
+      field_key: ''                                           # the target key corresponding to multi-level field information need to be separated by '.'
+      min_value: 0                                            # the min filter value in SpecifiedNumericField op
+      max_value: 10000                                        # the max filter value in SpecifiedNumericField op
   - stopwords_filter:                                       # filter text with stopword ratio smaller than a specific min value
       lang: en                                                # consider stopwords in what language
       tokenization: false                                     # whether to use model to tokenize documents
@@ -232,6 +288,8 @@ process:
       use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
       words_aug_group_sizes: [2]                              # the group size of words to augment
       words_aug_join_char: ""                                 # the join char between words to augment
+  - suffix_filter:                                          # filter to keep samples with specified suffix.
+      suffixes: []                                            # the suffix of text that will be keep. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
   - text_action_filter:                                     # filter text according the number of action verb
       lang: en                                                # consider the words in what language
       min_action_num: 1                                       # text will be filtered whose verbs less the min action number
@@ -246,6 +304,49 @@ process:
       hf_tokenizer: EleutherAI/pythia-6.9b-deduped            # name of used Hugging Face tokenizer
       min_num: 10                                             # the min number of filter range
       max_num: 10000                                          # the max number of filter range
+  - video_aesthetics_filter:                                # filter samples according to the aesthetics score of frame images extracted from videos.
+      hf_scorer_model: shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE # Huggingface model name for the aesthetics predictor
+      min_score: 0.3                                          # the min aesthetics score of filter range
+      max_score: 1.0                                          # the max aesthetics score of filter range
+      frame_sampling_method: 'uniform'                        # sampling method of extracting frame images from the videos. Should be one of ["all_keyframe", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "uniform" with frame_num=3, considering that the number of keyframes can be large while their difference is usually small in terms of their aesthetics.
+      frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
+      reduce_mode: avg                                        # reduce mode to the all frames extracted from videos, must be one of ['avg','max', 'min'].
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - video_aspect_ratio_filter:                              # filter samples according to the aspect ratios of videos (a fraction of width by height, r=w/h) in them
+      min_ratio: 9/21                                         # the minimum aspect ratio to keep samples, supported format is a string, such as "9:21" or "9/21".
+      max_ratio: 21/9                                         # the maximum aspect ratio to keep samples, supported format is a string, such as "21:9" or "21/9".
+      any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
+  - video_duration_filter:                                  # Keep data samples whose videos' durations are within a specified range.
+      min_duration: 0                                         # the min video duration of filter range (in seconds)
+      max_duration: 10                                        # the max video duration of filter range (in seconds)
+      any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
+  - video_frames_text_similarity_filter:                    # keep samples those similarities between sampled video frame images and text within a specific range.
+      hf_clip: 'openai/clip-vit-base-patch32'                 # clip model name on huggingface to compute the similarity between frame image and text. It's kind of language-related. For example, for Chinese datasets, ChineseCLIP might be a better choice.
+      min_score: 0.1                                          # the min similarity to keep samples.
+      max_score: 1.0                                          # the max similarity to keep samples.
+      frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
+      horizontal_flip: false                                  # flip frame image horizontally (left to right).
+      vertical_flip: false                                    # flip frame image vertically (top to bottom).
+      reduce_mode: avg                                        # reduce mode when one text corresponds to multiple videos in a chunk,  must be one of ['avg','max', 'min'].
+      any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
+  - video_motion_score_filter:                              # Keep samples with video motion scores within a specific range.
+      min_score: 0.25                                         # the minimum motion score to keep samples
+      max_score: 10000.0                                      # the maximum motion score to keep samples
+      sampling_fps: 2                                         # the samplig rate of frames_per_second to compute optical flow
+      any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
+  - video_ocr_area_ratio_filter:                            # Keep data samples whose detected text area ratios for specified frames in the video are within a specified range.
+      min_area_ratio: 0                                       # the min ocr area ratio to keep samples. It's 0 by default.
+      max_area_ratio: 1.0                                     # the max ocr area ratio to keep samples. It's 1.0 by default.
+      frame_sample_num: 3                                     # the number of sampled frames to calculate the ocr area ratio. If it's 1, only middle frame will be selected. If it's 2, only the first and the last frames will be selected. If it's larger than 2, in addition to the first and the last frames, other frames will be sampled evenly within the video duration.
+      languages_to_detect: ['ch_sim', 'en']                   # texts in which languages should be detected. Default: ['ch_sim', 'en']. Full language list can be found here: https://www.jaided.ai/easyocr/.
+      any_or_all: any                                         # keep this sample with 'any' or 'all' strategy of all videos. 'any': keep this sample if any videos meet the condition. 'all': keep this sample only if all videos meet the condition.
+  - video_resolution_filter:                                # filter samples according to the resolution of videos in them
+      min_width: 1280                                         # the min resolution of horizontal resolution filter range (unit p)
+      max_width: 4096                                         # the max resolution of horizontal resolution filter range (unit p)
+      min_height: 480                                         # the min resolution of vertical resolution filter range (unit p)
+      max_height: 1080                                        # the max resolution of vertical resolution filter range (unit p)
+      any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
   - words_num_filter:                                       # filter text with number of words out of specific range
       lang: en                                                # sample in which language
       tokenization: false                                     # whether to use model to tokenize documents
@@ -257,15 +358,6 @@ process:
       rep_len: 10                                             # repetition length for word-level n-gram
       min_ratio: 0.0                                          # the min ratio of filter range
       max_ratio: 0.5                                          # the max ratio of filter range
-  - suffix_filter:                                          # filter to keep samples with specified suffix.
-      suffixes: []                                            # the suffix of text that will be keep. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
-  - specified_field_filter:                                 # filter text with the specified field info out of specific range
-      field_key: ''                                           # the target key corresponding to multi-level field information need to be separated by '.'
-      target_value: []                                        # the range of specified field information corresponding to the samples that need to be retained
-  - specified_numeric_field_filter:                         # filter text with the specified numeric field info out of specific range
-      field_key: ''                                           # the target key corresponding to multi-level field information need to be separated by '.'
-      min_value: 0                                            # the min filter value in SpecifiedNumericField op
-      max_value: 10000                                        # the max filter value in SpecifiedNumericField op
 
   # Deduplicator ops
   - document_deduplicator:                                  # deduplicate text samples using md5 hashing exact matching method
@@ -289,6 +381,7 @@ process:
       ignore_pattern: null                                    # whether to ignore sub-strings with specific pattern when computing simhash.
   - image_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of images between documents.
       method: phash                                           # hash method for image. One of [phash, dhash, whash, ahash]
+  - video_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of videos between documents.
 
   # Selector ops
   - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field

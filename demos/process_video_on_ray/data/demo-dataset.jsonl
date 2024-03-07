@@ -1,0 +1,3 @@
+{"videos": ["./videos/video1.mp4"], "text": "<__dj__video> 10s videos <|__dj__eoc|>'}"}
+{"videos": ["./videos/video2.mp4"], "text": "<__dj__video> 23s videos <|__dj__eoc|>'}"}
+{"videos": ["./videos/video3.mp4"], "text": "<__dj__video> 46s videos <|__dj__eoc|>'}"}

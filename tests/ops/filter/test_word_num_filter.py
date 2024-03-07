@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.word_num_filter import WordNumFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class WordNumFilterTest(unittest.TestCase):
+class WordNumFilterTest(DataJuicerTestCaseBase):
 
     def _run_word_num_filter(self, dataset: Dataset, target_list, op):
         if Fields.stats not in dataset.features:

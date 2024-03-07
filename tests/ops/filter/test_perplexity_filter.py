@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.perplexity_filter import PerplexityFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class PerplexityFilterTest(unittest.TestCase):
+class PerplexityFilterTest(DataJuicerTestCaseBase):
 
     def _run_perplexity_filter(self, dataset: Dataset, target_list, op):
         if Fields.stats not in dataset.features:

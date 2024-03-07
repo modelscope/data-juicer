@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.deduplicator.document_simhash_deduplicator import \
     DocumentSimhashDeduplicator
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class DocumentSimhashDeduplicatorTest(unittest.TestCase):
+class DocumentSimhashDeduplicatorTest(DataJuicerTestCaseBase):
 
     def _run_simhash_dedup(self, dataset: Dataset, target_list, op):
         dataset = dataset.map(op.compute_hash)

@@ -5,19 +5,18 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.image_size_filter import ImageSizeFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class ImageSizeFilterTest(unittest.TestCase):
+class ImageSizeFilterTest(DataJuicerTestCaseBase):
 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                             '..', 'data')
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
+                             'data')
     img1_path = os.path.join(data_path, 'img1.png')
     img2_path = os.path.join(data_path, 'img2.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
 
-    def _run_image_size_filter(self,
-                                       dataset: Dataset, target_list,
-                                       op):
+    def _run_image_size_filter(self, dataset: Dataset, target_list, op):
         if Fields.stats not in dataset.features:
             dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
@@ -29,54 +28,56 @@ class ImageSizeFilterTest(unittest.TestCase):
 
     def test_min_max(self):
 
-        ds_list = [{
-            'images': [self.img1_path]  # 171KB
-        }, {
-            'images': [self.img2_path]  # 189KB
-        }, {
-            'images': [self.img3_path]  # 114KB
-        }]
-        tgt_list = [{
-            'images': [self.img1_path]
-        }]
+        ds_list = [
+            {
+                'images': [self.img1_path]  # 171KB
+            },
+            {
+                'images': [self.img2_path]  # 189KB
+            },
+            {
+                'images': [self.img3_path]  # 114KB
+            }
+        ]
+        tgt_list = [{'images': [self.img1_path]}]
         dataset = Dataset.from_list(ds_list)
-        op = ImageSizeFilter(min_size="120kb", max_size="180KB")
+        op = ImageSizeFilter(min_size='120kb', max_size='180KB')
         self._run_image_size_filter(dataset, tgt_list, op)
 
     def test_min(self):
 
-        ds_list = [{
-            'images': [self.img1_path]  # 171KB
-        }, {
-            'images': [self.img2_path]  # 189KB
-        }, {
-            'images': [self.img3_path]  # 114KB
-        }]
-        tgt_list = [{
-            'images': [self.img1_path]
-        }, {
-            'images': [self.img2_path]
-        }]
+        ds_list = [
+            {
+                'images': [self.img1_path]  # 171KB
+            },
+            {
+                'images': [self.img2_path]  # 189KB
+            },
+            {
+                'images': [self.img3_path]  # 114KB
+            }
+        ]
+        tgt_list = [{'images': [self.img1_path]}, {'images': [self.img2_path]}]
         dataset = Dataset.from_list(ds_list)
-        op = ImageSizeFilter(min_size="120kib")
+        op = ImageSizeFilter(min_size='120kib')
         self._run_image_size_filter(dataset, tgt_list, op)
 
     def test_max(self):
 
-        ds_list = [{
-            'images': [self.img1_path]  # 171KB
-        }, {
-            'images': [self.img2_path]  # 189KB
-        }, {
-            'images': [self.img3_path]  # 114KB
-        }]
-        tgt_list = [{
-            'images': [self.img1_path]
-        }, {
-            'images': [self.img3_path]
-        }]
+        ds_list = [
+            {
+                'images': [self.img1_path]  # 171KB
+            },
+            {
+                'images': [self.img2_path]  # 189KB
+            },
+            {
+                'images': [self.img3_path]  # 114KB
+            }
+        ]
+        tgt_list = [{'images': [self.img1_path]}, {'images': [self.img3_path]}]
         dataset = Dataset.from_list(ds_list)
-        op = ImageSizeFilter(max_size="180KiB")
+        op = ImageSizeFilter(max_size='180KiB')
         self._run_image_size_filter(dataset, tgt_list, op)
 
     def test_any(self):
@@ -94,8 +95,9 @@ class ImageSizeFilterTest(unittest.TestCase):
             'images': [self.img1_path, self.img3_path]
         }]
         dataset = Dataset.from_list(ds_list)
-        op = ImageSizeFilter(min_size="120kb", max_size="180KB",
-                                    any_or_all='any')
+        op = ImageSizeFilter(min_size='120kb',
+                             max_size='180KB',
+                             any_or_all='any')
         self._run_image_size_filter(dataset, tgt_list, op)
 
     def test_all(self):
@@ -109,7 +111,9 @@ class ImageSizeFilterTest(unittest.TestCase):
         }]
         tgt_list = []
         dataset = Dataset.from_list(ds_list)
-        op = ImageSizeFilter(min_size="120kb", max_size="180KB", any_or_all='all')
+        op = ImageSizeFilter(min_size='120kb',
+                             max_size='180KB',
+                             any_or_all='all')
         self._run_image_size_filter(dataset, tgt_list, op)
 
 

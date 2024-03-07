@@ -2,9 +2,10 @@ import unittest
 
 from data_juicer.ops.mapper.remove_long_words_mapper import \
     RemoveLongWordsMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class RemoveLongWordsMapperTest(unittest.TestCase):
+class RemoveLongWordsMapperTest(DataJuicerTestCaseBase):
 
     def _run_remove_long_words(self, samples, op):
         for sample in samples:

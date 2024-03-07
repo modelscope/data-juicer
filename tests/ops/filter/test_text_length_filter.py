@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.text_length_filter import TextLengthFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class TextLengthFilterTest(unittest.TestCase):
+class TextLengthFilterTest(DataJuicerTestCaseBase):
 
     def _run_text_length_filter(self, dataset: Dataset, target_list, op):
         if Fields.stats not in dataset.features:

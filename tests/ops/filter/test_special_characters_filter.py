@@ -5,9 +5,10 @@ from datasets import Dataset
 from data_juicer.ops.filter.special_characters_filter import \
     SpecialCharactersFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class SpecialCharactersFilterTest(unittest.TestCase):
+class SpecialCharactersFilterTest(DataJuicerTestCaseBase):
 
     def _run_special_characters_filter(self, dataset: Dataset, target_list,
                                        op):

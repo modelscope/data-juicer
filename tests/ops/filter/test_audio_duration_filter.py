@@ -5,12 +5,13 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.audio_duration_filter import AudioDurationFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class AudioDurationFilterTest(unittest.TestCase):
+class AudioDurationFilterTest(DataJuicerTestCaseBase):
 
-    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                             '..', 'data')
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
+                             'data')
     aud1_path = os.path.join(data_path, 'audio1.wav')  # about 6s
     aud2_path = os.path.join(data_path, 'audio2.wav')  # about 14s
     aud3_path = os.path.join(data_path, 'audio3.ogg')  # about 1min59s
@@ -49,22 +50,6 @@ class AudioDurationFilterTest(unittest.TestCase):
         op = AudioDurationFilter()
         self._run_audio_duration_filter(dataset, tgt_list, op)
 
-    def test_filter_short_audios(self):
-
-        ds_list = [{
-            'audios': [self.aud1_path]
-        }, {
-            'audios': [self.aud2_path]
-        }, {
-            'audios': [self.aud3_path]
-        }]
-        tgt_list = [{
-            'audios': [self.aud1_path]
-        }]
-        dataset = Dataset.from_list(ds_list)
-        op = AudioDurationFilter(max_duration=10)
-        self._run_audio_duration_filter(dataset, tgt_list, op)
-
     def test_filter_long_audios(self):
 
         ds_list = [{
@@ -74,9 +59,21 @@ class AudioDurationFilterTest(unittest.TestCase):
         }, {
             'audios': [self.aud3_path]
         }]
-        tgt_list = [{
+        tgt_list = [{'audios': [self.aud1_path]}]
+        dataset = Dataset.from_list(ds_list)
+        op = AudioDurationFilter(max_duration=10)
+        self._run_audio_duration_filter(dataset, tgt_list, op)
+
+    def test_filter_short_audios(self):
+
+        ds_list = [{
+            'audios': [self.aud1_path]
+        }, {
+            'audios': [self.aud2_path]
+        }, {
             'audios': [self.aud3_path]
         }]
+        tgt_list = [{'audios': [self.aud3_path]}]
         dataset = Dataset.from_list(ds_list)
         op = AudioDurationFilter(min_duration=60)
         self._run_audio_duration_filter(dataset, tgt_list, op)
@@ -90,12 +87,9 @@ class AudioDurationFilterTest(unittest.TestCase):
         }, {
             'audios': [self.aud3_path]
         }]
-        tgt_list = [{
-            'audios': [self.aud2_path]
-        }]
+        tgt_list = [{'audios': [self.aud2_path]}]
         dataset = Dataset.from_list(ds_list)
-        op = AudioDurationFilter(min_duration=10,
-                                 max_duration=20)
+        op = AudioDurationFilter(min_duration=10, max_duration=20)
         self._run_audio_duration_filter(dataset, tgt_list, op)
 
     def test_any(self):
@@ -143,12 +137,9 @@ class AudioDurationFilterTest(unittest.TestCase):
         }, {
             'audios': [self.aud3_path]
         }]
-        tgt_list = [{
-            'audios': [self.aud2_path]
-        }]
+        tgt_list = [{'audios': [self.aud2_path]}]
         dataset = Dataset.from_list(ds_list)
-        op = AudioDurationFilter(min_duration=10,
-                                 max_duration=20)
+        op = AudioDurationFilter(min_duration=10, max_duration=20)
         self._run_audio_duration_filter(dataset, tgt_list, op, np=2)
 
 

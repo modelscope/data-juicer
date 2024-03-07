@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.sentence_split_mapper import SentenceSplitMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class SentenceSplitMapperTest(unittest.TestCase):
+class SentenceSplitMapperTest(DataJuicerTestCaseBase):
 
     def _run_helper(self, op, samples):
         for sample in samples:

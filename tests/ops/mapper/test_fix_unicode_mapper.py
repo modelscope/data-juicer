@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.fix_unicode_mapper import FixUnicodeMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class FixUnicodeMapperTest(unittest.TestCase):
+class FixUnicodeMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = FixUnicodeMapper()

@@ -1,0 +1,104 @@
+import hashlib
+from collections import defaultdict
+from typing import Dict, Set
+
+from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.mm_utils import load_data_with_context, load_video
+
+from ..base_op import OPERATORS, Deduplicator
+from ..op_fusion import LOADED_VIDEOS
+
+OP_NAME = 'video_deduplicator'
+
+
+@OPERATORS.register_module(OP_NAME)
+@LOADED_VIDEOS.register_module(OP_NAME)
+class VideoDeduplicator(Deduplicator):
+    """
+    Deduplicator to deduplicate samples at document-level using exact matching
+    of videos between documents.
+    """
+
+    def __init__(self, *args, **kwargs):
+        """
+        Initialization.
+
+        :param args: extra args
+        :param kwargs: extra args
+        """
+        super().__init__(*args, **kwargs)
+
+    def compute_hash(self, sample, context=False):
+        # check if it's computed already
+        if HashKeys.videohash in sample:
+            return sample
+
+        # there is no video in this sample
+        sample[HashKeys.videohash] = ''
+        if self.video_key not in sample or not sample[self.video_key]:
+            return sample
+
+        # load videos
+        loaded_video_keys = sample[self.video_key]
+        sample, videos = load_data_with_context(sample, context,
+                                                loaded_video_keys, load_video)
+
+        # compute hash
+        md5_hash = hashlib.md5()
+        for key in videos:
+            # consider the multi stream of video in one container
+            for packet in videos[key].demux():
+                if packet.stream.type == 'video':
+                    md5_hash.update(packet.to_bytes())
+
+        sample[HashKeys.videohash] = md5_hash.hexdigest()
+        return sample
+
+    def process(self, dataset, show_num=0):
+        """
+        For doc-level, dataset --> dataset.
+
+        :param dataset: input dataset
+        :param show_num: number of traced samples used when tracer is
+            open.
+        :return: deduplicated dataset and the sampled duplicate pairs.
+        """
+        # no need to deduplicate because too few samples
+        if len(dataset) <= 1:
+            return dataset, {}
+
+        dup_hashes = None
+        if show_num > 0:
+            # sample duplicate pairs
+            hash2ids: Dict[int, Set[int]] = defaultdict(set)
+            for sid, hash_val in enumerate(dataset[HashKeys.videohash]):
+                if hash_val:
+                    hash2ids[hash_val].add(sid)
+            dup_samples = sorted(list(hash2ids.items()),
+                                 key=lambda x: len(x[1]),
+                                 reverse=True)
+            dup_hashes = set([
+                item[0] for item in dup_samples if len(item[1]) > 1
+            ][:show_num])
+
+        def _filter_dup_helper(sample, hashes):
+            hash = sample[HashKeys.videohash]
+            if not hash:
+                return True
+            if show_num > 0 and hash in dup_hashes \
+                    and len(dup_pairs[hash]) < 2:
+                # tracer is open and not enough duplicate sample pairs
+                dup_pairs[hash].append(sample)
+            if hash in hashes:
+                return False
+            else:
+                hashes.add(hash)
+                return True
+
+        hashes = set()
+        dup_pairs = {hash_v: [] for hash_v in dup_hashes} if dup_hashes else {}
+        dataset = dataset.filter(
+            _filter_dup_helper,
+            fn_kwargs=dict(hashes=hashes),
+            load_from_cache_file=False if show_num > 0 else True)  # num_proc=1
+        return dataset, dup_pairs

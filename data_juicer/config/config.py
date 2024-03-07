@@ -150,6 +150,18 @@ def init_configs(args=None):
         'default, it\'s "<__dj__audio>". You can specify your own special'
         ' token according to your input dataset.')
     parser.add_argument(
+        '--video_key',
+        type=str,
+        default='videos',
+        help='Key name of field to store the list of sample video paths.')
+    parser.add_argument(
+        '--video_special_token',
+        type=str,
+        default=SpecialTokens.video,
+        help='The special token that represents a video in the text. In '
+        'default, it\'s "<__dj__video>". You can specify your own special'
+        ' token according to your input dataset.')
+    parser.add_argument(
         '--eoc_special_token',
         type=str,
         default=SpecialTokens.eoc,

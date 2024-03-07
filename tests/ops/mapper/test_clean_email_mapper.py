@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.clean_email_mapper import CleanEmailMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class CleanEmailMapperTest(unittest.TestCase):
+class CleanEmailMapperTest(DataJuicerTestCaseBase):
 
     def _run_clean_email(self, op, samples):
         for sample in samples:
@@ -45,6 +46,7 @@ class CleanEmailMapperTest(unittest.TestCase):
         }]
         op = CleanEmailMapper(repl='<EMAIL>')
         self._run_clean_email(op, samples)
-        
+
+
 if __name__ == '__main__':
     unittest.main()

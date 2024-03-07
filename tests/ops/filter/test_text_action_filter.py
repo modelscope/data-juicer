@@ -1,14 +1,15 @@
-import unittest
 import os
+import unittest
 
 from datasets import Dataset
 
 from data_juicer.ops.filter.text_action_filter import TextActionFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class TextActionFilterTest(unittest.TestCase):
+class TextActionFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
@@ -16,7 +17,8 @@ class TextActionFilterTest(unittest.TestCase):
     cat_path = os.path.join(data_path, 'cat.jpg')
     img3_path = os.path.join(data_path, 'img3.jpg')
 
-    def _run_text_action_filter(self, dataset: Dataset, target_list, op, column_names):
+    def _run_text_action_filter(self, dataset: Dataset, target_list, op,
+                                column_names):
         if Fields.stats not in dataset.features:
             dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
@@ -34,7 +36,7 @@ class TextActionFilterTest(unittest.TestCase):
             'text': 'Tom plays piano.'
         }, {
             'text': 'Tom played piano.'
-        },{
+        }, {
             'text': 'I play piano.'
         }, {
             'text': 'to play piano.'
@@ -53,7 +55,7 @@ class TextActionFilterTest(unittest.TestCase):
             'text': 'Tom plays piano.'
         }, {
             'text': 'Tom played piano.'
-        },{
+        }, {
             'text': 'I play piano.'
         }, {
             'text': 'to play piano.'
@@ -75,11 +77,7 @@ class TextActionFilterTest(unittest.TestCase):
         }, {
             'text': '我有一只猫，它是一只猫'
         }]
-        tgt_list = [{
-            'text': '小明在 弹奏钢琴'
-        }, {
-            'text': 'Tom在打篮球'
-        }]
+        tgt_list = [{'text': '小明在 弹奏钢琴'}, {'text': 'Tom在打篮球'}]
         dataset = Dataset.from_list(ds_list)
         op = TextActionFilter(lang='zh')
         self._run_text_action_filter(dataset, tgt_list, op, ['text'])
@@ -95,20 +93,21 @@ class TextActionFilterTest(unittest.TestCase):
             'text': f'{SpecialTokens.image}背影{SpecialTokens.eoc}',
             'images': [self.img3_path]
         }, {
-            'text': f'雨中行走的女人背影',
+            'text': '雨中行走的女人背影',
             'images': [self.img3_path]
         }]
         tgt_list = [{
             'text': f'{SpecialTokens.image}小猫咪正在睡觉。{SpecialTokens.eoc}',
             'images': [self.cat_path]
         }, {
-            'text': f'雨中行走的女人背影',
+            'text': '雨中行走的女人背影',
             'images': [self.img3_path]
         }]
 
         dataset = Dataset.from_list(ds_list)
         op = TextActionFilter(lang='zh')
         self._run_text_action_filter(dataset, tgt_list, op, ['text', 'images'])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -15,6 +15,10 @@ class Fields(object):
     context = DEFAULT_PREFIX + 'context__'
     suffix = DEFAULT_PREFIX + 'suffix__'
 
+    # video_frame_tags
+    video_frame_tags = DEFAULT_PREFIX + 'video_frame_tags__'
+    video_audio_tags = DEFAULT_PREFIX + 'video_audio_tags__'
+
 
 class StatsKeysMeta(type):
     """
@@ -125,17 +129,31 @@ class StatsKeysConstant(object):
     image_sizes = 'image_sizes'
     face_ratios = 'face_ratios'
     face_detections = 'face_detections'
+    image_aesthetics_scores = 'image_aesthetics_scores'
 
     # audios
     audio_duration = 'audio_duration'
     audio_nmf_snr = 'audio_nmf_snr'
     audio_sizes = 'audio_sizes'
 
+    # videos
+    video_duration = 'video_duration'
+    video_aspect_ratios = 'video_aspect_ratios'
+    video_width = 'video_width'
+    video_height = 'video_height'
+    video_ocr_area_ratio = 'video_ocr_area_ratio'
+    video_aesthetic_score = 'video_aesthetic_score'
+    video_frames_aesthetics_score = 'video_frames_aesthetics_score'
+    video_motion_score = 'video_motion_score'
+
     # multimodal
     # image-text
     image_text_similarity = 'image_text_similarity'
     image_text_matching_score = 'image_text_matching_score'
     phrase_grounding_recall = 'phrase_grounding_recall'
+
+    # video-text
+    video_frames_text_matching_score = 'video_frames_text_matching_score'
 
 
 class StatsKeys(object, metaclass=StatsKeysMeta):
@@ -150,6 +168,9 @@ class HashKeys(object):
     # image
     imagehash = DEFAULT_PREFIX + 'imagehash'
 
+    # video
+    videohash = DEFAULT_PREFIX + 'videohash'
+
 
 class InterVars(object):
     # text
@@ -162,3 +183,6 @@ class InterVars(object):
 
     # audios
     loaded_audios = DEFAULT_PREFIX + 'loaded_audios'  # (data, sampling_rate)
+
+    # videos
+    loaded_videos = DEFAULT_PREFIX + 'loaded_videos'  # InputContainer from av

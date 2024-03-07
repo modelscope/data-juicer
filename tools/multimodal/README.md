@@ -69,11 +69,15 @@ These tools consist of two types:
 
 For now, dataset formats that are supported by Data-Juicer are listed in the following table.
 
-| Format     | Type       | source_format_to_data_juicer_format | data_juicer_format_to_target_format | Ref.                                                                                                             |
-|------------|------------|-------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| LLaVA-like | image-text | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
-| MMC4-like  | image-text | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [Format Description](https://github.com/allenai/mmc4#documents)                                                  |
-| WavCaps-like  | audio-text | `wavcaps_to_dj.py` | `dj_to_wavcaps.py`                  | [Format Description](https://github.com/XinhaoMei/WavCaps#table-of-contents) |
+| Format             | Type       | source_format_to_data_juicer_format | data_juicer_format_to_target_format | Ref.                                                                                                             |
+|--------------------|------------|-------------------------------------|-------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| LLaVA-like         | image-text | `llava_to_dj.py`                    | `dj_to_llava.py`                    | [Format Description](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format) |
+| MMC4-like          | image-text | `mmc4_to_dj.py`                     | `dj_to_mmc4.py`                     | [Format Description](https://github.com/allenai/mmc4#documents)                                                  |
+| WavCaps-like       | audio-text | `wavcaps_to_dj.py`                  | `dj_to_wavcaps.py`                  | [Format Description](https://github.com/XinhaoMei/WavCaps#table-of-contents)                                     |
+| Video-ChatGPT-like | video-text | `video_chatgpt_to_dj.py`            | `dj_to_video_chatgpt.py`                | [Format Description]( https://github.com/mbzuai-oryx/Video-ChatGPT/tree/main/data)                                                                                           |                                                                                          |
+| Youku-mPLUG-like   | video-text | `youku_to_dj.py`                    | `dj_to_youku.py`                    | [Format Description](https://modelscope.cn/datasets/modelscope/Youku-AliceMind/summary)                          |                                                                                          |
+| InternVid-like     | video-text | `internvid_to_dj.py`                | `dj_to_internvid.py`                | [Format Description](https://huggingface.co/datasets/OpenGVLab/InternVid)                                        |                                                                                          |
+
 
 For all tools, you can run the following command to find out the usage of them:
 
@@ -161,7 +165,7 @@ Users should be cautious about this point if you need this matrix in later usage
 
 Despite these extra fields, tools for MMC4 can perfectly convert MMC4-like datasets to Data-Juicer-format datasets and convert them back~
 
-### WavCaps-like
+#### WavCaps-like
 
 The [WavCaps](https://github.com/XinhaoMei/WavCaps#dataset) is composed of four sub-datasets: [FreeSound](https://freesound.org/), [BBC Sound Effects](https://sound-effects.bbcrewind.co.uk/),[SoundBible](https://soundbible.com/) and [AudioSet Strongly-labelled Subset](https://research.google.com/audioset/download_strong.html). Each sub-dataset has different fields. For example, the 'description' field is included in SoundBible, but does not exist in AudioSet. To ensure that the different sub-datasets can be properly merged after conversion, the union of all fields from the sub-datasets is used during the wavcaps_to_dj stage, and all fields are fully retained during the dj_to_wavcaps stage.
 
@@ -196,3 +200,35 @@ The [WavCaps](https://github.com/XinhaoMei/WavCaps#dataset) is composed of four 
         "tags": "" }]    
 }
 ```
+
+#### Video-ChatGPT-like
+
+The Video-ChatGPT dataset contains 3 types of data with unified format:
+- Topics for Video summarization
+- Description-based question-answers (exploring spatial, temporal, relationships, and reasoning concepts);
+- and Creative/generative question-answers.
+They all obey the `<question, answer, video_id>` format, where the `video_id` is in the form "v_youtube_id". We suppose that users have downloaded these videos already, and they need to specify the corresponding storage directory when using the converter tool.
+
+
+
+#### Youku-mPLUG-like
+
+The Youku-mPLUG dataset contains 4 types of format: pretrain, classification, retrieval, captioning. 
+They are slightly different from each other in field name or other attributes, but all of them obey the `<video, caption>` format.
+
+#### InternVid-like
+
+The InternVid dataset contains 4 fields:
+- `YoutubeID`: the Youtube ID of the video used in the sample. 
+We suppose that users have downloaded these videos already
+and this field is replaced with its storage path.
+- `Start_timestamp`: the start timestamp in string of the video clip for the 
+corresponding caption.
+- `End_timestamp`: the end timestamp in string of the video clip for the 
+corresponding caption.
+- `Caption`: the corresponding caption for the video clip.
+
+As we can see, the caption in this dataset corresponds to the video clip 
+specified by the start/end timestamps instead of the whole video. So the 
+conversion tool will cut the specified video clip for you if the argument 
+`cut_videos` is set to True. You can cut before conversion by yourself as well.

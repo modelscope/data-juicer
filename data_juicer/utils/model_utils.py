@@ -1,6 +1,7 @@
 import fnmatch
 import os
 from functools import partial
+from typing import Optional, Union
 
 import multiprocess as mp
 import wget
@@ -31,7 +32,7 @@ BACKUP_MODEL_LINKS = {
     # sentence split model from nltk punkt
     'punkt.*.pickle':
     'https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/'
-    'data_juicer/models/'
+    'data_juicer/models/',
 }
 
 
@@ -176,6 +177,183 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
     return nltk_model
 
 
+def prepare_video_blip_model(pretrained_model_name_or_path,
+                             return_model=True,
+                             trust_remote_code=False):
+    """
+    Prepare and load a video-clip model with the correspoding processor.
+
+    :param pretrained_model_name_or_path: model name or path
+    :param return_model: return model or not
+    :param trust_remote_code: passed to transformers
+    :return: a tuple (model, input processor) if `return_model` is True;
+        otherwise, only the processor is returned.
+    """
+    import torch
+    import torch.nn as nn
+    from transformers import (AutoModelForCausalLM, AutoModelForSeq2SeqLM,
+                              Blip2Config, Blip2ForConditionalGeneration,
+                              Blip2QFormerModel, Blip2VisionModel)
+    from transformers.modeling_outputs import BaseModelOutputWithPooling
+
+    class VideoBlipVisionModel(Blip2VisionModel):
+        """A simple, augmented version of Blip2VisionModel to handle
+        videos."""
+
+        def forward(
+            self,
+            pixel_values: Optional[torch.FloatTensor] = None,
+            output_attentions: Optional[bool] = None,
+            output_hidden_states: Optional[bool] = None,
+            return_dict: Optional[bool] = None,
+        ) -> Union[tuple, BaseModelOutputWithPooling]:
+            """Flatten `pixel_values` along the batch and time dimension,
+            pass it through the original vision model,
+            then unflatten it back.
+
+            :param pixel_values: a tensor of shape
+            (batch, channel, time, height, width)
+
+            :returns:
+                last_hidden_state: a tensor of shape
+                (batch, time * seq_len, hidden_size)
+                pooler_output: a tensor of shape
+                (batch, time, hidden_size)
+                hidden_states:
+                    a tuple of tensors of shape
+                    (batch, time * seq_len, hidden_size),
+                    one for the output of the embeddings +
+                    one for each layer
+                attentions:
+                    a tuple of tensors of shape
+                    (batch, time, num_heads, seq_len, seq_len),
+                    one for each layer
+            """
+            if pixel_values is None:
+                raise ValueError('You have to specify pixel_values')
+
+            batch, _, time, _, _ = pixel_values.size()
+
+            # flatten along the batch and time dimension to create a
+            # tensor of shape
+            # (batch * time, channel, height, width)
+            flat_pixel_values = pixel_values.permute(0, 2, 1, 3,
+                                                     4).flatten(end_dim=1)
+
+            vision_outputs: BaseModelOutputWithPooling = super().forward(
+                pixel_values=flat_pixel_values,
+                output_attentions=output_attentions,
+                output_hidden_states=output_hidden_states,
+                return_dict=True,
+            )
+
+            # now restore the original dimensions
+            # vision_outputs.last_hidden_state is of shape
+            # (batch * time, seq_len, hidden_size)
+            seq_len = vision_outputs.last_hidden_state.size(1)
+            last_hidden_state = vision_outputs.last_hidden_state.view(
+                batch, time * seq_len, -1)
+            # vision_outputs.pooler_output is of shape
+            # (batch * time, hidden_size)
+            pooler_output = vision_outputs.pooler_output.view(batch, time, -1)
+            # hidden_states is a tuple of tensors of shape
+            # (batch * time, seq_len, hidden_size)
+            hidden_states = (tuple(
+                hidden.view(batch, time * seq_len, -1)
+                for hidden in vision_outputs.hidden_states)
+                             if vision_outputs.hidden_states is not None else
+                             None)
+            # attentions is a tuple of tensors of shape
+            # (batch * time, num_heads, seq_len, seq_len)
+            attentions = (tuple(
+                hidden.view(batch, time, -1, seq_len, seq_len)
+                for hidden in vision_outputs.attentions)
+                          if vision_outputs.attentions is not None else None)
+            if return_dict:
+                return BaseModelOutputWithPooling(
+                    last_hidden_state=last_hidden_state,
+                    pooler_output=pooler_output,
+                    hidden_states=hidden_states,
+                    attentions=attentions,
+                )
+            return (last_hidden_state, pooler_output, hidden_states,
+                    attentions)
+
+    class VideoBlipForConditionalGeneration(Blip2ForConditionalGeneration):
+
+        def __init__(self, config: Blip2Config) -> None:
+            # HACK: we call the grandparent super().__init__() to bypass
+            # Blip2ForConditionalGeneration.__init__() so we can replace
+            # self.vision_model
+            super(Blip2ForConditionalGeneration, self).__init__(config)
+
+            self.vision_model = VideoBlipVisionModel(config.vision_config)
+
+            self.query_tokens = nn.Parameter(
+                torch.zeros(1, config.num_query_tokens,
+                            config.qformer_config.hidden_size))
+            self.qformer = Blip2QFormerModel(config.qformer_config)
+
+            self.language_projection = nn.Linear(
+                config.qformer_config.hidden_size,
+                config.text_config.hidden_size)
+            if config.use_decoder_only_language_model:
+                language_model = AutoModelForCausalLM.from_config(
+                    config.text_config)
+            else:
+                language_model = AutoModelForSeq2SeqLM.from_config(
+                    config.text_config)
+            self.language_model = language_model
+
+            # Initialize weights and apply final processing
+            self.post_init()
+
+    from transformers import AutoProcessor
+    processor = AutoProcessor.from_pretrained(
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+    if return_model:
+        model_class = VideoBlipForConditionalGeneration
+        model = model_class.from_pretrained(
+            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+    return (model, processor) if return_model else processor
+
+
+def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
+                                    return_model=True):
+    """
+    Prepare and load a simple aesthetics model.
+
+    :param pretrained_model_name_or_path: model name or path
+    :param return_model: return model or not
+    :return: a tuple (model, input processor) if `return_model` is True;
+        otherwise, only the processor is returned.
+    """
+    from aesthetics_predictor import (AestheticsPredictorV1,
+                                      AestheticsPredictorV2Linear,
+                                      AestheticsPredictorV2ReLU)
+    from transformers import CLIPProcessor
+
+    processor = CLIPProcessor.from_pretrained(pretrained_model_name_or_path)
+    if not return_model:
+        return processor
+    else:
+        if 'v1' in pretrained_model_name_or_path:
+            model = AestheticsPredictorV1.from_pretrained(
+                pretrained_model_name_or_path)
+        elif ('v2' in pretrained_model_name_or_path
+              and 'linear' in pretrained_model_name_or_path):
+            model = AestheticsPredictorV2Linear.from_pretrained(
+                pretrained_model_name_or_path)
+        elif ('v2' in pretrained_model_name_or_path
+              and 'relu' in pretrained_model_name_or_path):
+            model = AestheticsPredictorV2ReLU.from_pretrained(
+                pretrained_model_name_or_path)
+        else:
+            raise ValueError(
+                'Not support {}'.format(pretrained_model_name_or_path))
+        return (model, processor)
+
+
 def prepare_huggingface_model(pretrained_model_name_or_path,
                               return_model=True,
                               trust_remote_code=False):
@@ -189,34 +367,26 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
         otherwise, only the processor is returned.
     """
     import transformers
-    from transformers import (AutoConfig, AutoImageProcessor, AutoProcessor,
-                              AutoTokenizer)
-    from transformers.models.auto.image_processing_auto import \
-        IMAGE_PROCESSOR_MAPPING_NAMES
-    from transformers.models.auto.processing_auto import \
-        PROCESSOR_MAPPING_NAMES
-    from transformers.models.auto.tokenization_auto import \
-        TOKENIZER_MAPPING_NAMES
+    from transformers import AutoConfig, AutoProcessor
 
-    config = AutoConfig.from_pretrained(pretrained_model_name_or_path)
-    # TODO: What happens when there are more than one?
-    arch = config.architectures[0]
-    model_class = getattr(transformers, arch)
-    model_type = config.model_type
-    if model_type in PROCESSOR_MAPPING_NAMES:
-        processor = AutoProcessor.from_pretrained(
-            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-    elif model_type in IMAGE_PROCESSOR_MAPPING_NAMES:
-        processor = AutoImageProcessor.from_pretrained(
-            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-    elif model_type in TOKENIZER_MAPPING_NAMES:
-        processor = AutoTokenizer.from_pretrained(
-            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-    else:
-        processor = None
+    processor = AutoProcessor.from_pretrained(
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
 
     if return_model:
-        model = model_class.from_pretrained(pretrained_model_name_or_path)
+        config = AutoConfig.from_pretrained(
+            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+        if hasattr(config, 'auto_map'):
+            class_name = next(
+                (k for k in config.auto_map if k.startswith('AutoModel')),
+                'AutoModel')
+        else:
+            # TODO: What happens if more than one
+            class_name = config.architectures[0]
+
+        model_class = getattr(transformers, class_name)
+        model = model_class.from_pretrained(
+            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+
     return (model, processor) if return_model else processor
 
 
@@ -308,14 +478,41 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
     return model
 
 
+def prepare_recognizeAnything_model(
+        pretrained_model_name_or_path='ram_plus_swin_large_14m.pth',
+        input_size=384):
+    """
+    Prepare and load recognizeAnything model.
+
+    :param model_name: input model name.
+    :param input_size: the input size of the model.
+    """
+    from ram.models import ram_plus
+    logger.info('Loading recognizeAnything model...')
+    try:
+        model = ram_plus(pretrained=check_model(pretrained_model_name_or_path),
+                         image_size=input_size,
+                         vit='swin_l')
+    except:  # noqa: E722
+        model = ram_plus(pretrained=check_model(pretrained_model_name_or_path,
+                                                force=True),
+                         image_size=input_size,
+                         vit='swin_l')
+    model.eval()
+    return model
+
+
 MODEL_FUNCTION_MAPPING = {
     'fasttext': prepare_fasttext_model,
     'sentencepiece': prepare_sentencepiece_model,
     'kenlm': prepare_kenlm_model,
     'nltk': prepare_nltk_model,
     'huggingface': prepare_huggingface_model,
+    'simple_aesthetics': prepare_simple_aesthetics_model,
     'spacy': prepare_spacy_model,
-    'diffusion': prepare_diffusion_model
+    'diffusion': prepare_diffusion_model,
+    'video_blip': prepare_video_blip_model,
+    'recognizeAnything': prepare_recognizeAnything_model
 }
 
 
@@ -342,9 +539,6 @@ def move_to_cuda(model, rank):
             logger.info(
                 f'Moving {module.__class__.__name__} to CUDA device {rank}')
             module.to(f'cuda:{rank}')
-            # Optionally, verify the device assignment
-            logger.debug(
-                f'{module.__class__.__name__} is on device {module.device}')
 
 
 def get_model(model_key=None, rank=None):

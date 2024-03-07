@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.suffix_filter import SuffixFilter
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class SuffixFilterTest(unittest.TestCase):
+class SuffixFilterTest(DataJuicerTestCaseBase):
 
     def _run_suffix_filter(self, dataset: Dataset, target_list, op):
         dataset = dataset.map(op.compute_stats)

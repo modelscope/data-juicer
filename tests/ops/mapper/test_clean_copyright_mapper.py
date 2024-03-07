@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.clean_copyright_mapper import CleanCopyrightMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class CleanCopyrightMapperTest(unittest.TestCase):
+class CleanCopyrightMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = CleanCopyrightMapper()

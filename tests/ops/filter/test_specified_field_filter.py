@@ -3,9 +3,10 @@ import unittest
 from datasets import Dataset
 
 from data_juicer.ops.filter.specified_field_filter import SpecifiedFieldFilter
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class SpecifiedFieldFilterTest(unittest.TestCase):
+class SpecifiedFieldFilterTest(DataJuicerTestCaseBase):
 
     def _run_specified_field_filter(self, dataset: Dataset, target_list, op):
         dataset = dataset.map(op.compute_stats)

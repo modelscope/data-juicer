@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.token_num_filter import TokenNumFilter
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class WordNumFilterTest(unittest.TestCase):
+class WordNumFilterTest(DataJuicerTestCaseBase):
 
     def test_token_num(self):
         src = [

@@ -2,9 +2,10 @@ import os
 import unittest
 
 from data_juicer.format.parquet_formatter import ParquetFormatter
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class CsvFormatterTest(unittest.TestCase):
+class CsvFormatterTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self._path = os.path.join(os.path.dirname(os.path.realpath(__file__)),

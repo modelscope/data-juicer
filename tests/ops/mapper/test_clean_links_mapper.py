@@ -1,9 +1,10 @@
 import unittest
 
 from data_juicer.ops.mapper.clean_links_mapper import CleanLinksMapper
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class CleanLinksMapperTest(unittest.TestCase):
+class CleanLinksMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
         self.op = CleanLinksMapper()
@@ -216,22 +217,28 @@ class CleanLinksMapperTest(unittest.TestCase):
 
     def test_replace_links_text(self):
 
-        samples = [{
-            'text': 'ftp://user:password@ftp.example.com:21/',
-            'target': '<LINKS>'
-        }, {
-            'text': 'This is a sample for test',
-            'target': 'This is a sample for test',
-        }, {
-            'text': 'abcd://ef is a sample for test',
-            'target': '<LINKS> is a sample for test',
-        }, {
+        samples = [
+            {
+                'text': 'ftp://user:password@ftp.example.com:21/',
+                'target': '<LINKS>'
+            },
+            {
+                'text': 'This is a sample for test',
+                'target': 'This is a sample for test',
+            },
+            {
+                'text': 'abcd://ef is a sample for test',
+                'target': '<LINKS> is a sample for test',
+            },
+            {
                 'text':
                 'HTTP://example.com/my-page.html?param1=value1&param2=value2',
                 'target': '<LINKS>'
-            },]
+            },
+        ]
         op = CleanLinksMapper(repl='<LINKS>')
         self._run_clean_links(op, samples)
+
 
 if __name__ == '__main__':
     unittest.main()

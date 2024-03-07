@@ -4,9 +4,10 @@ from datasets import Dataset
 
 from data_juicer.ops.deduplicator.document_deduplicator import \
     DocumentDeduplicator
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class DocumentDeduplicatorTest(unittest.TestCase):
+class DocumentDeduplicatorTest(DataJuicerTestCaseBase):
 
     def _run_doc_dedup(self, dataset: Dataset, target_list, op):
         dataset = dataset.map(op.compute_hash)
