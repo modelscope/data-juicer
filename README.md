@@ -59,7 +59,7 @@ Table of Contents
 * [Data-Juicer: A One-Stop Data Processing System for Large Language Models](#data-juicer-a-one-stop-data-processing-system-for-large-language-models)
 * [Table of Contents](#table-of-contents)
    * [Features](#features)
-   * [Documentation Index | 文档索引](#documentation-index--文档索引-a-namedocumentationindex)
+   * [Documentation Index | 文档索引](#documents)
    * [Demos](#demos)
    * [Prerequisites](#prerequisites)
    * [Installation](#installation)
