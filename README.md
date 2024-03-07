@@ -1,4 +1,4 @@
-[[中文主页]](README_ZH.md) | [[Docs]](README.md#documentation-index--文档索引-a-namedocumentationindex) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
+[[中文主页]](README_ZH.md) | [[Docs]](README.md#documentationindex) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
 
 # Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
@@ -16,8 +16,8 @@
 
 
 
-[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](README.md#documentation-index--文档索引-a-namedocumentationindex)
-[![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documentation-index--文档索引-a-namedocumentationindex)
+[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](README.md#documentationindex)
+[![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documentationindex)
 [![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 
@@ -59,7 +59,7 @@ Table of Contents
 * [Data-Juicer: A One-Stop Data Processing System for Large Language Models](#data-juicer-a-one-stop-data-processing-system-for-large-language-models)
 * [Table of Contents](#table-of-contents)
    * [Features](#features)
-   * [Documentation Index | 文档索引](#documentation-index--文档索引-a-namedocumentationindex)
+   * [Documentation Index | 文档索引](#documentationindex)
    * [Demos](#demos)
    * [Prerequisites](#prerequisites)
    * [Installation](#installation)
