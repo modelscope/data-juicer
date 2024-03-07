@@ -55,7 +55,7 @@ setuptools.setup(
     name='py-data-juicer',
     version=version,
     url='https://github.com/alibaba/data-juicer',
-    author='SysML team of Alibaba DAMO Academy',
+    author='SysML Team of Alibaba Tongyi Lab',
     description='A One-Stop Data Processing System for Large Language '
     'Models.',
     long_description=readme_md,
