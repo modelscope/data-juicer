@@ -53,7 +53,7 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
 * [Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据](#data-juicer-为大语言模型提供更高质量更丰富更易消化的数据)
 * [目录](#目录)
   * [特点](#特点)
-  * [Documentation Index | 文档索引](#documents)
+  * [文档索引](#documents)
   * [演示样例](#演示样例)
   * [前置条件](#前置条件)
   * [安装](#安装)
@@ -93,20 +93,20 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
 * **灵活 & 易扩展**：支持大多数数据格式（如jsonl、parquet、csv等），并允许灵活组合算子。支持[自定义算子](docs/DeveloperGuide_ZH.md#构建自己的算子)，以执行定制化的数据处理。
 
 
-## Documentation Index | 文档索引 <a name="documents"/>
+## 文档索引 <a name="documents"/>
 
-* [Overview](README.md) | [概览](README_ZH.md)
-* [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
-* [Configs](configs/README.md) | [配置系统](configs/README_ZH.md)
-* [Developer Guide](docs/DeveloperGuide.md) | [开发者指南](docs/DeveloperGuide_ZH.md)
-* ["Bad" Data Exhibition](docs/BadDataExhibition.md) | [“坏”数据展览](docs/BadDataExhibition_ZH.md)
-* Dedicated Toolkits | 专用工具箱
-  * [Quality Classifier](tools/quality_classifier/README.md) | [质量分类器](tools/quality_classifier/README_ZH.md)
-  * [Auto Evaluation](tools/evaluator/README.md) | [自动评测](tools/evaluator/README_ZH.md)
-  * [Preprocess](tools/preprocess/README.md) | [前处理](tools/preprocess/README_ZH.md)
-  * [Postprocess](tools/postprocess/README.md) | [后处理](tools/postprocess/README_ZH.md)
-* [Third-parties (LLM Ecosystems)](thirdparty/README.md) | [第三方库（大语言模型生态）](thirdparty/README_ZH.md)
-* [API references](https://alibaba.github.io/data-juicer/)
+* [概览](README_ZH.md)
+* [算子库](docs/Operators_ZH.md)
+* [配置系统](configs/README_ZH.md)
+* [开发者指南](docs/DeveloperGuide_ZH.md)
+* [“坏”数据展览](docs/BadDataExhibition_ZH.md)
+* 专用工具箱
+  * [质量分类器](tools/quality_classifier/README_ZH.md)
+  * [自动评测](tools/evaluator/README_ZH.md)
+  * [前处理](tools/preprocess/README_ZH.md)
+  * [后处理](tools/postprocess/README_ZH.md)
+* [第三方库（大语言模型生态）](thirdparty/README_ZH.md)
+* [API 参考](https://alibaba.github.io/data-juicer/)
 * [Awesome LLM-Data](docs/awesome_llm_data.md)
 * [DJ-SORA](docs/DJ_SORA_ZH.md)
 
