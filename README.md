@@ -111,19 +111,19 @@ Table of Contents
 
 
 
-## Documentation Index | 文档索引 <a name="documents"/>
+## Documentation Index <a name="documents"/>
 
-- [Overview](README.md) | [概览](README_ZH.md)
-- [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
-- [Configs](configs/README.md) | [配置系统](configs/README_ZH.md)
-- [Developer Guide](docs/DeveloperGuide.md) | [开发者指南](docs/DeveloperGuide_ZH.md)
-- ["Bad" Data Exhibition](docs/BadDataExhibition.md) | [“坏”数据展览](docs/BadDataExhibition_ZH.md)
-- Dedicated Toolkits | 专用工具箱
-  - [Quality Classifier](tools/quality_classifier/README.md) | [质量分类器](tools/quality_classifier/README_ZH.md)
-  - [Auto Evaluation](tools/evaluator/README.md) | [自动评测](tools/evaluator/README_ZH.md)
-  - [Preprocess](tools/preprocess/README.md) | [前处理](tools/preprocess/README_ZH.md)
-  - [Postprocess](tools/postprocess/README.md) | [后处理](tools/postprocess/README_ZH.md)
-- [Third-parties (LLM Ecosystems)](thirdparty/README.md) | [第三方库（大语言模型生态）](thirdparty/README_ZH.md)
+- [Overview](README.md)
+- [Operator Zoo](docs/Operators.md)
+- [Configs](configs/README.md)
+- [Developer Guide](docs/DeveloperGuide.md)
+- ["Bad" Data Exhibition](docs/BadDataExhibition.md)
+- Dedicated Toolkits
+  - [Quality Classifier](tools/quality_classifier/README.md)
+  - [Auto Evaluation](tools/evaluator/README.md)
+  - [Preprocess](tools/preprocess/README.md)
+  - [Postprocess](tools/postprocess/README.md)
+- [Third-parties (LLM Ecosystems)](thirdparty/README.md)
 - [API references](https://alibaba.github.io/data-juicer/)
 - [Awesome LLM-Data](docs/awesome_llm_data.md)
 - [DJ-SORA](docs/DJ_SORA.md)
