@@ -1,4 +1,4 @@
-[[English Page]](README.md) | [[文档]](README_ZH.md#documentation-index--文档索引-a-namedocumentationindex) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md) 
+[[English Page]](README.md) | [[文档]](#documents) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md) 
 
 # Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据
 
@@ -14,8 +14,8 @@
 [![ModelScope- Demos](https://img.shields.io/badge/ModelScope-Demos-4e29ff.svg?logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjI0IDEyMS4zMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im0wIDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtOTkuMTQgNzMuNDloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xNzYuMDkgOTkuMTRoLTI1LjY1djIyLjE5aDQ3Ljg0di00Ny44NGgtMjIuMTl6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTEyNC43OSA0Ny44NGgyNS42NXYyNS42NWgtMjUuNjV6IiBmaWxsPSIjMzZjZmQxIiAvPgoJPHBhdGggZD0ibTAgMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xOTguMjggNDcuODRoMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xOTguMjggMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xNTAuNDQgMHYyMi4xOWgyNS42NXYyNS42NWgyMi4xOXYtNDcuODR6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTczLjQ5IDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiMzNmNmZDEiIC8+Cgk8cGF0aCBkPSJtNDcuODQgMjIuMTloMjUuNjV2LTIyLjE5aC00Ny44NHY0Ny44NGgyMi4xOXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtNDcuODQgNzMuNDloLTIyLjE5djQ3Ljg0aDQ3Ljg0di0yMi4xOWgtMjUuNjV6IiBmaWxsPSIjNjI0YWZmIiAvPgo8L3N2Zz4K)](https://modelscope.cn/studios?name=Data-Jiucer&page=1&sort=latest&type=1)
 [![HuggingFace- Demos](https://img.shields.io/badge/🤗HuggingFace-Demos-4e29ff.svg)](https://huggingface.co/spaces?&search=datajuicer)
 
-[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](README.md#documentation-index--文档索引-a-namedocumentationindex)
-[![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documentation-index--文档索引-a-namedocumentationindex)
+[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](README.md#documents)
+[![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](#documents)
 [![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 
@@ -40,7 +40,7 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
 - [2024-01-10] 开启“数据混合”新视界——第二届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532174)，了解赛事详情。
 
 -[2024-01-05] 现在，我们发布了 **Data-Juicer v0.1.3** 版本！ 
-在这个新版本中，我们支持了**更多Python版本**（3.7-3.10），同时支持了**多模态**数据集的[转换](tools/multimodal/README_ZH.md)和[处理](docs/Operators_ZH.md)（包括文本、图像和音频。更多模态也将会在之后支持）。
+在这个新版本中，我们支持了**更多Python版本**（3.8-3.10），同时支持了**多模态**数据集的[转换](tools/multimodal/README_ZH.md)和[处理](docs/Operators_ZH.md)（包括文本、图像和音频。更多模态也将会在之后支持）。
 此外，我们的论文也更新到了[第三版](https://arxiv.org/abs/2309.02033) 。
 
 - [2023-10-13] 我们的第一届以数据为中心的 LLM 竞赛开始了！
@@ -53,7 +53,7 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
 * [Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据](#data-juicer-为大语言模型提供更高质量更丰富更易消化的数据)
 * [目录](#目录)
   * [特点](#特点)
-  * [Documentation Index | 文档索引](#documentation-index--文档索引-a-namedocumentationindex)
+  * [文档索引](#documents)
   * [演示样例](#演示样例)
   * [前置条件](#前置条件)
   * [安装](#安装)
@@ -93,20 +93,20 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
 * **灵活 & 易扩展**：支持大多数数据格式（如jsonl、parquet、csv等），并允许灵活组合算子。支持[自定义算子](docs/DeveloperGuide_ZH.md#构建自己的算子)，以执行定制化的数据处理。
 
 
-## Documentation Index | 文档索引 <a name="documentationindex"/>
+## 文档索引 <a name="documents"/>
 
-* [Overview](README.md) | [概览](README_ZH.md)
-* [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
-* [Configs](configs/README.md) | [配置系统](configs/README_ZH.md)
-* [Developer Guide](docs/DeveloperGuide.md) | [开发者指南](docs/DeveloperGuide_ZH.md)
-* ["Bad" Data Exhibition](docs/BadDataExhibition.md) | [“坏”数据展览](docs/BadDataExhibition_ZH.md)
-* Dedicated Toolkits | 专用工具箱
-  * [Quality Classifier](tools/quality_classifier/README.md) | [质量分类器](tools/quality_classifier/README_ZH.md)
-  * [Auto Evaluation](tools/evaluator/README.md) | [自动评测](tools/evaluator/README_ZH.md)
-  * [Preprocess](tools/preprocess/README.md) | [前处理](tools/preprocess/README_ZH.md)
-  * [Postprocess](tools/postprocess/README.md) | [后处理](tools/postprocess/README_ZH.md)
-* [Third-parties (LLM Ecosystems)](thirdparty/README.md) | [第三方库（大语言模型生态）](thirdparty/README_ZH.md)
-* [API references](https://alibaba.github.io/data-juicer/)
+* [概览](README_ZH.md)
+* [算子库](docs/Operators_ZH.md)
+* [配置系统](configs/README_ZH.md)
+* [开发者指南](docs/DeveloperGuide_ZH.md)
+* [“坏”数据展览](docs/BadDataExhibition_ZH.md)
+* 专用工具箱
+  * [质量分类器](tools/quality_classifier/README_ZH.md)
+  * [自动评测](tools/evaluator/README_ZH.md)
+  * [前处理](tools/preprocess/README_ZH.md)
+  * [后处理](tools/postprocess/README_ZH.md)
+* [第三方库（大语言模型生态）](thirdparty/README_ZH.md)
+* [API 参考](https://alibaba.github.io/data-juicer/)
 * [Awesome LLM-Data](docs/awesome_llm_data.md)
 * [DJ-SORA](docs/DJ_SORA_ZH.md)
 

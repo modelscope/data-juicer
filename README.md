@@ -1,4 +1,4 @@
-[[中文主页]](README_ZH.md) | [[Docs]](README.md#documentation-index--文档索引-a-namedocumentationindex) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
+[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
 
 # Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
@@ -16,8 +16,8 @@
 
 
 
-[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](README.md#documentation-index--文档索引-a-namedocumentationindex)
-[![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documentation-index--文档索引-a-namedocumentationindex)
+[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documents)
+[![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documents)
 [![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 
@@ -45,7 +45,7 @@ In this new version, we support more features for **multimodal data (including v
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
 - [2024-01-10] Discover new horizons in "Data Mixture"—Our second data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532174) for more information.
 - [2024-01-05] We release **Data-Juicer v0.1.3** now! 
-In this new version, we support **more Python versions** (3.7-3.10), and support **multimodal** dataset [converting](tools/multimodal/README.md)/[processing](docs/Operators.md) (Including texts, images, and audios. More modalities will be supported in the future).
+In this new version, we support **more Python versions** (3.8-3.10), and support **multimodal** dataset [converting](tools/multimodal/README.md)/[processing](docs/Operators.md) (Including texts, images, and audios. More modalities will be supported in the future).
 Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 
 - [2023-10-13] Our first data-centric LLM competition begins! Please
@@ -59,7 +59,7 @@ Table of Contents
 * [Data-Juicer: A One-Stop Data Processing System for Large Language Models](#data-juicer-a-one-stop-data-processing-system-for-large-language-models)
 * [Table of Contents](#table-of-contents)
    * [Features](#features)
-   * [Documentation Index | 文档索引](#documentation-index--文档索引-a-namedocumentationindex)
+   * [Documentation Index](#documents)
    * [Demos](#demos)
    * [Prerequisites](#prerequisites)
    * [Installation](#installation)
@@ -111,19 +111,19 @@ Table of Contents
 
 
 
-## Documentation Index | 文档索引 <a name="documentationindex"/>
+## Documentation Index <a name="documents"/>
 
-- [Overview](README.md) | [概览](README_ZH.md)
-- [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
-- [Configs](configs/README.md) | [配置系统](configs/README_ZH.md)
-- [Developer Guide](docs/DeveloperGuide.md) | [开发者指南](docs/DeveloperGuide_ZH.md)
-- ["Bad" Data Exhibition](docs/BadDataExhibition.md) | [“坏”数据展览](docs/BadDataExhibition_ZH.md)
-- Dedicated Toolkits | 专用工具箱
-  - [Quality Classifier](tools/quality_classifier/README.md) | [质量分类器](tools/quality_classifier/README_ZH.md)
-  - [Auto Evaluation](tools/evaluator/README.md) | [自动评测](tools/evaluator/README_ZH.md)
-  - [Preprocess](tools/preprocess/README.md) | [前处理](tools/preprocess/README_ZH.md)
-  - [Postprocess](tools/postprocess/README.md) | [后处理](tools/postprocess/README_ZH.md)
-- [Third-parties (LLM Ecosystems)](thirdparty/README.md) | [第三方库（大语言模型生态）](thirdparty/README_ZH.md)
+- [Overview](README.md)
+- [Operator Zoo](docs/Operators.md)
+- [Configs](configs/README.md)
+- [Developer Guide](docs/DeveloperGuide.md)
+- ["Bad" Data Exhibition](docs/BadDataExhibition.md)
+- Dedicated Toolkits
+  - [Quality Classifier](tools/quality_classifier/README.md)
+  - [Auto Evaluation](tools/evaluator/README.md)
+  - [Preprocess](tools/preprocess/README.md)
+  - [Postprocess](tools/postprocess/README.md)
+- [Third-parties (LLM Ecosystems)](thirdparty/README.md)
 - [API references](https://alibaba.github.io/data-juicer/)
 - [Awesome LLM-Data](docs/awesome_llm_data.md)
 - [DJ-SORA](docs/DJ_SORA.md)
