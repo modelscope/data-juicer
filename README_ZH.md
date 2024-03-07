@@ -1,4 +1,4 @@
-[[English Page]](README.md) | [[文档]](README_ZH.md#documentation-index--文档索引-a-namedocumentationindex) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md) 
+[[English Page]](README.md) | [[文档]](README_ZH.md#documents) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md) 
 
 # Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据
 
@@ -93,7 +93,7 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
 * **灵活 & 易扩展**：支持大多数数据格式（如jsonl、parquet、csv等），并允许灵活组合算子。支持[自定义算子](docs/DeveloperGuide_ZH.md#构建自己的算子)，以执行定制化的数据处理。
 
 
-## Documentation Index | 文档索引 <a name="documentationindex"/>
+## Documentation Index | 文档索引 <a name="documents"/>
 
 * [Overview](README.md) | [概览](README_ZH.md)
 * [Operator Zoo](docs/Operators.md) | [算子库](docs/Operators_ZH.md)
