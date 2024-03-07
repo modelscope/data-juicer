@@ -70,8 +70,8 @@ class VideoSplitByKeyFrameMapper(Mapper):
     def _process_single_sample(self, sample):
         # there is no video in this sample
         if self.video_key not in sample \
-            or sample[self.video_key] is None \
-            or len(sample[self.video_key]) == 0:
+                or sample[self.video_key] is None \
+                or len(sample[self.video_key]) == 0:
             return []
 
         # the split results

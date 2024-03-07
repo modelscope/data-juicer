@@ -2,15 +2,12 @@ import copy
 import re
 
 import numpy as np
-import pandas as pd
-from pyarrow import Table
 
 from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
 from data_juicer.utils.mm_utils import (SpecialTokens, cut_video_by_seconds,
                                         get_video_duration, load_video)
 
-from loguru import logger
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
@@ -86,8 +83,8 @@ class VideoSplitByDurationMapper(Mapper):
     def _process_single_sample(self, sample):
         # there is no video in this sample
         if self.video_key not in sample \
-            or sample[self.video_key] is None \
-            or len(sample[self.video_key]) == 0:
+                or sample[self.video_key] is None \
+                or len(sample[self.video_key]) == 0:
             return []
 
         # the split results
