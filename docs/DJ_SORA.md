@@ -18,12 +18,12 @@ This project is being actively updated and maintained. We eagerly invite you to 
 
 # Roadmap
 ## Overview
-* [Support high-performance loading and processing of video data](#Support high-performance loading and processing of video data)
-* [Basic Operators (video spatio-temporal dimension)](#Basic operator video spatio-temporal dimension)
-* [Advanced Operators (fine-grained modal matching and data generation)](#Advanced operators fine-grained modal matching and data generation)
-* [Advanced Operators (Video Content)](#Advanced Operator Video Content)
-* [DJ-SORA Data Recipes and Datasets](#DJ-SORA Data Recipes and Datasets)
-* [DJ-SORA Data Validation and Model Training](#DJ-SORA Data Validation and Model Training)
+* [Support high-performance loading and processing of video data](#support-high-performance-loading-and-processing-of-video-data)
+* [Basic Operators (video spatio-temporal dimension)](#basic-operators-video-spatio-temporal-dimension)
+* [Advanced Operators (fine-grained modal matching and data generation)](#advanced-operators-fine-grained-modal-matching-and-data-generation)
+* [Advanced Operators (Video Content)](#advanced-operators-video-content)
+* [DJ-SORA Data Recipes and Datasets](#dj-sora-data-recipes-and-datasets)
+* [DJ-SORA Data Validation and Model Training](#dj-sora-data-validation-and-model-training)
 
 
 ## Support high-performance loading and processing of video data
