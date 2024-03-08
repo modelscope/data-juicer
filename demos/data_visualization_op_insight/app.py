@@ -71,7 +71,7 @@ op_list_desc = {
     'selector':extract_op_desc(op_text, '## Selector <a name="selector"/>'),
 }
 
-op_types = ['mapper', 'filter',]# 'deduplicator'] , 'selector']
+op_types = ['filter',]# 'deduplicator'] , 'selector']
 local_ops_dict = {op_type:[] for op_type in op_types}
 multimodal = os.getenv('MULTI_MODAL', False)
 multimodal = True
@@ -79,6 +79,7 @@ text_key = 'text'
 image_key = 'images'
 audio_key = 'audios'
 video_key = 'videos'
+
 def get_op_lists(op_type):
     use_local_op = os.getenv('USE_LOCAL_OP', False)
     if not use_local_op:
@@ -96,7 +97,26 @@ def get_op_lists(op_type):
 def show_code(op_name):
     op_class = OPERATORS.modules[op_name]
     text = inspect.getsourcelines(op_class)
-    return ''.join(text[0])
+
+    init_signature = inspect.signature(op_class.__init__)
+
+    # 输出每个参数的名字和默认值
+    default_params = dict()
+    for name, parameter in init_signature.parameters.items():
+        if name in ['self', 'args', 'kwargs']:
+            continue  # 跳过 'self' 参数
+        if parameter.default is not inspect.Parameter.empty:
+            default_params[name] = parameter.default
+
+    return ''.join(text[0]), yaml.dump(default_params)
+
+def encode_sample(input_text, input_image, input_video, input_audio):
+    sample = dict()
+    sample[text_key]=input_text
+    sample[image_key]= input_image #[input_image] if input_image else []
+    sample[video_key]=[input_video] if input_video else []
+    sample[audio_key]=[input_audio] if input_audio else []
+    return sample
 
 def decode_sample(output_sample):
     output_text = output_sample[text_key]
@@ -115,70 +135,18 @@ def decode_sample(output_sample):
     audio_file = copy_func(output_audio)
     return output_text, image_file, video_file, audio_file
 
-def create_mapper_tab(op_type, op_tab):
+def create_tab_layout(op_tab, op_type, run_op, has_stats=False):
     with op_tab:
         options = get_op_lists(op_type)
         label = f'Select a {op_type} to show details'
         with gr.Row():
             op_selector = gr.Dropdown(value=options[0], label=label, choices=options, interactive=True)
+            with gr.Column():
+                gr.Markdown(" **Op Parameters**")
+                op_params = gr.Code(label="Yaml",language='yaml', interactive=True)
             run_button = gr.Button(value="🚀Run")
             show_code_button = gr.Button(value="🔍Show Code")
-        gr.Markdown(" **Op Parameters**")
-        op_params = gr.Code(label="Yaml",language='yaml', interactive=True)
-        with gr.Column():
-            with gr.Group('Inputs'):
-                gr.Markdown(" **Inputs**")
-                with gr.Row():
-                    # img = '/private/var/folders/7b/p5l9gykj1k7_tylkvwjv_sl00000gp/T/gradio/f24972121fd4d4f95f42f1cd70f859bb03839e76/image_blur_mapper/喜欢的书__dj_hash_#14a7b2e1b96410fbe63ea16a70422180db53d644661630938b2773d8efa18dde#.png'
-                    
-                    input_text = gr.TextArea(label="Text",interactive=True,)
-                    input_image = gr.Image(label='Image', type='filepath', visible=multimodal)
-                    input_video = gr.Video(label='Video', visible=multimodal)
-                    input_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal)
-            with gr.Group('Outputs'):
-                gr.Markdown(" **Outputs**")
-                with gr.Row():
-                    output_text = gr.TextArea(label="Text",interactive=False,)
-                    output_image = gr.Image(label='Image', visible=multimodal)
-                    output_video = gr.Video(label='Video', visible=multimodal)
-                    output_audio = gr.Audio(label='Audio', visible=multimodal)
-            code = gr.Code(label='Source', language='python')
-        def run_op(op_name, op_params, input_text, input_image, input_video, input_audio):
-            op_class = OPERATORS.modules[op_name]
-            try:
-                params = yaml.safe_load(op_params)
-            except:
-                params = {}
-            if params is None:
-                params = {}
-            op = op_class(**params)
-            sample = dict()
-            
-            sample[text_key] = input_text
-            sample[image_key] = [input_image]
-            sample[video_key] = [input_video]
-            sample[audio_key] = [input_audio]
-            
-            output_sample = op.process(copy.deepcopy(sample))
-            
-            return decode_sample(output_sample)
-        
-        inputs = [op_selector, op_params, input_text, input_image, input_video, input_audio]
-        outputs = [output_text, output_image, output_video, output_audio]
-        run_button.click(run_op, inputs=inputs, outputs=outputs)
-        show_code_button.click(show_code, inputs=[op_selector], outputs=[code])
 
-def create_filter_tab(op_type, op_tab):
-    with op_tab:
-
-        options = get_op_lists(op_type)
-        label = f'Select a {op_type} to show details'
-        with gr.Row():
-            op_selector = gr.Dropdown(value=options[0], label=label, choices=options, interactive=True)
-            run_button = gr.Button(value="🚀Run")
-            show_code_button = gr.Button(value="🔍Show Code")
-        gr.Markdown(" **Op Parameters**")
-        op_params = gr.Code(label="Yaml",language='yaml', interactive=True)
         with gr.Column():
             with gr.Group('Inputs'):
                 gr.Markdown(" **Inputs**")
@@ -187,7 +155,6 @@ def create_filter_tab(op_type, op_tab):
                     input_image = gr.Image(label='Image', type='filepath', visible=multimodal)
                     input_video = gr.Video(label='Video', visible=multimodal)
                     input_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal)
-                    input_stats = gr.Json(label='Stats')
 
             with gr.Group('Outputs'):
                 gr.Markdown(" **Outputs**")
@@ -196,9 +163,34 @@ def create_filter_tab(op_type, op_tab):
                     output_image = gr.Image(label='Image', type='filepath', visible=multimodal)
                     output_video = gr.Video(label='Video', visible=multimodal)
                     output_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal)
-                    output_stats = gr.Json(label='Stats')
+                    if has_stats:
+                        with gr.Column():
+                            output_stats = gr.Json(label='Stats')
+                            output_keep = gr.Text(label='Keep or not?', interactive=False)
 
             code = gr.Code(label='Source', language='python')
+        inputs = [op_selector, op_params, input_text, input_image, input_video, input_audio]
+        outputs = [output_text, output_image, output_video, output_audio]
+        if has_stats:
+            outputs.append(output_stats)
+            outputs.append(output_keep)
+
+        def run_func(*args):
+            try:
+                return run_op(*args)
+            except Exception as e:
+                gr.Error(str(e))
+                return outputs
+
+        def on_tab_select():
+            return gr.Dropdown(value=options[-1], label=label, choices=options, interactive=True)
+        show_code_button.click(show_code, inputs=[op_selector], outputs=[code, op_params])
+        run_button.click(run_func, inputs=inputs, outputs=outputs)
+        op_selector.change(show_code, inputs=[op_selector], outputs=[code, op_params])
+        # op_selector.select(show_code, inputs=[op_selector], outputs=[code, op_params])
+    op_tab.select(on_tab_select, outputs=[op_selector])
+def create_mapper_tab(op_type, op_tab):
+    with op_tab:
         def run_op(op_name, op_params, input_text, input_image, input_video, input_audio):
             op_class = OPERATORS.modules[op_name]
             try:
@@ -208,50 +200,37 @@ def create_filter_tab(op_type, op_tab):
             if params is None:
                 params = {}
             op = op_class(**params)
-            sample = dict()
-            sample[Fields.stats] = dict()
-            sample[text_key] = input_text
-            sample[image_key] = [input_image]
-            sample[video_key] = [input_video]
-            sample[audio_key] = [input_audio]
-            input_stats = sample[Fields.stats]
-            output_sample = op.compute_stats(copy.deepcopy(sample))
-            output_stats = output_sample[Fields.stats]   
-            return *decode_sample(output_sample), input_stats, output_stats
+            sample = encode_sample(input_text, input_image, input_video, input_audio)
+            output_sample = op.process(copy.deepcopy(sample))
+            return decode_sample(output_sample)
         
-        inputs = [op_selector, op_params, input_text, input_image, input_video, input_audio]
-        outputs = [output_text, output_image, output_video, output_audio, input_stats, output_stats]
-        run_button.click(run_op, inputs=inputs, outputs=outputs)
-        show_code_button.click(show_code, inputs=[op_selector], outputs=[code])
+        create_tab_layout(op_tab, op_type, run_op)
+
+
+def create_filter_tab(op_type, op_tab):
+
+    def run_op(op_name, op_params, input_text, input_image, input_video, input_audio):
+        op_class = OPERATORS.modules[op_name]
+        try:
+            params = yaml.safe_load(op_params)
+        except:
+            params = {}
+        if params is None:
+            params = {}
+        op = op_class(**params)
+        sample = encode_sample(input_text, input_image, input_video, input_audio)
+        sample[Fields.stats] = dict()
+        output_sample = op.compute_stats(copy.deepcopy(sample))
+        if op.process(output_sample):
+            output_keep = 'Yes'
+        else:
+            output_keep = 'No'
+        output_stats = output_sample[Fields.stats]
+        return *decode_sample(output_sample), output_stats, output_keep
+    create_tab_layout(op_tab, op_type, run_op, has_stats=True)
 
 def create_deduplicator_tab(op_type, op_tab):
     with op_tab:
-        options = get_op_lists(op_type)
-        label = f'Select a {op_type} to show details'
-        with gr.Row():
-            op_selector = gr.Dropdown(value=options[0], label=label, choices=options, interactive=True)
-            run_button = gr.Button(value="🚀Run")
-            show_code_button = gr.Button(value="🔍Show Code")
-        gr.Markdown(" **Op Parameters**")
-        op_params = gr.Code(label="Yaml",language='yaml', interactive=True)
-        with gr.Column():
-            with gr.Group('Inputs'):
-                gr.Markdown(" **Inputs**")
-                with gr.Row():
-                    input_text = gr.TextArea(label="Text",interactive=True,)
-                    input_image = gr.Image(label='Image', type='filepath', visible=multimodal)
-                    input_video = gr.Video(label='Video', visible=multimodal)
-                    input_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal)
-
-            with gr.Group('Outputs'):
-                gr.Markdown(" **Outputs**")
-                with gr.Row():
-                    output_text = gr.TextArea(label="Text",interactive=False,)
-                    output_image = gr.Image(label='Image', type='filepath', visible=multimodal)
-                    output_video = gr.Video(label='Video', visible=multimodal)
-                    output_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal)
-
-            code = gr.Code(label='Source', language='python')
         def run_op(op_name, op_params, input_text, input_images, input_video, input_audio):
             op_class = OPERATORS.modules[op_name]
             try:
@@ -261,50 +240,13 @@ def create_deduplicator_tab(op_type, op_tab):
             if params is None:
                 params = {}
             op = op_class(**params)
-            sample = dict()
-            sample[text_key] = input_text
-            sample[image_key] = input_images
-            sample[video_key] = [input_video]
-            sample[audio_key] = [input_audio]
-            
+            sample = encode_sample(input_text, input_image, input_video, input_audio)
             output_sample = sample #op.compute_hash(copy.deepcopy(sample))   
             return decode_sample(output_sample)
-        
-        inputs = [op_selector, op_params, input_text, input_image, input_video, input_audio]
-        outputs = [output_text, output_image, output_video, output_audio]
-        run_button.click(run_op, inputs=inputs, outputs=outputs)
-        show_code_button.click(show_code, inputs=[op_selector], outputs=[code])
+        create_tab_layout(op_tab, op_type, run_op, has_stats=True)
 
 def create_selector_tab(op_type, op_tab):
     with op_tab:
-        options = get_op_lists(op_type)
-        label = f'Select a {op_type} to show details'
-        with gr.Row():
-            op_selector = gr.Dropdown(value=options[0], label=label, choices=options, interactive=True)
-            run_button = gr.Button(value="🚀Run")
-            show_code_button = gr.Button(value="🔍Show Code")
-        gr.Markdown(" **Op Parameters**")
-        op_params = gr.Code(label="Yaml",language='yaml', interactive=True)
-        with gr.Column():
-            with gr.Group('Inputs'):
-                gr.Markdown(" **Inputs**")
-                with gr.Row():
-                    input_text = gr.TextArea(label="Text",interactive=True,)
-                    input_image = gr.Image(label='Image', type='filepath', visible=multimodal)
-                    input_video = gr.Video(label='Video', visible=multimodal)
-                    input_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal)
-                    input_stats = gr.Json(label='Stats')
-
-            with gr.Group('Outputs'):
-                gr.Markdown(" **Outputs**")
-                with gr.Row():
-                    output_text = gr.TextArea(label="Text",interactive=False,)
-                    output_image = gr.Image(label='Image', type='filepath', visible=multimodal)
-                    output_video = gr.Video(label='Video', visible=multimodal)
-                    output_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal)
-                    output_stats = gr.Json(label='Stats')
-
-            code = gr.Code(label='Source', language='python')
         def run_op(op_name, op_params, input_text, input_image, input_video, input_audio):
             op_class = OPERATORS.modules[op_name]
             try:
@@ -314,22 +256,13 @@ def create_selector_tab(op_type, op_tab):
             if params is None:
                 params = {}
             op = op_class(**params)
-            sample = dict()
+            sample = encode_sample(input_text, input_image, input_video, input_audio)
             sample[Fields.stats] = dict()
-            sample[text_key] = input_text
-            sample[image_key] = [input_image]
-            sample[video_key] = [input_video]
-            sample[audio_key] = [input_audio]
             input_stats = sample[Fields.stats]
             output_sample = op.compute_stats(copy.deepcopy(sample))
             output_stats = output_sample[Fields.stats]
-   
             return *decode_sample(output_sample), input_stats, output_stats
-        
-        inputs = [op_selector, op_params, input_text, input_image, input_video, input_audio]
-        outputs = [output_text, output_image, output_video, output_audio, input_stats, output_stats]
-        run_button.click(run_op, inputs=inputs, outputs=outputs)
-        show_code_button.click(show_code, inputs=[op_selector], outputs=[code])
+        create_tab_layout(op_tab, op_type, run_op, has_stats=True)
 
 with gr.Blocks(css="./app.css") as demo:
     
@@ -338,7 +271,6 @@ with gr.Blocks(css="./app.css") as demo:
     
     with gr.Accordion(label='Op Insight',open=True):
         tabs = gr.Tabs()
-
         with tabs:
             op_tabs = {op_type: gr.Tab(label=op_type.capitalize() + 's') for op_type in op_types}
             for op_type, op_tab in op_tabs.items():
