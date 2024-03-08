@@ -97,6 +97,17 @@
   width: 80%;
   height: 80%;
 }
+.show_image {
+  justify-content: center;
+  align-items: center;
+}
+
+.show_image img {
+  width: 50%;
+  height: 50%;
+}
+
+
 
 .project_label {
   font-size: 18px; /* 标题字体大小 */
