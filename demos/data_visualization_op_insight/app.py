@@ -77,6 +77,7 @@ op_types = ['mapper', 'filter',]# 'deduplicator'] , 'selector']
 local_ops_dict = {op_type:[] for op_type in op_types}
 multimodal = os.getenv('MULTI_MODAL', True)
 multimodal_visible = False
+cache_dir = './cache'
 text_key = 'text'
 image_key = 'images'
 audio_key = 'audios'
@@ -125,12 +126,26 @@ def change_visible(op_name):
         image_visible = True
     return gr.update(visible=text_visible), gr.update(visible=image_visible), gr.update(visible=video_visible), gr.update(visible=audio_visible),  gr.update(visible=text_visible), gr.update(visible=image_visible), gr.update(visible=video_visible), gr.update(visible=audio_visible)
 
+
+def clear_directory(directory=cache_dir):
+    for item in os.listdir(directory):
+        if item == '.gitkeep':
+            continue
+        item_path = os.path.join(directory, item)
+        if os.path.isfile(item_path) or os.path.islink(item_path):
+            os.remove(item_path)  # 删除文件或链接
+        elif os.path.isdir(item_path):
+            shutil.rmtree(item_path)  # 递归删除目录
+
+
 def copy_func(file):
-        filename = None
-        if file:
-            filename= os.path.basename(file)
-            shutil.copyfile(file, filename)
-        return filename
+    cache_file = None
+    if file:
+        filename= os.path.basename(file)
+        cache_file = os.path.join(cache_dir, filename)
+        shutil.copyfile(file, cache_file)
+    return cache_file
+
 
 def encode_sample(input_text, input_image, input_video, input_audio):
     sample = dict()
@@ -139,6 +154,7 @@ def encode_sample(input_text, input_image, input_video, input_audio):
     sample[video_key]=[input_video] if input_video else []
     sample[audio_key]=[input_audio] if input_audio else []
     return sample
+
 
 def decode_sample(output_sample):
     output_text = output_sample[text_key]
@@ -149,6 +165,7 @@ def decode_sample(output_sample):
     video_file = copy_func(output_video)
     audio_file = copy_func(output_audio)
     return output_text, image_file, video_file, audio_file
+
 
 def create_tab_layout(op_tab, op_type, run_op, has_stats=False):
     with op_tab:
@@ -167,7 +184,7 @@ def create_tab_layout(op_tab, op_type, run_op, has_stats=False):
                 gr.Markdown(" **Inputs**")
                 with gr.Row():
                     input_text = gr.TextArea(label="Text",interactive=True,)
-                    input_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible, elem_classes="show_image")
+                    input_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
                     input_video = gr.Video(label='Video', visible=multimodal_visible)
                     input_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal_visible)
 
@@ -175,7 +192,7 @@ def create_tab_layout(op_tab, op_type, run_op, has_stats=False):
                 gr.Markdown(" **Outputs**")
                 with gr.Row():
                     output_text = gr.TextArea(label="Text",interactive=False,)
-                    output_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible, elem_classes="show_image")
+                    output_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
                     output_video = gr.Video(label='Video', visible=multimodal_visible)
                     output_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal_visible)
                 
@@ -215,6 +232,7 @@ def create_tab_layout(op_tab, op_type, run_op, has_stats=False):
         op_selector.select(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4])
         op_tab.select(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4])
 
+
 def create_mapper_tab(op_type, op_tab):
     with op_tab:
         def run_op(input_text, input_image, input_video, input_audio, op_name, op_params):
@@ -252,6 +270,7 @@ def create_deduplicator_tab(op_type, op_tab):
             return decode_sample(output_sample)
         create_tab_layout(op_tab, op_type, run_op, has_stats=True)
 
+
 def create_tab_double_layout(op_tab, op_type, run_op):
     with op_tab:
         options = get_op_lists(op_type)
@@ -270,8 +289,8 @@ def create_tab_double_layout(op_tab, op_type, run_op):
                 with gr.Row():
                     input_text = gr.TextArea(label="Text",interactive=True,)
                     input_text2 = gr.TextArea(label="Text",interactive=True,)
-                    input_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible, elem_classes="show_image")
-                    input_image2 = gr.Image(label='Image', type='filepath', visible=multimodal_visible, elem_classes="show_image")
+                    input_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
+                    input_image2 = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
                     input_video = gr.Video(label='Video', visible=multimodal_visible)
                     input_video2 = gr.Video(label='Video', visible=multimodal_visible)
                     input_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal_visible)
@@ -282,8 +301,8 @@ def create_tab_double_layout(op_tab, op_type, run_op):
                 with gr.Row():
                     output_text = gr.TextArea(label="Text",interactive=False,)
                     output_text2 = gr.TextArea(label="Text",interactive=False,)
-                    output_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible, elem_classes="show_image")
-                    output_image2 = gr.Image(label='Image', type='filepath', visible=multimodal_visible, elem_classes="show_image")
+                    output_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
+                    output_image2 = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
                     output_video = gr.Video(label='Video', visible=multimodal_visible)
                     output_video2 = gr.Video(label='Video', visible=multimodal_visible)
                     output_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal_visible)
@@ -316,8 +335,8 @@ def create_tab_double_layout(op_tab, op_type, run_op):
         run_button.click(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4]).then(run_func, inputs=[op_selector], outputs=[code, op_params])
         op_selector.select(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4]).then(show_code, inputs=[op_selector], outputs=[code, op_params])
         op_tab.select(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4])
-with gr.Blocks(css="./app.css") as demo:
 
+with gr.Blocks(css="./app.css") as demo:
     dj_image = os.path.join(project_path, 'docs/imgs/data-juicer.jpg')
     gr.HTML(format_cover_html(dj_image))
     
@@ -331,5 +350,5 @@ with gr.Blocks(css="./app.css") as demo:
                         create_op_tab_func(op_type, op_tab)
                     else:
                         gr.Error(f'{op_type} not callable')
-
+    demo.load(clear_directory, every=10)
     demo.launch()
