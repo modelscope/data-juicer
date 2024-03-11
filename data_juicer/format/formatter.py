@@ -228,7 +228,7 @@ def unify_format(
         if video_key in dataset.features:
             data_path_keys.append(video_key)
         if len(data_path_keys) == 0:
-            # no image/audios path list in dataset, no need to convert
+            # no image/audio/videos path list in dataset, no need to convert
             return dataset
 
         if ds_dir == '':
