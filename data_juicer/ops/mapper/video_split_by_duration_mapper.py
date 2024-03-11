@@ -71,7 +71,8 @@ class VideoSplitByDurationMapper(Mapper):
             split_video_keys.append(split_video_key)
             count += 1
 
-        if video_duration - timestamps[-1] >= self.min_last_split_duration:
+        if video_duration - timestamps[
+                -1] >= self.min_last_split_duration + 0.1:
             split_video_key = transfer_filename(video_key, OP_NAME,
                                                 **self._init_parameters)
             suffix = '_split-by-duration-' + str(count)
