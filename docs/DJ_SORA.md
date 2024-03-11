@@ -2,7 +2,7 @@ English | [中文页面](DJ_SORA_ZH.md)
 
 ---
 
-Data is the key to the unprecedented development of large multi-modal models such as SORA. How to obtain and process data efficiently and scientifically faces new challenges! DJ-SORA aims to create a series of large-scale, high-quality open source multi-modal data sets to assist the open source community in data understanding and model training.
+Data is the key to the unprecedented development of large multi-modal models such as SORA. How to obtain and process data efficiently and scientifically faces new challenges! DJ-SORA aims to create a series of large-scale, high-quality open-source multi-modal data sets to assist the open-source community in data understanding and model training.
 
 DJ-SORA is based on Data-Juicer (including hundreds of dedicated video, image, audio, text and other multi-modal data processing [operators](Operators_ZH.md) and tools) to form a series of systematic and reusable Multimodal "data recipes" for analyzing, cleaning, and generating large-scale, high-quality multimodal data.
 
@@ -18,12 +18,12 @@ This project is being actively updated and maintained. We eagerly invite you to 
 
 # Roadmap
 ## Overview
-* [Support high-performance loading and processing of video data](#Support high-performance loading and processing of video data)
-* [Basic Operators (video spatio-temporal dimension)](#Basic operator video spatio-temporal dimension)
-* [Advanced Operators (fine-grained modal matching and data generation)](#Advanced operators fine-grained modal matching and data generation)
-* [Advanced Operators (Video Content)](#Advanced Operator Video Content)
-* [DJ-SORA Data Recipes and Datasets](#DJ-SORA Data Recipes and Datasets)
-* [DJ-SORA Data Validation and Model Training](#DJ-SORA Data Validation and Model Training)
+* [Support high-performance loading and processing of video data](#support-high-performance-loading-and-processing-of-video-data)
+* [Basic Operators (video spatio-temporal dimension)](#basic-operators-video-spatio-temporal-dimension)
+* [Advanced Operators (fine-grained modal matching and data generation)](#advanced-operators-fine-grained-modal-matching-and-data-generation)
+* [Advanced Operators (Video Content)](#advanced-operators-video-content)
+* [DJ-SORA Data Recipes and Datasets](#dj-sora-data-recipes-and-datasets)
+* [DJ-SORA Data Validation and Model Training](#dj-sora-data-validation-and-model-training)
 
 
 ## Support high-performance loading and processing of video data

@@ -28,7 +28,7 @@ def partition_data(json_file_path: str, hostnames: List[str]):
         nodes_video_size[min_node] += video_sizes[video]
 
     for hostname in hostnames:
-        host_file_path = f"{json_file_path.rsplit('.', 1)[0]}_{hostname}.json"
+        host_file_path = f"{json_file_path.rsplit('.', 1)[0]}_{hostname}.jsonl"
         with open(host_file_path, 'w') as f:
             for entry in nodes_data[hostname]:
                 f.write(json.dumps(entry) + '\n')
