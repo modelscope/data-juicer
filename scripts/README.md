@@ -9,6 +9,6 @@ The scripts to run are in ./dlc folder.
 
 #### Running Using Slurm
 
- - [ ] We will provide scripts to support running on slurm.
+We provide scripts to support running on slurm, see ./run_slurm.sh.
 
 You can also manually partition the data according to specific circumstances and then use Slurm to run it on multiple machines by yourself.
