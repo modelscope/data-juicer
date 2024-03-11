@@ -141,8 +141,11 @@ def main(
                     start_pts = timecode_string_to_seconds(
                         s['Start_timestamp'])
                     end_pts = timecode_string_to_seconds(s['End_timestamp'])
-                    cut_video_by_seconds(video, new_video, start_pts, end_pts)
-                    video = new_video
+                    if cut_video_by_seconds(video, new_video, start_pts,
+                                            end_pts):
+                        video = new_video
+                    else:
+                        continue
 
                 new_sample[video_key] = [video]
                 new_sample[text_key] = text
