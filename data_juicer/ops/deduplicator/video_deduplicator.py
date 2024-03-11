@@ -49,7 +49,7 @@ class VideoDeduplicator(Deduplicator):
             # consider the multi stream of video in one container
             for packet in videos[key].demux():
                 if packet.stream.type == 'video':
-                    md5_hash.update(packet.to_bytes())
+                    md5_hash.update(bytes(packet))
 
         sample[HashKeys.videohash] = md5_hash.hexdigest()
         return sample

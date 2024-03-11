@@ -420,11 +420,13 @@ def init_setup_from_cfg(cfg):
                     'text_key': text_key,
                     'image_key': cfg.image_key,
                     'audio_key': cfg.audio_key,
+                    'video_key': cfg.video_key,
                 }
             elif args['text_key'] is None:
                 args['text_key'] = text_key
                 args['image_key'] = cfg.image_key
                 args['audio_key'] = cfg.audio_key
+                args['video_key'] = cfg.video_key
             op[op_name] = args
 
     return cfg
