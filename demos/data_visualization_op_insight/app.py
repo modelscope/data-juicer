@@ -1,12 +1,17 @@
-import os
-import inspect
 import base64
-import yaml
 import copy
+import inspect
+import json
+import os
 import shutil
+
 import gradio as gr
+import yaml
+from datasets import Dataset
+
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.constant import Fields
+
 demo_path = os.path.dirname(os.path.abspath(__file__))
 project_path = os.path.dirname(os.path.dirname(demo_path))
 
@@ -73,7 +78,7 @@ op_list_desc = {
     'selector':extract_op_desc(op_text, '## Selector <a name="selector"/>'),
 }
 
-op_types = ['mapper', 'filter',]# 'deduplicator'] , 'selector']
+op_types = ['mapper', 'filter', 'deduplicator']
 local_ops_dict = {op_type:[] for op_type in op_types}
 multimodal = os.getenv('MULTI_MODAL', True)
 multimodal_visible = False
@@ -113,8 +118,8 @@ def show_code(op_name):
 
     return ''.join(text[0]), yaml.dump(default_params)
 
-def change_visible(op_name):
-    text_visible = True
+def change_visible(op_name, show_text):
+    text_visible = show_text
     video_visible = False
     audio_visible = False
     image_visible = False
@@ -124,6 +129,8 @@ def change_visible(op_name):
         audio_visible = True
     elif 'image' in op_name:
         image_visible = True
+    elif 'document' in op_name:
+        text_visible = True
     return gr.update(visible=text_visible), gr.update(visible=image_visible), gr.update(visible=video_visible), gr.update(visible=audio_visible),  gr.update(visible=text_visible), gr.update(visible=image_visible), gr.update(visible=video_visible), gr.update(visible=audio_visible)
 
 
@@ -178,7 +185,7 @@ def create_tab_layout(op_tab, op_type, run_op, has_stats=False):
                 op_params = gr.Code(label="Yaml",language='yaml', interactive=True)
             run_button = gr.Button(value="🚀Run")
             show_code_button = gr.Button(value="🔍Show Code")
-
+        show_text = gr.Checkbox(value=True,visible=False)
         with gr.Column():
             with gr.Group('Inputs'):
                 gr.Markdown(" **Inputs**")
@@ -225,13 +232,13 @@ def create_tab_layout(op_tab, op_type, run_op, has_stats=False):
                 return outputs
 
         show_code_button.click(show_code, inputs=[op_selector], outputs=[code, op_params])
-        show_code_button.click(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4])        
+        show_code_button.click(change_visible, inputs=[op_selector,show_text], outputs=outputs[:4] + inputs[:4])        
         run_button.click(run_func, inputs=inputs, outputs=outputs)
-        run_button.click(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4])   
+        run_button.click(change_visible, inputs=[op_selector,show_text], outputs=outputs[:4] + inputs[:4])   
         op_selector.select(show_code, inputs=[op_selector], outputs=[code, op_params])
-        op_selector.select(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4])
-        op_tab.select(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4])
-
+        op_selector.select(change_visible, inputs=[op_selector,show_text], outputs=outputs[:4] + inputs[:4])
+        op_tab.select(change_visible, inputs=[op_selector,show_text], outputs=outputs[:4] + inputs[:4])
+        op_tab.select(show_code, inputs=[op_selector], outputs=[code, op_params])
 
 def create_mapper_tab(op_type, op_tab):
     with op_tab:
@@ -262,13 +269,30 @@ def create_filter_tab(op_type, op_tab):
 
 def create_deduplicator_tab(op_type, op_tab):
     with op_tab:
-        def run_op( input_text, input_image, input_video, input_audio, op_name, op_params):
+        def run_op(input_text, input_image, input_video, input_audio, input_text2, input_image2, input_video2, input_audio2, op_name, op_params):
             op_class = OPERATORS.modules[op_name]
             op = op_class(**op_params)
             sample = encode_sample(input_text, input_image, input_video, input_audio)
-            output_sample = sample #op.compute_hash(copy.deepcopy(sample))   
-            return decode_sample(output_sample)
-        create_tab_layout(op_tab, op_type, run_op, has_stats=True)
+            sample2 = encode_sample(input_text2, input_image2, input_video2, input_audio2)
+            output_sample = op.compute_hash(copy.deepcopy(sample))
+            output_sample2 = op.compute_hash(copy.deepcopy(sample2))
+            ds = Dataset.from_list([output_sample, output_sample2])
+            hash_values = ds.remove_columns([text_key, image_key, video_key, audio_key]).to_dict()
+            ds.cleanup_cache_files()
+            for key, values in hash_values.items():
+                new_values = []
+                for value in values:
+                    if isinstance(value, list):
+                        new_values.append([v.hex() for v in value])
+                hash_values[key] = new_values or values
+            _, dedup_pairs = op.process(ds, show_num=1)
+            if dedup_pairs:
+                dedup = "Yes"
+            else:
+                dedup = "No"
+            
+            return json.dumps(hash_values), dedup
+        create_tab_double_layout(op_tab, op_type, run_op)
 
 
 def create_tab_double_layout(op_tab, op_type, run_op):
@@ -282,11 +306,12 @@ def create_tab_double_layout(op_tab, op_type, run_op):
                 op_params = gr.Code(label="Yaml",language='yaml', interactive=True)
             run_button = gr.Button(value="🚀Run")
             show_code_button = gr.Button(value="🔍Show Code")
-
+        show_text = gr.Checkbox(value=False,visible=False)
         with gr.Column():
             with gr.Group('Inputs'):
                 gr.Markdown(" **Inputs**")
                 with gr.Row():
+                    
                     input_text = gr.TextArea(label="Text",interactive=True,)
                     input_text2 = gr.TextArea(label="Text",interactive=True,)
                     input_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
@@ -299,42 +324,37 @@ def create_tab_double_layout(op_tab, op_type, run_op):
             with gr.Group('Outputs'):
                 gr.Markdown(" **Outputs**")
                 with gr.Row():
-                    output_text = gr.TextArea(label="Text",interactive=False,)
-                    output_text2 = gr.TextArea(label="Text",interactive=False,)
-                    output_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
-                    output_image2 = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
-                    output_video = gr.Video(label='Video', visible=multimodal_visible)
-                    output_video2 = gr.Video(label='Video', visible=multimodal_visible)
-                    output_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal_visible)
-                    output_audio2 = gr.Audio(label='Audio', type='filepath', visible=multimodal_visible)
-                
+                    output_deduplicated_pairs = gr.Json(label='Deduplicated pairs')
+                    output_deduplicated = gr.Text(label='Deduplicate or not?', interactive=False)
+                    
             code = gr.Code(label='Source', language='python')
         inputs = [input_text, input_image, input_video, input_audio, input_text2, input_image2, input_video2, input_audio2, op_selector, op_params]
-        outputs = [output_text, output_image, output_video, output_audio, output_text2, output_image2, output_video2, output_audio2]
+        outputs = [output_deduplicated_pairs, output_deduplicated]
 
         def run_func(*args):
             try:
                 try:
-                    op_params = args[-1]
+                    args = list(args)
+                    op_params = args.pop()
                     params = yaml.safe_load(op_params)
                 except:
                     params = {}
                 if params is None:
                     params = {}
-                return run_op(input_text, input_image, input_video, input_audio, op_selector, params)
+                return run_op(*args, params)
             except Exception as e:
                 gr.Error(str(e))
+                print(e)
                 return outputs
 
-        # show_code_button.click(show_code, inputs=[op_selector], outputs=[code, op_params])
-        # show_code_button.click(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4])    
-        # run_button.click(run_func, inputs=inputs, outputs=outputs)
-        # op_selector.select(show_code, inputs=[op_selector], outputs=[code, op_params])
-        # op_selector.select(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4])
-        show_code_button.click(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4]).then(show_code, inputs=[op_selector], outputs=[code, op_params])
-        run_button.click(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4]).then(run_func, inputs=[op_selector], outputs=[code, op_params])
-        op_selector.select(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4]).then(show_code, inputs=[op_selector], outputs=[code, op_params])
-        op_tab.select(change_visible, inputs=[op_selector], outputs=outputs[:4] + inputs[:4])
+        show_code_button.click(show_code, inputs=[op_selector], outputs=[code, op_params])
+        show_code_button.click(change_visible, inputs=[op_selector, show_text], outputs=inputs[:8])        
+        run_button.click(run_func, inputs=inputs, outputs=outputs)
+        run_button.click(change_visible, inputs=[op_selector,show_text], outputs=inputs[:8])   
+        op_selector.select(show_code, inputs=[op_selector], outputs=[code, op_params])
+        op_selector.select(change_visible, inputs=[op_selector,show_text], outputs=inputs[:8])
+        op_tab.select(change_visible, inputs=[op_selector,show_text], outputs= inputs[:8])
+        op_tab.select(show_code, inputs=[op_selector], outputs=[code, op_params])
 
 with gr.Blocks(css="./app.css") as demo:
     dj_image = os.path.join(project_path, 'docs/imgs/data-juicer.jpg')
