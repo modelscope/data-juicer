@@ -23,3 +23,6 @@ RUN cat environments/* | xargs pip install --default-timeout 1000
 # install data-juicer then
 COPY . .
 RUN pip install -v -e .[all]
+
+# install 3rd-party system dependencies
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
