@@ -26,7 +26,6 @@ class VideoResizeResolutionMapperTest(DataJuicerTestCaseBase):
         for sample in dataset.to_list():
             cur_list = []
             for value in sample['videos']:
-                print(value)
                 probe = ffmpeg.probe(value)
                 video_stream = next((stream for stream in probe['streams']
                                      if stream['codec_type'] == 'video'), None)

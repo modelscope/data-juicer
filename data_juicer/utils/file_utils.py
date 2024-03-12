@@ -8,7 +8,7 @@ from typing import List, Tuple, Union
 
 from datasets.utils.extract import ZstdExtractor as Extractor
 
-from data_juicer.utils.constant import DEFAULT_PREFIX
+from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 
 
 def find_files_with_suffix(
@@ -132,24 +132,27 @@ def transfer_filename(original_filepath: Union[str, Path], op_name,
         original_filepath to another unique file path. E.g.
 
             1. abc.jpg -->
-                {op_name}/abc__dj_hash_#{hash_val}#.jpg
+                __dj__produced_datas__/{op_name}/
+                abc__dj_hash_#{hash_val}#.jpg
             2. ./abc.jpg -->
-                ./{op_name}/abc__dj_hash_#{hash_val}#.jpg
+                ./__dj__produced_datas__/{op_name}/
+                abc__dj_hash_#{hash_val}#.jpg
             3. /path/to/abc.jpg -->
-                /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg
-            4. /path/to/{op_name}/abc.jpg -->
-                /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg
-            5. /path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg -->
-                /path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg
+                /path/to/__dj__produced_datas__/{op_name}/
+                abc__dj_hash_#{hash_val}#.jpg
+            4. /path/to/__dj__produced_datas__/{op_name}/
+                abc__dj_hash_#{hash_val1}#.jpg -->
+                /path/to/__dj__produced_datas__/{op_name}/
+                abc__dj_hash_#{hash_val2}#.jpg
 
     """
     # produce the directory
     original_dir = os.path.dirname(original_filepath)
-    parent_dir = os.path.basename(original_dir)
-    if parent_dir == op_name:
-        new_dir = original_dir
-    else:
-        new_dir = os.path.join(original_dir, f'{op_name}')
+    dir_token = f'/{Fields.multimodal_data_output_dir}/'
+    if dir_token in original_dir:
+        original_dir = original_dir.split(dir_token)[0]
+    new_dir = os.path.join(original_dir,
+                           f'{Fields.multimodal_data_output_dir}/{op_name}')
     create_directory_if_not_exists(new_dir)
 
     # produce the unique hash code
