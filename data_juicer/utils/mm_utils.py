@@ -30,11 +30,15 @@ class SpecialTokens(object):
 
 AV_STREAM_THREAD_TYPE = 'AUTO'
 """
-av stream thread type support "SLICE", "FRAME", "AUTO".
-    "SLICE": Decode more than one part of a single frame at once
-    "FRAME": Decode more than one frame at once
-    "AUTO": Using both "FRAME" and "SLICE"
-    AUTO is faster when there are no video latency.
+    av stream thread type support "SLICE", "FRAME", "AUTO".
+
+        "SLICE": Decode more than one part of a single frame at once
+
+        "FRAME": Decode more than one frame at once
+
+        "AUTO": Using both "FRAME" and "SLICE"
+        AUTO is faster when there are no video latency.
+
 """
 
 
@@ -174,6 +178,7 @@ def get_video_duration(input_video: Union[str, av.container.InputContainer],
                        video_stream_index=0):
     """
     Get the video's duration from the container
+
     :param input_video: the container object form PyAv library, which
         contains all streams in this video (video/audio/...) and can be used
         to decode these streams to frames.
@@ -200,6 +205,7 @@ def get_decoded_frames_from_video(
         video_stream_index=0):
     """
     Get the video's frames from the container
+
     :param input_video: the container object form PyAv library, which
         contains all streams in this video (video/audio/...) and can be used
         to decode these streams to frames.

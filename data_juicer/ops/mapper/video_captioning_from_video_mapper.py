@@ -57,23 +57,29 @@ class VideoCaptioningFromVideoMapper(Mapper):
         Initialization method.
 
         :param hf_video_blip: video-blip model name on huggingface
-        to generate caption
+            to generate caption
         :param caption_num: how many candidate captions to generate
-        for each video
+            for each video
         :param keep_candidate_mode: retain strategy for the generated
-        $caption_num$ candidates.
+            $caption_num$ candidates.
+
             'random_any': Retain the random one from generated captions
+
             'similar_one_simhash': Retain the generated one that is most
                 similar to the original caption
+
             'all': Retain all generated captions by concatenation
-        Note: This is a batched_OP, whose input and output type are
+
+        Note:
+            This is a batched_OP, whose input and output type are
             both list. Suppose there are $N$ list of input samples, whose batch
             size is $b$, and denote caption_num as $M$.
             The number of total samples after generation is $2Nb$ when
             keep_original_sample is True and $Nb$ when keep_original_sample is
             False. For 'random_any' and 'similar_one_simhash' mode,
-             it's $(1+M)Nb$ for 'all' mode when keep_original_sample is True
-             and $MNb$ when keep_original_sample is False.
+            it's $(1+M)Nb$ for 'all' mode when keep_original_sample is True
+            and $MNb$ when keep_original_sample is False.
+
         :param keep_original_sample: whether to keep the original sample. If
             it's set to False, there will be only generated captions in the
             final datasets and the original captions will be removed. It's True
@@ -86,8 +92,9 @@ class VideoCaptioningFromVideoMapper(Mapper):
             samples. If it's none, use prompt in parameter "prompt". It's None
             in default.
         :param frame_sampling_method: sampling method of extracting frame
-            videos from the videos. Should be one of ["all_keyframes",
-            "uniform"]. The former one extracts all key frames (the number
+            videos from the videos. Should be one of
+            ["all_keyframes", "uniform"].
+            The former one extracts all key frames (the number
             of which depends on the duration of the video) and the latter
             one extract specified number of frames uniformly from the video.
             Default: "all_keyframes".
@@ -328,14 +335,16 @@ class VideoCaptioningFromVideoMapper(Mapper):
 
     def process(self, samples, rank=None, context=False):
         """
-        Note: This is a batched_OP, whose the input and output type are
+        :param samples:
+        :return:
+
+        Note:
+            This is a batched_OP, whose the input and output type are
             both list. Suppose there are $N$ input sample list with batch
             size as $b$, and denote caption_num as $M$.
             the number of total samples after generation is $2Nb$
             for 'random_any' and 'similar_one' mode,
-             and $(1+M)Nb$ for 'all' mode.
-        :param samples:
-        :return:
+            and $(1+M)Nb$ for 'all' mode.
         """
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []

@@ -72,7 +72,7 @@ class CheckpointManager:
         from the checkpoint. Otherwise, process the original dataset
         from scratch.
 
-        :return: whether to skip somme ops or not
+        :return: whether to skip some ops or not
         """
 
         # load op records
