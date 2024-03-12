@@ -48,21 +48,27 @@ class GenerateCaptionMapper(Mapper):
 
         :param hf_blip2: blip2 model name on huggingface to generate caption
         :param caption_num: how many candidate captions to generate
-        for each image
+            for each image
         :param keep_candidate_mode: retain strategy for the generated
-        $caption_num$ candidates.
+            $caption_num$ candidates.
+
             'random_any': Retain the random one from generated captions
+
             'similar_one_simhash': Retain the generated one that is most
-                similar to the original caption
+            similar to the original caption
+
             'all': Retain all generated captions by concatenation
-        Note: This is a batched_OP, whose input and output type are
+
+        Note:
+            This is a batched_OP, whose input and output type are
             both list. Suppose there are $N$ list of input samples, whose batch
             size is $b$, and denote caption_num as $M$.
             The number of total samples after generation is $2Nb$ when
             keep_original_sample is True and $Nb$ when keep_original_sample is
             False. For 'random_any' and 'similar_one_simhash' mode,
-             it's $(1+M)Nb$ for 'all' mode when keep_original_sample is True
-             and $MNb$ when keep_original_sample is False.
+            it's $(1+M)Nb$ for 'all' mode when keep_original_sample is True
+            and $MNb$ when keep_original_sample is False.
+
         :param keep_original_sample: whether to keep the original sample. If
             it's set to False, there will be only generated captions in the
             final datasets and the original captions will be removed. It's True
@@ -267,12 +273,14 @@ class GenerateCaptionMapper(Mapper):
 
     def process(self, samples, rank=None):
         """
-        Note: This is a batched_OP, whose the input and output type are
+        Note:
+            This is a batched_OP, whose the input and output type are
             both list. Suppose there are $N$ input sample list with batch
             size as $b$, and denote caption_num as $M$.
             the number of total samples after generation is $2Nb$
             for 'random_any' and 'similar_one' mode,
-             and $(1+M)Nb$ for 'all' mode.
+            and $(1+M)Nb$ for 'all' mode.
+
         :param samples:
         :return:
         """

@@ -22,9 +22,9 @@ class ImageSizeFilter(Filter):
         Initialization method.
 
         :param min_size: The min image size to keep samples.  set to be "0" by
-        default for no size constraint
+            default for no size constraint
         :param max_size: The max image size to keep samples.  set to be
-        "1TB" by default, an approximate for un-limited case
+            "1TB" by default, an approximate for un-limited case
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the

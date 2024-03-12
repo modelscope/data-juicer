@@ -17,8 +17,8 @@ class FixUnicodeMapper(Mapper):
         Initialization method.
 
         :param normalization: the specified form of Unicode
-             normalization mode, which can be one of ['NFC',
-            'NFKC', 'NFD', and 'NFKD'], default 'NFC'
+             normalization mode, which can be one of
+             ['NFC', 'NFKC', 'NFD', and 'NFKD'], default 'NFC'.
         :param args: extra args
         :param kwargs: extra args
         """

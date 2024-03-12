@@ -3,7 +3,7 @@ data\_juicer.ops.common
 
 
 data\_juicer.ops.common.helper\_func
-------------------------------------
+-------------------------------------------
 
 .. automodule:: data_juicer.ops.common.helper_func
    :members:
@@ -11,7 +11,7 @@ data\_juicer.ops.common.helper\_func
    :show-inheritance:
 
 data\_juicer.ops.common.special\_characters
--------------------------------------------
+--------------------------------------------------
 
 .. automodule:: data_juicer.ops.common.special_characters
    :members:

@@ -62,9 +62,11 @@ class RayExecutor:
     Executor based on Ray [Experimental].
 
     Run Data-Juicer data processing in a distributed cluster.
+
         1. Only support Filter and Mapper operators for now.
         2. Only support loading `.json` files.
-        2. Advanced functions such as checkpoint, tracer are not supported.
+        3. Advanced functions such as checkpoint, tracer are not supported.
+
     """
 
     def __init__(self, cfg=None):

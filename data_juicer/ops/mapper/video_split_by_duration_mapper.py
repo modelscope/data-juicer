@@ -37,6 +37,7 @@ class VideoSplitByDurationMapper(Mapper):
                  **kwargs):
         """
         Initialization method.
+
         :param split_duration: duration of each video split in seconds.
         :param min_last_split_duration: The minimum allowable duration in
             seconds for the last video split. If the duration of the last

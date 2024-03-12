@@ -129,18 +129,19 @@ def transfer_filename(original_filepath: Union[str, Path], op_name,
     """
         According to the op and hashing its parameters 'op_kwargs' addition
         to the process id and current time as the 'hash_val', map the
-        original_filepath to another unique file path.
-        E.g.
-        1. abc.jpg -->
-            {op_name}/abc__dj_hash_#{hash_val}#.jpg
-        2. ./abc.jpg -->
-            ./{op_name}/abc__dj_hash_#{hash_val}#.jpg
-        3. /path/to/abc.jpg -->
-           /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg
-        4. /path/to/{op_name}/abc.jpg -->
-           /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg
-        5. /path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg -->
-           /path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg
+        original_filepath to another unique file path. E.g.
+
+            1. abc.jpg -->
+                {op_name}/abc__dj_hash_#{hash_val}#.jpg
+            2. ./abc.jpg -->
+                ./{op_name}/abc__dj_hash_#{hash_val}#.jpg
+            3. /path/to/abc.jpg -->
+                /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg
+            4. /path/to/{op_name}/abc.jpg -->
+                /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg
+            5. /path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg -->
+                /path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg
+
     """
     # produce the directory
     original_dir = os.path.dirname(original_filepath)
