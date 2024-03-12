@@ -32,9 +32,11 @@ class ChineseConvertMapper(Mapper):
 
             tw2s: Traditional Chinese (Taiwan Standard) to Simplified Chinese,
 
-            s2hk: Simplified Chinese to Traditional Chinese (Hong Kong variant),
+            s2hk: Simplified Chinese to Traditional Chinese
+            (Hong Kong variant),
 
-            hk2s: Traditional Chinese (Hong Kong variant) to Simplified Chinese,
+            hk2s: Traditional Chinese (Hong Kong variant) to Simplified
+            Chinese,
 
             s2twp: Simplified Chinese to Traditional Chinese (Taiwan Standard)
             with Taiwanese idiom,
@@ -46,13 +48,17 @@ class ChineseConvertMapper(Mapper):
 
             tw2t: Traditional Chinese (Taiwan standard) to Traditional Chinese,
 
-            hk2t: Traditional Chinese (Hong Kong variant) to Traditional Chinese,
+            hk2t: Traditional Chinese (Hong Kong variant) to Traditional
+            Chinese,
 
-            t2hk: Traditional Chinese to Traditional Chinese (Hong Kong variant),
+            t2hk: Traditional Chinese to Traditional Chinese
+            (Hong Kong variant),
 
-            t2jp: Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji,
+            t2jp: Traditional Chinese Characters (Kyūjitai) to New Japanese
+            Kanji,
 
-            jp2t: New Japanese Kanji (Shinjitai) to Traditional Chinese Characters,
+            jp2t: New Japanese Kanji (Shinjitai) to Traditional Chinese
+            Characters,
 
         :param args: extra args
         :param kwargs: extra args
