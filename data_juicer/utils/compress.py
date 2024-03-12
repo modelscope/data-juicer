@@ -45,6 +45,7 @@ class Extractor(HF_Extractor):
     ):
         """
         Extract content from a compressed file.
+
         :param input_path: path to compressed file.
         :param output_path: path to uncompressed file.
         :param extractor_format: extraction format,
@@ -69,6 +70,7 @@ class BaseCompressor(ABC):
     def compress(input_path: Union[Path, str], output_path: Union[Path, str]):
         """
         Compress input file and save to output file.
+
         :param input_path: path to uncompressed file.
         :param output_path: path to compressed file.
         """
@@ -84,6 +86,7 @@ class ZstdCompressor(BaseCompressor):
     def compress(input_path: Union[Path, str], output_path: Union[Path, str]):
         """
         Compress input file and save to output file.
+
         :param input_path: path to uncompressed file.
         :param output_path: path to compressed file.
         """
@@ -104,6 +107,7 @@ class Lz4Compressor(BaseCompressor):
     def compress(input_path: Union[Path, str], output_path: Union[Path, str]):
         """
         Compress a input file and save to output file.
+
         :param input_path: path to uncompressed file.
         :param output_path: path to compressed file.
         """
@@ -123,6 +127,7 @@ class GzipCompressor(BaseCompressor):
     def compress(input_path: Union[Path, str], output_path: Union[Path, str]):
         """
         Compress input file and save to output file.
+
         :param input_path: path to uncompressed file.
         :param output_path: path to compressed file.
         """
@@ -157,6 +162,7 @@ class Compressor:
     ):
         """
         Compress input file and save to output file.
+
         :param input_path: path to uncompressed file.
         :param output_path: path to compressed file.
         :param compressor_format: compression format,
@@ -199,6 +205,7 @@ class CompressManager:
     ):
         """
         Compress input file and save to output file.
+
         :param input_path: path to uncompressed file.
         :param output_path: path to compressed file.
         """
@@ -212,6 +219,7 @@ class CompressManager:
     ):
         """
         Decompress input file and save to output file.
+
         :param input_path: path to compressed file.
         :param output_path: path to uncompressed file.
         """
@@ -276,6 +284,7 @@ class CacheCompressManager:
         """
         Get all cache files in the dataset cache directory with fingerprints,
         which ends with specified extension.
+
         :param cache_directory: dataset cache directory.
         :param fingerprints: fingerprints of cache files. String or List are
             accepted. If `None`, we will find all cache files which starts with
@@ -305,6 +314,7 @@ class CacheCompressManager:
                  num_proc: int = 1):
         """
         Compress cache files with fingerprint in dataset cache directory.
+
         :param prev_ds: previous dataset whose cache files need to be
             compressed here.
         :param this_ds: Current dataset that is computed from the previous
@@ -372,6 +382,7 @@ class CacheCompressManager:
         """
         Decompress compressed cache files with fingerprint in
         dataset cache directory.
+
         :param ds: input dataset.
         :param fingerprints: fingerprintd of cache files. String or List are
             accepted. If `None`, we will find all cache files which starts with

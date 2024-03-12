@@ -132,11 +132,11 @@ def get_words_from_document(
     Get words from a document. Useful to compute ratios, like the
     stopwords ratio.
 
-    :param document: document that need to split words
+    :param document: document that need to split words.
     :param token_func: function of tokenizer, if specified, the function
         will be used for split document into different tokens.
-    :param new_line: whether to use `\\\\n' to split words
-    :param tab: whether to use '\\\\t' to split words
+    :param new_line: whether to use `\\\\n' to split words.
+    :param tab: whether to use '\\\\t' to split words.
     :return: word list obtained from document
     """
     if token_func:

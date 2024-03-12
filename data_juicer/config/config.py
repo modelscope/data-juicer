@@ -563,7 +563,8 @@ def export_config(cfg,
                   overwrite=False,
                   multifile=True):
     """
-        save the config object, some params are from jsonargparse
+    Save the config object, some params are from jsonargparse
+
     :param cfg: cfg object to save (Namespace type)
     :param path: the save path
     :param format: 'yaml', 'json', 'json_indented', 'parser_mode'
@@ -596,14 +597,14 @@ def export_config(cfg,
 
 def merge_config(ori_cfg, new_cfg: Dict):
     """
-        Merge configuration from new_cfg into ori_cfg
+    Merge configuration from new_cfg into ori_cfg
 
     :param ori_cfg: the original configuration object, whose type is
-    expected as namespace from jsonargparse
+        expected as namespace from jsonargparse
     :param new_cfg: the configuration object to be merged, whose type is
-    expected as dict or namespace from jsonargparse
+        expected as dict or namespace from jsonargparse
 
-    :return cfg_after_merge
+    :return: cfg_after_merge
     """
     try:
         ori_specified_op_names = set()

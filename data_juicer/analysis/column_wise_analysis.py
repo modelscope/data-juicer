@@ -61,6 +61,7 @@ class ColumnWiseAnalysis:
                  save_stats_in_one_file=True):
         """
         Initialization method
+
         :param dataset: the dataset to be analysed
         :param output_path: path to store the analysis results
         :param overall_result: optional precomputed overall stats result
