@@ -11,6 +11,7 @@ from datasets import Dataset
 
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.mm_utils import SpecialTokens, remove_special_tokens
 
 demo_path = os.path.dirname(os.path.abspath(__file__))
 project_path = os.path.dirname(os.path.dirname(demo_path))
@@ -156,15 +157,23 @@ def copy_func(file):
 
 def encode_sample(input_text, input_image, input_video, input_audio):
     sample = dict()
-    sample[text_key]=input_text
     sample[image_key]= [input_image] if input_image else []
     sample[video_key]=[input_video] if input_video else []
     sample[audio_key]=[input_audio] if input_audio else []
+
+    if input_image:
+        input_text += SpecialTokens.image
+    if input_video:
+        input_text += SpecialTokens.video
+    if input_audio:
+        input_text += SpecialTokens.audio
+    sample[text_key]=input_text
+
     return sample
 
 
 def decode_sample(output_sample):
-    output_text = output_sample[text_key]
+    output_text = remove_special_tokens(output_sample[text_key])
     output_image = output_sample[image_key][0] if output_sample[image_key] else None
     output_video = output_sample[video_key][0] if output_sample[video_key] else None 
     output_audio = output_sample[audio_key][0] if output_sample[audio_key] else None
