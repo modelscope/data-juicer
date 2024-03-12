@@ -169,7 +169,7 @@ process:
       force_divisible_by: 4                                   # Ensures that both the output dimensions, width and height, are divisible by the given integer when used together with force_original_aspect_ratio
   - video_split_by_duration_mapper:                         # Mapper to split video by duration.
       split_duration: 10                                      # duration of each video split in seconds.
-      min_last_split_duration: 0                              # the minimum allowable duration in seconds for the last video split. If the duration of the last split is less than this value, it will be discarded.
+      min_last_split_duration: 0.1                              # the minimum allowable duration in seconds for the last video split. If the duration of the last split is less than this value, it will be discarded.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
   - video_split_by_key_frame_mapper:                        # Mapper to split video by key frame.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default

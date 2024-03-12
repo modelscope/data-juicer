@@ -231,6 +231,8 @@ def cut_video_by_seconds(
     :param start_seconds: the start time in second.
     :param end_seconds: the end time in second. If it's None, this function
         will cut the video from the start_seconds to the end of the video.
+    :return: a boolean flag indicating whether the video was successfully
+        cut or not.
     """
     # open the original video
     if isinstance(input_video, str):
@@ -309,6 +311,11 @@ def cut_video_by_seconds(
     if isinstance(input_video, str):
         container.close()
     output_container.close()
+    if not os.path.exists(output_video):
+        logger.warning(f'This video could not be successfully cut in '
+                       f'[{start_seconds}, {end_seconds}] seconds. '
+                       f'Please set more accurate parameters.')
+    return os.path.exists(output_video)
 
 
 def process_each_frame(input_video: Union[str, av.container.InputContainer],
