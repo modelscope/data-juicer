@@ -155,7 +155,7 @@ def copy_func(file):
     return cache_file
 
 
-def encode_sample(input_text, input_image, input_video, input_audio):
+def encode_sample(input_text, input_image, input_video, input_audio, is_batched_op=False):
     sample = dict()
     sample[image_key]= [input_image] if input_image else []
     sample[video_key]=[input_video] if input_video else []
@@ -169,10 +169,17 @@ def encode_sample(input_text, input_image, input_video, input_audio):
         input_text += SpecialTokens.audio
     sample[text_key]=input_text
 
+    if is_batched_op:
+        for k, v in sample.items():
+            sample[k] = [v]
     return sample
 
 
-def decode_sample(output_sample):
+def decode_sample(output_sample, is_batched_op=False):
+    if is_batched_op:
+        for k, v in output_sample.items():
+            output_sample[k] = v[-1]
+
     output_text = remove_special_tokens(output_sample[text_key])
     output_image = output_sample[image_key][0] if output_sample[image_key] else None
     output_video = output_sample[video_key][0] if output_sample[video_key] else None 
@@ -199,7 +206,7 @@ def create_tab_layout(op_tab, op_type, run_op, has_stats=False):
             with gr.Group('Inputs'):
                 gr.Markdown(" **Inputs**")
                 with gr.Row():
-                    input_text = gr.TextArea(label="Text",interactive=True,)
+                    input_text = gr.TextArea(label="Text",interactive=True,scale=2)
                     input_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
                     input_video = gr.Video(label='Video', visible=multimodal_visible)
                     input_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal_visible)
@@ -207,11 +214,11 @@ def create_tab_layout(op_tab, op_type, run_op, has_stats=False):
             with gr.Group('Outputs'):
                 gr.Markdown(" **Outputs**")
                 with gr.Row():
-                    output_text = gr.TextArea(label="Text",interactive=False,)
+                    output_text = gr.TextArea(label="Text",interactive=False,scale=2)
                     output_image = gr.Image(label='Image', type='filepath', visible=multimodal_visible)
-                    output_video = gr.Video(label='Video', visible=multimodal_visible)
+                    output_video = gr.Video(label='Video', visible=multimodal_visible,)
                     output_audio = gr.Audio(label='Audio', type='filepath', visible=multimodal_visible)
-                
+
                 with gr.Row():
                     if has_stats:
                         output_stats = gr.Json(label='Stats')
@@ -254,9 +261,10 @@ def create_mapper_tab(op_type, op_tab):
         def run_op(input_text, input_image, input_video, input_audio, op_name, op_params):
             op_class = OPERATORS.modules[op_name]
             op = op_class(**op_params)
-            sample = encode_sample(input_text, input_image, input_video, input_audio)
+            is_batched_op = op.is_batched_op()
+            sample = encode_sample(input_text, input_image, input_video, input_audio, is_batched_op)
             output_sample = op.process(copy.deepcopy(sample))
-            return decode_sample(output_sample)
+            return decode_sample(output_sample, is_batched_op)
         create_tab_layout(op_tab, op_type, run_op)
 
 
