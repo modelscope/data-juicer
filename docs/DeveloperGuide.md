@@ -1,12 +1,12 @@
 # How-to Guide for Developers
 
-* [How-to Guide for Developers](#how-to-guide-for-developers)
-   * [Coding Style](#coding-style)
-   * [Build your own OPs](#build-your-own-ops)
-      * [(Optional) Make your OP fusible](#optional-make-your-op-fusible)
-   * [Build your own configs](#build-your-own-configs)
-      * [Fruitful config sources &amp; Type hints](#fruitful-config-sources--type-hints)
-      * [Hierarchical configs and helps](#hierarchical-configs-and-helps)
+- [How-to Guide for Developers](#how-to-guide-for-developers)
+  - [Coding Style](#coding-style)
+  - [Build your own OPs](#build-your-own-ops)
+    - [(Optional) Make your OP fusible](#optional-make-your-op-fusible)
+  - [Build your own configs](#build-your-own-configs)
+    - [Fruitful config sources \& Type hints](#fruitful-config-sources--type-hints)
+    - [Hierarchical configs and helps](#hierarchical-configs-and-helps)
 
 ## Coding Style
 
@@ -280,6 +280,8 @@ the corresponding documents, including the following docs:
 
    3. `docs/Operators_ZH.md`: this doc is the Chinese version of the doc in 6.ii, so we need to update the Chinese content at
    the same positions.
+
+   4. `docs/sphinx_doc/source/data_juicer.ops.{filter | mapper | deduplicator | selector}.rst`: this doc is the index of API reference. When the operator file name is modified or an operator file is added or deleted, the corresponding entries in the file need to be updated accordingly.
 
 ### (Optional) Make your OP fusible
 
