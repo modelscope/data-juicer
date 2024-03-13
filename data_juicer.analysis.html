@@ -48,6 +48,7 @@
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="data_juicer.html">data_juicer</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">data_juicer.analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#data-juicer-analysis-collector">data_juicer.analysis.collector</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.analysis.column_wise_analysis">data_juicer.analysis.column_wise_analysis</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis"><code class="docutils literal notranslate"><span class="pre">ColumnWiseAnalysis</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.column_wise_analysis.get_row_col"><code class="docutils literal notranslate"><span class="pre">get_row_col()</span></code></a></li>
@@ -60,6 +61,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.diversity_analysis.get_diversity"><code class="docutils literal notranslate"><span class="pre">get_diversity()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.analysis.draw">data_juicer.analysis.draw</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.draw.draw_heatmap"><code class="docutils literal notranslate"><span class="pre">draw_heatmap()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#data-juicer-analysis-measure">data_juicer.analysis.measure</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.analysis.overall_analysis">data_juicer.analysis.overall_analysis</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.analysis.overall_analysis.OverallAnalysis"><code class="docutils literal notranslate"><span class="pre">OverallAnalysis</span></code></a></li>
 </ul>
@@ -103,6 +109,9 @@
              
   <section id="data-juicer-analysis">
 <h1>data_juicer.analysis<a class="headerlink" href="#data-juicer-analysis" title="Permalink to this heading">¶</a></h1>
+<section id="data-juicer-analysis-collector">
+<h2>data_juicer.analysis.collector<a class="headerlink" href="#data-juicer-analysis-collector" title="Permalink to this heading">¶</a></h2>
+</section>
 <section id="module-data_juicer.analysis.column_wise_analysis">
 <span id="data-juicer-analysis-column-wise-analysis"></span><h2>data_juicer.analysis.column_wise_analysis<a class="headerlink" href="#module-data_juicer.analysis.column_wise_analysis" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -113,14 +122,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overall_result</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_stats_in_one_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/column_wise_analysis.html#ColumnWiseAnalysis.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialization method
-:param dataset: the dataset to be analysed
-:param output_path: path to store the analysis results
-:param overall_result: optional precomputed overall stats result
-:param save_stats_in_one_file: whether save all analysis figures of all</p>
-<blockquote>
-<div><p>stats into one image file</p>
-</div></blockquote>
+<dd><p>Initialization method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – the dataset to be analysed</p></li>
+<li><p><strong>output_path</strong> – path to store the analysis results</p></li>
+<li><p><strong>overall_result</strong> – optional precomputed overall stats result</p></li>
+<li><p><strong>save_stats_in_one_file</strong> – whether save all analysis figures of all
+stats into one image file</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -323,6 +336,33 @@ for each verb group</p></li>
 </dl>
 </dd></dl>
 
+</section>
+<section id="module-data_juicer.analysis.draw">
+<span id="data-juicer-analysis-draw"></span><h2>data_juicer.analysis.draw<a class="headerlink" href="#module-data_juicer.analysis.draw" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.analysis.draw.draw_heatmap">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.analysis.draw.</span></span><span class="sig-name descname"><span class="pre">draw_heatmap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triangle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/draw.html#draw_heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.draw.draw_heatmap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draw heatmap of input data with special lables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – input data, now support
+[<cite>list</cite>, <cite>tuple</cite>, <cite>numpy array</cite>, ‘torch tensor’]</p></li>
+<li><p><strong>xlabels</strong> – x axis labels.</p></li>
+<li><p><strong>ylabels</strong> – y axis labels, if None, use xlabels.</p></li>
+<li><p><strong>figsize</strong> – figure size.</p></li>
+<li><p><strong>triangle</strong> – only display triangle.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a plot figure.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="data-juicer-analysis-measure">
+<h2>data_juicer.analysis.measure<a class="headerlink" href="#data-juicer-analysis-measure" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-data_juicer.analysis.overall_analysis">
 <span id="data-juicer-analysis-overall-analysis"></span><h2>data_juicer.analysis.overall_analysis<a class="headerlink" href="#module-data_juicer.analysis.overall_analysis" title="Permalink to this heading">¶</a></h2>

@@ -57,6 +57,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.deduplicator.document_deduplicator">data_juicer.ops.deduplicator.document_deduplicator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.deduplicator.document_minhash_deduplicator">data_juicer.ops.deduplicator.document_minhash_deduplicator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.deduplicator.document_simhash_deduplicator">data_juicer.ops.deduplicator.document_simhash_deduplicator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.deduplicator.image_deduplicator">data_juicer.ops.deduplicator.image_deduplicator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.deduplicator.video_deduplicator">data_juicer.ops.deduplicator.video_deduplicator</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
@@ -326,6 +328,121 @@ num_blocks</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.process">
 <span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/document_simhash_deduplicator.html#DocumentSimhashDeduplicator.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>For doc-level, dataset –&gt; dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – input dataset</p></li>
+<li><p><strong>show_num</strong> – number of traced samples used when tracer is
+open.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>deduplicated dataset and the sampled duplicate pairs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.ops.deduplicator.image_deduplicator">
+<span id="data-juicer-ops-deduplicator-image-deduplicator"></span><h2>data_juicer.ops.deduplicator.image_deduplicator<a class="headerlink" href="#module-data_juicer.ops.deduplicator.image_deduplicator" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.deduplicator.image_deduplicator.</span></span><span class="sig-name descname"><span class="pre">ImageDeduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'phash'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/image_deduplicator.html#ImageDeduplicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator" title="data_juicer.ops.base_op.Deduplicator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Deduplicator</span></code></a></p>
+<p>Deduplicator to deduplicate samples at document-level using exact matching
+of images between documents.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'phash'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/image_deduplicator.html#ImageDeduplicator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> – hash method for image</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator.compute_hash">
+<span class="sig-name descname"><span class="pre">compute_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/image_deduplicator.html#ImageDeduplicator.compute_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator.compute_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute hash values for the sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – input sample</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sample with computed hash value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/image_deduplicator.html#ImageDeduplicator.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>For doc-level, dataset –&gt; dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – input dataset</p></li>
+<li><p><strong>show_num</strong> – number of traced samples used when tracer is
+open.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>deduplicated dataset and the sampled duplicate pairs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.ops.deduplicator.video_deduplicator">
+<span id="data-juicer-ops-deduplicator-video-deduplicator"></span><h2>data_juicer.ops.deduplicator.video_deduplicator<a class="headerlink" href="#module-data_juicer.ops.deduplicator.video_deduplicator" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.deduplicator.video_deduplicator.</span></span><span class="sig-name descname"><span class="pre">VideoDeduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/video_deduplicator.html#VideoDeduplicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Deduplicator" title="data_juicer.ops.base_op.Deduplicator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Deduplicator</span></code></a></p>
+<p>Deduplicator to deduplicate samples at document-level using exact matching
+of videos between documents.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/video_deduplicator.html#VideoDeduplicator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator.compute_hash">
+<span class="sig-name descname"><span class="pre">compute_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/video_deduplicator.html#VideoDeduplicator.compute_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator.compute_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute hash values for the sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – input sample</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sample with computed hash value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/video_deduplicator.html#VideoDeduplicator.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For doc-level, dataset –&gt; dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

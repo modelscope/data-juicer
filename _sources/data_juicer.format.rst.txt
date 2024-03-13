@@ -1,9 +1,9 @@
 data\_juicer.format
-===================
+===========================
 
 
 data\_juicer.format.csv\_formatter
-----------------------------------
+-----------------------------------------
 
 .. automodule:: data_juicer.format.csv_formatter
    :members:
@@ -11,7 +11,7 @@ data\_juicer.format.csv\_formatter
    :show-inheritance:
 
 data\_juicer.format.formatter
------------------------------
+------------------------------------
 
 .. automodule:: data_juicer.format.formatter
    :members:
@@ -19,7 +19,7 @@ data\_juicer.format.formatter
    :show-inheritance:
 
 data\_juicer.format.json\_formatter
------------------------------------
+------------------------------------------
 
 .. automodule:: data_juicer.format.json_formatter
    :members:
@@ -27,7 +27,7 @@ data\_juicer.format.json\_formatter
    :show-inheritance:
 
 data\_juicer.format.load
-------------------------
+-------------------------------
 
 .. automodule:: data_juicer.format.load
    :members:
@@ -35,7 +35,7 @@ data\_juicer.format.load
    :show-inheritance:
 
 data\_juicer.format.mixture\_formatter
---------------------------------------
+---------------------------------------------
 
 .. automodule:: data_juicer.format.mixture_formatter
    :members:
@@ -43,7 +43,7 @@ data\_juicer.format.mixture\_formatter
    :show-inheritance:
 
 data\_juicer.format.parquet\_formatter
---------------------------------------
+---------------------------------------------
 
 .. automodule:: data_juicer.format.parquet_formatter
    :members:
@@ -51,7 +51,7 @@ data\_juicer.format.parquet\_formatter
    :show-inheritance:
 
 data\_juicer.format.text\_formatter
------------------------------------
+------------------------------------------
 
 .. automodule:: data_juicer.format.text_formatter
    :members:
@@ -59,7 +59,7 @@ data\_juicer.format.text\_formatter
    :show-inheritance:
 
 data\_juicer.format.tsv\_formatter
-----------------------------------
+-----------------------------------------
 
 .. automodule:: data_juicer.format.tsv_formatter
    :members:

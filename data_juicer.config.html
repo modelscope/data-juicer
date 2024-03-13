@@ -114,9 +114,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.config.config.export_config">
 <span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">export_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_none</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multifile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#export_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.export_config" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>save the config object, some params are from jsonargparse</p>
-</div></blockquote>
+<dd><p>Save the config object, some params are from jsonargparse</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -180,18 +178,20 @@ by using the __path__ metas.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.config.config.merge_config">
 <span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">merge_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ori_cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#merge_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.merge_config" title="Permalink to this definition">¶</a></dt>
-<dd><blockquote>
-<div><p>Merge configuration from new_cfg into ori_cfg</p>
-</div></blockquote>
+<dd><p>Merge configuration from new_cfg into ori_cfg</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ori_cfg</strong> – the original configuration object, whose type is</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ori_cfg</strong> – the original configuration object, whose type is
+expected as namespace from jsonargparse</p></li>
+<li><p><strong>new_cfg</strong> – the configuration object to be merged, whose type is
+expected as dict or namespace from jsonargparse</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>cfg_after_merge</p>
 </dd>
 </dl>
-<p>expected as namespace from jsonargparse
-:param new_cfg: the configuration object to be merged, whose type is
-expected as dict or namespace from jsonargparse</p>
-<p>:return cfg_after_merge</p>
 </dd></dl>
 
 <dl class="py function">

@@ -118,6 +118,7 @@
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Extract content from a compressed file.</span>
+
 <span class="sd">        :param input_path: path to compressed file.</span>
 <span class="sd">        :param output_path: path to uncompressed file.</span>
 <span class="sd">        :param extractor_format: extraction format,</span>
@@ -142,6 +143,7 @@
     <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="n">input_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">output_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress input file and save to output file.</span>
+
 <span class="sd">        :param input_path: path to uncompressed file.</span>
 <span class="sd">        :param output_path: path to compressed file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -157,6 +159,7 @@
     <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="n">input_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">output_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress input file and save to output file.</span>
+
 <span class="sd">        :param input_path: path to uncompressed file.</span>
 <span class="sd">        :param output_path: path to compressed file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -177,6 +180,7 @@
     <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="n">input_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">output_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress a input file and save to output file.</span>
+
 <span class="sd">        :param input_path: path to uncompressed file.</span>
 <span class="sd">        :param output_path: path to compressed file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -196,6 +200,7 @@
     <span class="k">def</span> <span class="nf">compress</span><span class="p">(</span><span class="n">input_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">output_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress input file and save to output file.</span>
+
 <span class="sd">        :param input_path: path to uncompressed file.</span>
 <span class="sd">        :param output_path: path to compressed file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -230,6 +235,7 @@
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress input file and save to output file.</span>
+
 <span class="sd">        :param input_path: path to uncompressed file.</span>
 <span class="sd">        :param output_path: path to compressed file.</span>
 <span class="sd">        :param compressor_format: compression format,</span>
@@ -272,6 +278,7 @@
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress input file and save to output file.</span>
+
 <span class="sd">        :param input_path: path to uncompressed file.</span>
 <span class="sd">        :param output_path: path to compressed file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -285,6 +292,7 @@
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decompress input file and save to output file.</span>
+
 <span class="sd">        :param input_path: path to compressed file.</span>
 <span class="sd">        :param output_path: path to uncompressed file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -349,6 +357,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get all cache files in the dataset cache directory with fingerprints,</span>
 <span class="sd">        which ends with specified extension.</span>
+
 <span class="sd">        :param cache_directory: dataset cache directory.</span>
 <span class="sd">        :param fingerprints: fingerprints of cache files. String or List are</span>
 <span class="sd">            accepted. If `None`, we will find all cache files which starts with</span>
@@ -378,6 +387,7 @@
                  <span class="n">num_proc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compress cache files with fingerprint in dataset cache directory.</span>
+
 <span class="sd">        :param prev_ds: previous dataset whose cache files need to be</span>
 <span class="sd">            compressed here.</span>
 <span class="sd">        :param this_ds: Current dataset that is computed from the previous</span>
@@ -445,6 +455,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decompress compressed cache files with fingerprint in</span>
 <span class="sd">        dataset cache directory.</span>
+
 <span class="sd">        :param ds: input dataset.</span>
 <span class="sd">        :param fingerprints: fingerprintd of cache files. String or List are</span>
 <span class="sd">            accepted. If `None`, we will find all cache files which starts with</span>

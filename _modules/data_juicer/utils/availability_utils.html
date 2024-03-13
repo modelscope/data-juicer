@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.utils.availability_utils &mdash; data_juicer 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b1f64a84"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+              <div class="version">
+                0.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.html">data_juicer</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">data_juicer.utils.availability_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.utils.availability_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib.metadata</span>
+<span class="kn">import</span> <span class="nn">importlib.util</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="n">UNAVAILABLE_OPERATORS</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">CHECK_SYSTEM_INFO_ONCE</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<div class="viewcode-block" id="UnavailableOperator"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.availability_utils.UnavailableOperator">[docs]</a><span class="k">class</span> <span class="nc">UnavailableOperator</span><span class="p">:</span>
+
+<div class="viewcode-block" id="UnavailableOperator.__init__"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.availability_utils.UnavailableOperator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">,</span> <span class="n">requires</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op_name</span> <span class="o">=</span> <span class="n">op_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requires</span> <span class="o">=</span> <span class="n">requires</span></div>
+
+<div class="viewcode-block" id="UnavailableOperator.get_warning_msg"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.availability_utils.UnavailableOperator.get_warning_msg">[docs]</a>    <span class="k">def</span> <span class="nf">get_warning_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;This OP [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] is unavailable due to importing &#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;third-party requirements of this OP failure: &#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">requires</span><span class="si">}</span><span class="s1">. You can either run &#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;`pip install -v -e .[sci]` to install all requirements for &#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;all OPs, or run `pip install </span><span class="si">{</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requires</span><span class="p">)</span><span class="si">}</span><span class="s1">` &#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;with library version specified by &#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;`environments/science_requires.txt` to install libraries &#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;required by this OP. Data processing will skip this OP later.&#39;</span></div></div>
+
+
+<div class="viewcode-block" id="AvailabilityChecking"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.availability_utils.AvailabilityChecking">[docs]</a><span class="k">class</span> <span class="nc">AvailabilityChecking</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a range that checks the availability of third-party libraries for</span>
+<span class="sd">    OPs or other situations. If the checking failed, add corresponding OP to</span>
+<span class="sd">    the unavailable OP</span>
+<span class="sd">    list and skip them when initializing OPs with warnings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AvailabilityChecking.__init__"><a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.availability_utils.AvailabilityChecking.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">requires_list</span><span class="p">,</span>
+        <span class="n">op_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">requires_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param requires_list: libraries to import in this range</span>
+<span class="sd">        :param op_name: which op requires these libraries. In default, it&#39;s</span>
+<span class="sd">            None, which means the importing process is not in an OP.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requires_list</span> <span class="o">=</span> <span class="n">requires_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op_name</span> <span class="o">=</span> <span class="n">op_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requires_type</span> <span class="o">=</span> <span class="n">requires_type</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;No module named </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">requires_list</span><span class="si">}</span><span class="s1">. You might &#39;</span> \
+                         <span class="sa">f</span><span class="s1">&#39;need to install it by running `pip install &#39;</span> \
+                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">requires_list</span><span class="p">)</span><span class="si">}</span><span class="s1">`.&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">requires_type</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; Or install all related requires by running &#39;</span> \
+                              <span class="sa">f</span><span class="s1">&#39;`pip install -v -e .[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">requires_type</span><span class="si">}</span><span class="s1">]`&#39;</span></div>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="c1"># only for python3.8 on mac</span>
+        <span class="k">global</span> <span class="n">CHECK_SYSTEM_INFO_ONCE</span>
+        <span class="k">if</span> <span class="n">CHECK_SYSTEM_INFO_ONCE</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">os</span>
+            <span class="kn">import</span> <span class="nn">platform</span>
+            <span class="kn">import</span> <span class="nn">sys</span>
+            <span class="n">major</span><span class="p">,</span> <span class="n">minor</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">system</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">major</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">minor</span> <span class="o">==</span> <span class="mi">8</span> <span class="ow">and</span> <span class="n">system</span> <span class="o">==</span> <span class="s1">&#39;Darwin&#39;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s1">&#39;The torch.set_num_threads function does not &#39;</span>
+                    <span class="s1">&#39;work in python3.8 version on Mac systems. We will set &#39;</span>
+                    <span class="s1">&#39;OMP_NUM_THREADS to 1 manually before importing torch&#39;</span><span class="p">)</span>
+
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;OMP_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">CHECK_SYSTEM_INFO_ONCE</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_name</span><span class="p">:</span>
+                <span class="c1"># ModuleNotFoundError for OP: register to UNAVAILABLE_OPERATORS</span>
+                <span class="n">UNAVAILABLE_OPERATORS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">op_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">UnavailableOperator</span><span class="p">(</span>
+                    <span class="n">op_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">op_name</span><span class="p">,</span>
+                    <span class="n">requires</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">requires_list</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># other situations: print error message and exit</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">exc_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">exc_val</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">exc_tb</span><span class="o">.</span><span class="n">tb_frame</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_msg</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># import libs successfully</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># other exceptions: raise the exception directly</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># return True to suppress the exception</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<span class="k">def</span> <span class="nf">_is_package_available</span><span class="p">(</span>
+        <span class="n">pkg_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">return_version</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]:</span>
+    <span class="c1"># Check we&#39;re not importing a &quot;pkg_name&quot; directory somewhere</span>
+    <span class="c1"># but the actual library by trying to grab the version</span>
+    <span class="n">package_exists</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="n">package_version</span> <span class="o">=</span> <span class="s1">&#39;N/A&#39;</span>
+    <span class="k">if</span> <span class="n">package_exists</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">package_version</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">pkg_name</span><span class="p">)</span>
+            <span class="n">package_exists</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">PackageNotFoundError</span><span class="p">:</span>
+            <span class="n">package_exists</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detected </span><span class="si">{</span><span class="n">pkg_name</span><span class="si">}</span><span class="s1"> version </span><span class="si">{</span><span class="n">package_version</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_version</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">package_exists</span><span class="p">,</span> <span class="n">package_version</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">package_exists</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

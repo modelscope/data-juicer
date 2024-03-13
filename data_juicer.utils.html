@@ -57,6 +57,11 @@
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.asset_utils.load_words_asset"><code class="docutils literal notranslate"><span class="pre">load_words_asset()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.availability_utils">data_juicer.utils.availability_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.availability_utils.AvailabilityChecking"><code class="docutils literal notranslate"><span class="pre">AvailabilityChecking</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.availability_utils.UnavailableOperator"><code class="docutils literal notranslate"><span class="pre">UnavailableOperator</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.cache_utils">data_juicer.utils.cache_utils</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.ckpt_utils">data_juicer.utils.ckpt_utils</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.ckpt_utils.CheckpointManager"><code class="docutils literal notranslate"><span class="pre">CheckpointManager</span></code></a></li>
@@ -111,6 +116,38 @@
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.logger_utils.setup_logger"><code class="docutils literal notranslate"><span class="pre">setup_logger()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.mm_utils">data_juicer.utils.mm_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.AV_STREAM_THREAD_TYPE"><code class="docutils literal notranslate"><span class="pre">AV_STREAM_THREAD_TYPE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.SpecialTokens"><code class="docutils literal notranslate"><span class="pre">SpecialTokens</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.cut_video_by_seconds"><code class="docutils literal notranslate"><span class="pre">cut_video_by_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.extract_audio_from_video"><code class="docutils literal notranslate"><span class="pre">extract_audio_from_video()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.extract_key_frames"><code class="docutils literal notranslate"><span class="pre">extract_key_frames()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.extract_video_frames_uniformly"><code class="docutils literal notranslate"><span class="pre">extract_video_frames_uniformly()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.get_decoded_frames_from_video"><code class="docutils literal notranslate"><span class="pre">get_decoded_frames_from_video()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.get_file_size"><code class="docutils literal notranslate"><span class="pre">get_file_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.get_key_frame_seconds"><code class="docutils literal notranslate"><span class="pre">get_key_frame_seconds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.get_special_tokens"><code class="docutils literal notranslate"><span class="pre">get_special_tokens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.get_video_duration"><code class="docutils literal notranslate"><span class="pre">get_video_duration()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.image_byte_to_base64"><code class="docutils literal notranslate"><span class="pre">image_byte_to_base64()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.image_path_to_base64"><code class="docutils literal notranslate"><span class="pre">image_path_to_base64()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.insert_texts_after_placeholders"><code class="docutils literal notranslate"><span class="pre">insert_texts_after_placeholders()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.iou"><code class="docutils literal notranslate"><span class="pre">iou()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_audio"><code class="docutils literal notranslate"><span class="pre">load_audio()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_audios"><code class="docutils literal notranslate"><span class="pre">load_audios()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_data_with_context"><code class="docutils literal notranslate"><span class="pre">load_data_with_context()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_image"><code class="docutils literal notranslate"><span class="pre">load_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_image_byte"><code class="docutils literal notranslate"><span class="pre">load_image_byte()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_images"><code class="docutils literal notranslate"><span class="pre">load_images()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_images_byte"><code class="docutils literal notranslate"><span class="pre">load_images_byte()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_video"><code class="docutils literal notranslate"><span class="pre">load_video()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_videos"><code class="docutils literal notranslate"><span class="pre">load_videos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.pil_to_opencv"><code class="docutils literal notranslate"><span class="pre">pil_to_opencv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.remove_non_special_tokens"><code class="docutils literal notranslate"><span class="pre">remove_non_special_tokens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.remove_special_tokens"><code class="docutils literal notranslate"><span class="pre">remove_special_tokens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.size_to_bytes"><code class="docutils literal notranslate"><span class="pre">size_to_bytes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.timecode_string_to_seconds"><code class="docutils literal notranslate"><span class="pre">timecode_string_to_seconds()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.model_utils">data_juicer.utils.model_utils</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.check_model"><code class="docutils literal notranslate"><span class="pre">check_model()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.model_utils.get_backup_model_link"><code class="docutils literal notranslate"><span class="pre">get_backup_model_link()</span></code></a></li>
@@ -131,6 +168,10 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.registry">data_juicer.utils.registry</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.registry.Registry"><code class="docutils literal notranslate"><span class="pre">Registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.utils.unittest_utils">data_juicer.utils.unittest_utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase"><code class="docutils literal notranslate"><span class="pre">DataJuicerTestCaseBase</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -188,6 +229,50 @@ names, and the values are lists of words</p>
 </dd></dl>
 
 </section>
+<section id="module-data_juicer.utils.availability_utils">
+<span id="data-juicer-utils-availability-utils"></span><h2>data_juicer.utils.availability_utils<a class="headerlink" href="#module-data_juicer.utils.availability_utils" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.utils.availability_utils.AvailabilityChecking">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.availability_utils.</span></span><span class="sig-name descname"><span class="pre">AvailabilityChecking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requires_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requires_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/availability_utils.html#AvailabilityChecking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.availability_utils.AvailabilityChecking" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Define a range that checks the availability of third-party libraries for
+OPs or other situations. If the checking failed, add corresponding OP to
+the unavailable OP
+list and skip them when initializing OPs with warnings.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.availability_utils.AvailabilityChecking.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requires_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requires_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/availability_utils.html#AvailabilityChecking.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.availability_utils.AvailabilityChecking.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>requires_list</strong> – libraries to import in this range</p></li>
+<li><p><strong>op_name</strong> – which op requires these libraries. In default, it’s
+None, which means the importing process is not in an OP.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.utils.availability_utils.UnavailableOperator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.availability_utils.</span></span><span class="sig-name descname"><span class="pre">UnavailableOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requires</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/availability_utils.html#UnavailableOperator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.availability_utils.UnavailableOperator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.availability_utils.UnavailableOperator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requires</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/availability_utils.html#UnavailableOperator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.availability_utils.UnavailableOperator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.availability_utils.UnavailableOperator.get_warning_msg">
+<span class="sig-name descname"><span class="pre">get_warning_msg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/availability_utils.html#UnavailableOperator.get_warning_msg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.availability_utils.UnavailableOperator.get_warning_msg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-data_juicer.utils.cache_utils">
 <span id="data-juicer-utils-cache-utils"></span><h2>data_juicer.utils.cache_utils<a class="headerlink" href="#module-data_juicer.utils.cache_utils" title="Permalink to this heading">¶</a></h2>
 </section>
@@ -238,7 +323,7 @@ from the checkpoint. Otherwise, process the original dataset
 from scratch.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>whether to skip somme ops or not</p>
+<dd class="field-odd"><p>whether to skip some ops or not</p>
 </dd>
 </dl>
 </dd></dl>
@@ -298,9 +383,15 @@ the process list from config to decide if a checkpoint is available.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.BaseCompressor.compress">
 <em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#BaseCompressor.compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.BaseCompressor.compress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compress input file and save to output file.
-:param input_path: path to uncompressed file.
-:param output_path: path to compressed file.</p>
+<dd><p>Compress input file and save to output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> – path to uncompressed file.</p></li>
+<li><p><strong>output_path</strong> – path to compressed file.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -334,14 +425,12 @@ which starts with <cite>cache-</cite> and ends with compression format
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.CacheCompressManager.compress">
 <span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prev_ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">this_ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#CacheCompressManager.compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.CacheCompressManager.compress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compress cache files with fingerprint in dataset cache directory.
-:param prev_ds: previous dataset whose cache files need to be</p>
-<blockquote>
-<div><p>compressed here.</p>
-</div></blockquote>
+<dd><p>Compress cache files with fingerprint in dataset cache directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>prev_ds</strong> – previous dataset whose cache files need to be
+compressed here.</p></li>
 <li><p><strong>this_ds</strong> – Current dataset that is computed from the previous
 dataset. There might be overlaps between cache files of them, so we
 must not compress cache files that will be used again in the
@@ -357,16 +446,16 @@ dataset should be compressed.</p></li>
 <dt class="sig sig-object py" id="data_juicer.utils.compress.CacheCompressManager.decompress">
 <span class="sig-name descname"><span class="pre">decompress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fingerprints</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#CacheCompressManager.decompress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.CacheCompressManager.decompress" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decompress compressed cache files with fingerprint in
-dataset cache directory.
-:param ds: input dataset.
-:param fingerprints: fingerprintd of cache files. String or List are</p>
-<blockquote>
-<div><p>accepted. If <cite>None</cite>, we will find all cache files which starts with
-<cite>cache-</cite> and ends with compression format.</p>
-</div></blockquote>
+dataset cache directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>num_proc</strong> – number of processes to decompress cache files.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds</strong> – input dataset.</p></li>
+<li><p><strong>fingerprints</strong> – fingerprintd of cache files. String or List are
+accepted. If <cite>None</cite>, we will find all cache files which starts with
+<cite>cache-</cite> and ends with compression format.</p></li>
+<li><p><strong>num_proc</strong> – number of processes to decompress cache files.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -401,17 +490,29 @@ default <cite>zstd</cite>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.CompressManager.compress">
 <span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#CompressManager.compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.CompressManager.compress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compress input file and save to output file.
-:param input_path: path to uncompressed file.
-:param output_path: path to compressed file.</p>
+<dd><p>Compress input file and save to output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> – path to uncompressed file.</p></li>
+<li><p><strong>output_path</strong> – path to compressed file.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.CompressManager.decompress">
 <span class="sig-name descname"><span class="pre">decompress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#CompressManager.decompress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.CompressManager.decompress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Decompress input file and save to output file.
-:param input_path: path to compressed file.
-:param output_path: path to uncompressed file.</p>
+<dd><p>Decompress input file and save to output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> – path to compressed file.</p></li>
+<li><p><strong>output_path</strong> – path to uncompressed file.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -431,13 +532,17 @@ default <cite>zstd</cite>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.Compressor.compress">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compressor_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#Compressor.compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.Compressor.compress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compress input file and save to output file.
-:param input_path: path to uncompressed file.
-:param output_path: path to compressed file.
-:param compressor_format: compression format,</p>
-<blockquote>
-<div><p>see supported algorithm in <cite>compressors</cite>.</p>
-</div></blockquote>
+<dd><p>Compress input file and save to output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> – path to uncompressed file.</p></li>
+<li><p><strong>output_path</strong> – path to compressed file.</p></li>
+<li><p><strong>compressor_format</strong> – compression format,
+see supported algorithm in <cite>compressors</cite>.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py attribute">
@@ -455,13 +560,17 @@ default <cite>zstd</cite>.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.Extractor.extract">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">extract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extractor_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#Extractor.extract"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.Extractor.extract" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract content from a compressed file.
-:param input_path: path to compressed file.
-:param output_path: path to uncompressed file.
-:param extractor_format: extraction format,</p>
-<blockquote>
-<div><p>see supported algorithm in <cite>Extractor</cite> of huggingface dataset.</p>
-</div></blockquote>
+<dd><p>Extract content from a compressed file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> – path to compressed file.</p></li>
+<li><p><strong>output_path</strong> – path to uncompressed file.</p></li>
+<li><p><strong>extractor_format</strong> – extraction format,
+see supported algorithm in <cite>Extractor</cite> of huggingface dataset.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -482,9 +591,15 @@ remove lock file automatically.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.GzipCompressor.compress">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#GzipCompressor.compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.GzipCompressor.compress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compress input file and save to output file.
-:param input_path: path to uncompressed file.
-:param output_path: path to compressed file.</p>
+<dd><p>Compress input file and save to output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> – path to uncompressed file.</p></li>
+<li><p><strong>output_path</strong> – path to compressed file.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -497,9 +612,15 @@ remove lock file automatically.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.Lz4Compressor.compress">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#Lz4Compressor.compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.Lz4Compressor.compress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compress a input file and save to output file.
-:param input_path: path to uncompressed file.
-:param output_path: path to compressed file.</p>
+<dd><p>Compress a input file and save to output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> – path to uncompressed file.</p></li>
+<li><p><strong>output_path</strong> – path to compressed file.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -512,9 +633,15 @@ remove lock file automatically.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.utils.compress.ZstdCompressor.compress">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/compress.html#ZstdCompressor.compress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.compress.ZstdCompressor.compress" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compress input file and save to output file.
-:param input_path: path to uncompressed file.
-:param output_path: path to compressed file.</p>
+<dd><p>Compress input file and save to output file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_path</strong> – path to uncompressed file.</p></li>
+<li><p><strong>output_path</strong> – path to compressed file.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -945,25 +1072,36 @@ path is a relative path.</p>
 <span class="sig-prename descclassname"><span class="pre">data_juicer.utils.file_utils.</span></span><span class="sig-name descname"><span class="pre">transfer_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">op_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/file_utils.html#transfer_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.file_utils.transfer_filename" title="Permalink to this definition">¶</a></dt>
 <dd><p>According to the op and hashing its parameters ‘op_kwargs’ addition
 to the process id and current time as the ‘hash_val’, map the
-original_filepath to another unique file path.
-E.g.
-1. abc.jpg –&gt;</p>
+original_filepath to another unique file path. E.g.</p>
 <blockquote>
-<div><p>{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
-</div></blockquote>
-<ol class="arabic simple" start="2">
+<div><ol class="arabic simple">
+<li><dl class="simple">
+<dt>abc.jpg –&gt;</dt><dd><p>{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
+</dd>
+</dl>
+</li>
 <li><dl class="simple">
 <dt>./abc.jpg –&gt;</dt><dd><p>./{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
 </dd>
 </dl>
 </li>
-<li><p>/path/to/abc.jpg –&gt;
-/path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</p></li>
-<li><p>/path/to/{op_name}/abc.jpg –&gt;
-/path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</p></li>
-<li><p>/path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg –&gt;
-/path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg</p></li>
+<li><dl class="simple">
+<dt>/path/to/abc.jpg –&gt;</dt><dd><p>/path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>/path/to/{op_name}/abc.jpg –&gt;</dt><dd><p>/path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>/path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg –&gt;</dt><dd><p>/path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg</p>
+</dd>
+</dl>
+</li>
 </ol>
+</div></blockquote>
 </dd></dl>
 
 </section>
@@ -1118,6 +1256,293 @@ Default value: (apex, pycocotools).</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>logger instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.utils.mm_utils">
+<span id="data-juicer-utils-mm-utils"></span><h2>data_juicer.utils.mm_utils<a class="headerlink" href="#module-data_juicer.utils.mm_utils" title="Permalink to this heading">¶</a></h2>
+<dl class="py data">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.AV_STREAM_THREAD_TYPE">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">AV_STREAM_THREAD_TYPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'AUTO'</span></em><a class="headerlink" href="#data_juicer.utils.mm_utils.AV_STREAM_THREAD_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>av stream thread type support “SLICE”, “FRAME”, “AUTO”.</p>
+<p>“SLICE”: Decode more than one part of a single frame at once</p>
+<p>“FRAME”: Decode more than one frame at once</p>
+<p>“AUTO”: Using both “FRAME” and “SLICE”
+AUTO is faster when there are no video latency.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.SpecialTokens">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">SpecialTokens</span></span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#SpecialTokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.SpecialTokens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.SpecialTokens.audio">
+<span class="sig-name descname"><span class="pre">audio</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&lt;__dj__audio&gt;'</span></em><a class="headerlink" href="#data_juicer.utils.mm_utils.SpecialTokens.audio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.SpecialTokens.eoc">
+<span class="sig-name descname"><span class="pre">eoc</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&lt;|__dj__eoc|&gt;'</span></em><a class="headerlink" href="#data_juicer.utils.mm_utils.SpecialTokens.eoc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.SpecialTokens.image">
+<span class="sig-name descname"><span class="pre">image</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&lt;__dj__image&gt;'</span></em><a class="headerlink" href="#data_juicer.utils.mm_utils.SpecialTokens.image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.SpecialTokens.video">
+<span class="sig-name descname"><span class="pre">video</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&lt;__dj__video&gt;'</span></em><a class="headerlink" href="#data_juicer.utils.mm_utils.SpecialTokens.video" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.cut_video_by_seconds">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">cut_video_by_seconds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">InputContainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#cut_video_by_seconds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.cut_video_by_seconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cut a video into several segments by times in second.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_video</strong> – the path to input video or the video container.</p></li>
+<li><p><strong>output_video</strong> – the path to output video.</p></li>
+<li><p><strong>start_seconds</strong> – the start time in second.</p></li>
+<li><p><strong>end_seconds</strong> – the end time in second. If it’s None, this function
+will cut the video from the start_seconds to the end of the video.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a boolean flag indicating whether the video was successfully
+cut or not.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.extract_audio_from_video">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">extract_audio_from_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">InputContainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_audio</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_seconds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_indexes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#extract_audio_from_video"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.extract_audio_from_video" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract audio data for the given video.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_video</strong> – input video. Can be a video path or an
+av.container.InputContainer.</p></li>
+<li><p><strong>output_audio</strong> – output audio path. If it’s None, the audio data won’t
+be written to file. If stream_indexes is not None, it will output
+multiple audio files with original filename and the stream indexes.
+Default: None.</p></li>
+<li><p><strong>start_seconds</strong> – the start seconds to extract audio data. Default: 0,
+which means extract from the start of the video.</p></li>
+<li><p><strong>end_seconds</strong> – the end seconds to stop extracting audio data. If it’s
+None, the extraction won’t stop until the end of the video. Default:
+None.</p></li>
+<li><p><strong>stream_indexes</strong> – there might be multiple audio streams in the video,
+so we need to decide which audio streams with stream_indexes will be
+extracted. It can be a single index or a list of indexes. If it’s None,
+all audio streams will be extracted. Default: None.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.extract_key_frames">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">extract_key_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">InputContainer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#extract_key_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.extract_key_frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract key frames from the input video.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_video</strong> – input video path or container.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a list of key frames.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.extract_video_frames_uniformly">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">extract_video_frames_uniformly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">InputContainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#extract_video_frames_uniformly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.extract_video_frames_uniformly" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract a number of video frames uniformly within the video duration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_video</strong> – input video path or container.</p></li>
+<li><p><strong>frame_num</strong> – The number of frames to be extracted. If it’s 1, only the
+middle frame will be extracted. If it’s 2, only the first and the last
+frames will be extracted. If it’s larger than 2, in addition to the
+first and the last frames, other frames will be extracted uniformly
+within the video duration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a list of extracted frames.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.get_decoded_frames_from_video">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">get_decoded_frames_from_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">InputContainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_stream_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#get_decoded_frames_from_video"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.get_decoded_frames_from_video" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the video’s frames from the container</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_video</strong> – the container object form PyAv library, which
+contains all streams in this video (video/audio/…) and can be used
+to decode these streams to frames.</p></li>
+<li><p><strong>video_stream_index</strong> – the video stream index to decode,
+default set to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>an iterator of all the frames of the video</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.get_file_size">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">get_file_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#get_file_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.get_file_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.get_key_frame_seconds">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">get_key_frame_seconds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">InputContainer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#get_key_frame_seconds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.get_key_frame_seconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get seconds of key frames in the input video.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.get_special_tokens">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">get_special_tokens</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#get_special_tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.get_special_tokens" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.get_video_duration">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">get_video_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">InputContainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_stream_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#get_video_duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.get_video_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the video’s duration from the container</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_video</strong> – the container object form PyAv library, which
+contains all streams in this video (video/audio/…) and can be used
+to decode these streams to frames.</p></li>
+<li><p><strong>video_stream_index</strong> – the video stream index to decode,
+default set to 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>duration of the video in second</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.image_byte_to_base64">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">image_byte_to_base64</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_byte</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#image_byte_to_base64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.image_byte_to_base64" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.image_path_to_base64">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">image_path_to_base64</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#image_path_to_base64"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.image_path_to_base64" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.insert_texts_after_placeholders">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">insert_texts_after_placeholders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">placeholders</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_texts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter_in_insert_pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#insert_texts_after_placeholders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.insert_texts_after_placeholders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.iou">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">iou</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">box1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#iou"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.iou" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_audio">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_audio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_audio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_audios">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_audios</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_audios"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_audios" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_data_with_context">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_data_with_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loaded_data_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_data_with_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_data_with_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>The unified loading function with contexts for multimodal data.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_image">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_image" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_image_byte">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_image_byte</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_image_byte"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_image_byte" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_images">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_images" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_images_byte">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_images_byte</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_images_byte"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_images_byte" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_video">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_video"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_video" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a video using its path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> – the path to this video.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a container object form PyAv library, which contains all streams
+in this video (video/audio/…) and can be used to decode these streams
+to frames.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.load_videos">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">load_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#load_videos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.load_videos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.pil_to_opencv">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">pil_to_opencv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pil_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#pil_to_opencv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.pil_to_opencv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.remove_non_special_tokens">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">remove_non_special_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#remove_non_special_tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.remove_non_special_tokens" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.remove_special_tokens">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">remove_special_tokens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#remove_special_tokens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.remove_special_tokens" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.size_to_bytes">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">size_to_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#size_to_bytes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.size_to_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.timecode_string_to_seconds">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">timecode_string_to_seconds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timecode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#timecode_string_to_seconds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.timecode_string_to_seconds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a timecode string to the float seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timecode</strong> – the input timecode string. Must in “HH:MM:SS.fff(fff)”
+format.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1424,6 +1849,27 @@ the same name. Default: False.</p></li>
 <span class="go">                            module_cls=TextFormatter2)</span>
 </pre></div>
 </div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.utils.unittest_utils">
+<span id="data-juicer-utils-unittest-utils"></span><h2>data_juicer.utils.unittest_utils<a class="headerlink" href="#module-data_juicer.utils.unittest_utils" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.utils.unittest_utils.DataJuicerTestCaseBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.utils.unittest_utils.</span></span><span class="sig-name descname"><span class="pre">DataJuicerTestCaseBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/unittest_utils.html#DataJuicerTestCaseBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.setUpClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">setUpClass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/unittest_utils.html#DataJuicerTestCaseBase.setUpClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.setUpClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.tearDownClass">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tearDownClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/data_juicer/utils/unittest_utils.html#DataJuicerTestCaseBase.tearDownClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.tearDownClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
 </dd></dl>
 
 </dd></dl>

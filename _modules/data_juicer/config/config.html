@@ -493,11 +493,13 @@
                     <span class="s1">&#39;text_key&#39;</span><span class="p">:</span> <span class="n">text_key</span><span class="p">,</span>
                     <span class="s1">&#39;image_key&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">image_key</span><span class="p">,</span>
                     <span class="s1">&#39;audio_key&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">audio_key</span><span class="p">,</span>
+                    <span class="s1">&#39;video_key&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">video_key</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;text_key&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">args</span><span class="p">[</span><span class="s1">&#39;text_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text_key</span>
                 <span class="n">args</span><span class="p">[</span><span class="s1">&#39;image_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">image_key</span>
                 <span class="n">args</span><span class="p">[</span><span class="s1">&#39;audio_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">audio_key</span>
+                <span class="n">args</span><span class="p">[</span><span class="s1">&#39;video_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">video_key</span>
             <span class="n">op</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span>
 
     <span class="k">return</span> <span class="n">cfg</span></div>
@@ -634,7 +636,8 @@
                   <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                   <span class="n">multifile</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        save the config object, some params are from jsonargparse</span>
+<span class="sd">    Save the config object, some params are from jsonargparse</span>
+
 <span class="sd">    :param cfg: cfg object to save (Namespace type)</span>
 <span class="sd">    :param path: the save path</span>
 <span class="sd">    :param format: &#39;yaml&#39;, &#39;json&#39;, &#39;json_indented&#39;, &#39;parser_mode&#39;</span>
@@ -667,14 +670,14 @@
 
 <div class="viewcode-block" id="merge_config"><a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.merge_config">[docs]</a><span class="k">def</span> <span class="nf">merge_config</span><span class="p">(</span><span class="n">ori_cfg</span><span class="p">,</span> <span class="n">new_cfg</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Merge configuration from new_cfg into ori_cfg</span>
+<span class="sd">    Merge configuration from new_cfg into ori_cfg</span>
 
 <span class="sd">    :param ori_cfg: the original configuration object, whose type is</span>
-<span class="sd">    expected as namespace from jsonargparse</span>
+<span class="sd">        expected as namespace from jsonargparse</span>
 <span class="sd">    :param new_cfg: the configuration object to be merged, whose type is</span>
-<span class="sd">    expected as dict or namespace from jsonargparse</span>
+<span class="sd">        expected as dict or namespace from jsonargparse</span>
 
-<span class="sd">    :return cfg_after_merge</span>
+<span class="sd">    :return: cfg_after_merge</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">ori_specified_op_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>

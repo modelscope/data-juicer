@@ -1,9 +1,9 @@
 data\_juicer.core
-=================
+=========================
 
 
 data\_juicer.core.analyser
---------------------------
+---------------------------------
 
 .. automodule:: data_juicer.core.analyser
    :members:
@@ -11,7 +11,7 @@ data\_juicer.core.analyser
    :show-inheritance:
 
 data\_juicer.core.data
-----------------------
+-----------------------------
 
 .. automodule:: data_juicer.core.data
    :members:
@@ -19,7 +19,7 @@ data\_juicer.core.data
    :show-inheritance:
 
 data\_juicer.core.executor
---------------------------
+---------------------------------
 
 .. automodule:: data_juicer.core.executor
    :members:
@@ -27,7 +27,7 @@ data\_juicer.core.executor
    :show-inheritance:
 
 data\_juicer.core.exporter
---------------------------
+---------------------------------
 
 .. automodule:: data_juicer.core.exporter
    :members:
@@ -35,7 +35,7 @@ data\_juicer.core.exporter
    :show-inheritance:
 
 data\_juicer.core.ray\_executor
--------------------------------
+--------------------------------------
 
 .. automodule:: data_juicer.core.ray_executor
    :members:
@@ -43,7 +43,7 @@ data\_juicer.core.ray\_executor
    :show-inheritance:
 
 data\_juicer.core.tracer
-------------------------
+-------------------------------
 
 .. automodule:: data_juicer.core.tracer
    :members:

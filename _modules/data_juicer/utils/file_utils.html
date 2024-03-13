@@ -202,18 +202,19 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        According to the op and hashing its parameters &#39;op_kwargs&#39; addition</span>
 <span class="sd">        to the process id and current time as the &#39;hash_val&#39;, map the</span>
-<span class="sd">        original_filepath to another unique file path.</span>
-<span class="sd">        E.g.</span>
-<span class="sd">        1. abc.jpg --&gt;</span>
-<span class="sd">            {op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
-<span class="sd">        2. ./abc.jpg --&gt;</span>
-<span class="sd">            ./{op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
-<span class="sd">        3. /path/to/abc.jpg --&gt;</span>
-<span class="sd">           /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
-<span class="sd">        4. /path/to/{op_name}/abc.jpg --&gt;</span>
-<span class="sd">           /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
-<span class="sd">        5. /path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg --&gt;</span>
-<span class="sd">           /path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg</span>
+<span class="sd">        original_filepath to another unique file path. E.g.</span>
+
+<span class="sd">            1. abc.jpg --&gt;</span>
+<span class="sd">                {op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
+<span class="sd">            2. ./abc.jpg --&gt;</span>
+<span class="sd">                ./{op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
+<span class="sd">            3. /path/to/abc.jpg --&gt;</span>
+<span class="sd">                /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
+<span class="sd">            4. /path/to/{op_name}/abc.jpg --&gt;</span>
+<span class="sd">                /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</span>
+<span class="sd">            5. /path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg --&gt;</span>
+<span class="sd">                /path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># produce the directory</span>
     <span class="n">original_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">original_filepath</span><span class="p">)</span>
