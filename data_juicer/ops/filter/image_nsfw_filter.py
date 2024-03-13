@@ -72,22 +72,14 @@ class ImageNSFWFilter(Filter):
         sample, images = load_data_with_context(sample, context,
                                                 loaded_image_keys, load_image)
 
-        nsfw_scores = []
         model, processor = get_model(self.model_key, rank=rank)
 
-        # for key in images:
-        #     inputs = processor(images=images[key], return_tensors="pt").to(model.device)
-        #     outputs = model(**inputs)
-        #     logits = outputs.logits[0]
-        #     score = torch.softmax(logits, dim=-1)[1]
-        #     nsfw_scores.append(score)
         images = [images[key] for key in images]
         inputs = processor(images=images, return_tensors="pt").to(model.device)
         outputs = model(**inputs)
         logits = outputs.logits
+        nsfw_scores = [scores[1] for scores in torch.softmax(logits, dim=-1)]
         
-
-
         sample[Fields.stats][
             StatsKeys.image_nsfw_score] = nsfw_scores
 

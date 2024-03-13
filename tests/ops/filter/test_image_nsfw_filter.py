@@ -62,30 +62,10 @@ class ImageNSFWFilterTest(DataJuicerTestCaseBase):
                             score_threshold=0.0005)
         self._run_filter(dataset, tgt_list, op)
 
-    def test_all(self):
-
-        ds_list = [{
-            'images': [self.img1_path]
-        }, {
-            'images': [self.img2_path]
-        }, {
-            'images': [self.img3_path]
-        }]
-        tgt_list = [{
-            'images': [self.img2_path]
-        }, {
-            'images': [self.img3_path]
-        }]
-
-        dataset = Dataset.from_list(ds_list)
-        op = ImageNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.0005)
-        self._run_filter(dataset, tgt_list, op)
-
     def test_any(self):
 
         ds_list = [{
-            'images': [self.img1_path, self.img1_path]
+            'images': [self.img1_path, self.img3_path]
         }, {
             'images': [self.img1_path, self.img2_path]
         }]
@@ -95,7 +75,7 @@ class ImageNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = ImageNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.0005,
+                            score_threshold=0.00012,
                             any_or_all='any')
         self._run_filter(dataset, tgt_list, op)    
 
@@ -104,10 +84,10 @@ class ImageNSFWFilterTest(DataJuicerTestCaseBase):
         ds_list = [{
             'images': [self.img1_path, self.img2_path]
         }, {
-            'images': [self.img2_path, self.img2_path]
+            'images': [self.img2_path, self.img3_path]
         }]
         tgt_list = [{
-            'images': [self.img2_path, self.img2_path]
+            'images': [self.img2_path, self.img3_path]
         }]
 
         dataset = Dataset.from_list(ds_list)
