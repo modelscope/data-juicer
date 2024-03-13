@@ -7,7 +7,7 @@
 #       - videos: video paths list.
 #   - other fields in the original format can be kept or not
 #   - in jsonl
-# {'videos': ['videos/video6513.mp4'],
+# {'videos': ['video6513.mp4'],
 #  'text': 'a family is having coversation',
 #  'category': 14',
 #  'url': 'https://www.youtube.com/watch?v=A9pM9iOuAzM',
