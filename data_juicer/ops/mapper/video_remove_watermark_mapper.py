@@ -146,8 +146,11 @@ class VideoRemoveWatermarkMapper(Mapper):
             pixel_diversity = pixel_diversity.sum(-1)
             max_diversity = np.max(pixel_diversity)
             min_diversity = np.min(pixel_diversity)
-            scaled_diversity = 255 * (pixel_diversity - min_diversity) / (
-                max_diversity - min_diversity)
+            if max_diversity > min_diversity:
+                scaled_diversity = 255 * (pixel_diversity - min_diversity) / (
+                    max_diversity - min_diversity)
+            else:
+                scaled_diversity = np.zeros_like(pixel_diversity)
             scaled_diversity = scaled_diversity.astype(np.uint8)
             _, binary_frame = cv.threshold(scaled_diversity, 0, 255,
                                            cv.THRESH_BINARY + cv.THRESH_OTSU)
