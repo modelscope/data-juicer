@@ -35,6 +35,7 @@ class VideoRemoveWatermarkMapper(Mapper):
                  frame_num: PositiveInt = 10,
                  min_frame_threshold: PositiveInt = 7,
                  detection_method: str = 'pixel_value',
+                 threshold: int = None,
                  *args,
                  **kwargs):
         """
@@ -56,11 +57,12 @@ class VideoRemoveWatermarkMapper(Mapper):
         :param min_frame_threshold: a coodination is considered as the
             location of a watermark pixel when it is that in no less
             min_frame_threshold frames.
-        :detection_method: the method to detect the pixels of watermark. If it
-            is 'pixel_value', we consider the distribution of pixel value in
-            each frame. If it is 'pixel_diversity', we will consider the pixel
-            diversity in different frames. The min_frame_threshold is useless
-            and frame_num must be greater than 1 in 'pixel_diversity' mode.
+        :param detection_method: the method to detect the pixels of watermark.
+            If it is 'pixel_value', we consider the distribution of pixel
+            value in each frame. If it is 'pixel_diversity', we will consider
+            the pixel diversity in different frames. The min_frame_threshold
+            is useless and frame_num must be greater than 1 in
+            'pixel_diversity' mode.
         :param args: extra args
         :param kwargs: extra args
         """
