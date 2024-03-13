@@ -8,7 +8,7 @@
 #   - other fields in the original format can be kept or not
 #   - in jsonl
 # {'videos': ['video6513.mp4'],
-#  'text': 'a family is having coversation',
+#  'text': 'a family is having conversation',
 #  'category': 14',
 #  'url': 'https://www.youtube.com/watch?v=A9pM9iOuAzM',
 #  'start time': 116.03,
@@ -23,8 +23,8 @@
 #   - videos are from load files, and start/end timestamps are given
 #       - **Notice**: Refer to: https://cove.thecvf.com/datasets/839 to download video files.  # noqa: E501
 #
-# {'video_id': 'video6513',
-#  'caption': 'a family is having coversation',
+# {'video_id': 'video6513.mp4',
+#  'caption': 'a family is having conversation',
 #  'category': 14',
 #  'url': 'https://www.youtube.com/watch?v=A9pM9iOuAzM',
 #  'start time': 116.03,
