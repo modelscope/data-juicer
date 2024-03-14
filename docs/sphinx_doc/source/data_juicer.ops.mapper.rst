@@ -266,6 +266,14 @@ data\_juicer.ops.mapper.video\_ffmpeg\_wrapped\_mapper
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.mapper.video\_remove\_watermark\_mapper
+-------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.mapper.video_remove_watermark_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.mapper.video\_resize\_aspect\_ratio\_mapper
 -------------------------------------------------------------------
 
