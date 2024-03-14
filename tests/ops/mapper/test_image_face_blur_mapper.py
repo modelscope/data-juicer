@@ -26,16 +26,16 @@ class ImageFaceBlurMapperTest(DataJuicerTestCaseBase):
         shutil.rmtree(cls.chk_path, ignore_errors=True)
         os.makedirs(cls.chk_path)
 
-    def _run_helper(self, op, source_list):
+    def _run_helper(self, op, source_list, np=1):
         dataset = Dataset.from_list(source_list)
-        dataset = dataset.map(op.process)
+        dataset = dataset.map(op.process, num_proc=np)
         res_list = dataset.to_list()
         for source, res in zip(source_list, res_list):
             self.assertEqual(len(source[op.image_key]), len(res[op.image_key]))
             # for manual check
             for path in res[op.image_key]:
                 basename = os.path.basename(path)
-                dst = f'{self.chk_path}/{op.blur_type}_{op.radius}_{basename}'
+                dst = f'{self.chk_path}/{op.blur_type}:{op.radius}_np:{np}_{basename}'
                 shutil.copy(path, dst)
 
     def test_gaussian(self):
@@ -93,6 +93,16 @@ class ImageFaceBlurMapperTest(DataJuicerTestCaseBase):
         op = ImageFaceBlurMapper(blur_type='mean')
         self._run_helper(op, ds_list)
 
+    def test_gaussian_radius_parallel(self):
+        ds_list = [{
+            'images': [self.img1_path]
+        }, {
+            'images': [self.img2_path]
+        }, {
+            'images': [self.img3_path]
+        }]
+        op = ImageFaceBlurMapper(blur_type='gaussian', radius=10)
+        self._run_helper(op, ds_list, np=2)
 
 if __name__ == '__main__':
     unittest.main()
