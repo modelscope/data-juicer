@@ -102,7 +102,7 @@ class ImageFaceBlurMapperTest(DataJuicerTestCaseBase):
             'images': [self.img3_path]
         }]
         op = ImageFaceBlurMapper(blur_type='gaussian', radius=10)
-        self._run_helper(op, ds_list, np=2)
+        self._run_helper(op, ds_list, np=3)
 
 if __name__ == '__main__':
     unittest.main()
