@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
-| [ Mapper ]( #mapper )             |   39   | Edits and transforms samples                    |
+| [ Mapper ]( #mapper )             |   40   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   36   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
@@ -81,6 +81,7 @@ All the specific operators are listed below, each featured with several capabili
 | video_captioning_from_audio_mapper                  | Multimodal         | -      | Caption a video according to its audio streams based on Qwen-Audio model                                      |
 | video_captioning_from_video_mapper                  | Multimodal         |  -     | generate samples whose captions are generated based on another model (video-blip) and sampled video frame within the original sample |
 | video_ffmpeg_wrapped_mapper                         | Video              | -      | Simple wrapper to run a FFmpeg video filter                                                                   |
+| video_remove_watermark_mapper                       | Video              | -      | Remove the watermarks in videos given regions                                                                 |
 | video_resize_aspect_ratio_mapper                    | Video              | -      | Resize video aspect ratio to a specified range                                                                |
 | video_resize_resolution_mapper                      | Video              | -      | Map videos to ones with given resolution range                                                                |
 | video_split_by_duration_mapper                      | Multimodal         | -      | Mapper to split video by duration                                                                             |
