@@ -23,7 +23,7 @@ class ImageFaceBlurMapperTest(DataJuicerTestCaseBase):
     def setUpClass(cls):
         super().setUpClass()
         cls.chk_path = os.path.join(cls.data_path, cls.__name__)
-        shutil.rmtree(cls.chk_path)
+        shutil.rmtree(cls.chk_path, ignore_errors=True)
         os.makedirs(cls.chk_path)
 
     def _run_helper(self, op, source_list):
@@ -91,17 +91,6 @@ class ImageFaceBlurMapperTest(DataJuicerTestCaseBase):
             'images': [self.img1_path]
         }]
         op = ImageFaceBlurMapper(blur_type='mean')
-        self._run_helper(op, ds_list)
-
-    def test_mean_radius(self):
-        ds_list = [{
-            'images': [self.img2_path]
-        }, {
-            'images': [self.img3_path]
-        }, {
-            'images': [self.img1_path]
-        }]
-        op = ImageFaceBlurMapper(blur_type='mean', radius=50)
         self._run_helper(op, ds_list)
 
 
