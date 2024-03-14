@@ -242,6 +242,14 @@ data\_juicer.ops.mapper.video\_captioning\_from\_audio\_mapper
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.mapper.video\_captioning\_from\_summarizer\_mapper
+---------------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.mapper.video_captioning_from_summarizer_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.mapper.video\_captioning\_from\_video\_mapper
 ---------------------------------------------------------------------
 
