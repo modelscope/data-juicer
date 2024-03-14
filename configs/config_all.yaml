@@ -148,11 +148,14 @@ process:
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       horizontal_flip: false                                  # flip frame image horizontally (left to right).
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
-  - video_split_by_scene_mapper:                            # split videos into scene clips
-      detector: 'ContentDetector'                             # PySceneDetect scene detector. Should be one of ['ContentDetector', 'ThresholdDetector', 'AdaptiveDetector`]
-      threshold: 27.0                                         # threshold passed to the detector
-      min_scene_len: 15                                       # minimum length of any scene
-      show_progress: false                                    # whether to show progress from scenedetect
+  - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
+  - video_remove_watermark_mapper:                          # Remove the watermarks in videos given regions
+      roi_strings: ['0,0,0.1,0.1']                            # a given list of regions the watermarks locate. The format of each can be "x1, y1, x2, y2", "(x1, y1, x2, y2)", or "[x1, y1, x2, y2]".
+      roi_type: ratio                                         # the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by wights and heights.
+      roi_key: null                                           # the key name of fields in samples to store roi_strings for each sample. It's used for set different rois for different samples.
+      frame_num: 10                                           # the number of frames to be extracted uniformly from the video to detect the pixels of watermark.
+      min_frame_threshold: 7                                  # a coodination is considered as the location of a watermark pixel when it is a watermark pixel in no less min_frame_threshold frames.
+      detection_method: pixel_value                           # the method to detect the pixels of watermark. If it is 'pixel_value', we consider the distribution of pixel value in each frame. If it is 'pixel_diversity', we will consider the pixel diversity in different frames.
   - video_resize_aspect_ratio_mapper:                       # resize videos aspect ratios of videos (a fraction of width by height, r=w/h) to a specified range
       min_ratio: 9/21                                         # the minimum aspect ratio to enforce videos with an aspect ratio below `min_ratio` will be resized to match this minimum ratio. The ratio should be provided as a string in the format "9:21" or "9/21".
       max_ratio: 21/9                                         # the maximum aspect ratio to enforce videos with an aspect ratio above `max_ratio` will be resized to match this maximum ratio. The ratio should be provided as a string in the format "21:9" or "21/9".
@@ -164,13 +167,17 @@ process:
       max_height: 1080                                        # the max vertical resolution (unit p), videos with height more than 'max_height' will be mapped to videos with equal or smaller height
       force_original_aspect_ratio: 'increase'                 # Enable decreasing or increasing output video width or height if necessary to keep the original aspect ratio
       force_divisible_by: 4                                   # Ensures that both the output dimensions, width and height, are divisible by the given integer when used together with force_original_aspect_ratio
-  - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
   - video_split_by_duration_mapper:                         # Mapper to split video by duration.
       split_duration: 10                                      # duration of each video split in seconds.
       min_last_split_duration: 0.1                              # the minimum allowable duration in seconds for the last video split. If the duration of the last split is less than this value, it will be discarded.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
   - video_split_by_key_frame_mapper:                        # Mapper to split video by key frame.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
+  - video_split_by_scene_mapper:                            # split videos into scene clips
+      detector: 'ContentDetector'                             # PySceneDetect scene detector. Should be one of ['ContentDetector', 'ThresholdDetector', 'AdaptiveDetector`]
+      threshold: 27.0                                         # threshold passed to the detector
+      min_scene_len: 15                                       # minimum length of any scene
+      show_progress: false                                    # whether to show progress from scenedetect
   - video_tagging_from_audio_mapper:                        # Mapper to generate video tags from audio streams extracted from the video.
       hf_ast: 'MIT/ast-finetuned-audioset-10-10-0.4593'       # Huggingface model name for the audio classification model.
   - video_tagging_from_frames_mapper:                       # Mapper to generate video tags from frames extracted from the video.
