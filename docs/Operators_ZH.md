@@ -11,7 +11,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 类型                                | 数量 | 描述            |
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
-| [ Mapper ]( #mapper )              | 39 | 对数据样本进行编辑和转换  |
+| [ Mapper ]( #mapper )              | 40 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 36 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
@@ -58,10 +58,11 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | clean_links_mapper                                  | General, Code         | en, zh    | 删除链接，例如以 http 或 ftp 开头的                                |
 | expand_macro_mapper                                 | LaTeX                 | en, zh    | 扩展通常在 TeX 文档顶部定义的宏                                     |
 | fix_unicode_mapper                                  | General               | en, zh    | 修复损坏的 Unicode（借助 [ftfy](https://ftfy.readthedocs.io/)） |
-| image_blur_mapper                                   | Multimodal            |  -        | 对图像进行模糊处理                                              |
+| image_blur_mapper                                   | Image                 |  -        | 对图像进行模糊处理                                              |
 | image_captioning_from_gpt4v_mapper                  | Multimodal            |  -        | 基于gpt-4-vision和图像生成文本                                |
 | image_captioning_mapper                             | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（例如 blip2）和原始样本中的图形生成的。                                             |
 | image_diffusion_mapper                              | Multimodal            |  -        | 用stable diffusion生成图像，对图像进行增强                       ｜
+| image_face_blur_mapper                              | Image                 |  -        | 对图像中的人脸进行模糊处理                                      ｜
 | nlpaug_en_mapper                                    | General               | en        | 使用`nlpaug`库对英语文本进行简单增强                                 | 
 | nlpcda_zh_mapper                                    | General               | zh        | 使用`nlpcda`库对中文文本进行简单增强                                 | 
 | punctuation_normalization_mapper                    | General               | en, zh    | 将各种 Unicode 标点符号标准化为其 ASCII 等效项                        |
@@ -99,12 +100,12 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | audio_size_filter              | Audio      | -      | 保留样本中包含的音频的大小（bytes）在指定范围内的样本             |
 | average_line_length_filter     | Code       | en, zh | 保留平均行长度在指定范围内的样本                            |
 | character_repetition_filter    | General    | en, zh | 保留 char-level n-gram 重复比率在指定范围内的样本          |
-| face_area_filter               | Image      | -      | 保留样本中包含的图片的最大脸部区域在指定范围内的样本                  |
 | flagged_words_filter           | General    | en, zh | 保留使标记字比率保持在指定阈值以下的样本                        |
+| image_aesthetics_filter        | Image      | -      | 保留包含美学分数在指定范围内的图像的样本 |
 | image_aspect_ratio_filter      | Image      | -      | 保留样本中包含的图片的宽高比在指定范围内的样本                     |
+| image_face_ratio_filter        | Image      | -      | 保留样本中包含的图片的最大脸部区域在指定范围内的样本                  |
 | image_shape_filter             | Image      | -      | 保留样本中包含的图片的形状（即宽和高）在指定范围内的样本                |
 | image_size_filter              | Image      | -      | 保留样本中包含的图片的大小（bytes）在指定范围内的样本               |
-| image_aesthetics_filter        | Image      | -      | 保留包含美学分数在指定范围内的图像的样本 |
 | image_text_matching_filter     | Multimodal | -      | 保留图像-文本的分类匹配分(基于BLIP模型)在指定范围内的样本            |
 | image_text_similarity_filter   | Multimodal | -      | 保留图像-文本的特征余弦相似度(基于CLIP模型)在指定范围内的样本          |
 | language_id_score_filter       | General    | en, zh | 保留特定语言的样本，通过预测的置信度得分来判断                     |

@@ -49,14 +49,6 @@ data\_juicer.ops.filter.character\_repetition\_filter
    :undoc-members:
    :show-inheritance:
 
-data\_juicer.ops.filter.face\_area\_filter
--------------------------------------------------
-
-.. automodule:: data_juicer.ops.filter.face_area_filter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 data\_juicer.ops.filter.flagged\_words\_filter
 -----------------------------------------------------
 
@@ -77,6 +69,14 @@ data\_juicer.ops.filter.image\_aspect\_ratio\_filter
 -----------------------------------------------------------
 
 .. automodule:: data_juicer.ops.filter.image_aspect_ratio_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.filter.image\_face\_ratio\_filter
+-------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.image_face_ratio_filter
    :members:
    :undoc-members:
    :show-inheritance:

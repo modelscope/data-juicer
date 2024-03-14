@@ -83,6 +83,9 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
       caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
+  - image_face_blur_mapper:                                 # mapper to blur faces detected in images.
+      blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
+      radius: 2                                               # radius of blur kernel
   - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library
       sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
       aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.
@@ -213,10 +216,6 @@ process:
       rep_len: 10                                             # repetition length for char-level n-gram
       min_ratio: 0.0                                          # the min ratio of filter range
       max_ratio: 0.5                                          # the max ratio of filter range
-  - face_area_filter:                                       # filter samples according to the face area ratios in images (r=face_area/image_area). If multiple faces are available, we use the largest one.
-      min_ratio: 0.0                                          # the min face area ratio of filter range
-      max_ratio: 0.4                                          # the max face area ratio of filter range
-      upsample_num_times: 0                                   # optional argument passing to the underlying dlib face detector
   - flagged_words_filter:                                   # filter text with the flagged-word ratio larger than a specific max value
       lang: en                                                # consider flagged words in what language
       tokenization: false                                     # whether to use model to tokenize documents
@@ -225,15 +224,18 @@ process:
       use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
       words_aug_group_sizes: [2]                              # the group size of words to augment
       words_aug_join_char: ""                                 # the join char between words to augment
-  - image_aspect_ratio_filter:                              # filter samples according to the aspect ratios of images (a fraction of width by height, r=w/h) in them
-      min_ratio: 0.333                                        # the min aspect ratio of filter range
-      max_ratio: 3.0                                          # the max aspect ratio of filter range
-      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - image_aesthetics_filter:                                # filter samples according to the aesthetics score of images.
       hf_scorer_model: shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE # Huggingface model name for the aesthetics predictor
       min_score: 0.3                                          # the min aesthetics score of filter range
       max_score: 1.0                                          # the max aesthetics score of filter range
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_aspect_ratio_filter:                              # filter samples according to the aspect ratios of images (a fraction of width by height, r=w/h) in them
+      min_ratio: 0.333                                        # the min aspect ratio of filter range
+      max_ratio: 3.0                                          # the max aspect ratio of filter range
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_face_ratio_filter:                                # filter samples according to the face area ratios in images (r=face_area/image_area). If multiple faces are available, we use the largest one.
+      min_ratio: 0.0                                          # the min face area ratio of filter range
+      max_ratio: 0.4                                          # the max face area ratio of filter range
   - image_shape_filter:                                     # filter samples according to the widths and heights of images in them
       min_width: 200                                          # the min width of width filter range
       max_width: 5000                                         # the max width of width filter range
