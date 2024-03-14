@@ -56,9 +56,9 @@ class AudioFFmpegWrappedMapper(Mapper):
             return sample
 
         loaded_audio_keys = sample[self.audio_key]
-        proceessed = {}
+        processed = {}
         for audio_key in loaded_audio_keys:
-            if audio_key in proceessed:
+            if audio_key in processed:
                 continue
 
             output_key = transfer_filename(audio_key, OP_NAME,
@@ -69,7 +69,7 @@ class AudioFFmpegWrappedMapper(Mapper):
                 stream = stream.global_args(*self.global_args)
             stream.run(capture_stderr=self.capture_stderr,
                        overwrite_output=self.overwrite_output)
-            proceessed[audio_key] = output_key
+            processed[audio_key] = output_key
 
-        sample[self.audio_key] = [proceessed[key] for key in loaded_audio_keys]
+        sample[self.audio_key] = [processed[key] for key in loaded_audio_keys]
         return sample

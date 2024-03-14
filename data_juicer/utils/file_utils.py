@@ -132,17 +132,17 @@ def transfer_filename(original_filepath: Union[str, Path], op_name,
         original_filepath to another unique file path. E.g.
 
             1. abc.jpg -->
-                __dj__produced_datas__/{op_name}/
+                __dj__produced_data__/{op_name}/
                 abc__dj_hash_#{hash_val}#.jpg
             2. ./abc.jpg -->
-                ./__dj__produced_datas__/{op_name}/
+                ./__dj__produced_data__/{op_name}/
                 abc__dj_hash_#{hash_val}#.jpg
             3. /path/to/abc.jpg -->
-                /path/to/__dj__produced_datas__/{op_name}/
+                /path/to/__dj__produced_data__/{op_name}/
                 abc__dj_hash_#{hash_val}#.jpg
-            4. /path/to/__dj__produced_datas__/{op_name}/
+            4. /path/to/__dj__produced_data__/{op_name}/
                 abc__dj_hash_#{hash_val1}#.jpg -->
-                /path/to/__dj__produced_datas__/{op_name}/
+                /path/to/__dj__produced_data__/{op_name}/
                 abc__dj_hash_#{hash_val2}#.jpg
 
     """

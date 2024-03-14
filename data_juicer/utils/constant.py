@@ -19,8 +19,8 @@ class Fields(object):
     video_frame_tags = DEFAULT_PREFIX + 'video_frame_tags__'
     video_audio_tags = DEFAULT_PREFIX + 'video_audio_tags__'
 
-    # the name of diretory to store the produced multimodal datas
-    multimodal_data_output_dir = DEFAULT_PREFIX + 'produced_datas__'
+    # the name of diretory to store the produced multimodal data
+    multimodal_data_output_dir = DEFAULT_PREFIX + 'produced_data__'
 
 
 class StatsKeysMeta(type):
