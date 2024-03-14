@@ -233,6 +233,10 @@ process:
   - image_face_ratio_filter:                                # filter samples according to the face area ratios in images (r=face_area/image_area). If multiple faces are available, we use the largest one.
       min_ratio: 0.0                                          # the min face area ratio of filter range
       max_ratio: 0.4                                          # the max face area ratio of filter range
+  - image_nsfw_filter:                                      # filter samples according to the nsfw scores of images in them
+      hf_nsfw_model: Falconsai/nsfw_image_detection           # Huggingface model name for nsfw classification
+      score_threshold: 0.5                                    # the nsfw score threshold for samples, range from 0 to 1
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - image_shape_filter:                                     # filter samples according to the widths and heights of images in them
       min_width: 200                                          # the min width of width filter range
       max_width: 5000                                         # the max width of width filter range
@@ -330,10 +334,10 @@ process:
       max_duration: 10                                        # the max video duration of filter range (in seconds)
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
   - video_frames_text_similarity_filter:                    # keep samples those similarities between sampled video frame images and text within a specific range.
-      hf_clip: 'openai/clip-vit-base-patch32'                 # clip model name on huggingface to compute the similarity between frame image and text. It's kind of language-related. For example, for Chinese datasets, ChineseCLIP might be a better choice.
+      hf_clip: openai/clip-vit-base-patch32                   # clip model name on huggingface to compute the similarity between frame image and text. It's kind of language-related. For example, for Chinese datasets, ChineseCLIP might be a better choice.
       min_score: 0.1                                          # the min similarity to keep samples.
       max_score: 1.0                                          # the max similarity to keep samples.
-      frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_sampling_method: all_keyframes                    # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       horizontal_flip: false                                  # flip frame image horizontally (left to right).
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
@@ -344,6 +348,13 @@ process:
       max_score: 10000.0                                      # the maximum motion score to keep samples
       sampling_fps: 2                                         # the samplig rate of frames_per_second to compute optical flow
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
+  - video_nsfw_filter:                                      # filter samples according to the nsfw scores of videos in them
+      hf_nsfw_model: Falconsai/nsfw_image_detection           # Huggingface model name for nsfw classification
+      score_threshold: 0.5                                    # the nsfw score threshold for samples, range from 0 to 1
+      frame_sampling_method: all_keyframes                    # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
+      reduce_mode: avg                                        # reduce mode for multiple sampled video frames to compute nsfw scores of videos, must be one of ['avg','max', 'min'].
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - video_ocr_area_ratio_filter:                            # Keep data samples whose detected text area ratios for specified frames in the video are within a specified range.
       min_area_ratio: 0                                       # the min ocr area ratio to keep samples. It's 0 by default.
       max_area_ratio: 1.0                                     # the max ocr area ratio to keep samples. It's 1.0 by default.

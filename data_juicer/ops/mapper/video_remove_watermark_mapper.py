@@ -225,8 +225,9 @@ class VideoRemoveWatermarkMapper(Mapper):
 
             loaded_video_keys[index] = cleaned_video_key
 
-            if not context:
-                video.close()
+        if not context:
+            for vid_key in videos:
+                videos[vid_key].close()
 
         sample[self.video_key] = loaded_video_keys
         return sample
