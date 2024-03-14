@@ -1,6 +1,5 @@
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
-from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -29,12 +28,12 @@ class VideoNSFWFilter(Filter):
     """Filter to keep samples whose videos have low nsfw scores."""
 
     def __init__(self,
-                 hf_nsfw_model = 'Falconsai/nsfw_image_detection',
-                 score_threshold: ClosedUnitInterval = 0.1,
+                 hf_nsfw_model='Falconsai/nsfw_image_detection',
+                 score_threshold: ClosedUnitInterval = 0.5,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
-                 any_or_all: str = 'any',
                  reduce_mode: str = 'avg',
+                 any_or_all: str = 'any',
                  *args,
                  **kwargs):
         """
@@ -56,14 +55,14 @@ class VideoNSFWFilter(Filter):
             the first and the last frames will be extracted. If it's larger
             than 2, in addition to the first and the last frames, other frames
             will be extracted uniformly within the video duration.
-        :param any_or_all: keep this sample with 'any' or 'all' strategy of
-            all videos. 'any': keep this sample if any videos meet the
-            condition. 'all': keep this sample only if all videos meet the
-            condition.
         :param reduce_mode: reduce mode for multiple sampled video frames.
             'avg': Take the average of multiple values
             'max': Take the max of multiple values
             'min': Take the min of multiple values
+        :param any_or_all: keep this sample with 'any' or 'all' strategy of
+            all videos. 'any': keep this sample if any videos meet the
+            condition. 'all': keep this sample only if all videos meet the
+            condition.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -81,8 +80,9 @@ class VideoNSFWFilter(Filter):
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
-        self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_nsfw_model)
+        self.model_key = prepare_model(
+            model_type='huggingface',
+            pretrained_model_name_or_path=hf_nsfw_model)
         self._accelerator = 'cuda'
         self.reduce_mode = reduce_mode
         self.frame_sampling_method = frame_sampling_method
@@ -95,9 +95,8 @@ class VideoNSFWFilter(Filter):
 
         # there is no videos in this sample
         if self.video_key not in sample or not sample[self.video_key]:
-            sample[Fields.stats][
-                StatsKeys.video_nsfw_score] = np.array(
-                    [], dtype=np.float64)
+            sample[Fields.stats][StatsKeys.video_nsfw_score] = np.array(
+                [], dtype=np.float64)
             return sample
 
         # load videos
@@ -108,62 +107,34 @@ class VideoNSFWFilter(Filter):
         nsfw_scores = []
         model, processor = get_model(self.model_key, rank=rank)
 
+        for video_key, video in videos.items():
 
-
-
-
-
-        for chunk in text.split(SpecialTokens.eoc):
-            count = chunk.count(SpecialTokens.video)
-
-            # no video or no text
-            if count == 0 or len(chunk) == 0:
-                continue
+            # extract frame images
+            if self.frame_sampling_method == 'all_keyframes':
+                frames = extract_key_frames(video)
+            elif self.frame_sampling_method == 'uniform':
+                frames = extract_video_frames_uniformly(video, self.frame_num)
             else:
-                text_chunk = remove_special_tokens(chunk)
-                video_frame_images_chunk = []
-                for video_key in loaded_video_keys[offset:offset + count]:
-                    video = videos[video_key]
+                frames = []
 
-                    # extract frame images
-                    if self.frame_sampling_method == 'all_keyframes':
-                        frames = extract_key_frames(video)
-                    elif self.frame_sampling_method == 'uniform':
-                        frames = extract_video_frames_uniformly(
-                            video, self.frame_num)
-                    else:
-                        frames = []
+            frame_images = [frame.to_image() for frame in frames]
+            inputs = processor(images=frame_images, return_tensors='pt')
+            inputs = inputs.to(model.device)
+            outputs = model(**inputs)
+            logits = outputs.logits
+            cur_scores = [
+                scores[1] for scores in torch.softmax(logits, dim=-1)
+            ]
+            cur_scores = torch.Tensor(cur_scores)
 
-                    frame_images = [frame.to_image() for frame in frames]
-                    for image in frame_images:
-                        if self.horizontal_flip:
-                            image = ImageOps.mirror(image)
-                        if self.vertical_flip:
-                            image = ImageOps.flip(image)
-                        video_frame_images_chunk.append(image)
+            if self.reduce_mode == 'avg':
+                nsfw_scores.append(cur_scores.mean())
+            elif self.reduce_mode == 'max':
+                nsfw_scores.append(cur_scores.max())
+            else:
+                nsfw_scores.append(cur_scores.min())
 
-                inputs = processor(text=text_chunk,
-                                   images=video_frame_images_chunk,
-                                   return_tensors='pt',
-                                   truncation=True,
-                                   max_length=model.config.text_config.
-                                   max_position_embeddings,
-                                   padding=True).to(model.device)
-
-                outputs = model(**inputs)
-                chunk_logits = outputs.logits_per_text.detach().cpu() / 100.0
-
-                if self.reduce_mode == 'avg':
-                    chunk_similarity = chunk_logits.mean()
-                elif self.reduce_mode == 'max':
-                    chunk_similarity = chunk_logits.max()
-                else:
-                    chunk_similarity = chunk_logits.min()
-
-                similarity.append(float(chunk_similarity))
-            offset += count
-        sample[Fields.stats][
-            StatsKeys.video_frames_text_matching_score] = similarity
+        sample[Fields.stats][StatsKeys.video_nsfw_score] = nsfw_scores
 
         if not context:
             for vid_key in videos:
@@ -172,14 +143,12 @@ class VideoNSFWFilter(Filter):
         return sample
 
     def process(self, sample, rank=None):
-        similarity = sample[Fields.stats][StatsKeys.video_nsfw_score]
-        if len(similarity) <= 0:
+        itm_scores = sample[Fields.stats][StatsKeys.video_nsfw_score]
+        if len(itm_scores) <= 0:
             return True
 
-        keep_bools = np.array([
-            itm_score <= self.score_threshold
-            for sim_value in similarity
-        ])
+        keep_bools = np.array(
+            [itm_score < self.score_threshold for itm_score in itm_scores])
 
         # different strategies
         if self.any:

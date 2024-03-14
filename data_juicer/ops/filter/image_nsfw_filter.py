@@ -1,11 +1,9 @@
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
-from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (load_data_with_context,
-                                        load_image)
+from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -27,8 +25,8 @@ class ImageNSFWFilter(Filter):
     """Filter to keep samples whose images have low nsfw scores."""
 
     def __init__(self,
-                 hf_nsfw_model = 'Falconsai/nsfw_image_detection',
-                 score_threshold: ClosedUnitInterval = 0.1,
+                 hf_nsfw_model='Falconsai/nsfw_image_detection',
+                 score_threshold: ClosedUnitInterval = 0.5,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -51,8 +49,9 @@ class ImageNSFWFilter(Filter):
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
-        self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_nsfw_model)
+        self.model_key = prepare_model(
+            model_type='huggingface',
+            pretrained_model_name_or_path=hf_nsfw_model)
         self._accelerator = 'cuda'
 
     def compute_stats(self, sample, rank=None, context=False):
@@ -62,9 +61,8 @@ class ImageNSFWFilter(Filter):
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][
-                StatsKeys.image_nsfw_score] = np.array(
-                    [], dtype=np.float64)
+            sample[Fields.stats][StatsKeys.image_nsfw_score] = np.array(
+                [], dtype=np.float64)
             return sample
 
         # load images
@@ -75,13 +73,12 @@ class ImageNSFWFilter(Filter):
         model, processor = get_model(self.model_key, rank=rank)
 
         images = [images[key] for key in images]
-        inputs = processor(images=images, return_tensors="pt").to(model.device)
+        inputs = processor(images=images, return_tensors='pt').to(model.device)
         outputs = model(**inputs)
         logits = outputs.logits
         nsfw_scores = [scores[1] for scores in torch.softmax(logits, dim=-1)]
-        
-        sample[Fields.stats][
-            StatsKeys.image_nsfw_score] = nsfw_scores
+
+        sample[Fields.stats][StatsKeys.image_nsfw_score] = nsfw_scores
 
         return sample
 
@@ -90,10 +87,8 @@ class ImageNSFWFilter(Filter):
         if len(itm_scores) <= 0:
             return True
 
-        keep_bools = np.array([
-            itm_score <= self.score_threshold
-            for itm_score in itm_scores
-        ])
+        keep_bools = np.array(
+            [itm_score < self.score_threshold for itm_score in itm_scores])
 
         # different strategies
         if self.any:

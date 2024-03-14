@@ -81,6 +81,14 @@ data\_juicer.ops.filter.image\_aspect\_ratio\_filter
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.filter.image\_nsfw\_filter
+-----------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.image_nsfw_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.filter.image\_shape\_filter
 ---------------------------------------------------
 
@@ -253,6 +261,14 @@ data\_juicer.ops.filter.video\_motion\_score\_filter
 -----------------------------------------------------------
 
 .. automodule:: data_juicer.ops.filter.video_motion_score_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.filter.video\_nsfw\_filter
+-----------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.video_nsfw_filter
    :members:
    :undoc-members:
    :show-inheritance:
