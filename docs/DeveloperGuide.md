@@ -140,10 +140,10 @@ class StatsKeys(object):
             # ... (same as above)
             self._batched_op = True
 
-        def compute_stats(self, sample, rank=None):
+        def compute_stats(self, sample):
             # ... (same as above)
 
-        def process(self, sample, rank=None):
+        def process(self, sample):
             # ... (same as above)
     ```
 
@@ -161,7 +161,7 @@ class StatsKeys(object):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
 
-        def process(self, sample, rank=None):
+        def process(self, sample):
             # ... (some codes)
             # captions[index] is the prompt for diffusion model
             related_parameters = self.add_parameters(
@@ -184,7 +184,7 @@ class StatsKeys(object):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
 
-        def process(self, sample, rank=None):
+        def process(self, sample):
             # ... (some codes)
             split_video_path = transfer_filename(
                         original_video_path, OP_NAME, **self._init_parameters)
