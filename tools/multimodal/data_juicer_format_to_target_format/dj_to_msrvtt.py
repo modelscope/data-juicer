@@ -8,7 +8,7 @@
 #   - other fields in the original format can be kept or not
 #   - in jsonl
 # {'videos': ['video6513.mp4'],
-#  'text': 'a family is having conversation',
+#  'text': '<__dj__video> a family is having conversation <|__dj__eoc|>',
 #  'category': 14',
 #  'url': 'https://www.youtube.com/watch?v=A9pM9iOuAzM',
 #  'start time': 116.03,

@@ -22,7 +22,7 @@
 #   - other fields in the original format can be kept or not
 #   - in jsonl
 # {'videos': ['videos/qJrOyggIB-w-cut.mp4'],
-#  'text': 'a screen shot of heroes of the storm with people in action',
+#  'text': '<__dj__video> a screen shot of heroes of the storm with people in action <|__dj__eoc|>',
 #  'Start_timestamp': '00:07:33.689',
 #  'End_timestamp': '00:07:51.085',
 #  'Aesthetic_Score': 4.29296875,
