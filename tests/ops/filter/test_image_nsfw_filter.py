@@ -96,5 +96,31 @@ class ImageNSFWFilterTest(DataJuicerTestCaseBase):
                             any_or_all='all')
         self._run_filter(dataset, tgt_list, op)   
 
+    def test_multi_process(self):
+
+        ds_list = [{
+            'images': [self.img1_path]
+        }, {
+            'images': [self.img2_path]
+        }, {
+            'images': [self.img3_path]
+        }]
+        tgt_list = [{
+            'images': [self.img2_path]
+        }, {
+            'images': [self.img3_path]
+        }
+        ]
+
+        # set num_proc <= the number of CUDA if it is available
+        num_proc = 2
+        if _cuda_device_count() == 1:
+            num_proc = 1
+
+        dataset = Dataset.from_list(ds_list)
+        op = ImageNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
+                            score_threshold=0.0005)
+        self._run_filter(dataset, tgt_list, op, num_proc=num_proc)
+
 if __name__ == '__main__':
     unittest.main()

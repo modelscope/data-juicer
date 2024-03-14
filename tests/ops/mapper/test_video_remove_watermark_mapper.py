@@ -103,6 +103,23 @@ class VideoRemoveWatermarkMapperTest(DataJuicerTestCaseBase):
         self._run_video_remove_watermask_mapper(dataset, op,
                                                 'test_detection_method')
 
+    def test_multi_process(self):
+        ds_list = [{
+            'videos': [self.vid1_path],
+            'roi_strings': ['[30, 60, 75, 300]'],
+        }, {
+            'videos': [self.vid1_path],
+            'roi_strings': ['[30, 60, 75, 140]', '30, 140, 53, 300', 'none'],
+        }, {
+            'videos': [self.vid1_path],
+            'roi_strings':
+            ['[30, 60, 75, 140]', '30, 140, 53, 200', '(30, 200, 53, 300)'],
+        }]
+        dataset = Dataset.from_list(ds_list)
+        op = VideoRemoveWatermarkMapper(roi_type='pixel',
+                                        roi_key='roi_strings')
+        self._run_video_remove_watermask_mapper(dataset, op, 'test_multi_process', np=2)
+
 
 if __name__ == '__main__':
     unittest.main()

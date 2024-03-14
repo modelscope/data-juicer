@@ -168,5 +168,32 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
                             any_or_all='all')
         self._run_filter(dataset, tgt_list, op)   
 
+    def test_multi_process(self):
+
+        ds_list = [{
+            'videos': [self.video1_path]
+        }, {
+            'videos': [self.video2_path]
+        }, {
+            'videos': [self.video3_path]
+        }]
+        tgt_list = [{
+            'videos': [self.video2_path]
+        }, {
+            'videos': [self.video3_path]
+        }
+        ]
+
+        # set num_proc <= the number of CUDA if it is available
+        num_proc = 2
+        if _cuda_device_count() == 1:
+            num_proc = 1
+
+        dataset = Dataset.from_list(ds_list)
+        op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
+                            score_threshold=0.1,
+                            frame_sampling_method='all_keyframes')
+        self._run_filter(dataset, tgt_list, op, num_proc=num_proc)
+
 if __name__ == '__main__':
     unittest.main()
