@@ -147,9 +147,10 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
-    - In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra datas. The format of the saving path is `{ORIGINAL_DATAPATH}/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`, where the `HASH_VALUE` is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. For convenience, we can call `self.remove_extra_parameters(locals())` at the beginning of the initiation to get the init parameters. At the same time, we can call `self.add_parameters` to add related parameters with the produced extra datas from each sample. Take the operator which enhances the images with diffusion models as example:
+    - In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra datas. The format of the saving path is `{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`, where the `HASH_VALUE` is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. For convenience, we can call `self.remove_extra_parameters(locals())` at the beginning of the initiation to get the init parameters. At the same time, we can call `self.add_parameters` to add related parameters with the produced extra datas from each sample. Take the operator which enhances the images with diffusion models as example:
     ```python
-    # ... (import some library)
+    from data_juicer.utils.file_utils import transfer_filename
+    # ... (import some other libraries)
     OP_NAME = 'image_diffusion_mapper'
     @OPERATORS.register_module(OP_NAME)
     @LOADED_IMAGES.register_module(OP_NAME)
@@ -172,7 +173,8 @@ class StatsKeys(object):
     ```
     For the mapper to produce multi extra datas base on one origin data, we can add suffix at the saving path. Take the operator which splits videos according to their key frames as example:
     ```python
-    # ... (import some library)
+    from data_juicer.utils.file_utils import add_suffix_to_filename, transfer_filename
+    # ... (import some other libraries)
     OP_NAME = 'video_split_by_key_frame_mapper'
     @OPERATORS.register_module(OP_NAME)
     @LOADED_VIDEOS.register_module(OP_NAME)
@@ -188,8 +190,7 @@ class StatsKeys(object):
             # ... (some codes)
             split_video_path = transfer_filename(
                         original_video_path, OP_NAME, **self._init_parameters)
-            suffix = '_split-by-key-frame-' + str(count)
-            split_video_path = add_suffix_to_filename(split_video_path, suffix)
+            split_video_path = add_suffix_to_filename(split_video_path,  f'_{count}')
             # ... (some codes)
     ```
 

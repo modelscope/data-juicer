@@ -49,20 +49,17 @@ class VideoSplitByKeyFrameMapper(Mapper):
 
         count = 0
         split_video_keys = []
+        unique_video_key = transfer_filename(video_key, OP_NAME,
+                                             **self._init_parameters)
         for i in range(1, len(timestamps)):
-            split_video_key = transfer_filename(video_key, OP_NAME,
-                                                **self._init_parameters)
-            suffix = '_split-by-key-frame-' + str(count)
-            split_video_key = add_suffix_to_filename(split_video_key, suffix)
+            split_video_key = add_suffix_to_filename(unique_video_key,
+                                                     f'_{count}')
             if cut_video_by_seconds(container, split_video_key,
                                     timestamps[i - 1], timestamps[i]):
                 split_video_keys.append(split_video_key)
                 count += 1
 
-        split_video_key = transfer_filename(video_key, OP_NAME,
-                                            **self._init_parameters)
-        suffix = '_split-by-key-frame-' + str(count)
-        split_video_key = add_suffix_to_filename(split_video_key, suffix)
+        split_video_key = add_suffix_to_filename(unique_video_key, f'_{count}')
         if cut_video_by_seconds(container, split_video_key, timestamps[-1]):
             split_video_keys.append(split_video_key)
         return split_video_keys
