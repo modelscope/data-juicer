@@ -85,7 +85,7 @@ data\_juicer.ops.filter.image\_nsfw\_filter
 -----------------------------------------------------------
 
 .. automodule:: data_juicer.ops.filter.image_nsfw_filter
-      :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
@@ -125,7 +125,7 @@ data\_juicer.ops.filter.image\_watermark\_filter
 -----------------------------------------------------------
 
 .. automodule:: data_juicer.ops.filter.image_watermark_filter
-      :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
@@ -301,7 +301,7 @@ data\_juicer.ops.filter.video\_watermark\_filter
 -----------------------------------------------------------
 
 .. automodule:: data_juicer.ops.filter.video_watermark_filter
-      :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
