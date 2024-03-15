@@ -289,6 +289,14 @@ data\_juicer.ops.filter.video\_resolution\_filter
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.filter.video\_tagging\_from\_frames\_filter
+--------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.video_tagging_from_frames_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.filter.word\_num\_filter
 ------------------------------------------------
 

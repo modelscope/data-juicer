@@ -131,6 +131,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | video_nsfw_filter              | Video      | -      | 保留包含视频的NSFW分数在指定阈值之下的样本｜
 | video_ocr_area_ratio_filter    | Video      | -      | 保留包含视频的特定帧中检测出的文本的面积占比在指定范围内的样本 ｜
 | video_resolution_filter        | Video      | -      | 保留包含视频的分辨率（包括横向分辨率和纵向分辨率）在指定范围内的样本 ｜
+| video_tagging_from_frames_filter  | Video   | -      | 保留包含具有给定标签视频的样本 |
 | word_num_filter                | General    | en, zh | 保留字数在指定范围内的样本                               |
 | word_repetition_filter         | General    | en, zh | 保留 word-level n-gram 重复比率在指定范围内的样本          |
 
