@@ -226,7 +226,6 @@ class VideoCaptioningFromVideoMapper(Mapper):
                         prompt_texts = [self.prompt]
                     else:
                         prompt_texts = None
-
                     inputs = processor(
                         text=prompt_texts,
                         images=video_frame_videos_chunk,
@@ -241,6 +240,11 @@ class VideoCaptioningFromVideoMapper(Mapper):
                         0).permute(0, 2, 1, 3, 4)
                     for i in range(self.caption_num):
                         generated_ids = model.generate(**inputs,
+                                                       num_beams=4,
+                                                       max_new_tokens=128,
+                                                       temperature=0.7,
+                                                       top_p=0.9,
+                                                       repetition_penalty=1.5,
                                                        do_sample=True).to(
                                                            model.device)
                         generated_text = processor.batch_decode(
