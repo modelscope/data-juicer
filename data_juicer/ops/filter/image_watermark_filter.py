@@ -9,33 +9,37 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-OP_NAME = 'image_nsfw_filter'
+OP_NAME = 'image_watermark_filter'
 
 with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
     import torch
     import transformers  # noqa: F401
 
-    # avoid hanging when calling nsfw detection in multiprocessing
+    # avoid hanging when calling watermark detection in multiprocessing
     torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
-class ImageNSFWFilter(Filter):
-    """Filter to keep samples whose images have low nsfw scores."""
+class ImageWatermarkFilter(Filter):
+    """
+        Filter to keep samples whose images have no watermark with high
+        probability.
+    """
 
     def __init__(self,
-                 hf_nsfw_model='Falconsai/nsfw_image_detection',
-                 score_threshold: ClosedUnitInterval = 0.5,
+                 hf_watermark_model='amrul-hzz/watermark_detector',
+                 prob_threshold: ClosedUnitInterval = 0.8,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
         """
         Initialization method.
 
-        :param hf_nsfw_model: nsfw detection model name on huggingface.
-        :param score_threshold: the nsfw score threshold for samples.
-            range from 0 to 1.
+        :param hf_watermark_model: watermark detection model name on 
+            huggingface.
+        :param prob_threshold: the predicted watermark probability threshold 
+            for samples. range from 0 to 1.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the
@@ -44,24 +48,24 @@ class ImageNSFWFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.score_threshold = score_threshold
+        self.prob_threshold = prob_threshold
         if any_or_all not in ['any', 'all']:
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(
             model_type='huggingface',
-            pretrained_model_name_or_path=hf_nsfw_model)
+            pretrained_model_name_or_path=hf_watermark_model)
         self._accelerator = 'cuda'
 
     def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
-        if StatsKeys.image_nsfw_score in sample[Fields.stats]:
+        if StatsKeys.image_watermark_prob in sample[Fields.stats]:
             return sample
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.image_nsfw_score] = np.array(
+            sample[Fields.stats][StatsKeys.image_watermark_prob] = np.array(
                 [], dtype=np.float64)
             return sample
 
@@ -76,19 +80,19 @@ class ImageNSFWFilter(Filter):
         inputs = processor(images=images, return_tensors='pt').to(model.device)
         outputs = model(**inputs)
         logits = outputs.logits
-        nsfw_scores = [scores[1] for scores in torch.softmax(logits, dim=-1)]
+        watermark_probs = [probs[1] for probs in torch.softmax(logits, dim=-1)]
 
-        sample[Fields.stats][StatsKeys.image_nsfw_score] = nsfw_scores
+        sample[Fields.stats][StatsKeys.image_watermark_prob] = watermark_probs
 
         return sample
 
     def process(self, sample, rank=None):
-        itm_scores = sample[Fields.stats][StatsKeys.image_nsfw_score]
-        if len(itm_scores) <= 0:
+        itm_probs = sample[Fields.stats][StatsKeys.image_watermark_prob]
+        if len(itm_probs) <= 0:
             return True
 
         keep_bools = np.array(
-            [itm_score < self.score_threshold for itm_score in itm_scores])
+            [itm_prob < self.prob_threshold for itm_prob in itm_probs])
 
         # different strategies
         if self.any:

@@ -6,12 +6,12 @@ import unittest
 from datasets import Dataset
 
 from data_juicer import _cuda_device_count
-from data_juicer.ops.filter.video_nsfw_filter import VideoNSFWFilter
+from data_juicer.ops.filter.video_watermark_filter import VideoWatermarkFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class VideoNSFWFilterTest(DataJuicerTestCaseBase):
+class VideoWatermarkFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
@@ -19,11 +19,11 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
     video1_path = os.path.join(data_path, 'video1.mp4')
     video2_path = os.path.join(data_path, 'video2.mp4')
     video3_path = os.path.join(data_path, 'video3.mp4')
-    hf_nsfw_model = 'Falconsai/nsfw_image_detection'
+    hf_watermark_model = 'amrul-hzz/watermark_detector'
 
     @classmethod
     def tearDownClass(cls) -> None:
-        super().tearDownClass(cls.hf_nsfw_model)
+        super().tearDownClass(cls.hf_watermark_model)
 
     def _run_filter(self, dataset: Dataset, target_list, op, num_proc=1):
 
@@ -42,7 +42,7 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
 
-    def test_all_keyframes(self):
+    def test_watermark_keyframes(self):
 
         ds_list = [{
             'videos': [self.video1_path]
@@ -52,15 +52,13 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
             'videos': [self.video3_path]
         }]
         tgt_list = [{
-            'videos': [self.video2_path]
-        }, {
             'videos': [self.video3_path]
         }
         ]
 
         dataset = Dataset.from_list(ds_list)
-        op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.1,
+        op = VideoWatermarkFilter(hf_watermark_model=self.hf_watermark_model,
+                            prob_threshold=0.8,
                             frame_sampling_method='all_keyframes')
         self._run_filter(dataset, tgt_list, op)
 
@@ -74,15 +72,13 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
             'videos': [self.video3_path]
         }]
         tgt_list = [{
-            'videos': [self.video2_path]
-        }, {
             'videos': [self.video3_path]
         }
         ]
 
         dataset = Dataset.from_list(ds_list)
-        op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.1,
+        op = VideoWatermarkFilter(hf_watermark_model=self.hf_watermark_model,
+                            prob_threshold=0.8,
                             frame_sampling_method='uniform',
                             frame_num=3)
         self._run_filter(dataset, tgt_list, op)
@@ -96,16 +92,11 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
         }, {
             'videos': [self.video3_path]
         }]
-        tgt_list = [{
-            'videos': [self.video2_path]
-        }, {
-            'videos': [self.video3_path]
-        }
-        ]
+        tgt_list = []
 
         dataset = Dataset.from_list(ds_list)
-        op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.9,
+        op = VideoWatermarkFilter(hf_watermark_model=self.hf_watermark_model,
+                            prob_threshold=0.9,
                             frame_sampling_method='all_keyframes',
                             reduce_mode='max')
         self._run_filter(dataset, tgt_list, op)
@@ -120,15 +111,15 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
             'videos': [self.video3_path]
         }]
         tgt_list = [{
-            'videos': [self.video1_path]
+            'videos': [self.video2_path]
         }, {
             'videos': [self.video3_path]
         }
         ]
 
         dataset = Dataset.from_list(ds_list)
-        op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.0004,
+        op = VideoWatermarkFilter(hf_watermark_model=self.hf_watermark_model,
+                            prob_threshold=0.85,
                             frame_sampling_method='all_keyframes',
                             reduce_mode='min')
         self._run_filter(dataset, tgt_list, op)
@@ -136,17 +127,17 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
     def test_any(self):
 
         ds_list = [{
-            'videos': [self.video1_path, self.video3_path]
-        }, {
             'videos': [self.video1_path, self.video2_path]
+        }, {
+            'videos': [self.video1_path, self.video3_path]
         }]
         tgt_list = [{
             'videos': [self.video1_path, self.video3_path]
         }]
 
         dataset = Dataset.from_list(ds_list)
-        op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.01,
+        op = VideoWatermarkFilter(hf_watermark_model=self.hf_watermark_model,
+                            prob_threshold=0.8,
                             frame_sampling_method='all_keyframes',
                             any_or_all='any')
         self._run_filter(dataset, tgt_list, op)    
@@ -163,8 +154,8 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(ds_list)
-        op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.1,
+        op = VideoWatermarkFilter(hf_watermark_model=self.hf_watermark_model,
+                            prob_threshold=0.9,
                             frame_sampling_method='all_keyframes',
                             any_or_all='all')
         self._run_filter(dataset, tgt_list, op)   
@@ -179,8 +170,6 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
             'videos': [self.video3_path]
         }]
         tgt_list = [{
-            'videos': [self.video2_path]
-        }, {
             'videos': [self.video3_path]
         }
         ]
@@ -191,8 +180,8 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
             num_proc = 1
 
         dataset = Dataset.from_list(ds_list)
-        op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.1,
+        op = VideoWatermarkFilter(hf_watermark_model=self.hf_watermark_model,
+                            prob_threshold=0.8,
                             frame_sampling_method='all_keyframes')
         self._run_filter(dataset, tgt_list, op, num_proc=num_proc)
 

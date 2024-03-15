@@ -134,6 +134,7 @@ class StatsKeysConstant(object):
     face_detections = 'face_detections'
     image_aesthetics_scores = 'image_aesthetics_scores'
     image_nsfw_score = 'image_nsfw_score'
+    image_watermark_prob = 'image_watermark_prob'
 
     # audios
     audio_duration = 'audio_duration'
@@ -150,6 +151,7 @@ class StatsKeysConstant(object):
     video_frames_aesthetics_score = 'video_frames_aesthetics_score'
     video_motion_score = 'video_motion_score'
     video_nsfw_score = 'video_nsfw_score'
+    video_watermark_prob = 'video_watermark_prob'
 
     # multimodal
     # image-text
