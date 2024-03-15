@@ -42,9 +42,9 @@ class VideoWatermarkFilter(Filter):
         """
         Initialization method.
 
-        :param hf_watermark_model: watermark detection model name on 
+        :param hf_watermark_model: watermark detection model name on
             huggingface.
-        :param prob_threshold: the predicted watermark probability threshold 
+        :param prob_threshold: the predicted watermark probability threshold
             for samples. range from 0 to 1.
         :param frame_sampling_method: sampling method of extracting frame
             images from the videos.
@@ -126,9 +126,7 @@ class VideoWatermarkFilter(Filter):
             inputs = inputs.to(model.device)
             outputs = model(**inputs)
             logits = outputs.logits
-            cur_probs = [
-                probs[1] for probs in torch.softmax(logits, dim=-1)
-            ]
+            cur_probs = [probs[1] for probs in torch.softmax(logits, dim=-1)]
             cur_probs = torch.Tensor(cur_probs)
 
             if self.reduce_mode == 'avg':

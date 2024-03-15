@@ -36,9 +36,9 @@ class ImageWatermarkFilter(Filter):
         """
         Initialization method.
 
-        :param hf_watermark_model: watermark detection model name on 
+        :param hf_watermark_model: watermark detection model name on
             huggingface.
-        :param prob_threshold: the predicted watermark probability threshold 
+        :param prob_threshold: the predicted watermark probability threshold
             for samples. range from 0 to 1.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
