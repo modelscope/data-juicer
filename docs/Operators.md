@@ -12,7 +12,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   41   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   36   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   38   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -107,6 +107,7 @@ All the specific operators are listed below, each featured with several capabili
 | image_aesthetics_filter        | Image      | -      | Keeps samples containing images whose aesthetics scores are within the specified range                                                              |
 | image_aspect_ratio_filter      | Image      | -      | Keeps samples containing images with aspect ratios within the specified range                                                                       |
 | image_face_ratio_filter        | Image      | -      | Keeps samples containing images with face area ratios within the specified range                                                                    |
+| image_nsfw_filter              | Image      | -      | Keeps samples containing images with NSFW scores below the threshold                                                               |
 | image_shape_filter             | Image      | -      | Keeps samples containing images with widths and heights within the specified range                                                                  |
 | image_size_filter              | Image      | -      | Keeps samples containing images whose size in bytes are within the specified range                                                                  |
 | image_text_matching_filter     | Multimodal | -      | Keeps samples with image-text classification matching score within the specified range based on a BLIP model                                        |
@@ -124,11 +125,12 @@ All the specific operators are listed below, each featured with several capabili
 | text_entity_dependency_filter  | General    | en, zh | Keeps samples containing entity nouns related to other tokens in the dependency tree of the texts                                                   |
 | text_length_filter             | General    | en, zh | Keeps samples with total text length within the specified range                                                                                     |
 | token_num_filter               | General    | en, zh | Keeps samples with token count within the specified range                                                                                           |
+| video_aesthetics_filter        | Video      | -      | Keeps samples whose specified frames have aesthetics scores within the specified range     |
 | video_aspect_ratio_filter      | Video      | -      | Keeps samples containing videos with aspect ratios within the specified range                                                                       |
 | video_duration_filter          | Video      | -      | Keep data samples whose videos' durations are within a specified range ｜                                                                            
-| video_aesthetics_filter        | Video      | -      | Keeps samples whose specified frames have aesthetics scores within the specified range     |
 | video_frames_text_similarity_filter    | Multimodal | -      | Keep data samples whose similarities between sampled video frame images and text are within a specific range ｜
 | video_motion_score_filter      | Video      | -      | Keep samples with video motion scores within a specific range ｜
+| video_nsfw_filter              | Video      | -      | Keeps samples containing videos with NSFW scores below the threshold                                                               |
 | video_ocr_area_ratio_filter    | Video      | -      | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range ｜                                  
 | video_resolution_filter        | Video      | -      | Keeps samples containing videos with horizontal and vertical resolutions within the specified range                                                 |
 | word_num_filter                | General    | en, zh | Keeps samples with word count within the specified range                                                                                            |

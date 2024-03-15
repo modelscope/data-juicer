@@ -16,16 +16,20 @@ class ImageDeduplicatorTest(DataJuicerTestCaseBase):
     img3_path = os.path.join(data_path, 'img3.jpg')
     # img1_dup.png is a duplicate sample of img1.png
     img4_path = os.path.join(data_path, 'img1_dup.png')
-    os.symlink(img1_path, img4_path)
+    if not os.path.exists(img4_path):
+        os.symlink(img1_path, img4_path)
     # img2_dup.jpg is a duplicate sample of img2.jpg
     img5_path = os.path.join(data_path, 'img2_dup.jpg')
-    os.symlink(img2_path, img5_path)
+    if not os.path.exists(img5_path):
+        os.symlink(img2_path, img5_path)
     # img3_dup.jpg is a duplicate sample of img3.jpg
     img6_path = os.path.join(data_path, 'img3_dup.jpg')
-    os.symlink(img3_path, img6_path)
+    if not os.path.exists(img6_path):
+        os.symlink(img3_path, img6_path)
     # img3_dup_dup.jpg is a duplicate sample of img6.jpg
     img7_path = os.path.join(data_path, 'img3_dup_dup.jpg')
-    os.symlink(img6_path, img7_path)
+    if not os.path.exists(img7_path):
+        os.symlink(img6_path, img7_path)
 
     def _run_image_deduplicator(self, dataset: Dataset, target_list, op):
 
