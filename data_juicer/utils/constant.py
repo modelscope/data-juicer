@@ -19,6 +19,9 @@ class Fields(object):
     video_frame_tags = DEFAULT_PREFIX + 'video_frame_tags__'
     video_audio_tags = DEFAULT_PREFIX + 'video_audio_tags__'
 
+    # the name of diretory to store the produced multimodal data
+    multimodal_data_output_dir = DEFAULT_PREFIX + 'produced_data__'
+
 
 class StatsKeysMeta(type):
     """
@@ -130,6 +133,7 @@ class StatsKeysConstant(object):
     face_ratios = 'face_ratios'
     face_detections = 'face_detections'
     image_aesthetics_scores = 'image_aesthetics_scores'
+    image_nsfw_score = 'image_nsfw_score'
 
     # audios
     audio_duration = 'audio_duration'
@@ -145,6 +149,7 @@ class StatsKeysConstant(object):
     video_aesthetic_score = 'video_aesthetic_score'
     video_frames_aesthetics_score = 'video_frames_aesthetics_score'
     video_motion_score = 'video_motion_score'
+    video_nsfw_score = 'video_nsfw_score'
 
     # multimodal
     # image-text

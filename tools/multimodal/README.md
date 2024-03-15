@@ -232,3 +232,9 @@ As we can see, the caption in this dataset corresponds to the video clip
 specified by the start/end timestamps instead of the whole video. So the 
 conversion tool will cut the specified video clip for you if the argument 
 `cut_videos` is set to True. You can cut before conversion by yourself as well.
+
+#### MSR-VTT-like
+MSR-VTT dataset contains multiple fields, here we use 2 fields:
+- `video_id`: the video file name without suffix used in the sample. 
+We suppose that users have downloaded these videos already。
+- `caption`: the corresponding caption for the video.
