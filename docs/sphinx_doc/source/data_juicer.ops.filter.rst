@@ -121,6 +121,14 @@ data\_juicer.ops.filter.image\_text\_similarity\_filter
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.filter.image\_watermark\_filter
+-----------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.image_watermark_filter
+      :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.filter.language\_id\_score\_filter
 ----------------------------------------------------------
 
