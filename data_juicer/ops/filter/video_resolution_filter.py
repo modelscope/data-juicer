@@ -78,9 +78,6 @@ class VideoResolutionFilter(Filter):
             if video_stream is None:
                 return sample
 
-            if not context:
-                video.close()
-
             video_width[video_key] = video_stream.codec_context.width
             video_height[video_key] = video_stream.codec_context.height
 
@@ -91,6 +88,10 @@ class VideoResolutionFilter(Filter):
         sample[Fields.stats][StatsKeys.video_height] = [
             video_height[video_key] for video_key in sample[self.video_key]
         ]
+
+        if not context:
+            for vid_key in videos:
+                videos[vid_key].close()
 
         return sample
 

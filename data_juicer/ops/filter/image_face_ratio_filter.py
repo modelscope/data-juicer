@@ -10,7 +10,7 @@ from data_juicer.utils.mm_utils import (load_data_with_context, load_image,
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-OP_NAME = 'face_area_filter'
+OP_NAME = 'image_face_ratio_filter'
 
 with AvailabilityChecking(['dlib'], OP_NAME):
     import dlib
@@ -18,9 +18,11 @@ with AvailabilityChecking(['dlib'], OP_NAME):
 
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
-class FaceAreaFilter(Filter):
-    """Filter to keep samples with face area ratio within a specific range.
+class ImageFaceRatioFilter(Filter):
+    """Filter to keep samples with face area ratios within a specific range.
     """
+
+    _default_kwargs = {'upsample_num_times': 0}
 
     def __init__(self,
                  min_ratio: ClosedUnitInterval = 0.0,
@@ -40,17 +42,14 @@ class FaceAreaFilter(Filter):
         :param args: Extra positional arguments.
         :param kwargs: Extra keyword arguments.
         """
-
-        # Extract face detector arguments from kwargs
-        detector_keys = ['upsample_num_times']
-        self.detector_kwargs = {
-            key: kwargs.pop(key)
-            for key in detector_keys if key in kwargs
-        }
-
         super().__init__(*args, **kwargs)
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
+
+        self.extra_kwargs = {
+            k: kwargs.get(k, v)
+            for k, v in self._default_kwargs.items()
+        }
 
         if any_or_all not in ['any', 'all']:
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
@@ -80,7 +79,7 @@ class FaceAreaFilter(Filter):
         face_detections = {}
         for key, image in images.items():
             img = pil_to_opencv(image)
-            dets = self.detector(img, **self.detector_kwargs)
+            dets = self.detector(img, **self.extra_kwargs)
             face_detections[key] = [[
                 max(det.left(), 0),
                 max(det.top(), 0),

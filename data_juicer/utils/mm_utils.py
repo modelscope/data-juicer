@@ -2,6 +2,7 @@ import base64
 import datetime
 import os
 import re
+import shutil
 from typing import List, Union
 
 import av
@@ -335,6 +336,8 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
     :param frame_func: a function which inputs a frame and outputs another
         frame.
     """
+    frame_modified = False
+
     # open the original video
     if isinstance(input_video, str):
         container = av.open(input_video)
@@ -364,6 +367,8 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
         for packet in container.demux(input_video_stream):
             for frame in packet.decode():
                 new_frame = frame_func(frame)
+                if new_frame != frame:
+                    frame_modified = True
                 # for resize cases
                 output_video_stream.width = new_frame.width
                 output_video_stream.height = new_frame.height
@@ -378,6 +383,13 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
     if isinstance(input_video, str):
         container.close()
     output_container.close()
+
+    if frame_modified:
+        return output_video
+    else:
+        shutil.rmtree(output_video, ignore_errors=True)
+        return (input_video
+                if isinstance(input_video, str) else input_video.name)
 
 
 def extract_key_frames(input_video: Union[str, av.container.InputContainer]):
