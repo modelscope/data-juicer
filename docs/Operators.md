@@ -12,7 +12,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   41   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   39   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -112,6 +112,7 @@ All the specific operators are listed below, each featured with several capabili
 | image_size_filter              | Image      | -      | Keeps samples containing images whose size in bytes are within the specified range                                                                  |
 | image_text_matching_filter     | Multimodal | -      | Keeps samples with image-text classification matching score within the specified range based on a BLIP model                                        |
 | image_text_similarity_filter   | Multimodal | -      | Keeps samples with image-text feature cosine similarity within the specified range based on a CLIP model                                            |
+| image_watermark_filter         | Image      | -      | Keeps samples containing images with predicted watermark probabilities below the threshold                                                               |
 | language_id_score_filter       | General    | en, zh | Keeps samples of the specified language, judged by a predicted confidence score                                                                     |
 | maximum_line_length_filter     | Code       | en, zh | Keeps samples with maximum line length within the specified range                                                                                   |
 | perplexity_filter              | General    | en, zh | Keeps samples with perplexity score below the specified threshold                                                                                   |
@@ -133,6 +134,7 @@ All the specific operators are listed below, each featured with several capabili
 | video_nsfw_filter              | Video      | -      | Keeps samples containing videos with NSFW scores below the threshold                                                               |
 | video_ocr_area_ratio_filter    | Video      | -      | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range ｜                                  
 | video_resolution_filter        | Video      | -      | Keeps samples containing videos with horizontal and vertical resolutions within the specified range                                                 |
+| video_watermark_filter         | Video      | -      | Keeps samples containing videos with predicted watermark probabilities below the threshold                                                               |
 | video_tagging_from_frames_filter  | Video   | -      | Keep samples containing videos with given tags |
 | word_num_filter                | General    | en, zh | Keeps samples with word count within the specified range                                                                                            |
 | word_repetition_filter         | General    | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range                                                                    |
