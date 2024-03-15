@@ -122,6 +122,14 @@ data\_juicer.ops.mapper.image\_diffusion\_mapper
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.mapper.image\_face\_blur\_mapper
+-------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.mapper.image_face_blur_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.mapper.nlpaug\_en\_mapper
 -------------------------------------------------
 
@@ -250,10 +258,26 @@ data\_juicer.ops.mapper.video\_captioning\_from\_video\_mapper
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.mapper.video\_face\_blur\_mapper
+-------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.mapper.video_face_blur_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.mapper.video\_ffmpeg\_wrapped\_mapper
 -------------------------------------------------------------
 
 .. automodule:: data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.mapper.video\_remove\_watermark\_mapper
+-------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.mapper.video_remove_watermark_mapper
    :members:
    :undoc-members:
    :show-inheritance:

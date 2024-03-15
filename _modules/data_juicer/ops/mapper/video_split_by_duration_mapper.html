@@ -135,21 +135,19 @@
         <span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">video_duration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_duration</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">split_video_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
+                                             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)):</span>
-            <span class="n">split_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
-                                                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
-            <span class="n">suffix</span> <span class="o">=</span> <span class="s1">&#39;_split-by-duration-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
-            <span class="n">split_video_key</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">split_video_key</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+            <span class="n">split_video_key</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">unique_video_key</span><span class="p">,</span>
+                                                     <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">cut_video_by_seconds</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">split_video_key</span><span class="p">,</span>
                                     <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
                 <span class="n">split_video_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">split_video_key</span><span class="p">)</span>
                 <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">video_duration</span> <span class="o">-</span> <span class="n">timestamps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_last_split_duration</span><span class="p">:</span>
-            <span class="n">split_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
-                                                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
-            <span class="n">suffix</span> <span class="o">=</span> <span class="s1">&#39;_split-by-duration-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
-            <span class="n">split_video_key</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">split_video_key</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+            <span class="n">split_video_key</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">unique_video_key</span><span class="p">,</span>
+                                                     <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">cut_video_by_seconds</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">split_video_key</span><span class="p">,</span>
                                     <span class="n">timestamps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
@@ -158,9 +156,8 @@
 
     <span class="k">def</span> <span class="nf">_process_single_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="c1"># there is no video in this sample</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> \
-                <span class="ow">or</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> \
-                <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="n">sample</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
 
         <span class="c1"># the split results</span>

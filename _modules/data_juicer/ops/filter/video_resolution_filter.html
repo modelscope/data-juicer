@@ -151,9 +151,6 @@
             <span class="k">if</span> <span class="n">video_stream</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">sample</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">:</span>
-                <span class="n">video</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
             <span class="n">video_width</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">video_stream</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">width</span>
             <span class="n">video_height</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">video_stream</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">height</span>
 
@@ -164,6 +161,10 @@
         <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">video_height</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">video_height</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="k">for</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
         <span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">vid_key</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
+                <span class="n">videos</span><span class="p">[</span><span class="n">vid_key</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">sample</span></div>
 

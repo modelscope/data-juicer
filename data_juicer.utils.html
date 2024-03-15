@@ -141,7 +141,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_images_byte"><code class="docutils literal notranslate"><span class="pre">load_images_byte()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_video"><code class="docutils literal notranslate"><span class="pre">load_video()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.load_videos"><code class="docutils literal notranslate"><span class="pre">load_videos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.parse_string_to_roi"><code class="docutils literal notranslate"><span class="pre">parse_string_to_roi()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.pil_to_opencv"><code class="docutils literal notranslate"><span class="pre">pil_to_opencv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.process_each_frame"><code class="docutils literal notranslate"><span class="pre">process_each_frame()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.remove_non_special_tokens"><code class="docutils literal notranslate"><span class="pre">remove_non_special_tokens()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.remove_special_tokens"><code class="docutils literal notranslate"><span class="pre">remove_special_tokens()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data_juicer.utils.mm_utils.size_to_bytes"><code class="docutils literal notranslate"><span class="pre">size_to_bytes()</span></code></a></li>
@@ -679,6 +681,11 @@ remove lock file automatically.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.Fields.multimodal_data_output_dir">
+<span class="sig-name descname"><span class="pre">multimodal_data_output_dir</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__produced_data__'</span></em><a class="headerlink" href="#data_juicer.utils.constant.Fields.multimodal_data_output_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.utils.constant.Fields.stats">
 <span class="sig-name descname"><span class="pre">stats</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'__dj__stats__'</span></em><a class="headerlink" href="#data_juicer.utils.constant.Fields.stats" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -843,6 +850,11 @@ remove lock file automatically.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.image_nsfw_score">
+<span class="sig-name descname"><span class="pre">image_nsfw_score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'image_nsfw_score'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.image_nsfw_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.image_sizes">
 <span class="sig-name descname"><span class="pre">image_sizes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'image_sizes'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.image_sizes" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -955,6 +967,11 @@ remove lock file automatically.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_motion_score">
 <span class="sig-name descname"><span class="pre">video_motion_score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_motion_score'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_motion_score" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_juicer.utils.constant.StatsKeysConstant.video_nsfw_score">
+<span class="sig-name descname"><span class="pre">video_nsfw_score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'video_nsfw_score'</span></em><a class="headerlink" href="#data_juicer.utils.constant.StatsKeysConstant.video_nsfw_score" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -1076,27 +1093,27 @@ original_filepath to another unique file path. E.g.</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><dl class="simple">
-<dt>abc.jpg –&gt;</dt><dd><p>{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
+<dt>abc.jpg –&gt;</dt><dd><p>__dj__produced_data__/{op_name}/
+abc__dj_hash_#{hash_val}#.jpg</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>./abc.jpg –&gt;</dt><dd><p>./{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
+<dt>./abc.jpg –&gt;</dt><dd><p>./__dj__produced_data__/{op_name}/
+abc__dj_hash_#{hash_val}#.jpg</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>/path/to/abc.jpg –&gt;</dt><dd><p>/path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
+<dt>/path/to/abc.jpg –&gt;</dt><dd><p>/path/to/__dj__produced_data__/{op_name}/
+abc__dj_hash_#{hash_val}#.jpg</p>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
-<dt>/path/to/{op_name}/abc.jpg –&gt;</dt><dd><p>/path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg</p>
-</dd>
-</dl>
-</li>
-<li><dl class="simple">
-<dt>/path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg –&gt;</dt><dd><p>/path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg</p>
+<dt>/path/to/__dj__produced_data__/{op_name}/</dt><dd><p>abc__dj_hash_#{hash_val1}#.jpg –&gt;
+/path/to/__dj__produced_data__/{op_name}/
+abc__dj_hash_#{hash_val2}#.jpg</p>
 </dd>
 </dl>
 </li>
@@ -1516,9 +1533,45 @@ to frames.</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.parse_string_to_roi">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">parse_string_to_roi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pixel'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#parse_string_to_roi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.parse_string_to_roi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a roi string to four number x1, y1, x2, y2 stand for the region.
+When the type is ‘pixel’, (x1, y1), (x2, y2) are the locations of pixels
+in the top left corner and the bottom right corner respectively. If the
+roi_type is ‘ratio’, the coordinates are normalized by wights and
+heights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>roi_string</strong> – the roi string</p>
+</dd>
+<dt class="field-even">Patam roi_type<span class="colon">:</span></dt>
+<dd class="field-even"><p>the roi string type</p>
+</dd>
+</dl>
+<p>return tuple of (x1, y1, x2, y2) if roi_string is valid, else None</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.mm_utils.pil_to_opencv">
 <span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">pil_to_opencv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pil_image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#pil_to_opencv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.pil_to_opencv" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.utils.mm_utils.process_each_frame">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.utils.mm_utils.</span></span><span class="sig-name descname"><span class="pre">process_each_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">InputContainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_video</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/utils/mm_utils.html#process_each_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.utils.mm_utils.process_each_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process each frame in video by replacing each frame by
+<cite>frame_func(frame)</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_video</strong> – the path to input video or the video container.</p></li>
+<li><p><strong>output_video</strong> – the path to output video.</p></li>
+<li><p><strong>frame_func</strong> – a function which inputs a frame and outputs another
+frame.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.utils.mm_utils.remove_non_special_tokens">

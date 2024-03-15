@@ -65,12 +65,13 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.clean_links_mapper">data_juicer.ops.mapper.clean_links_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.expand_macro_mapper">data_juicer.ops.mapper.expand_macro_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.fix_unicode_mapper">data_juicer.ops.mapper.fix_unicode_mapper</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.generate_caption_mapper">data_juicer.ops.mapper.generate_caption_mapper</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.gpt4v_generate_mapper">data_juicer.ops.mapper.gpt4v_generate_mapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-juicer-ops-mapper-generate-caption-mapper">data_juicer.ops.mapper.generate_caption_mapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data-juicer-ops-mapper-gpt4v-generate-mapper">data_juicer.ops.mapper.gpt4v_generate_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.image_blur_mapper">data_juicer.ops.mapper.image_blur_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper">data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.image_captioning_mapper">data_juicer.ops.mapper.image_captioning_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.image_diffusion_mapper">data_juicer.ops.mapper.image_diffusion_mapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.image_face_blur_mapper">data_juicer.ops.mapper.image_face_blur_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.nlpaug_en_mapper">data_juicer.ops.mapper.nlpaug_en_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.nlpcda_zh_mapper">data_juicer.ops.mapper.nlpcda_zh_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.punctuation_normalization_mapper">data_juicer.ops.mapper.punctuation_normalization_mapper</a></li>
@@ -87,7 +88,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.sentence_split_mapper">data_juicer.ops.mapper.sentence_split_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.video_captioning_from_audio_mapper">data_juicer.ops.mapper.video_captioning_from_audio_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.video_captioning_from_video_mapper">data_juicer.ops.mapper.video_captioning_from_video_mapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.video_face_blur_mapper">data_juicer.ops.mapper.video_face_blur_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper">data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.video_remove_watermark_mapper">data_juicer.ops.mapper.video_remove_watermark_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.video_resize_aspect_ratio_mapper">data_juicer.ops.mapper.video_resize_aspect_ratio_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.video_resize_resolution_mapper">data_juicer.ops.mapper.video_resize_resolution_mapper</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-data_juicer.ops.mapper.video_split_by_duration_mapper">data_juicer.ops.mapper.video_split_by_duration_mapper</a></li>
@@ -526,160 +529,11 @@ normalization mode, which can be one of
 </dd></dl>
 
 </section>
-<section id="module-data_juicer.ops.mapper.generate_caption_mapper">
-<span id="data-juicer-ops-mapper-generate-caption-mapper"></span><h2>data_juicer.ops.mapper.generate_caption_mapper<a class="headerlink" href="#module-data_juicer.ops.mapper.generate_caption_mapper" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.ops.mapper.generate_caption_mapper.GenerateCaptionMapper">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.generate_caption_mapper.</span></span><span class="sig-name descname"><span class="pre">GenerateCaptionMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_blip2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Salesforce/blip2-opt-2.7b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_candidate_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'random_any'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_original_sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/generate_caption_mapper.html#GenerateCaptionMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.generate_caption_mapper.GenerateCaptionMapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
-<p>Mapper to generate samples whose captions are generated based on
-another model and the figure.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.mapper.generate_caption_mapper.GenerateCaptionMapper.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_blip2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Salesforce/blip2-opt-2.7b'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_candidate_mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'random_any'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_original_sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prompt_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/generate_caption_mapper.html#GenerateCaptionMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.generate_caption_mapper.GenerateCaptionMapper.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>hf_blip2</strong> – blip2 model name on huggingface to generate caption</p></li>
-<li><p><strong>caption_num</strong> – how many candidate captions to generate
-for each image</p></li>
-<li><p><strong>keep_candidate_mode</strong> – <p>retain strategy for the generated
-$caption_num$ candidates.</p>
-<p>’random_any’: Retain the random one from generated captions</p>
-<p>’similar_one_simhash’: Retain the generated one that is most
-similar to the original caption</p>
-<p>’all’: Retain all generated captions by concatenation</p>
-</p></li>
-</ul>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This is a batched_OP, whose input and output type are
-both list. Suppose there are $N$ list of input samples, whose batch
-size is $b$, and denote caption_num as $M$.
-The number of total samples after generation is $2Nb$ when
-keep_original_sample is True and $Nb$ when keep_original_sample is
-False. For ‘random_any’ and ‘similar_one_simhash’ mode,
-it’s $(1+M)Nb$ for ‘all’ mode when keep_original_sample is True
-and $MNb$ when keep_original_sample is False.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>keep_original_sample</strong> – whether to keep the original sample. If
-it’s set to False, there will be only generated captions in the
-final datasets and the original captions will be removed. It’s True
-in default.</p></li>
-<li><p><strong>prompt</strong> – a string prompt to guide the generation of blip2 model
-for all samples globally. It’s None in default, which means no
-prompt provided.</p></li>
-<li><p><strong>prompt_key</strong> – the key name of fields in samples to store prompts
-for each sample. It’s used for set different prompts for different
-samples. If it’s none, use prompt in parameter “prompt”. It’s None
-in default.</p></li>
-<li><p><strong>args</strong> – extra args</p></li>
-<li><p><strong>kwargs</strong> – extra args</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.mapper.generate_caption_mapper.GenerateCaptionMapper.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/generate_caption_mapper.html#GenerateCaptionMapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.generate_caption_mapper.GenerateCaptionMapper.process" title="Permalink to this definition">¶</a></dt>
-<dd><div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This is a batched_OP, whose the input and output type are
-both list. Suppose there are $N$ input sample list with batch
-size as $b$, and denote caption_num as $M$.
-the number of total samples after generation is $2Nb$
-for ‘random_any’ and ‘similar_one’ mode,
-and $(1+M)Nb$ for ‘all’ mode.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>samples</strong> – </p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+<section id="data-juicer-ops-mapper-generate-caption-mapper">
+<h2>data_juicer.ops.mapper.generate_caption_mapper<a class="headerlink" href="#data-juicer-ops-mapper-generate-caption-mapper" title="Permalink to this heading">¶</a></h2>
 </section>
-<section id="module-data_juicer.ops.mapper.gpt4v_generate_mapper">
-<span id="data-juicer-ops-mapper-gpt4v-generate-mapper"></span><h2>data_juicer.ops.mapper.gpt4v_generate_mapper<a class="headerlink" href="#module-data_juicer.ops.mapper.gpt4v_generate_mapper" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.ops.mapper.gpt4v_generate_mapper.Gpt4vGenerateMapper">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.gpt4v_generate_mapper.</span></span><span class="sig-name descname"><span class="pre">Gpt4vGenerateMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'description'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_prompt_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_original_sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">any_or_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/gpt4v_generate_mapper.html#Gpt4vGenerateMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.gpt4v_generate_mapper.Gpt4vGenerateMapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
-<p>Mapper to generate samples whose texts are generated based on
-gpt-4-visison and the image.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.mapper.gpt4v_generate_mapper.Gpt4vGenerateMapper.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'description'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_prompt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_prompt_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_original_sample</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">any_or_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/gpt4v_generate_mapper.html#Gpt4vGenerateMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.gpt4v_generate_mapper.Gpt4vGenerateMapper.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> – mode of text generated from images, can be one of
-[‘resoning’, ‘description’, ‘conversation’, ‘custom’]</p></li>
-<li><p><strong>api_key</strong> – the API key to authenticate the request.</p></li>
-<li><p><strong>max_token</strong> – the maximum number of tokens to generate.
-Default is 500.</p></li>
-<li><p><strong>temperature</strong> – controls the randomness of the output (range
-from 0 to 1). Default is 0.</p></li>
-<li><p><strong>system_prompt</strong> – a string prompt used to set the context of a
-conversation and provide global guidance or rules for the
-gpt4-vision so that it can  generate responses in the expected way.
-If <cite>mode</cite> set to <cite>custom</cite>, the parameter will be used.</p></li>
-<li><p><strong>user_prompt</strong> – a string prompt to guide the generation of
-gpt4-vision for each samples. It’s “” in default, which means no
-prompt provided.</p></li>
-<li><p><strong>uers_prompt_key</strong> – the key name of fields in samples to store
-prompts for each sample. It’s used for set different prompts for
-different samples. If it’s none, use prompt in parameter “prompt”.
-It’s None in default.</p></li>
-<li><p><strong>keep_original_sample</strong> – whether to keep the original sample. If
-it’s set to False, there will be only generated text in the
-final datasets and the original text will be removed. It’s True
-in default.</p></li>
-<li><p><strong>any_or_all</strong> – keep this sample with ‘any’ or ‘all’ strategy of
-all images. ‘any’: keep this sample if any images meet the
-condition. ‘all’: keep this sample only if all images meet the
-condition.</p></li>
-<li><p><strong>args</strong> – extra args</p></li>
-<li><p><strong>kwargs</strong> – extra args</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.mapper.gpt4v_generate_mapper.Gpt4vGenerateMapper.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/gpt4v_generate_mapper.html#Gpt4vGenerateMapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.gpt4v_generate_mapper.Gpt4vGenerateMapper.process" title="Permalink to this definition">¶</a></dt>
-<dd><p>For sample level, sample –&gt; sample</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>sample</strong> – sample to process</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>processed sample</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.ops.mapper.gpt4v_generate_mapper.call_gpt_vision_api">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.gpt4v_generate_mapper.</span></span><span class="sig-name descname"><span class="pre">call_gpt_vision_api</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">api_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_prompt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_prompt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base64_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gpt-4-vision-preview'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/gpt4v_generate_mapper.html#call_gpt_vision_api"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.gpt4v_generate_mapper.call_gpt_vision_api" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
+<section id="data-juicer-ops-mapper-gpt4v-generate-mapper">
+<h2>data_juicer.ops.mapper.gpt4v_generate_mapper<a class="headerlink" href="#data-juicer-ops-mapper-gpt4v-generate-mapper" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-data_juicer.ops.mapper.image_blur_mapper">
 <span id="data-juicer-ops-mapper-image-blur-mapper"></span><h2>data_juicer.ops.mapper.image_blur_mapper<a class="headerlink" href="#module-data_juicer.ops.mapper.image_blur_mapper" title="Permalink to this heading">¶</a></h2>
@@ -964,6 +818,45 @@ the number of total samples after generation is  $(1+M)Nb$.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.ops.mapper.image_face_blur_mapper">
+<span id="data-juicer-ops-mapper-image-face-blur-mapper"></span><h2>data_juicer.ops.mapper.image_face_blur_mapper<a class="headerlink" href="#module-data_juicer.ops.mapper.image_face_blur_mapper" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.image_face_blur_mapper.ImageFaceBlurMapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.image_face_blur_mapper.</span></span><span class="sig-name descname"><span class="pre">ImageFaceBlurMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blur_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/image_face_blur_mapper.html#ImageFaceBlurMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.image_face_blur_mapper.ImageFaceBlurMapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
+<p>Mapper to blur faces detected in images.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.image_face_blur_mapper.ImageFaceBlurMapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blur_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/image_face_blur_mapper.html#ImageFaceBlurMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.image_face_blur_mapper.ImageFaceBlurMapper.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>blur_type</strong> – Type of blur kernel, including</p>
+</dd>
+</dl>
+<p>[‘mean’, ‘box’, ‘gaussian’].
+:param radius: Radius of blur kernel.
+:param args: extra args
+:param kwargs: extra args</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.image_face_blur_mapper.ImageFaceBlurMapper.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/image_face_blur_mapper.html#ImageFaceBlurMapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.image_face_blur_mapper.ImageFaceBlurMapper.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>For sample level, sample –&gt; sample</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – sample to process</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>processed sample</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1779,6 +1672,45 @@ and $(1+M)Nb$ for ‘all’ mode.</p>
 </dd></dl>
 
 </section>
+<section id="module-data_juicer.ops.mapper.video_face_blur_mapper">
+<span id="data-juicer-ops-mapper-video-face-blur-mapper"></span><h2>data_juicer.ops.mapper.video_face_blur_mapper<a class="headerlink" href="#module-data_juicer.ops.mapper.video_face_blur_mapper" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.video_face_blur_mapper.</span></span><span class="sig-name descname"><span class="pre">VideoFaceBlurMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blur_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/video_face_blur_mapper.html#VideoFaceBlurMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
+<p>Mapper to blur faces detected in videos.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">blur_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'gaussian'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/video_face_blur_mapper.html#VideoFaceBlurMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>blur_type</strong> – Type of blur kernel, including</p>
+</dd>
+</dl>
+<p>[‘mean’, ‘box’, ‘gaussian’].
+:param radius: Radius of blur kernel.
+:param args: extra args
+:param kwargs: extra args</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/video_face_blur_mapper.html#VideoFaceBlurMapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>For sample level, sample –&gt; sample</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – sample to process</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>processed sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 <section id="module-data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper">
 <span id="data-juicer-ops-mapper-video-ffmpeg-wrapped-mapper"></span><h2>data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper<a class="headerlink" href="#module-data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
@@ -1808,6 +1740,66 @@ and $(1+M)Nb$ for ‘all’ mode.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper.VideoFFmpegWrappedMapper.process">
 <span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/video_ffmpeg_wrapped_mapper.html#VideoFFmpegWrappedMapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper.VideoFFmpegWrappedMapper.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>For sample level, sample –&gt; sample</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – sample to process</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>processed sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.ops.mapper.video_remove_watermark_mapper">
+<span id="data-juicer-ops-mapper-video-remove-watermark-mapper"></span><h2>data_juicer.ops.mapper.video_remove_watermark_mapper<a class="headerlink" href="#module-data_juicer.ops.mapper.video_remove_watermark_mapper" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.video_remove_watermark_mapper.</span></span><span class="sig-name descname"><span class="pre">VideoRemoveWatermarkMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi_strings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['0,0,0.1,0.1']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ratio'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_frame_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detection_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pixel_value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/video_remove_watermark_mapper.html#VideoRemoveWatermarkMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
+<p>Remove the watermarks in videos given regions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">roi_strings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">['0,0,0.1,0.1']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ratio'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_num</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_frame_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PositiveInt</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detection_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pixel_value'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/video_remove_watermark_mapper.html#VideoRemoveWatermarkMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>roi_strings</strong> – a given list of regions the watermarks locate.
+The format of each can be “x1, y1, x2, y2”, “(x1, y1, x2, y2)”,
+or “[x1, y1, x2, y2]”.</p></li>
+<li><p><strong>roi_type</strong> – the roi string type. When the type is ‘pixel’, (x1,
+y1), (x2, y2) are the locations of pixels in the top left corner
+and the bottom right corner respectively. If the roi_type is
+‘ratio’, the coordinates are normalized by wights and heights.</p></li>
+<li><p><strong>roi_key</strong> – the key name of fields in samples to store roi_strings
+for each sample. It’s used for set different rois for different
+samples. If it’s none, use rois in parameter “roi_strings”.
+It’s None in default.</p></li>
+<li><p><strong>frame_num</strong> – the number of frames to be extracted uniformly from
+the video to detect the pixels of watermark.</p></li>
+<li><p><strong>min_frame_threshold</strong> – a coodination is considered as the
+location of a watermark pixel when it is that in no less
+min_frame_threshold frames.</p></li>
+<li><p><strong>detection_method</strong> – the method to detect the pixels of watermark.
+If it is ‘pixel_value’, we consider the distribution of pixel
+value in each frame. If it is ‘pixel_diversity’, we will consider
+the pixel diversity in different frames. The min_frame_threshold
+is useless and frame_num must be greater than 1 in
+‘pixel_diversity’ mode.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/video_remove_watermark_mapper.html#VideoRemoveWatermarkMapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; sample</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

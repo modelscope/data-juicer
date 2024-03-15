@@ -129,9 +129,9 @@
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="n">loaded_video_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
-        <span class="n">proceessed</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">processed</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">proceessed</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">processed</span><span class="p">:</span>
                 <span class="k">continue</span>
 
             <span class="n">output_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
@@ -142,9 +142,9 @@
                 <span class="n">stream</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">global_args</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">global_args</span><span class="p">)</span>
             <span class="n">stream</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">capture_stderr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">capture_stderr</span><span class="p">,</span>
                        <span class="n">overwrite_output</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">overwrite_output</span><span class="p">)</span>
-            <span class="n">proceessed</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_key</span>
+            <span class="n">processed</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_key</span>
 
-        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">proceessed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">]</span>
+        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">processed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">sample</span></div></div>
 </pre></div>
 
