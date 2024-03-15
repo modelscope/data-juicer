@@ -122,6 +122,14 @@ data\_juicer.ops.mapper.image\_diffusion\_mapper
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.mapper.image\_face\_blur\_mapper
+-------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.mapper.image_face_blur_mapper
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.mapper.nlpaug\_en\_mapper
 -------------------------------------------------
 

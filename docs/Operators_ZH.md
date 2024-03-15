@@ -11,7 +11,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 类型                                | 数量 | 描述            |
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
-| [ Mapper ]( #mapper )              | 40 | 对数据样本进行编辑和转换  |
+| [ Mapper ]( #mapper )              | 41 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 40 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
@@ -79,6 +79,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | sentence_split_mapper                               | General               | en        | 根据语义拆分和重组句子                                            |
 | video_captioning_from_audio_mapper                         | Multimodal         | -      | 基于 Qwen-Audio 模型根据视频的音频流为视频生成新的标题描述 |
 | video_captioning_from_video_mapper                             | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（video-blip）和原始样本中的视频中指定帧的图像。                                             |
+| video_face_blur_mapper                              | Video                 |  -        | 对视频中的人脸进行模糊处理                                      ｜
 | video_ffmpeg_wrapped_mapper                         | Video                 | -         | 运行 FFmpeg 视频过滤器的简单封装                         |
 | video_remove_watermark_mapper                       | Video                 | -         | 去除视频中给定区域的水印                                            ｜
 | video_resize_aspect_ratio_mapper                    | Video                 | -         | 将视频的宽高比调整到指定范围内                                              |
