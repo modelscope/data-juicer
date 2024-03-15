@@ -220,8 +220,9 @@ class VideoRemoveWatermarkMapper(Mapper):
                 def process_frame_func(frame):
                     return self._clean_watermark(frame, watermark_mask)
 
-                process_each_frame(video, cleaned_video_key,
-                                   process_frame_func)
+                cleaned_video_key = process_each_frame(video,
+                                                       cleaned_video_key,
+                                                       process_frame_func)
 
             loaded_video_keys[index] = cleaned_video_key
 
