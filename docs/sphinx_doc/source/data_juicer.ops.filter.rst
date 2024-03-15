@@ -85,7 +85,7 @@ data\_juicer.ops.filter.image\_nsfw\_filter
 -----------------------------------------------------------
 
 .. automodule:: data_juicer.ops.filter.image_nsfw_filter
-      :members:
+   :members:
    :undoc-members:
    :show-inheritance:
 
