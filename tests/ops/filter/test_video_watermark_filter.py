@@ -42,7 +42,7 @@ class VideoWatermarkFilterTest(DataJuicerTestCaseBase):
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
 
-    def test_watermark_keyframes(self):
+    def test_all_keyframes(self):
 
         ds_list = [{
             'videos': [self.video1_path]
