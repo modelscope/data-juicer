@@ -42,7 +42,7 @@ class VideoTaggingFromFramesFilter(Filter):
             in https://github.com/xinyu1205/recognize-anything/blob/main/ram/data/ram_tag_list.txt # noqa: E501
         :param contain: require the videos containing 'any' or 'all' tags.
             When tags equal to [], 'all' keeps all samples, 'any' keeps no
-            samples.
+            sample.
         :param frame_sampling_method: sampling method of extracting frame
             images from the videos. Should be one of
             ["all_keyframes", "uniform"].
