@@ -297,6 +297,14 @@ data\_juicer.ops.filter.video\_resolution\_filter
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.filter.video\_watermark\_filter
+-----------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.video_watermark_filter
+      :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.filter.word\_num\_filter
 ------------------------------------------------
 
