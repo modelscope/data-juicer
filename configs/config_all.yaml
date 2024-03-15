@@ -137,6 +137,17 @@ process:
       lang: 'en'                                              # split text in what language
   - video_captioning_from_audio_mapper:                     # caption a video according to its audio streams based on Qwen-Audio model
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only captioned sample in the final datasets and the original sample will be removed. It's True in default.
+  - video_captioning_from_frames_mapper:                    # generate samples whose captions are generated based on an image-to-text model and sampled video frames. Captions from different frames will be concatenated to a single string.
+      hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # image-to-text model name on huggingface to generate caption
+      caption_num: 1                                          # how many candidate captions to generate for each video
+      keep_candidate_mode: 'random_any'                       # retain strategy for the generated $caption_num$ candidates. should be in ["random_any", "similar_one_simhash", "all"].
+      keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True in default.
+      prompt: null                                            # a string prompt to guide the generation of image-to-text model for all samples globally. It's None in default, which means no prompt provided.
+      prompt_key: null                                        # the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default.
+      frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
+      horizontal_flip: false                                  # flip frame image horizontally (left to right).
+      vertical_flip: false                                    # flip frame image vertically (top to bottom).
   - video_captioning_from_video_mapper:                     # generate captions by frame images extracted from video to augment datasets
       hf_video_blip: 'kpyu/video-blip-opt-2.7b-ego4d'         # video-blip model name on huggingface to generate caption
       caption_num: 1                                          # how many candidate captions to generate for each video

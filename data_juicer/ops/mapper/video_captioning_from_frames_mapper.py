@@ -19,7 +19,7 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
-OP_NAME = 'video_captioning_from_video_mapper'
+OP_NAME = 'video_captioning_from_frames_mapper'
 
 with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
                           OP_NAME):
@@ -34,13 +34,14 @@ with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
 
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
-class VideoCaptioningFromVideoMapper(Mapper):
+class VideoCaptioningFromFramesMapper(Mapper):
     """Mapper to generate samples whose captions are generated based on
-    a video-to-text model and sampled video frame."""
+    an image-to-text model and sampled video frames. Captions from different
+    frames will be concatenated to a single string."""
 
     def __init__(
         self,
-        hf_video_blip='kpyu/video-blip-opt-2.7b-ego4d',
+        hf_img2seq='Salesforce/blip2-opt-2.7b',
         caption_num: PositiveInt = 1,
         keep_candidate_mode: str = 'random_any',
         keep_original_sample: bool = True,
@@ -56,8 +57,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
         """
         Initialization method.
 
-        :param hf_video_blip: video-blip model name on huggingface
-            to generate caption
+        :param hf_img2seq: model name on huggingface to generate caption
         :param caption_num: how many candidate captions to generate
             for each video
         :param keep_candidate_mode: retain strategy for the generated
@@ -84,7 +84,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
             it's set to False, there will be only generated captions in the
             final datasets and the original captions will be removed. It's True
             in default.
-        :param prompt: a string prompt to guide the generation of video-blip
+        :param prompt: a string prompt to guide the generation of image-to-text
             model for all samples globally. It's None in default, which means
             no prompt provided.
         :param prompt_key: the key name of fields in samples to store prompts
@@ -154,8 +154,8 @@ class VideoCaptioningFromVideoMapper(Mapper):
         self.frame_num = frame_num
 
         self.model_key = prepare_model(
-            model_type='video_blip',
-            pretrained_model_name_or_path=hf_video_blip,
+            model_type='huggingface',
+            pretrained_model_name_or_path=hf_img2seq,
         )
 
     def _process_single_sample(self, ori_sample, rank=None, context=False):
@@ -186,7 +186,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
             video_count = chunk.count(SpecialTokens.video)
 
             # no video or no text
-            if video_count == 0 or len(chunk) == 0:
+            if video_count == 0 or len(chunk.strip()) == 0:
                 continue
             else:
                 text_with_only_special_tokens = remove_non_special_tokens(
@@ -208,22 +208,24 @@ class VideoCaptioningFromVideoMapper(Mapper):
                     else:
                         frames = []
                     frame_videos = [frame.to_image() for frame in frames]
-                    for video in frame_videos:
+                    for frame in frame_videos:
                         if self.horizontal_flip:
-                            video = ImageOps.mirror(video)
+                            frame = ImageOps.mirror(frame)
                         if self.vertical_flip:
-                            video = ImageOps.flip(video)
-                        video_frame_videos_chunk.append(video)
+                            frame = ImageOps.flip(frame)
+                        video_frame_videos_chunk.append(frame)
 
                     # construct prompts
                     if self.prompt_key and isinstance(
                             ori_sample[self.prompt_key], str):
                         # check prompt_key is not None, and it's a str
                         # in the sample
-                        prompt_texts = [ori_sample[self.prompt_key]]
+                        prompt_texts = [ori_sample[self.prompt_key]
+                                        ] * len(video_frame_videos_chunk)
                     elif self.prompt and isinstance(self.prompt, str):
                         # check prompt is not None, and it's a str
-                        prompt_texts = [self.prompt]
+                        prompt_texts = [self.prompt
+                                        ] * len(video_frame_videos_chunk)
                     else:
                         prompt_texts = None
 
@@ -231,22 +233,17 @@ class VideoCaptioningFromVideoMapper(Mapper):
                         text=prompt_texts,
                         images=video_frame_videos_chunk,
                         return_tensors='pt',
-                        truncation=True,
-                        max_length=model.config.text_config.
-                        max_position_embeddings,
-                        padding=True,
                     ).to(model.device)
-                    # tchw to bcthw
-                    inputs['pixel_values'] = inputs.pixel_values.unsqueeze(
-                        0).permute(0, 2, 1, 3, 4)
                     for i in range(self.caption_num):
                         generated_ids = model.generate(**inputs,
+                                                       max_new_tokens=128,
                                                        do_sample=True).to(
                                                            model.device)
                         generated_text = processor.batch_decode(
                             generated_ids, skip_special_tokens=True)
-                        generated_text_candidates_single_chunk[
-                            i] += generated_text
+                        generated_text_candidates_single_chunk[i] += [
+                            '. '.join([txt.strip() for txt in generated_text])
+                        ]
 
                 # 3. insert a list of generated captions into the positions of
                 # subsequent placeholders in the original string
