@@ -9,8 +9,8 @@
 #SBATCH --exclusive
 
 # set data-juicer and config file path
-datajuicer_path=  # 填写 data-juicer 的实际路径 please fill the actual path of datajuicer
-config_path=  # 填写实际的配置文件路径 please fill the actual path of config file
+datajuicer_path=  # please fill the actual path of datajuicer
+config_path=  # please fill the actual path of config file
 
 
 cd $datajuicer_path
@@ -20,7 +20,7 @@ readarray -t nodes <<< "$(sinfo --noheader --states=idle,mixed --format=%n)"
 PARTITION_SCRIPT=./scripts/dlc/partition_data_dlc.py
 
 # set dataset path
-JSON_FILE_PATH = #填写为实际的数据集路径 please fill the actual path of dataset file
+JSON_FILE_PATH = # please fill the actual path of dataset file
 
 # split_dataset
 python $PARTITION_SCRIPT --input_file_path $JSON_FILE_PATH --output_file_path $JSON_FILE_PATH --hostnames "${nodes[@]}"
