@@ -23,7 +23,7 @@ PARTITION_SCRIPT=./scripts/dlc/partition_data_dlc.py
 JSON_FILE_PATH = #填写为实际的数据集路径 please fill the actual path of dataset file
 
 # split_dataset
-python $PARTITION_SCRIPT $JSON_FILE_PATH "${nodes[@]}"
+python $PARTITION_SCRIPT --input_file_path $JSON_FILE_PATH --output_file_path $JSON_FILE_PATH --hostnames "${nodes[@]}"
 
 # run on nodes
 

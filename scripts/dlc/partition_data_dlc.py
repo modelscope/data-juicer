@@ -19,7 +19,8 @@ def convert_to_absolute_path(video_path, json_file_path):
     return ret
 
 
-def partition_data(json_file_path: str, hostnames: List[str]):
+def partition_data(json_file_path: str, output_file_path: str,
+                   hostnames: List[str]):
     with open(json_file_path, 'r') as f:
         data = [json.loads(line) for line in f]
     video_to_entries_map = defaultdict(list)
@@ -42,7 +43,8 @@ def partition_data(json_file_path: str, hostnames: List[str]):
         nodes_video_size[min_node] += video_sizes[video]
 
     for hostname in hostnames:
-        host_file_path = f"{json_file_path.rsplit('.', 1)[0]}_{hostname}.jsonl"
+        host_file_path = \
+            f"{output_file_path.rsplit('.', 1)[0]}_{hostname}.jsonl"
         if os.path.exists(host_file_path):
             print(f'Warning: File {host_file_path} already exists')
             continue
@@ -56,11 +58,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Partition data across hostnames.')
 
-    parser.add_argument('file_path',
+    parser.add_argument('--input_file_path',
                         type=str,
                         help='Path of the file to distribute.')
-    parser.add_argument('hostnames', nargs='+', help='The list of hostnames')
+    parser.add_argument('--output_file_path',
+                        type=str,
+                        help='Path of the file to be output(without suffix).')
+    parser.add_argument('--hostnames', nargs='+', help='The list of hostnames')
 
     args = parser.parse_args()
 
-    partition_data(args.file_path, args.hostnames)
+    partition_data(args.input_file_path, args.output_file_path, args.hostnames)
