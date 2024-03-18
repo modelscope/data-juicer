@@ -44,7 +44,7 @@ def partition_data(json_file_path: str, hostnames: List[str]):
     for hostname in hostnames:
         host_file_path = f"{json_file_path.rsplit('.', 1)[0]}_{hostname}.jsonl"
         if os.path.exists(host_file_path):
-            print(f"Warning: File {host_file_path} already exists")
+            print(f'Warning: File {host_file_path} already exists')
             continue
         with open(host_file_path, 'w') as f:
             for entry in nodes_data[hostname]:
