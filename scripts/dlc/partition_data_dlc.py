@@ -5,6 +5,20 @@ from collections import defaultdict
 from typing import List
 
 
+def is_valid_path(item, dataset_dir):
+    full_path = os.path.abspath(os.path.join(dataset_dir, item))
+    return os.path.exists(full_path)
+
+
+def convert_to_absolute_path(video_path, json_file_path):
+    dataset_dir = os.path.dirname(json_file_path)
+    ret = os.path.join(
+        dataset_dir,
+        video_path) if isinstance(video_path, str) and is_valid_path(
+            video_path, dataset_dir) else video_path
+    return ret
+
+
 def partition_data(json_file_path: str, hostnames: List[str]):
     with open(json_file_path, 'r') as f:
         data = [json.loads(line) for line in f]
@@ -17,7 +31,7 @@ def partition_data(json_file_path: str, hostnames: List[str]):
 
     # distribute videos to nodes based on the total size of videos
     video_sizes = {
-        video: os.path.getsize(video)
+        video: os.path.getsize(convert_to_absolute_path(video))
         for video in video_to_entries_map.keys()
     }
 
