@@ -1,12 +1,6 @@
-import hashlib
-from collections import defaultdict
-from typing import Dict, Set
-
 import redis
 
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.mm_utils import load_data_with_context, load_video
-
 from ..base_op import Filter
 
 
@@ -28,6 +22,7 @@ class RayBasicDeduplicator(Filter):
         super().__init__(*args, **kwargs)
 
     def calculate_hash(self, sample, context=False):
+        """Calculate hash value for the sample."""
         raise NotImplementedError
 
     def compute_stats(self, sample, context=False):
