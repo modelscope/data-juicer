@@ -100,7 +100,7 @@ class VideoSplitBySceneMapper(Mapper):
             redirected_video_key = transfer_filename(video_key, OP_NAME,
                                                      **self._init_parameters)
             output_template = add_suffix_to_filename(redirected_video_key,
-                                                     '_Scene-$SCENE_NUMBER')
+                                                     '_$SCENE_NUMBER')
 
             # detect scenes
             detector = self.detector_class(self.threshold, self.min_scene_len,
@@ -120,9 +120,9 @@ class VideoSplitBySceneMapper(Mapper):
                     for i in range(len(scene_list))
                 ]
                 # split video into clips
-                split_video_ffmpeg(video_key,
-                                   scene_list,
-                                   output_template,
+                split_video_ffmpeg(input_video_path=video_key,
+                                   scene_list=scene_list,
+                                   output_file_template=output_template,
                                    show_progress=self.show_progress)
             else:
                 output_video_keys[video_key] = [video_key]

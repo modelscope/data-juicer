@@ -2,6 +2,7 @@ import base64
 import datetime
 import os
 import re
+import shutil
 from typing import List, Union
 
 import av
@@ -322,6 +323,73 @@ def cut_video_by_seconds(
                        f'[{start_seconds}, {end_seconds}] seconds. '
                        f'Please set more accurate parameters.')
     return os.path.exists(output_video)
+
+
+def process_each_frame(input_video: Union[str, av.container.InputContainer],
+                       output_video: str, frame_func):
+    """
+    Process each frame in video by replacing each frame by
+    `frame_func(frame)`.
+
+    :param input_video: the path to input video or the video container.
+    :param output_video: the path to output video.
+    :param frame_func: a function which inputs a frame and outputs another
+        frame.
+    """
+    frame_modified = False
+
+    # open the original video
+    if isinstance(input_video, str):
+        container = av.open(input_video)
+    else:
+        container = input_video
+
+    # create the output video
+    output_container = av.open(output_video, 'w')
+
+    # add the audio stream into the output video with template of input audio
+    for input_audio_stream in container.streams.audio:
+        output_container.add_stream(template=input_audio_stream)
+
+    # add the video stream into the output video according to input video
+    for input_video_stream in container.streams.video:
+        # search from the beginning
+        container.seek(0, backward=False, any_frame=True)
+
+        codec_name = input_video_stream.codec_context.name
+        fps = input_video_stream.base_rate
+        output_video_stream = output_container.add_stream(codec_name,
+                                                          rate=str(fps))
+        output_video_stream.pix_fmt = input_video_stream.codec_context.pix_fmt
+        output_video_stream.width = input_video_stream.codec_context.width
+        output_video_stream.height = input_video_stream.codec_context.height
+
+        for packet in container.demux(input_video_stream):
+            for frame in packet.decode():
+                new_frame = frame_func(frame)
+                if new_frame != frame:
+                    frame_modified = True
+                # for resize cases
+                output_video_stream.width = new_frame.width
+                output_video_stream.height = new_frame.height
+                for inter_packet in output_video_stream.encode(new_frame):
+                    output_container.mux(inter_packet)
+
+        # flush all packets
+        for packet in output_video_stream.encode():
+            output_container.mux(packet)
+
+    # close the output videos
+    if isinstance(input_video, str):
+        container.close()
+    output_container.close()
+
+    if frame_modified:
+        return output_video
+    else:
+        shutil.rmtree(output_video, ignore_errors=True)
+        return (input_video
+                if isinstance(input_video, str) else input_video.name)
 
 
 def extract_key_frames(input_video: Union[str, av.container.InputContainer]):
@@ -670,3 +738,39 @@ def timecode_string_to_seconds(timecode: str):
     # compute the start/end time in second
     pts = dt.hour * 3600 + dt.minute * 60 + dt.second + dt.microsecond / 1e6
     return pts
+
+
+def parse_string_to_roi(roi_string, roi_type='pixel'):
+    """
+    Convert a roi string to four number x1, y1, x2, y2 stand for the region.
+    When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels
+    in the top left corner and the bottom right corner respectively. If the
+    roi_type is 'ratio', the coordinates are normalized by wights and
+    heights.
+
+    :param roi_string: the roi string
+    :patam roi_type: the roi string type
+    return tuple of (x1, y1, x2, y2) if roi_string is valid, else None
+    """
+    if not roi_string:
+        return None
+
+    pattern = r'^\s*[\[\(]?\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)\s*[\]\)]?\s*$'  # noqa: E501
+
+    match = re.match(pattern, roi_string)
+
+    if match:
+        if roi_type == 'pixel':
+            return tuple(int(num) for num in match.groups())
+        elif roi_type == 'ratio':
+            return tuple(min(1.0, float(num)) for num in match.groups())
+        else:
+            logger.warning('The roi_type must be "pixel" or "ratio".')
+            return None
+    else:
+        logger.warning(
+            'The roi_string must be four no negative numbers in the '
+            'format of "x1, y1, x2, y2", "(x1, y1, x2, y2)", or '
+            '"[x1, y1, x2, y2]".')
+        return None
+    return None

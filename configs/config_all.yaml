@@ -83,6 +83,9 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
       caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
+  - image_face_blur_mapper:                                 # blur faces detected in images
+      blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
+      radius: 2                                               # radius of blur kernel
   - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library
       sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
       aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.
@@ -148,11 +151,17 @@ process:
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       horizontal_flip: false                                  # flip frame image horizontally (left to right).
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
-  - video_split_by_scene_mapper:                            # split videos into scene clips
-      detector: 'ContentDetector'                             # PySceneDetect scene detector. Should be one of ['ContentDetector', 'ThresholdDetector', 'AdaptiveDetector`]
-      threshold: 27.0                                         # threshold passed to the detector
-      min_scene_len: 15                                       # minimum length of any scene
-      show_progress: false                                    # whether to show progress from scenedetect
+  - video_face_blur_mapper:                                 # blur faces detected in videos
+      blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
+      radius: 2                                               # radius of blur kernel
+  - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
+  - video_remove_watermark_mapper:                          # Remove the watermarks in videos given regions
+      roi_strings: ['0,0,0.1,0.1']                            # a given list of regions the watermarks locate. The format of each can be "x1, y1, x2, y2", "(x1, y1, x2, y2)", or "[x1, y1, x2, y2]".
+      roi_type: ratio                                         # the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by wights and heights.
+      roi_key: null                                           # the key name of fields in samples to store roi_strings for each sample. It's used for set different rois for different samples.
+      frame_num: 10                                           # the number of frames to be extracted uniformly from the video to detect the pixels of watermark.
+      min_frame_threshold: 7                                  # a coodination is considered as the location of a watermark pixel when it is a watermark pixel in no less min_frame_threshold frames.
+      detection_method: pixel_value                           # the method to detect the pixels of watermark. If it is 'pixel_value', we consider the distribution of pixel value in each frame. If it is 'pixel_diversity', we will consider the pixel diversity in different frames.
   - video_resize_aspect_ratio_mapper:                       # resize videos aspect ratios of videos (a fraction of width by height, r=w/h) to a specified range
       min_ratio: 9/21                                         # the minimum aspect ratio to enforce videos with an aspect ratio below `min_ratio` will be resized to match this minimum ratio. The ratio should be provided as a string in the format "9:21" or "9/21".
       max_ratio: 21/9                                         # the maximum aspect ratio to enforce videos with an aspect ratio above `max_ratio` will be resized to match this maximum ratio. The ratio should be provided as a string in the format "21:9" or "21/9".
@@ -164,13 +173,17 @@ process:
       max_height: 1080                                        # the max vertical resolution (unit p), videos with height more than 'max_height' will be mapped to videos with equal or smaller height
       force_original_aspect_ratio: 'increase'                 # Enable decreasing or increasing output video width or height if necessary to keep the original aspect ratio
       force_divisible_by: 4                                   # Ensures that both the output dimensions, width and height, are divisible by the given integer when used together with force_original_aspect_ratio
-  - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
   - video_split_by_duration_mapper:                         # Mapper to split video by duration.
       split_duration: 10                                      # duration of each video split in seconds.
       min_last_split_duration: 0.1                              # the minimum allowable duration in seconds for the last video split. If the duration of the last split is less than this value, it will be discarded.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
   - video_split_by_key_frame_mapper:                        # Mapper to split video by key frame.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
+  - video_split_by_scene_mapper:                            # split videos into scene clips
+      detector: 'ContentDetector'                             # PySceneDetect scene detector. Should be one of ['ContentDetector', 'ThresholdDetector', 'AdaptiveDetector`]
+      threshold: 27.0                                         # threshold passed to the detector
+      min_scene_len: 15                                       # minimum length of any scene
+      show_progress: false                                    # whether to show progress from scenedetect
   - video_tagging_from_audio_mapper:                        # Mapper to generate video tags from audio streams extracted from the video.
       hf_ast: 'MIT/ast-finetuned-audioset-10-10-0.4593'       # Huggingface model name for the audio classification model.
   - video_tagging_from_frames_mapper:                       # Mapper to generate video tags from frames extracted from the video.
@@ -203,10 +216,6 @@ process:
       rep_len: 10                                             # repetition length for char-level n-gram
       min_ratio: 0.0                                          # the min ratio of filter range
       max_ratio: 0.5                                          # the max ratio of filter range
-  - face_area_filter:                                       # filter samples according to the face area ratios in images (r=face_area/image_area). If multiple faces are available, we use the largest one.
-      min_ratio: 0.0                                          # the min face area ratio of filter range
-      max_ratio: 0.4                                          # the max face area ratio of filter range
-      upsample_num_times: 0                                   # optional argument passing to the underlying dlib face detector
   - flagged_words_filter:                                   # filter text with the flagged-word ratio larger than a specific max value
       lang: en                                                # consider flagged words in what language
       tokenization: false                                     # whether to use model to tokenize documents
@@ -215,14 +224,21 @@ process:
       use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
       words_aug_group_sizes: [2]                              # the group size of words to augment
       words_aug_join_char: ""                                 # the join char between words to augment
-  - image_aspect_ratio_filter:                              # filter samples according to the aspect ratios of images (a fraction of width by height, r=w/h) in them
-      min_ratio: 0.333                                        # the min aspect ratio of filter range
-      max_ratio: 3.0                                          # the max aspect ratio of filter range
-      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - image_aesthetics_filter:                                # filter samples according to the aesthetics score of images.
       hf_scorer_model: shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE # Huggingface model name for the aesthetics predictor
       min_score: 0.3                                          # the min aesthetics score of filter range
       max_score: 1.0                                          # the max aesthetics score of filter range
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_aspect_ratio_filter:                              # filter samples according to the aspect ratios of images (a fraction of width by height, r=w/h) in them
+      min_ratio: 0.333                                        # the min aspect ratio of filter range
+      max_ratio: 3.0                                          # the max aspect ratio of filter range
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_face_ratio_filter:                                # filter samples according to the face area ratios in images (r=face_area/image_area). If multiple faces are available, we use the largest one.
+      min_ratio: 0.0                                          # the min face area ratio of filter range
+      max_ratio: 0.4                                          # the max face area ratio of filter range
+  - image_nsfw_filter:                                      # filter samples according to the nsfw scores of images in them
+      hf_nsfw_model: Falconsai/nsfw_image_detection           # Huggingface model name for nsfw classification
+      score_threshold: 0.5                                    # the nsfw score threshold for samples, range from 0 to 1
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - image_shape_filter:                                     # filter samples according to the widths and heights of images in them
       min_width: 200                                          # the min width of width filter range
@@ -249,6 +265,10 @@ process:
       horizontal_flip: false                                  # flip image horizontally (left to right).
       vertical_flip: false                                    # flip image vertically (top to bottom).
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - image_watermark_filter:                                 # filter samples according to the predicted watermark probabilities of images in them
+      hf_watermark_model: amrul-hzz/watermark_detector        # Huggingface model name for watermark classification
+      prob_threshold: 0.8                                     # the predicted watermark probability threshold for samples, range from 0 to 1
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
       lang: en                                                # keep text in what language
@@ -321,10 +341,10 @@ process:
       max_duration: 10                                        # the max video duration of filter range (in seconds)
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
   - video_frames_text_similarity_filter:                    # keep samples those similarities between sampled video frame images and text within a specific range.
-      hf_clip: 'openai/clip-vit-base-patch32'                 # clip model name on huggingface to compute the similarity between frame image and text. It's kind of language-related. For example, for Chinese datasets, ChineseCLIP might be a better choice.
+      hf_clip: openai/clip-vit-base-patch32                   # clip model name on huggingface to compute the similarity between frame image and text. It's kind of language-related. For example, for Chinese datasets, ChineseCLIP might be a better choice.
       min_score: 0.1                                          # the min similarity to keep samples.
       max_score: 1.0                                          # the max similarity to keep samples.
-      frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_sampling_method: all_keyframes                    # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       horizontal_flip: false                                  # flip frame image horizontally (left to right).
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
@@ -335,6 +355,13 @@ process:
       max_score: 10000.0                                      # the maximum motion score to keep samples
       sampling_fps: 2                                         # the samplig rate of frames_per_second to compute optical flow
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
+  - video_nsfw_filter:                                      # filter samples according to the nsfw scores of videos in them
+      hf_nsfw_model: Falconsai/nsfw_image_detection           # Huggingface model name for nsfw classification
+      score_threshold: 0.5                                    # the nsfw score threshold for samples, range from 0 to 1
+      frame_sampling_method: all_keyframes                    # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
+      reduce_mode: avg                                        # reduce mode for multiple sampled video frames to compute nsfw scores of videos, must be one of ['avg','max', 'min'].
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - video_ocr_area_ratio_filter:                            # Keep data samples whose detected text area ratios for specified frames in the video are within a specified range.
       min_area_ratio: 0                                       # the min ocr area ratio to keep samples. It's 0 by default.
       max_area_ratio: 1.0                                     # the max ocr area ratio to keep samples. It's 1.0 by default.
@@ -347,6 +374,13 @@ process:
       min_height: 480                                         # the min resolution of vertical resolution filter range (unit p)
       max_height: 1080                                        # the max resolution of vertical resolution filter range (unit p)
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
+  - video_watermark_filter:                                 # filter samples according to the predicted watermark probabilities of videos in them
+      hf_watermark_model: amrul-hzz/watermark_detector        # Huggingface model name for watermark classification
+      prob_threshold: 0.8                                     # the predicted watermark probability threshold for samples, range from 0 to 1
+      frame_sampling_method: all_keyframes                    # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
+      reduce_mode: avg                                        # reduce mode for multiple sampled video frames to compute final predicted watermark probabilities of videos, must be one of ['avg','max', 'min'].
+      any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - words_num_filter:                                       # filter text with number of words out of specific range
       lang: en                                                # sample in which language
       tokenization: false                                     # whether to use model to tokenize documents
