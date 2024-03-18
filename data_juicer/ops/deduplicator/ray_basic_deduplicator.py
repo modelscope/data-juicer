@@ -11,8 +11,9 @@ with AvailabilityChecking(['redis'], requires_type='dist'):
 
 class RayBasicDeduplicator(Filter):
     """
-    A basic deduplicator to deduplicate samples at document-level using exact
-    matching.
+    A basic exact matching deduplicator for RAY.
+    Although its functionality is deduplication,
+    it is implemented as Filter sub-class.
     """
 
     # TODO: Set a more reasonable value

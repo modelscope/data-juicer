@@ -148,7 +148,9 @@ All the specific operators are listed below, each featured with several capabili
 | document_simhash_deduplicator | General | en, zh | Deduplicates samples at document-level using SimHash         |
 | image_deduplicator            | Image   |   -    | Deduplicates samples at document-level using exact matching of images between documents |
 | video_deduplicator            | Video   |   -    | Deduplicates samples at document-level using exact matching of videos between documents |
-
+| ray_document_deduplicator     | General | en, zh | Deduplicates samples at document-level by comparing MD5 hash on ray                     |
+| ray_image_deduplicator        | Image   |   -    | Deduplicates samples at document-level using exact matching of images between documents on ray |
+| ray_video_deduplicator        | Video   |   -    | Deduplicates samples at document-level using exact matching of videos between documents on ray |
 
 ## Selector <a name="selector"/>
 
