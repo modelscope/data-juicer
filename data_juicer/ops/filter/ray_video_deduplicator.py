@@ -49,28 +49,3 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
                     md5_hash.update(bytes(packet))
 
         return md5_hash.hexdigest()
-
-    def compute_stats(self, sample, context=False):
-        # there is no video in this sample
-        r = redis.StrictRedis(host="localhost", port=6379, db=0)
-        if self.video_key not in sample or not sample[self.video_key]:
-            return sample
-
-        # load videos
-        loaded_video_keys = sample[self.video_key]
-        sample, videos = load_data_with_context(sample, context,
-                                                loaded_video_keys, load_video)
-        # compute hash
-        md5_hash = hashlib.md5()
-        for key in videos:
-            # consider the multi stream of video in one container
-            for packet in videos[key].demux():
-                if packet.stream.type == 'video':
-                    md5_hash.update(bytes(packet))
-
-        text_md5 = md5_hash.hexdigest()
-        sample[HashKeys.videohash] = r.setnx(text_md5, 1)
-        return sample
-
-    def process(self, sample):
-        return sample[HashKeys.videohash]
