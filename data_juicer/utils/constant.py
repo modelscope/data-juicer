@@ -181,6 +181,7 @@ class HashKeys(object):
     # duplicate flag
     is_duplicate = DEFAULT_PREFIX + 'is_duplicate'
 
+
 class InterVars(object):
     # text
     lines = DEFAULT_PREFIX + 'lines'

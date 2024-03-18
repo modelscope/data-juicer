@@ -1,16 +1,18 @@
 import redis
 
 from data_juicer.utils.constant import HashKeys
+
 from ..base_op import Filter
 
 
 class RayBasicDeduplicator(Filter):
     """
-    A basic deduplicator to deduplicate samples at document-level using exact matching.
+    A basic deduplicator to deduplicate samples at document-level using exact
+    matching.
     """
 
     # TODO: Set a more reasonable value
-    EMPTY_HASH_VALUE = "EMPTY"
+    EMPTY_HASH_VALUE = 'EMPTY'
 
     def __init__(self, *args, **kwargs):
         """
@@ -27,7 +29,7 @@ class RayBasicDeduplicator(Filter):
 
     def compute_stats(self, sample, context=False):
         # init redis client
-        r = redis.StrictRedis(host="localhost", port=6379, db=0)
+        r = redis.StrictRedis(host='localhost', port=6379, db=0)
         # compute hash
         md5_value = self.calculate_hash(sample, context)
         # check existing

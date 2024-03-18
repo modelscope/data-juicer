@@ -1,9 +1,9 @@
 import hashlib
 import string
+
 import regex as re
 
 from ..base_op import OPERATORS
-
 from .ray_basic_deduplicator import RayBasicDeduplicator
 
 OP_NAME = 'ray_document_deduplicator'
@@ -35,7 +35,6 @@ class RayDocumentDeduplicator(RayBasicDeduplicator):
         self.remove_non_character_regex = re.compile(
             f'\s+|\d+|[{re.escape(string.punctuation)}]'  # noqa: W605
         ) if ignore_non_character else None
-
 
     def calculate_hash(self, sample, context=False):
         if self.text_key not in sample or not sample[self.text_key]:
