@@ -31,7 +31,7 @@ def partition_data(json_file_path: str, hostnames: List[str]):
 
     # distribute videos to nodes based on the total size of videos
     video_sizes = {
-        video: os.path.getsize(convert_to_absolute_path(video))
+        video: os.path.getsize(convert_to_absolute_path(video, json_file_path))
         for video in video_to_entries_map.keys()
     }
 
