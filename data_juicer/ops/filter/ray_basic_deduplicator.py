@@ -30,6 +30,10 @@ class RayBasicDeduplicator(Filter):
         super().__init__(*args, **kwargs)
         self.redis_host_ip = redis_host_ip
         self.redis_host_port = redis_host_port
+        r = redis.StrictRedis(host=self.redis_host_ip,
+                              port=self.redis_host_port,
+                              db=0)
+        r.flushdb(0)
 
     def calculate_hash(self, sample, context=False):
         """Calculate hash value for the sample."""
