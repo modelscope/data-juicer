@@ -262,7 +262,7 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 - To run data processing across multiple machines, it is necessary to ensure that all distributed nodes can access the corresponding data paths (for example, by mounting the respective data paths on a file-sharing system such as NAS).
 - The deduplicator operators for RAY mode are different from the single-machine version, and all those operators are prefixed with `ray`, e.g. `ray_video_deduplicator` and `ray_document_deduplicator`. Those operators also rely on a [Redis](https://redis.io/) instance. So in addition to starting the RAY cluster, you also need to setup your Redis instance in advance and provide `host` and `port` of your Redis instance in configuration.
 
-> Users can also opt not to use RAY and instead split the dataset to run on a cluster with Slurm/DLC. In this case, please use the default Data-Juicer without RAY.
+> Users can also opt not to use RAY and instead split the dataset to run on a cluster with [Slurm](https://slurm.schedmd.com/) / [Aliyun PAI-DLC](https://www.aliyun.com/activity/bigdata/pai-dlc). In this case, please use the default Data-Juicer without RAY.
 
 
 ### Data Analysis
