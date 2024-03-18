@@ -171,6 +171,8 @@ class HashKeys(object):
     # video
     videohash = DEFAULT_PREFIX + 'videohash'
 
+    # duplicate flag
+    is_duplicate = DEFAULT_PREFIX + 'is_duplicate'
 
 class InterVars(object):
     # text
