@@ -20,8 +20,8 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
     """
 
     def __init__(self,
-                 redis_host_ip: str = 'localhost',
-                 redis_host_port: PositiveInt = 6380,
+                 redis_host: str = 'localhost',
+                 redis_port: PositiveInt = 6380,
                  *args,
                  **kwargs):
         """
@@ -31,8 +31,8 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(redis_host_ip=redis_host_ip,
-                         redis_host_port=redis_host_port,
+        super().__init__(redis_host=redis_host,
+                         redis_port=redis_port,
                          *args,
                          **kwargs)
 

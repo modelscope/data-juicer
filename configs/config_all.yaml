@@ -416,12 +416,12 @@ process:
   - image_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of images between documents.
       method: phash                                           # hash method for image. One of [phash, dhash, whash, ahash]
   - video_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of videos between documents.
-  - ray_video_deduplicator:                                 # the simple video deduplicator that can run on multi-nodes
-      redis_host_ip: '172.24.224.214'                         # the ip address of redis host server that nodes can connect to
-      redis_host_port: 6380                                   # the port of redis host server, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
-  - ray_document_deduplicator:
-      redis_host_ip: '172.24.224.214'                         # the ip address of redis host server that nodes can connect to
-      redis_host_port: 6380                                   # the port of redis host server, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
+  - ray_video_deduplicator:                                 # the simple video deduplicator that can run on multi-nodes using md5 hashing exact matching method
+      redis_host: 'redis_host'                              # the host of the redis instance
+      redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
+  - ray_document_deduplicator:                              # the simple document deduplicator that can run on multi-nodes using md5 hashing exact matching method
+      redis_host: 'redis_host'                              # the host of the redis instance
+      redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
       lowercase: false                                        # whether to convert text to lower case
       ignore_non_character: false                             # whether to ignore non-alphabet characters, including whitespaces, digits, and punctuations
 
