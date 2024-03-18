@@ -1,13 +1,8 @@
 import hashlib
-from collections import defaultdict
-from typing import Dict, Set
 
-import redis
-
-from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.mm_utils import load_data_with_context, load_video
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import OPERATORS
 from ..op_fusion import LOADED_VIDEOS
 from .ray_basic_deduplicator import RayBasicDeduplicator
 
@@ -33,8 +28,7 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
 
     def calculate_hash(self, sample, context=False):
         if self.video_key not in sample or not sample[self.video_key]:
-            # todo: return a more reasonable value
-            return "EMPTY"
+            return RayBasicDeduplicator.EMPTY_HASH_VALUE
 
         # load videos
         loaded_video_keys = sample[self.video_key]
