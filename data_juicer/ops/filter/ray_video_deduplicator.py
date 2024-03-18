@@ -26,8 +26,8 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
                  **kwargs):
         """
         Initialization.
-        :param redis_host_ip: the ip address of redis server
-        :param redis_host_port: the port of redis server
+        :param redis_host: the hostname of redis server
+        :param redis_port: the port of redis server
         :param args: extra args
         :param kwargs: extra args
         """

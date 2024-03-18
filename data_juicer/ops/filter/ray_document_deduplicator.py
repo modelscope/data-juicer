@@ -13,8 +13,7 @@ OP_NAME = 'ray_document_deduplicator'
 @OPERATORS.register_module(OP_NAME)
 class RayDocumentDeduplicator(RayBasicDeduplicator):
     """
-    Deduplicator to deduplicate samples at document-level using exact matching
-    of videos between documents.
+    Deduplicator to deduplicate samples at document-level using exact matching.
     """
 
     def __init__(self,
@@ -26,7 +25,7 @@ class RayDocumentDeduplicator(RayBasicDeduplicator):
                  **kwargs):
         """
         Initialization method.
-        :param redis_host: the host of redis server
+        :param redis_host: the hostname of redis server
         :param redis_port: the port of redis server
         :param lowercase: Whether to convert sample text to lower case
         :param ignore_non_character: Whether to ignore non-alphabet

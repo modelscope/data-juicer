@@ -33,9 +33,7 @@ class RayBasicDeduplicator(Filter):
         super().__init__(*args, **kwargs)
         self.redis_host = redis_host
         self.redis_port = redis_port
-        r = redis.StrictRedis(host=self.redis_host,
-                              port=self.redis_port,
-                              db=0)
+        r = redis.StrictRedis(host=self.redis_host, port=self.redis_port, db=0)
         r.flushdb(0)
 
     def calculate_hash(self, sample, context=False):
@@ -44,9 +42,7 @@ class RayBasicDeduplicator(Filter):
 
     def compute_stats(self, sample, context=False):
         # init redis client
-        r = redis.StrictRedis(host=self.redis_host,
-                              port=self.redis_port,
-                              db=0)
+        r = redis.StrictRedis(host=self.redis_host, port=self.redis_port, db=0)
         # compute hash
         md5_value = self.calculate_hash(sample, context)
         # check existing
