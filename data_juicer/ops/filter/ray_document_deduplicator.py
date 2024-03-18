@@ -2,6 +2,7 @@ import hashlib
 import string
 
 import regex as re
+from jsonargparse.typing import PositiveInt
 
 from ..base_op import OPERATORS
 from .ray_basic_deduplicator import RayBasicDeduplicator
@@ -17,20 +18,26 @@ class RayDocumentDeduplicator(RayBasicDeduplicator):
     """
 
     def __init__(self,
+                 redis_host_ip: str = 'localhost',
+                 redis_host_port: PositiveInt = 6380,
                  lowercase: bool = False,
                  ignore_non_character: bool = False,
                  *args,
                  **kwargs):
         """
         Initialization method.
-
+        :param redis_host_ip: the ip address of redis server
+        :param redis_host_port: the port of redis server
         :param lowercase: Whether to convert sample text to lower case
         :param ignore_non_character: Whether to ignore non-alphabet
             characters, including whitespaces, digits, and punctuations
         :param args: extra args
         :param kwargs: extra args.
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(redis_host_ip=redis_host_ip,
+                         redis_host_port=redis_host_port,
+                         *args,
+                         **kwargs)
         self.lowercase = lowercase
         self.remove_non_character_regex = re.compile(
             f'\s+|\d+|[{re.escape(string.punctuation)}]'  # noqa: W605

@@ -1,5 +1,7 @@
 import hashlib
 
+from jsonargparse.typing import PositiveInt
+
 from data_juicer.utils.mm_utils import load_data_with_context, load_video
 
 from ..base_op import OPERATORS
@@ -17,14 +19,22 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
     of videos between documents.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self,
+                 redis_host_ip: str = 'localhost',
+                 redis_host_port: PositiveInt = 6380,
+                 *args,
+                 **kwargs):
         """
         Initialization.
-
+        :param redis_host_ip: the ip address of redis server
+        :param redis_host_port: the port of redis server
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(redis_host_ip=redis_host_ip,
+                         redis_host_port=redis_host_port,
+                         *args,
+                         **kwargs)
 
     def calculate_hash(self, sample, context=False):
         if self.video_key not in sample or not sample[self.video_key]:
