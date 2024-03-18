@@ -34,6 +34,8 @@ class RayBasicDeduplicator(Filter):
         super().__init__(*args, **kwargs)
         self.redis_host = redis_host
         self.redis_port = redis_port
+        # TODO: add a barrier to ensure that flushdb is performed before
+        # the operator is called
         r = redis.StrictRedis(host=self.redis_host, port=self.redis_port, db=0)
         r.flushdb(0)
 
