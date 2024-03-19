@@ -45,7 +45,8 @@ class VideoWatermarkFilter(Filter):
         :param hf_watermark_model: watermark detection model name on
             huggingface.
         :param prob_threshold: the predicted watermark probability threshold
-            for samples. range from 0 to 1.
+            for samples. range from 0 to 1. Samples with watermark probability
+            less than this threshold will be kept.
         :param frame_sampling_method: sampling method of extracting frame
             images from the videos.
             Should be one of ["all_keyframes", "uniform"].
