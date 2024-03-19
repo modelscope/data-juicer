@@ -5,7 +5,9 @@ from data_juicer.utils.constant import HashKeys
 
 from ..base_op import Filter
 
-with AvailabilityChecking(['redis'], requires_type='dist'):
+with AvailabilityChecking(['redis'],
+                          op_name='ray_xxx_deduplicator',
+                          requires_type='dist'):
     import redis
 
 
