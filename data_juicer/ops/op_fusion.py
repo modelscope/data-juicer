@@ -20,6 +20,7 @@ LOADED_AUDIOS = Registry(InterVars.loaded_audios)
 
 # videos
 LOADED_VIDEOS = Registry(InterVars.loaded_videos)
+INTER_SAMPLED_FRAMES = Registry(InterVars.sampled_frames)
 
 # all
 ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_IMAGES, LOADED_VIDEOS]
