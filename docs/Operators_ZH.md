@@ -145,6 +145,9 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | document_simhash_deduplicator  | General  | en, zh  | 使用 SimHash 在文档级别对样本去重                         |
 | image_deduplicator             | Image    |   -     | 使用文档之间图像的精确匹配在文档级别删除重复样本 |
 | video_deduplicator             | Video    |   -     | 使用文档之间视频的精确匹配在文档级别删除重复样本 |
+| ray_document_deduplicator      | General  | en, zh  | 通过比较 MD5 哈希值在文档级别对样本去重，面向RAY分布式模式    |
+| ray_image_deduplicator         | Image    |   -     | 使用文档之间图像的精确匹配在文档级别删除重复样本，面向RAY分布式模式 |
+| ray_video_deduplicator         | Video    |   -     | 使用文档之间视频的精确匹配在文档级别删除重复样本，面向RAY分布式模式 |
 
 ## Selector <a name="selector"/>
 

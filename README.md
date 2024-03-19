@@ -56,30 +56,31 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 Table of Contents
 =================
 
-* [Data-Juicer: A One-Stop Data Processing System for Large Language Models](#data-juicer-a-one-stop-data-processing-system-for-large-language-models)
-* [Table of Contents](#table-of-contents)
-   * [Features](#features)
-   * [Documentation Index](#documents)
-   * [Demos](#demos)
-   * [Prerequisites](#prerequisites)
-   * [Installation](#installation)
-     * [From Source](#from-source)
-     * [Using pip](#using-pip)
-     * [Using Docker](#using-docker)
-     * [Installation check](#installation-check)
-   * [Quick Start](#quick-start)
-      * [Data Processing](#data-processing)
-      * [Distributed Data Processing](#distributed-data-processing)
-      * [Data Analysis](#data-analysis)
-      * [Data Visualization](#data-visualization)
-      * [Build Up Config Files](#build-up-config-files)
-      * [Preprocess raw data (Optional)](#preprocess-raw-data-optional)
-      * [For Docker Users](#for-docker-users)
-   * [Data Recipes](#data-recipes)
-   * [License](#license)
-   * [Contributing](#contributing)
-  * [Acknowledgement](#acknowledgement)
-  * [References](#references)
+- [Data-Juicer:  A One-Stop Data Processing System for Large Language Models](#data-juicer--a-one-stop-data-processing-system-for-large-language-models)
+  - [News](#news)
+- [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Documentation Index ](#documentation-index-)
+  - [Demos](#demos)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+    - [From Source](#from-source)
+    - [Using pip](#using-pip)
+    - [Using Docker](#using-docker)
+    - [Installation check](#installation-check)
+  - [Quick Start](#quick-start)
+    - [Data Processing](#data-processing)
+    - [Distributed Data Processing](#distributed-data-processing)
+    - [Data Analysis](#data-analysis)
+    - [Data Visualization](#data-visualization)
+    - [Build Up Config Files](#build-up-config-files)
+    - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
+    - [For Docker Users](#for-docker-users)
+  - [Data Recipes](#data-recipes)
+  - [License](#license)
+  - [Contributing](#contributing)
+  - [Acknowledgement](#acknowledgement)
+  - [References](#references)
 
 
 ## Features
@@ -249,7 +250,7 @@ export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 
 ### Distributed Data Processing
 
-We have now implemented multi-machine distributed data processing based on RAY. The corresponding demos can be run using the following commands:
+We have now implemented multi-machine distributed data processing based on [RAY](https://www.ray.io/). The corresponding demos can be run using the following commands:
 
 ```shell
 # Run text data processing
@@ -258,10 +259,10 @@ python tools/process_data.py --config ./demos/process_on_ray/configs/demo.yaml
 python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.yaml
 ```
 
-- To run multimodal data processing across multiple machines, it is necessary to ensure that all distributed nodes can access the corresponding data paths (for example, by mounting the respective data paths on a file-sharing system such as NAS).
+- To run data processing across multiple machines, it is necessary to ensure that all distributed nodes can access the corresponding data paths (for example, by mounting the respective data paths on a file-sharing system such as NAS).
+- The deduplicator operators for RAY mode are different from the single-machine version, and all those operators are prefixed with `ray`, e.g. `ray_video_deduplicator` and `ray_document_deduplicator`. Those operators also rely on a [Redis](https://redis.io/) instance. So in addition to starting the RAY cluster, you also need to setup your Redis instance in advance and provide `host` and `port` of your Redis instance in configuration.
 
-- Users can also opt not to use RAY and instead split the dataset to run on a cluster with Slurm/DLC.
-
+> Users can also opt not to use RAY and instead split the dataset to run on a cluster with [Slurm](https://slurm.schedmd.com/) / [Aliyun PAI-DLC](https://www.aliyun.com/activity/bigdata/pai-dlc). In this case, please use the default Data-Juicer without RAY.
 
 
 ### Data Analysis

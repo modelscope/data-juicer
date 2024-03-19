@@ -416,6 +416,18 @@ process:
   - image_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of images between documents.
       method: phash                                           # hash method for image. One of [phash, dhash, whash, ahash]
   - video_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of videos between documents.
+  - ray_video_deduplicator:                                 # the simple video deduplicator that can run on multi-nodes using md5 hashing exact matching method
+      redis_host: 'redis_host'                              # the host of the redis instance
+      redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
+  - ray_image_deduplicator:                                 # the simple image deduplicator that can deduplicate samples at document-level using exact matching of images between documents.
+      redis_host: 'redis_host'                              # the host of the redis instance
+      redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
+      method: phash                                         # hash method for image. One of [phash, dhash, whash, ahash]
+  - ray_document_deduplicator:                              # the simple document deduplicator that can run on multi-nodes using md5 hashing exact matching method
+      redis_host: 'redis_host'                              # the host of the redis instance
+      redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
+      lowercase: false                                        # whether to convert text to lower case
+      ignore_non_character: false                             # whether to ignore non-alphabet characters, including whitespaces, digits, and punctuations
 
   # Selector ops
   - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
