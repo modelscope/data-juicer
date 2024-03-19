@@ -12,7 +12,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   42   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   40   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -136,6 +136,7 @@ All the specific operators are listed below, each featured with several capabili
 | video_ocr_area_ratio_filter    | Video      | -      | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range ｜                                  
 | video_resolution_filter        | Video      | -      | Keeps samples containing videos with horizontal and vertical resolutions within the specified range                                                 |
 | video_watermark_filter         | Video      | -      | Keeps samples containing videos with predicted watermark probabilities below the threshold                                                               |
+| video_tagging_from_frames_filter  | Video   | -      | Keep samples containing videos with given tags |
 | word_num_filter                | General    | en, zh | Keeps samples with word count within the specified range                                                                                            |
 | word_repetition_filter         | General    | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range                                                                    |
 
@@ -149,7 +150,9 @@ All the specific operators are listed below, each featured with several capabili
 | document_simhash_deduplicator | General | en, zh | Deduplicates samples at document-level using SimHash         |
 | image_deduplicator            | Image   |   -    | Deduplicates samples at document-level using exact matching of images between documents |
 | video_deduplicator            | Video   |   -    | Deduplicates samples at document-level using exact matching of videos between documents |
-
+| ray_document_deduplicator     | General | en, zh | Deduplicates samples at document-level by comparing MD5 hash on ray                     |
+| ray_image_deduplicator        | Image   |   -    | Deduplicates samples at document-level using exact matching of images between documents on ray |
+| ray_video_deduplicator        | Video   |   -    | Deduplicates samples at document-level using exact matching of videos between documents on ray |
 
 ## Selector <a name="selector"/>
 

@@ -392,6 +392,12 @@ process:
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       reduce_mode: avg                                        # reduce mode for multiple sampled video frames to compute final predicted watermark probabilities of videos, must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+  - video_tagging_from_frames_filter:                       # filter samples according to the tags of videos in them
+      tags: ['people']                                        # a tag list to shift the videos, total tags can be found in https://github.com/xinyu1205/recognize-anything/blob/main/ram/data/ram_tag_list.txt
+      contain: any                                            # require the videos containing 'any' or 'all' given tags. When tags equal to [], 'all' keeps all samples, 'any' keeps no sample.
+      frame_sampling_method: all_keyframes                    # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
+      any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
   - words_num_filter:                                       # filter text with number of words out of specific range
       lang: en                                                # sample in which language
       tokenization: false                                     # whether to use model to tokenize documents
@@ -427,6 +433,18 @@ process:
   - image_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of images between documents.
       method: phash                                           # hash method for image. One of [phash, dhash, whash, ahash]
   - video_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of videos between documents.
+  - ray_video_deduplicator:                                 # the simple video deduplicator that can run on multi-nodes using md5 hashing exact matching method
+      redis_host: 'redis_host'                              # the host of the redis instance
+      redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
+  - ray_image_deduplicator:                                 # the simple image deduplicator that can deduplicate samples at document-level using exact matching of images between documents.
+      redis_host: 'redis_host'                              # the host of the redis instance
+      redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
+      method: phash                                         # hash method for image. One of [phash, dhash, whash, ahash]
+  - ray_document_deduplicator:                              # the simple document deduplicator that can run on multi-nodes using md5 hashing exact matching method
+      redis_host: 'redis_host'                              # the host of the redis instance
+      redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
+      lowercase: false                                        # whether to convert text to lower case
+      ignore_non_character: false                             # whether to ignore non-alphabet characters, including whitespaces, digits, and punctuations
 
   # Selector ops
   - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
