@@ -11,8 +11,8 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 类型                                | 数量 | 描述            |
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
-| [ Mapper ]( #mapper )              | 40 | 对数据样本进行编辑和转换  |
-| [ Filter ]( #filter )              | 36 | 过滤低质量样本       |
+| [ Mapper ]( #mapper )              | 43 | 对数据样本进行编辑和转换  |
+| [ Filter ]( #filter )              | 41 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
 
@@ -58,10 +58,11 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | clean_links_mapper                                  | General, Code         | en, zh    | 删除链接，例如以 http 或 ftp 开头的                                |
 | expand_macro_mapper                                 | LaTeX                 | en, zh    | 扩展通常在 TeX 文档顶部定义的宏                                     |
 | fix_unicode_mapper                                  | General               | en, zh    | 修复损坏的 Unicode（借助 [ftfy](https://ftfy.readthedocs.io/)） |
-| image_blur_mapper                                   | Multimodal            |  -        | 对图像进行模糊处理                                              |
+| image_blur_mapper                                   | Image                 |  -        | 对图像进行模糊处理                                              |
 | image_captioning_from_gpt4v_mapper                  | Multimodal            |  -        | 基于gpt-4-vision和图像生成文本                                |
 | image_captioning_mapper                             | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（例如 blip2）和原始样本中的图形生成的。                                             |
 | image_diffusion_mapper                              | Multimodal            |  -        | 用stable diffusion生成图像，对图像进行增强                       ｜
+| image_face_blur_mapper                              | Image                 |  -        | 对图像中的人脸进行模糊处理                                      ｜
 | nlpaug_en_mapper                                    | General               | en        | 使用`nlpaug`库对英语文本进行简单增强                                 | 
 | nlpcda_zh_mapper                                    | General               | zh        | 使用`nlpcda`库对中文文本进行简单增强                                 | 
 | punctuation_normalization_mapper                    | General               | en, zh    | 将各种 Unicode 标点符号标准化为其 ASCII 等效项                        |
@@ -77,8 +78,10 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | replace_content_mapper                              | General               | en, zh    | 使用一个指定的替换字符串替换文本中满足特定正则表达式模版的所有内容             |
 | sentence_split_mapper                               | General               | en        | 根据语义拆分和重组句子                                            |
 | video_captioning_from_audio_mapper                         | Multimodal         | -      | 基于 Qwen-Audio 模型根据视频的音频流为视频生成新的标题描述 |
+| video_captioning_from_frames_mapper                 | Multimodal         |  -     | 生成样本，其标题是基于一个文字生成图片的模型和原始样本视频中指定帧的图像。不同帧产出的标题会拼接为一条单独的字符串。             |
 | video_captioning_from_summarizer_mapper             | Multimodal         | -      | 通过对多种不同方式生成的文本进行摘要以生成样本的标题（从视频/音频/帧生成标题，从音频/帧生成标签，...）                |
 | video_captioning_from_video_mapper                             | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（video-blip）和原始样本中的视频中指定帧的图像。                                             |
+| video_face_blur_mapper                              | Video                 |  -        | 对视频中的人脸进行模糊处理                                      ｜
 | video_ffmpeg_wrapped_mapper                         | Video                 | -         | 运行 FFmpeg 视频过滤器的简单封装                         |
 | video_remove_watermark_mapper                       | Video                 | -         | 去除视频中给定区域的水印                                            ｜
 | video_resize_aspect_ratio_mapper                    | Video                 | -         | 将视频的宽高比调整到指定范围内                                              |
@@ -87,27 +90,29 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | video_split_by_key_frame_mapper                       | Multimodal            | -         | 根据关键帧切分视频                |
 | video_split_by_scene_mapper                         | Multimodal            | -         | 将视频切分为场景片段                                              |
 | video_tagging_from_audio_mapper                    | Multimodal         | -      | 从视频提取的音频中生成视频标签                                                        |
-| video_tagging_from_frames_mapper                     | Multimodal         | -      | 从视频提取的帧中生成视频标签    |
-| whitespace_normalization_mapper                     | General               | en, zh    | 将各种 Unicode 空白标准化为常规 ASCII 空格 (U+0020)                 |
+| video_tagging_from_frames_mapper                     | Multimodal         | -      | 从视频提取的帧中生成视频标签                                                         |
+| whitespace_normalization_mapper                     | General               | en, zh    | 将各种 Unicode 空白标准化为常规 ASCII 空格 (U+0020)                                 |
 
 ## Filter <a name="filter"/>
 
 | 算子                             | 场景         | 语言     | 描述                                          |
 |--------------------------------|------------|--------|---------------------------------------------|
 | alphanumeric_filter            | General    | en, zh | 保留字母数字比例在指定范围内的样本                           |
-| audio_duration_filter          | Audio      | -      | 保留样本中包含的音频的时长在指定范围内的样本                      |
-| audio_nmf_snr_filter           | Audio      | -      | 保留样本中包含的音频信噪比SNR（基于非负矩阵分解方法NMF计算）在指定范围内的样本 |
-| audio_size_filter              | Audio      | -      | 保留样本中包含的音频的大小（bytes）在指定范围内的样本             |
+| audio_duration_filter          | Audio      | -      | 保留包含音频的时长在指定范围内的样本                      |
+| audio_nmf_snr_filter           | Audio      | -      | 保留包含音频信噪比SNR（基于非负矩阵分解方法NMF计算）在指定范围内的样本 |
+| audio_size_filter              | Audio      | -      | 保留包含音频的大小（bytes）在指定范围内的样本             |
 | average_line_length_filter     | Code       | en, zh | 保留平均行长度在指定范围内的样本                            |
 | character_repetition_filter    | General    | en, zh | 保留 char-level n-gram 重复比率在指定范围内的样本          |
-| face_area_filter               | Image      | -      | 保留样本中包含的图片的最大脸部区域在指定范围内的样本                  |
 | flagged_words_filter           | General    | en, zh | 保留使标记字比率保持在指定阈值以下的样本                        |
+| image_aesthetics_filter        | Image      | -      | 保留包含美学分数在指定范围内的图像的样本 |
 | image_aspect_ratio_filter      | Image      | -      | 保留样本中包含的图片的宽高比在指定范围内的样本                     |
+| image_face_ratio_filter        | Image      | -      | 保留样本中包含的图片的最大脸部区域在指定范围内的样本                  |
+| image_nsfw_filter              | Image      | -      | 保留包含NSFW分数在指定阈值之下的图像的样本 |
 | image_shape_filter             | Image      | -      | 保留样本中包含的图片的形状（即宽和高）在指定范围内的样本                |
 | image_size_filter              | Image      | -      | 保留样本中包含的图片的大小（bytes）在指定范围内的样本               |
-| image_aesthetics_filter        | Image      | -      | 保留包含美学分数在指定范围内的图像的样本 |
 | image_text_matching_filter     | Multimodal | -      | 保留图像-文本的分类匹配分(基于BLIP模型)在指定范围内的样本            |
 | image_text_similarity_filter   | Multimodal | -      | 保留图像-文本的特征余弦相似度(基于CLIP模型)在指定范围内的样本          |
+| image_watermark_filter         | Image      | -      | 保留包含有水印概率在指定阈值之下的图像的样本 |
 | language_id_score_filter       | General    | en, zh | 保留特定语言的样本，通过预测的置信度得分来判断                     |
 | maximum_line_length_filter     | Code       | en, zh | 保留最大行长度在指定范围内的样本                            |
 | perplexity_filter              | General    | en, zh | 保留困惑度低于指定阈值的样本                              |
@@ -121,13 +126,16 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | text_entity_dependency_filter  | General    | en, zh | 保留文本部分的依存树中具有非独立实体的样本                       |
 | text_length_filter             | General    | en, zh | 保留总文本长度在指定范围内的样本                            |
 | token_num_filter               | General    | en, zh | 保留token数在指定范围内的样本                           |
-| video_aspect_ratio_filter      | Video      | -      | 保留样本中包含的视频的宽高比在指定范围内的样本                     |
-| video_duration_filter          | Video      | -      | 保留样本中包含的视频的时长在指定范围内的样本                 ｜
+| video_aspect_ratio_filter      | Video      | -      | 保留包含视频的宽高比在指定范围内的样本                     |
+| video_duration_filter          | Video      | -      | 保留包含视频的时长在指定范围内的样本                 ｜
 | video_aesthetics_filter        | Video      | -      | 保留指定帧的美学分数在指定范围内的样本|
 | video_frames_text_similarity_filter    | Multimodal | -      | 保留视频中指定帧的图像-文本的特征余弦相似度(基于CLIP模型)在指定范围内的样本 ｜
-| video_motion_score_filter      | Video      | -      | 保留样本中包含的视频的运动份（基于稠密光流）在指定范围内的样本 ｜
-| video_ocr_area_ratio_filter    | Video      | -      | 保留样本中包含的视频的特定帧中检测出的文本的面积占比在指定范围内的样本 ｜
-| video_resolution_filter        | Video      | -      | 保留样本中包含的视频的分辨率（包括横向分辨率和纵向分辨率）在指定范围内的样本 ｜
+| video_motion_score_filter      | Video      | -      | 保留包含视频的运动分数（基于稠密光流）在指定范围内的样本 ｜
+| video_nsfw_filter              | Video      | -      | 保留包含视频的NSFW分数在指定阈值之下的样本｜
+| video_ocr_area_ratio_filter    | Video      | -      | 保留包含视频的特定帧中检测出的文本的面积占比在指定范围内的样本 ｜
+| video_resolution_filter        | Video      | -      | 保留包含视频的分辨率（包括横向分辨率和纵向分辨率）在指定范围内的样本 ｜
+| video_watermark_filter         | Video      | -      | 保留包含视频有水印的概率在指定阈值之下的样本｜
+| video_tagging_from_frames_filter  | Video   | -      | 保留包含具有给定标签视频的样本 |
 | word_num_filter                | General    | en, zh | 保留字数在指定范围内的样本                               |
 | word_repetition_filter         | General    | en, zh | 保留 word-level n-gram 重复比率在指定范围内的样本          |
 
@@ -140,6 +148,9 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | document_simhash_deduplicator  | General  | en, zh  | 使用 SimHash 在文档级别对样本去重                         |
 | image_deduplicator             | Image    |   -     | 使用文档之间图像的精确匹配在文档级别删除重复样本 |
 | video_deduplicator             | Video    |   -     | 使用文档之间视频的精确匹配在文档级别删除重复样本 |
+| ray_document_deduplicator      | General  | en, zh  | 通过比较 MD5 哈希值在文档级别对样本去重，面向RAY分布式模式    |
+| ray_image_deduplicator         | Image    |   -     | 使用文档之间图像的精确匹配在文档级别删除重复样本，面向RAY分布式模式 |
+| ray_video_deduplicator         | Video    |   -     | 使用文档之间视频的精确匹配在文档级别删除重复样本，面向RAY分布式模式 |
 
 ## Selector <a name="selector"/>
 

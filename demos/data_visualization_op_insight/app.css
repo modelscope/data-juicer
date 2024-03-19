@@ -98,6 +98,19 @@
   height: 80%;
 }
 
+.show_image {
+  display: flex; /* 启用flexbox布局 */
+  justify-content: center; /* 水平居中 */
+  align-items: center; /* 垂直居中 */
+  overflow: hidden; /* 如果图像超出容器，就隐藏多余部分 */
+}
+
+.show_image img {
+  max-width: 100%; /* 图像最大宽度为容器的50%，但不超过图像原始尺寸 */
+  max-height: 50%; /* 图像最大高度为容器的50%，但不超过图像原始尺寸 */
+  height: auto; /* 高度自动调整以保持纵横比 */
+}
+
 .project_label {
   font-size: 18px; /* 标题字体大小 */
   color: #333; /* 字体颜色，这里使用深灰色 */
@@ -149,12 +162,10 @@
   font-size: 0.9em;
 }
 
-
 .project_intro {
   display: grid;
   place-items: center; /* 完美居中 */
   height: 100px; /* 高度 */
-  width: 
   font-size: 15px; /* 正文字体大小 */
   /* text-align: center; 文字居中 */
   color: #555; /* 正文字体颜色，这里使用较浅的灰色 */

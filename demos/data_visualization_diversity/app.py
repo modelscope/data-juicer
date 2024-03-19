@@ -10,7 +10,7 @@ from data_juicer.analysis.diversity_analysis import (DiversityAnalysis,
 from data_juicer.config import init_configs
 from data_juicer.core import Analyser
 from data_juicer.ops.base_op import OPERATORS
-from data_juicer.utils.model_utils import MODEL_ZOO, prepare_model
+from data_juicer.utils.model_utils import prepare_model, get_model
 
 
 @st.cache_data
@@ -28,8 +28,8 @@ def convert_to_jsonl(df):
 
 @st.cache_data
 def get_diversity_model(lang):
-    model_key = prepare_model(lang, 'spacy')
-    diversity_model = MODEL_ZOO.get(model_key)
+    model_key = prepare_model('spacy', lang=lang)
+    diversity_model = get_model(model_key)
     return diversity_model
 
 

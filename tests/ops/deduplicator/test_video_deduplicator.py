@@ -16,16 +16,20 @@ class VideoDeduplicatorTest(DataJuicerTestCaseBase):
     video3_path = os.path.join(data_path, 'video3.mp4')
     # video1_dup.mp4 is a duplicate sample of video1.mp4
     video4_path = os.path.join(data_path, 'video1_dup.mp4')
-    os.symlink(video1_path, video4_path)
+    if not os.path.exists(video4_path):
+        os.symlink(video1_path, video4_path)
     # video2_dup.mp4 is a duplicate sample of video2.mp4
     video5_path = os.path.join(data_path, 'video2_dup.mp4')
-    os.symlink(video2_path, video5_path)
+    if not os.path.exists(video5_path):
+        os.symlink(video2_path, video5_path)
     # video3_dup.mp4 is a duplicate sample of video3.mp4
     video6_path = os.path.join(data_path, 'video3_dup.mp4')
-    os.symlink(video3_path, video6_path)
+    if not os.path.exists(video6_path):
+        os.symlink(video3_path, video6_path)
     # video3_dup_dup.mp4 is a duplicate sample of video6.mp4
     video7_path = os.path.join(data_path, 'video3_dup_dup.mp4')
-    os.symlink(video6_path, video7_path)
+    if not os.path.exists(video7_path):
+        os.symlink(video6_path, video7_path)
 
     def _run_video_deduplicator(self, dataset: Dataset, target_list, op):
 

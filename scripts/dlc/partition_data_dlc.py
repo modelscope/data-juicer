@@ -5,7 +5,22 @@ from collections import defaultdict
 from typing import List
 
 
-def partition_data(json_file_path: str, hostnames: List[str]):
+def is_valid_path(item, dataset_dir):
+    full_path = os.path.abspath(os.path.join(dataset_dir, item))
+    return os.path.exists(full_path)
+
+
+def convert_to_absolute_path(video_path, json_file_path):
+    dataset_dir = os.path.dirname(json_file_path)
+    ret = os.path.join(
+        dataset_dir,
+        video_path) if isinstance(video_path, str) and is_valid_path(
+            video_path, dataset_dir) else video_path
+    return ret
+
+
+def partition_data(json_file_path: str, output_file_path: str,
+                   hostnames: List[str]):
     with open(json_file_path, 'r') as f:
         data = [json.loads(line) for line in f]
     video_to_entries_map = defaultdict(list)
@@ -17,7 +32,7 @@ def partition_data(json_file_path: str, hostnames: List[str]):
 
     # distribute videos to nodes based on the total size of videos
     video_sizes = {
-        video: os.path.getsize(video)
+        video: os.path.getsize(convert_to_absolute_path(video, json_file_path))
         for video in video_to_entries_map.keys()
     }
 
@@ -28,7 +43,11 @@ def partition_data(json_file_path: str, hostnames: List[str]):
         nodes_video_size[min_node] += video_sizes[video]
 
     for hostname in hostnames:
-        host_file_path = f"{json_file_path.rsplit('.', 1)[0]}_{hostname}.jsonl"
+        host_file_path = \
+            f"{output_file_path.rsplit('.', 1)[0]}_{hostname}.jsonl"
+        if os.path.exists(host_file_path):
+            print(f'Warning: File {host_file_path} already exists')
+            continue
         with open(host_file_path, 'w') as f:
             for entry in nodes_data[hostname]:
                 f.write(json.dumps(entry) + '\n')
@@ -39,11 +58,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Partition data across hostnames.')
 
-    parser.add_argument('file_path',
+    parser.add_argument('--input_file_path',
                         type=str,
                         help='Path of the file to distribute.')
-    parser.add_argument('hostnames', nargs='+', help='The list of hostnames')
+    parser.add_argument('--output_file_path',
+                        type=str,
+                        help='Path of the file to be output(without suffix).')
+    parser.add_argument('--hostnames', nargs='+', help='The list of hostnames')
 
     args = parser.parse_args()
 
-    partition_data(args.file_path, args.hostnames)
+    partition_data(args.input_file_path, args.output_file_path, args.hostnames)
