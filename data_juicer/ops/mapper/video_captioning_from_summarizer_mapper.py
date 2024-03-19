@@ -147,14 +147,12 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
             self.cap_op_list.append(
                 VideoCaptioningFromAudioMapper(**self._prepare_op_args(
                     VideoCaptioningFromAudioMapper, {})))
-        # TODO: uncomment this part after video_captioning_from_frames_maper is
-        #  implemented.
-        # if consider_video_caption_from_frames:
-        #     from .video_captioning_from_frames_mapper import \
-        #         VideoCaptioningFromFramesMapper
-        #     self.cap_op_list.append(
-        #         VideoCaptioningFromFramesMapper(**self._prepare_op_args(
-        #             VideoCaptioningFromFramesMapper, vid_cap_from_frm_args)))
+        if consider_video_caption_from_frames:
+            from .video_captioning_from_frames_mapper import \
+                VideoCaptioningFromFramesMapper
+            self.cap_op_list.append(
+                VideoCaptioningFromFramesMapper(**self._prepare_op_args(
+                    VideoCaptioningFromFramesMapper, vid_cap_from_frm_args)))
         if consider_video_tags_from_audio:
             from .video_tagging_from_audio_mapper import \
                 VideoTaggingFromAudioMapper
