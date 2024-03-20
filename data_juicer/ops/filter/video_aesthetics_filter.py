@@ -112,7 +112,8 @@ class VideoAestheticsFilter(Filter):
         self.frame_num = frame_num
 
         self.sampled_frames_key_suffix = f'-{frame_sampling_method}' + \
-            '' if frame_sampling_method == 'all_keyframes' else f'-{frame_num}'
+            ('' if frame_sampling_method == 'all_keyframes'
+             else f'-{frame_num}')
 
     def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already

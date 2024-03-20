@@ -136,7 +136,7 @@ class VideoOcrAreaRatioFilter(Filter):
                 for points in free_list[0]:
                     triangle1 = points[:3]
                     quad_area += triangle_area(*triangle1)
-                    triangle2 = points[3:] + [points[0]]
+                    triangle2 = points[2:] + [points[0]]
                     quad_area += triangle_area(*triangle2)
                 text_area = rect_area + quad_area
                 frame_ocr_area_ratios.append(text_area / total_area)

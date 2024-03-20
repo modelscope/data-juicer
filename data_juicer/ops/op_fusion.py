@@ -133,7 +133,7 @@ class FusedFilter(Filter):
         """
         Initialization method.
 
-        :param fused_filers: a list of filters to be fused.
+        :param fused_filters: a list of filters to be fused.
         """
         super().__init__()
         self.fused_filters = fused_filters
