@@ -220,6 +220,13 @@ import data_juicer as dj
 print(dj.__version__)
 ```
 
+### For Video-related Operators
+Before using video-related operators, **FFmpeg** should be installed and accessible via the $PATH environment variable.
+
+You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [offical ffmpeg link](https://ffmpeg.org/download.html).
+
+Check if your environment path is set correctly by running the ffmpeg command from the terminal.
+
 ## Quick Start
 
 

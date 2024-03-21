@@ -200,6 +200,14 @@ import data_juicer as dj
 print(dj.__version__)
 ```
 
+### 使用视频相关算子
+
+在使用视频相关算子之前，应该安装 **FFmpeg** 并确保其可通过 $PATH 环境变量访问。
+
+你可以使用包管理器安装 FFmpeg（例如，在 Debian/Ubuntu 上使用 sudo apt install ffmpeg，在 OS X 上使用 brew install ffmpeg），或访问[官方FFmpeg链接](https://ffmpeg.org/download.html)。
+
+随后在终端运行 ffmpeg 命令检查环境是否设置正确。
+
 ## 快速上手
 
 ### 数据处理
