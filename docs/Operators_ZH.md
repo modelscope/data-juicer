@@ -11,7 +11,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 类型                                | 数量 | 描述            |
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
-| [ Mapper ]( #mapper )              | 42 | 对数据样本进行编辑和转换  |
+| [ Mapper ]( #mapper )              | 43 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 41 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
@@ -79,6 +79,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | sentence_split_mapper                               | General               | en        | 根据语义拆分和重组句子                                            |
 | video_captioning_from_audio_mapper                         | Multimodal         | -      | 基于 Qwen-Audio 模型根据视频的音频流为视频生成新的标题描述 |
 | video_captioning_from_frames_mapper                 | Multimodal         |  -     | 生成样本，其标题是基于一个文字生成图片的模型和原始样本视频中指定帧的图像。不同帧产出的标题会拼接为一条单独的字符串。             |
+| video_captioning_from_summarizer_mapper             | Multimodal         | -      | 通过对多种不同方式生成的文本进行摘要以生成样本的标题（从视频/音频/帧生成标题，从音频/帧生成标签，...）                |
 | video_captioning_from_video_mapper                             | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（video-blip）和原始样本中的视频中指定帧的图像。                                             |
 | video_face_blur_mapper                              | Video                 |  -        | 对视频中的人脸进行模糊处理                                      ｜
 | video_ffmpeg_wrapped_mapper                         | Video                 | -         | 运行 FFmpeg 视频过滤器的简单封装                         |
