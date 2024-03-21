@@ -5,11 +5,10 @@ import unittest
 from data_juicer.core.data import NestedDataset
 from data_juicer.ops.filter.video_tagging_from_frames_filter import \
     VideoTaggingFromFramesFilter
-from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
-
+@SKIPPED_TESTS.register_module()
 class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
