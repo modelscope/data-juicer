@@ -107,25 +107,35 @@ def prepare_fasttext_model(model_name='lid.176.bin'):
     return ft_model
 
 
-def prepare_sentencepiece_model(lang, name_pattern='{}.sp.model'):
+def prepare_sentencepiece_model(model_path):
     """
     Prepare and load a sentencepiece model.
 
-    :param model_name: input model name in formatting syntax
-    :param lang: language to render model name
-    :return: model instance.
+    :param model_path: input model path
+    :return: model instance
     """
     import sentencepiece
-
-    model_name = name_pattern.format(lang)
 
     logger.info('Loading sentencepiece model...')
     sentencepiece_model = sentencepiece.SentencePieceProcessor()
     try:
-        sentencepiece_model.load(check_model(model_name))
+        sentencepiece_model.load(check_model(model_path))
     except:  # noqa: E722
-        sentencepiece_model.load(check_model(model_name, force=True))
+        sentencepiece_model.load(check_model(model_path, force=True))
     return sentencepiece_model
+
+
+def prepare_sentencepiece_for_lang(lang, name_pattern='{}.sp.model'):
+    """
+    Prepare and load a sentencepiece model for specific langauge.
+
+    :param lang: language to render model name
+    :param name_pattern: pattern to render the model name
+    :return: model instance.
+    """
+
+    model_name = name_pattern.format(lang)
+    return prepare_sentencepiece_model(model_name)
 
 
 def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin'):
@@ -504,7 +514,7 @@ def prepare_recognizeAnything_model(
 
 MODEL_FUNCTION_MAPPING = {
     'fasttext': prepare_fasttext_model,
-    'sentencepiece': prepare_sentencepiece_model,
+    'sentencepiece': prepare_sentencepiece_for_lang,
     'kenlm': prepare_kenlm_model,
     'nltk': prepare_nltk_model,
     'huggingface': prepare_huggingface_model,
