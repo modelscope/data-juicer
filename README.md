@@ -1,4 +1,4 @@
-[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
+[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
 
 # Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
@@ -18,7 +18,7 @@
 
 [![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documents)
 [![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documents)
-[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
+[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://modelscope.github.io/data-juicer/)
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 
 
@@ -85,7 +85,7 @@ Table of Contents
 
 ## Features
 
-![Overview](https://img.alicdn.com/imgextra/i2/O1CN01IMPeD11xYRUYLmXKO_!!6000000006455-2-tps-3620-1604.png)
+![Overview](https://img.alicdn.com/imgextra/i4/O1CN01WYQP3Z1JHsaXaQDK6_!!6000000001004-0-tps-3640-1812.jpg)
 
 - **Systematic & Reusable**:
   Empowering users with a systematic library of 80+ core [OPs](docs/Operators.md), 20+ reusable [config recipes](configs), and 20+ feature-rich
@@ -94,7 +94,7 @@ Table of Contents
 
 - **Data-in-the-loop**: Allowing detailed data analyses with an automated
   report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.
-  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
+  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data
   processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on
@@ -125,7 +125,7 @@ Table of Contents
   - [Preprocess](tools/preprocess/README.md)
   - [Postprocess](tools/postprocess/README.md)
 - [Third-parties (LLM Ecosystems)](thirdparty/README.md)
-- [API references](https://alibaba.github.io/data-juicer/)
+- [API references](https://modelscope.github.io/data-juicer/)
 - [Awesome LLM-Data](docs/awesome_llm_data.md)
 - [DJ-SORA](docs/DJ_SORA.md)
 
