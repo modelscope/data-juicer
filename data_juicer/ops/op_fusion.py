@@ -137,7 +137,12 @@ class FusedFilter(Filter):
         """
         super().__init__()
         self.fused_filters = fused_filters
-        self._accelerator = 'cuda'
+        # set _accelerator to 'cuda' if there exists any ops whose _accelerator
+        # is 'cuda'
+        accelerator_methods = set(
+            [op._accelerator for op in self.fused_filters])
+        if 'cuda' in accelerator_methods:
+            self._accelerator = 'cuda'
 
     def compute_stats(self, sample, rank=None):
         import av
