@@ -85,7 +85,7 @@ Table of Contents
 
 ## Features
 
-![Overview](https://img.alicdn.com/imgextra/i2/O1CN01IMPeD11xYRUYLmXKO_!!6000000006455-2-tps-3620-1604.png)
+![Overview](https://img.alicdn.com/imgextra/i1/O1CN01xD3KFm1iyLi5hkWqr_!!6000000004481-0-tps-1820-906.jpg)
 
 - **Systematic & Reusable**:
   Empowering users with a systematic library of 80+ core [OPs](docs/Operators.md), 20+ reusable [config recipes](configs), and 20+ feature-rich
@@ -94,7 +94,7 @@ Table of Contents
 
 - **Data-in-the-loop**: Allowing detailed data analyses with an automated
   report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.
-  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
+  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN019ujTOF1xIPgGiAsOb_!!6000000006420-0-tps-1820-784.jpg)
 
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data
   processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on
