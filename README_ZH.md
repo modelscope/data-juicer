@@ -1,4 +1,4 @@
-[[English Page]](README.md) | [[文档]](#documents) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md) 
+[[English Page]](README.md) | [[文档]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md) 
 
 # Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据
 
@@ -16,7 +16,7 @@
 
 [![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](README.md#documents)
 [![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](#documents)
-[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
+[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://modelscope.github.io/data-juicer/)
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 
 
@@ -107,7 +107,7 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
   * [前处理](tools/preprocess/README_ZH.md)
   * [后处理](tools/postprocess/README_ZH.md)
 * [第三方库（大语言模型生态）](thirdparty/README_ZH.md)
-* [API 参考](https://alibaba.github.io/data-juicer/)
+* [API 参考](https://modelscope.github.io/data-juicer/)
 * [Awesome LLM-Data](docs/awesome_llm_data.md)
 * [DJ-SORA](docs/DJ_SORA_ZH.md)
 

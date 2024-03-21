@@ -1,4 +1,4 @@
-[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
+[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
 
 # Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
@@ -18,7 +18,7 @@
 
 [![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documents)
 [![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documents)
-[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
+[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://modelscope.github.io/data-juicer/)
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 
 
@@ -125,7 +125,7 @@ Table of Contents
   - [Preprocess](tools/preprocess/README.md)
   - [Postprocess](tools/postprocess/README.md)
 - [Third-parties (LLM Ecosystems)](thirdparty/README.md)
-- [API references](https://alibaba.github.io/data-juicer/)
+- [API references](https://modelscope.github.io/data-juicer/)
 - [Awesome LLM-Data](docs/awesome_llm_data.md)
 - [DJ-SORA](docs/DJ_SORA.md)
 
