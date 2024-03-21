@@ -7,7 +7,7 @@ import multiprocess as mp
 import wget
 from loguru import logger
 
-from data_juicer import use_cuda
+from data_juicer import cuda_device_count, use_cuda
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 
@@ -553,5 +553,6 @@ def get_model(model_key=None, rank=None):
         MODEL_ZOO[model_key] = model_key()
     if use_cuda():
         rank = 0 if rank is None else rank
+        rank = rank % cuda_device_count()
         move_to_cuda(MODEL_ZOO[model_key], rank)
     return MODEL_ZOO[model_key]

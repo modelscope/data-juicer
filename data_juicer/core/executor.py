@@ -1,3 +1,4 @@
+import math
 import os
 from time import time
 
@@ -116,12 +117,26 @@ class Executor:
         for op_cfg, op in zip(self.process_list, self.ops):
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
-            if use_cuda() and op._accelerator == 'cuda':
+            with_rank = use_cuda() and op._accelerator == 'cuda'
+            if op.spec_numprocs != 0:
+                op_proc = op.spec_numprocs
+                logger.info(f'Op [{op_name}] running with sepcified '
+                            f'number of procs:{op.spec_numprocs}')
+            elif op.numprocs_coef != 1:
+                op_proc = math.ceil(self.cfg.np / op.numprocs_coef)
+                logger.info(f'Op [{op_name}] running with np/'
+                            f'op.numprocs_coef '
+                            f'= {self.cfg.np}/{op.numprocs_coef}'
+                            f'= {op_proc}, set specified number of procs'
+                            f'(spec_numprocs) for this op if needed')
+            elif use_cuda() and op._accelerator == 'cuda':
                 op_proc = min(cuda_device_count(), self.cfg.np)
-                with_rank = True
+                logger.info(f'Op [{op_name}] running with op_proc = '
+                            f'cuda_device_count() = '
+                            f'{op_proc}, set specified number of procs'
+                            f'(spec_numprocs) for this op if needed')
             else:
                 op_proc = self.cfg.np
-                with_rank = False
             try:
                 if isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,
