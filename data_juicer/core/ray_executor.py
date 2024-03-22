@@ -123,8 +123,7 @@ class RayExecutor:
                                           batch_format='pyarrow')
 
         logger.info('Processing data...')
-        start = time.time()
-        tstart = start
+        tstart = time.time()
         for op_cfg, op in zip(self.process_list, self.ops):
             num_gpus = 1 if use_cuda() and op._accelerator == 'cuda' else 0
             op_name, _ = list(op_cfg.items())[0]
