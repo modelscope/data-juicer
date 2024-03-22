@@ -23,11 +23,13 @@ BACKUP_MODEL_LINKS = {
     # language identification model from fasttext
     'lid.176.bin':
     'https://dl.fbaipublicfiles.com/fasttext/supervised-models/',
+
     # tokenizer and language model for English from sentencepiece and KenLM
     '*.sp.model':
     'https://huggingface.co/edugp/kenlm/resolve/main/wikipedia/',
     '*.arpa.bin':
     'https://huggingface.co/edugp/kenlm/resolve/main/wikipedia/',
+
     # sentence split model from nltk punkt
     'punkt.*.pickle':
     'https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/'
@@ -171,7 +173,7 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
         'en': 'english',
         'fr': 'french',
         'pt': 'portuguese',
-        'es': 'spanish',
+        'es': 'spanish'
     }
     assert (lang in nltk_to_punkt.keys()
             ), 'lang must be one of the following: {}'.format(
@@ -285,12 +287,8 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
                     hidden_states=hidden_states,
                     attentions=attentions,
                 )
-            return (
-                last_hidden_state,
-                pooler_output,
-                hidden_states,
-                attentions,
-            )
+            return (last_hidden_state, pooler_output, hidden_states,
+                    attentions)
 
     class VideoBlipForConditionalGeneration(Blip2ForConditionalGeneration):
 
@@ -303,17 +301,13 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
             self.vision_model = VideoBlipVisionModel(config.vision_config)
 
             self.query_tokens = nn.Parameter(
-                torch.zeros(
-                    1,
-                    config.num_query_tokens,
-                    config.qformer_config.hidden_size,
-                ))
+                torch.zeros(1, config.num_query_tokens,
+                            config.qformer_config.hidden_size))
             self.qformer = Blip2QFormerModel(config.qformer_config)
 
             self.language_projection = nn.Linear(
                 config.qformer_config.hidden_size,
-                config.text_config.hidden_size,
-            )
+                config.text_config.hidden_size)
             if config.use_decoder_only_language_model:
                 language_model = AutoModelForCausalLM.from_config(
                     config.text_config)
@@ -396,8 +390,7 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
         if hasattr(config, 'auto_map'):
             class_name = next(
                 (k for k in config.auto_map if k.startswith('AutoModel')),
-                'AutoModel',
-            )
+                'AutoModel')
         else:
             # TODO: What happens if more than one
             class_name = config.architectures[0]
@@ -467,7 +460,7 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
     diffusion_type_to_pipeline = {
         'image2image': AutoPipelineForImage2Image,
         'text2image': AutoPipelineForText2Image,
-        'inpainting': AutoPipelineForInpainting,
+        'inpainting': AutoPipelineForInpainting
     }
 
     if diffusion_type not in diffusion_type_to_pipeline.keys():
@@ -491,11 +484,9 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
     revision = floating_point
     torch_dtype = torch.float32 if floating_point == 'fp32' else torch.float16
 
-    model = pipeline.from_pretrained(
-        pretrained_model_name_or_path,
-        revision=revision,
-        torch_dtype=torch_dtype,
-    )
+    model = pipeline.from_pretrained(pretrained_model_name_or_path,
+                                     revision=revision,
+                                     torch_dtype=torch_dtype)
 
     return model
 
@@ -513,17 +504,14 @@ def prepare_recognizeAnything_model(
 
     logger.info('Loading recognizeAnything model...')
     try:
-        model = ram_plus(
-            pretrained=check_model(pretrained_model_name_or_path),
-            image_size=input_size,
-            vit='swin_l',
-        )
+        model = ram_plus(pretrained=check_model(pretrained_model_name_or_path),
+                         image_size=input_size,
+                         vit='swin_l')
     except:  # noqa: E722
-        model = ram_plus(
-            pretrained=check_model(pretrained_model_name_or_path, force=True),
-            image_size=input_size,
-            vit='swin_l',
-        )
+        model = ram_plus(pretrained=check_model(pretrained_model_name_or_path,
+                                                force=True),
+                         image_size=input_size,
+                         vit='swin_l')
     model.eval()
     return model
 
