@@ -1,9 +1,10 @@
 import fnmatch
 import os
 from functools import partial
-from typing import Optional, Union
+from typing import Any, List, Optional, Union
 
 import multiprocess as mp
+import requests
 import wget
 from loguru import logger
 
@@ -14,21 +15,19 @@ from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 MODEL_ZOO = {}
 
 # Default cached models links for downloading
-MODEL_LINKS = 'https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/' \
-               'data_juicer/models/'
+MODEL_LINKS = ('https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/'
+               'data_juicer/models/')
 
 # Backup cached models links for downloading
 BACKUP_MODEL_LINKS = {
     # language identification model from fasttext
     'lid.176.bin':
     'https://dl.fbaipublicfiles.com/fasttext/supervised-models/',
-
     # tokenizer and language model for English from sentencepiece and KenLM
     '*.sp.model':
     'https://huggingface.co/edugp/kenlm/resolve/main/wikipedia/',
     '*.arpa.bin':
     'https://huggingface.co/edugp/kenlm/resolve/main/wikipedia/',
-
     # sentence split model from nltk punkt
     'punkt.*.pickle':
     'https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/'
@@ -172,11 +171,11 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
         'en': 'english',
         'fr': 'french',
         'pt': 'portuguese',
-        'es': 'spanish'
+        'es': 'spanish',
     }
-    assert lang in nltk_to_punkt.keys(
-    ), 'lang must be one of the following: {}'.format(
-        list(nltk_to_punkt.keys()))
+    assert (lang in nltk_to_punkt.keys()
+            ), 'lang must be one of the following: {}'.format(
+                list(nltk_to_punkt.keys()))
     model_name = name_pattern.format(nltk_to_punkt[lang])
 
     logger.info('Loading nltk punkt split model...')
@@ -286,8 +285,12 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
                     hidden_states=hidden_states,
                     attentions=attentions,
                 )
-            return (last_hidden_state, pooler_output, hidden_states,
-                    attentions)
+            return (
+                last_hidden_state,
+                pooler_output,
+                hidden_states,
+                attentions,
+            )
 
     class VideoBlipForConditionalGeneration(Blip2ForConditionalGeneration):
 
@@ -300,13 +303,17 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
             self.vision_model = VideoBlipVisionModel(config.vision_config)
 
             self.query_tokens = nn.Parameter(
-                torch.zeros(1, config.num_query_tokens,
-                            config.qformer_config.hidden_size))
+                torch.zeros(
+                    1,
+                    config.num_query_tokens,
+                    config.qformer_config.hidden_size,
+                ))
             self.qformer = Blip2QFormerModel(config.qformer_config)
 
             self.language_projection = nn.Linear(
                 config.qformer_config.hidden_size,
-                config.text_config.hidden_size)
+                config.text_config.hidden_size,
+            )
             if config.use_decoder_only_language_model:
                 language_model = AutoModelForCausalLM.from_config(
                     config.text_config)
@@ -319,6 +326,7 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
             self.post_init()
 
     from transformers import AutoProcessor
+
     processor = AutoProcessor.from_pretrained(
         pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
     if return_model:
@@ -388,7 +396,8 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
         if hasattr(config, 'auto_map'):
             class_name = next(
                 (k for k in config.auto_map if k.startswith('AutoModel')),
-                'AutoModel')
+                'AutoModel',
+            )
         else:
             # TODO: What happens if more than one
             class_name = config.architectures[0]
@@ -418,10 +427,11 @@ def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
     # decompress the compressed model if it's not decompressed
     def decompress_model(compressed_model_path):
         decompressed_model_path = compressed_model_path.replace('.zip', '')
-        if os.path.exists(decompressed_model_path) \
-                and os.path.isdir(decompressed_model_path):
+        if os.path.exists(decompressed_model_path) and os.path.isdir(
+                decompressed_model_path):
             return decompressed_model_path
         import zipfile
+
         with zipfile.ZipFile(compressed_model_path) as zf:
             zf.extractall(DJMC)
         return decompressed_model_path
@@ -439,15 +449,15 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
                             diffusion_type,
                             floating_point='fp32'):
     """
-        Prepare and load an Diffusion model from HuggingFace.
+    Prepare and load an Diffusion model from HuggingFace.
 
-        :param pretrained_model_name_or_path: input Diffusion model name
-            or local path to the model
-        :param diffusion_type: the use of the diffusion model. It can be
-            'image2image', 'text2image', 'inpainting'
-        :param floating_point: the floating point to load the diffusion
-            model. It can be 'fp16', 'fp32'
-        :return: a Diffusion model.
+    :param pretrained_model_name_or_path: input Diffusion model name
+        or local path to the model
+    :param diffusion_type: the use of the diffusion model. It can be
+        'image2image', 'text2image', 'inpainting'
+    :param floating_point: the floating point to load the diffusion
+        model. It can be 'fp16', 'fp32'
+    :return: a Diffusion model.
     """
     import torch
     from diffusers import (AutoPipelineForImage2Image,
@@ -457,7 +467,7 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
     diffusion_type_to_pipeline = {
         'image2image': AutoPipelineForImage2Image,
         'text2image': AutoPipelineForText2Image,
-        'inpainting': AutoPipelineForInpainting
+        'inpainting': AutoPipelineForInpainting,
     }
 
     if diffusion_type not in diffusion_type_to_pipeline.keys():
@@ -481,9 +491,11 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
     revision = floating_point
     torch_dtype = torch.float32 if floating_point == 'fp32' else torch.float16
 
-    model = pipeline.from_pretrained(pretrained_model_name_or_path,
-                                     revision=revision,
-                                     torch_dtype=torch_dtype)
+    model = pipeline.from_pretrained(
+        pretrained_model_name_or_path,
+        revision=revision,
+        torch_dtype=torch_dtype,
+    )
 
     return model
 
@@ -498,16 +510,20 @@ def prepare_recognizeAnything_model(
     :param input_size: the input size of the model.
     """
     from ram.models import ram_plus
+
     logger.info('Loading recognizeAnything model...')
     try:
-        model = ram_plus(pretrained=check_model(pretrained_model_name_or_path),
-                         image_size=input_size,
-                         vit='swin_l')
+        model = ram_plus(
+            pretrained=check_model(pretrained_model_name_or_path),
+            image_size=input_size,
+            vit='swin_l',
+        )
     except:  # noqa: E722
-        model = ram_plus(pretrained=check_model(pretrained_model_name_or_path,
-                                                force=True),
-                         image_size=input_size,
-                         vit='swin_l')
+        model = ram_plus(
+            pretrained=check_model(pretrained_model_name_or_path, force=True),
+            image_size=input_size,
+            vit='swin_l',
+        )
     model.eval()
     return model
 
@@ -565,3 +581,87 @@ def get_model(model_key=None, rank=None):
         rank = 0 if rank is None else rank
         move_to_cuda(MODEL_ZOO[model_key], rank)
     return MODEL_ZOO[model_key]
+
+
+def call_gpt_vision_api(
+    system_prompt: str = '',
+    user_prompt: str = '',
+    images: Union[str, List[str], None] = None,
+    *,
+    max_tokens: int = 500,
+    temperature: float = 0.0,
+    model: str = 'gpt-4-vision-preview',
+    **kwargs: Any,
+):
+    images = [images] if isinstance(images, str) else (images or [])
+
+    api_url = 'https://api.openai.com/v1/chat/completions'
+    api_key = os.getenv('OPENAI_API_KEY')
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}',
+    }
+    image_payload = [{
+        'type': 'image_url',
+        'image_url': {
+            'url': url,
+            'detail': 'low'
+        }
+    } for url in images]
+    data = {
+        'model':
+        model,
+        'messages': [
+            {
+                'role': 'system',
+                'content': system_prompt
+            },
+            {
+                'role':
+                'user',
+                'content': [
+                    {
+                        'type': 'text',
+                        'text': user_prompt
+                    },
+                    *image_payload,
+                ],
+            },
+        ],
+        'max_tokens':
+        max_tokens,
+        'temperature':
+        temperature,
+        **kwargs,
+    }
+
+    try:
+        response = requests.post(api_url, headers=headers, json=data)
+        response.raise_for_status()
+        result = response.json()
+
+        if 'choices' in result and result['choices']:
+            return result['choices'][0]['message']['content']
+        else:
+            logger.warning('No results returned from the API, return None.')
+            return ''
+    except requests.exceptions.HTTPError as errh:
+        if errh.response.status_code == 401:
+            logger.warning('Invalid API key provided.')
+        elif errh.response.status_code == 429:
+            logger.warning(
+                'API request limit has been reached. Please try again later.')
+        else:
+            logger.warning(f'HTTP error occurred: {errh}')
+    except requests.exceptions.ConnectionError:
+        logger.warning('Network error occurred. Please check your connection.')
+    except requests.exceptions.Timeout:
+        logger.warning('The request timed out. Please try again later.')
+    except requests.exceptions.RequestException as err:
+        logger.warningt(f'An error occurred: {err}')
+    except Exception as e:
+        logger.warning(f'An unexpected error occurred: {e}')
+
+    logger.warning('API request failed, return None.')
+    return ''
