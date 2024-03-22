@@ -123,7 +123,7 @@ class RayExecutor:
                                           batch_format='pyarrow')
 
         logger.info('Processing data...')
-        start = time()
+        start = time.time()
         tstart = start
         for op_cfg, op in zip(self.process_list, self.ops):
             num_gpus = 1 if use_cuda() and op._accelerator == 'cuda' else 0
@@ -150,7 +150,7 @@ class RayExecutor:
                 import traceback
                 traceback.print_exc()
                 exit(1)
-        tend = time()
+        tend = time.time()
         logger.info(f'All Ops are done in {"%.3f" % (tend - tstart)}(s).')
 
         # 4. data export
