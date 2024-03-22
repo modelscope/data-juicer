@@ -128,7 +128,6 @@ class StatsKeys(object):
 
     - If the operator processes data in batches rather than a single sample, it is necessary to declare `self._batched_op = True`.
     ```python
-    from data_juicer.utils.file_utils import transfer_filename
     # ... (import some other libraries)
     OP_NAME = 'image_diffusion_mapper'
     @OPERATORS.register_module(OP_NAME)
