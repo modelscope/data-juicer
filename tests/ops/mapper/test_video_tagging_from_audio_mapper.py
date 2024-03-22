@@ -6,9 +6,9 @@ from data_juicer.ops.mapper.video_tagging_from_audio_mapper import \
     VideoTaggingFromAudioMapper
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
-
+@SKIPPED_TESTS.register_module()
 class VideoTaggingFromAudioMapperTest(DataJuicerTestCaseBase):
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')

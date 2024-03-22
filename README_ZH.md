@@ -1,4 +1,4 @@
-[[English Page]](README.md) | [[文档]](#documents) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md) 
+[[English Page]](README.md) | [[文档]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md) 
 
 # Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据
 
@@ -16,7 +16,7 @@
 
 [![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](README.md#documents)
 [![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](#documents)
-[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
+[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://modelscope.github.io/data-juicer/)
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 
 
@@ -79,11 +79,11 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
 
 ## 特点
 
-![Overview](https://img.alicdn.com/imgextra/i2/O1CN01IMPeD11xYRUYLmXKO_!!6000000006455-2-tps-3620-1604.png)
+![Overview](https://img.alicdn.com/imgextra/i4/O1CN01WYQP3Z1JHsaXaQDK6_!!6000000001004-0-tps-3640-1812.jpg)
 
 * **系统化 & 可复用**：为用户提供系统化且可复用的80+核心[算子](docs/Operators_ZH.md)，20+[配置菜谱](configs/README_ZH.md)和20+专用[工具池](#documentation)，旨在让数据处理独立于特定的大语言模型数据集和处理流水线。
 
-* **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行及时反馈循环。  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
+* **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行及时反馈循环。  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
 * **全面的数据处理菜谱**：为pre-training、fine-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。 在LLaMA、LLaVA等模型上有效验证。 ![exp_llama](https://img.alicdn.com/imgextra/i2/O1CN019WtUPP1uhebnDlPR8_!!6000000006069-2-tps-2530-1005.png)
 
@@ -107,7 +107,7 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
   * [前处理](tools/preprocess/README_ZH.md)
   * [后处理](tools/postprocess/README_ZH.md)
 * [第三方库（大语言模型生态）](thirdparty/README_ZH.md)
-* [API 参考](https://alibaba.github.io/data-juicer/)
+* [API 参考](https://modelscope.github.io/data-juicer/)
 * [Awesome LLM-Data](docs/awesome_llm_data.md)
 * [DJ-SORA](docs/DJ_SORA_ZH.md)
 
@@ -199,6 +199,14 @@ pip install py-data-juicer
 import data_juicer as dj
 print(dj.__version__)
 ```
+
+### 使用视频相关算子
+
+在使用视频相关算子之前，应该安装 **FFmpeg** 并确保其可通过 $PATH 环境变量访问。
+
+你可以使用包管理器安装 FFmpeg（例如，在 Debian/Ubuntu 上使用 sudo apt install ffmpeg，在 OS X 上使用 brew install ffmpeg），或访问[官方FFmpeg链接](https://ffmpeg.org/download.html)。
+
+随后在终端运行 ffmpeg 命令检查环境是否设置正确。
 
 ## 快速上手
 
