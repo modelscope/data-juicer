@@ -31,7 +31,8 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
 
     def __init__(self,
                  mode: str = 'description',
-                 max_token: int = 500,
+                 api_key: str = None,
+                 max_tokens: int = 500,
                  temperature: ClosedUnitInterval = 1.0,
                  system_prompt: str = '',
                  user_prompt: str = '',
@@ -45,7 +46,8 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
 
         :param mode: mode of text generated from images, can be one of
             ['resoning', 'description', 'conversation', 'custom']
-        :param max_token: the maximum number of tokens to generate.
+        :param api_key: the API key to authenticate the request.
+        :param max_tokens: the maximum number of tokens to generate.
             Default is 500.
         :param temperature: controls the randomness of the output (range
             from 0 to 1). Default is 0.
@@ -90,7 +92,8 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
                 f'use default prompt to generate text.')
 
         self.mode = mode
-        self.max_token = max_token
+        self.api_key = api_key
+        self.max_tokens = max_tokens
         self.temperature = temperature
         self.user_prompt = user_prompt
         self.user_prompt_key = user_prompt_key
@@ -151,8 +154,10 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
                                               prompt_texts,
                                               image_byte_to_base64(
                                                   image, 'image/jpeg'),
-                                              max_tokens=self.max_token,
-                                              temperature=self.temperature)
+                                              api_key=self.api_key,
+                                              max_tokens=self.max_tokens,
+                                              temperature=self.temperature,
+                                              **self.extra_args)
                     generated_text_single_chunk.append(res)
                 if self.any_or_all == 'all' and not all(
                         generated_text_single_chunk):

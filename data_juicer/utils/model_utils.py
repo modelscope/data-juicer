@@ -588,15 +588,23 @@ def call_gpt_vision_api(
     user_prompt: str = '',
     images: Union[str, List[str], None] = None,
     *,
+    api_key: str = None,
+    model: str = 'gpt-4-vision-preview',
     max_tokens: int = 500,
     temperature: float = 0.0,
-    model: str = 'gpt-4-vision-preview',
     **kwargs: Any,
 ):
     images = [images] if isinstance(images, str) else (images or [])
 
     api_url = 'https://api.openai.com/v1/chat/completions'
-    api_key = os.getenv('OPENAI_API_KEY')
+
+    if api_key is None:
+        api_key = os.getenv('OPENAI_API_KEY')
+    if api_key is None:
+        logger.error(
+            'The api_key must be set either by passing it to the function '
+            'call or by setting the OPENAI_API_KEY environment variable')
+        return ''
 
     headers = {
         'Content-Type': 'application/json',

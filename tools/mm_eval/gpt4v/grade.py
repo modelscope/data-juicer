@@ -7,8 +7,8 @@ import fire
 from data_juicer.utils.mm_utils import (image_path_to_base64,
                                         video_path_to_base64)
 
-from .lib import (grade_frames_to_caption, grade_image_to_caption,
-                  grade_prompt_to_frames, grade_prompt_to_image)
+from .lib import (grade_image_to_text, grade_text_to_image,
+                  grade_text_to_video, grade_video_to_text)
 
 
 def _construct_text_eval(score, rationale):
@@ -81,9 +81,8 @@ def _parse_ini(result_raw):
     return result
 
 
-# image --> text
-def image_to_caption(input: str, output: str, **kwargs: Any):
-    expected_keys = ['image', 'caption']
+def image_to_text(input: str, output: str, **kwargs: Any):
+    expected_keys = ['image', 'text']
 
     with open(input) as fin, open(output, 'w') as fout:
         for line in fin:
@@ -95,8 +94,8 @@ def image_to_caption(input: str, output: str, **kwargs: Any):
                     0, f"Missing keys: {' '.join(missing)}")
             else:
                 image = image_path_to_base64(entry['image'], mime_type='auto')
-                caption = entry['caption'].strip()
-                result_raw = grade_image_to_caption(image, caption, **kwargs)
+                text = entry['text'].strip()
+                result_raw = grade_image_to_text(image, text, **kwargs)
                 if not result_raw:
                     result = _construct_text_eval(0, 'Request error')
                 else:
@@ -104,9 +103,8 @@ def image_to_caption(input: str, output: str, **kwargs: Any):
             fout.write(result + '\n')
 
 
-# text --> image
-def prompt_to_image(input: str, output: str, **kwargs: Any):
-    expected_keys = ['prompt', 'image']
+def text_to_image(input: str, output: str, **kwargs: Any):
+    expected_keys = ['text', 'image']
 
     with open(input) as fin, open(output, 'w') as fout:
         for line in fin:
@@ -117,9 +115,9 @@ def prompt_to_image(input: str, output: str, **kwargs: Any):
                 result = _construct_image_eval(
                     0, f"Missing keys: {' '.join(missing)}")
             else:
-                prompt = entry['prompt'].strip()
+                text = entry['text'].strip()
                 image = image_path_to_base64(entry['image'], mime_type='auto')
-                result_raw = grade_prompt_to_image(prompt, image, **kwargs)
+                result_raw = grade_text_to_image(text, image, **kwargs)
                 if not result_raw:
                     result = _construct_image_eval(0, 'Request error')
                 else:
@@ -127,8 +125,7 @@ def prompt_to_image(input: str, output: str, **kwargs: Any):
             fout.write(result + '\n')
 
 
-# video --> text
-def video_to_caption(
+def video_to_text(
     input: str,
     output: str,
     *,
@@ -140,7 +137,7 @@ def video_to_caption(
         raise ValueError("The parameters 'frame_num' and 'sampling_fps' are \
                 mutually exclusive; only one may be set.")
 
-    expected_keys = ['video', 'caption']
+    expected_keys = ['video', 'text']
 
     with open(input) as fin, open(output, 'w') as fout:
         for line in fin:
@@ -155,8 +152,8 @@ def video_to_caption(
                                               frame_num=frame_num,
                                               sampling_fps=sampling_fps,
                                               mime_type='auto')
-                caption = entry['caption'].strip()
-                result_raw = grade_frames_to_caption(frames, caption, **kwargs)
+                text = entry['text'].strip()
+                result_raw = grade_video_to_text(frames, text, **kwargs)
                 if not result_raw:
                     result = _construct_text_eval(0, 'Request error')
                 else:
@@ -165,7 +162,7 @@ def video_to_caption(
 
 
 # text --> video
-def prompt_to_video(
+def text_to_video(
     input: str,
     output: str,
     *,
@@ -177,7 +174,7 @@ def prompt_to_video(
         raise ValueError("The parameters 'frame_num' and 'sampling_fps' are \
                 mutually exclusive; only one may be set.")
 
-    expected_keys = ['prompt', 'video']
+    expected_keys = ['text', 'video']
 
     with open(input) as fin, open(output, 'w') as fout:
         for line in fin:
@@ -188,12 +185,12 @@ def prompt_to_video(
                 result = _construct_video_eval(
                     0, f"Missing keys: {' '.join(missing)}")
             else:
-                prompt = entry['prompt'].strip()
+                text = entry['text'].strip()
                 frames = video_path_to_base64(entry['video'],
                                               frame_num=frame_num,
                                               sampling_fps=sampling_fps,
                                               mime_type='auto')
-                result_raw = grade_prompt_to_frames(prompt, frames, **kwargs)
+                result_raw = grade_text_to_video(text, frames, **kwargs)
                 if not result_raw:
                     result = _construct_video_eval(0, 'Request error')
                 else:
