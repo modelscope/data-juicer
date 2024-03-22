@@ -437,7 +437,8 @@ def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
 
 def prepare_diffusion_model(pretrained_model_name_or_path,
                             diffusion_type,
-                            floating_point='fp32'):
+                            floating_point='fp32',
+                            revision='main'):
     """
         Prepare and load an Diffusion model from HuggingFace.
 
@@ -478,7 +479,6 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
             ' model.')
 
     pipeline = diffusion_type_to_pipeline[diffusion_type]
-    revision = floating_point
     torch_dtype = torch.float32 if floating_point == 'fp32' else torch.float16
 
     model = pipeline.from_pretrained(pretrained_model_name_or_path,
