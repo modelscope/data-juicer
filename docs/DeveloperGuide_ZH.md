@@ -123,7 +123,6 @@ class StatsKeys(object):
 
     - 如果算子批量处理数据，输入不是一个样本而是一个batch，需要声明`self._batched_op = True`。
     ```python
-    from data_juicer.utils.file_utils import transfer_filename
     # ... (import some other libraries)
     OP_NAME = 'image_diffusion_mapper'
     @OPERATORS.register_module(OP_NAME)
