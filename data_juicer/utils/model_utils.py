@@ -467,7 +467,7 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
             'model. Can only be one of '
             '["image2image", "text2image", "inpainting"].')
 
-    if torch_dtype not in ['fp32', 'fp16']:
+    if torch_dtype not in ['fp32', 'fp16', 'bf16']:
         raise ValueError(
             f'Not support {torch_dtype} torch_dtype for diffusion '
             'model. Can only be one of '
