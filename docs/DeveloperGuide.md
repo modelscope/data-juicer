@@ -142,7 +142,6 @@ class StatsKeys(object):
             self._batched_op = True
 
         def process(self, samples):
-            
             # ... (some codes)
     ```
 
