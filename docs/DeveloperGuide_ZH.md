@@ -121,25 +121,22 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
-    - 如果算子批量处理数据，输入不是一个样本而是一个batch，需要声明`self._batched_op = True`。
+    - 如果算子输入一个sample产生多个sample，需要将输入输出打成batch，需要声明`self._batched_op = True`。该功能现在只有mapper类型的算子支持。
      ```python
-    # ... (same as above)
-
-    @OPERATORS.register_module('text_length_filter')
-    class TextLengthFilter(Filter):
+    # ... (import some other libraries)
+    OP_NAME = 'image_diffusion_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_IMAGES.register_module(OP_NAME)
+    class ImageDiffusionMapper(Mapper):
         def __init__(self,
-                    min_len: PositiveInt = 10,
-                    max_len: PositiveInt = sys.maxsize,
-                    *args,
-                    **kwargs):
-            # ... (same as above)
+                # ... (OP parameters)
+                *args,
+                **kwargs):
+            super().__init__(*args, **kwargs)
             self._batched_op = True
 
-        def compute_stats(self, sample):
-            # ... (same as above)
-
-        def process(self, sample):
-            # ... (same as above)
+        def process(self, samples):
+            # ... (some codes)
     ```
 
     - 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式为`{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`，其中`HASH_VALUE`是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。为了方便，可以在OP类初始化开头调用`self.remove_extra_parameters(locals())`获取算子初始化参数，同时可以调用`self.add_parameters`添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：

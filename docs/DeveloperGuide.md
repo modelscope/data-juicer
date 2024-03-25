@@ -126,7 +126,7 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
-    - If the operator processes data in batches rather than a single sample, it is necessary to declare `self._batched_op = True`.
+    - If an operator takes one sample as input and produces multiple samples, the input and output need to be batched together by declaring `self._batched_op = True`. This feature is currently only supported by mapper operators.
     ```python
     # ... (same as above)
 

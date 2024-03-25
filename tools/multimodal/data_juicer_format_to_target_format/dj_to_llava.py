@@ -137,12 +137,13 @@ def main(
 
     # if convert_to_relative_paths is True, check if the original_llava_ds_path
     # is provided as well.
-    if not original_llava_ds_path:
-        raise ValueError('When convert_to_relative_paths is set to True, '
-                         'the original_llava_ds_path must be provided '
-                         'for recovering the relative paths. Please '
-                         'check and retry.')
-    original_llava_ds_path = os.path.abspath(original_llava_ds_path)
+    if convert_to_relative_paths:
+        if not original_llava_ds_path:
+            raise ValueError('When convert_to_relative_paths is set to True, '
+                            'the original_llava_ds_path must be provided '
+                            'for recovering the relative paths. Please '
+                            'check and retry.')
+        original_llava_ds_path = os.path.abspath(original_llava_ds_path)
     # prepare id2idx dict
     ori_ds = json.load(open(original_llava_ds_path, 'r', encoding='utf-8'))
     id2idx = {str(s['id']): idx for idx, s in enumerate(ori_ds)}
