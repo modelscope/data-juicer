@@ -122,7 +122,7 @@ class StatsKeys(object):
     ```
 
     - 如果算子输入一个sample产生多个sample，需要将输入输出打成batch，需要声明`self._batched_op = True`。该功能现在只有mapper类型的算子支持。
-     ```python
+    ```python
     # ... (import some other libraries)
     OP_NAME = 'image_diffusion_mapper'
     @OPERATORS.register_module(OP_NAME)
