@@ -3,20 +3,21 @@ import json
 from typing import Any, Optional
 
 import fire
+import tqdm
 
 from data_juicer.utils.mm_utils import (image_path_to_base64,
                                         video_path_to_base64)
-
-from .lib import (grade_image_to_text, grade_text_to_image,
-                  grade_text_to_video, grade_video_to_text)
+from tools.mm_eval.gpt4v.lib import (grade_image_to_text, grade_text_to_image,
+                                     grade_text_to_video, grade_video_to_text)
 
 
 def _construct_text_eval(score, rationale):
-    return {'score': score, 'rationale': rationale}
+    result = {'score': score, 'rationale': rationale}
+    return json.dumps(result)
 
 
 def _construct_image_eval(score, rationale):
-    return {
+    result = {
         'relevance': {
             'score': score,
             'rationale': rationale
@@ -34,10 +35,11 @@ def _construct_image_eval(score, rationale):
             'rationale': rationale
         },
     }
+    return json.dumps(result)
 
 
 def _construct_video_eval(score, rationale):
-    return {
+    result = {
         'relevance': {
             'score': score,
             'rationale': rationale
@@ -59,6 +61,7 @@ def _construct_video_eval(score, rationale):
             'rationale': rationale
         },
     }
+    return json.dumps(result)
 
 
 def _check_missing_keys(json_dict, expected_keys):
@@ -75,17 +78,19 @@ def _parse_ini(result_raw):
         config.read_string(result_raw)
         result = {sec: dict(config[sec]) for sec in config.sections()}
     except Exception:
-        pass
-    finally:
-        result = json.dumps(result_raw)
-    return result
+        result = result_raw
+
+    return json.dumps(result)
 
 
 def image_to_text(input: str, output: str, **kwargs: Any):
     expected_keys = ['image', 'text']
 
-    with open(input) as fin, open(output, 'w') as fout:
-        for line in fin:
+    with open(input) as fin:
+        lines = fin.readlines()
+
+    with open(output, 'w') as fout:
+        for line in tqdm.tqdm(lines):
             line = line.strip()
             entry = json.loads(line)
             missing = _check_missing_keys(entry, expected_keys)
@@ -106,8 +111,11 @@ def image_to_text(input: str, output: str, **kwargs: Any):
 def text_to_image(input: str, output: str, **kwargs: Any):
     expected_keys = ['text', 'image']
 
-    with open(input) as fin, open(output, 'w') as fout:
-        for line in fin:
+    with open(input) as fin:
+        lines = fin.readlines()
+
+    with open(output, 'w') as fout:
+        for line in tqdm.tqdm(lines):
             line = line.strip()
             entry = json.loads(line)
             missing = _check_missing_keys(entry, expected_keys)
@@ -139,8 +147,11 @@ def video_to_text(
 
     expected_keys = ['video', 'text']
 
-    with open(input) as fin, open(output, 'w') as fout:
-        for line in fin:
+    with open(input) as fin:
+        lines = fin.readlines()
+
+    with open(output, 'w') as fout:
+        for line in tqdm.tqdm(lines):
             line = line.strip()
             entry = json.loads(line)
             missing = _check_missing_keys(entry, expected_keys)
@@ -175,9 +186,11 @@ def text_to_video(
                 mutually exclusive; only one may be set.")
 
     expected_keys = ['text', 'video']
+    with open(input) as fin:
+        lines = fin.readlines()
 
-    with open(input) as fin, open(output, 'w') as fout:
-        for line in fin:
+    with open(output, 'w') as fout:
+        for line in tqdm.tqdm(lines):
             line = line.strip()
             entry = json.loads(line)
             missing = _check_missing_keys(entry, expected_keys)
