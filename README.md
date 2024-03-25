@@ -30,6 +30,8 @@ juicier, and more digestible for LLMs.
 Data-Juicer (including [DJ-SORA](docs/DJ_SORA.md)) is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets. 
 We welcome you to join us in promoting LLM data development and research!
 
+We provide a [Playground](http://8.130.100.170/) with a managed JupyterLab. [Try Data-Juicer](http://8.130.100.170/) straight away in your browser!
+
 If you find Data-Juicer useful for your research or development, please kindly 
 cite our [work](#references). Welcome to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw), [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11), or WeChat group (scan the QR code below with WeChat) for discussion.
 
