@@ -27,8 +27,9 @@ class OP:
         self.video_key = kwargs.get('video_key', 'videos')
 
         self._accelerator = kwargs.get('accelerator', 'cpu')
-        self.numprocs_coef = kwargs.get('numprocs_coef', 1)
         self.spec_numprocs = kwargs.get('spec_numprocs', 0)
+        self.cpu_required = kwargs.get('cpu_required', 1)
+        self.mem_required = kwargs.get('mem_required', 0)
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.process = wrap_func_with_nested_access(self.process)

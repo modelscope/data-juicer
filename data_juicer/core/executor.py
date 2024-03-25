@@ -2,6 +2,7 @@ import math
 import os
 from time import time
 
+import psutil
 from loguru import logger
 
 from data_juicer import cuda_device_count, use_cuda
@@ -86,6 +87,23 @@ class Executor:
                 logger.info('Trace for all ops.')
                 self.op_list_to_trace = set(OPERATORS.modules.keys())
 
+    def calculate_np(self, op, op_name):
+        np = self.cfg.np
+        cpu_available = psutil.cpu_count()
+        mem_available = psutil.virtual_memory().available
+        mem_available = mem_available / 1024**3
+        np = min(np, math.floor(cpu_available / op.cpu_required))
+        np = min(np, math.floor(mem_available / (op.mem_required + 0.1)))
+        if np < 1.0:
+            logger.warning(f'The required cpu number:{op.cpu_required} '
+                           f'and memory:{op.memory_required}GB might '
+                           f'are more than the available cpu:{cpu_available} '
+                           f'and memory :{mem_available}GB.'
+                           f'This op [{op_name}] might '
+                           f'require more resource to run.')
+        np = max(np, 1)
+        return np
+
     def run(self, load_data_np=None):
         """
         Running the dataset process pipeline.
@@ -122,13 +140,6 @@ class Executor:
                 op_proc = op.spec_numprocs
                 logger.info(f'Op [{op_name}] running with sepcified '
                             f'number of procs:{op.spec_numprocs}')
-            elif op.numprocs_coef != 1:
-                op_proc = math.ceil(self.cfg.np / op.numprocs_coef)
-                logger.info(f'Op [{op_name}] running with np/'
-                            f'op.numprocs_coef '
-                            f'= {self.cfg.np}/{op.numprocs_coef}'
-                            f'= {op_proc}, set specified number of procs'
-                            f'(spec_numprocs) for this op if needed')
             elif use_cuda() and op._accelerator == 'cuda':
                 op_proc = min(cuda_device_count(), self.cfg.np)
                 logger.info(f'Op [{op_name}] running with op_proc = '
@@ -136,7 +147,7 @@ class Executor:
                             f'{op_proc}, set specified number of procs'
                             f'(spec_numprocs) for this op if needed')
             else:
-                op_proc = self.cfg.np
+                op_proc = self.calculate_np(op, op_name)
             try:
                 if isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,
