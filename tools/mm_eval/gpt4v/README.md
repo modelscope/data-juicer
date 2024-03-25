@@ -54,6 +54,19 @@ For grading evaluation, run `python grade.py <task> <input.jsonl> <output.jsonl>
 
 For comparison evaluation, run `python compare.py <task> <input.jsonl> <output.jsonl>`
 
+Avaliable `<task>` are:
+- image_to_text
+- text_to_image
+- video_to_text
+- text_to_video
+
+
+You can always get usage and configurable arguments by running:
+```shell
+python grade.py <task> --help
+python compare.py <task> --help
+```
+
 ## Output
 
 The evaluaiton results are also formatted in the JSON Lines structure, where each line directly corresponds to the respective input entry.

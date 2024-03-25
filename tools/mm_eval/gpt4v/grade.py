@@ -84,6 +84,14 @@ def _parse_ini(result_raw):
 
 
 def image_to_text(input: str, output: str, **kwargs: Any):
+    '''
+    Evaluates text-to-image generation using single-answer grading.
+
+    :param input: Path to the JSONL file containing evaluation entries.
+    :param output: Path to the JSONL file for saving evaluation results.
+    :param kwargs: Extra keyword arguments passed to the OpenAI API request.
+    '''
+
     expected_keys = ['image', 'text']
 
     with open(input) as fin:
@@ -109,6 +117,14 @@ def image_to_text(input: str, output: str, **kwargs: Any):
 
 
 def text_to_image(input: str, output: str, **kwargs: Any):
+    '''
+    Evaluates text-to-image generation using single-answer grading.
+
+    :param input: Path to the JSONL file containing evaluation entries.
+    :param output: Path to the JSONL file for saving evaluation results.
+    :param kwargs: Extra keyword arguments passed to the OpenAI API request.
+    '''
+
     expected_keys = ['text', 'image']
 
     with open(input) as fin:
@@ -138,11 +154,23 @@ def video_to_text(
     output: str,
     *,
     frame_num: Optional[int] = None,
-    sampling_fps: Optional[float] = None,
+    fps: Optional[float] = None,
     **kwargs: Any,
 ):
-    if frame_num is not None and sampling_fps is not None:
-        raise ValueError("The parameters 'frame_num' and 'sampling_fps' are \
+    '''
+    Evaluates video-to-text generation using single-answer grading.
+
+    :param input: Path to the JSONL file containing evaluation entries.
+    :param output: Path to the JSONL file for saving evaluation results.
+    :param frame_num: The number of frames to sample from each video.
+    :param fps: The sampling rate in frames per second.
+    :param kwargs: Extra keyword arguments passed to the OpenAI API request.
+
+    Note: `frame_num` and `fps` are mutually exclusive; only one may be set.
+    '''
+
+    if frame_num is not None and fps is not None:
+        raise ValueError("The parameters 'frame_num' and 'fps' are \
                 mutually exclusive; only one may be set.")
 
     expected_keys = ['video', 'text']
@@ -161,7 +189,7 @@ def video_to_text(
             else:
                 frames = video_path_to_base64(entry['video'],
                                               frame_num=frame_num,
-                                              sampling_fps=sampling_fps,
+                                              fps=fps,
                                               mime_type='auto')
                 text = entry['text'].strip()
                 result_raw = grade_video_to_text(frames, text, **kwargs)
@@ -178,11 +206,23 @@ def text_to_video(
     output: str,
     *,
     frame_num: Optional[int] = None,
-    sampling_fps: Optional[float] = None,
+    fps: Optional[float] = None,
     **kwargs: Any,
 ):
-    if frame_num is not None and sampling_fps is not None:
-        raise ValueError("The parameters 'frame_num' and 'sampling_fps' are \
+    '''
+    Evaluates text-to-video generation using single-answer grading.
+
+    :param input: Path to the JSONL file containing evaluation entries.
+    :param output: Path to the JSONL file for saving evaluation results.
+    :param frame_num: The number of frames to sample from each video.
+    :param fps: The sampling rate in frames per second.
+    :param kwargs: Extra keyword arguments passed to the OpenAI API request.
+
+    Note: `frame_num` and `fps` are mutually exclusive; only one may be set.
+    '''
+
+    if frame_num is not None and fps is not None:
+        raise ValueError("The parameters 'frame_num' and 'fps' are \
                 mutually exclusive; only one may be set.")
 
     expected_keys = ['text', 'video']
@@ -201,7 +241,7 @@ def text_to_video(
                 text = entry['text'].strip()
                 frames = video_path_to_base64(entry['video'],
                                               frame_num=frame_num,
-                                              sampling_fps=sampling_fps,
+                                              fps=fps,
                                               mime_type='auto')
                 result_raw = grade_text_to_video(text, frames, **kwargs)
                 if not result_raw:
@@ -213,4 +253,9 @@ def text_to_video(
 
 
 if __name__ == '__main__':
-    fire.Fire()
+    fire.Fire({
+        'image_to_text': image_to_text,
+        'text_to_image': text_to_image,
+        'video_to_text': video_to_text,
+        'text_to_video': text_to_video,
+    })

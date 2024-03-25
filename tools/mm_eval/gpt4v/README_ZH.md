@@ -55,6 +55,18 @@
 
 对于比较评测，运行 `python compare.py <task> <input.jsonl> <output.jsonl>`
 
+可选的 `<task>` 包括:
+- image_to_text
+- text_to_image
+- video_to_text
+- text_to_video
+
+执行以下命令获取各任务的使用说明和可配置参数：
+```shell
+python grade.py <task> --help
+python compare.py <task> --help
+```
+
 ## 输出
 
 评估结果也以 JSON Lines 格式保存，其中每行对应于相应的输入条目。
