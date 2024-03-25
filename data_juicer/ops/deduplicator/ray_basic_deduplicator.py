@@ -1,3 +1,5 @@
+from typing import Any
+
 from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -8,7 +10,10 @@ from ..base_op import Filter
 with AvailabilityChecking(['redis'],
                           op_name='ray_xxx_deduplicator',
                           requires_type='dist'):
-    import redis
+    try:
+        import redis
+    except Exception:
+        redis = Any
 
 
 class RayBasicDeduplicator(Filter):

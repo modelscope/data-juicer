@@ -42,7 +42,8 @@ class VideoNSFWFilter(Filter):
 
         :param hf_nsfw_model: nsfw detection model name on huggingface.
         :param score_threshold: the nsfw score threshold for samples.
-            range from 0 to 1.
+            range from 0 to 1. Samples with nsfw score less than this threshold
+            will be kept.
         :param frame_sampling_method: sampling method of extracting frame
             images from the videos.
             Should be one of ["all_keyframes", "uniform"].

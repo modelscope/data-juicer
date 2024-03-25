@@ -33,6 +33,7 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
   - [✅] 支持单机多核  
   - [✅] GPU调用  
   - [✅] Ray多机分布式  
+  - [✅] 基于阿里云PAI-DLC和Slurm的多机分布式 
 - [ ] [WIP] 分布式调度优化（OP-aware、自动化负载均衡）-->  Aliyun PAI-DLC
 - [ ] [WIP] 分布式存储优化  
 
@@ -55,11 +56,11 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
   - [✅] video_frames_text_similarity_filter（在时空一致性维度过滤，计算关键/指定帧 和文本的匹配分）
 - 面向数据多样性及数量
   - [✅] video_tagging_from_frames_mapper (轻量图生文模型，密集帧生成空间  概要信息)
-  - [ ] [WIP] video_captioning_from_frames_mapper（更重的图生文模型，少量帧生  成更详细空间信息）
+  - [✅] video_captioning_from_frames_mapper（更重的图生文模型，少量帧生  成更详细空间信息）
   - [✅] video_tagging_from_audio_mapper (引入audio classification/category等meta信息)
   - [✅] video_captioning_from_audio_mapper（引入人声/对话等信息；  AudioCaption环境、场景等全局信息）
   - [✅] video_captioning_from_video_mapper（视频生文模型，连续帧生成时序信息）
-  - [ ] [WIP] video_captioning_from_summarizer_mapper（基于上述子能力的组合，使用纯文本大模型对不同种caption信息去噪、摘要）
+  - [✅] video_captioning_from_summarizer_mapper（基于上述子能力的组合，使用纯文本大模型对不同种caption信息去噪、摘要）
   - [ ] [WIP] video_interleaved_mapper（在ICL、时间和跨模态维度增强），`interleaved_modes` include
     - text_image_interleaved（按时序交叉放置同一视频的的caption和frames）
     - text_audio_interleaved（按时序交叉放置同一视频的的ASR文本和frames）
@@ -73,9 +74,9 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
   - video_ffmpeg_wrapped_mapper
 - [WIP] 视频内容合规和隐私保护算子（图像、文字、音频）：
   - [✅] 马赛克
-  - [ ] 版权水印
-  - [ ] 人脸模糊
-  - [ ] 黄暴恐
+  - [✅] 版权水印
+  - [✅] 人脸模糊
+  - [✅] 黄暴恐
 - [ ] [TODO] (Beyond Interpolation) 增强数据真实性和稠密性 
   - 碰撞、光影、重力、3D、场景切换（phase tranisition）、景深等
   - [ ] Filter类算子: caption是否描述真实性，该描述的相关性得分/正确性得分
@@ -86,13 +87,14 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
 
 ## DJ-SORA数据菜谱及数据集
 - 支持代表性数据的统一加载和转换（other-data <-> dj-data），方便DJ算子处理及扩展数据集
-  - [✅] **Video-ChatGPT**: 100k video-instruction data:`{<question, answer, youtube_id>}`
+  - [✅] **Video-ChatGPT**: 100K video-instruction data:`{<question, answer, youtube_id>}`
   - [✅] **Youku-mPLUG-CN**: 36TB video-caption data：`{<caption, video_id>}`
   - [✅] **InternVid**: 234M data sample:`{<caption, youtube_id, start/end_time>}`
-  - [ ] VideoInstruct-100K, Panda70M, MSR-VTT, ......
+  - [✅] **MSR-VTT**: 10K video-caption data：`{<caption, video_id>}`
+  - [ ] VideoInstruct-100K, Panda70M, ......
   - [ ] ModelScope数据集集成
 - [ ] 大规模高质量DJ-SORA数据集
-   - [ ] [WIP] 数据源持续扩充：open-datasets, youku, web， ...
+  - [ ] [WIP] 数据源持续扩充：open-datasets, youku, web， ...
   - [ ] [WIP] (Data sandbox) 基于DJ-video算子构建和优化多模态数据菜谱 (算子同期持续完善)
   - [ ] [WIP] 基于DJ菜谱规模化分析、清洗高质量多模态数据集
   - [ ] [WIP] 基于DJ菜谱规模化生成高质量多模态数据集

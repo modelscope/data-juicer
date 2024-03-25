@@ -1,10 +1,12 @@
 import os
+import time
 from functools import partial
 
 import pandas as pd
 import pyarrow as pa
 from loguru import logger
 
+from data_juicer import use_cuda
 from data_juicer.config import init_configs
 from data_juicer.ops import Filter, Mapper, load_ops
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -121,18 +123,21 @@ class RayExecutor:
                                           batch_format='pyarrow')
 
         logger.info('Processing data...')
+        tstart = time.time()
         for op_cfg, op in zip(self.process_list, self.ops):
+            num_gpus = 1 if use_cuda() and op._accelerator == 'cuda' else 0
             op_name, _ = list(op_cfg.items())[0]
             try:
                 if isinstance(op, Mapper):
                     if op.is_batched_op():
                         dataset = dataset.map_batches(partial(
                             ray_batch_mapper_wrapper, fn=op.process),
-                                                      batch_format='pyarrow')
+                                                      batch_format='pyarrow',
+                                                      num_gpus=num_gpus)
                     else:
-                        dataset = dataset.map(op.process)
+                        dataset = dataset.map(op.process, num_gpus=num_gpus)
                 elif isinstance(op, Filter):
-                    dataset = dataset.map(op.compute_stats)
+                    dataset = dataset.map(op.compute_stats, num_gpus=num_gpus)
                     dataset = dataset.filter(op.process)
                 else:
                     logger.error(
@@ -144,6 +149,8 @@ class RayExecutor:
                 import traceback
                 traceback.print_exc()
                 exit(1)
+        tend = time.time()
+        logger.info(f'All Ops are done in {"%.3f" % (tend - tstart)}(s).')
 
         # 4. data export
         logger.info('Exporting dataset to disk...')

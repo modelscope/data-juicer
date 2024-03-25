@@ -2,7 +2,7 @@
 
 Operators are a collection of basic processes that assist in data modification, cleaning, filtering, deduplication, etc. We support a wide range of data sources and file formats, and allow for flexible extension to custom datasets.
 
-This page offers a basic description of the operators (OPs) in Data-Juicer. Users can refer to the [API documentation](https://alibaba.github.io/data-juicer/) for the specific parameters of each operator. Users can refer to and run the unit tests for [examples of operator-wise usage](../tests/ops) as well as the effects of each operator when applied to built-in test data samples.
+This page offers a basic description of the operators (OPs) in Data-Juicer. Users can refer to the [API documentation](https://modelscope.github.io/data-juicer/) for the specific parameters of each operator. Users can refer to and run the unit tests for [examples of operator-wise usage](../tests/ops) as well as the effects of each operator when applied to built-in test data samples.
 
 ## Overview
 
@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
-| [ Mapper ]( #mapper )             |   41   | Edits and transforms samples                    |
+| [ Mapper ]( #mapper )             |   43   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
@@ -79,6 +79,8 @@ All the specific operators are listed below, each featured with several capabili
 | replace_content_mapper                              | General            | en, zh | Replace all content in the text that matches a specific regular expression pattern with a designated replacement string                    |
 | sentence_split_mapper                               | General            | en     | Splits and reorganizes sentences according to semantics                                                       |
 | video_captioning_from_audio_mapper                  | Multimodal         | -      | Caption a video according to its audio streams based on Qwen-Audio model                                      |
+| video_captioning_from_frames_mapper                 | Multimodal         |  -     | generate samples whose captions are generated based on an image-to-text model and sampled video frames. Captions from different frames will be concatenated to a single string |
+| video_captioning_from_summarizer_mapper             | Multimodal         | -      | Generate video captions by summarizing several kinds of generated texts (captions from video/audio/frames, tags from audio/frames, ...) |
 | video_captioning_from_video_mapper                  | Multimodal         |  -     | generate samples whose captions are generated based on another model (video-blip) and sampled video frame within the original sample |
 | video_face_blur_mapper                              | Video              |  -     | Blur faces detected in videos                                                                                 |
 | video_ffmpeg_wrapped_mapper                         | Video              | -      | Simple wrapper to run a FFmpeg video filter                                                                   |

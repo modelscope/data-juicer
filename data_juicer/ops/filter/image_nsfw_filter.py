@@ -35,7 +35,8 @@ class ImageNSFWFilter(Filter):
 
         :param hf_nsfw_model: nsfw detection model name on huggingface.
         :param score_threshold: the nsfw score threshold for samples.
-            range from 0 to 1.
+            range from 0 to 1. Samples with nsfw score less than this threshold
+            will be kept.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the

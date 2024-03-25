@@ -191,6 +191,7 @@ class ImageCaptioningMapper(Mapper):
                                return_tensors='pt').to(model.device)
             for i in range(self.caption_num):
                 generated_ids = model.generate(**inputs,
+                                               max_new_tokens=128,
                                                do_sample=True).to(model.device)
                 generated_text = processor.batch_decode(
                     generated_ids, skip_special_tokens=True)

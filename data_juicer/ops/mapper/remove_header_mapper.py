@@ -7,7 +7,6 @@ import regex as re
 from ..base_op import OPERATORS, Mapper
 
 
-# TODO
 @OPERATORS.register_module('remove_header_mapper')
 class RemoveHeaderMapper(Mapper):
     """Mapper to remove headers at the beginning of documents in Latex
