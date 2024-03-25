@@ -448,6 +448,9 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
             'image2image', 'text2image', 'inpainting'
         :param torch_dtype: the floating point to load the diffusion
             model. Can be one of ['fp32', 'fp16', 'bf16']
+        :param revision: The specific model version to use. It can be a
+            branch name, a tag name, a commit id, or any identifier allowed
+            by Git.
         :return: a Diffusion model.
     """
     import torch
