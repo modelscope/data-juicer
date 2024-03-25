@@ -75,8 +75,9 @@ process:
       prompt: null                                            # a string prompt to guide the generation of blip2 model for all samples globally. It's None in default, which means no prompt provided.
       prompt_key: null                                        # the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default.
   - image_diffusion_mapper:                                 # generate images by diffusion model
-      floating_point: 'fp32'                                  # the floating point used to load the diffusion model.
       hf_diffusion: 'CompVis/stable-diffusion-v1-4'           # stable diffusion model name on huggingface to generate image
+      torch_dtype: 'fp32'                                     # the floating point type used to load the diffusion model. Can be one of ['fp32', 'fp16', 'bf16']
+      revision: 'main'                                        # The specific model version to use. It can be a branch name, a tag name, a commit id, or any identifier allowed by Git.
       strength: 0.8                                           # parameter of stable diffusion model, indicates extent to transform the reference image. will ignore the input image if it equals to 1
       guidance_scale: 7.5                                     # parameter of stable diffusion model, a higher guidance scale value encourages the model to generate images closely linked to the text prompt at the expense of lower image quality
       aug_num: 1                                              # the number of images to generate
