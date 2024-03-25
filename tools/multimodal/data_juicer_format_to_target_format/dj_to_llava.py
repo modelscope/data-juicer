@@ -103,7 +103,7 @@ def main(
         and converted dataset will be used in another machine, it's better to
         set this argument to True. Default: False.
     :param restore_questions: need to restore human questions if only keep
-        caption when converting the LLaVA-like dataset to Data-Juicer-format. 
+        caption when converting the LLaVA-like dataset to Data-Juicer-format.
         If it's True, an extra argument original_llava_ds_path is required.
     :param original_llava_ds_path: path to the original unprocessed LLaVA
         dataset, which is used to help to recover the relative image paths for
@@ -139,14 +139,14 @@ def main(
                        'token. There might be some compatibility problem if '
                        'you change it.')
 
-    # if convert_to_relative_paths or restore_questions is True, check if 
+    # if convert_to_relative_paths or restore_questions is True, check if
     # the original_llava_ds_path is provided as well.
     if convert_to_relative_paths or restore_questions:
         if not original_llava_ds_path:
             raise ValueError('When convert_to_relative_paths is set to True, '
-                            'the original_llava_ds_path must be provided '
-                            'for recovering the relative paths. Please '
-                            'check and retry.')
+                             'the original_llava_ds_path must be provided '
+                             'for recovering the relative paths. Please '
+                             'check and retry.')
         original_llava_ds_path = os.path.abspath(original_llava_ds_path)
         # prepare id2idx dict
         ori_ds = json.load(open(original_llava_ds_path, 'r', encoding='utf-8'))
@@ -199,10 +199,11 @@ def main(
                 elif str(sid) in id2idx:
                     sid = ori_ds[id2idx[str(sid)]]['id']
                 else:
-                    raise ValueError(f'The id [{sid}] in the sample cannot be '
-                                    f'aligned with any samples in the original '
-                                    f'dataset. Please check and fix it and '
-                                    f'retry.')
+                    raise ValueError(
+                        f'The id [{sid}] in the sample cannot be '
+                        f'aligned with any samples in the original '
+                        f'dataset. Please check and fix it and '
+                        f'retry.')
                 # need to restore questions for samples with only captions
                 ori_convs = ori_ds[id2idx[str(id)]]['conversations']
                 conversations.append(ori_convs[0])  # add question
