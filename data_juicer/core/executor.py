@@ -1,8 +1,10 @@
 import math
 import os
+import subprocess
 from time import time
 
 import psutil
+import torch
 from loguru import logger
 
 from data_juicer import cuda_device_count, use_cuda
@@ -87,22 +89,53 @@ class Executor:
                 logger.info('Trace for all ops.')
                 self.op_list_to_trace = set(OPERATORS.modules.keys())
 
+    def get_min_cuda_memory(self):
+        # get cuda memory info using "nvidia-smi" command
+        min_cuda_memory = torch.cuda.get_device_properties(0).total_memory
+        nvidia_smi_output = subprocess.check_output([
+            'nvidia-smi', '--query-gpu=memory.total,memory.used',
+            '--format=csv,noheader,nounits'
+        ]).decode('utf-8')
+        for line in nvidia_smi_output.strip().split('\n'):
+            total_memory, used_memory = map(int, line.split(', '))
+            free_memory = total_memory - used_memory
+            min_cuda_memory = min(min_cuda_memory, free_memory)
+        return min_cuda_memory
+
     def calculate_np(self, op, op_name):
-        np = self.cfg.np
-        cpu_available = psutil.cpu_count()
-        mem_available = psutil.virtual_memory().available
-        mem_available = mem_available / 1024**3
-        np = min(np, math.floor(cpu_available / op.cpu_required))
-        np = min(np, math.floor(mem_available / (op.mem_required + 0.1)))
-        if np < 1.0:
-            logger.warning(f'The required cpu number:{op.cpu_required} '
-                           f'and memory:{op.memory_required}GB might '
-                           f'are more than the available cpu:{cpu_available} '
-                           f'and memory :{mem_available}GB.'
-                           f'This op [{op_name}] might '
-                           f'require more resource to run.')
-        np = max(np, 1)
-        return np
+        if use_cuda() and op._accelerator == 'cuda':
+            cuda_mem_available = torch.cuda.device_count() * \
+                self.get_min_cuda_memory() / 1024
+            op_proc = min(
+                self.cfg.np,
+                math.floor(cuda_mem_available / (op.mem_required + 0.1)))
+            if op_proc < 1.0:
+                logger.warning(
+                    f'The required cuda memory:{op.memory_required}GB might '
+                    f'be more than the available cuda memory:'
+                    f'{cuda_mem_available}GB.'
+                    f'This op [{op_name}] might '
+                    f'require more resource to run.')
+            op_proc = max(op_proc, 1)
+            return op_proc
+        else:
+            op_proc = self.cfg.np
+            cpu_available = psutil.cpu_count()
+            mem_available = psutil.virtual_memory().available
+            mem_available = mem_available / 1024**3
+            op_proc = min(op_proc, math.floor(cpu_available / op.cpu_required))
+            op_proc = min(op_proc,
+                          math.floor(mem_available / (op.mem_required + 0.1)))
+            if op_proc < 1.0:
+                logger.warning(
+                    f'The required cpu number:{op.cpu_required} '
+                    f'and memory:{op.memory_required}GB might '
+                    f'are more than the available cpu:{cpu_available} '
+                    f'and memory :{mem_available}GB.'
+                    f'This op [{op_name}] might '
+                    f'require more resource to run.')
+            op_proc = max(op_proc, 1)
+            return op_proc
 
     def run(self, load_data_np=None):
         """
@@ -140,12 +173,6 @@ class Executor:
                 op_proc = op.spec_numprocs
                 logger.info(f'Op [{op_name}] running with sepcified '
                             f'number of procs:{op.spec_numprocs}')
-            elif use_cuda() and op._accelerator == 'cuda':
-                op_proc = min(cuda_device_count(), self.cfg.np)
-                logger.info(f'Op [{op_name}] running with op_proc = '
-                            f'cuda_device_count() = '
-                            f'{op_proc}, set specified number of procs'
-                            f'(spec_numprocs) for this op if needed')
             else:
                 op_proc = self.calculate_np(op, op_name)
             try:
