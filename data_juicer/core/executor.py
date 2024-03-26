@@ -114,7 +114,7 @@ class Executor:
                     f'The required cuda memory:{op.memory_required}GB might '
                     f'be more than the available cuda memory:'
                     f'{cuda_mem_available}GB.'
-                    f'This op [{op_name}] might '
+                    f'This Op [{op_name}] might '
                     f'require more resource to run.')
             op_proc = max(op_proc, 1)
             return op_proc
@@ -128,11 +128,11 @@ class Executor:
                           math.floor(mem_available / (op.mem_required + 0.1)))
             if op_proc < 1.0:
                 logger.warning(
-                    f'The required cpu number:{op.cpu_required} '
+                    f'The required CPU number:{op.cpu_required} '
                     f'and memory:{op.memory_required}GB might '
-                    f'are more than the available cpu:{cpu_available} '
+                    f'be more than the available CPU:{cpu_available} '
                     f'and memory :{mem_available}GB.'
-                    f'This op [{op_name}] might '
+                    f'This Op [{op_name}] might '
                     f'require more resource to run.')
             op_proc = max(op_proc, 1)
             return op_proc
