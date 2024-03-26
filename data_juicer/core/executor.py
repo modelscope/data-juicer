@@ -111,7 +111,7 @@ class Executor:
                 cuda_device_count())
             if op_proc < 1.0:
                 logger.warning(
-                    f'The required cuda memory:{op.memory_required}GB might '
+                    f'The required cuda memory:{op.mem_required}GB might '
                     f'be more than the available cuda memory:'
                     f'{cuda_mem_available}GB.'
                     f'This Op [{op_name}] might '
