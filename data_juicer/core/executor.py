@@ -91,7 +91,8 @@ class Executor:
 
     def get_min_cuda_memory(self):
         # get cuda memory info using "nvidia-smi" command
-        min_cuda_memory = torch.cuda.get_device_properties(0).total_memory
+        min_cuda_memory = torch.cuda.get_device_properties(
+            0).total_memory / 1024**2
         nvidia_smi_output = subprocess.check_output([
             'nvidia-smi', '--query-gpu=memory.free',
             '--format=csv,noheader,nounits'
