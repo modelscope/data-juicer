@@ -1,5 +1,6 @@
 import copy
 
+from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
@@ -30,6 +31,8 @@ class OP:
         self.spec_numprocs = kwargs.get('spec_numprocs', 0)
         self.cpu_required = kwargs.get('cpu_required', 1)
         self.mem_required = kwargs.get('mem_required', 0)
+        if isinstance(self.mem_required, str):
+            self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.process = wrap_func_with_nested_access(self.process)
