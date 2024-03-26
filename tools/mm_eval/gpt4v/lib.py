@@ -1,6 +1,29 @@
-from typing import Any, List
+import configparser
+from functools import reduce
+from typing import Any, Dict, List, Union
 
 from data_juicer.utils.model_utils import call_gpt_vision_api
+
+
+# utils
+def check_missing_keys(json_dict, expected_keys):
+    missing = []
+    for key in expected_keys:
+        if key not in json_dict:
+            missing.append(key)
+    return missing
+
+
+def parse_ini(result_raw: str, check_key: str = '') -> Union[Dict, str]:
+    try:
+        config = configparser.ConfigParser()
+        config.read_string(result_raw)
+        result = {sec: dict(config[sec]) for sec in config.sections()}
+        # check if the expected value exists
+        _ = reduce(dict.get, check_key.split('.'), result)
+        return result
+    except Exception:
+        return result_raw
 
 
 # image -> text

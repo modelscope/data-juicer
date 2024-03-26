@@ -648,7 +648,7 @@ def call_gpt_vision_api(
         if 'choices' in result and result['choices']:
             return result['choices'][0]['message']['content']
         else:
-            logger.warning('No results returned from the API, return None.')
+            logger.warning('No results returned from the API.')
             return ''
     except requests.exceptions.HTTPError as errh:
         if errh.response.status_code == 401:
@@ -667,5 +667,5 @@ def call_gpt_vision_api(
     except Exception as e:
         logger.warning(f'An unexpected error occurred: {e}')
 
-    logger.warning('API request failed, return None.')
+    logger.warning('API request failed.')
     return ''

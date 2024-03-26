@@ -1,96 +1,30 @@
-import configparser
 import json
 from typing import Any, Optional
 
 import fire
-import tqdm
+from tqdm import tqdm
 
 from data_juicer.utils.mm_utils import (image_path_to_base64,
                                         video_path_to_base64)
-from tools.mm_eval.gpt4v.lib import (compare_image_to_text,
+from tools.mm_eval.gpt4v.lib import (check_missing_keys, compare_image_to_text,
                                      compare_text_to_image,
                                      compare_text_to_video,
-                                     compare_video_to_text)
+                                     compare_video_to_text, parse_ini)
 
 
-def _construct_text_eval(winner, rationale):
-    result = {'winner': winner, 'rationale': rationale}
-    return json.dumps(result)
-
-
-def _construct_image_eval(score, rationale):
-    result = {
-        'relevance': {
-            'score': score,
-            'rationale': rationale
-        },
-        'clarity': {
-            'score': score,
-            'rationale': rationale
-        },
-        'accuracy': {
-            'score': score,
-            'rationale': rationale
-        },
-        'overall': {
-            'score': score,
-            'rationale': rationale
-        },
-    }
-    return json.dumps(result)
-
-
-def _construct_video_eval(score, rationale):
-    result = {
-        'relevance': {
-            'score': score,
-            'rationale': rationale
-        },
-        'clarity': {
-            'score': score,
-            'rationale': rationale
-        },
-        'coherence': {
-            'score': score,
-            'rationale': rationale
-        },
-        'accuracy': {
-            'score': score,
-            'rationale': rationale
-        },
-        'overall': {
-            'score': score,
-            'rationale': rationale
-        },
-    }
-    return json.dumps(result)
-
-
-def _check_missing_keys(json_dict, expected_keys):
-    missing = []
-    for key in expected_keys:
-        if key not in json_dict:
-            missing.append(key)
-    return missing
-
-
-def _parse_ini(result_raw):
-    try:
-        config = configparser.ConfigParser()
-        config.read_string(result_raw)
-        result = {sec: dict(config[sec]) for sec in config.sections()}
-    except Exception:
-        result = result_raw
-
-    return json.dumps(result)
-
-
-def image_to_text(input: str, output: str, **kwargs: Any):
+def image_to_text(input: str,
+                  output: str,
+                  *,
+                  check_key: str = '',
+                  **kwargs: Any):
     '''
     Evaluates image-to-text generation using pairwise comparison.
 
     :param input: Path for the JSONL file containing evaluation entries.
     :param output: Path to the JSONL file for saving evaluation results.
+    :param check_key: Key path to check for existence in the evaluation
+        results. Separated by dots for nested keys.
+    :param kwargs: Extra keyword arguments passed to the OpenAI API request.
     '''
 
     expected_keys = ['image', 'text_0', 'text_1']
@@ -99,13 +33,12 @@ def image_to_text(input: str, output: str, **kwargs: Any):
         lines = fin.readlines()
 
     with open(output, 'w') as fout:
-        for line in tqdm.tqdm(lines):
+        for line in tqdm(lines):
             line = line.strip()
             entry = json.loads(line)
-            missing = _check_missing_keys(entry, expected_keys)
+            missing = check_missing_keys(entry, expected_keys)
             if missing:
-                result = _construct_text_eval(
-                    'Tie', f"Missing keys: {' '.join(missing)}")
+                result = f'Missing keys: {" ".join(missing)}'
             else:
                 image = image_path_to_base64(entry['image'], mime_type='auto')
                 text_0 = entry['text_0'].strip()
@@ -113,18 +46,25 @@ def image_to_text(input: str, output: str, **kwargs: Any):
                 result_raw = compare_image_to_text(image, text_0, text_1,
                                                    **kwargs)
                 if not result_raw:
-                    result = _construct_text_eval('Tie', 'Request error')
+                    result = 'API Request error'
                 else:
-                    result = _parse_ini(result_raw)
-            fout.write(result + '\n')
+                    result = parse_ini(result_raw, check_key)
+            fout.write(json.dumps(result) + '\n')
 
 
-def text_to_image(input: str, output: str, **kwargs: Any):
+def text_to_image(input: str,
+                  output: str,
+                  *,
+                  check_key: str = '',
+                  **kwargs: Any):
     '''
     Evaluates text-to-image generation using pairwise comparison.
 
     :param input: Path to the JSONL file containing evaluation entries.
     :param output: Path to the JSONL file for saving evaluation results.
+    :param check_key: Key path to check for existence in the evaluation
+        results. Separated by dots for nested keys.
+    :param kwargs: Extra keyword arguments passed to the OpenAI API request.
     '''
 
     expected_keys = ['text', 'image_0', 'image_1']
@@ -133,13 +73,12 @@ def text_to_image(input: str, output: str, **kwargs: Any):
         lines = fin.readlines()
 
     with open(output, 'w') as fout:
-        for line in tqdm.tqdm(lines):
+        for line in tqdm(lines):
             line = line.strip()
             entry = json.loads(line)
-            missing = _check_missing_keys(entry, expected_keys)
+            missing = check_missing_keys(entry, expected_keys)
             if missing:
-                result = _construct_image_eval(
-                    'Tie', f"Missing keys: {' '.join(missing)}")
+                result = f'Missing keys: {" ".join(missing)}'
             else:
                 text = entry['text'].strip()
                 image_0 = image_path_to_base64(entry['image_0'],
@@ -149,10 +88,10 @@ def text_to_image(input: str, output: str, **kwargs: Any):
                 result_raw = compare_text_to_image(text, image_0, image_1,
                                                    **kwargs)
                 if not result_raw:
-                    result = _construct_image_eval('Tie', 'Request error')
+                    result = 'API Request error'
                 else:
-                    result = _parse_ini(result_raw)
-            fout.write(result + '\n')
+                    result = parse_ini(result_raw, check_key)
+            fout.write(json.dumps(result) + '\n')
 
 
 def video_to_text(
@@ -161,6 +100,7 @@ def video_to_text(
     *,
     frame_num: Optional[int] = None,
     fps: Optional[float] = None,
+    check_key: str = '',
     **kwargs: Any,
 ):
     '''
@@ -170,12 +110,14 @@ def video_to_text(
     :param output: Path to the JSONL file for saving evaluation results.
     :param frame_num: The number of frames to sample from each video.
     :param fps: The sampling rate in frames per second.
+    :param check_key: Key path to check for existence in the evaluation
+        results. Separated by dots for nested keys.
     :param kwargs: Extra keyword arguments passed to the OpenAI API request.
 
     Note: `frame_num` and `fps` are mutually exclusive; only one may be set.
     '''
 
-    if frame_num is not None and fps is not None:
+    if not ((frame_num is None) ^ (fps is None)):
         raise ValueError("The parameters 'frame_num' and 'fps' are \
                 mutually exclusive; only one may be set.")
 
@@ -185,13 +127,12 @@ def video_to_text(
         lines = fin.readlines()
 
     with open(output, 'w') as fout:
-        for line in tqdm.tqdm(lines):
+        for line in tqdm(lines):
             line = line.strip()
             entry = json.loads(line)
-            missing = _check_missing_keys(entry, expected_keys)
+            missing = check_missing_keys(entry, expected_keys)
             if missing:
-                result = _construct_text_eval(
-                    'Tie', f"Missing keys: {' '.join(missing)}")
+                result = f'Missing keys: {" ".join(missing)}'
             else:
                 frames = video_path_to_base64(entry['video'],
                                               frame_num=frame_num,
@@ -202,10 +143,10 @@ def video_to_text(
                 result_raw = compare_video_to_text(frames, text_0, text_1,
                                                    **kwargs)
                 if not result_raw:
-                    result = _construct_text_eval('Tie', 'Request error')
+                    result = 'API Request error'
                 else:
-                    result = _parse_ini(result_raw)
-            fout.write(result + '\n')
+                    result = parse_ini(result_raw, check_key)
+            fout.write(json.dumps(result) + '\n')
 
 
 def text_to_video(
@@ -214,6 +155,7 @@ def text_to_video(
     *,
     frame_num: Optional[int] = None,
     fps: Optional[float] = None,
+    check_key: str = '',
     **kwargs: Any,
 ):
     '''
@@ -223,12 +165,14 @@ def text_to_video(
     :param output: Path to the JSONL file for saving evaluation results.
     :param frame_num: The number of frames to sample from each video.
     :param fps: The sampling rate in frames per second.
+    :param check_key: Key path to check for existence in the evaluation
+        results. Separated by dots for nested keys.
     :param kwargs: Extra keyword arguments passed to the OpenAI API request.
 
     Note: `frame_num` and `fps` are mutually exclusive; only one may be set.
     '''
 
-    if frame_num is not None and fps is not None:
+    if not ((frame_num is None) ^ (fps is None)):
         raise ValueError("The parameters 'frame_num' and 'fps' are \
                 mutually exclusive; only one may be set.")
 
@@ -238,13 +182,12 @@ def text_to_video(
         lines = fin.readlines()
 
     with open(output, 'w') as fout:
-        for line in tqdm.tqdm(lines):
+        for line in tqdm(lines):
             line = line.strip()
             entry = json.loads(line)
-            missing = _check_missing_keys(entry, expected_keys)
+            missing = check_missing_keys(entry, expected_keys)
             if missing:
-                result = _construct_video_eval(
-                    'Tie', f"Missing keys: {' '.join(missing)}")
+                result = 'Missing keys: {" ".join(missing)}'
             else:
                 text = entry['text'].strip()
                 frames_0 = video_path_to_base64(entry['video_0'],
@@ -258,11 +201,10 @@ def text_to_video(
                 result_raw = compare_text_to_video(text, frames_0, frames_1,
                                                    **kwargs)
                 if not result_raw:
-                    result = _construct_video_eval('Tie', 'Request error')
+                    result = 'API Request error'
                 else:
-                    result = _parse_ini(result_raw)
-
-            fout.write(result + '\n')
+                    result = parse_ini(result_raw, check_key)
+            fout.write(json.dumps(result) + '\n')
 
 
 if __name__ == '__main__':

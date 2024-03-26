@@ -192,14 +192,11 @@ def load_video(path):
     return container
 
 
-def video_path_to_base64(video_path,
-                         frame_num=None,
-                         sampling_fps=None,
-                         mime_type=None):
+def video_path_to_base64(video_path, frame_num=None, fps=None, mime_type=None):
     duration = get_video_duration(video_path)
 
-    if sampling_fps is not None:
-        valid_frame_num = round(duration * sampling_fps)
+    if fps is not None:
+        valid_frame_num = round(duration * fps)
         if frame_num is not None:
             valid_frame_num = min(valid_frame_num, frame_num)
     else:
