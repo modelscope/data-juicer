@@ -1,6 +1,10 @@
+import math
 import os
+import subprocess
 from time import time
 
+import psutil
+import torch
 from loguru import logger
 
 from data_juicer import cuda_device_count, use_cuda
@@ -85,6 +89,54 @@ class Executor:
                 logger.info('Trace for all ops.')
                 self.op_list_to_trace = set(OPERATORS.modules.keys())
 
+    def get_min_cuda_memory(self):
+        # get cuda memory info using "nvidia-smi" command
+        min_cuda_memory = torch.cuda.get_device_properties(
+            0).total_memory / 1024**2
+        nvidia_smi_output = subprocess.check_output([
+            'nvidia-smi', '--query-gpu=memory.free',
+            '--format=csv,noheader,nounits'
+        ]).decode('utf-8')
+        for line in nvidia_smi_output.strip().split('\n'):
+            free_memory = int(line)
+            min_cuda_memory = min(min_cuda_memory, free_memory)
+        return min_cuda_memory
+
+    def calculate_np(self, op, op_name):
+        if use_cuda() and op._accelerator == 'cuda':
+            cuda_mem_available = self.get_min_cuda_memory() / 1024
+            op_proc = min(
+                self.cfg.np,
+                math.floor(cuda_mem_available / (op.mem_required + 0.1)) *
+                cuda_device_count())
+            if op_proc < 1.0:
+                logger.warning(
+                    f'The required cuda memory:{op.memory_required}GB might '
+                    f'be more than the available cuda memory:'
+                    f'{cuda_mem_available}GB.'
+                    f'This Op [{op_name}] might '
+                    f'require more resource to run.')
+            op_proc = max(op_proc, 1)
+            return op_proc
+        else:
+            op_proc = self.cfg.np
+            cpu_available = psutil.cpu_count()
+            mem_available = psutil.virtual_memory().available
+            mem_available = mem_available / 1024**3
+            op_proc = min(op_proc, math.floor(cpu_available / op.cpu_required))
+            op_proc = min(op_proc,
+                          math.floor(mem_available / (op.mem_required + 0.1)))
+            if op_proc < 1.0:
+                logger.warning(
+                    f'The required CPU number:{op.cpu_required} '
+                    f'and memory:{op.memory_required}GB might '
+                    f'be more than the available CPU:{cpu_available} '
+                    f'and memory :{mem_available}GB.'
+                    f'This Op [{op_name}] might '
+                    f'require more resource to run.')
+            op_proc = max(op_proc, 1)
+            return op_proc
+
     def run(self, load_data_np=None):
         """
         Running the dataset process pipeline.
@@ -116,12 +168,13 @@ class Executor:
         for op_cfg, op in zip(self.process_list, self.ops):
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
-            if use_cuda() and op._accelerator == 'cuda':
-                op_proc = min(cuda_device_count(), self.cfg.np)
-                with_rank = True
+            with_rank = use_cuda() and op._accelerator == 'cuda'
+            if op.spec_numprocs != 0:
+                op_proc = op.spec_numprocs
+                logger.info(f'Op [{op_name}] running with sepcified '
+                            f'number of procs:{op.spec_numprocs}')
             else:
-                op_proc = self.cfg.np
-                with_rank = False
+                op_proc = self.calculate_np(op, op_name)
             try:
                 if isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,

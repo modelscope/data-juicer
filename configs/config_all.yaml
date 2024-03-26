@@ -74,6 +74,7 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True in default.
       prompt: null                                            # a string prompt to guide the generation of blip2 model for all samples globally. It's None in default, which means no prompt provided.
       prompt_key: null                                        # the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default.
+      mem_required: '20GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_diffusion_mapper:                                 # generate images by diffusion model
       hf_diffusion: 'CompVis/stable-diffusion-v1-4'           # stable diffusion model name on huggingface to generate image
       torch_dtype: 'fp32'                                     # the floating point type used to load the diffusion model. Can be one of ['fp32', 'fp16', 'bf16']
@@ -84,6 +85,7 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
       caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
+      mem_required: '25GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_face_blur_mapper:                                 # blur faces detected in images
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
@@ -141,6 +143,7 @@ process:
       lang: 'en'                                              # split text in what language
   - video_captioning_from_audio_mapper:                     # caption a video according to its audio streams based on Qwen-Audio model
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only captioned sample in the final datasets and the original sample will be removed. It's True in default.
+      mem_required: '30GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_captioning_from_frames_mapper:                    # generate samples whose captions are generated based on an image-to-text model and sampled video frames. Captions from different frames will be concatenated to a single string.
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # image-to-text model name on huggingface to generate caption
       caption_num: 1                                          # how many candidate captions to generate for each video
@@ -152,6 +155,7 @@ process:
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       horizontal_flip: false                                  # flip frame image horizontally (left to right).
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
+      mem_required: '20GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_captioning_from_summarizer_mapper:                # generate video captions by summarizing several kinds of generated texts (captions from video/audio/frames, tags from audio/frames, ...)
       hf_summarizer: 'mrm8488/flan-t5-large-finetuned-openai-summarize_from_feedback'  # the summarizer model used to summarize texts generated by other methods.
       consider_video_caption_from_video: true                 # whether to consider the video caption generated from video directly in the summarization process. Default: True.
@@ -165,6 +169,7 @@ process:
       vid_tag_from_frm_args: null                             # the arg dict for video tagging from sampled frames from the video with keys are the arg names and values are the arg values. Default: None.
       keep_tag_num: 5                                         # max number N of tags from sampled frames to keep. Too many tags might bring negative influence to summarized text, so we consider to only keep the N most frequent tags. Default: 5.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only summarized captions in the final datasets and the original captions will be removed. It's True in default.
+      mem_required: '40GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_captioning_from_video_mapper:                     # generate captions by frame images extracted from video to augment datasets
       hf_video_blip: 'kpyu/video-blip-opt-2.7b-ego4d'         # video-blip model name on huggingface to generate caption
       caption_num: 1                                          # how many candidate captions to generate for each video
@@ -176,6 +181,7 @@ process:
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       horizontal_flip: false                                  # flip frame image horizontally (left to right).
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
+      mem_required: '20GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_face_blur_mapper:                                 # blur faces detected in videos
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
@@ -200,7 +206,7 @@ process:
       force_divisible_by: 4                                   # Ensures that both the output dimensions, width and height, are divisible by the given integer when used together with force_original_aspect_ratio
   - video_split_by_duration_mapper:                         # Mapper to split video by duration.
       split_duration: 10                                      # duration of each video split in seconds.
-      min_last_split_duration: 0.1                              # the minimum allowable duration in seconds for the last video split. If the duration of the last split is less than this value, it will be discarded.
+      min_last_split_duration: 0.1                            # the minimum allowable duration in seconds for the last video split. If the duration of the last split is less than this value, it will be discarded.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
   - video_split_by_key_frame_mapper:                        # Mapper to split video by key frame.
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only cut sample in the final datasets and the original sample will be removed. It's True in default
@@ -211,6 +217,7 @@ process:
       show_progress: false                                    # whether to show progress from scenedetect
   - video_tagging_from_audio_mapper:                        # Mapper to generate video tags from audio streams extracted from the video.
       hf_ast: 'MIT/ast-finetuned-audioset-10-10-0.4593'       # Huggingface model name for the audio classification model.
+      mem_required: '500MB'                                   # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_tagging_from_frames_mapper:                       # Mapper to generate video tags from frames extracted from the video.
       frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
@@ -254,6 +261,7 @@ process:
       min_score: 0.3                                          # the min aesthetics score of filter range
       max_score: 1.0                                          # the max aesthetics score of filter range
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+      mem_required: '1500MB'                                  # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_aspect_ratio_filter:                              # filter samples according to the aspect ratios of images (a fraction of width by height, r=w/h) in them
       min_ratio: 0.333                                        # the min aspect ratio of filter range
       max_ratio: 3.0                                          # the max aspect ratio of filter range
@@ -265,6 +273,7 @@ process:
       hf_nsfw_model: Falconsai/nsfw_image_detection           # Huggingface model name for nsfw classification
       score_threshold: 0.5                                    # the nsfw score threshold for samples, range from 0 to 1. Samples with nsfw score less than this threshold will be kept.
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+      mem_required: '1GB'                                     # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_shape_filter:                                     # filter samples according to the widths and heights of images in them
       min_width: 200                                          # the min width of width filter range
       max_width: 5000                                         # the max width of width filter range
@@ -283,6 +292,7 @@ process:
       vertical_flip: false                                    # flip image vertically (top to bottom).
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+      mem_required: '1500MB'                                  # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_text_similarity_filter:                           # filter samples according to the similarity between image and text.
       hf_clip: openai/clip-vit-base-patch32                   # name of used Hugging Face clip
       min_score: 0.1                                          # the min similarity of filter range
@@ -291,10 +301,12 @@ process:
       vertical_flip: false                                    # flip image vertically (top to bottom).
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+      mem_required: '1500MB'                                  # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_watermark_filter:                                 # filter samples according to the predicted watermark probabilities of images in them
       hf_watermark_model: amrul-hzz/watermark_detector        # Huggingface model name for watermark classification
       prob_threshold: 0.8                                     # the predicted watermark probability threshold for samples, range from 0 to 1. Samples with watermark probability less than this threshold will be kept.
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+      mem_required: '500MB'                                   # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
       lang: en                                                # keep text in what language
       min_score: 0.8                                          # the min language scores to filter text
@@ -315,6 +327,7 @@ process:
       conf_thr: 0.0                                           # the confidence score threshold for removing low-confidence bboxes
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple images in a chunk,  must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+      mem_required: '1GB'                                     # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - special_characters_filter:                              # filter text with special-char ratio out of specific range
       min_ratio: 0.0                                          # the min ratio of filter range
       max_ratio: 0.25                                         # the max ratio of filter range
@@ -357,6 +370,7 @@ process:
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       reduce_mode: avg                                        # reduce mode to the all frames extracted from videos, must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+      mem_required: '1500MB'                                  # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_aspect_ratio_filter:                              # filter samples according to the aspect ratios of videos (a fraction of width by height, r=w/h) in them
       min_ratio: 9/21                                         # the minimum aspect ratio to keep samples, supported format is a string, such as "9:21" or "9/21".
       max_ratio: 21/9                                         # the maximum aspect ratio to keep samples, supported format is a string, such as "21:9" or "21/9".
@@ -375,6 +389,7 @@ process:
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple videos in a chunk,  must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
+      mem_required: '1GB'                                     # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_motion_score_filter:                              # Keep samples with video motion scores within a specific range.
       min_score: 0.25                                         # the minimum motion score to keep samples
       max_score: 10000.0                                      # the maximum motion score to keep samples
@@ -387,6 +402,7 @@ process:
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       reduce_mode: avg                                        # reduce mode for multiple sampled video frames to compute nsfw scores of videos, must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+      mem_required: '1GB'                                     # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_ocr_area_ratio_filter:                            # Keep data samples whose detected text area ratios for specified frames in the video are within a specified range.
       min_area_ratio: 0                                       # the min ocr area ratio to keep samples. It's 0 by default.
       max_area_ratio: 1.0                                     # the max ocr area ratio to keep samples. It's 1.0 by default.
@@ -406,6 +422,7 @@ process:
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       reduce_mode: avg                                        # reduce mode for multiple sampled video frames to compute final predicted watermark probabilities of videos, must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
+      mem_required: '500MB'                                   # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_tagging_from_frames_filter:                       # filter samples according to the tags of videos in them
       tags: ['people']                                        # a tag list to shift the videos, total tags can be found in https://github.com/xinyu1205/recognize-anything/blob/main/ram/data/ram_tag_list.txt
       contain: any                                            # require the videos containing 'any' or 'all' given tags. When tags equal to [], 'all' keeps all samples, 'any' keeps no sample.
