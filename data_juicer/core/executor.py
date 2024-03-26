@@ -93,22 +93,21 @@ class Executor:
         # get cuda memory info using "nvidia-smi" command
         min_cuda_memory = torch.cuda.get_device_properties(0).total_memory
         nvidia_smi_output = subprocess.check_output([
-            'nvidia-smi', '--query-gpu=memory.total,memory.used',
+            'nvidia-smi', '--query-gpu=memory.free',
             '--format=csv,noheader,nounits'
         ]).decode('utf-8')
         for line in nvidia_smi_output.strip().split('\n'):
-            total_memory, used_memory = map(int, line.split(', '))
-            free_memory = total_memory - used_memory
+            free_memory = int(line)
             min_cuda_memory = min(min_cuda_memory, free_memory)
         return min_cuda_memory
 
     def calculate_np(self, op, op_name):
         if use_cuda() and op._accelerator == 'cuda':
-            cuda_mem_available = cuda_device_count() * \
-                self.get_min_cuda_memory() / 1024
+            cuda_mem_available = self.get_min_cuda_memory() / 1024
             op_proc = min(
                 self.cfg.np,
-                math.floor(cuda_mem_available / (op.mem_required + 0.1)))
+                math.floor(cuda_mem_available / (op.mem_required + 0.1)) *
+                cuda_device_count())
             if op_proc < 1.0:
                 logger.warning(
                     f'The required cuda memory:{op.memory_required}GB might '
