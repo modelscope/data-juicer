@@ -104,7 +104,7 @@ class Executor:
 
     def calculate_np(self, op, op_name):
         if use_cuda() and op._accelerator == 'cuda':
-            cuda_mem_available = torch.cuda.device_count() * \
+            cuda_mem_available = cuda_device_count() * \
                 self.get_min_cuda_memory() / 1024
             op_proc = min(
                 self.cfg.np,
