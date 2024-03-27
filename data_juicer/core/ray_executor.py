@@ -141,7 +141,9 @@ class RayExecutor:
                                 concurrency=self.cfg.np,
                                 fn_constructor_kwargs=op_args,
                                 batch_format='pyarrow',
-                                num_gpus=num_gpus)
+                                num_gpus=num_gpus,
+                                batch_size=1)
+                            # The batch size here is same as in data.py
                         else:
                             dataset = dataset.map_batches(
                                 partial(ray_batch_mapper_wrapper,
