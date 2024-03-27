@@ -15,6 +15,9 @@ from data_juicer.utils.constant import Fields
 with AvailabilityChecking(['ray'], requires_type='dist'):
     import ray
     import ray.data as rd
+    from ray.data import ActorPoolStrategy
+
+from data_juicer.ops.base_op import OPERATORS
 
 
 def is_valid_path(item, dataset_dir):
@@ -126,18 +129,48 @@ class RayExecutor:
         tstart = time.time()
         for op_cfg, op in zip(self.process_list, self.ops):
             num_gpus = 1 if use_cuda() and op._accelerator == 'cuda' else 0
-            op_name, _ = list(op_cfg.items())[0]
+            op_name, op_args = list(op_cfg.items())[0]
             try:
                 if isinstance(op, Mapper):
                     if op.is_batched_op():
-                        dataset = dataset.map_batches(partial(
-                            ray_batch_mapper_wrapper, fn=op.process),
-                                                      batch_format='pyarrow',
-                                                      num_gpus=num_gpus)
+                        if op.use_actor():
+                            op_cls = OPERATORS.modules[op_name]
+                            dataset = dataset.map_batches(
+                                op_cls,
+                                compute=ActorPoolStrategy(),
+                                concurrency=self.cfg.np,
+                                fn_constructor_kwargs=op_args,
+                                batch_format='pyarrow',
+                                num_gpus=num_gpus)
+                        else:
+                            dataset = dataset.map_batches(
+                                partial(ray_batch_mapper_wrapper,
+                                        fn=op.process),
+                                batch_format='pyarrow',
+                                num_gpus=num_gpus)
                     else:
-                        dataset = dataset.map(op.process, num_gpus=num_gpus)
+                        if op.use_actor():
+                            op_cls = OPERATORS.modules[op_name]
+                            dataset = dataset.map(
+                                op_cls,
+                                compute=ActorPoolStrategy(),
+                                concurrency=self.cfg.np,
+                                fn_constructor_kwargs=op_args)
+                        else:
+                            dataset = dataset.map(op.process,
+                                                  num_gpus=num_gpus)
+
                 elif isinstance(op, Filter):
-                    dataset = dataset.map(op.compute_stats, num_gpus=num_gpus)
+                    if op.use_actor():
+                        op_cls = OPERATORS.modules[op_name]
+                        dataset = dataset.map(op_cls,
+                                              compute=ActorPoolStrategy(),
+                                              concurrency=self.cfg.np,
+                                              fn_constructor_kwargs=op_args,
+                                              num_gpus=num_gpus)
+                    else:
+                        dataset = dataset.map(op.compute_stats,
+                                              num_gpus=num_gpus)
                     dataset = dataset.filter(op.process)
                 else:
                     logger.error(
