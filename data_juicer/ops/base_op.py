@@ -1,6 +1,7 @@
 import copy
+import pandas as pd
+import pyarrow as pa
 
-from data_juicer.core.ray_executor import ray_batch_mapper_wrapper
 from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.registry import Registry
 
@@ -76,6 +77,12 @@ class OP:
         related_parameters.update(extra_param_dict)
         return related_parameters
 
+def ray_batch_mapper_wrapper(samples, fn):
+    samples = samples.to_pandas()
+    res = fn(samples)
+    if not isinstance(res, pd.DataFrame):
+        res = pd.DataFrame(res)
+    return pa.Table.from_pandas(res)
 
 class Mapper(OP):
 
@@ -114,7 +121,12 @@ class Mapper(OP):
         Make the class callable to enable ray actor usage
         """
         if self.is_batched_op():
-            return ray_batch_mapper_wrapper(sample, self.process)
+            # same logic as ray_batch_mapper_wrapper
+            samples = sample.to_pandas()
+            res = self.process(samples)
+            if not isinstance(res, pd.DataFrame):
+                res = pd.DataFrame(res)
+            return pa.Table.from_pandas(res)
         else:
             return self.process(sample)
 
