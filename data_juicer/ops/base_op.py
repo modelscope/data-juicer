@@ -1,4 +1,5 @@
 import copy
+
 import pandas as pd
 import pyarrow as pa
 
@@ -77,12 +78,14 @@ class OP:
         related_parameters.update(extra_param_dict)
         return related_parameters
 
+
 def ray_batch_mapper_wrapper(samples, fn):
     samples = samples.to_pandas()
     res = fn(samples)
     if not isinstance(res, pd.DataFrame):
         res = pd.DataFrame(res)
     return pa.Table.from_pandas(res)
+
 
 class Mapper(OP):
 
