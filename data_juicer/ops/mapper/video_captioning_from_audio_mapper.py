@@ -47,7 +47,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
 
         self._accelerator = 'cuda'
 
-        self._hf_qwen_audio = 'Qwen-Audio'
+        self._hf_qwen_audio = 'Qwen/Qwen-Audio'
         self.model_key = prepare_model(
             model_type='huggingface',
             pretrained_model_name_or_path=self._hf_qwen_audio,
@@ -97,7 +97,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
                                    return_tensors='pt',
                                    audio_info=audio_info).to(model.device)
                 outputs = model.generate(**inputs, audio_info=audio_info)
-                response = processor.decode(outputs.cpu()[0],
+                response = processor.decode(outputs[0],
                                             skip_special_tokens=True,
                                             audio_info=audio_info)
                 # remove audio path

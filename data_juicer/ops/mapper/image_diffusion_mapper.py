@@ -174,7 +174,8 @@ class ImageDiffusionMapper(Mapper):
                 self.text_key: [SpecialTokens.image] * len(images),
                 self.image_key: [[k] for k in loaded_image_keys]
             }
-            caption_samples = self.op_generate_caption.process(caption_samples)
+            caption_samples = self.op_generate_caption.process(caption_samples,
+                                                               rank=rank)
             captions = caption_samples[self.text_key]
             captions = [
                 self.prompt + remove_special_tokens(c) for c in captions
