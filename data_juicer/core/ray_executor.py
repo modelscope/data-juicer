@@ -2,10 +2,12 @@ import math
 import os
 import time
 from functools import partial
+import subprocess
 
 import pandas as pd
 import psutil
 import pyarrow as pa
+import torch
 from loguru import logger
 
 from data_juicer import cuda_device_count, use_cuda
@@ -91,6 +93,19 @@ class RayExecutor:
         logger.info('Initing Ray ...')
         ray.init(self.cfg.ray_address)
         self.process_list = self.cfg.process
+
+    def get_min_cuda_memory(self):
+        # get cuda memory info using "nvidia-smi" command
+        min_cuda_memory = torch.cuda.get_device_properties(
+            0).total_memory / 1024**2
+        nvidia_smi_output = subprocess.check_output([
+            'nvidia-smi', '--query-gpu=memory.free',
+            '--format=csv,noheader,nounits'
+        ]).decode('utf-8')
+        for line in nvidia_smi_output.strip().split('\n'):
+            free_memory = int(line)
+            min_cuda_memory = min(min_cuda_memory, free_memory)
+        return min_cuda_memory
 
     def calculate_np(self, op, op_name):
         if self.cfg.np == None:
