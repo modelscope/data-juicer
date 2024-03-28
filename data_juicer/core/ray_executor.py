@@ -256,7 +256,7 @@ class RayExecutor:
                 exit(1)
             end = time.time()
             logger.info(f'Op [{op_name}] Done in {"%.3f" % (end - start)}(s). '
-                        f'Left {len(dataset)} samples.')
+                        f'Left {dataset.count()} samples.')
             start = end
 
         # 4. data export
