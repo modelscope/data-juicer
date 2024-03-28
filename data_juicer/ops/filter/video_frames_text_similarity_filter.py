@@ -104,13 +104,13 @@ class VideoFramesTextSimilarityFilter(Filter):
 
     def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
-        if StatsKeys.video_frames_text_matching_score in sample[Fields.stats]:
+        if StatsKeys.video_frames_text_similarity in sample[Fields.stats]:
             return sample
 
         # there is no videos in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.stats][
-                StatsKeys.video_frames_text_matching_score] = np.array(
+                StatsKeys.video_frames_text_similarity] = np.array(
                     [], dtype=np.float64)
             return sample
 
@@ -162,7 +162,7 @@ class VideoFramesTextSimilarityFilter(Filter):
                                    padding=True).to(model.device)
 
                 outputs = model(**inputs)
-                chunk_logits = outputs.logits_per_text.detach().cpu() / 100.0
+                chunk_logits = outputs.logits_per_text / 100.0
 
                 if self.reduce_mode == 'avg':
                     chunk_similarity = chunk_logits.mean()
@@ -174,7 +174,7 @@ class VideoFramesTextSimilarityFilter(Filter):
                 similarity.append(float(chunk_similarity))
             offset += count
         sample[Fields.stats][
-            StatsKeys.video_frames_text_matching_score] = similarity
+            StatsKeys.video_frames_text_similarity] = similarity
 
         if not context:
             for vid_key in videos:
@@ -184,7 +184,7 @@ class VideoFramesTextSimilarityFilter(Filter):
 
     def process(self, sample, rank=None):
         similarity = sample[Fields.stats][
-            StatsKeys.video_frames_text_matching_score]
+            StatsKeys.video_frames_text_similarity]
         if len(similarity) <= 0:
             return True
 

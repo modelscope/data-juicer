@@ -150,9 +150,9 @@ class VideoAestheticsFilter(Filter):
             with torch.no_grad():
                 outputs = model(**inputs)
             if self.need_normalized_by_ten:
-                aesthetics_score = (outputs.logits / 10.0).detach().cpu()
+                aesthetics_score = outputs.logits / 10.0
             else:
-                aesthetics_score = outputs.logits.detach().cpu()
+                aesthetics_score = outputs.logits
 
             if self.reduce_mode == 'avg':
                 aesthetics_score = float(aesthetics_score.mean())

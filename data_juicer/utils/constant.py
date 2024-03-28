@@ -160,7 +160,7 @@ class StatsKeysConstant(object):
     phrase_grounding_recall = 'phrase_grounding_recall'
 
     # video-text
-    video_frames_text_matching_score = 'video_frames_text_matching_score'
+    video_frames_text_similarity = 'video_frames_text_similarity'
 
 
 class StatsKeys(object, metaclass=StatsKeysMeta):
