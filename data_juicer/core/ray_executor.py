@@ -149,7 +149,9 @@ class RayExecutor:
                                 partial(ray_batch_mapper_wrapper,
                                         fn=op.process),
                                 batch_format='pyarrow',
-                                num_gpus=num_gpus)
+                                num_gpus=num_gpus,
+                                batch_size=1)
+                            # The batch size here is same as in data.py
                     else:
                         if op.use_actor():
                             op_cls = OPERATORS.modules[op_name]
