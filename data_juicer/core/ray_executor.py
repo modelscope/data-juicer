@@ -1,8 +1,8 @@
 import math
 import os
+import subprocess
 import time
 from functools import partial
-import subprocess
 
 import pandas as pd
 import psutil
@@ -68,11 +68,11 @@ def ray_batch_mapper_wrapper(samples, fn):
 
 class RayExecutor:
     """
-    Executor based on Ray [Experimental].
+    Executor based on Ray.
 
     Run Data-Juicer data processing in a distributed cluster.
 
-        1. Only support Filter and Mapper operators for now.
+        1. Support Filter, Mapper and Exact Deduplicator operators for now.
         2. Only support loading `.json` files.
         3. Advanced functions such as checkpoint, tracer are not supported.
 
@@ -108,7 +108,7 @@ class RayExecutor:
         return min_cuda_memory
 
     def calculate_np(self, op, op_name):
-        if self.cfg.np == None:
+        if self.cfg.np is None:
             self.cfg.np = psutil.cpu_count()
         if use_cuda() and op._accelerator == 'cuda':
             cuda_mem_available = self.get_min_cuda_memory() / 1024
