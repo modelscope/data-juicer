@@ -91,7 +91,8 @@ class ImageAestheticsFilter(Filter):
 
         # compute aesthetics_scores
         model, processor = get_model(self.model_key, rank=rank)
-        inputs = processor(images=list(images.values()), return_tensors='pt')
+        inputs = processor(images=list(images.values()),
+                           return_tensors='pt').to(model.device)
         with torch.no_grad():
             outputs = model(**inputs)
         if self.need_normalized_by_ten:
