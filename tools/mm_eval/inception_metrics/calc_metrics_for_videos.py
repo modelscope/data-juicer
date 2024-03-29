@@ -3,13 +3,13 @@ import json
 import torch
 from pathlib import Path
 
-from tools.video_metrics.metrics import metric_main
-from tools.video_metrics.util import EasyDict
+from tools.mm_eval.inception_metrics.video_metrics import metric_main
+from tools.mm_eval.inception_metrics.util import EasyDict
 
 
 def calc_metrics(
-    real_data_path: str,
     fake_data_path: str,
+    real_data_path: str = None,
     metric: str = "fvd2048_16f",
     detector_path: str = None,
     result_path: str = None,

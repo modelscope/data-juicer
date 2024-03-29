@@ -13,12 +13,17 @@ import time
 import json
 import torch
 import numpy as np
-from tools.video_metrics import distributed
-from tools.video_metrics.util import EasyDict, format_time
+from tools.mm_eval.inception_metrics import distributed
+from tools.mm_eval.inception_metrics.util import EasyDict, format_time
 
 from . import metric_utils
 from . import video_inception_score
 from . import frechet_video_distance
+from . import frechet_inception_distance
+from . import kernel_inception_distance
+from . import inception_score
+from . import precision_recall
+from . import video_precision_recall
 
 
 # fmt: off
@@ -96,9 +101,41 @@ def report_metric(result_dict, run_dir=None, snapshot_pkl=None):
 #----------------------------------------------------------------------------
 
 @register_metric
+def fid50k_full(opts):
+    '''
+        Compute Frechet Inception Distance (FID) of frames, sample 50000 frames from fake dataset at most
+    '''
+    fid = frechet_inception_distance.compute_fid(opts, max_real=None, num_gen=50000)
+    return dict(fid50k_full=fid)
+
+@register_metric
+def kid50k_full(opts):
+    '''
+        Compute Kernel Inception Distance (KID) of frames, sample 50000 frames from fake dataset at most, split features to 100 subset to compute KIDs and return the mean.
+    '''
+    kid = kernel_inception_distance.compute_kid(opts, max_real=1000000, num_gen=50000, num_subsets=100, max_subset_size=1000)
+    return dict(kid50k_full=kid)
+
+@register_metric
+def is50k(opts):
+    '''
+        Compute Inception Score(IS) of frames, sample 50000 frames from fake dataset at most, split features to 10 subset to compute ISs and return the mean and std.
+    '''
+    mean, std = inception_score.compute_is(opts, num_gen=50000, num_splits=10)
+    return dict(is50k_mean=mean, is50k_std=std)
+
+@register_metric
+def pr50k_3n_full(opts):
+    '''
+        Compute Precision/Recall (PR) of frames, sample 50000 frames from fake dataset at most, with the 4th (3+1) nearest features to estimate the distributions
+    '''
+    precision, recall = precision_recall.compute_pr(opts, max_real=200000, num_gen=50000, nhood_size=3, row_batch_size=10000, col_batch_size=10000)
+    return dict(pr50k_3n_full_precision=precision, pr50k_3n_full_recall=recall)
+
+@register_metric
 def fvd2048_16f(opts):
     '''
-        compute FVD, sample 2048 times in dataset, 16 adjacent frames each time.
+        Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 16 adjacent frames each time.
     '''
     fvd = frechet_video_distance.compute_fvd(opts, max_real=2048, num_gen=2048, num_frames=16)
     return dict(fvd2048_16f=fvd)
@@ -106,7 +143,7 @@ def fvd2048_16f(opts):
 @register_metric
 def fvd2048_128f(opts):
     '''
-        compute FVD, sample 2048 times in dataset, 128 adjacent frames each time.
+        Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 128 adjacent frames each time.
     '''
     fvd = frechet_video_distance.compute_fvd(opts, max_real=2048, num_gen=2048, num_frames=128)
     return dict(fvd2048_128f=fvd)
@@ -114,7 +151,7 @@ def fvd2048_128f(opts):
 @register_metric
 def fvd2048_128f_subsample8f(opts):
     '''
-        compute FVD, sample 2048 times in dataset, 16 frames each time, sample 1 frame every adjacent 8 frames.
+        Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 16 frames each time, sample 1 frame every adjacent 8 frames.
     '''
     fvd = frechet_video_distance.compute_fvd(opts, max_real=2048, num_gen=2048, num_frames=16, subsample_factor=8)
     return dict(fvd2048_128f_subsample8f=fvd)
@@ -122,7 +159,16 @@ def fvd2048_128f_subsample8f(opts):
 @register_metric
 def isv2048_ucf(opts):
     '''
-        compute IS, sample 2048 times in dataset, 16 frames each time, split to 10 subset to compute ISs and return the mean and std of ISs.
+        Compute Inception Score of Videos (ISV), sample 2048 times in dataset, 16 adjacent frames each time, split features to 10 subset to compute ISs and return the mean and std.
     '''
     mean, std = video_inception_score.compute_isv(opts, num_gen=2048, num_splits=10, backbone='c3d_ucf101')
     return dict(isv2048_ucf_mean=mean, isv2048_ucf_std=std)
+
+
+@register_metric
+def prv2048_3n_16f(opts):
+    '''
+        Compute Precision/Recall of Videos (PRV), sample 2048 times in dataset, 16 adjacent frames each time, with the 4th (3+1) nearest features to estimate the distributions
+    '''
+    precision, recall = video_precision_recall.compute_pr(opts, max_real=2048, num_gen=2048, nhood_size=3, row_batch_size=10000, col_batch_size=10000, num_frames=16)
+    return dict(prv2048_3n_16f_precision=precision, prv2048_3n_16f_recall=recall)

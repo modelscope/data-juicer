@@ -15,12 +15,12 @@ import time
 import uuid
 from urllib.parse import urlparse
 
-from tools.video_metrics.util import EasyDict, format_time, make_cache_dir_path, open_url
+from tools.mm_eval.inception_metrics.util import EasyDict, format_time, make_cache_dir_path, open_url
 import einops
 import numpy as np
 import torch
-from tools.video_metrics.dataset import VideoDataset, VideoDatasetPerImage
-from tools.video_metrics import distributed
+from tools.mm_eval.inception_metrics.dataset import VideoDataset, VideoDatasetPerImage
+from tools.mm_eval.inception_metrics import distributed
 from torch.utils.data import DataLoader, Dataset, DistributedSampler
 from collections.abc import Iterator
 
@@ -140,10 +140,22 @@ class FeatureStats:
     def is_full(self):
         return (self.max_items is not None) and (self.num_items >= self.max_items)
 
-    def append(self, x, weight=None):
+    def append(self, x, weight=None, div_feature_dim=None):
         x = np.asarray(x, dtype=np.float32)
         assert x.ndim == 2
         
+        # reduce feature dim for calculation of sqrtm
+        def reduce_column(arr, div):
+            n_cols = arr.shape[1] // div
+            result = arr[:, :n_cols] + \
+                     arr[:, n_cols:2*n_cols] + \
+                     arr[:, 2*n_cols:3*n_cols] + \
+                     arr[:, 3*n_cols::4*n_cols]
+            return result
+
+        if div_feature_dim is not None:
+            x = reduce_column(x, div_feature_dim)
+
         if weight is not None:
             assert weight.ndim == 1
             assert weight.shape[0] == x.shape[0]
@@ -174,11 +186,11 @@ class FeatureStats:
                 self.raw_cov += x64.T @ weighted_x64
                 self.weight += weight.sum(axis=0)
 
-    def append_torch(self, x, weight=None):
+    def append_torch(self, x, weight=None, div_feature_dim=None):
         assert isinstance(x, torch.Tensor) and x.ndim == 2
         x = gather_interleave(x).cpu().numpy()
         weight = None if weight is None else gather_interleave(weight).cpu().numpy()
-        self.append(x, weight)
+        self.append(x, weight, div_feature_dim)
 
     def get_all(self):
         assert self.capture_all
@@ -257,7 +269,7 @@ class ProgressMonitor:
 def compute_feature_stats_for_dataset(
     opts, detector_url, detector_kwargs, rel_lo=0, rel_hi=1, batch_size=64,
     max_items=None, temporal_detector=False, use_image_dataset=False,
-    feature_stats_cls=FeatureStats, **stats_kwargs):
+    feature_stats_cls=FeatureStats, div_feature_dim=None, **stats_kwargs):
     
     assert not temporal_detector or not use_image_dataset
     
@@ -344,7 +356,7 @@ def compute_feature_stats_for_dataset(
         images = (images * 127.5 + 128).clamp(0, 255).to(torch.uint8)
         features = detector(images.to("cuda"), **detector_kwargs)
 
-        stats.append_torch(features, weight)
+        stats.append_torch(features, weight, div_feature_dim)
         progress.update(stats.num_items)
 
     # Save to cache.
@@ -361,7 +373,7 @@ def compute_feature_stats_for_dataset(
 def compute_feature_stats_for_generator(
         opts, detector_url, detector_kwargs, rel_lo=0, rel_hi=1, batch_size: int=16, batch_gen=None, jit=False,
         temporal_detector=False, use_image_dataset=False, num_video_frames: int=1, feature_stats_cls=FeatureStats,
-        subsample_factor: int=1, max_items=None, **stats_kwargs):
+        subsample_factor: int=1, max_items=None, div_feature_dim=None, **stats_kwargs):
 
     assert not jit
 
@@ -463,7 +475,7 @@ def compute_feature_stats_for_generator(
     
         features = detector(images, **detector_kwargs)
 
-        stats.append_torch(features, weights)
+        stats.append_torch(features, weights, div_feature_dim)
         progress.update(stats.num_items)
     return stats
 

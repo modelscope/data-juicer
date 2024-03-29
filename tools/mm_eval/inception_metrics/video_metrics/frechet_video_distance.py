@@ -17,7 +17,7 @@ import copy
 import numpy as np
 import scipy.linalg
 from . import metric_utils
-from tools.video_metrics import distributed
+from tools.mm_eval.inception_metrics import distributed
 
 # fmt: off
 #----------------------------------------------------------------------------
@@ -44,8 +44,9 @@ def compute_fvd(opts, max_real: int, num_gen: int, num_frames: int, subsample_fa
     batch_size = max(1, 64 // num_frames)
 
     mu_real, sigma_real = metric_utils.compute_feature_stats_for_dataset(
-        opts=opts, detector_url=detector_url, detector_kwargs=detector_kwargs, rel_lo=0, rel_hi=0,
-        capture_mean_cov=True, max_items=max_real, temporal_detector=True, batch_size=batch_size, use_image_dataset=use_image_dataset).get_mean_cov()
+        opts=opts, detector_url=detector_url, detector_kwargs=detector_kwargs,
+        rel_lo=0, rel_hi=0, capture_mean_cov=True, max_items=max_real, temporal_detector=True,
+        batch_size=batch_size, use_image_dataset=use_image_dataset).get_mean_cov()
 
     if opts.generator_as_dataset:
         compute_gen_stats_fn = metric_utils.compute_feature_stats_for_dataset
@@ -57,8 +58,9 @@ def compute_fvd(opts, max_real: int, num_gen: int, num_frames: int, subsample_fa
         gen_kwargs = dict(num_video_frames=num_frames, subsample_factor=subsample_factor)
 
     mu_gen, sigma_gen = compute_gen_stats_fn(
-        opts=gen_opts, detector_url=detector_url, detector_kwargs=detector_kwargs, rel_lo=0, rel_hi=1, capture_mean_cov=True,
-        max_items=num_gen, temporal_detector=True, batch_size=batch_size, use_image_dataset=use_image_dataset, **gen_kwargs).get_mean_cov()
+        opts=gen_opts, detector_url=detector_url, detector_kwargs=detector_kwargs,
+        rel_lo=0, rel_hi=1, capture_mean_cov=True, max_items=num_gen, temporal_detector=True,
+        batch_size=batch_size, use_image_dataset=use_image_dataset, **gen_kwargs).get_mean_cov()
 
     if distributed.get_rank() != 0:
         return float('nan')

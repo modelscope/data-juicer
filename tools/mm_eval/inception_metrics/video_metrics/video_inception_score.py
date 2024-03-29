@@ -16,7 +16,7 @@ https://github.com/openai/improved-gan/blob/master/inception_score/model.py
 import copy
 import numpy as np
 from . import metric_utils
-from tools.video_metrics import distributed
+from tools.mm_eval.inception_metrics import distributed
 
 # fmt: off
 #----------------------------------------------------------------------------
