@@ -48,6 +48,9 @@ python tools/video_metrics/calc_metrics_for_dataset.py --help
 ### FVD
 Frechet Video Distance (FVD)<sup>[1](#reference)</sup>衡量了从真实数据集和生成数据集中提取的视频特征的分布距离。视频特征是由视频分类器提取的。视频分类器是一个在Kinetics-400数据集上训练的I3D模型，包含400种人类动作类别。
 
+### KVD
+Kernel Video Distance (KID)<sup>是视频版本的Frechet Inception Distance (FID)<sup>[3](#reference)</sup>，它从视频中提取特征，使用了一个在包含400种人类动作类别的Kinetics-400数据集上训练的I3D模型。
+
 ### ISV
 Inception Score of Videos (ISV)<sup>[2](#reference)</sup>基于生成视频的质量和多样性进行评估，其中更偏向于多样性。ISV利用了在UCF101动作识别数据集上训练的C3D视频分类模型，通过计算每个视频分类预测的负熵之和来评估质量。多样性则是通过预测概率分布的平均值的熵来衡量的。
 

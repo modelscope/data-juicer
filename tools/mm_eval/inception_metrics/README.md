@@ -25,10 +25,11 @@ python tools/video_metrics/calc_metrics_for_dataset.py --help
 
 - `real_data_path`: The path to ground truth dataset. Only support for `jsonl` format. The video paths are put in the list under `videos` keys. Required when computing FVD, FID, KID, and PR.
 - `fake_data_path`: The path to generated dataset. Only support for `jsonl` format. The video paths are put in the list under `videos` keys.
-- `metric`: The name of metric applied, currently support `fvd2048_16f`, `fvd2048_128f`, `fvd2048_128f_subsample8f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k_full`, `kid50k_full`, `is50k`, `pr50k_n3_full`.
+- `metric`: The name of metric applied, currently support `fvd2048_16f`, `fvd2048_128f`, `fvd2048_128f_subsample8f`, `kvd2048_16f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k_full`, `kid50k_full`, `is50k`, `pr50k_n3_full`.
     - `fvd2048_16f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 16 adjacent frames each time.
     - `fvd2048_128f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 128 adjacent frames each time.
     - `fvd2048_128f_subsample8f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 16 frames each time, sample 1 frame every adjacent 8 frames.
+    - `kvd2048_16f`: Compute Kernel Video Distance (KVD), sample 2048 times in dataset, 16 adjacent frames each time, split features to 100 subset to compute KVDs and return the mean.
     - `isv2048_ucf`: Compute Inception Score of Videos (ISV), sample 2048 times in dataset, 16 frames each time, split features to 10 subset to compute ISs and return the mean and std.
     - `prv2048_3n_16f`: Compute Precision/Recall of Videos (PRV), sample 2048 times in dataset, 16 adjacent frames each time, with the 4th nearest features to estimate the distributions.
     - `fid50k_full`: Compute Frechet Inception Distance (FID) of frames, sample 50000 frames from fake dataset at most.
@@ -47,6 +48,9 @@ python tools/video_metrics/calc_metrics_for_dataset.py --help
 
 ### FVD
 The Frechet Video Distance (FVD)<sup>[1](#reference)</sup> measures the distance of distribution of video features from real dataset and fake dataset, extracted by a video classifier. The video classifier is an I3D model, trained on Kinetics-400, containing 400 human action classes.
+
+### KVD
+The Kernel Video Distance (KID)<sup> is the video version of Frechet Inception Distance (FID)<sup>[3](#reference)</sup>, which extract features from videos by an I3D model, trained on Kinetics-400, containing 400 human action classes.
 
 ### ISV
 The Inception Score of Videos (ISV)<sup>[2](#reference)</sup> evaluates the generated videos based on their quality and diversity, with a preference for diversity. Utilizing a C3D video classification model trained on the UCF101 action recognition dataset, ISV assesses quality through the classification certainty of each video—specifically, by computing the sum of the negative entropy of individual predictions. Meanwhile, diversity is gauged by the entropy of the prediction averages.

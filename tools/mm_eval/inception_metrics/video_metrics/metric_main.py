@@ -17,12 +17,13 @@ from tools.mm_eval.inception_metrics import distributed
 from tools.mm_eval.inception_metrics.util import EasyDict, format_time
 
 from . import metric_utils
-from . import video_inception_score
-from . import frechet_video_distance
 from . import frechet_inception_distance
 from . import kernel_inception_distance
 from . import inception_score
 from . import precision_recall
+from . import frechet_video_distance
+from . import kernel_video_distance
+from . import video_inception_score
 from . import video_precision_recall
 
 
@@ -155,6 +156,14 @@ def fvd2048_128f_subsample8f(opts):
     '''
     fvd = frechet_video_distance.compute_fvd(opts, max_real=2048, num_gen=2048, num_frames=16, subsample_factor=8)
     return dict(fvd2048_128f_subsample8f=fvd)
+
+@register_metric
+def kvd2048_16f(opts):
+    '''
+        Compute Kernel Video Distance (KVD), sample 2048 times in dataset, 16 adjacent frames each time, split features to 100 subset to compute KVDs and return the mean.
+    '''
+    kid = kernel_video_distance.compute_kid(opts, max_real=2048, num_gen=2048, num_frames=16, num_subsets=100, max_subset_size=1000)
+    return dict(kvd2048_16f=kid)
 
 @register_metric
 def isv2048_ucf(opts):
