@@ -193,7 +193,7 @@ class RayExecutor:
             try:
                 if isinstance(op, Mapper):
                     if op.is_batched_op():
-                        if op.use_actor():
+                        if op.use_actor() or num_gpus != 0:
                             op_proc = self.calculate_np(op, op_name)
                             num_gpus = self.get_num_gpus(op, op_proc)
                             op_cls = OPERATORS.modules[op_name]
@@ -215,7 +215,7 @@ class RayExecutor:
                                 batch_size=1)
                             # The batch size here is same as in data.py
                     else:
-                        if op.use_actor():
+                        if op.use_actor() or num_gpus != 0:
                             op_cls = OPERATORS.modules[op_name]
                             op_proc = self.calculate_np(op, op_name)
                             num_gpus = self.get_num_gpus(op, op_proc)
@@ -230,7 +230,7 @@ class RayExecutor:
                                                   num_gpus=num_gpus)
 
                 elif isinstance(op, Filter):
-                    if op.use_actor():
+                    if op.use_actor() or num_gpus != 0:
                         op_cls = OPERATORS.modules[op_name]
                         op_proc = self.calculate_np(op, op_name)
                         num_gpus = self.get_num_gpus(op, op_proc)
