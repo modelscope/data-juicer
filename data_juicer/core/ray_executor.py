@@ -1,13 +1,9 @@
-import math
 import os
-import subprocess
 import time
 from functools import partial
 
 import pandas as pd
-import psutil
 import pyarrow as pa
-import torch
 from loguru import logger
 
 from data_juicer import cuda_device_count, use_cuda
@@ -15,6 +11,7 @@ from data_juicer.config import init_configs
 from data_juicer.ops import Filter, Mapper, load_ops
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.process_utils import calculate_np
 
 with AvailabilityChecking(['ray'], requires_type='dist'):
     import ray
@@ -94,56 +91,6 @@ class RayExecutor:
         ray.init(self.cfg.ray_address)
         self.process_list = self.cfg.process
 
-    def get_min_cuda_memory(self):
-        # get cuda memory info using "nvidia-smi" command
-        min_cuda_memory = torch.cuda.get_device_properties(
-            0).total_memory / 1024**2
-        nvidia_smi_output = subprocess.check_output([
-            'nvidia-smi', '--query-gpu=memory.free',
-            '--format=csv,noheader,nounits'
-        ]).decode('utf-8')
-        for line in nvidia_smi_output.strip().split('\n'):
-            free_memory = int(line)
-            min_cuda_memory = min(min_cuda_memory, free_memory)
-        return min_cuda_memory
-
-    def calculate_np(self, op, op_name):
-        if self.cfg.np is None:
-            self.cfg.np = psutil.cpu_count()
-        if use_cuda() and op._accelerator == 'cuda':
-            cuda_mem_available = self.get_min_cuda_memory() / 1024
-            op_proc = min(
-                self.cfg.np,
-                math.floor(cuda_mem_available / (op.mem_required + 0.1)) *
-                cuda_device_count())
-            if op_proc < 1.0:
-                logger.warning(
-                    f'The required cuda memory:{op.mem_required}GB might '
-                    f'be more than the available cuda memory:'
-                    f'{cuda_mem_available}GB.'
-                    f'This Op [{op_name}] might '
-                    f'require more resource to run.')
-            op_proc = max(op_proc, 1)
-            return op_proc
-        else:
-            op_proc = self.cfg.np
-            cpu_available = psutil.cpu_count()
-            mem_available = psutil.virtual_memory().available
-            mem_available = mem_available / 1024**3
-            op_proc = min(op_proc, math.floor(cpu_available / op.cpu_required))
-            op_proc = min(op_proc,
-                          math.floor(mem_available / (op.mem_required + 0.1)))
-            if op_proc < 1.0:
-                logger.warning(
-                    f'The required CPU number:{op.cpu_required} '
-                    f'and memory:{op.mem_required}GB might '
-                    f'be more than the available CPU:{cpu_available} '
-                    f'and memory :{mem_available}GB.'
-                    f'This Op [{op_name}] might '
-                    f'require more resource to run.')
-            op_proc = max(op_proc, 1)
-            return op_proc
-
     def get_num_gpus(self, op, op_proc):
         if not use_cuda() or not op._accelerator == 'cuda':
             return 0
@@ -194,7 +141,7 @@ class RayExecutor:
                 if isinstance(op, Mapper):
                     if op.is_batched_op():
                         if op.use_actor() or num_gpus != 0:
-                            op_proc = self.calculate_np(op, op_name)
+                            op_proc = calculate_np(self.cfg.np, op, op_name)
                             num_gpus = self.get_num_gpus(op, op_proc)
                             op_cls = OPERATORS.modules[op_name]
                             dataset = dataset.map_batches(
@@ -217,7 +164,7 @@ class RayExecutor:
                     else:
                         if op.use_actor() or num_gpus != 0:
                             op_cls = OPERATORS.modules[op_name]
-                            op_proc = self.calculate_np(op, op_name)
+                            op_proc = calculate_np(self.cfg.np, op, op_name)
                             num_gpus = self.get_num_gpus(op, op_proc)
                             dataset = dataset.map(
                                 op_cls,
@@ -232,7 +179,7 @@ class RayExecutor:
                 elif isinstance(op, Filter):
                     if op.use_actor() or num_gpus != 0:
                         op_cls = OPERATORS.modules[op_name]
-                        op_proc = self.calculate_np(op, op_name)
+                        op_proc = calculate_np(self.cfg.np, op, op_name)
                         num_gpus = self.get_num_gpus(op, op_proc)
                         dataset = dataset.map(op_cls,
                                               compute=ActorPoolStrategy(),
