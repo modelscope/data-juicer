@@ -31,6 +31,14 @@ def calculate_np(num_proc, op, op_name):
             num_proc,
             math.floor(cuda_mem_available / (op.mem_required + 0.1)) *
             cuda_device_count())
+        if use_cuda() and op.mem_required == 0:
+            logger.warning(f'The required cuda memory of Op[{op_name}] '
+                           f'has not been specified. '
+                           f'Please specify the mem_required field in the '
+                           f'config file, or you might encounter CUDA '
+                           f'Out of memory error. You can reference '
+                           f'the mem_required field in the '
+                           f'config_all.yaml file. ')
         if op_proc < 1.0:
             logger.warning(
                 f'The required cuda memory:{op.mem_required}GB might '
