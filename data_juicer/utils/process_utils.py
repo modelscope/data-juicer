@@ -36,7 +36,7 @@ def calculate_np(num_proc, op, op_name):
                            f'has not been specified. '
                            f'Please specify the mem_required field in the '
                            f'config file, or you might encounter CUDA '
-                           f'Out of memory error. You can reference '
+                           f'out of memory error. You can reference '
                            f'the mem_required field in the '
                            f'config_all.yaml file. ')
         if op_proc < 1.0:
