@@ -1,4 +1,4 @@
-# This tool is used to convert the absolute paths ot relative paths in 
+# This tool is used to convert the absolute paths ot relative paths in
 # dj dataset.
 #
 # Data-Juicer format with absolute path:
@@ -35,18 +35,18 @@
 #                  }
 # }
 #
-import click
-import copy
 import json
 import os
 import shutil
+from pathlib import Path
 
+import click
 import jsonlines as jl
 from loguru import logger
-from pathlib import Path
 from tqdm import tqdm
 
 from data_juicer.utils.constant import Fields
+
 
 def match_prefix(candidates, string):
     for candidate in candidates:
@@ -54,6 +54,7 @@ def match_prefix(candidates, string):
             return candidate
     logger.warning(f'Match no corresponding absolute dir in {string}.')
     return '/'
+
 
 def get_last_dict(d, nest_key):
     sub_keys = nest_key.split('.')
@@ -64,6 +65,7 @@ def get_last_dict(d, nest_key):
             last_dict[key] = {}
         last_dict = last_dict[key]
     return last_dict, final_key
+
 
 def copy_data(from_dir, to_dir, data_path):
     from_path = os.path.join(from_dir, data_path)
@@ -80,15 +82,29 @@ def copy_data(from_dir, to_dir, data_path):
 
 @logger.catch
 @click.command()
-@click.option("--dj_ds_path", "dj_ds_path", type=str, required=True)
-@click.option("--absolute_dir", "-d", "absolute_dirs", type=str, 
-    required=True, multiple=True)
-@click.option("--path_key", "-k", "path_keys", type=str, required=True,
-    multiple=True)
-@click.option("--target_dj_ds_path", "target_dj_ds_path", type=str,
-    required=False, default=None)
-@click.option("--target_mt_dir", "target_mt_dir", type=str,
-    required=False, default=None)
+@click.option('--dj_ds_path', 'dj_ds_path', type=str, required=True)
+@click.option('--absolute_dir',
+              '-d',
+              'absolute_dirs',
+              type=str,
+              required=True,
+              multiple=True)
+@click.option('--path_key',
+              '-k',
+              'path_keys',
+              type=str,
+              required=True,
+              multiple=True)
+@click.option('--target_dj_ds_path',
+              'target_dj_ds_path',
+              type=str,
+              required=False,
+              default=None)
+@click.option('--target_mt_dir',
+              'target_mt_dir',
+              type=str,
+              required=False,
+              default=None)
 def convert_absolute_path_to_relative_path(
     dj_ds_path: str,
     absolute_dirs: list[str],
@@ -103,7 +119,7 @@ def convert_absolute_path_to_relative_path(
         paths to multimodal data.
     :param absolute_dirs: all possible absolute dirs in the absolute paths.
         A list param to support multi sources of multimodal data here.
-    :param path_keys: the keys to the absolute paths. Multi-level field 
+    :param path_keys: the keys to the absolute paths. Multi-level field
         information in the keys need to be separated by '.'.
     :param target_dj_ds_path: path to store the converted dataset if it is
         not None.
@@ -139,14 +155,14 @@ def convert_absolute_path_to_relative_path(
             for path_key in path_keys:
                 last_dict, final_key = get_last_dict(sample, path_key)
                 abs_dir_last_dict, _ = get_last_dict(
-                        sample[Fields.meta][abs_dir_key], path_key)
+                    sample[Fields.meta][abs_dir_key], path_key)
                 absolute_paths = last_dict[final_key]
                 if type(absolute_paths) is not list:
                     absolute_paths = [absolute_paths]
 
                 # normalize the paths
                 absolute_paths = [str(Path(p)) for p in absolute_paths]
-                
+
                 cur_dirs = [
                     match_prefix(absolute_dirs, p) for p in absolute_paths
                 ]
