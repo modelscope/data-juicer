@@ -100,8 +100,7 @@ class RayExecutor:
 
         # convert all the path in dataset to absolute path
         dataset = set_dataset_to_absolute_path(dataset, self.cfg.dataset_path)
-        for items in dataset.iter_rows():
-            print('item is:', items)
+
         # 2. extract processes
         logger.info('Preparing process operators...')
         self.process_list, self.ops = load_ops(self.cfg.process,
