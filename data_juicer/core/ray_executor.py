@@ -183,7 +183,7 @@ class RayExecutor:
                         num_gpus = self.get_num_gpus(op, op_proc)
                         dataset = dataset.map(op_cls,
                                               compute=ActorPoolStrategy(),
-                                              concurrency=self.cfg.np,
+                                              concurrency=op_proc,
                                               fn_constructor_kwargs=op_args,
                                               num_gpus=num_gpus)
                     else:
