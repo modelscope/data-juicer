@@ -532,7 +532,8 @@ def config_backup(cfg):
     target_path = os.path.join(work_dir, os.path.basename(cfg_path))
     logger.info(f'Back up the input config file [{cfg_path}] into the '
                 f'work_dir [{work_dir}]')
-    shutil.copyfile(cfg_path, target_path)
+    if not os.path.exists(target_path):
+        shutil.copyfile(cfg_path, target_path)
 
 
 def display_config(cfg):

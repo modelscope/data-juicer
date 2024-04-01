@@ -27,7 +27,7 @@ from loguru import logger
 from tools.quality_classifier.qc_utils import eval, init_spark, load_datasets
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(positive_datasets=None,
          negative_datasets=None,
          model='my_quality_model',

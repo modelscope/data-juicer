@@ -8,7 +8,7 @@ from data_juicer.core import Analyser, Executor
 from data_juicer.utils.constant import StatsKeys
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main():
 
     path_3sigma_recipe = None

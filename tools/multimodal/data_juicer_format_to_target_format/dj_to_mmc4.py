@@ -94,7 +94,7 @@ from tqdm import tqdm
 from data_juicer.utils.mm_utils import SpecialTokens
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(
     dj_ds_path: str,
     target_mmc4_ds_path: str,
