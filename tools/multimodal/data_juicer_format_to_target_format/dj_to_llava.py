@@ -145,10 +145,6 @@ def main(
         # prepare id2idx dict
         ori_ds = json.load(open(original_llava_ds_path, 'r', encoding='utf-8'))
         id2idx = {str(s['id']): idx for idx, s in enumerate(ori_ds)}
-        # if provided original_llava_ds_path is the dataset file path, only
-        # keep the directory path.
-        if os.path.isfile(original_llava_ds_path):
-            original_llava_ds_path = os.path.dirname(original_llava_ds_path)
 
     logger.info('Start to convert.')
     samples = []

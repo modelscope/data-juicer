@@ -2,7 +2,7 @@
 
 This folder contains some scripts and tools for multimodal datasets before and after using Data-Juicer.
 
-## 绝对路径转相对路径
+## Convert Absolute Path to Relative Path
 
 After being processed by Data-Juicer, the output multimodal data paths are absolute and could originate from diverse sources, being stored under various root directories.
 To convert absolute paths to relative paths and facilitate data migration, we provide a tool to carry out this transformation. This tool also supports copying related multimodal data from multiple sources into a single directory.
