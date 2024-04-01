@@ -51,7 +51,7 @@ def set_dataset_to_absolute_path(dataset, dataset_path):
     dataset_dir = os.path.dirname(dataset_path)
     dataset = dataset.map(
         lambda item: convert_to_absolute_paths(item, dataset_dir))
-    print(f"transfer {dataset.count()} sample's paths")
+    logger.info(f"transfer {dataset.count()} sample's paths")
     return dataset
 
 
@@ -110,8 +110,6 @@ class RayExecutor:
 
         # convert all the path in dataset to absolute path
         dataset = set_dataset_to_absolute_path(dataset, self.cfg.dataset_path)
-        for items in dataset.iter_rows():
-            print('item is:', items)
         # 2. extract processes
         logger.info('Preparing process operators...')
         self.process_list, self.ops = load_ops(self.cfg.process,
@@ -135,15 +133,15 @@ class RayExecutor:
         logger.info('Processing data...')
         tstart = time.time()
         for op_cfg, op in zip(self.process_list, self.ops):
-            num_gpus = 1 if use_cuda() and op._accelerator == 'cuda' else 0
             op_name, op_args = list(op_cfg.items())[0]
+            op_cls = OPERATORS.modules[op_name]
+            op_proc = calculate_np(self.cfg.np, op, op_name)
+            num_gpus = self.get_num_gpus(op, op_proc)
+            use_actor = op.use_actor() or num_gpus
             try:
                 if isinstance(op, Mapper):
                     if op.is_batched_op():
-                        if op.use_actor() or num_gpus != 0:
-                            op_proc = calculate_np(self.cfg.np, op, op_name)
-                            num_gpus = self.get_num_gpus(op, op_proc)
-                            op_cls = OPERATORS.modules[op_name]
+                        if use_actor:
                             dataset = dataset.map_batches(
                                 op_cls,
                                 compute=ActorPoolStrategy(),
@@ -162,10 +160,7 @@ class RayExecutor:
                                 batch_size=1)
                             # The batch size here is same as in data.py
                     else:
-                        if op.use_actor() or num_gpus != 0:
-                            op_cls = OPERATORS.modules[op_name]
-                            op_proc = calculate_np(self.cfg.np, op, op_name)
-                            num_gpus = self.get_num_gpus(op, op_proc)
+                        if use_actor:
                             dataset = dataset.map(
                                 op_cls,
                                 compute=ActorPoolStrategy(),
@@ -177,10 +172,7 @@ class RayExecutor:
                                                   num_gpus=num_gpus)
 
                 elif isinstance(op, Filter):
-                    if op.use_actor() or num_gpus != 0:
-                        op_cls = OPERATORS.modules[op_name]
-                        op_proc = calculate_np(self.cfg.np, op, op_name)
-                        num_gpus = self.get_num_gpus(op, op_proc)
+                    if use_actor:
                         dataset = dataset.map(op_cls,
                                               compute=ActorPoolStrategy(),
                                               concurrency=op_proc,
