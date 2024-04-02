@@ -50,7 +50,7 @@ python tools/video_metrics/calc_metrics_for_dataset.py --help
 The Frechet Video Distance (FVD)<sup>[1](#reference)</sup> measures the distance of distribution of video features from real dataset and fake dataset, extracted by a video classifier. The video classifier is an I3D model, trained on Kinetics-400, containing 400 human action classes.
 
 ### KVD
-The Kernel Video Distance (KID)<sup> is the video version of Frechet Inception Distance (FID)<sup>[3](#reference)</sup>, which extract features from videos by an I3D model, trained on Kinetics-400, containing 400 human action classes.
+The Kernel Video Distance (KVD) is the video version of Frechet Inception Distance (FID)<sup>[3](#reference)</sup>, which extract features from videos by an I3D model, trained on Kinetics-400, containing 400 human action classes.
 
 ### ISV
 The Inception Score of Videos (ISV)<sup>[2](#reference)</sup> evaluates the generated videos based on their quality and diversity, with a preference for diversity. Utilizing a C3D video classification model trained on the UCF101 action recognition dataset, ISV assesses quality through the classification certainty of each video—specifically, by computing the sum of the negative entropy of individual predictions. Meanwhile, diversity is gauged by the entropy of the prediction averages.
