@@ -188,7 +188,9 @@ def convert_absolute_path_to_relative_path(
     if target_dj_ds_path is not None:
         logger.info(f'Start to write the converted dataset to '
                     f'[{target_dj_ds_path}]...')
-        json.dump(samples, open(target_dj_ds_path, 'w', encoding='utf-8'))
+        with jl.open(target_ds_path, 'w') as writer:
+            for sample in samples:
+                writer.write(sample)
     return samples
 
 
