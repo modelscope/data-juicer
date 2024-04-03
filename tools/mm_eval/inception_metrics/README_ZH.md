@@ -23,9 +23,11 @@ python tools/video_metrics/calc_metrics_for_dataset.py        \
 python tools/video_metrics/calc_metrics_for_dataset.py --help
 ```
 
-- `real_data_path`: 真实数据集的路径。目前只支持 `jsonl` 格式。每个sample的视频路径放在`videos`关键词下的列表里。计算FVD、FID、KID和PR时需要。
 - `fake_data_path`: 生成数据集的路径。目前只支持 `jsonl` 格式。每个sample的视频路径放在`videos`关键词下的列表里。
-- `metric`: 测评的名称, 目前支持`fvd2048_16f`、`fvd2048_128f`、`fvd2048_128f_subsample8f`、`isv2048_ucf`、`prv2048_3n_16f`、`fid50k_full`、`kid50k_full`、`is50k`、`pr50k_n3_full`。
+- `real_data_path`: 真实数据集的路径。目前只支持 `jsonl` 格式。每个sample的视频路径放在`videos`关键词下的列表里。计算FVD、FID、KID和PR时需要。
+- `fake_mm_dir`: 存储生成视频的目录。如果不是none，在fake_data_path下的jonl文件中的路径为相对它的相对路径，否则为绝对路径。
+- `real_mm_dir`: 存储真实视频的目录。如果不是none，在real_data_path下的jonl文件中的路径为相对它的相对路径，否则为绝对路径。
+- `metric`: 测评的名称, 目前支持`fvd2048_16f`、`fvd2048_128f`、`fvd2048_128f_subsample8f`、`isv2048_ucf`、`prv2048_3n_16f`、`fid50k_full`、`kid50k_full`、`is50k`、`pr50k_3n_full`。
     - `fvd2048_16f`: 计算Frechet Video Distance (FVD)，在数据集中采样2048次，每次采样连续的16帧。
     - `fvd2048_128f`: 计算Frechet Video Distance (FVD)，在数据集中采样2048次，每次采样连续的128帧。
     - `fvd2048_128f_subsample8f`: 计算Frechet Video Distance (FVD)，在数据集中采样2048次，每次采样16帧，每帧间隔8帧。
@@ -42,6 +44,7 @@ python tools/video_metrics/calc_metrics_for_dataset.py --help
 - `width`: 每一帧测评时resize到这个宽度
 - `replace_cache`: 是否覆盖cache重新计算
 - `verbose`: 是否打log
+- `seed`: 随机种子
 
 ## 指标介绍
 
@@ -55,7 +58,8 @@ Kernel Video Distance (KVD)是视频版本的Frechet Inception Distance (FID)<su
 Inception Score of Videos (ISV)<sup>[2](#reference)</sup>基于生成视频的质量和多样性进行评估，其中更偏向于多样性。ISV利用了在UCF101动作识别数据集上训练的C3D视频分类模型，通过计算每个视频分类预测的负熵之和来评估质量。多样性则是通过预测概率分布的平均值的熵来衡量的。
 
 ### PRV
-Precision/Recall of Videos (PRV)c<sup>[5](#reference)</sup>通过在特征空间中划定到k个最近领特征的距离内的区域，来估计视频特征的分布。然后，通过确定样本是否落在真实数据集和生成数据集的分布内，来评估视频生成的精确度和召回率。这些特征是从Kinetics-400数据集上训练的包含400个人类动作类别的I3D模型中提取的。
+Precision/Recall of Videos (PRV)<sup>[5](#reference)</sup>通过在特征空间中划定到k个最近领特征的距离内的区域，来估计视频特征的分布。然后，通过确定样本是否落在真实数据集和生成数据集的分布内，来评估视频生成的精确度和召回率。这些特征是从Kinetics-400数据集上训练的包含400个人类动作类别的I3D模型中提取的。
+Precision/Recall of Videos (PRV)是视频版本的Precision/Recall (PR)<sup>[5](#reference)</sup>，它从视频中提取特征，使用了一个在包含400种人类动作类别的Kinetics-400数据集上训练的I3D模型。
 
 ### FID
 Frechet Inception Distance (FID)<sup>[3](#reference)</sup>与FVD的方法类似，这里提取的是每一帧的特征，模型采用在ImageNet上训练的图像分类模型。
@@ -67,7 +71,7 @@ Kernel Inception Distance (KID)<sup>[4](#reference)</sup>类似于FID，通过�
 Inception Score (IS)<sup>[2](#reference)</sup>与ISV的方法类似，这里提利用了模型对每一帧的分类预测，模型采用在ImageNet上训练的图像分类模型。
 
 ### PR
-The Precision/Recall (PR) metric<sup>[5](#reference)</sup>与ISV的方法类似，这里提取的是每一帧的特征，模型采用在ILSVRC-2012上训练的VGG图像分类模型<sup>[6](#reference)</sup>。
+The Precision/Recall (PR)<sup>[5](#reference)</sup>通过在视频帧的特征空间中划定到k个最近领特征的距离内的区域，来估计视频特征的分布。然后，通过确定样本帧是否落在真实数据集和生成数据集的分布内，来评估视频生成帧的精确度和召回率。这些特征是从ILSVRC-2012上训练的VGG图像分类模型<sup>[6](#reference)</sup>中提取的。
 
 
 <h2 id="reference">参考文献：</h2>

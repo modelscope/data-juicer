@@ -17,6 +17,7 @@ class VideoDataset(Dataset):
     seq_length: int
     height: int
     width: int
+    mm_dir: str = None
     min_spacing: int = 1
     max_spacing: int = 1
     x_flip: bool = False
@@ -32,6 +33,8 @@ class VideoDataset(Dataset):
             for line in f.readlines():
                 data = json.loads(line.strip())
                 for video_path in data[self.video_key]:
+                    if self.mm_dir is not None:
+                        video_path = os.path.join(self.mm_dir, video_path)
                     self.video_paths.append(video_path)
 
     def sample_frames(self, video_path):
@@ -67,6 +70,7 @@ class VideoDataset(Dataset):
                 frame_id += 1
         
         container.close()
+        assert frame_id >= total_frame_num, 'frame num error'
         return sampled_frames, spacing
         
     def __getitem__(self, index: int) -> dict[str, Any]:
@@ -91,6 +95,7 @@ class VideoDatasetPerImage(Dataset):
     dataset_path: str
     height: int
     width: int
+    mm_dir: str = None
     seq_length: int = 1
     x_flip: bool = False
     video_key: str = 'videos'
@@ -104,6 +109,8 @@ class VideoDatasetPerImage(Dataset):
             for line in f.readlines():
                 data = json.loads(line.strip())
                 for video_path in data[self.video_key]:
+                    if self.mm_dir is not None:
+                        video_path = os.path.join(self.mm_dir, video_path)
                     container = av.open(video_path)
                     input_video_stream = container.streams.video[0]
                     total_frame_num = input_video_stream.frames

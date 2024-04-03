@@ -23,9 +23,11 @@ python tools/video_metrics/calc_metrics_for_dataset.py        \
 python tools/video_metrics/calc_metrics_for_dataset.py --help
 ```
 
-- `real_data_path`: The path to ground truth dataset. Only support for `jsonl` format. The video paths are put in the list under `videos` keys. Required when computing FVD, FID, KID, and PR.
 - `fake_data_path`: The path to generated dataset. Only support for `jsonl` format. The video paths are put in the list under `videos` keys.
-- `metric`: The name of metric applied, currently support `fvd2048_16f`, `fvd2048_128f`, `fvd2048_128f_subsample8f`, `kvd2048_16f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k_full`, `kid50k_full`, `is50k`, `pr50k_n3_full`.
+- `real_data_path`: The path to ground truth dataset. Only support for `jsonl` format. The video paths are put in the list under `videos` keys. Required when computing FVD, FID, KID, and PR.
+- `fake_mm_dir`: The root diretory to store the fake videos. If it is not none, the paths in jsonl file at fake_data_path are relative paths on it, else are absolute path.
+- `real_mm_dir`: The root diretory to store the real videos. If it is not none, the paths in jsonl file at real_data_path are relative paths on it, else are absolute path.
+- `metric`: The name of metric applied, currently support `fvd2048_16f`, `fvd2048_128f`, `fvd2048_128f_subsample8f`, `kvd2048_16f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k_full`, `kid50k_full`, `is50k`, `pr50k_3n_full`.
     - `fvd2048_16f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 16 adjacent frames each time.
     - `fvd2048_128f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 128 adjacent frames each time.
     - `fvd2048_128f_subsample8f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 16 frames each time, sample 1 frame every adjacent 8 frames.
@@ -43,6 +45,7 @@ python tools/video_metrics/calc_metrics_for_dataset.py --help
 - `width`: Sampled frames will be resized to this width.
 - `replace_cache`: Whether to replace the dataset stats cache.
 - `verbose`: Whether to log progress.
+- `seed`: the random seed
 
 ## Introduction of Metrics
 
@@ -56,7 +59,7 @@ The Kernel Video Distance (KVD) is the video version of Frechet Inception Distan
 The Inception Score of Videos (ISV)<sup>[2](#reference)</sup> evaluates the generated videos based on their quality and diversity, with a preference for diversity. Utilizing a C3D video classification model trained on the UCF101 action recognition dataset, ISV assesses quality through the classification certainty of each video—specifically, by computing the sum of the negative entropy of individual predictions. Meanwhile, diversity is gauged by the entropy of the prediction averages.
 
 ### PRV
-The Precision/Recall of Videos (PRV)<sup>[5](#reference)</sup> estimates the distribution of features of videos in the feature space by demarcating a region within the distance to the k-nearest neighbor features. It then assesses the precision and recall of video generation by determining whether samples fall within the distributions of the real and fake datasets. The features are extracted from the I3D model, trained on Kinetics-400, containing 400 human action classes.
+The Precision/Recall of Videos (PRV) is the video version of Precision/Recall (PR)<sup>[5](#reference)</sup>, which extract features from videos by an I3D model, trained on Kinetics-400, containing 400 human action classes.
 
 ### FID
 The Frechet Inception Distance (FID)<sup>[3](#reference)</sup> shares similarities with FVD in its approach, evaluating videos by analyzing the features of individual frames derived from a image classification model trained on ImageNet.
@@ -68,7 +71,7 @@ The Kernel Inception Distance (KID)<sup>[4](#reference)</sup> is similar to FID 
 The Inception Score (IS)<sup>[2](#reference)</sup> shares similarities with ISV in its approach, evaluating videos by analyzing the predictions of individual frames derived from a image classification model trained on ImageNet.
 
 ### PR
-The Precision/Recall (PR)<sup>[5](#reference)</sup> shares similarities with PRV in its approach, evaluating videos by analyzing the features of individual frames. The features are extracted from the VGG image classification model<sup>[6](#reference)</sup> trained on ILSVRC-2012.
+The Precision/Recall (PR)<sup>[5](#reference)</sup> estimates the distribution of features of frames in the feature space by demarcating a region within the distance to the k-nearest neighbor features. It then assesses the precision and recall of frame generation by determining whether samples fall within the distributions of the real and fake datasets. The features are extracted from the VGG image classification model<sup>[6](#reference)</sup> trained on ILSVRC-2012.
 
 <h2 id="reference">Reference:</h2>
 
