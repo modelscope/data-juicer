@@ -49,8 +49,8 @@ def calc_metrics(
             are relative paths on it, else are absolute path.
         :param metric: Metric to compute, can be one of 
             [`fvd2048_16f`, `fvd2048_128f`, `fvd2048_128f_subsample8f`,
-            `kvd2048_16f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k_full`,
-            `kid50k_full`, `is50k`, `pr50k_3n_full`]
+            `kvd2048_16f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k`,
+            `kid50k`, `is50k`, `pr50k_3n`]
         :param detector_path: Path to the corresponding detection model.
             Download the model from web if it is None.
         :param result_path: Path to JSON filename for saving results

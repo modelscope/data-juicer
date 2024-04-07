@@ -102,20 +102,20 @@ def report_metric(result_dict, run_dir=None, snapshot_pkl=None):
 #----------------------------------------------------------------------------
 
 @register_metric
-def fid50k_full(opts):
+def fid50k(opts):
     '''
         Compute Frechet Inception Distance (FID) of frames, sample 50000 frames from fake dataset at most
     '''
-    fid = frechet_inception_distance.compute_fid(opts, max_real=None, num_gen=50000)
-    return dict(fid50k_full=fid)
+    fid = frechet_inception_distance.compute_fid(opts, max_real=50000, num_gen=50000)
+    return dict(fid50k=fid)
 
 @register_metric
-def kid50k_full(opts):
+def kid50k(opts):
     '''
         Compute Kernel Inception Distance (KID) of frames, sample 50000 frames from fake dataset at most, split features to 100 subset to compute KIDs and return the mean.
     '''
-    kid = kernel_inception_distance.compute_kid(opts, max_real=1000000, num_gen=50000, num_subsets=100, max_subset_size=1000)
-    return dict(kid50k_full=kid)
+    kid = kernel_inception_distance.compute_kid(opts, max_real=50000, num_gen=50000, num_subsets=100, max_subset_size=1000)
+    return dict(kid50k=kid)
 
 @register_metric
 def is50k(opts):
@@ -126,12 +126,12 @@ def is50k(opts):
     return dict(is50k_mean=mean, is50k_std=std)
 
 @register_metric
-def pr50k_3n_full(opts):
+def pr50k_3n(opts):
     '''
         Compute Precision/Recall (PR) of frames, sample 50000 frames from fake dataset at most, with the 4th (3+1) nearest features to estimate the distributions
     '''
-    precision, recall = precision_recall.compute_pr(opts, max_real=200000, num_gen=50000, nhood_size=3, row_batch_size=10000, col_batch_size=10000)
-    return dict(pr50k_3n_full_precision=precision, pr50k_3n_full_recall=recall)
+    precision, recall = precision_recall.compute_pr(opts, max_real=50000, num_gen=50000, nhood_size=3, row_batch_size=10000, col_batch_size=10000)
+    return dict(pr50k_3n_precision=precision, pr50k_3n_recall=recall)
 
 @register_metric
 def fvd2048_16f(opts):

@@ -27,17 +27,17 @@ python tools/video_metrics/calc_metrics_for_dataset.py --help
 - `real_data_path`: The path to ground truth dataset. Only support for `jsonl` format. The video paths are put in the list under `videos` keys. Required when computing FVD, FID, KID, and PR.
 - `fake_mm_dir`: The root diretory to store the fake videos. If it is not none, the paths in jsonl file at fake_data_path are relative paths on it, else are absolute path.
 - `real_mm_dir`: The root diretory to store the real videos. If it is not none, the paths in jsonl file at real_data_path are relative paths on it, else are absolute path.
-- `metric`: The name of metric applied, currently support `fvd2048_16f`, `fvd2048_128f`, `fvd2048_128f_subsample8f`, `kvd2048_16f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k_full`, `kid50k_full`, `is50k`, `pr50k_3n_full`.
+- `metric`: The name of metric applied, currently support `fvd2048_16f`, `fvd2048_128f`, `fvd2048_128f_subsample8f`, `kvd2048_16f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k`, `kid50k`, `is50k`, `pr50k_3n`.
     - `fvd2048_16f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 16 adjacent frames each time.
     - `fvd2048_128f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 128 adjacent frames each time.
     - `fvd2048_128f_subsample8f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 16 frames each time, sample 1 frame every adjacent 8 frames.
     - `kvd2048_16f`: Compute Kernel Video Distance (KVD), sample 2048 times in dataset, 16 adjacent frames each time, split features to 100 subset to compute KVDs and return the mean.
     - `isv2048_ucf`: Compute Inception Score of Videos (ISV), sample 2048 times in dataset, 16 frames each time, split features to 10 subset to compute ISs and return the mean and std.
     - `prv2048_3n_16f`: Compute Precision/Recall of Videos (PRV), sample 2048 times in dataset, 16 adjacent frames each time, with the 4th nearest features to estimate the distributions.
-    - `fid50k_full`: Compute Frechet Inception Distance (FID) of frames, sample 50000 frames from fake dataset at most.
-    - `kid50k_full`: Compute Kernel Inception Distance (KID) of frames, sample 50000 frames from fake dataset at most, split features to 100 subset to compute KIDs and return the mean.
+    - `fid50k`: Compute Frechet Inception Distance (FID) of frames, sample 50000 frames from fake dataset at most.
+    - `kid50k`: Compute Kernel Inception Distance (KID) of frames, sample 50000 frames from fake dataset at most, split features to 100 subset to compute KIDs and return the mean.
     - `is50k`: Compute Inception Score(IS) of frames, sample 50000 frames from fake dataset at most, split features to 10 subset to compute ISs and return the mean and std.
-    - `pr50k_3n_full`: Compute Precision/Recall (PR) of frames, sample 50000 frames from fake dataset at most, with the 4th nearest features to estimate the distributions
+    - `pr50k_3n`: Compute Precision/Recall (PR) of frames, sample 50000 frames from fake dataset at most, with the 4th nearest features to estimate the distributions
 - `detector_path`: Path to the corresponding detection model. Download the model from web if it is None.
 - `result_path`: Path to JSON filename for saving results.
 - `num_runs`: How many runs of the metric to average over.

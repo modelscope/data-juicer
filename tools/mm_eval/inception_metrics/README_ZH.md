@@ -27,16 +27,16 @@ python tools/video_metrics/calc_metrics_for_dataset.py --help
 - `real_data_path`: 真实数据集的路径。目前只支持 `jsonl` 格式。每个sample的视频路径放在`videos`关键词下的列表里。计算FVD、FID、KID和PR时需要。
 - `fake_mm_dir`: 存储生成视频的目录。如果不是none，在fake_data_path下的jonl文件中的路径为相对它的相对路径，否则为绝对路径。
 - `real_mm_dir`: 存储真实视频的目录。如果不是none，在real_data_path下的jonl文件中的路径为相对它的相对路径，否则为绝对路径。
-- `metric`: 测评的名称, 目前支持`fvd2048_16f`、`fvd2048_128f`、`fvd2048_128f_subsample8f`、`isv2048_ucf`、`prv2048_3n_16f`、`fid50k_full`、`kid50k_full`、`is50k`、`pr50k_3n_full`。
+- `metric`: 测评的名称, 目前支持`fvd2048_16f`、`fvd2048_128f`、`fvd2048_128f_subsample8f`、`isv2048_ucf`、`prv2048_3n_16f`、`fid50k`、`kid50k`、`is50k`、`pr50k_3n`。
     - `fvd2048_16f`: 计算Frechet Video Distance (FVD)，在数据集中采样2048次，每次采样连续的16帧。
     - `fvd2048_128f`: 计算Frechet Video Distance (FVD)，在数据集中采样2048次，每次采样连续的128帧。
     - `fvd2048_128f_subsample8f`: 计算Frechet Video Distance (FVD)，在数据集中采样2048次，每次采样16帧，每帧间隔8帧。
     - `isv2048_ucf`: 计算Inception Score of Videos (ISV)，在数据集中采样2048次，每次采样连续的16帧，分成10份计算IS，返回均值和方差。
     - `prv2048_3n_16f`: 计算Precision/Recall of Videos (PRV)，在数据集中采样2048次，每次采样连续的16帧，采用第4近邻的特征距离来评估特征分布
-    - `fid50k_full`: 计算视频帧的Frechet Inception Distance (FID)，从生成数据集中最多采样50000帧。
-    - `kid50k_full`: 计算视频帧的Kernel Inception Distance (KID)，从生成数据集中最多采样50000帧，并将得到的特征拆分成100份来计算KID，返回其均值。
+    - `fid50k`: 计算视频帧的Frechet Inception Distance (FID)，从生成数据集中最多采样50000帧。
+    - `kid50k`: 计算视频帧的Kernel Inception Distance (KID)，从生成数据集中最多采样50000帧，并将得到的特征拆分成100份来计算KID，返回其均值。
     - `is50k`: 计算视频帧的Inception Score(IS)，从生成数据集中最多采样50000帧，并将得到的特征拆分成10份来计算IS，返回其均值和方差。
-    - `pr50k_3n_full`: 计算视频的Precision/Recall (PR)，从生成数据集中最多采样50000帧，采用第4近邻的特征距离来评估特征分布。
+    - `pr50k_3n`: 计算视频的Precision/Recall (PR)，从生成数据集中最多采样50000帧，采用第4近邻的特征距离来评估特征分布。
 - `detector_path`: metric对应的视频分类模型的路径，如果为None则自动从网上下载。
 - `result_path`: 结果存储路径，`jsonl` 格式。
 - `num_runs`: 测评次数，大于1时最终结果会取平均。
