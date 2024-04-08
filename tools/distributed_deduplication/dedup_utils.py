@@ -1,3 +1,7 @@
+# The Star-Graph-Connected-Components (SGCC) algorithm here referenced from:
+# https://github.com/bigcode-project/bigcode-dataset/blob/main/near_deduplication/minhash_deduplication_spark.py
+# --------------------------------------------------------
+
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
