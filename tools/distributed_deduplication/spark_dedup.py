@@ -24,12 +24,13 @@ def dedup_dataset(dataset_path: str,
                   text_key: str = 'text'):
     """
     Perform fuzzy text deduplication on the given dataset.
-    :param dataset_path: the path to the dataset to perform deduplication
-    :param result_path: the path to store the predicted result dataset
+    :param dataset_path: the path to the dataset to perform deduplication,
+        The suffix of the path should be one of the json, jsonl, parquet.
+    :param result_path: the path to store the predicted result dataset.
     :param tokenizer: what tokenizer to use to tokenize texts. It's None in
         default, which means using the standard Tokenizer of PySpark. You can
         use one of ["zh.sp.model", "code.sp.model"] we provided, or you can set
-        it to the path to your own sentencepiece model
+        it to the path to your own sentencepiece model.
     :param threshold: if the Jaccard similarity between two documents
         exceeds a predetermined threshold, they are considered duplicates.
         The accuracy of deduplication depends on the similarity threshold set.
@@ -42,7 +43,7 @@ def dedup_dataset(dataset_path: str,
     :param num_hashtables: the number of hashes used in MinHashLSH.
         Default with 10 hashes as mentioned in the GPT3 paper.
     :param text_key: the field key name to hold texts to be classified. It's
-        "text" in default
+        "text" in default.
     """
     spark = init_spark()
     ds = load_dataset(spark, dataset_path, text_key=text_key)
