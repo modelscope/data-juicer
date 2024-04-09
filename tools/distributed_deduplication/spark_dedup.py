@@ -88,7 +88,6 @@ def dedup_dataset(dataset_path: str,
     components.show()
     df = df.join(components, on='id', how='left')
     df = df.filter(F.col('component').isNull()).drop('id', 'component').cache()
-    # df.write.mode("overwrite").json("output_of_spark")
     export_result(df, result_path)
 
 
