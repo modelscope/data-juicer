@@ -24,7 +24,7 @@ def dedup_dataset(dataset_path: str,
                   text_key: str = 'text'):
     """
     Perform fuzzy text deduplication on the given dataset.
-    :param dataset_path: the path to the dataset you want to predict for
+    :param dataset_path: the path to the dataset to perform deduplication
     :param result_path: the path to store the predicted result dataset
     :param tokenizer: what tokenizer to use to tokenize texts. It's None in
         default, which means using the standard Tokenizer of PySpark. You can
