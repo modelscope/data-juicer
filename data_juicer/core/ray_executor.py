@@ -6,15 +6,19 @@ import pandas as pd
 import pyarrow as pa
 from loguru import logger
 
-from data_juicer import use_cuda
+from data_juicer import cuda_device_count, use_cuda
 from data_juicer.config import init_configs
 from data_juicer.ops import Filter, Mapper, load_ops
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.process_utils import calculate_np
 
 with AvailabilityChecking(['ray'], requires_type='dist'):
     import ray
     import ray.data as rd
+    from ray.data import ActorPoolStrategy
+
+from data_juicer.ops.base_op import OPERATORS
 
 
 def is_valid_path(item, dataset_dir):
@@ -47,7 +51,7 @@ def set_dataset_to_absolute_path(dataset, dataset_path):
     dataset_dir = os.path.dirname(dataset_path)
     dataset = dataset.map(
         lambda item: convert_to_absolute_paths(item, dataset_dir))
-    print(f"transfer {dataset.count()} sample's paths")
+    logger.info(f"transfer {dataset.count()} sample's paths")
     return dataset
 
 
@@ -61,11 +65,11 @@ def ray_batch_mapper_wrapper(samples, fn):
 
 class RayExecutor:
     """
-    Executor based on Ray [Experimental].
+    Executor based on Ray.
 
     Run Data-Juicer data processing in a distributed cluster.
 
-        1. Only support Filter and Mapper operators for now.
+        1. Support Filter, Mapper and Exact Deduplicator operators for now.
         2. Only support loading `.json` files.
         3. Advanced functions such as checkpoint, tracer are not supported.
 
@@ -87,6 +91,12 @@ class RayExecutor:
         ray.init(self.cfg.ray_address)
         self.process_list = self.cfg.process
 
+    def get_num_gpus(self, op, op_proc):
+        if not use_cuda() or not op._accelerator == 'cuda':
+            return 0
+        proc_per_gpu = op_proc / cuda_device_count()
+        return 1.0 / proc_per_gpu
+
     def run(self, load_data_np=None):
         """
         Running the dataset process pipeline.
@@ -100,8 +110,6 @@ class RayExecutor:
 
         # convert all the path in dataset to absolute path
         dataset = set_dataset_to_absolute_path(dataset, self.cfg.dataset_path)
-        for items in dataset.iter_rows():
-            print('item is:', items)
         # 2. extract processes
         logger.info('Preparing process operators...')
         self.process_list, self.ops = load_ops(self.cfg.process,
@@ -125,19 +133,54 @@ class RayExecutor:
         logger.info('Processing data...')
         tstart = time.time()
         for op_cfg, op in zip(self.process_list, self.ops):
-            num_gpus = 1 if use_cuda() and op._accelerator == 'cuda' else 0
-            op_name, _ = list(op_cfg.items())[0]
+            op_name, op_args = list(op_cfg.items())[0]
+            op_cls = OPERATORS.modules[op_name]
+            op_proc = calculate_np(self.cfg.np, op, op_name)
+            num_gpus = self.get_num_gpus(op, op_proc)
+            use_actor = op.use_actor() or num_gpus
             try:
                 if isinstance(op, Mapper):
                     if op.is_batched_op():
-                        dataset = dataset.map_batches(partial(
-                            ray_batch_mapper_wrapper, fn=op.process),
-                                                      batch_format='pyarrow',
-                                                      num_gpus=num_gpus)
+                        if use_actor:
+                            dataset = dataset.map_batches(
+                                op_cls,
+                                compute=ActorPoolStrategy(),
+                                concurrency=op_proc,
+                                fn_constructor_kwargs=op_args,
+                                batch_format='pyarrow',
+                                num_gpus=num_gpus,
+                                batch_size=1)
+                            # The batch size here is same as in data.py
+                        else:
+                            dataset = dataset.map_batches(
+                                partial(ray_batch_mapper_wrapper,
+                                        fn=op.process),
+                                batch_format='pyarrow',
+                                num_gpus=num_gpus,
+                                batch_size=1)
+                            # The batch size here is same as in data.py
                     else:
-                        dataset = dataset.map(op.process, num_gpus=num_gpus)
+                        if use_actor:
+                            dataset = dataset.map(
+                                op_cls,
+                                compute=ActorPoolStrategy(),
+                                concurrency=op_proc,
+                                fn_constructor_kwargs=op_args,
+                                num_gpus=num_gpus)
+                        else:
+                            dataset = dataset.map(op.process,
+                                                  num_gpus=num_gpus)
+
                 elif isinstance(op, Filter):
-                    dataset = dataset.map(op.compute_stats, num_gpus=num_gpus)
+                    if use_actor:
+                        dataset = dataset.map(op_cls,
+                                              compute=ActorPoolStrategy(),
+                                              concurrency=op_proc,
+                                              fn_constructor_kwargs=op_args,
+                                              num_gpus=num_gpus)
+                    else:
+                        dataset = dataset.map(op.compute_stats,
+                                              num_gpus=num_gpus)
                     dataset = dataset.filter(op.process)
                 else:
                     logger.error(
