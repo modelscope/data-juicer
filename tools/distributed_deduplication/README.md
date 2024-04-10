@@ -29,7 +29,8 @@ python spark_dedup.py \
     [--threshold <threshold_value>] \
     [--num_features <num_features>] \
     [--num_hashtables <num_hashtables>] \
-    [--text_key <text_key>]
+    [--text_key <text_key>] \
+    [--master_url <master_url>]
 
 # print the usage message
 python spark_dedup.py --help
@@ -42,4 +43,4 @@ python spark_dedup.py --help
 - `num_features`: the number of features that HashingTF generates. Default with 1047576 as mentioned in megatron-turing-nlg paper.
 - `num_hashtables`: (Optional. Default: 10) the number of hashes used in MinHashLSH. Default with 10 hashes as mentioned in the GPT3 paper.
 - `text_key`: (Optional. Default: "text") the field name to store texts to be classified in the input dataset.
-
+- `master_url`: (Optional. Default: None) the master url for spark config. If None, then run with "local[*]"

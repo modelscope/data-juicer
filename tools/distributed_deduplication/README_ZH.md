@@ -25,6 +25,7 @@ python spark_dedup.py \
 # 打印使用信息
 python spark_dedup.py --help
 
+```
 
 - `dataset_path`：输入数据集路径。路径的后缀应该是`[json, jsonl, parquet]`中的一个。
 - `result_path`：存储带有预测结果数据集的路径。路径的后缀应该是`[json, jsonl, parquet]`中的一个。

@@ -23,7 +23,7 @@ def dedup_dataset(dataset_path: str,
                   num_features: int = 1047576,
                   num_hashtables: int = 10,
                   text_key: str = 'text',
-                  master_url: str = 'text'):
+                  master_url: Union[str, None] = None):
     """
     Perform fuzzy text deduplication on the given dataset.
     :param dataset_path: the path to the dataset to perform deduplication,
@@ -46,7 +46,7 @@ def dedup_dataset(dataset_path: str,
         Default with 10 hashes as mentioned in the GPT3 paper.
     :param text_key: the field key name to hold texts to be classified. It's
         "text" in default.
-    :param master_url: the master url for spark config.
+    :param master_url: the master url for spark config. Default is None.
         If None, then run with local[*].
     """
     # for inited cluster,
