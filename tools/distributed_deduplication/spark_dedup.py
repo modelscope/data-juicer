@@ -1,4 +1,5 @@
 import sys
+import time
 from typing import Union
 
 import fire
@@ -21,7 +22,8 @@ def dedup_dataset(dataset_path: str,
                   threshold: float = 0.7,
                   num_features: int = 1047576,
                   num_hashtables: int = 10,
-                  text_key: str = 'text'):
+                  text_key: str = 'text',
+                  master_url: str = 'text'):
     """
     Perform fuzzy text deduplication on the given dataset.
     :param dataset_path: the path to the dataset to perform deduplication,
@@ -44,8 +46,12 @@ def dedup_dataset(dataset_path: str,
         Default with 10 hashes as mentioned in the GPT3 paper.
     :param text_key: the field key name to hold texts to be classified. It's
         "text" in default.
+    :param master_url: the master url for spark config.
+        If None, then run with local[*].
     """
-    spark = init_spark()
+    # for inited cluster,
+    # provide master url such as "spark://master:7077"
+    spark = init_spark(master_url=master_url)
     ds = load_dataset(spark, dataset_path, text_key=text_key)
     ds = ds.withColumn('id', F.monotonically_increasing_id()).cache()
     df = ds
@@ -93,4 +99,7 @@ def dedup_dataset(dataset_path: str,
 
 
 if __name__ == '__main__':
+    stime = time.time()
     fire.Fire(dedup_dataset)
+    etime = time.time()
+    logger.info(f'Execution Done, Total time {etime - stime}')

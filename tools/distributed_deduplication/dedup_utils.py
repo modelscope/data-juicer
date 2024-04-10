@@ -2,15 +2,35 @@
 # https://github.com/bigcode-project/bigcode-dataset/blob/main/near_deduplication/minhash_deduplication_spark.py
 # --------------------------------------------------------
 
+from typing import Union
+
+from loguru import logger
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
 
-def init_spark():
+def init_spark(master_ulr: Union[str, None] = None,
+               spark_executor_memory=None,
+               spark_driver_memory=None,
+               spark_executor_memoryOverhead=None):
+    if not spark_executor_memory:
+        spark_executor_memory = '64g'
+    if not spark_driver_memory:
+        spark_driver_memory = '64g'
+    if not spark_executor_memoryOverhead:
+        spark_executor_memoryOverhead = '20000'
+    if not master_ulr:
+        master_ulr = 'local[*]'
     conf = SparkConf()
     conf.set('spark.app.name', 'MinHashLSH')
     conf.set('spark.debug.maxToStringFields', '100')
+    conf.set('spark.master', master_ulr)
+    conf.set('spark.executor.memory', spark_executor_memory)
+    conf.set('spark.driver.memory', spark_driver_memory)
+    conf.set('spark.sql.execution.arrow.pyspark.enabled', 'true')
+    conf.set('spark.executor.memoryOverhead', spark_executor_memoryOverhead)
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
+    logger.info('Spark initialization done.')
     return spark
 
 

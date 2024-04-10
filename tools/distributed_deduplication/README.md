@@ -29,8 +29,7 @@ python spark_dedup.py \
     [--threshold <threshold_value>] \
     [--num_features <num_features>] \
     [--num_hashtables <num_hashtables>] \
-    [--text_key <text_key>] \
-    [--overall_stats]
+    [--text_key <text_key>]
 
 # print the usage message
 python spark_dedup.py --help
