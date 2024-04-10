@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Union
 
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
                           namespace_to_dict)
-from jsonargparse.typing import NonNegativeInt, PositiveInt
+from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS
@@ -65,6 +65,22 @@ def init_configs(args=None):
         help='Path to eval configuration file when calling auto-evaluator '
         'in sandbox. '
         'If not specified, the eval related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--data_probe_algo',
+        type=str,
+        default='uniform',
+        help='Sampling algorithm to use. Options are "uniform", '
+        '"frequency_specified_field_selector", or '
+        '"topk_specified_field_selector". Default is "uniform". Only '
+        'used for dataset sampling',
+        required=False)
+    parser.add_argument(
+        '--data_probe_ratio',
+        type=ClosedUnitInterval,
+        default=1.0,
+        help='The ratio of the sample size to the original dataset size. '
+        'Default is 1.0 (no sampling). Only used for dataset sampling',
         required=False)
 
     # basic global paras with extended type hints

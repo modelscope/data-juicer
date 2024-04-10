@@ -93,6 +93,7 @@ class Executor:
 
     def sample_data(self,
                     dataset_to_sample: Dataset = None,
+                    load_data_np=None,
                     sample_ratio: float = 1.0,
                     sample_algo: str = 'uniform',
                     **kwargs):
@@ -101,6 +102,7 @@ class Executor:
 
         :param dataset_to_sample: Dataset to sample from. If None, will use
             the formatter linked by the executor. Default is None.
+        :param load_data_np: number of workers when loading the dataset.
         :param sample_ratio: The ratio of the sample size to the original
             dataset size. Default is 1.0 (no sampling).
         :param sample_algo: Sampling algorithm to use. Options are "uniform",
@@ -117,7 +119,9 @@ class Executor:
             dataset = self.ckpt_manager.load_ckpt()
         elif hasattr(self, 'formatter'):
             logger.info('Loading dataset from data formatter...')
-            dataset = self.formatter.load_dataset()
+            if load_data_np is None:
+                load_data_np = self.cfg.np
+            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
         else:
             raise ValueError('No dataset available to sample from.')
 

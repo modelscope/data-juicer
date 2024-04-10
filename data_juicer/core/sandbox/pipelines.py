@@ -178,7 +178,7 @@ class SandBoxExecutor:
         if (self.model_infer_executor is not None
                 and self.data_evaluator is not None):
             sampled_data = self.data_executor.sample_data(
-                sample_ratio=self.dj_cfg.data_probe_num,
+                sample_ratio=self.dj_cfg.data_probe_ratio,
                 sample_algo=self.dj_cfg.data_probe_algo,
             )
             res_type, infer_res = self.model_infer_executor.run(sampled_data)
