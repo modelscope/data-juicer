@@ -46,6 +46,11 @@ def init_configs(args=None):
         help='Path to save a configuration file when using k-sigma tool.',
         required=False)
     parser.add_argument(
+        '--path_model_feedback_recipe',
+        type=str,
+        help='Path to save a configuration file refined by model feedback.',
+        required=False)
+    parser.add_argument(
         '--model_infer_config',
         type=str,
         help='Path to model inference configuration file when calling '
@@ -60,10 +65,17 @@ def init_configs(args=None):
         'training related hooks will be disabled.',
         required=False)
     parser.add_argument(
-        '--eval_config',
+        '--data_eval_config',
         type=str,
         help='Path to eval configuration file when calling auto-evaluator '
-        'in sandbox. '
+        'for data in sandbox. '
+        'If not specified, the eval related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--model_eval_config',
+        type=str,
+        help='Path to eval configuration file when calling auto-evaluator '
+        'for model in sandbox. '
         'If not specified, the eval related hooks will be disabled.',
         required=False)
     parser.add_argument(

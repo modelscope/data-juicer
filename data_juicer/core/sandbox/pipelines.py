@@ -1,9 +1,11 @@
-import wandb
+from typing import List
+
 import yaml
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import namespace_to_dict
 from loguru import logger
 
+import wandb
 from data_juicer.config import init_configs, merge_config
 from data_juicer.core import Analyser
 from data_juicer.core import Executor as DjExecutor
@@ -17,7 +19,7 @@ from tools.hpo.execute_hpo_3sigma import modify_recipe_k_sigma
 class SandBoxWatcher:
     """
     Basic Watcher class to manage interested results, and manage the experiment
-    within the sanbox based on WandB UI and it's utilities.
+    within the sandbox based on WandB UI and it's utilities.
     """
 
     def __init__(self, dj_cfg):
@@ -27,13 +29,13 @@ class SandBoxWatcher:
 
         # the web-ui and experiment versioning is based on WandB
         project_name = dj_cfg.project_name
-        sweep_config = dj_cfg.sweep_config
+        hpo_config = dj_cfg.hpo_config
         self.dj_cfg = dj_cfg
 
         self.wandb_run = wandb.init(project=project_name)
-        if (sweep_config is not None and 'metric' in sweep_config
-                and 'name' in sweep_config['metric']):
-            self.object_name_in_hpo = sweep_config['metric']['name']
+        if (hpo_config is not None and 'metric' in hpo_config
+                and 'name' in hpo_config['metric']):
+            self.object_name_in_hpo = hpo_config['metric']['name']
         else:
             self.object_name_in_hpo = None
         self.logged_res = {}
@@ -65,27 +67,30 @@ class SandBoxWatcher:
                 res = float(res)
             self.wandb_run.log({res_name: res})
 
-    def setup_sweep(self, sweep_config: dict = None, project_name: str = None):
+    def setup_sweep(self, hpo_config: dict = None, project_name: str = None):
         """
         Setup and start a new WandB sweep.
         """
-        if sweep_config is None:
-            sweep_config = self.dj_cfg.sweep_config
+        if hpo_config is None:
+            hpo_config = self.dj_cfg.hpo_config
         if project_name is None:
             project_name = self.dj_cfg.project_name
-        sweep_id = wandb.sweep(sweep=sweep_config, project=project_name)
-        if (sweep_config is not None and 'metric' in sweep_config
-                and 'name' in sweep_config['metric']):
-            self.object_name_in_hpo = sweep_config['metric']['name']
+        sweep_id = wandb.sweep(sweep=hpo_config, project=project_name)
+        if (hpo_config is not None and 'metric' in hpo_config
+                and 'name' in hpo_config['metric']):
+            self.object_name_in_hpo = hpo_config['metric']['name']
         return sweep_id
 
-    def watch_cfgs(self, cfgs: list[(dict, str)] = None):
+    def watch_cfgs(self, cfgs: List[tuple] = None):
         """
         Watch the configuration of the experiment.
         """
         merged_cfgs = {}
         if cfgs is not None:
             for cfg, cfg_prefix in cfgs:
+                # skip empty configs
+                if cfg is None:
+                    continue
                 if isinstance(cfg, JsonNamespace):
                     converged_cfg = namespace_to_dict(cfg)
                 elif isinstance(cfg, dict):
@@ -163,15 +168,20 @@ class SandBoxExecutor:
 
         self.register_default_jobs()
 
-    def hook_probe_via_analyzer(self, res_name: str):
+    def hook_probe_via_analyzer(self, args: dict, **kwargs):
         # probe the data via Analyser
         logger.info('Begin to analyze data')
         analyser = Analyser(self.dj_cfg)
         analyser.run()
         analyser_res = analyser.overall_result
-        self.watcher.watch(analyser_res, res_name)
+        # drop string rows to avoid unaligned dtypes
+        string_rows = ['unique', 'top', 'freq']
+        for row_name in string_rows:
+            if row_name in analyser_res.index:
+                analyser_res = analyser_res.drop(row_name)
+        self.watcher.watch(analyser_res, args['res_name'])
 
-    def hook_probe_via_model_infer(self, res_name: str):
+    def hook_probe_via_model_infer(self, args: dict, **kwargs):
         # probe the model (calling inference sub-pipeline) based on
         # original data, such that we know what is the "hard" data for
         # the model and how to process the data accordingly
@@ -183,16 +193,16 @@ class SandBoxExecutor:
             )
             res_type, infer_res = self.model_infer_executor.run(sampled_data)
             measure_on_infer_res = self.data_evaluator.run(res_type, infer_res)
-            self.watcher.watch({res_name: measure_on_infer_res})
+            self.watcher.watch({args['res_name']: measure_on_infer_res})
 
-    def hook_refine_recipe_via_k_sigma(self):
+    def hook_refine_recipe_via_k_sigma(self, args: dict, **kwargs):
         # use k-sigma strategy to modify the data recipe
         if self.dj_cfg.path_k_sigma_recipe is not None:
             modify_recipe_k_sigma(self.dj_cfg,
-                                  self.watcher.query('analyser_res'),
+                                  self.watcher.query(args['res_name']),
                                   self.dj_cfg.path_k_sigma_recipe)
 
-    def hook_refine_recipe_via_model_feedback(self):
+    def hook_refine_recipe_via_model_feedback(self, args: dict, **kwargs):
         # use model-feedback-based strategy to modify the data recipe,
         # e.g., more mapper on the "hard" or "sensitive" data, those were
         # ranked by user-interested measurement after model inference
@@ -203,24 +213,33 @@ class SandBoxExecutor:
             #     self.dj_cfg.path_model_feedback_recipe)
             raise NotImplementedError('Not implemented yet.')
 
-    def hook_process_data(self):
+    def hook_process_data(self, args: dict, **kwargs):
         # basic routine to process data, users can customize this freely
         logger.info('Begin to process the data with given dj recipe')
         self.data_executor.run()
 
-    def hook_train_model(self, **kwargs):
+    def hook_train_model(self, args: dict, **kwargs):
+        if not self.model_trainer:
+            return
+
         # basic routine to train model via the processed data,
         # users can customize this freely
         logger.info('Begin to train the model with given model config')
         self.model_trainer.run(**kwargs)
 
-    def hook_evaluate_data(self, **kwargs):
+    def hook_evaluate_data(self, args: dict, **kwargs):
+        if not self.data_evaluator:
+            return
+
         # basic routine to evaluate the given data,
         # users can customize this freely
         logger.info('Begin to evaluate the data with given evaluator config')
         self.data_evaluator.run(**kwargs)
 
-    def hook_evaluate_model(self, **kwargs):
+    def hook_evaluate_model(self, args: dict, **kwargs):
+        if not self.model_evaluator:
+            return
+
         # basic routine to evaluate the given model,
         # users can customize this freely
         logger.info('Begin to evaluate the model with given evaluator config')
@@ -234,8 +253,9 @@ class SandBoxExecutor:
             'res_name': 'analysis_ori_model'
         }))
 
-        self.refine_recipe_jobs.append(
-            (self.hook_refine_recipe_via_k_sigma, None))
+        self.refine_recipe_jobs.append((self.hook_refine_recipe_via_k_sigma, {
+            'res_name': 'analysis_ori_data'
+        }))
         self.refine_recipe_jobs.append(
             (self.hook_refine_recipe_via_model_feedback, None))
 
@@ -304,9 +324,9 @@ class SandBoxExecutor:
           evaluation metrics to the watcher.
         """
         with open(self.dj_cfg.hpo_config) as file:
-            sweep_configuration = yaml.safe_load(file)
-            sweep_id = self.watcher.setup_sweep(sweep_configuration)
+            hpo_configuration = yaml.safe_load(file)
+            sweep_id = self.watcher.setup_sweep(hpo_configuration)
             wandb.agent(sweep_id,
                         function=self.one_trial,
-                        count=sweep_configuration['sweep_max_count']
-                        if 'sweep_max_count' in sweep_configuration else None)
+                        count=hpo_configuration['sweep_max_count']
+                        if 'sweep_max_count' in hpo_configuration else None)

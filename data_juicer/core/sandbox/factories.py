@@ -11,6 +11,9 @@ class DataEvaluatorFactory(object):
     """
 
     def __call__(self, eval_cfg: dict = None, *args, **kwargs):
+        if eval_cfg is None:
+            return None
+
         evaluator = None
         if eval_cfg.type == 'dj_video_evaluator':
             pass
@@ -32,6 +35,9 @@ class ModelEvaluatorFactory(object):
     """
 
     def __call__(self, eval_cfg: dict = None, *args, **kwargs):
+        if eval_cfg is None:
+            return None
+
         pass
 
 
@@ -41,6 +47,9 @@ model_evaluator_factory = ModelEvaluatorFactory()
 class ModelInferExecutorFactory(object):
 
     def __call__(self, model_cfg: dict = None, *args, **kwargs):
+        if model_cfg is None:
+            return None
+
         if model_cfg.type == 'modelscope':
             return ModelscopeInferExecutor(model_cfg)
 
@@ -53,7 +62,10 @@ mode_infer_executor_factory = ModelInferExecutorFactory()
 class ModelTrainExecutorFactory(object):
 
     def __call__(self, model_cfg: dict = None, *args, **kwargs):
-        if model_cfg.name == 'modelscope':
+        if model_cfg is None:
+            return None
+
+        if model_cfg.type == 'modelscope':
             return ModelscopeTrainExecutor(model_cfg)
 
         # add more model trainer here freely
