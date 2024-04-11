@@ -36,7 +36,6 @@
 # }
 #
 import os
-import shutil
 from pathlib import Path
 
 import click
@@ -45,6 +44,7 @@ from loguru import logger
 from tqdm import tqdm
 
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.file_utils import copy_data
 
 
 def match_prefix(candidates, string):
@@ -64,19 +64,6 @@ def get_last_dict(d, nest_key):
             last_dict[key] = {}
         last_dict = last_dict[key]
     return last_dict, final_key
-
-
-def copy_data(from_dir, to_dir, data_path):
-    from_path = os.path.join(from_dir, data_path)
-    to_path = os.path.join(to_dir, data_path)
-    if not os.path.exists(from_path):
-        logger.warning(f'Data does not exists: {from_path}.')
-        return False
-    parent_dir = os.path.dirname(to_path)
-    if not os.path.exists(parent_dir):
-        os.makedirs(parent_dir)
-    shutil.copy2(from_path, to_path)
-    return True
 
 
 @logger.catch
@@ -180,7 +167,9 @@ def convert_absolute_path_to_relative_path(
                 # copy and reorganize multimodal datas
                 if target_mt_dir is not None:
                     for d, p in zip(cur_dirs, relative_paths):
-                        copy_data(d, target_mt_dir, p)
+                        succeed = copy_data(d, target_mt_dir, p)
+                        if not succeed:
+                            logger.warning(f'{p} does not exists in {d}.')
 
             samples.append(sample)
 
