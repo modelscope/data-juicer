@@ -1,3 +1,4 @@
+import os.path
 from typing import List
 
 import yaml
@@ -13,6 +14,7 @@ from data_juicer.core.sandbox.factories import (data_evaluator_factory,
                                                 mode_infer_executor_factory,
                                                 model_evaluator_factory,
                                                 model_train_executor_factory)
+from data_juicer.utils.file_utils import add_suffix_to_filename
 from tools.hpo.execute_hpo_3sigma import modify_recipe_k_sigma
 
 
@@ -182,18 +184,17 @@ class SandBoxExecutor:
         self.watcher.watch(analyser_res, args['res_name'])
 
     def hook_probe_via_model_infer(self, args: dict, **kwargs):
+        # TODO
         # probe the model (calling inference sub-pipeline) based on
         # original data, such that we know what is the "hard" data for
         # the model and how to process the data accordingly
-        if (self.model_infer_executor is not None
-                and self.data_evaluator is not None):
+        if self.model_infer_executor is not None:
             sampled_data = self.data_executor.sample_data(
                 sample_ratio=self.dj_cfg.data_probe_ratio,
                 sample_algo=self.dj_cfg.data_probe_algo,
             )
             res_type, infer_res = self.model_infer_executor.run(sampled_data)
-            measure_on_infer_res = self.data_evaluator.run(res_type, infer_res)
-            self.watcher.watch({args['res_name']: measure_on_infer_res})
+            self.watcher.watch({args['res_name']: infer_res})
 
     def hook_refine_recipe_via_k_sigma(self, args: dict, **kwargs):
         # use k-sigma strategy to modify the data recipe
@@ -203,6 +204,7 @@ class SandBoxExecutor:
                                   self.dj_cfg.path_k_sigma_recipe)
 
     def hook_refine_recipe_via_model_feedback(self, args: dict, **kwargs):
+        # TODO
         # use model-feedback-based strategy to modify the data recipe,
         # e.g., more mapper on the "hard" or "sensitive" data, those were
         # ranked by user-interested measurement after model inference
@@ -217,6 +219,12 @@ class SandBoxExecutor:
         # basic routine to process data, users can customize this freely
         logger.info('Begin to process the data with given dj recipe')
         self.data_executor.run()
+        # update the input dataset path to the processed dataset path
+        processed_ds_path = self.dj_cfg.export_path
+        new_analyzed_ds = add_suffix_to_filename(processed_ds_path,
+                                                 '_processed')
+        self.dj_cfg.dataset_path = processed_ds_path
+        self.dj_cfg.export_path = new_analyzed_ds
 
     def hook_train_model(self, args: dict, **kwargs):
         if not self.model_trainer:
@@ -234,7 +242,13 @@ class SandBoxExecutor:
         # basic routine to evaluate the given data,
         # users can customize this freely
         logger.info('Begin to evaluate the data with given evaluator config')
-        self.data_evaluator.run(**kwargs)
+        processed_dataset = self.dj_cfg.dataset_path
+        export_path = os.path.dirname(processed_dataset)
+        eval_res = self.data_evaluator.run(eval_type='data',
+                                           eval_obj=processed_dataset,
+                                           export_path=export_path,
+                                           **kwargs)
+        self.watcher.watch(eval_res, args['res_name'])
 
     def hook_evaluate_model(self, args: dict, **kwargs):
         if not self.model_evaluator:

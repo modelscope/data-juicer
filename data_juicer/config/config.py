@@ -52,30 +52,30 @@ def init_configs(args=None):
         required=False)
     parser.add_argument(
         '--model_infer_config',
-        type=str,
-        help='Path to model inference configuration file when calling '
-        'model executor in sandbox. If not specified, the model '
+        type=Union[str, dict],
+        help='Path or a dict to model inference configuration file when '
+        'calling model executor in sandbox. If not specified, the model '
         'inference related hooks will be disabled.',
         required=False)
     parser.add_argument(
         '--model_train_config',
-        type=str,
-        help='Path to model training configuration file when calling '
-        'model executor in sandbox. If not specified, the model '
+        type=Union[str, dict],
+        help='Path or a dict to model training configuration file when '
+        'calling model executor in sandbox. If not specified, the model '
         'training related hooks will be disabled.',
         required=False)
     parser.add_argument(
         '--data_eval_config',
-        type=str,
-        help='Path to eval configuration file when calling auto-evaluator '
-        'for data in sandbox. '
+        type=Union[str, dict],
+        help='Path or a dict to eval configuration file when calling '
+        'auto-evaluator for data in sandbox. '
         'If not specified, the eval related hooks will be disabled.',
         required=False)
     parser.add_argument(
         '--model_eval_config',
-        type=str,
-        help='Path to eval configuration file when calling auto-evaluator '
-        'for model in sandbox. '
+        type=Union[str, dict],
+        help='Path or a dict to eval configuration file when calling '
+        'auto-evaluator for model in sandbox. '
         'If not specified, the eval related hooks will be disabled.',
         required=False)
     parser.add_argument(

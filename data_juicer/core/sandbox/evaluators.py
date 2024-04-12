@@ -1,8 +1,8 @@
 import os
 import shutil
 
-from datasets import Dataset
-
+# TODO: cannot import tools correctly if DJ is installed by pypi. Maybe we need
+#       other importing methods.
 from tools.quality_classifier.predict import predict_score
 
 
@@ -24,25 +24,25 @@ class Gpt3QualityEvaluator(BaseEvaluator):
 
     def run(self, eval_type, eval_obj, export_path='', **kwargs):
         if eval_type == 'data':
-            assert issubclass(type(eval_obj), Dataset)
-            tmp_data_export_path = export_path + '.tmp_data.jsonl'
-            eval_obj.save_to_disk(export_path=tmp_data_export_path)
-            tmp_res_export_path = tmp_data_export_path + '.tmp_res.jsonl'
+            # eval_obj is the path to the dataset to be evaluated
+            assert isinstance(eval_obj, str)
+            input_data_path = eval_obj
+            tmp_res_export_path = input_data_path + '.tmp_res.jsonl'
             if os.path.exists(tmp_res_export_path):
                 if os.path.isfile(tmp_res_export_path):
                     os.remove(tmp_res_export_path)
                 if os.path.isdir(tmp_res_export_path):
                     shutil.rmtree(tmp_res_export_path)
 
-            overall_quality_stats = predict_score(tmp_data_export_path,
+            overall_quality_stats = predict_score(input_data_path,
                                                   tmp_res_export_path,
                                                   overall_stats=True)
 
-            os.remove(tmp_res_export_path)
+            shutil.rmtree(tmp_res_export_path)
 
             # by default, using the mean quality score of processed data
             # as final score
-            return overall_quality_stats.loc['mean']
+            return float(overall_quality_stats.loc['mean'])
         else:
             raise NotImplementedError(
                 'Unsupported evaluation type: {}'.format(eval_type))

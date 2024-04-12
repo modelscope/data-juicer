@@ -1,7 +1,22 @@
+import yaml
 from loguru import logger
 
-from data_juicer.config import init_configs
+from data_juicer.config import dict_to_namespace, init_configs
 from data_juicer.core import SandBoxExecutor
+
+
+def prepare_side_configs(config):
+    if isinstance(config, str):
+        # config path
+        with open(config) as fin:
+            config = yaml.safe_load(fin)
+            return dict_to_namespace(config)
+    elif isinstance(config, dict):
+        # config dict
+        config = dict_to_namespace(config)
+        return config
+    else:
+        raise TypeError(f'Unrecognized side config type: [{type(config)}.')
 
 
 def split_configs(cfg):
@@ -16,13 +31,15 @@ def split_configs(cfg):
         'dj_cfg': cfg,
     }
     if cfg.model_infer_config:
-        configs['model_infer_cfg'] = cfg.model_infer_config
+        configs['model_infer_cfg'] = prepare_side_configs(
+            cfg.model_infer_config)
     if cfg.model_train_config:
-        configs['model_train_cfg'] = cfg.model_train_config
+        configs['model_train_cfg'] = prepare_side_configs(
+            cfg.model_train_config)
     if cfg.data_eval_config:
-        configs['data_eval_cfg'] = cfg.data_eval_config
+        configs['data_eval_cfg'] = prepare_side_configs(cfg.data_eval_config)
     if cfg.model_eval_config:
-        configs['model_eval_cfg'] = cfg.model_eval_config
+        configs['model_eval_cfg'] = prepare_side_configs(cfg.model_eval_config)
 
     return configs
 
