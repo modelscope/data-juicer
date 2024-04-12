@@ -26,8 +26,10 @@ def is_valid_path(item, dataset_dir):
     return os.path.exists(full_path)
 
 
-def convert_to_absolute_paths(dict_with_paths, dataset_dir):
+def convert_to_absolute_paths(dict_with_paths, dataset_dir, path_keys):
     for key, value in dict_with_paths.items():
+        if key not in path_keys:
+            continue
         if isinstance(value, list):
             dict_with_paths[key] = [
                 os.path.abspath(os.path.join(dataset_dir, item))
@@ -43,14 +45,14 @@ def convert_to_absolute_paths(dict_with_paths, dataset_dir):
     return dict_with_paths
 
 
-def set_dataset_to_absolute_path(dataset, dataset_path):
+def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     """
     Set all the path in input data to absolute path.
     Checks dataset_dir and project_dir for valid paths.
     """
     dataset_dir = os.path.dirname(dataset_path)
-    dataset = dataset.map(
-        lambda item: convert_to_absolute_paths(item, dataset_dir))
+    dataset = dataset.map(lambda item: convert_to_absolute_paths(
+        item, dataset_dir, [cfg.video_key, cfg.image_key, cfg.audio_key]))
     logger.info(f"transfer {dataset.count()} sample's paths")
     return dataset
 
@@ -109,7 +111,8 @@ class RayExecutor:
         dataset = rd.read_json(self.cfg.dataset_path)
 
         # convert all the path in dataset to absolute path
-        dataset = set_dataset_to_absolute_path(dataset, self.cfg.dataset_path)
+        dataset = set_dataset_to_absolute_path(dataset, self.cfg.dataset_path,
+                                               self.cfg)
         # 2. extract processes
         logger.info('Preparing process operators...')
         self.process_list, self.ops = load_ops(self.cfg.process,
