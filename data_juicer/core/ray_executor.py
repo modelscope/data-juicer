@@ -26,31 +26,36 @@ def is_valid_path(item, dataset_dir):
     return os.path.exists(full_path)
 
 
-def convert_to_absolute_paths(dict_with_paths, dataset_dir):
-    for key, value in dict_with_paths.items():
-        if isinstance(value, list):
+def convert_to_absolute_paths(dict_with_paths, dataset_dir, path_keys):
+    for key in path_keys:
+        if key not in dict_with_paths:
+            continue
+        if isinstance(dict_with_paths[key], list):
             dict_with_paths[key] = [
                 os.path.abspath(os.path.join(dataset_dir, item))
                 if isinstance(item, str) and is_valid_path(dataset_dir, item)
-                else item for item in value
+                else item for item in dict_with_paths[key]
             ]
-        elif isinstance(value, str):
+        elif isinstance(dict_with_paths[key], str):
             dict_with_paths[key] = os.path.abspath(
-                os.path.join(
-                    dataset_dir,
-                    value)) if isinstance(value, str) and is_valid_path(
-                        value, dataset_dir) else value
+                os.path.join(dataset_dir,
+                             dict_with_paths[key])) if is_valid_path(
+                                 dict_with_paths[key],
+                                 dataset_dir) else dict_with_paths[key]
     return dict_with_paths
 
 
-def set_dataset_to_absolute_path(dataset, dataset_path):
+def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     """
     Set all the path in input data to absolute path.
     Checks dataset_dir and project_dir for valid paths.
     """
+    if not (cfg.video_key in dataset.columns() or cfg.image_key
+            in dataset.columns() or cfg.audio_key in dataset.columns()):
+        return dataset
     dataset_dir = os.path.dirname(dataset_path)
-    dataset = dataset.map(
-        lambda item: convert_to_absolute_paths(item, dataset_dir))
+    dataset = dataset.map(lambda item: convert_to_absolute_paths(
+        item, dataset_dir, [cfg.video_key, cfg.image_key, cfg.audio_key]))
     logger.info(f"transfer {dataset.count()} sample's paths")
     return dataset
 
@@ -109,7 +114,9 @@ class RayExecutor:
         dataset = rd.read_json(self.cfg.dataset_path)
 
         # convert all the path in dataset to absolute path
-        dataset = set_dataset_to_absolute_path(dataset, self.cfg.dataset_path)
+        dataset = set_dataset_to_absolute_path(dataset, self.cfg.dataset_path,
+                                               self.cfg)
+        logger.info('Dataset columns:', dataset.columns())
         # 2. extract processes
         logger.info('Preparing process operators...')
         self.process_list, self.ops = load_ops(self.cfg.process,
