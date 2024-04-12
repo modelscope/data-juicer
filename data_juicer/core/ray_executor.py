@@ -50,9 +50,8 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     Set all the path in input data to absolute path.
     Checks dataset_dir and project_dir for valid paths.
     """
-    if not (cfg.video_key in dataset.schema().names
-            or cfg.image_key in dataset.schema().names
-            or cfg.audio_key in dataset.schema().names):
+    if not (cfg.video_key in dataset.columns() or cfg.image_key
+            in dataset.columns() or cfg.audio_key in dataset.columns()):
         return dataset
     dataset_dir = os.path.dirname(dataset_path)
     dataset = dataset.map(lambda item: convert_to_absolute_paths(
