@@ -27,21 +27,21 @@ def is_valid_path(item, dataset_dir):
 
 
 def convert_to_absolute_paths(dict_with_paths, dataset_dir, path_keys):
-    for key, value in dict_with_paths.items():
-        if key not in path_keys:
+    for key in path_keys:
+        if key not in dict_with_paths:
             continue
-        if isinstance(value, list):
+        if isinstance(dict_with_paths[key], list):
             dict_with_paths[key] = [
                 os.path.abspath(os.path.join(dataset_dir, item))
                 if isinstance(item, str) and is_valid_path(dataset_dir, item)
-                else item for item in value
+                else item for item in dict_with_paths[key]
             ]
-        elif isinstance(value, str):
+        elif isinstance(dict_with_paths[key], str):
             dict_with_paths[key] = os.path.abspath(
-                os.path.join(
-                    dataset_dir,
-                    value)) if isinstance(value, str) and is_valid_path(
-                        value, dataset_dir) else value
+                os.path.join(dataset_dir,
+                             dict_with_paths[key])) if is_valid_path(
+                                 dict_with_paths[key],
+                                 dataset_dir) else dict_with_paths[key]
     return dict_with_paths
 
 
@@ -50,6 +50,10 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     Set all the path in input data to absolute path.
     Checks dataset_dir and project_dir for valid paths.
     """
+    if not (cfg.video_key in dataset.schema().names
+            or cfg.image_key in dataset.schema().names
+            or cfg.audio_key in dataset.schema().names):
+        return dataset
     dataset_dir = os.path.dirname(dataset_path)
     dataset = dataset.map(lambda item: convert_to_absolute_paths(
         item, dataset_dir, [cfg.video_key, cfg.image_key, cfg.audio_key]))
