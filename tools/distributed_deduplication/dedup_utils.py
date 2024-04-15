@@ -9,7 +9,7 @@ from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
 
-def init_spark(master_ulr: Union[str, None] = None,
+def init_spark(master_url: Union[str, None] = None,
                spark_executor_memory=None,
                spark_driver_memory=None,
                spark_executor_memoryOverhead=None):
@@ -19,12 +19,12 @@ def init_spark(master_ulr: Union[str, None] = None,
         spark_driver_memory = '64g'
     if not spark_executor_memoryOverhead:
         spark_executor_memoryOverhead = '20000'
-    if not master_ulr:
-        master_ulr = 'local[*]'
+    if not master_url:
+        master_url = 'local[*]'
     conf = SparkConf()
     conf.set('spark.app.name', 'MinHashLSH')
     conf.set('spark.debug.maxToStringFields', '100')
-    conf.set('spark.master', master_ulr)
+    conf.set('spark.master', master_url)
     conf.set('spark.executor.memory', spark_executor_memory)
     conf.set('spark.driver.memory', spark_driver_memory)
     conf.set('spark.sql.execution.arrow.pyspark.enabled', 'true')
