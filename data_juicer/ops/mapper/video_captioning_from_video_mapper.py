@@ -245,8 +245,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
                                                        temperature=0.7,
                                                        top_p=0.9,
                                                        repetition_penalty=1.5,
-                                                       do_sample=True).to(
-                                                           model.device)
+                                                       do_sample=True)
                         generated_text = processor.batch_decode(
                             generated_ids, skip_special_tokens=True)
                         generated_text_candidates_single_chunk[

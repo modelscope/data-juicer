@@ -217,7 +217,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
             captioned_text_list = []
             # tag ops
             for op in self.tag_op_list:
-                temp_sample = op.process(temp_sample)
+                temp_sample = op.process(temp_sample, rank=rank)
             if Fields.video_audio_tags in temp_sample:
                 captioned_text_list.extend(
                     temp_sample[Fields.video_audio_tags])
@@ -228,11 +228,13 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
             for op in self.cap_op_list:
                 captioned_text_list.append(
                     remove_special_tokens(
-                        op._process_single_sample(temp_sample)[0]['text']))
+                        op._process_single_sample(temp_sample,
+                                                  rank=rank)[0]['text']))
 
             # summarization
             all_texts = ', '.join(captioned_text_list)
-            input_ids = tokenizer(all_texts, return_tensors='pt').input_ids
+            input_ids = tokenizer(all_texts, return_tensors='pt').input_ids.to(
+                model.device)
             outputs = model.generate(input_ids, max_new_tokens=128)
             summarized_text = tokenizer.decode(outputs[0],
                                                skip_special_tokens=True)

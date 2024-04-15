@@ -156,13 +156,14 @@ class VideoAestheticsFilter(Filter):
 
             # compute aesthetics_scores
             model, processor = get_model(self.model_key, rank=rank)
-            inputs = processor(images=frame_images, return_tensors='pt')
+            inputs = processor(images=frame_images,
+                               return_tensors='pt').to(model.device)
             with torch.no_grad():
                 outputs = model(**inputs)
             if self.need_normalized_by_ten:
-                aesthetics_score = (outputs.logits / 10.0).detach().cpu()
+                aesthetics_score = outputs.logits / 10.0
             else:
-                aesthetics_score = outputs.logits.detach().cpu()
+                aesthetics_score = outputs.logits
 
             if self.reduce_mode == 'avg':
                 aesthetics_score = float(aesthetics_score.mean())

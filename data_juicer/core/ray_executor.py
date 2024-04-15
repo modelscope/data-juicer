@@ -6,15 +6,19 @@ import pandas as pd
 import pyarrow as pa
 from loguru import logger
 
-from data_juicer import use_cuda
+from data_juicer import cuda_device_count, use_cuda
 from data_juicer.config import init_configs
 from data_juicer.ops import Filter, Mapper, load_ops
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.process_utils import calculate_np
 
 with AvailabilityChecking(['ray'], requires_type='dist'):
     import ray
     import ray.data as rd
+    from ray.data import ActorPoolStrategy
+
+from data_juicer.ops.base_op import OPERATORS
 
 
 def is_valid_path(item, dataset_dir):
@@ -22,32 +26,37 @@ def is_valid_path(item, dataset_dir):
     return os.path.exists(full_path)
 
 
-def convert_to_absolute_paths(dict_with_paths, dataset_dir):
-    for key, value in dict_with_paths.items():
-        if isinstance(value, list):
+def convert_to_absolute_paths(dict_with_paths, dataset_dir, path_keys):
+    for key in path_keys:
+        if key not in dict_with_paths:
+            continue
+        if isinstance(dict_with_paths[key], list):
             dict_with_paths[key] = [
                 os.path.abspath(os.path.join(dataset_dir, item))
                 if isinstance(item, str) and is_valid_path(dataset_dir, item)
-                else item for item in value
+                else item for item in dict_with_paths[key]
             ]
-        elif isinstance(value, str):
+        elif isinstance(dict_with_paths[key], str):
             dict_with_paths[key] = os.path.abspath(
-                os.path.join(
-                    dataset_dir,
-                    value)) if isinstance(value, str) and is_valid_path(
-                        value, dataset_dir) else value
+                os.path.join(dataset_dir,
+                             dict_with_paths[key])) if is_valid_path(
+                                 dict_with_paths[key],
+                                 dataset_dir) else dict_with_paths[key]
     return dict_with_paths
 
 
-def set_dataset_to_absolute_path(dataset, dataset_path):
+def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     """
     Set all the path in input data to absolute path.
     Checks dataset_dir and project_dir for valid paths.
     """
+    if not (cfg.video_key in dataset.columns() or cfg.image_key
+            in dataset.columns() or cfg.audio_key in dataset.columns()):
+        return dataset
     dataset_dir = os.path.dirname(dataset_path)
-    dataset = dataset.map(
-        lambda item: convert_to_absolute_paths(item, dataset_dir))
-    print(f"transfer {dataset.count()} sample's paths")
+    dataset = dataset.map(lambda item: convert_to_absolute_paths(
+        item, dataset_dir, [cfg.video_key, cfg.image_key, cfg.audio_key]))
+    logger.info(f"transfer {dataset.count()} sample's paths")
     return dataset
 
 
@@ -61,11 +70,11 @@ def ray_batch_mapper_wrapper(samples, fn):
 
 class RayExecutor:
     """
-    Executor based on Ray [Experimental].
+    Executor based on Ray.
 
     Run Data-Juicer data processing in a distributed cluster.
 
-        1. Only support Filter and Mapper operators for now.
+        1. Support Filter, Mapper and Exact Deduplicator operators for now.
         2. Only support loading `.json` files.
         3. Advanced functions such as checkpoint, tracer are not supported.
 
@@ -87,6 +96,12 @@ class RayExecutor:
         ray.init(self.cfg.ray_address)
         self.process_list = self.cfg.process
 
+    def get_num_gpus(self, op, op_proc):
+        if not use_cuda() or not op._accelerator == 'cuda':
+            return 0
+        proc_per_gpu = op_proc / cuda_device_count()
+        return 1.0 / proc_per_gpu
+
     def run(self, load_data_np=None):
         """
         Running the dataset process pipeline.
@@ -99,9 +114,9 @@ class RayExecutor:
         dataset = rd.read_json(self.cfg.dataset_path)
 
         # convert all the path in dataset to absolute path
-        dataset = set_dataset_to_absolute_path(dataset, self.cfg.dataset_path)
-        for items in dataset.iter_rows():
-            print('item is:', items)
+        dataset = set_dataset_to_absolute_path(dataset, self.cfg.dataset_path,
+                                               self.cfg)
+        logger.info('Dataset columns:', dataset.columns())
         # 2. extract processes
         logger.info('Preparing process operators...')
         self.process_list, self.ops = load_ops(self.cfg.process,
@@ -125,19 +140,54 @@ class RayExecutor:
         logger.info('Processing data...')
         tstart = time.time()
         for op_cfg, op in zip(self.process_list, self.ops):
-            num_gpus = 1 if use_cuda() and op._accelerator == 'cuda' else 0
-            op_name, _ = list(op_cfg.items())[0]
+            op_name, op_args = list(op_cfg.items())[0]
+            op_cls = OPERATORS.modules[op_name]
+            op_proc = calculate_np(self.cfg.np, op, op_name)
+            num_gpus = self.get_num_gpus(op, op_proc)
+            use_actor = op.use_actor() or num_gpus
             try:
                 if isinstance(op, Mapper):
                     if op.is_batched_op():
-                        dataset = dataset.map_batches(partial(
-                            ray_batch_mapper_wrapper, fn=op.process),
-                                                      batch_format='pyarrow',
-                                                      num_gpus=num_gpus)
+                        if use_actor:
+                            dataset = dataset.map_batches(
+                                op_cls,
+                                compute=ActorPoolStrategy(),
+                                concurrency=op_proc,
+                                fn_constructor_kwargs=op_args,
+                                batch_format='pyarrow',
+                                num_gpus=num_gpus,
+                                batch_size=1)
+                            # The batch size here is same as in data.py
+                        else:
+                            dataset = dataset.map_batches(
+                                partial(ray_batch_mapper_wrapper,
+                                        fn=op.process),
+                                batch_format='pyarrow',
+                                num_gpus=num_gpus,
+                                batch_size=1)
+                            # The batch size here is same as in data.py
                     else:
-                        dataset = dataset.map(op.process, num_gpus=num_gpus)
+                        if use_actor:
+                            dataset = dataset.map(
+                                op_cls,
+                                compute=ActorPoolStrategy(),
+                                concurrency=op_proc,
+                                fn_constructor_kwargs=op_args,
+                                num_gpus=num_gpus)
+                        else:
+                            dataset = dataset.map(op.process,
+                                                  num_gpus=num_gpus)
+
                 elif isinstance(op, Filter):
-                    dataset = dataset.map(op.compute_stats, num_gpus=num_gpus)
+                    if use_actor:
+                        dataset = dataset.map(op_cls,
+                                              compute=ActorPoolStrategy(),
+                                              concurrency=op_proc,
+                                              fn_constructor_kwargs=op_args,
+                                              num_gpus=num_gpus)
+                    else:
+                        dataset = dataset.map(op.compute_stats,
+                                              num_gpus=num_gpus)
                     dataset = dataset.filter(op.process)
                 else:
                     logger.error(
@@ -149,10 +199,10 @@ class RayExecutor:
                 import traceback
                 traceback.print_exc()
                 exit(1)
-        tend = time.time()
-        logger.info(f'All Ops are done in {"%.3f" % (tend - tstart)}(s).')
 
         # 4. data export
         logger.info('Exporting dataset to disk...')
         dataset.write_json(self.cfg.export_path, force_ascii=False)
+        tend = time.time()
+        logger.info(f'All Ops are done in {"%.3f" % (tend - tstart)}(s).')
         return dataset

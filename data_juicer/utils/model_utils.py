@@ -7,7 +7,7 @@ import multiprocess as mp
 import wget
 from loguru import logger
 
-from data_juicer import use_cuda
+from data_juicer import cuda_device_count, use_cuda
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 
@@ -437,7 +437,8 @@ def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
 
 def prepare_diffusion_model(pretrained_model_name_or_path,
                             diffusion_type,
-                            floating_point='fp32'):
+                            torch_dtype='fp32',
+                            revision='main'):
     """
         Prepare and load an Diffusion model from HuggingFace.
 
@@ -445,8 +446,11 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
             or local path to the model
         :param diffusion_type: the use of the diffusion model. It can be
             'image2image', 'text2image', 'inpainting'
-        :param floating_point: the floating point to load the diffusion
-            model. It can be 'fp16', 'fp32'
+        :param torch_dtype: the floating point to load the diffusion
+            model. Can be one of ['fp32', 'fp16', 'bf16']
+        :param revision: The specific model version to use. It can be a
+            branch name, a tag name, a commit id, or any identifier allowed
+            by Git.
         :return: a Diffusion model.
     """
     import torch
@@ -466,20 +470,24 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
             'model. Can only be one of '
             '["image2image", "text2image", "inpainting"].')
 
-    if floating_point not in ['fp32', 'fp16']:
+    if torch_dtype not in ['fp32', 'fp16', 'bf16']:
         raise ValueError(
-            f'Not support {floating_point} floating_point for diffusion '
+            f'Not support {torch_dtype} torch_dtype for diffusion '
             'model. Can only be one of '
-            '["fp32", "fp16"].')
+            '["fp32", "fp16", "bf16"].')
 
-    if not use_cuda() and floating_point == 'fp16':
+    if not use_cuda() and (torch_dtype == 'fp16' or torch_dtype == 'bf16'):
         raise ValueError(
-            'In cpu mode, only fp32 floating_point can be used for diffusion'
+            'In cpu mode, only fp32 torch_dtype can be used for diffusion'
             ' model.')
 
     pipeline = diffusion_type_to_pipeline[diffusion_type]
-    revision = floating_point
-    torch_dtype = torch.float32 if floating_point == 'fp32' else torch.float16
+    if torch_dtype == 'bf16':
+        torch_dtype = torch.bfloat16
+    elif torch_dtype == 'fp16':
+        torch_dtype = torch.float16
+    else:
+        torch_dtype = torch.float32
 
     model = pipeline.from_pretrained(pretrained_model_name_or_path,
                                      revision=revision,
@@ -563,5 +571,6 @@ def get_model(model_key=None, rank=None):
         MODEL_ZOO[model_key] = model_key()
     if use_cuda():
         rank = 0 if rank is None else rank
+        rank = rank % cuda_device_count()
         move_to_cuda(MODEL_ZOO[model_key], rank)
     return MODEL_ZOO[model_key]

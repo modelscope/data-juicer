@@ -3,7 +3,7 @@ from time import time
 
 from loguru import logger
 
-from data_juicer import cuda_device_count, use_cuda
+from data_juicer import use_cuda
 from data_juicer.config import init_configs
 from data_juicer.format.load import load_formatter
 from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
@@ -11,6 +11,7 @@ from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.process_utils import calculate_np
 
 from .data import add_same_content_to_new_column
 from .exporter import Exporter
@@ -116,12 +117,13 @@ class Executor:
         for op_cfg, op in zip(self.process_list, self.ops):
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
-            if use_cuda() and op._accelerator == 'cuda':
-                op_proc = min(cuda_device_count(), self.cfg.np)
-                with_rank = True
+            with_rank = use_cuda() and op._accelerator == 'cuda'
+            if op.spec_numprocs != 0:
+                op_proc = op.spec_numprocs
+                logger.info(f'Op [{op_name}] running with sepcified '
+                            f'number of procs:{op.spec_numprocs}')
             else:
-                op_proc = self.cfg.np
-                with_rank = False
+                op_proc = calculate_np(self.cfg.np, op, op_name)
             try:
                 if isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,
