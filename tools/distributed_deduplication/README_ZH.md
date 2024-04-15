@@ -17,7 +17,6 @@ python spark_dedup.py \
     <dataset_path> \
     <result_path> \
     [--tokenizer <tokenizer_type>] \
-    [--threshold <threshold_value>] \
     [--num_features <num_features>] \
     [--num_hashtables <num_hashtables>] \
     [--text_key <text_key>] \
@@ -30,7 +29,6 @@ python spark_dedup.py --help
 - `dataset_path`：输入数据集路径。路径的后缀应该是`[json, jsonl, parquet]`中的一个。
 - `result_path`：存储带有预测结果数据集的路径。路径的后缀应该是`[json, jsonl, parquet]`中的一个。
 - `tokenizer`：（可选。默认值：None）用于对将要分类的文本进行分词的分词器。如果为None，将使用PySpark的[标准分词器](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Tokenizer.html#tokenizer)。此外，你可以使用我们提供的分词器`[zh.sp.model, code.sp.model]`中的一个，或者你可以将其设置为你自己的[sentencepiece](https://github.com/google/sentencepiece)模型的路径。
-- `threshold`：（可选。默认值：0.7）如果两个文档之间的Jaccard相似度超出预设定的阈值，则它们会被认为是重复的。去重的准确度取决于相似度阈值的设定。阈值越低，能识别的重复项就越多，但这可能增加误报的风险。你需要根据你对去重准确度的需求来调整阈值。
 - `num_features`：HashingTF生成的特征数量。默认值为1047576，如megatron-turing-nlg论文中所述。
 - `num_hashtables`：（可选。默认值：10）MinHashLSH中使用的哈希数量。默认使用10个哈希，如GPT-3论文中所述。
 - `text_key`：（可选。默认值："text"）输入数据集中用于存储待分类文本的字段名称。

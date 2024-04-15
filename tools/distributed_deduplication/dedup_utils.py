@@ -2,7 +2,7 @@
 # https://github.com/bigcode-project/bigcode-dataset/blob/main/near_deduplication/minhash_deduplication_spark.py
 # --------------------------------------------------------
 
-from typing import Union
+from typing import List, Tuple, Union
 
 from loguru import logger
 from pyspark import SparkConf
@@ -32,6 +32,29 @@ def init_spark(master_url: Union[str, None] = None,
     spark = SparkSession.builder.config(conf=conf).getOrCreate()
     logger.info('Spark initialization done.')
     return spark
+
+
+def generate_edges(nodes: List[int]) -> List[Tuple[int, int]]:
+    """
+    Generate edges from a cluster. Instead of generating N^2 edges,
+    we only need all nodes align to a single node,
+    since we will be running connected components on the edges later.
+
+    Parameters
+    ----------
+    nodes : List[int]
+        The list of nodes in the cluster.
+
+    Returns
+    -------
+    List[Tuple[int, int]]
+        The list of edges.
+    """
+    if len(nodes) <= 1:
+        return []
+
+    min_node = min(nodes)
+    return [(n, min_node) for n in nodes if n != min_node]
 
 
 # Connected Components in MapReduce and Beyond

@@ -6,10 +6,10 @@ import fire
 from loguru import logger
 from pyspark.ml.feature import HashingTF, MinHashLSH, Tokenizer
 from pyspark.sql import functions as F
-from pyspark.sql.functions import col
-from pyspark.sql.functions import min as mincol
+from pyspark.sql.functions import posexplode
 
 from tools.distributed_deduplication.dedup_utils import (find_components,
+                                                         generate_edges,
                                                          init_spark)
 from tools.quality_classifier.qc_utils import (export_result, load_dataset,
                                                tokenize_dataset)
@@ -19,7 +19,6 @@ from tools.quality_classifier.qc_utils import (export_result, load_dataset,
 def dedup_dataset(dataset_path: str,
                   result_path: str,
                   tokenizer: Union[str, None] = None,
-                  threshold: float = 0.7,
                   num_features: int = 1047576,
                   num_hashtables: int = 10,
                   text_key: str = 'text',
@@ -33,13 +32,6 @@ def dedup_dataset(dataset_path: str,
         default, which means using the standard Tokenizer of PySpark. You can
         use one of ["zh.sp.model", "code.sp.model"] we provided, or you can set
         it to the path to your own sentencepiece model.
-    :param threshold: if the Jaccard similarity between two documents
-        exceeds a predetermined threshold, they are considered duplicates.
-        The accuracy of deduplication depends on the similarity threshold set.
-        The lower the threshold, the more duplicates can be identified,
-        but this may also increase the risk of false positives.
-        You need to adjust the threshold based on your requirements for
-        deduplication accuracy.
     :param num_features: the number of features that HashingTF generates.
         Default with 1047576 as mentioned in megatron-turing-nlg paper.
     :param num_hashtables: the number of hashes used in MinHashLSH.
@@ -73,16 +65,13 @@ def dedup_dataset(dataset_path: str,
 
     ds = model.transform(ds)
 
-    self_join = model.approxSimilarityJoin(
-        ds, ds, threshold=threshold,
-        distCol='JaccardDistance').filter('datasetA.id > datasetB.id').select(
-            col('datasetA.id').alias('idA'),
-            col('datasetB.id').alias('idB'), col('JaccardDistance'))
+    ds = ds.select('id', posexplode('hashes').alias('band_idx', 'hash_vector'))
 
-    self_dup_edge = self_join.groupBy('idA').agg(
-        mincol(col('idB')).alias('min_idB'))
+    record = ds.rdd.map(lambda x:
+                        (x['band_idx'], int(x['hash_vector'][0]), x['id']))
 
-    edges = (self_dup_edge.rdd.map(lambda row: (row.idA, row.min_idB)))
+    edges = (record.groupBy(lambda x: (x[0], x[1])).flatMap(
+        lambda x: generate_edges([i[2] for i in x[1]])).distinct().cache())
 
     results = find_components(edges)
     if len(results) == 0:

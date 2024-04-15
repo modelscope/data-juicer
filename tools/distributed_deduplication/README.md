@@ -26,7 +26,6 @@ python spark_dedup.py \
     <dataset_path> \
     <result_path> \
     [--tokenizer <tokenizer_type>] \
-    [--threshold <threshold_value>] \
     [--num_features <num_features>] \
     [--num_hashtables <num_hashtables>] \
     [--text_key <text_key>] \
@@ -39,7 +38,6 @@ python spark_dedup.py --help
 - `dataset_path`: the input dataset path. The suffix of the path should be one of the `[json, jsonl, parquet]`.
 - `result_path`: the path to store the dataset with prediction results. The suffix of the path should be one of the `[json, jsonl, parquet]`.
 - `tokenizer`: (Optional. Default: None) the tokenizer to tokenize texts to be classified. If it's None, the [standard Tokenizer](https://spark.apache.org/docs/latest/api/python/reference/api/pyspark.ml.feature.Tokenizer.html#tokenizer) of PySpark will be used. Besides, you can use one of the tokenizers we provide `[zh.sp.model, code.sp.model]`. Or you can set it to a path to your own [sentencepiece](https://github.com/google/sentencepiece) model.
-- `threshold`: (Optional. Default: 0.7) If the Jaccard similarity between two documents exceeds a predetermined threshold, they are considered duplicates. The accuracy of deduplication depends on the similarity threshold set. The lower the threshold, the more duplicates can be identified, but this may also increase the risk of false positives. You need to adjust the threshold based on your requirements for deduplication accuracy.
 - `num_features`: the number of features that HashingTF generates. Default with 1047576 as mentioned in megatron-turing-nlg paper.
 - `num_hashtables`: (Optional. Default: 10) the number of hashes used in MinHashLSH. Default with 10 hashes as mentioned in the GPT3 paper.
 - `text_key`: (Optional. Default: "text") the field name to store texts to be classified in the input dataset.
