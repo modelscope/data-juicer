@@ -69,8 +69,6 @@ def main(
     video_special_token: str = SpecialTokens.video,
     sent_seperator: str = ' ',
     subset_type: str = 'classification',
-    convert_to_relative_paths: bool = False,
-    original_youku_ds_path: str = None,
 ):
     """
     Convert a Data-Juicer-format dataset to a Youku-mPLUG-like dataset.
@@ -90,14 +88,6 @@ def main(
     :param subset_type: the subset type of the input dataset. Should be one of
         ["pretrain", "classification", "retrieval", "captioning"]. Default:
         "classification".
-    :param convert_to_relative_paths: whether convert the video paths in this
-        dataset to relative paths to the original dataset. If it's True, an
-        extra argument original_youku_ds_path is required. When the processed
-        and converted dataset will be used in another machine, it's better to
-        set this argument to True. Default: False.
-    :param original_youku_ds_path: path to the original unprocessed Youku-mPLUG
-        dataset, which is used to help to recover the relative video paths for
-        better migration. Default: None.
     """
     # ----- Constant settings. Better not to change them. -----
     text_key = 'text'  # default key of field to store the sample text
@@ -149,20 +139,6 @@ def main(
     tgt_text_key = fields_infos[subset_type]['text_key']
     tgt_required_keys = fields_infos[subset_type]['other_required_keys']
 
-    # if convert_to_relative_paths is True, check if the original_youku_ds_path
-    # is provided as well.
-    if convert_to_relative_paths:
-        if not original_youku_ds_path:
-            raise ValueError('When convert_to_relative_paths is set to True, '
-                             'the original_youku_ds_path must be provided '
-                             'for recovering the relative paths. Please '
-                             'check and retry.')
-        original_youku_ds_path = os.path.abspath(original_youku_ds_path)
-        # if provided original_youku_ds_path is the dataset file path, only
-        # keep the directory path.
-        if os.path.isfile(original_youku_ds_path):
-            original_youku_ds_path = os.path.dirname(original_youku_ds_path)
-
     # save Youku-mPLUG dataset from Data-Juicer format
     logger.info(
         'Start converting the original dataset to Youku-mPLUG format...')
@@ -184,19 +160,6 @@ def main(
 
                 # add video, only keep the first one
                 video = s[video_key][0]
-                if convert_to_relative_paths:
-                    if video.startswith(original_youku_ds_path):
-                        video = os.path.relpath(video, original_youku_ds_path)
-                    else:
-                        raise ValueError(
-                            f'The original_youku_ds_path '
-                            f'[{original_youku_ds_path}] is not the '
-                            f'directory that contains the video '
-                            f'[{video}] in the sample of line number '
-                            f'[{line_num}]. Please check if the correct '
-                            f'original_youku_ds_path is provided or '
-                            f'something wrong with this sample, and try '
-                            f'again later.')
                 new_sample[tgt_video_key] = video
 
                 # add text, remove extra special tokens

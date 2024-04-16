@@ -36,7 +36,7 @@ with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoCaptioningFromVideoMapper(Mapper):
     """Mapper to generate samples whose captions are generated based on
-    another model and sampled video frame."""
+    a video-to-text model and sampled video frame."""
 
     def __init__(
         self,
@@ -226,7 +226,6 @@ class VideoCaptioningFromVideoMapper(Mapper):
                         prompt_texts = [self.prompt]
                     else:
                         prompt_texts = None
-
                     inputs = processor(
                         text=prompt_texts,
                         images=video_frame_videos_chunk,
@@ -241,8 +240,12 @@ class VideoCaptioningFromVideoMapper(Mapper):
                         0).permute(0, 2, 1, 3, 4)
                     for i in range(self.caption_num):
                         generated_ids = model.generate(**inputs,
-                                                       do_sample=True).to(
-                                                           model.device)
+                                                       num_beams=4,
+                                                       max_new_tokens=128,
+                                                       temperature=0.7,
+                                                       top_p=0.9,
+                                                       repetition_penalty=1.5,
+                                                       do_sample=True)
                         generated_text = processor.batch_decode(
                             generated_ids, skip_special_tokens=True)
                         generated_text_candidates_single_chunk[

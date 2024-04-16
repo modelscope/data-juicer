@@ -13,7 +13,7 @@ from pyspark.sql.types import ArrayType, DoubleType, IntegerType, StringType
 
 from data_juicer.utils.cache_utils import DATA_JUICER_MODELS_CACHE
 from data_juicer.utils.model_utils import (MODEL_LINKS,
-                                           prepare_sentencepiece_model)
+                                           prepare_sentencepiece_for_lang)
 
 
 def init_spark(spark_executor_memory=None,
@@ -192,7 +192,7 @@ def tokenize_dataset(ds, tokenizer):
     :return: a dataset with an extra column "words" that stores the tokenized
         texts
     """
-    tkn = prepare_sentencepiece_model('', tokenizer)
+    tkn = prepare_sentencepiece_for_lang('', tokenizer)
     # create a PySpark udf to tokenize the dataset
     tokenizer_udf = udf(lambda text: tkn.encode_as_pieces(text),
                         ArrayType(StringType()))

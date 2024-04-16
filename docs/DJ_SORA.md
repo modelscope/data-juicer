@@ -34,6 +34,7 @@ This project is being actively updated and maintained. We eagerly invite you to 
    - [✅] Support single machine multicore running
    - [✅] GPU utilization
    - [✅] Ray based multi-machine distributed running
+   - [✅] Aliyun PAI-DLC & Slurm based multi-machine distributed running
 - [ ] [WIP] Distributed scheduling optimization (OP-aware, automated load balancing) --> Aliyun PAI-DLC
 - [ ] [WIP] Distributed storage optimization
 
@@ -56,11 +57,11 @@ This project is being actively updated and maintained. We eagerly invite you to 
   - [✅] video_frames_text_similarity_filter (enhancement in the spatiotemporal consistency dimension, calculating the matching score of key/specified frames and text)
 - Towards Diversity & Quantity
   - [✅] video_tagging_from_frames_mapper (with lightweight image-to-text models, spatial summary information from dense frames)
-  - [ ] [WIP] video_captioning_from_frames_mapper (heavier image-to-text models, generating more detailed spatial information from fewer frames)
+  - [✅] video_captioning_from_frames_mapper (heavier image-to-text models, generating more detailed spatial information from fewer frames)
   - [✅] video_tagging_from_audio_mapper (introducing audio classification/category and other meta information)
   - [✅] video_captioning_from_audio_mapper (incorporating voice/dialogue information; AudioCaption for environmental and global context)
   - [✅] video_captioning_from_video_mapper (video-to-text model, generating spacetime information from continuous frames)
-  - [ ] [WIP] video_captioning_from_summarizer_mapper (combining the above sub-abilities, using pure text large models for denoising and summarizing different types of caption information)
+  - [✅] video_captioning_from_summarizer_mapper (combining the above sub-abilities, using pure text large models for denoising and summarizing different types of caption information)
   - [ ] [WIP] video_interleaved_mapper (enhancement in ICL, temporal, and cross-modal dimensions), `interleaved_modes` include:
     - text_image_interleaved (placing captions and frames of the same video in temporal order)
     - text_audio_interleaved (placing ASR text and frames of the same video in temporal order)
@@ -71,11 +72,11 @@ This project is being actively updated and maintained. We eagerly invite you to 
 - [✅] Compatibility with existing ffmpeg video commands
   - audio_ffmpeg_wrapped_mapper 
   - video_ffmpeg_wrapped_mapper
-- [WIP] Video content compliance and privacy protection operators (image, text, audio):
+- [✅] Video content compliance and privacy protection operators (image, text, audio):
   - [✅] Mosaic
-  - [ ] Copyright watermark
-  - [ ] Face blurring
-  - [ ] Violence and Adult Content
+  - [✅] Copyright watermark
+  - [✅] Face blurring
+  - [✅] Violence and Adult Content
 - [ ] [TODO] (Beyond Interpolation) Enhancing data authenticity and density
   - Collisions, lighting, gravity, 3D, scene and phase transitions, depth of field, etc.
   - [ ] Filter-type operators: whether captions describe authenticity, relevance scoring/correctness of that description
@@ -83,13 +84,14 @@ This project is being actively updated and maintained. We eagerly invite you to 
   - [ ] ...
 ## DJ-SORA Data Recipes and Datasets
 - Support for unified loading and conversion of representative datasets (other-data <-> dj-data), facilitating DJ operator processing and dataset expansion.
-  - [✅] **Video-ChatGPT**: 100k video-instruction data: `{<question, answer, youtube_id>}`
+  - [✅] **Video-ChatGPT**: 100K video-instruction data: `{<question, answer, youtube_id>}`
   - [✅] **Youku-mPLUG-CN**: 36TB video-caption data: `{<caption, video_id>}`
   - [✅] **InternVid**: 234M data sample: `{<caption, youtube_id, start/end_time>}`
-  - [ ] VideoInstruct-100K, Panda70M, MSR-VTT, ......
+  - [✅] **MSR-VTT**: 10K video-caption data: `{<caption, video_id>}`
+  - [ ] VideoInstruct-100K, Panda70M, ......
   - [ ] ModelScope's datasets integration
 - [ ] Large-scale high-quality DJ-SORA dataset
-   - [ ] [WIP] Continuous expansion of data sources: open-datasets, Youku, web, ...
+  - [ ] [WIP] Continuous expansion of data sources: open-datasets, Youku, web, ...
   - [ ] [WIP] (Data sandbox) Building and optimizing multimodal data recipes with DJ-video operators (which are also being continuously extended and improved).
   - [ ] [WIP] Large-scale analysis and cleaning of high-quality multimodal datasets based on DJ recipes
   - [ ] [WIP] Large-scale generation of high-quality multimodal datasets based on DJ recipes.

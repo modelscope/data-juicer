@@ -1,4 +1,4 @@
-[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
+[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
 
 # Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
@@ -18,7 +18,7 @@
 
 [![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documents)
 [![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documents)
-[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
+[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://modelscope.github.io/data-juicer/)
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 
 
@@ -29,6 +29,8 @@ juicier, and more digestible for LLMs.
 
 Data-Juicer (including [DJ-SORA](docs/DJ_SORA.md)) is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets. 
 We welcome you to join us in promoting LLM data development and research!
+
+We provide a [Playground](http://8.130.100.170/) with a managed JupyterLab. [Try Data-Juicer](http://8.130.100.170/) straight away in your browser!
 
 If you find Data-Juicer useful for your research or development, please kindly cite our [work](#references).
 Welcome any issues/PRs and to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw) 
@@ -54,35 +56,36 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 Table of Contents
 =================
 
-* [Data-Juicer: A One-Stop Data Processing System for Large Language Models](#data-juicer-a-one-stop-data-processing-system-for-large-language-models)
-* [Table of Contents](#table-of-contents)
-   * [Features](#features)
-   * [Documentation Index](#documents)
-   * [Demos](#demos)
-   * [Prerequisites](#prerequisites)
-   * [Installation](#installation)
-     * [From Source](#from-source)
-     * [Using pip](#using-pip)
-     * [Using Docker](#using-docker)
-     * [Installation check](#installation-check)
-   * [Quick Start](#quick-start)
-      * [Data Processing](#data-processing)
-      * [Distributed Data Processing](#distributed-data-processing)
-      * [Data Analysis](#data-analysis)
-      * [Data Visualization](#data-visualization)
-      * [Build Up Config Files](#build-up-config-files)
-      * [Preprocess raw data (Optional)](#preprocess-raw-data-optional)
-      * [For Docker Users](#for-docker-users)
-   * [Data Recipes](#data-recipes)
-   * [License](#license)
-   * [Contributing](#contributing)
-  * [Acknowledgement](#acknowledgement)
-  * [References](#references)
+- [Data-Juicer:  A One-Stop Data Processing System for Large Language Models](#data-juicer--a-one-stop-data-processing-system-for-large-language-models)
+  - [News](#news)
+- [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Documentation Index ](#documentation-index-)
+  - [Demos](#demos)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+    - [From Source](#from-source)
+    - [Using pip](#using-pip)
+    - [Using Docker](#using-docker)
+    - [Installation check](#installation-check)
+  - [Quick Start](#quick-start)
+    - [Data Processing](#data-processing)
+    - [Distributed Data Processing](#distributed-data-processing)
+    - [Data Analysis](#data-analysis)
+    - [Data Visualization](#data-visualization)
+    - [Build Up Config Files](#build-up-config-files)
+    - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
+    - [For Docker Users](#for-docker-users)
+  - [Data Recipes](#data-recipes)
+  - [License](#license)
+  - [Contributing](#contributing)
+  - [Acknowledgement](#acknowledgement)
+  - [References](#references)
 
 
 ## Features
 
-![Overview](https://img.alicdn.com/imgextra/i2/O1CN01IMPeD11xYRUYLmXKO_!!6000000006455-2-tps-3620-1604.png)
+![Overview](https://img.alicdn.com/imgextra/i4/O1CN01WYQP3Z1JHsaXaQDK6_!!6000000001004-0-tps-3640-1812.jpg)
 
 - **Systematic & Reusable**:
   Empowering users with a systematic library of 80+ core [OPs](docs/Operators.md), 20+ reusable [config recipes](configs), and 20+ feature-rich
@@ -91,7 +94,7 @@ Table of Contents
 
 - **Data-in-the-loop**: Allowing detailed data analyses with an automated
   report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.
-  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
+  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data
   processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on
@@ -122,7 +125,7 @@ Table of Contents
   - [Preprocess](tools/preprocess/README.md)
   - [Postprocess](tools/postprocess/README.md)
 - [Third-parties (LLM Ecosystems)](thirdparty/README.md)
-- [API references](https://alibaba.github.io/data-juicer/)
+- [API references](https://modelscope.github.io/data-juicer/)
 - [Awesome LLM-Data](docs/awesome_llm_data.md)
 - [DJ-SORA](docs/DJ_SORA.md)
 
@@ -217,6 +220,13 @@ import data_juicer as dj
 print(dj.__version__)
 ```
 
+### For Video-related Operators
+Before using video-related operators, **FFmpeg** should be installed and accessible via the $PATH environment variable.
+
+You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [offical ffmpeg link](https://ffmpeg.org/download.html).
+
+Check if your environment path is set correctly by running the ffmpeg command from the terminal.
+
 ## Quick Start
 
 
@@ -236,6 +246,8 @@ dj-process --config configs/demo/process.yaml
 - **Note:** For some operators that involve third-party models or resources which are not stored locally on your computer, it might be slow for the first running because these ops need to download corresponding resources into a directory first.
 The default download cache directory is `~/.cache/data_juicer`. Change the cache location by setting the shell environment variable, `DATA_JUICER_CACHE_HOME` to another directory, and you can also change `DATA_JUICER_MODELS_CACHE` or `DATA_JUICER_ASSETS_CACHE` in the same way:
 
+- **Note:** When using operators with third-party models, it's necessary to declare the corresponding `mem_required` in the configuration file (you can refer to the settings in the `config_all.yaml` file). During runtime, Data-Juicer will control the number of processes based on memory availability and the memory requirements of the operator models to achieve better data processing efficiency. When running with CUDA environment, if the mem_required for an operator is not declared correctly, it could potentially lead to a CUDA Out of Memory issue.
+
 ```shell
 # cache home
 export DATA_JUICER_CACHE_HOME="/path/to/another/directory"
@@ -247,7 +259,7 @@ export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 
 ### Distributed Data Processing
 
-We have now implemented multi-machine distributed data processing based on RAY. The corresponding demos can be run using the following commands:
+We have now implemented multi-machine distributed data processing based on [RAY](https://www.ray.io/). The corresponding demos can be run using the following commands:
 
 ```shell
 # Run text data processing
@@ -256,10 +268,10 @@ python tools/process_data.py --config ./demos/process_on_ray/configs/demo.yaml
 python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.yaml
 ```
 
-- To run multimodal data processing across multiple machines, it is necessary to ensure that all distributed nodes can access the corresponding data paths (for example, by mounting the respective data paths on a file-sharing system such as NAS).
+- To run data processing across multiple machines, it is necessary to ensure that all distributed nodes can access the corresponding data paths (for example, by mounting the respective data paths on a file-sharing system such as NAS).
+- The deduplicator operators for RAY mode are different from the single-machine version, and all those operators are prefixed with `ray`, e.g. `ray_video_deduplicator` and `ray_document_deduplicator`. Those operators also rely on a [Redis](https://redis.io/) instance. So in addition to starting the RAY cluster, you also need to setup your Redis instance in advance and provide `host` and `port` of your Redis instance in configuration.
 
-- Users can also opt not to use RAY and instead split the dataset to run on a cluster with Slurm/DLC.
-
+> Users can also opt not to use RAY and instead split the dataset to run on a cluster with [Slurm](https://slurm.schedmd.com/) / [Aliyun PAI-DLC](https://www.aliyun.com/activity/bigdata/pai-dlc). In this case, please use the default Data-Juicer without RAY.
 
 
 ### Data Analysis

@@ -2,6 +2,7 @@ import base64
 import datetime
 import os
 import re
+import shutil
 from typing import List, Union
 
 import av
@@ -335,6 +336,8 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
     :param frame_func: a function which inputs a frame and outputs another
         frame.
     """
+    frame_modified = False
+
     # open the original video
     if isinstance(input_video, str):
         container = av.open(input_video)
@@ -364,6 +367,8 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
         for packet in container.demux(input_video_stream):
             for frame in packet.decode():
                 new_frame = frame_func(frame)
+                if new_frame != frame:
+                    frame_modified = True
                 # for resize cases
                 output_video_stream.width = new_frame.width
                 output_video_stream.height = new_frame.height
@@ -379,10 +384,18 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
         container.close()
     output_container.close()
 
+    if frame_modified:
+        return output_video
+    else:
+        shutil.rmtree(output_video, ignore_errors=True)
+        return (input_video
+                if isinstance(input_video, str) else input_video.name)
+
 
 def extract_key_frames(input_video: Union[str, av.container.InputContainer]):
     """
-    Extract key frames from the input video.
+    Extract key frames from the input video. If there is no keyframes in the
+    video, return the first frame.
 
     :param input_video: input video path or container.
     :return: a list of key frames.
@@ -402,11 +415,19 @@ def extract_key_frames(input_video: Union[str, av.container.InputContainer]):
     ori_skip_method = input_video_stream.codec_context.skip_frame
     input_video_stream.codec_context.skip_frame = 'NONKEY'
     # restore to the beginning of the video
-    container.seek(0, backward=False, any_frame=False)
+    container.seek(0)
     for frame in container.decode(input_video_stream):
         key_frames.append(frame)
     # restore to the original skip_type
     input_video_stream.codec_context.skip_frame = ori_skip_method
+
+    if len(key_frames) == 0:
+        logger.warning(f'No keyframes in this video [{input_video}]. Return '
+                       f'the first frame instead.')
+        container.seek(0)
+        for frame in container.decode(input_video_stream):
+            key_frames.append(frame)
+            break
 
     if isinstance(input_video, str):
         container.close()
@@ -502,7 +523,7 @@ def extract_video_frames_uniformly(
             continue
         if key_frame_second == 0.0:
             # search from the beginning
-            container.seek(0, backward=False, any_frame=True)
+            container.seek(0)
             search_idx = 0
             curr_pts = second_group[search_idx] / time_base
             for frame in container.decode(input_video_stream):

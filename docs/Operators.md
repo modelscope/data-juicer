@@ -2,7 +2,7 @@
 
 Operators are a collection of basic processes that assist in data modification, cleaning, filtering, deduplication, etc. We support a wide range of data sources and file formats, and allow for flexible extension to custom datasets.
 
-This page offers a basic description of the operators (OPs) in Data-Juicer. Users can refer to the [API documentation](https://alibaba.github.io/data-juicer/) for the specific parameters of each operator. Users can refer to and run the unit tests for [examples of operator-wise usage](../tests/ops) as well as the effects of each operator when applied to built-in test data samples.
+This page offers a basic description of the operators (OPs) in Data-Juicer. Users can refer to the [API documentation](https://modelscope.github.io/data-juicer/) for the specific parameters of each operator. Users can refer to and run the unit tests for [examples of operator-wise usage](../tests/ops) as well as the effects of each operator when applied to built-in test data samples.
 
 ## Overview
 
@@ -11,8 +11,8 @@ The operators in Data-Juicer are categorized into 5 types.
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
-| [ Mapper ]( #mapper )             |   40   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   36   | Filters out low-quality samples                 |
+| [ Mapper ]( #mapper )             |   43   | Edits and transforms samples                    |
+| [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
 
@@ -79,7 +79,10 @@ All the specific operators are listed below, each featured with several capabili
 | replace_content_mapper                              | General            | en, zh | Replace all content in the text that matches a specific regular expression pattern with a designated replacement string                    |
 | sentence_split_mapper                               | General            | en     | Splits and reorganizes sentences according to semantics                                                       |
 | video_captioning_from_audio_mapper                  | Multimodal         | -      | Caption a video according to its audio streams based on Qwen-Audio model                                      |
+| video_captioning_from_frames_mapper                 | Multimodal         |  -     | generate samples whose captions are generated based on an image-to-text model and sampled video frames. Captions from different frames will be concatenated to a single string |
+| video_captioning_from_summarizer_mapper             | Multimodal         | -      | Generate video captions by summarizing several kinds of generated texts (captions from video/audio/frames, tags from audio/frames, ...) |
 | video_captioning_from_video_mapper                  | Multimodal         |  -     | generate samples whose captions are generated based on another model (video-blip) and sampled video frame within the original sample |
+| video_face_blur_mapper                              | Video              |  -     | Blur faces detected in videos                                                                                 |
 | video_ffmpeg_wrapped_mapper                         | Video              | -      | Simple wrapper to run a FFmpeg video filter                                                                   |
 | video_remove_watermark_mapper                       | Video              | -      | Remove the watermarks in videos given regions                                                                 |
 | video_resize_aspect_ratio_mapper                    | Video              | -      | Resize video aspect ratio to a specified range                                                                |
@@ -106,10 +109,12 @@ All the specific operators are listed below, each featured with several capabili
 | image_aesthetics_filter        | Image      | -      | Keeps samples containing images whose aesthetics scores are within the specified range                                                              |
 | image_aspect_ratio_filter      | Image      | -      | Keeps samples containing images with aspect ratios within the specified range                                                                       |
 | image_face_ratio_filter        | Image      | -      | Keeps samples containing images with face area ratios within the specified range                                                                    |
+| image_nsfw_filter              | Image      | -      | Keeps samples containing images with NSFW scores below the threshold                                                               |
 | image_shape_filter             | Image      | -      | Keeps samples containing images with widths and heights within the specified range                                                                  |
 | image_size_filter              | Image      | -      | Keeps samples containing images whose size in bytes are within the specified range                                                                  |
 | image_text_matching_filter     | Multimodal | -      | Keeps samples with image-text classification matching score within the specified range based on a BLIP model                                        |
 | image_text_similarity_filter   | Multimodal | -      | Keeps samples with image-text feature cosine similarity within the specified range based on a CLIP model                                            |
+| image_watermark_filter         | Image      | -      | Keeps samples containing images with predicted watermark probabilities below the threshold                                                               |
 | language_id_score_filter       | General    | en, zh | Keeps samples of the specified language, judged by a predicted confidence score                                                                     |
 | maximum_line_length_filter     | Code       | en, zh | Keeps samples with maximum line length within the specified range                                                                                   |
 | perplexity_filter              | General    | en, zh | Keeps samples with perplexity score below the specified threshold                                                                                   |
@@ -123,13 +128,16 @@ All the specific operators are listed below, each featured with several capabili
 | text_entity_dependency_filter  | General    | en, zh | Keeps samples containing entity nouns related to other tokens in the dependency tree of the texts                                                   |
 | text_length_filter             | General    | en, zh | Keeps samples with total text length within the specified range                                                                                     |
 | token_num_filter               | General    | en, zh | Keeps samples with token count within the specified range                                                                                           |
+| video_aesthetics_filter        | Video      | -      | Keeps samples whose specified frames have aesthetics scores within the specified range     |
 | video_aspect_ratio_filter      | Video      | -      | Keeps samples containing videos with aspect ratios within the specified range                                                                       |
 | video_duration_filter          | Video      | -      | Keep data samples whose videos' durations are within a specified range ｜                                                                            
-| video_aesthetics_filter        | Video      | -      | Keeps samples whose specified frames have aesthetics scores within the specified range     |
 | video_frames_text_similarity_filter    | Multimodal | -      | Keep data samples whose similarities between sampled video frame images and text are within a specific range ｜
 | video_motion_score_filter      | Video      | -      | Keep samples with video motion scores within a specific range ｜
+| video_nsfw_filter              | Video      | -      | Keeps samples containing videos with NSFW scores below the threshold                                                               |
 | video_ocr_area_ratio_filter    | Video      | -      | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range ｜                                  
 | video_resolution_filter        | Video      | -      | Keeps samples containing videos with horizontal and vertical resolutions within the specified range                                                 |
+| video_watermark_filter         | Video      | -      | Keeps samples containing videos with predicted watermark probabilities below the threshold                                                               |
+| video_tagging_from_frames_filter  | Video   | -      | Keep samples containing videos with given tags |
 | word_num_filter                | General    | en, zh | Keeps samples with word count within the specified range                                                                                            |
 | word_repetition_filter         | General    | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range                                                                    |
 
@@ -143,7 +151,9 @@ All the specific operators are listed below, each featured with several capabili
 | document_simhash_deduplicator | General | en, zh | Deduplicates samples at document-level using SimHash         |
 | image_deduplicator            | Image   |   -    | Deduplicates samples at document-level using exact matching of images between documents |
 | video_deduplicator            | Video   |   -    | Deduplicates samples at document-level using exact matching of videos between documents |
-
+| ray_document_deduplicator     | General | en, zh | Deduplicates samples at document-level by comparing MD5 hash on ray                     |
+| ray_image_deduplicator        | Image   |   -    | Deduplicates samples at document-level using exact matching of images between documents on ray |
+| ray_video_deduplicator        | Video   |   -    | Deduplicates samples at document-level using exact matching of videos between documents on ray |
 
 ## Selector <a name="selector"/>
 

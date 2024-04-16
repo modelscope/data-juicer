@@ -81,6 +81,14 @@ data\_juicer.ops.filter.image\_face\_ratio\_filter
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.filter.image\_nsfw\_filter
+-----------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.image_nsfw_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.filter.image\_shape\_filter
 ---------------------------------------------------
 
@@ -109,6 +117,14 @@ data\_juicer.ops.filter.image\_text\_similarity\_filter
 --------------------------------------------------------------
 
 .. automodule:: data_juicer.ops.filter.image_text_similarity_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.filter.image\_watermark\_filter
+-----------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.image_watermark_filter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -257,6 +273,14 @@ data\_juicer.ops.filter.video\_motion\_score\_filter
    :undoc-members:
    :show-inheritance:
 
+data\_juicer.ops.filter.video\_nsfw\_filter
+-----------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.video_nsfw_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_juicer.ops.filter.video\_ocr\_area\_ratio\_filter
 --------------------------------------------------------------
 
@@ -269,6 +293,22 @@ data\_juicer.ops.filter.video\_resolution\_filter
 --------------------------------------------------------
 
 .. automodule:: data_juicer.ops.filter.video_resolution_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.filter.video\_watermark\_filter
+-----------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.video_watermark_filter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.filter.video\_tagging\_from\_frames\_filter
+--------------------------------------------------------
+
+.. automodule:: data_juicer.ops.filter.video_tagging_from_frames_filter
    :members:
    :undoc-members:
    :show-inheritance:

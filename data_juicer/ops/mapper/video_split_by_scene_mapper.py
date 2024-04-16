@@ -120,9 +120,9 @@ class VideoSplitBySceneMapper(Mapper):
                     for i in range(len(scene_list))
                 ]
                 # split video into clips
-                split_video_ffmpeg(video_key,
-                                   scene_list,
-                                   output_template,
+                split_video_ffmpeg(input_video_path=video_key,
+                                   scene_list=scene_list,
+                                   output_file_template=output_template,
                                    show_progress=self.show_progress)
             else:
                 output_video_keys[video_key] = [video_key]

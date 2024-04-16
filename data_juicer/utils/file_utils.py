@@ -3,6 +3,7 @@ import copy
 import hashlib
 import os
 import re
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import AsyncGenerator, List, Tuple, Union
@@ -212,3 +213,19 @@ def transfer_filename(original_filepath: Union[str, Path], op_name,
     new_filepath = os.path.join(new_dir, f'{new_name}{ext}')
 
     return new_filepath
+
+
+def copy_data(from_dir, to_dir, data_path):
+    """
+        Copy data from from_dir/data_path to to_dir/data_path.
+        Return Ture if success.
+    """
+    from_path = os.path.join(from_dir, data_path)
+    to_path = os.path.join(to_dir, data_path)
+    if not os.path.exists(from_path):
+        return False
+    parent_dir = os.path.dirname(to_path)
+    if not os.path.exists(parent_dir):
+        os.makedirs(parent_dir)
+    shutil.copy2(from_path, to_path)
+    return True
