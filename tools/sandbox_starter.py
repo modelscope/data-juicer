@@ -1,3 +1,5 @@
+import json
+
 import yaml
 from loguru import logger
 
@@ -8,9 +10,18 @@ from data_juicer.core import SandBoxExecutor
 def prepare_side_configs(config):
     if isinstance(config, str):
         # config path
-        with open(config) as fin:
-            config = yaml.safe_load(fin)
-            return dict_to_namespace(config)
+        if config.endswith('.yaml') or config.endswith('.yml'):
+            with open(config) as fin:
+                config = yaml.safe_load(fin)
+                return dict_to_namespace(config)
+        elif config.endswith('.json'):
+            with open(config) as fin:
+                config = json.load(fin)
+                return dict_to_namespace(config)
+        else:
+            raise TypeError(f'Unrecognized config file type [{config}]. '
+                            f'Should be one of the types [".yaml", ".yml", '
+                            f'".json"].')
     elif isinstance(config, dict):
         # config dict
         config = dict_to_namespace(config)

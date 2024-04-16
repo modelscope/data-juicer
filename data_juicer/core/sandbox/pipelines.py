@@ -1,3 +1,4 @@
+import asyncio
 import os.path
 from typing import List
 
@@ -157,7 +158,8 @@ class SandBoxExecutor:
         self.data_executor = DjExecutor(self.dj_cfg)
         self.model_infer_executor = mode_infer_executor_factory(
             model_infer_cfg)
-        self.model_trainer = model_train_executor_factory(model_train_cfg)
+        self.model_trainer = model_train_executor_factory(model_train_cfg,
+                                                          watcher=self.watcher)
         self.data_evaluator = data_evaluator_factory(data_eval_cfg)
         self.model_evaluator = model_evaluator_factory(model_eval_cfg)
 
@@ -233,7 +235,14 @@ class SandBoxExecutor:
         # basic routine to train model via the processed data,
         # users can customize this freely
         logger.info('Begin to train the model with given model config')
-        self.model_trainer.run(**kwargs)
+        # update training dataset path
+        training_args = {
+            'train_dataset':
+            self.dj_cfg.dataset_path,
+            'work_dir':
+            os.path.join(self.dj_cfg.work_dir, 'model_trainer_outputs'),
+        }
+        asyncio.run(self.model_trainer.run(None, training_args, **kwargs))
 
     def hook_evaluate_data(self, args: dict, **kwargs):
         if not self.data_evaluator:

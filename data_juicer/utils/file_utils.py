@@ -1,21 +1,21 @@
+import asyncio
 import copy
 import hashlib
 import os
 import re
-import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Generator, List, Tuple, Union
+from typing import AsyncGenerator, List, Tuple, Union
 
 from datasets.utils.extract import ZstdExtractor as Extractor
 
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 
 
-def follow_read(
+async def follow_read(
     logfile_path: str,
     skip_existing_content: bool = False,
-) -> Generator:
+) -> AsyncGenerator:
     """Read a file in online and iterative manner
 
     Args:
@@ -38,7 +38,7 @@ def follow_read(
             line = logfile.readline()
             if not line:
                 # no new line, wait to avoid CPU override
-                time.sleep(0.1)
+                await asyncio.sleep(0.1)
                 continue
             yield line
 

@@ -66,7 +66,7 @@ class ModelTrainExecutorFactory(object):
             return None
 
         if model_cfg.type == 'modelscope':
-            return ModelscopeTrainExecutor(model_cfg)
+            return ModelscopeTrainExecutor(model_cfg, **kwargs)
 
         # add more model trainer here freely
 

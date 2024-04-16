@@ -4,6 +4,7 @@ import re
 import sys
 import time
 
+from data_juicer.config.config import namespace_to_dict
 from data_juicer.utils.file_utils import follow_read
 
 
@@ -12,10 +13,10 @@ class BaseModelExecutor(object):
     Base abstraction for model executor within the DataJuicer's sandbox
     """
 
-    def __init__(self, model_config: dict):
+    def __init__(self, model_config: dict, watcher=None):
         self.model_config = model_config
         self.executor = None
-        self.watcher = None
+        self.watcher = watcher
         # log to tell the end of model execution
         self.END_OF_MODEL_EXEC = \
             "<DJ-Sandbox> End of ModelExecutor's running <DJ-Sandbox>"
@@ -25,11 +26,11 @@ class BaseModelExecutor(object):
         conduct some model-related execution tasks
             given specified run_type and run_obj
         """
-        run_task = asyncio.create_task(self._run(run_type, run_obj, **kwargs))
         watch_task = asyncio.create_task(
             self.watch_run(run_type, run_obj, **kwargs))
-
         if self.watcher is None:
+            run_task = asyncio.create_task(
+                self._run(run_type, run_obj, **kwargs))
             await run_task
             return None
         else:
@@ -40,14 +41,17 @@ class BaseModelExecutor(object):
                 log_f_name = os.path.join(
                     self.watcher.dj_cfg.work_dir,
                     f'model_exe_{run_type}_{timestamp}.log')
+                # for h in self.executor.logger.handlers:
+                #     if isinstance(h, logging.FileHandler):
+                #         log_f_name = h.baseFilename
                 self.watcher.model_exe_log_file = log_f_name
-                summarized_watched_res = await watch_task
                 with open(log_f_name, 'w') as log_f:
                     sys.stdout = log_f
                     run_task = asyncio.create_task(
                         self._run(run_type, run_obj, **kwargs))
                     await run_task
-                    print(self.END_OF_MODEL_EXEC)
+                    print(self.END_OF_MODEL_EXEC, flush=True)
+                    summarized_watched_res = await watch_task
             finally:
                 sys.stdout = original_stdout
             return summarized_watched_res
@@ -60,12 +64,17 @@ class BaseModelExecutor(object):
         watch the running process in an online manner, and
             return the summarized results
         """
-        while True:
-            for line in follow_read(self.watcher.model_exe_log_file):
-                if self.END_OF_MODEL_EXEC in line:
-                    break
-                else:
-                    self._watch_run(line, **kwargs)
+        met_eof = False
+        while not met_eof:
+            if os.path.exists(self.watcher.model_exe_log_file):
+                async for line in follow_read(self.watcher.model_exe_log_file):
+                    if self.END_OF_MODEL_EXEC in line:
+                        met_eof = True
+                        break
+                    else:
+                        self._watch_run(line, **kwargs)
+            else:
+                await asyncio.sleep(0.1)
 
     def _watch_run(self, line, **kwargs):
         """
@@ -83,10 +92,24 @@ class BaseModelExecutor(object):
 
 class ModelScopeExecutor(BaseModelExecutor):
 
-    def data_connector(self, input_data, **kwargs):
+    def data_connector(self,
+                       input_data,
+                       split='train',
+                       key_remapping=None,
+                       **kwargs):
         try:
             from modelscope.msdatasets import MsDataset
-            return MsDataset.to_ms_dataset(input_data)
+            if isinstance(input_data, str):
+                # dataset path
+                ds = MsDataset.load(input_data, split=split).ds_instance
+            else:
+                ds = input_data
+            if key_remapping:
+                features = ds.features
+                for key in key_remapping:
+                    if key in features:
+                        ds = ds.rename_column(key, key_remapping[key])
+            return ds
         except ModuleNotFoundError:
             raise ModuleNotFoundError('modelscope package not installed')
 
@@ -112,7 +135,7 @@ class ModelscopeInferExecutor(ModelScopeExecutor):
         except ModuleNotFoundError:
             raise ModuleNotFoundError('modelscope package not installed')
 
-    def run(self, run_type, run_obj, **kwargs):
+    async def _run(self, run_type, run_obj, **kwargs):
         if run_type == 'infer_on_data':
             return self.executor(self.data_connector(run_obj), **kwargs)
         else:
@@ -121,34 +144,62 @@ class ModelscopeInferExecutor(ModelScopeExecutor):
 
 class ModelscopeTrainExecutor(ModelScopeExecutor):
 
-    def __init__(self, model_config: dict):
-        super().__init__(model_config)
-        self.model_config = model_config
+    def __init__(self, model_config, watcher=None):
+        super().__init__(model_config, watcher)
+        self.model_config = namespace_to_dict(model_config)
+        self.executor = None
+
+    def cfg_modify_fn(self, cfg):
+        cfg.merge_from_dict(self.model_config)
+        return cfg
+
+    def build_executor(self,
+                       model_name,
+                       trainer_name,
+                       work_dir,
+                       train_dataset=None,
+                       eval_dataset=None):
         try:
             from modelscope.trainers import build_trainer
-            self.executor = build_trainer(**model_config)
+            kwargs = dict(
+                model=model_name,
+                train_dataset=train_dataset,
+                eval_dataset=eval_dataset,
+                work_dir=work_dir,
+                cfg_modify_fn=self.cfg_modify_fn,
+            )
+            self.executor = build_trainer(
+                name=trainer_name,
+                default_args=kwargs,
+            )
         except ModuleNotFoundError:
             raise ModuleNotFoundError('modelscope package not installed')
 
-    def run(self, run_type, run_obj, **kwargs):
-        if run_type == 'has_configured':
-            self.executor.train()
-        elif run_type == 'update_config':
-            # training cfg updated, such as datasets and training parameters
-            if issubclass(type(run_obj), dict):
-                builder_kwargs = {**run_obj, **kwargs}
-            else:
-                builder_kwargs = kwargs
-            if 'train_dataset' in builder_kwargs:
-                builder_kwargs['train_dataset'] = self.data_connector(
-                    builder_kwargs['train_dataset'])
-            if 'eval_dataset' in builder_kwargs:
-                builder_kwargs['eval_dataset'] = self.data_connector(
-                    builder_kwargs['eval_dataset'])
-            self.__init__(**builder_kwargs)
-            self.executor.train()
+    async def _run(self, run_type, run_obj, **kwargs):
+        # training cfg updated, such as datasets and training parameters
+        builder_kwargs = {
+            'model_name': self.model_config['model_name'],
+            'trainer_name': self.model_config['trainer_name'],
+        }
+        if 'key_remapping' in self.model_config:
+            key_remapping = self.model_config['key_remapping']
         else:
-            raise ValueError(f'run_type {run_type} not supported')
+            key_remapping = None
+        if 'train_dataset' in run_obj:
+            builder_kwargs['train_dataset'] = self.data_connector(
+                run_obj['train_dataset'],
+                split='train',
+                key_remapping=key_remapping)
+        if 'eval_dataset' in run_obj:
+            builder_kwargs['eval_dataset'] = self.data_connector(
+                run_obj['eval_dataset'],
+                split='val',
+                key_remapping=key_remapping)
+        if 'work_dir' in run_obj:
+            builder_kwargs['work_dir'] = run_obj['work_dir']
+        self.work_dir = builder_kwargs['work_dir']
+        self.build_executor(**builder_kwargs)
+        self.executor.train()
 
 
 # TODO: add watcher for the re-directed output streams and log parsers
