@@ -35,18 +35,17 @@ class BaseModelExecutor(object):
             return None
         else:
             original_stdout = sys.stdout
+            original_stderr = sys.stderr
             try:
                 timestamp = time.strftime('%Y%m%d%H%M%S',
                                           time.localtime(time.time()))
                 log_f_name = os.path.join(
                     self.watcher.dj_cfg.work_dir,
                     f'model_exe_{run_type}_{timestamp}.log')
-                # for h in self.executor.logger.handlers:
-                #     if isinstance(h, logging.FileHandler):
-                #         log_f_name = h.baseFilename
                 self.watcher.model_exe_log_file = log_f_name
                 with open(log_f_name, 'w') as log_f:
                     sys.stdout = log_f
+                    sys.stderr = log_f
                     run_task = asyncio.create_task(
                         self._run(run_type, run_obj, **kwargs))
                     await run_task
@@ -54,6 +53,7 @@ class BaseModelExecutor(object):
                     summarized_watched_res = await watch_task
             finally:
                 sys.stdout = original_stdout
+                sys.stderr = original_stderr
             return summarized_watched_res
 
     async def _run(self, run_type, run_obj, **kwargs):
@@ -121,7 +121,7 @@ class ModelScopeExecutor(BaseModelExecutor):
         if self.watcher is not None:
             match = re.search(pattern, line)
             if match:
-                loss_value = match.group(1)
+                loss_value = float(match.group(1))
                 self.watcher.watch(loss_value, 'loss')
 
 
