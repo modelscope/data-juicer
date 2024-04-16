@@ -150,7 +150,7 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
         dataset = NestedDataset.from_list(ds_list)
         op = ImageDiffusionMapper(hf_diffusion=self.hf_diffusion,
                                   torch_dtype='fp16',
-                                  revision='fp16'
+                                  revision='fp16',
                                   aug_num=aug_num,
                                   keep_original_sample=False,
                                   caption_key='text')
