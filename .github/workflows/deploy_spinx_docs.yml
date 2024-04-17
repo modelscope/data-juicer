@@ -32,7 +32,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: SphinxDoc
-        path: 'docs/sphinx_doc/build'
+        path: 'docs/sphinx_doc/build/html'
     - uses: peaceiris/actions-gh-pages@v3
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
       with:
