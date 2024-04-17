@@ -27,7 +27,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
 
-    def test_default(self):
+    def test(self):
         ds_list = [{
             'text': f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [self.vid1_path]

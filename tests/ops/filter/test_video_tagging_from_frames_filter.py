@@ -28,7 +28,7 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
 
-    def test_default(self):
+    def test(self):
         ds_list = [{
             'text': f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [self.vid1_path]
@@ -73,7 +73,6 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
                                           frame_sampling_method='uniform',
                                           frame_num=10)
         self._run_video_tagging_from_frames_filter(op, ds_list, tgt_list)
-
 
     def test_contain_any(self):
         ds_list = [{
@@ -133,7 +132,6 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
                                           any_or_all='any')
         self._run_video_tagging_from_frames_filter(op, ds_list, tgt_list)
 
-
     def test_all(self):
         ds_list = [{
             'text':
@@ -158,7 +156,6 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
                                           contain='any',
                                           any_or_all='all')
         self._run_video_tagging_from_frames_filter(op, ds_list, tgt_list)
-
 
     def test_multi_process(self):
         # WARNING: current parallel tests only work in spawn method

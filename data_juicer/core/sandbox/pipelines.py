@@ -2,12 +2,12 @@ import asyncio
 import os.path
 from typing import List
 
+import wandb
 import yaml
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import namespace_to_dict
 from loguru import logger
 
-import wandb
 from data_juicer.config import init_configs, merge_config
 from data_juicer.core import Analyser
 from data_juicer.core import Executor as DjExecutor

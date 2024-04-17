@@ -4,7 +4,7 @@ import yaml
 from loguru import logger
 
 from data_juicer.config import dict_to_namespace, init_configs
-from data_juicer.core import SandBoxExecutor
+from data_juicer.core.sandbox.pipelines import SandBoxExecutor
 
 
 def prepare_side_configs(config):
