@@ -3,6 +3,8 @@ import os
 import unittest
 
 from data_juicer.core.data import NestedDataset
+from data_juicer.ops.mapper.video_tagging_from_frames_mapper import \
+    VideoTaggingFromFramesMapper
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
@@ -25,7 +27,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
 
-    def test(self):
+    def test_default(self):
         ds_list = [{
             'text': f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [self.vid1_path]
@@ -66,8 +68,6 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
                 'hand', 'selfie', 'stand'
             ]]
         }]
-        from data_juicer.ops.mapper.video_tagging_from_frames_mapper import \
-            VideoTaggingFromFramesMapper
         op = VideoTaggingFromFramesMapper()
         self._run_video_tagging_from_frames_mapper(op, ds_list, tgt_list)
 
@@ -115,8 +115,6 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
                 'point'
             ]]
         }]
-        from data_juicer.ops.mapper.video_tagging_from_frames_mapper import \
-            VideoTaggingFromFramesMapper
         op = VideoTaggingFromFramesMapper(frame_sampling_method='uniform',
                                           frame_num=10)
         self._run_video_tagging_from_frames_mapper(op, ds_list, tgt_list)
@@ -167,8 +165,6 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
                 'hand', 'selfie', 'stand'
             ]]
         }]
-        from data_juicer.ops.mapper.video_tagging_from_frames_mapper import \
-            VideoTaggingFromFramesMapper
         op = VideoTaggingFromFramesMapper()
         self._run_video_tagging_from_frames_mapper(op,
                                                    ds_list,
@@ -240,8 +236,6 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
                                           'cabinet', 'hand', 'selfie', 'stand'
                                       ]]
         }]
-        from data_juicer.ops.mapper.video_tagging_from_frames_mapper import \
-            VideoTaggingFromFramesMapper
         op = VideoTaggingFromFramesMapper()
         self._run_video_tagging_from_frames_mapper(op, ds_list, tgt_list)
 

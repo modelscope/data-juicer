@@ -3,6 +3,8 @@ import os
 import unittest
 
 from data_juicer.core.data import NestedDataset
+from data_juicer.ops.filter.video_tagging_from_frames_filter import \
+    VideoTaggingFromFramesFilter
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
@@ -26,7 +28,7 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
 
-    def test(self):
+    def test_default(self):
         ds_list = [{
             'text': f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [self.vid1_path]
@@ -43,8 +45,6 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
             'text': f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [self.vid1_path]
         }]
-        from data_juicer.ops.filter.video_tagging_from_frames_filter import \
-            VideoTaggingFromFramesFilter
         op = VideoTaggingFromFramesFilter(tags=['cartoon'])
         self._run_video_tagging_from_frames_filter(op, ds_list, tgt_list)
 
@@ -69,8 +69,6 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
             'videos': [self.vid3_path]
         }]
-        from data_juicer.ops.filter.video_tagging_from_frames_filter import \
-            VideoTaggingFromFramesFilter
         op = VideoTaggingFromFramesFilter(tags=['person'],
                                           frame_sampling_method='uniform',
                                           frame_num=10)
@@ -100,8 +98,7 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。{SpecialTokens.eoc}{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
             'videos': [self.vid1_path, self.vid3_path]
         }]
-        from data_juicer.ops.filter.video_tagging_from_frames_filter import \
-            VideoTaggingFromFramesFilter
+
         op = VideoTaggingFromFramesFilter(tags=['cartoon', 'fish'],
                                           contain='any',
                                           any_or_all='any')
@@ -130,8 +127,7 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。{SpecialTokens.eoc}{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
             'videos': [self.vid1_path, self.vid3_path]
         }]
-        from data_juicer.ops.filter.video_tagging_from_frames_filter import \
-            VideoTaggingFromFramesFilter
+
         op = VideoTaggingFromFramesFilter(tags=['girl', 'person'],
                                           contain='all',
                                           any_or_all='any')
@@ -157,8 +153,7 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。{SpecialTokens.eoc}{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
             'videos': [self.vid1_path, self.vid3_path]
         }]
-        from data_juicer.ops.filter.video_tagging_from_frames_filter import \
-            VideoTaggingFromFramesFilter
+
         op = VideoTaggingFromFramesFilter(tags=['cartoon', 'girl'],
                                           contain='any',
                                           any_or_all='all')
@@ -187,8 +182,6 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
             'text': f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [self.vid1_path]
         }]
-        from data_juicer.ops.filter.video_tagging_from_frames_filter import \
-            VideoTaggingFromFramesFilter
         op = VideoTaggingFromFramesFilter(tags=['cartoon'])
         self._run_video_tagging_from_frames_filter(op,
                                                    ds_list,
@@ -197,6 +190,7 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
         # WARNING: current parallel tests only work in spawn method
         multiprocess.set_start_method(original_method, force=True)
         # WARNING: current parallel tests only work in spawn method
+
 
 if __name__ == '__main__':
     unittest.main()
