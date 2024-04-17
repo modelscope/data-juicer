@@ -427,6 +427,11 @@ def init_setup_from_cfg(cfg):
                 args['image_key'] = cfg.image_key
                 args['audio_key'] = cfg.audio_key
                 args['video_key'] = cfg.video_key
+            if text_key:
+                args['text_key'] = text_key
+                args['image_key'] = cfg.image_key
+                args['audio_key'] = cfg.audio_key
+                args['video_key'] = cfg.video_key
             op[op_name] = args
 
     return cfg
