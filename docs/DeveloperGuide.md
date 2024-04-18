@@ -196,6 +196,12 @@ class StatsKeys(object):
 ```python
 from . import (...,              # other OPs
                text_length_filter)  # import this new OP module
+# other OPs
+from text_length_filter import TextLengthFilter  # import this new OP class
+__all__ = [
+    # other Ops
+    text_length_filter,  # add this new Op to __all__
+]
 ```
 
 4. Now you can use this new OP with custom arguments in your own config files!
@@ -279,7 +285,6 @@ the corresponding documents, including the following docs:
    3. `docs/Operators_ZH.md`: this doc is the Chinese version of the doc in 6.ii, so we need to update the Chinese content at
    the same positions.
 
-   4. `docs/sphinx_doc/source/data_juicer.ops.{filter | mapper | deduplicator | selector}.rst`: this doc is the index of API reference. When the operator file name is modified or an operator file is added or deleted, the corresponding entries in the file need to be updated accordingly.
 
 ### (Optional) Make your OP fusible
 
