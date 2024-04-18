@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="data_juicer.ops.common" href="data_juicer.ops.common.html" />
-    <link rel="prev" title="data_juicer.format" href="data_juicer.format.html" /> 
+    <link rel="next" title="data_juicer.ops.filter" href="data_juicer.ops.filter.html" />
+    <link rel="prev" title="data_juicer.core" href="data_juicer.core.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -45,42 +45,25 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="data_juicer.html">data_juicer</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">data_juicer.ops</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.ops.base_op">data_juicer.ops.base_op</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.ops.base_op.Deduplicator"><code class="docutils literal notranslate"><span class="pre">Deduplicator</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.ops.base_op.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.ops.base_op.Mapper"><code class="docutils literal notranslate"><span class="pre">Mapper</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.ops.base_op.OP"><code class="docutils literal notranslate"><span class="pre">OP</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.ops.base_op.Selector"><code class="docutils literal notranslate"><span class="pre">Selector</span></code></a></li>
+              <p class="caption" role="heading"><span class="caption-text">Data-Juicer API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">data_juicer.ops</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.load_ops"><code class="docutils literal notranslate"><span class="pre">load_ops()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.Mapper"><code class="docutils literal notranslate"><span class="pre">Mapper</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.Deduplicator"><code class="docutils literal notranslate"><span class="pre">Deduplicator</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.Selector"><code class="docutils literal notranslate"><span class="pre">Selector</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.ops.load">data_juicer.ops.load</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.ops.load.load_ops"><code class="docutils literal notranslate"><span class="pre">load_ops()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-data_juicer.ops.op_fusion">data_juicer.ops.op_fusion</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.ops.op_fusion.FusedFilter"><code class="docutils literal notranslate"><span class="pre">FusedFilter</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.ops.op_fusion.fuse_filter_group"><code class="docutils literal notranslate"><span class="pre">fuse_filter_group()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data_juicer.ops.op_fusion.fuse_operators"><code class="docutils literal notranslate"><span class="pre">fuse_operators()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.tools.html">data_juicer.tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.utils.html">data_juicer.utils</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
 </ul>
 
         </div>
@@ -97,7 +80,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="data_juicer.html">data_juicer</a></li>
       <li class="breadcrumb-item active">data_juicer.ops</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/data_juicer.ops.rst.txt" rel="nofollow"> View page source</a>
@@ -108,861 +90,34 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="data-juicer-ops">
-<h1>data_juicer.ops<a class="headerlink" href="#data-juicer-ops" title="Permalink to this heading">¶</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html#module-data_juicer.ops.common.helper_func">data_juicer.ops.common.helper_func</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.UnionFind"><code class="docutils literal notranslate"><span class="pre">UnionFind</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.UnionFind.__init__"><code class="docutils literal notranslate"><span class="pre">UnionFind.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.UnionFind.find"><code class="docutils literal notranslate"><span class="pre">UnionFind.find()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.UnionFind.union"><code class="docutils literal notranslate"><span class="pre">UnionFind.union()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.get_sentences_from_document"><code class="docutils literal notranslate"><span class="pre">get_sentences_from_document()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.get_words_from_document"><code class="docutils literal notranslate"><span class="pre">get_words_from_document()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.merge_on_whitespace_tab_newline"><code class="docutils literal notranslate"><span class="pre">merge_on_whitespace_tab_newline()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.split_on_newline_tab_whitespace"><code class="docutils literal notranslate"><span class="pre">split_on_newline_tab_whitespace()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.split_on_whitespace"><code class="docutils literal notranslate"><span class="pre">split_on_whitespace()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.strip"><code class="docutils literal notranslate"><span class="pre">strip()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.words_augmentation"><code class="docutils literal notranslate"><span class="pre">words_augmentation()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.words_refinement"><code class="docutils literal notranslate"><span class="pre">words_refinement()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html#module-data_juicer.ops.common.special_characters">data_juicer.ops.common.special_characters</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#module-data_juicer.ops.deduplicator.document_deduplicator">data_juicer.ops.deduplicator.document_deduplicator</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator"><code class="docutils literal notranslate"><span class="pre">DocumentDeduplicator</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator.__init__"><code class="docutils literal notranslate"><span class="pre">DocumentDeduplicator.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator.compute_hash"><code class="docutils literal notranslate"><span class="pre">DocumentDeduplicator.compute_hash()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_deduplicator.DocumentDeduplicator.process"><code class="docutils literal notranslate"><span class="pre">DocumentDeduplicator.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#module-data_juicer.ops.deduplicator.document_minhash_deduplicator">data_juicer.ops.deduplicator.document_minhash_deduplicator</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_minhash_deduplicator.DocumentMinhashDeduplicator"><code class="docutils literal notranslate"><span class="pre">DocumentMinhashDeduplicator</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_minhash_deduplicator.DocumentMinhashDeduplicator.__init__"><code class="docutils literal notranslate"><span class="pre">DocumentMinhashDeduplicator.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_minhash_deduplicator.DocumentMinhashDeduplicator.compute_hash"><code class="docutils literal notranslate"><span class="pre">DocumentMinhashDeduplicator.compute_hash()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_minhash_deduplicator.DocumentMinhashDeduplicator.process"><code class="docutils literal notranslate"><span class="pre">DocumentMinhashDeduplicator.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_minhash_deduplicator.optimal_param"><code class="docutils literal notranslate"><span class="pre">optimal_param()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_minhash_deduplicator.sha1_hash32"><code class="docutils literal notranslate"><span class="pre">sha1_hash32()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#module-data_juicer.ops.deduplicator.document_simhash_deduplicator">data_juicer.ops.deduplicator.document_simhash_deduplicator</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator"><code class="docutils literal notranslate"><span class="pre">DocumentSimhashDeduplicator</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.__init__"><code class="docutils literal notranslate"><span class="pre">DocumentSimhashDeduplicator.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.compute_hash"><code class="docutils literal notranslate"><span class="pre">DocumentSimhashDeduplicator.compute_hash()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.document_simhash_deduplicator.DocumentSimhashDeduplicator.process"><code class="docutils literal notranslate"><span class="pre">DocumentSimhashDeduplicator.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#module-data_juicer.ops.deduplicator.image_deduplicator">data_juicer.ops.deduplicator.image_deduplicator</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator"><code class="docutils literal notranslate"><span class="pre">ImageDeduplicator</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator.__init__"><code class="docutils literal notranslate"><span class="pre">ImageDeduplicator.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator.compute_hash"><code class="docutils literal notranslate"><span class="pre">ImageDeduplicator.compute_hash()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.image_deduplicator.ImageDeduplicator.process"><code class="docutils literal notranslate"><span class="pre">ImageDeduplicator.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#module-data_juicer.ops.deduplicator.video_deduplicator">data_juicer.ops.deduplicator.video_deduplicator</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator"><code class="docutils literal notranslate"><span class="pre">VideoDeduplicator</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator.__init__"><code class="docutils literal notranslate"><span class="pre">VideoDeduplicator.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator.compute_hash"><code class="docutils literal notranslate"><span class="pre">VideoDeduplicator.compute_hash()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.video_deduplicator.VideoDeduplicator.process"><code class="docutils literal notranslate"><span class="pre">VideoDeduplicator.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.alphanumeric_filter">data_juicer.ops.filter.alphanumeric_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter"><code class="docutils literal notranslate"><span class="pre">AlphanumericFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter.__init__"><code class="docutils literal notranslate"><span class="pre">AlphanumericFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">AlphanumericFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.alphanumeric_filter.AlphanumericFilter.process"><code class="docutils literal notranslate"><span class="pre">AlphanumericFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.audio_duration_filter">data_juicer.ops.filter.audio_duration_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_duration_filter.AudioDurationFilter"><code class="docutils literal notranslate"><span class="pre">AudioDurationFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_duration_filter.AudioDurationFilter.__init__"><code class="docutils literal notranslate"><span class="pre">AudioDurationFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_duration_filter.AudioDurationFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">AudioDurationFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_duration_filter.AudioDurationFilter.process"><code class="docutils literal notranslate"><span class="pre">AudioDurationFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.audio_nmf_snr_filter">data_juicer.ops.filter.audio_nmf_snr_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter"><code class="docutils literal notranslate"><span class="pre">AudioNMFSNRFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter.__init__"><code class="docutils literal notranslate"><span class="pre">AudioNMFSNRFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">AudioNMFSNRFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter.process"><code class="docutils literal notranslate"><span class="pre">AudioNMFSNRFilter.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.compute_nmf_snr"><code class="docutils literal notranslate"><span class="pre">compute_nmf_snr()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.separate_signal_noise"><code class="docutils literal notranslate"><span class="pre">separate_signal_noise()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.audio_size_filter">data_juicer.ops.filter.audio_size_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_size_filter.AudioSizeFilter"><code class="docutils literal notranslate"><span class="pre">AudioSizeFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_size_filter.AudioSizeFilter.__init__"><code class="docutils literal notranslate"><span class="pre">AudioSizeFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_size_filter.AudioSizeFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">AudioSizeFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.audio_size_filter.AudioSizeFilter.process"><code class="docutils literal notranslate"><span class="pre">AudioSizeFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.average_line_length_filter">data_juicer.ops.filter.average_line_length_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.average_line_length_filter.AverageLineLengthFilter"><code class="docutils literal notranslate"><span class="pre">AverageLineLengthFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.average_line_length_filter.AverageLineLengthFilter.__init__"><code class="docutils literal notranslate"><span class="pre">AverageLineLengthFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.average_line_length_filter.AverageLineLengthFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">AverageLineLengthFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.average_line_length_filter.AverageLineLengthFilter.process"><code class="docutils literal notranslate"><span class="pre">AverageLineLengthFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.character_repetition_filter">data_juicer.ops.filter.character_repetition_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter"><code class="docutils literal notranslate"><span class="pre">CharacterRepetitionFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter.__init__"><code class="docutils literal notranslate"><span class="pre">CharacterRepetitionFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">CharacterRepetitionFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.character_repetition_filter.CharacterRepetitionFilter.process"><code class="docutils literal notranslate"><span class="pre">CharacterRepetitionFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.flagged_words_filter">data_juicer.ops.filter.flagged_words_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.flagged_words_filter.FlaggedWordFilter"><code class="docutils literal notranslate"><span class="pre">FlaggedWordFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.flagged_words_filter.FlaggedWordFilter.__init__"><code class="docutils literal notranslate"><span class="pre">FlaggedWordFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.flagged_words_filter.FlaggedWordFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">FlaggedWordFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.flagged_words_filter.FlaggedWordFilter.process"><code class="docutils literal notranslate"><span class="pre">FlaggedWordFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.image_aesthetics_filter">data_juicer.ops.filter.image_aesthetics_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_aesthetics_filter.ImageAestheticsFilter"><code class="docutils literal notranslate"><span class="pre">ImageAestheticsFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_aesthetics_filter.ImageAestheticsFilter.__init__"><code class="docutils literal notranslate"><span class="pre">ImageAestheticsFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_aesthetics_filter.ImageAestheticsFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">ImageAestheticsFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_aesthetics_filter.ImageAestheticsFilter.process"><code class="docutils literal notranslate"><span class="pre">ImageAestheticsFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.image_aspect_ratio_filter">data_juicer.ops.filter.image_aspect_ratio_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_aspect_ratio_filter.ImageAspectRatioFilter"><code class="docutils literal notranslate"><span class="pre">ImageAspectRatioFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_aspect_ratio_filter.ImageAspectRatioFilter.__init__"><code class="docutils literal notranslate"><span class="pre">ImageAspectRatioFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_aspect_ratio_filter.ImageAspectRatioFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">ImageAspectRatioFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_aspect_ratio_filter.ImageAspectRatioFilter.process"><code class="docutils literal notranslate"><span class="pre">ImageAspectRatioFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#data-juicer-ops-filter-image-face-ratio-filter">data_juicer.ops.filter.image_face_ratio_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_face_ratio_filter.ImageFaceRatioFilter"><code class="docutils literal notranslate"><span class="pre">ImageFaceRatioFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_face_ratio_filter.ImageFaceRatioFilter.__init__"><code class="docutils literal notranslate"><span class="pre">ImageFaceRatioFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_face_ratio_filter.ImageFaceRatioFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">ImageFaceRatioFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_face_ratio_filter.ImageFaceRatioFilter.process"><code class="docutils literal notranslate"><span class="pre">ImageFaceRatioFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#data-juicer-ops-filter-image-nsfw-filter">data_juicer.ops.filter.image_nsfw_filter</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.image_shape_filter">data_juicer.ops.filter.image_shape_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_shape_filter.ImageShapeFilter"><code class="docutils literal notranslate"><span class="pre">ImageShapeFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_shape_filter.ImageShapeFilter.__init__"><code class="docutils literal notranslate"><span class="pre">ImageShapeFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_shape_filter.ImageShapeFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">ImageShapeFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_shape_filter.ImageShapeFilter.process"><code class="docutils literal notranslate"><span class="pre">ImageShapeFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.image_size_filter">data_juicer.ops.filter.image_size_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_size_filter.ImageSizeFilter"><code class="docutils literal notranslate"><span class="pre">ImageSizeFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_size_filter.ImageSizeFilter.__init__"><code class="docutils literal notranslate"><span class="pre">ImageSizeFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_size_filter.ImageSizeFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">ImageSizeFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_size_filter.ImageSizeFilter.process"><code class="docutils literal notranslate"><span class="pre">ImageSizeFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.image_text_matching_filter">data_juicer.ops.filter.image_text_matching_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_text_matching_filter.ImageTextMatchingFilter"><code class="docutils literal notranslate"><span class="pre">ImageTextMatchingFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_text_matching_filter.ImageTextMatchingFilter.__init__"><code class="docutils literal notranslate"><span class="pre">ImageTextMatchingFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_text_matching_filter.ImageTextMatchingFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">ImageTextMatchingFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_text_matching_filter.ImageTextMatchingFilter.process"><code class="docutils literal notranslate"><span class="pre">ImageTextMatchingFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.image_text_similarity_filter">data_juicer.ops.filter.image_text_similarity_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_text_similarity_filter.ImageTextSimilarityFilter"><code class="docutils literal notranslate"><span class="pre">ImageTextSimilarityFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_text_similarity_filter.ImageTextSimilarityFilter.__init__"><code class="docutils literal notranslate"><span class="pre">ImageTextSimilarityFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_text_similarity_filter.ImageTextSimilarityFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">ImageTextSimilarityFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.image_text_similarity_filter.ImageTextSimilarityFilter.process"><code class="docutils literal notranslate"><span class="pre">ImageTextSimilarityFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.language_id_score_filter">data_juicer.ops.filter.language_id_score_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter"><code class="docutils literal notranslate"><span class="pre">LanguageIDScoreFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.__init__"><code class="docutils literal notranslate"><span class="pre">LanguageIDScoreFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">LanguageIDScoreFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.language_id_score_filter.LanguageIDScoreFilter.process"><code class="docutils literal notranslate"><span class="pre">LanguageIDScoreFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.maximum_line_length_filter">data_juicer.ops.filter.maximum_line_length_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.maximum_line_length_filter.MaximumLineLengthFilter"><code class="docutils literal notranslate"><span class="pre">MaximumLineLengthFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.maximum_line_length_filter.MaximumLineLengthFilter.__init__"><code class="docutils literal notranslate"><span class="pre">MaximumLineLengthFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.maximum_line_length_filter.MaximumLineLengthFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">MaximumLineLengthFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.maximum_line_length_filter.MaximumLineLengthFilter.process"><code class="docutils literal notranslate"><span class="pre">MaximumLineLengthFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.perplexity_filter">data_juicer.ops.filter.perplexity_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.perplexity_filter.PerplexityFilter"><code class="docutils literal notranslate"><span class="pre">PerplexityFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.perplexity_filter.PerplexityFilter.__init__"><code class="docutils literal notranslate"><span class="pre">PerplexityFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.perplexity_filter.PerplexityFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">PerplexityFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.perplexity_filter.PerplexityFilter.process"><code class="docutils literal notranslate"><span class="pre">PerplexityFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.phrase_grounding_recall_filter">data_juicer.ops.filter.phrase_grounding_recall_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.phrase_grounding_recall_filter.PhraseGroundingRecallFilter"><code class="docutils literal notranslate"><span class="pre">PhraseGroundingRecallFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.phrase_grounding_recall_filter.PhraseGroundingRecallFilter.__init__"><code class="docutils literal notranslate"><span class="pre">PhraseGroundingRecallFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.phrase_grounding_recall_filter.PhraseGroundingRecallFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">PhraseGroundingRecallFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.phrase_grounding_recall_filter.PhraseGroundingRecallFilter.process"><code class="docutils literal notranslate"><span class="pre">PhraseGroundingRecallFilter.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.phrase_grounding_recall_filter.find_noun_phrases"><code class="docutils literal notranslate"><span class="pre">find_noun_phrases()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.phrase_grounding_recall_filter.remove_punctuation"><code class="docutils literal notranslate"><span class="pre">remove_punctuation()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.phrase_grounding_recall_filter.run_ner"><code class="docutils literal notranslate"><span class="pre">run_ner()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.special_characters_filter">data_juicer.ops.filter.special_characters_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter"><code class="docutils literal notranslate"><span class="pre">SpecialCharactersFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter.__init__"><code class="docutils literal notranslate"><span class="pre">SpecialCharactersFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">SpecialCharactersFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.special_characters_filter.SpecialCharactersFilter.process"><code class="docutils literal notranslate"><span class="pre">SpecialCharactersFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.specified_field_filter">data_juicer.ops.filter.specified_field_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.specified_field_filter.SpecifiedFieldFilter"><code class="docutils literal notranslate"><span class="pre">SpecifiedFieldFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.specified_field_filter.SpecifiedFieldFilter.__init__"><code class="docutils literal notranslate"><span class="pre">SpecifiedFieldFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.specified_field_filter.SpecifiedFieldFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">SpecifiedFieldFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.specified_field_filter.SpecifiedFieldFilter.process"><code class="docutils literal notranslate"><span class="pre">SpecifiedFieldFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.specified_numeric_field_filter">data_juicer.ops.filter.specified_numeric_field_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter"><code class="docutils literal notranslate"><span class="pre">SpecifiedNumericFieldFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter.__init__"><code class="docutils literal notranslate"><span class="pre">SpecifiedNumericFieldFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">SpecifiedNumericFieldFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.specified_numeric_field_filter.SpecifiedNumericFieldFilter.process"><code class="docutils literal notranslate"><span class="pre">SpecifiedNumericFieldFilter.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.specified_numeric_field_filter.is_number"><code class="docutils literal notranslate"><span class="pre">is_number()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.stopwords_filter">data_juicer.ops.filter.stopwords_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.stopwords_filter.StopWordsFilter"><code class="docutils literal notranslate"><span class="pre">StopWordsFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.stopwords_filter.StopWordsFilter.__init__"><code class="docutils literal notranslate"><span class="pre">StopWordsFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.stopwords_filter.StopWordsFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">StopWordsFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.stopwords_filter.StopWordsFilter.process"><code class="docutils literal notranslate"><span class="pre">StopWordsFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.suffix_filter">data_juicer.ops.filter.suffix_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.suffix_filter.SuffixFilter"><code class="docutils literal notranslate"><span class="pre">SuffixFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.suffix_filter.SuffixFilter.__init__"><code class="docutils literal notranslate"><span class="pre">SuffixFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.suffix_filter.SuffixFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">SuffixFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.suffix_filter.SuffixFilter.process"><code class="docutils literal notranslate"><span class="pre">SuffixFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.text_action_filter">data_juicer.ops.filter.text_action_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_action_filter.TextActionFilter"><code class="docutils literal notranslate"><span class="pre">TextActionFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_action_filter.TextActionFilter.__init__"><code class="docutils literal notranslate"><span class="pre">TextActionFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_action_filter.TextActionFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">TextActionFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_action_filter.TextActionFilter.process"><code class="docutils literal notranslate"><span class="pre">TextActionFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.text_entity_dependency_filter">data_juicer.ops.filter.text_entity_dependency_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_entity_dependency_filter.TextEntityDependencyFilter"><code class="docutils literal notranslate"><span class="pre">TextEntityDependencyFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_entity_dependency_filter.TextEntityDependencyFilter.__init__"><code class="docutils literal notranslate"><span class="pre">TextEntityDependencyFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_entity_dependency_filter.TextEntityDependencyFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">TextEntityDependencyFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_entity_dependency_filter.TextEntityDependencyFilter.process"><code class="docutils literal notranslate"><span class="pre">TextEntityDependencyFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.text_length_filter">data_juicer.ops.filter.text_length_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_length_filter.TextLengthFilter"><code class="docutils literal notranslate"><span class="pre">TextLengthFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_length_filter.TextLengthFilter.__init__"><code class="docutils literal notranslate"><span class="pre">TextLengthFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_length_filter.TextLengthFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">TextLengthFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.text_length_filter.TextLengthFilter.process"><code class="docutils literal notranslate"><span class="pre">TextLengthFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.token_num_filter">data_juicer.ops.filter.token_num_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.token_num_filter.TokenNumFilter"><code class="docutils literal notranslate"><span class="pre">TokenNumFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.token_num_filter.TokenNumFilter.__init__"><code class="docutils literal notranslate"><span class="pre">TokenNumFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.token_num_filter.TokenNumFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">TokenNumFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.token_num_filter.TokenNumFilter.process"><code class="docutils literal notranslate"><span class="pre">TokenNumFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.video_aesthetics_filter">data_juicer.ops.filter.video_aesthetics_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_aesthetics_filter.VideoAestheticsFilter"><code class="docutils literal notranslate"><span class="pre">VideoAestheticsFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_aesthetics_filter.VideoAestheticsFilter.__init__"><code class="docutils literal notranslate"><span class="pre">VideoAestheticsFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_aesthetics_filter.VideoAestheticsFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">VideoAestheticsFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_aesthetics_filter.VideoAestheticsFilter.process"><code class="docutils literal notranslate"><span class="pre">VideoAestheticsFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.video_aspect_ratio_filter">data_juicer.ops.filter.video_aspect_ratio_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_aspect_ratio_filter.VideoAspectRatioFilter"><code class="docutils literal notranslate"><span class="pre">VideoAspectRatioFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_aspect_ratio_filter.VideoAspectRatioFilter.__init__"><code class="docutils literal notranslate"><span class="pre">VideoAspectRatioFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_aspect_ratio_filter.VideoAspectRatioFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">VideoAspectRatioFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_aspect_ratio_filter.VideoAspectRatioFilter.process"><code class="docutils literal notranslate"><span class="pre">VideoAspectRatioFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.video_duration_filter">data_juicer.ops.filter.video_duration_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_duration_filter.VideoDurationFilter"><code class="docutils literal notranslate"><span class="pre">VideoDurationFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_duration_filter.VideoDurationFilter.__init__"><code class="docutils literal notranslate"><span class="pre">VideoDurationFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_duration_filter.VideoDurationFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">VideoDurationFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_duration_filter.VideoDurationFilter.process"><code class="docutils literal notranslate"><span class="pre">VideoDurationFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.video_frames_text_similarity_filter">data_juicer.ops.filter.video_frames_text_similarity_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_frames_text_similarity_filter.VideoFramesTextSimilarityFilter"><code class="docutils literal notranslate"><span class="pre">VideoFramesTextSimilarityFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_frames_text_similarity_filter.VideoFramesTextSimilarityFilter.__init__"><code class="docutils literal notranslate"><span class="pre">VideoFramesTextSimilarityFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_frames_text_similarity_filter.VideoFramesTextSimilarityFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">VideoFramesTextSimilarityFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_frames_text_similarity_filter.VideoFramesTextSimilarityFilter.process"><code class="docutils literal notranslate"><span class="pre">VideoFramesTextSimilarityFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.video_motion_score_filter">data_juicer.ops.filter.video_motion_score_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_motion_score_filter.VideoCapture"><code class="docutils literal notranslate"><span class="pre">VideoCapture()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_motion_score_filter.VideoMotionScoreFilter"><code class="docutils literal notranslate"><span class="pre">VideoMotionScoreFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_motion_score_filter.VideoMotionScoreFilter.__init__"><code class="docutils literal notranslate"><span class="pre">VideoMotionScoreFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_motion_score_filter.VideoMotionScoreFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">VideoMotionScoreFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_motion_score_filter.VideoMotionScoreFilter.process"><code class="docutils literal notranslate"><span class="pre">VideoMotionScoreFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.video_nsfw_filter">data_juicer.ops.filter.video_nsfw_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_nsfw_filter.VideoNSFWFilter"><code class="docutils literal notranslate"><span class="pre">VideoNSFWFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_nsfw_filter.VideoNSFWFilter.__init__"><code class="docutils literal notranslate"><span class="pre">VideoNSFWFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_nsfw_filter.VideoNSFWFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">VideoNSFWFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_nsfw_filter.VideoNSFWFilter.process"><code class="docutils literal notranslate"><span class="pre">VideoNSFWFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.video_ocr_area_ratio_filter">data_juicer.ops.filter.video_ocr_area_ratio_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_ocr_area_ratio_filter.VideoOcrAreaRatioFilter"><code class="docutils literal notranslate"><span class="pre">VideoOcrAreaRatioFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_ocr_area_ratio_filter.VideoOcrAreaRatioFilter.__init__"><code class="docutils literal notranslate"><span class="pre">VideoOcrAreaRatioFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_ocr_area_ratio_filter.VideoOcrAreaRatioFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">VideoOcrAreaRatioFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_ocr_area_ratio_filter.VideoOcrAreaRatioFilter.process"><code class="docutils literal notranslate"><span class="pre">VideoOcrAreaRatioFilter.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_ocr_area_ratio_filter.triangle_area"><code class="docutils literal notranslate"><span class="pre">triangle_area()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.video_resolution_filter">data_juicer.ops.filter.video_resolution_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_resolution_filter.VideoResolutionFilter"><code class="docutils literal notranslate"><span class="pre">VideoResolutionFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_resolution_filter.VideoResolutionFilter.__init__"><code class="docutils literal notranslate"><span class="pre">VideoResolutionFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_resolution_filter.VideoResolutionFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">VideoResolutionFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.video_resolution_filter.VideoResolutionFilter.process"><code class="docutils literal notranslate"><span class="pre">VideoResolutionFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.word_num_filter">data_juicer.ops.filter.word_num_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.word_num_filter.WordNumFilter"><code class="docutils literal notranslate"><span class="pre">WordNumFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.word_num_filter.WordNumFilter.__init__"><code class="docutils literal notranslate"><span class="pre">WordNumFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.word_num_filter.WordNumFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">WordNumFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.word_num_filter.WordNumFilter.process"><code class="docutils literal notranslate"><span class="pre">WordNumFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#module-data_juicer.ops.filter.word_repetition_filter">data_juicer.ops.filter.word_repetition_filter</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter"><code class="docutils literal notranslate"><span class="pre">WordRepetitionFilter</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter.__init__"><code class="docutils literal notranslate"><span class="pre">WordRepetitionFilter.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter.compute_stats"><code class="docutils literal notranslate"><span class="pre">WordRepetitionFilter.compute_stats()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.word_repetition_filter.WordRepetitionFilter.process"><code class="docutils literal notranslate"><span class="pre">WordRepetitionFilter.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper">data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper.AudioFFmpegWrappedMapper"><code class="docutils literal notranslate"><span class="pre">AudioFFmpegWrappedMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper.AudioFFmpegWrappedMapper.__init__"><code class="docutils literal notranslate"><span class="pre">AudioFFmpegWrappedMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper.AudioFFmpegWrappedMapper.process"><code class="docutils literal notranslate"><span class="pre">AudioFFmpegWrappedMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.chinese_convert_mapper">data_juicer.ops.mapper.chinese_convert_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.chinese_convert_mapper.ChineseConvertMapper"><code class="docutils literal notranslate"><span class="pre">ChineseConvertMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.chinese_convert_mapper.ChineseConvertMapper.__init__"><code class="docutils literal notranslate"><span class="pre">ChineseConvertMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.chinese_convert_mapper.ChineseConvertMapper.process"><code class="docutils literal notranslate"><span class="pre">ChineseConvertMapper.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.chinese_convert_mapper.prepare_converter"><code class="docutils literal notranslate"><span class="pre">prepare_converter()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.clean_copyright_mapper">data_juicer.ops.mapper.clean_copyright_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_copyright_mapper.CleanCopyrightMapper"><code class="docutils literal notranslate"><span class="pre">CleanCopyrightMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_copyright_mapper.CleanCopyrightMapper.__init__"><code class="docutils literal notranslate"><span class="pre">CleanCopyrightMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_copyright_mapper.CleanCopyrightMapper.process"><code class="docutils literal notranslate"><span class="pre">CleanCopyrightMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.clean_email_mapper">data_juicer.ops.mapper.clean_email_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_email_mapper.CleanEmailMapper"><code class="docutils literal notranslate"><span class="pre">CleanEmailMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_email_mapper.CleanEmailMapper.__init__"><code class="docutils literal notranslate"><span class="pre">CleanEmailMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_email_mapper.CleanEmailMapper.process"><code class="docutils literal notranslate"><span class="pre">CleanEmailMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.clean_html_mapper">data_juicer.ops.mapper.clean_html_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_html_mapper.CleanHtmlMapper"><code class="docutils literal notranslate"><span class="pre">CleanHtmlMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_html_mapper.CleanHtmlMapper.__init__"><code class="docutils literal notranslate"><span class="pre">CleanHtmlMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_html_mapper.CleanHtmlMapper.process"><code class="docutils literal notranslate"><span class="pre">CleanHtmlMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.clean_ip_mapper">data_juicer.ops.mapper.clean_ip_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_ip_mapper.CleanIpMapper"><code class="docutils literal notranslate"><span class="pre">CleanIpMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_ip_mapper.CleanIpMapper.__init__"><code class="docutils literal notranslate"><span class="pre">CleanIpMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_ip_mapper.CleanIpMapper.process"><code class="docutils literal notranslate"><span class="pre">CleanIpMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.clean_links_mapper">data_juicer.ops.mapper.clean_links_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_links_mapper.CleanLinksMapper"><code class="docutils literal notranslate"><span class="pre">CleanLinksMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_links_mapper.CleanLinksMapper.__init__"><code class="docutils literal notranslate"><span class="pre">CleanLinksMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.clean_links_mapper.CleanLinksMapper.process"><code class="docutils literal notranslate"><span class="pre">CleanLinksMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.expand_macro_mapper">data_juicer.ops.mapper.expand_macro_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper"><code class="docutils literal notranslate"><span class="pre">ExpandMacroMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper.__init__"><code class="docutils literal notranslate"><span class="pre">ExpandMacroMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.expand_macro_mapper.ExpandMacroMapper.process"><code class="docutils literal notranslate"><span class="pre">ExpandMacroMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.fix_unicode_mapper">data_juicer.ops.mapper.fix_unicode_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.fix_unicode_mapper.FixUnicodeMapper"><code class="docutils literal notranslate"><span class="pre">FixUnicodeMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.fix_unicode_mapper.FixUnicodeMapper.__init__"><code class="docutils literal notranslate"><span class="pre">FixUnicodeMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.fix_unicode_mapper.FixUnicodeMapper.process"><code class="docutils literal notranslate"><span class="pre">FixUnicodeMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#data-juicer-ops-mapper-generate-caption-mapper">data_juicer.ops.mapper.generate_caption_mapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#data-juicer-ops-mapper-gpt4v-generate-mapper">data_juicer.ops.mapper.gpt4v_generate_mapper</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.image_blur_mapper">data_juicer.ops.mapper.image_blur_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_blur_mapper.ImageBlurMapper"><code class="docutils literal notranslate"><span class="pre">ImageBlurMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_blur_mapper.ImageBlurMapper.__init__"><code class="docutils literal notranslate"><span class="pre">ImageBlurMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_blur_mapper.ImageBlurMapper.process"><code class="docutils literal notranslate"><span class="pre">ImageBlurMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper">data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.ImageCaptioningFromGPT4VMapper"><code class="docutils literal notranslate"><span class="pre">ImageCaptioningFromGPT4VMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.ImageCaptioningFromGPT4VMapper.__init__"><code class="docutils literal notranslate"><span class="pre">ImageCaptioningFromGPT4VMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.ImageCaptioningFromGPT4VMapper.process"><code class="docutils literal notranslate"><span class="pre">ImageCaptioningFromGPT4VMapper.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_captioning_from_gpt4v_mapper.call_gpt_vision_api"><code class="docutils literal notranslate"><span class="pre">call_gpt_vision_api()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.image_captioning_mapper">data_juicer.ops.mapper.image_captioning_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_captioning_mapper.ImageCaptioningMapper"><code class="docutils literal notranslate"><span class="pre">ImageCaptioningMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_captioning_mapper.ImageCaptioningMapper.__init__"><code class="docutils literal notranslate"><span class="pre">ImageCaptioningMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_captioning_mapper.ImageCaptioningMapper.process"><code class="docutils literal notranslate"><span class="pre">ImageCaptioningMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.image_diffusion_mapper">data_juicer.ops.mapper.image_diffusion_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_diffusion_mapper.ImageDiffusionMapper"><code class="docutils literal notranslate"><span class="pre">ImageDiffusionMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_diffusion_mapper.ImageDiffusionMapper.__init__"><code class="docutils literal notranslate"><span class="pre">ImageDiffusionMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_diffusion_mapper.ImageDiffusionMapper.process"><code class="docutils literal notranslate"><span class="pre">ImageDiffusionMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.image_face_blur_mapper">data_juicer.ops.mapper.image_face_blur_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_face_blur_mapper.ImageFaceBlurMapper"><code class="docutils literal notranslate"><span class="pre">ImageFaceBlurMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_face_blur_mapper.ImageFaceBlurMapper.__init__"><code class="docutils literal notranslate"><span class="pre">ImageFaceBlurMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.image_face_blur_mapper.ImageFaceBlurMapper.process"><code class="docutils literal notranslate"><span class="pre">ImageFaceBlurMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.nlpaug_en_mapper">data_juicer.ops.mapper.nlpaug_en_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.nlpaug_en_mapper.NlpaugEnMapper"><code class="docutils literal notranslate"><span class="pre">NlpaugEnMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.nlpaug_en_mapper.NlpaugEnMapper.__init__"><code class="docutils literal notranslate"><span class="pre">NlpaugEnMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.nlpaug_en_mapper.NlpaugEnMapper.process"><code class="docutils literal notranslate"><span class="pre">NlpaugEnMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.nlpcda_zh_mapper">data_juicer.ops.mapper.nlpcda_zh_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.nlpcda_zh_mapper.NlpcdaZhMapper"><code class="docutils literal notranslate"><span class="pre">NlpcdaZhMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.nlpcda_zh_mapper.NlpcdaZhMapper.__init__"><code class="docutils literal notranslate"><span class="pre">NlpcdaZhMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.nlpcda_zh_mapper.NlpcdaZhMapper.process"><code class="docutils literal notranslate"><span class="pre">NlpcdaZhMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.punctuation_normalization_mapper">data_juicer.ops.mapper.punctuation_normalization_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper"><code class="docutils literal notranslate"><span class="pre">PunctuationNormalizationMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper.__init__"><code class="docutils literal notranslate"><span class="pre">PunctuationNormalizationMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.punctuation_normalization_mapper.PunctuationNormalizationMapper.process"><code class="docutils literal notranslate"><span class="pre">PunctuationNormalizationMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.remove_bibliography_mapper">data_juicer.ops.mapper.remove_bibliography_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper"><code class="docutils literal notranslate"><span class="pre">RemoveBibliographyMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper.__init__"><code class="docutils literal notranslate"><span class="pre">RemoveBibliographyMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_bibliography_mapper.RemoveBibliographyMapper.process"><code class="docutils literal notranslate"><span class="pre">RemoveBibliographyMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.remove_comments_mapper">data_juicer.ops.mapper.remove_comments_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_comments_mapper.RemoveCommentsMapper"><code class="docutils literal notranslate"><span class="pre">RemoveCommentsMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_comments_mapper.RemoveCommentsMapper.__init__"><code class="docutils literal notranslate"><span class="pre">RemoveCommentsMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_comments_mapper.RemoveCommentsMapper.process"><code class="docutils literal notranslate"><span class="pre">RemoveCommentsMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.remove_header_mapper">data_juicer.ops.mapper.remove_header_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_header_mapper.RemoveHeaderMapper"><code class="docutils literal notranslate"><span class="pre">RemoveHeaderMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_header_mapper.RemoveHeaderMapper.__init__"><code class="docutils literal notranslate"><span class="pre">RemoveHeaderMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_header_mapper.RemoveHeaderMapper.process"><code class="docutils literal notranslate"><span class="pre">RemoveHeaderMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.remove_long_words_mapper">data_juicer.ops.mapper.remove_long_words_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper"><code class="docutils literal notranslate"><span class="pre">RemoveLongWordsMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper.__init__"><code class="docutils literal notranslate"><span class="pre">RemoveLongWordsMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper.process"><code class="docutils literal notranslate"><span class="pre">RemoveLongWordsMapper.process()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_long_words_mapper.RemoveLongWordsMapper.should_keep_long_word"><code class="docutils literal notranslate"><span class="pre">RemoveLongWordsMapper.should_keep_long_word()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.remove_non_chinese_character_mapper">data_juicer.ops.mapper.remove_non_chinese_character_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_non_chinese_character_mapper.RemoveNonChineseCharacterlMapper"><code class="docutils literal notranslate"><span class="pre">RemoveNonChineseCharacterlMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_non_chinese_character_mapper.RemoveNonChineseCharacterlMapper.__init__"><code class="docutils literal notranslate"><span class="pre">RemoveNonChineseCharacterlMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_non_chinese_character_mapper.RemoveNonChineseCharacterlMapper.process"><code class="docutils literal notranslate"><span class="pre">RemoveNonChineseCharacterlMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.remove_repeat_sentences_mapper">data_juicer.ops.mapper.remove_repeat_sentences_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_repeat_sentences_mapper.RemoveRepeatSentencesMapper"><code class="docutils literal notranslate"><span class="pre">RemoveRepeatSentencesMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_repeat_sentences_mapper.RemoveRepeatSentencesMapper.__init__"><code class="docutils literal notranslate"><span class="pre">RemoveRepeatSentencesMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_repeat_sentences_mapper.RemoveRepeatSentencesMapper.process"><code class="docutils literal notranslate"><span class="pre">RemoveRepeatSentencesMapper.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_repeat_sentences_mapper.split_sentence"><code class="docutils literal notranslate"><span class="pre">split_sentence()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.remove_specific_chars_mapper">data_juicer.ops.mapper.remove_specific_chars_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_specific_chars_mapper.RemoveSpecificCharsMapper"><code class="docutils literal notranslate"><span class="pre">RemoveSpecificCharsMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_specific_chars_mapper.RemoveSpecificCharsMapper.__init__"><code class="docutils literal notranslate"><span class="pre">RemoveSpecificCharsMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_specific_chars_mapper.RemoveSpecificCharsMapper.process"><code class="docutils literal notranslate"><span class="pre">RemoveSpecificCharsMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.remove_table_text_mapper">data_juicer.ops.mapper.remove_table_text_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_table_text_mapper.RemoveTableTextMapper"><code class="docutils literal notranslate"><span class="pre">RemoveTableTextMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_table_text_mapper.RemoveTableTextMapper.__init__"><code class="docutils literal notranslate"><span class="pre">RemoveTableTextMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_table_text_mapper.RemoveTableTextMapper.process"><code class="docutils literal notranslate"><span class="pre">RemoveTableTextMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper">data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper"><code class="docutils literal notranslate"><span class="pre">RemoveWordsWithIncorrectSubstringsMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper.__init__"><code class="docutils literal notranslate"><span class="pre">RemoveWordsWithIncorrectSubstringsMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper.process"><code class="docutils literal notranslate"><span class="pre">RemoveWordsWithIncorrectSubstringsMapper.process()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.remove_words_with_incorrect_substrings_mapper.RemoveWordsWithIncorrectSubstringsMapper.should_keep_word_with_incorrect_substrings"><code class="docutils literal notranslate"><span class="pre">RemoveWordsWithIncorrectSubstringsMapper.should_keep_word_with_incorrect_substrings()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.replace_content_mapper">data_juicer.ops.mapper.replace_content_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.replace_content_mapper.ReplaceContentMapper"><code class="docutils literal notranslate"><span class="pre">ReplaceContentMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.replace_content_mapper.ReplaceContentMapper.__init__"><code class="docutils literal notranslate"><span class="pre">ReplaceContentMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.replace_content_mapper.ReplaceContentMapper.process"><code class="docutils literal notranslate"><span class="pre">ReplaceContentMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.sentence_split_mapper">data_juicer.ops.mapper.sentence_split_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.sentence_split_mapper.SentenceSplitMapper"><code class="docutils literal notranslate"><span class="pre">SentenceSplitMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.sentence_split_mapper.SentenceSplitMapper.__init__"><code class="docutils literal notranslate"><span class="pre">SentenceSplitMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.sentence_split_mapper.SentenceSplitMapper.process"><code class="docutils literal notranslate"><span class="pre">SentenceSplitMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_captioning_from_audio_mapper">data_juicer.ops.mapper.video_captioning_from_audio_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_captioning_from_audio_mapper.VideoCaptioningFromAudioMapper"><code class="docutils literal notranslate"><span class="pre">VideoCaptioningFromAudioMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_captioning_from_audio_mapper.VideoCaptioningFromAudioMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoCaptioningFromAudioMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_captioning_from_audio_mapper.VideoCaptioningFromAudioMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoCaptioningFromAudioMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_captioning_from_video_mapper">data_juicer.ops.mapper.video_captioning_from_video_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_captioning_from_video_mapper.VideoCaptioningFromVideoMapper"><code class="docutils literal notranslate"><span class="pre">VideoCaptioningFromVideoMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_captioning_from_video_mapper.VideoCaptioningFromVideoMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoCaptioningFromVideoMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_captioning_from_video_mapper.VideoCaptioningFromVideoMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoCaptioningFromVideoMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_face_blur_mapper">data_juicer.ops.mapper.video_face_blur_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper"><code class="docutils literal notranslate"><span class="pre">VideoFaceBlurMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoFaceBlurMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_face_blur_mapper.VideoFaceBlurMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoFaceBlurMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper">data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper.VideoFFmpegWrappedMapper"><code class="docutils literal notranslate"><span class="pre">VideoFFmpegWrappedMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper.VideoFFmpegWrappedMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoFFmpegWrappedMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_ffmpeg_wrapped_mapper.VideoFFmpegWrappedMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoFFmpegWrappedMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_remove_watermark_mapper">data_juicer.ops.mapper.video_remove_watermark_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper"><code class="docutils literal notranslate"><span class="pre">VideoRemoveWatermarkMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoRemoveWatermarkMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_remove_watermark_mapper.VideoRemoveWatermarkMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoRemoveWatermarkMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_resize_aspect_ratio_mapper">data_juicer.ops.mapper.video_resize_aspect_ratio_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.VideoResizeAspectRatioMapper"><code class="docutils literal notranslate"><span class="pre">VideoResizeAspectRatioMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.VideoResizeAspectRatioMapper.STRATEGY"><code class="docutils literal notranslate"><span class="pre">VideoResizeAspectRatioMapper.STRATEGY</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.VideoResizeAspectRatioMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoResizeAspectRatioMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.VideoResizeAspectRatioMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoResizeAspectRatioMapper.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_aspect_ratio_mapper.rescale"><code class="docutils literal notranslate"><span class="pre">rescale()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_resize_resolution_mapper">data_juicer.ops.mapper.video_resize_resolution_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_resolution_mapper.VideoResizeResolutionMapper"><code class="docutils literal notranslate"><span class="pre">VideoResizeResolutionMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_resolution_mapper.VideoResizeResolutionMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoResizeResolutionMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_resize_resolution_mapper.VideoResizeResolutionMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoResizeResolutionMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_split_by_duration_mapper">data_juicer.ops.mapper.video_split_by_duration_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_duration_mapper.VideoSplitByDurationMapper"><code class="docutils literal notranslate"><span class="pre">VideoSplitByDurationMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_duration_mapper.VideoSplitByDurationMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoSplitByDurationMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_duration_mapper.VideoSplitByDurationMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoSplitByDurationMapper.process()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_duration_mapper.VideoSplitByDurationMapper.split_videos_by_duration"><code class="docutils literal notranslate"><span class="pre">VideoSplitByDurationMapper.split_videos_by_duration()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_duration_mapper.create_replacer"><code class="docutils literal notranslate"><span class="pre">create_replacer()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_split_by_key_frame_mapper">data_juicer.ops.mapper.video_split_by_key_frame_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_key_frame_mapper.VideoSplitByKeyFrameMapper"><code class="docutils literal notranslate"><span class="pre">VideoSplitByKeyFrameMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_key_frame_mapper.VideoSplitByKeyFrameMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoSplitByKeyFrameMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_key_frame_mapper.VideoSplitByKeyFrameMapper.get_split_key_frame"><code class="docutils literal notranslate"><span class="pre">VideoSplitByKeyFrameMapper.get_split_key_frame()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_key_frame_mapper.VideoSplitByKeyFrameMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoSplitByKeyFrameMapper.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_key_frame_mapper.create_replacer"><code class="docutils literal notranslate"><span class="pre">create_replacer()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_split_by_scene_mapper">data_juicer.ops.mapper.video_split_by_scene_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_scene_mapper.VideoSplitBySceneMapper"><code class="docutils literal notranslate"><span class="pre">VideoSplitBySceneMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_scene_mapper.VideoSplitBySceneMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoSplitBySceneMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_scene_mapper.VideoSplitBySceneMapper.avaliable_detectors"><code class="docutils literal notranslate"><span class="pre">VideoSplitBySceneMapper.avaliable_detectors</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_scene_mapper.VideoSplitBySceneMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoSplitBySceneMapper.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_split_by_scene_mapper.replace_func"><code class="docutils literal notranslate"><span class="pre">replace_func()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_tagging_from_audio_mapper">data_juicer.ops.mapper.video_tagging_from_audio_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_tagging_from_audio_mapper.VideoTaggingFromAudioMapper"><code class="docutils literal notranslate"><span class="pre">VideoTaggingFromAudioMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_tagging_from_audio_mapper.VideoTaggingFromAudioMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoTaggingFromAudioMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_tagging_from_audio_mapper.VideoTaggingFromAudioMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoTaggingFromAudioMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.video_tagging_from_frames_mapper">data_juicer.ops.mapper.video_tagging_from_frames_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_tagging_from_frames_mapper.VideoTaggingFromFramesMapper"><code class="docutils literal notranslate"><span class="pre">VideoTaggingFromFramesMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_tagging_from_frames_mapper.VideoTaggingFromFramesMapper.__init__"><code class="docutils literal notranslate"><span class="pre">VideoTaggingFromFramesMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.video_tagging_from_frames_mapper.VideoTaggingFromFramesMapper.process"><code class="docutils literal notranslate"><span class="pre">VideoTaggingFromFramesMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.mapper.html#module-data_juicer.ops.mapper.whitespace_normalization_mapper">data_juicer.ops.mapper.whitespace_normalization_mapper</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.whitespace_normalization_mapper.WhitespaceNormalizationMapper"><code class="docutils literal notranslate"><span class="pre">WhitespaceNormalizationMapper</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.whitespace_normalization_mapper.WhitespaceNormalizationMapper.__init__"><code class="docutils literal notranslate"><span class="pre">WhitespaceNormalizationMapper.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.whitespace_normalization_mapper.WhitespaceNormalizationMapper.process"><code class="docutils literal notranslate"><span class="pre">WhitespaceNormalizationMapper.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html#module-data_juicer.ops.selector.frequency_specified_field_selector">data_juicer.ops.selector.frequency_specified_field_selector</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.frequency_specified_field_selector.FrequencySpecifiedFieldSelector"><code class="docutils literal notranslate"><span class="pre">FrequencySpecifiedFieldSelector</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.frequency_specified_field_selector.FrequencySpecifiedFieldSelector.__init__"><code class="docutils literal notranslate"><span class="pre">FrequencySpecifiedFieldSelector.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.frequency_specified_field_selector.FrequencySpecifiedFieldSelector.process"><code class="docutils literal notranslate"><span class="pre">FrequencySpecifiedFieldSelector.process()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html#module-data_juicer.ops.selector.topk_specified_field_selector">data_juicer.ops.selector.topk_specified_field_selector</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector"><code class="docutils literal notranslate"><span class="pre">TopkSpecifiedFieldSelector</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector.__init__"><code class="docutils literal notranslate"><span class="pre">TopkSpecifiedFieldSelector.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.topk_specified_field_selector.TopkSpecifiedFieldSelector.process"><code class="docutils literal notranslate"><span class="pre">TopkSpecifiedFieldSelector.process()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.topk_specified_field_selector.to_number"><code class="docutils literal notranslate"><span class="pre">to_number()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-<section id="module-data_juicer.ops.base_op">
-<span id="data-juicer-ops-base-op"></span><h2>data_juicer.ops.base_op<a class="headerlink" href="#module-data_juicer.ops.base_op" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Deduplicator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Deduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Deduplicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Deduplicator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Deduplicator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Deduplicator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Deduplicator.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Base class that conducts deduplication.</p>
+  <section id="module-data_juicer.ops">
+<span id="data-juicer-ops"></span><h1>data_juicer.ops<a class="headerlink" href="#module-data_juicer.ops" title="Permalink to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.load_ops">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.</span></span><span class="sig-name descname"><span class="pre">load_ops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_fusion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/load.html#load_ops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.load_ops" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load op list according to the process list from config file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>text_key</strong> – the key name of field that stores sample texts
-to be processed</p></li>
-<li><p><strong>image_key</strong> – the key name of field that stores sample image list
-to be processed</p></li>
-<li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
-to be processed</p></li>
-<li><p><strong>video_key</strong> – the key name of field that stores sample video list
-to be processed</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Deduplicator.compute_hash">
-<span class="sig-name descname"><span class="pre">compute_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Deduplicator.compute_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Deduplicator.compute_hash" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute hash values for the sample.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>sample</strong> – input sample</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>sample with computed hash value.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Deduplicator.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Deduplicator.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Deduplicator.process" title="Permalink to this definition">¶</a></dt>
-<dd><p>For doc-level, dataset –&gt; dataset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset</strong> – input dataset</p></li>
-<li><p><strong>show_num</strong> – number of traced samples used when tracer is
-open.</p></li>
+<li><p><strong>process_list</strong> – A process list. Each item is an op name and its
+arguments.</p></li>
+<li><p><strong>op_fusion</strong> – whether to fuse ops that share the same intermediate
+variables.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>deduplicated dataset and the sampled duplicate pairs.</p>
+<dd class="field-even"><p>The op instance list.</p>
 </dd>
 </dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dt class="sig sig-object py" id="data_juicer.ops.Filter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.</span></span><span class="sig-name descname"><span class="pre">Filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.ops.Filter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Filter.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class that removes specific info.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -981,8 +136,8 @@ to be processed</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.ops.Filter.compute_stats">
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Filter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -1000,8 +155,8 @@ vars in the sample temporarily.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Filter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Filter.process" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.ops.Filter.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Filter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Filter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1016,12 +171,12 @@ vars in the sample temporarily.</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dt class="sig sig-object py" id="data_juicer.ops.Mapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.</span></span><span class="sig-name descname"><span class="pre">Mapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Mapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.ops.Mapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Mapper.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class that conducts data editing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1040,13 +195,8 @@ to be processed</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper.is_batched_op">
-<span class="sig-name descname"><span class="pre">is_batched_op</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper.is_batched_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper.is_batched_op" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Mapper.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Mapper.process" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.ops.Mapper.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Mapper.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; sample</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1058,21 +208,26 @@ to be processed</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.Mapper.is_batched_op">
+<span class="sig-name descname"><span class="pre">is_batched_op</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Mapper.is_batched_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Mapper.is_batched_op" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">OP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#OP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dt class="sig sig-object py" id="data_juicer.ops.Deduplicator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.</span></span><span class="sig-name descname"><span class="pre">Deduplicator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Deduplicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Deduplicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#OP.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Base class of operators.</p>
+<dt class="sig sig-object py" id="data_juicer.ops.Deduplicator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Deduplicator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Deduplicator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class that conducts deduplication.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>text_key</strong> – the key name of field that stores sample texts
-to be processed.</p></li>
+to be processed</p></li>
 <li><p><strong>image_key</strong> – the key name of field that stores sample image list
 to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
@@ -1085,34 +240,46 @@ to be processed</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.add_parameters">
-<span class="sig-name descname"><span class="pre">add_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_parameter_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra_param_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#OP.add_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>add parameters for each sample, need to keep extra_param_dict
-and init_parameter_dict unchanged.</p>
+<dt class="sig sig-object py" id="data_juicer.ops.Deduplicator.compute_hash">
+<span class="sig-name descname"><span class="pre">compute_hash</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Deduplicator.compute_hash"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Deduplicator.compute_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute hash values for the sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – input sample</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sample with computed hash value.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#OP.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.process" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.OP.remove_extra_parameters">
-<span class="sig-name descname"><span class="pre">remove_extra_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#OP.remove_extra_parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.OP.remove_extra_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>at the begining of the init of the mapper op, call
-self.remove_extra_parameters(locals())
-to get the init parameter dict of the op for convenience</p>
+<dt class="sig sig-object py" id="data_juicer.ops.Deduplicator.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Deduplicator.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Deduplicator.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>For doc-level, dataset –&gt; dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – input dataset</p></li>
+<li><p><strong>show_num</strong> – number of traced samples used when tracer is
+open.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>deduplicated dataset and the sampled duplicate pairs.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Selector">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.base_op.</span></span><span class="sig-name descname"><span class="pre">Selector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Selector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Selector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dt class="sig sig-object py" id="data_juicer.ops.Selector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.</span></span><span class="sig-name descname"><span class="pre">Selector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Selector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Selector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Selector.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">audio_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Selector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Selector.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.ops.Selector.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Selector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Selector.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class that conducts selection in dataset-level.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1131,8 +298,8 @@ to be processed</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.base_op.Selector.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Selector.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.base_op.Selector.process" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.ops.Selector.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/base_op.html#Selector.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.Selector.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dataset –&gt; dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1147,123 +314,13 @@ to be processed</p></li>
 </dd></dl>
 
 </section>
-<section id="module-data_juicer.ops.load">
-<span id="data-juicer-ops-load"></span><h2>data_juicer.ops.load<a class="headerlink" href="#module-data_juicer.ops.load" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.ops.load.load_ops">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.load.</span></span><span class="sig-name descname"><span class="pre">load_ops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">op_fusion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/load.html#load_ops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.load.load_ops" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load op list according to the process list from config file.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>process_list</strong> – A process list. Each item is an op name and its
-arguments.</p></li>
-<li><p><strong>op_fusion</strong> – whether to fuse ops that share the same intermediate
-variables.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The op instance list.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-data_juicer.ops.op_fusion">
-<span id="data-juicer-ops-op-fusion"></span><h2>data_juicer.ops.op_fusion<a class="headerlink" href="#module-data_juicer.ops.op_fusion" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.ops.op_fusion.FusedFilter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.op_fusion.</span></span><span class="sig-name descname"><span class="pre">FusedFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fused_filters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/op_fusion.html#FusedFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.op_fusion.FusedFilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.base_op.Filter" title="data_juicer.ops.base_op.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p>
-<p>A fused operator for filters.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.op_fusion.FusedFilter.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fused_filters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/op_fusion.html#FusedFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.op_fusion.FusedFilter.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialization method.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>fused_filers</strong> – a list of filters to be fused.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.op_fusion.FusedFilter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/op_fusion.html#FusedFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.op_fusion.FusedFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute stats for the sample which is used as a metric to decide
-whether to filter this sample.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sample</strong> – input sample.</p></li>
-<li><p><strong>context</strong> – whether to store context information of intermediate
-vars in the sample temporarily.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>sample with computed stats</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.op_fusion.FusedFilter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/op_fusion.html#FusedFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.op_fusion.FusedFilter.process" title="Permalink to this definition">¶</a></dt>
-<dd><p>For sample level, sample –&gt; Boolean.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>sample</strong> – sample to decide whether to filter</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>true for keeping and false for filtering</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.ops.op_fusion.fuse_filter_group">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.op_fusion.</span></span><span class="sig-name descname"><span class="pre">fuse_filter_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_filter_group</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/op_fusion.html#fuse_filter_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.op_fusion.fuse_filter_group" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fuse single filter group and return the fused filter group.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>original_filter_group</strong> – the original filter group, including op
-definitions and objects.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the fused definitions and objects of the input filter group.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.ops.op_fusion.fuse_operators">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.op_fusion.</span></span><span class="sig-name descname"><span class="pre">fuse_operators</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ops</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/op_fusion.html#fuse_operators"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.op_fusion.fuse_operators" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fuse the input ops list and return the fused ops list.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>process_list</strong> – the list of original process definition, including op
-names and args.</p></li>
-<li><p><strong>ops</strong> – the corresponding list of op objects.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a list of fused op objects.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="data_juicer.format.html" class="btn btn-neutral float-left" title="data_juicer.format" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="data_juicer.ops.common.html" class="btn btn-neutral float-right" title="data_juicer.ops.common" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="data_juicer.core.html" class="btn btn-neutral float-left" title="data_juicer.core" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_juicer.ops.filter.html" class="btn btn-neutral float-right" title="data_juicer.ops.filter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

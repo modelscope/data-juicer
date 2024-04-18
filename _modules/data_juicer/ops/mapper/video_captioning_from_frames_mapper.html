@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.mapper.video_captioning_from_frames_mapper &mdash; data_juicer 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=b1f64a84"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+              <div class="version">
+                0.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Data-Juicer API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.mapper.video_captioning_from_frames_mapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.mapper.video_captioning_from_frames_mapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">ImageOps</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">HashKeys</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SpecialTokens</span><span class="p">,</span> <span class="n">extract_key_frames</span><span class="p">,</span>
+                                        <span class="n">extract_video_frames_uniformly</span><span class="p">,</span>
+                                        <span class="n">insert_texts_after_placeholders</span><span class="p">,</span>
+                                        <span class="n">load_data_with_context</span><span class="p">,</span> <span class="n">load_video</span><span class="p">,</span>
+                                        <span class="n">remove_non_special_tokens</span><span class="p">,</span>
+                                        <span class="n">remove_special_tokens</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
+
+<span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
+<span class="kn">from</span> <span class="nn">..op_fusion</span> <span class="kn">import</span> <span class="n">LOADED_VIDEOS</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;video_captioning_from_frames_mapper&#39;</span>
+
+<span class="k">with</span> <span class="n">AvailabilityChecking</span><span class="p">([</span><span class="s1">&#39;torch&#39;</span><span class="p">,</span> <span class="s1">&#39;transformers&#39;</span><span class="p">,</span> <span class="s1">&#39;simhash-pybind&#39;</span><span class="p">],</span>
+                          <span class="n">OP_NAME</span><span class="p">):</span>
+
+    <span class="kn">import</span> <span class="nn">simhash</span>  <span class="c1"># noqa: F401</span>
+    <span class="kn">import</span> <span class="nn">torch</span>
+    <span class="kn">import</span> <span class="nn">transformers</span>  <span class="c1"># noqa: F401</span>
+
+    <span class="c1"># avoid hanging when calling clip in multiprocessing</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">set_num_threads</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="VideoCaptioningFromFramesMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoCaptioningFromFramesMapper">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">VideoCaptioningFromFramesMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate samples whose captions are generated based on</span>
+<span class="sd">    an image-to-text model and sampled video frames. Captions from different</span>
+<span class="sd">    frames will be concatenated to a single string.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="VideoCaptioningFromFramesMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoCaptioningFromFramesMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">hf_img2seq</span><span class="o">=</span><span class="s1">&#39;Salesforce/blip2-opt-2.7b&#39;</span><span class="p">,</span>
+        <span class="n">caption_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">keep_candidate_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;random_any&#39;</span><span class="p">,</span>
+        <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prompt_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">frame_sampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;all_keyframes&#39;</span><span class="p">,</span>
+        <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">horizontal_flip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">vertical_flip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param hf_img2seq: model name on huggingface to generate caption</span>
+<span class="sd">        :param caption_num: how many candidate captions to generate</span>
+<span class="sd">            for each video</span>
+<span class="sd">        :param keep_candidate_mode: retain strategy for the generated</span>
+<span class="sd">            $caption_num$ candidates.</span>
+
+<span class="sd">            &#39;random_any&#39;: Retain the random one from generated captions</span>
+
+<span class="sd">            &#39;similar_one_simhash&#39;: Retain the generated one that is most</span>
+<span class="sd">                similar to the original caption</span>
+
+<span class="sd">            &#39;all&#39;: Retain all generated captions by concatenation</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This is a batched_OP, whose input and output type are</span>
+<span class="sd">            both list. Suppose there are $N$ list of input samples, whose batch</span>
+<span class="sd">            size is $b$, and denote caption_num as $M$.</span>
+<span class="sd">            The number of total samples after generation is $2Nb$ when</span>
+<span class="sd">            keep_original_sample is True and $Nb$ when keep_original_sample is</span>
+<span class="sd">            False. For &#39;random_any&#39; and &#39;similar_one_simhash&#39; mode,</span>
+<span class="sd">            it&#39;s $(1+M)Nb$ for &#39;all&#39; mode when keep_original_sample is True</span>
+<span class="sd">            and $MNb$ when keep_original_sample is False.</span>
+
+<span class="sd">        :param keep_original_sample: whether to keep the original sample. If</span>
+<span class="sd">            it&#39;s set to False, there will be only generated captions in the</span>
+<span class="sd">            final datasets and the original captions will be removed. It&#39;s True</span>
+<span class="sd">            in default.</span>
+<span class="sd">        :param prompt: a string prompt to guide the generation of image-to-text</span>
+<span class="sd">            model for all samples globally. It&#39;s None in default, which means</span>
+<span class="sd">            no prompt provided.</span>
+<span class="sd">        :param prompt_key: the key name of fields in samples to store prompts</span>
+<span class="sd">            for each sample. It&#39;s used for set different prompts for different</span>
+<span class="sd">            samples. If it&#39;s none, use prompt in parameter &quot;prompt&quot;. It&#39;s None</span>
+<span class="sd">            in default.</span>
+<span class="sd">        :param frame_sampling_method: sampling method of extracting frame</span>
+<span class="sd">            videos from the videos. Should be one of</span>
+<span class="sd">            [&quot;all_keyframes&quot;, &quot;uniform&quot;].</span>
+<span class="sd">            The former one extracts all key frames (the number</span>
+<span class="sd">            of which depends on the duration of the video) and the latter</span>
+<span class="sd">            one extract specified number of frames uniformly from the video.</span>
+<span class="sd">            Default: &quot;all_keyframes&quot;.</span>
+<span class="sd">        :param frame_num: the number of frames to be extracted uniformly from</span>
+<span class="sd">            the video. Only works when frame_sampling_method is &quot;uniform&quot;. If</span>
+<span class="sd">            it&#39;s 1, only the middle frame will be extracted. If it&#39;s 2, only</span>
+<span class="sd">            the first and the last frames will be extracted. If it&#39;s larger</span>
+<span class="sd">            than 2, in addition to the first and the last frames, other frames</span>
+<span class="sd">            will be extracted uniformly within the video duration.</span>
+<span class="sd">        :param horizontal_flip: flip frame video horizontally (left to right).</span>
+<span class="sd">        :param vertical_flip: flip frame video vertically (top to bottom).</span>
+<span class="sd">        :param args: extra args</span>
+<span class="sd">        :param kwargs: extra args</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+
+        <span class="k">if</span> <span class="n">keep_candidate_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s1">&#39;random_any&#39;</span><span class="p">,</span> <span class="s1">&#39;similar_one_simhash&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span>
+        <span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Keep strategy [</span><span class="si">{</span><span class="n">keep_candidate_mode</span><span class="si">}</span><span class="s1">] is not supported. &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Can only be one of &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;[&quot;random_any&quot;, &quot;similar_one_simhash&quot;, &quot;all&quot;].&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">keep_candidate_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;random_any&#39;</span><span class="p">,</span> <span class="s1">&#39;similar_one_simhash&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">keep_candidate_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span> <span class="o">=</span> <span class="n">caption_num</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># report a warning when both prompt and prompt_key are set</span>
+        <span class="k">if</span> <span class="n">prompt</span> <span class="ow">and</span> <span class="n">prompt_key</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;Both the parameter `prompt` and `prompt_key` are &#39;</span>
+                <span class="s1">&#39;set. Data-Juicer will consider `prompt_key` first.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">caption_num</span> <span class="o">=</span> <span class="n">caption_num</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">=</span> <span class="n">keep_candidate_mode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span> <span class="o">=</span> <span class="n">keep_original_sample</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="n">prompt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span> <span class="o">=</span> <span class="n">prompt_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="n">kwargs</span>
+
+        <span class="k">if</span> <span class="n">frame_sampling_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;all_keyframes&#39;</span><span class="p">,</span> <span class="s1">&#39;uniform&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Frame sampling method &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">frame_sampling_method</span><span class="si">}</span><span class="s1">] is not supported. &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;all_keyframes&quot;, &quot;uniform&quot;].&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">horizontal_flip</span> <span class="o">=</span> <span class="n">horizontal_flip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_flip</span> <span class="o">=</span> <span class="n">vertical_flip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_sampling_method</span> <span class="o">=</span> <span class="n">frame_sampling_method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_num</span> <span class="o">=</span> <span class="n">frame_num</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
+            <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_img2seq</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_process_single_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ori_sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="c1"># there is no videos in this sample</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ori_sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># the generated results</span>
+        <span class="n">generated_samples</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">generated_sample</span> <span class="ow">in</span> <span class="n">generated_samples</span><span class="p">:</span>
+            <span class="n">generated_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="c1"># load videos</span>
+        <span class="n">loaded_video_keys</span> <span class="o">=</span> <span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">videos</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span>
+                                                <span class="n">loaded_video_keys</span><span class="p">,</span> <span class="n">load_video</span><span class="p">)</span>
+
+        <span class="n">text</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">processor</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="p">):</span>
+
+            <span class="n">video_count</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">)</span>
+
+            <span class="c1"># no video or no text</span>
+            <span class="k">if</span> <span class="n">video_count</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">text_with_only_special_tokens</span> <span class="o">=</span> <span class="n">remove_non_special_tokens</span><span class="p">(</span>
+                    <span class="n">chunk</span><span class="p">)</span>
+                <span class="c1"># generate candidate caption(s) in batch manner</span>
+                <span class="n">generated_text_candidates_single_chunk</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caption_num</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="k">for</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">offset</span> <span class="o">+</span>
+                                                   <span class="n">video_count</span><span class="p">]:</span>
+                    <span class="n">video</span> <span class="o">=</span> <span class="n">videos</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span>
+                    <span class="n">video_frame_videos_chunk</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="c1"># extract frame videos</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_sampling_method</span> <span class="o">==</span> <span class="s1">&#39;all_keyframes&#39;</span><span class="p">:</span>
+                        <span class="n">frames</span> <span class="o">=</span> <span class="n">extract_key_frames</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_sampling_method</span> <span class="o">==</span> <span class="s1">&#39;uniform&#39;</span><span class="p">:</span>
+                        <span class="n">frames</span> <span class="o">=</span> <span class="n">extract_video_frames_uniformly</span><span class="p">(</span>
+                            <span class="n">video</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_num</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">frame_videos</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span><span class="o">.</span><span class="n">to_image</span><span class="p">()</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">frames</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">frame_videos</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">horizontal_flip</span><span class="p">:</span>
+                            <span class="n">frame</span> <span class="o">=</span> <span class="n">ImageOps</span><span class="o">.</span><span class="n">mirror</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertical_flip</span><span class="p">:</span>
+                            <span class="n">frame</span> <span class="o">=</span> <span class="n">ImageOps</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+                        <span class="n">video_frame_videos_chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+                    <span class="c1"># construct prompts</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+                            <span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="c1"># check prompt_key is not None, and it&#39;s a str</span>
+                        <span class="c1"># in the sample</span>
+                        <span class="n">prompt_texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span><span class="p">]</span>
+                                        <span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">video_frame_videos_chunk</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="c1"># check prompt is not None, and it&#39;s a str</span>
+                        <span class="n">prompt_texts</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span>
+                                        <span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">video_frame_videos_chunk</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">prompt_texts</span> <span class="o">=</span> <span class="kc">None</span>
+
+                    <span class="n">inputs</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span>
+                        <span class="n">text</span><span class="o">=</span><span class="n">prompt_texts</span><span class="p">,</span>
+                        <span class="n">images</span><span class="o">=</span><span class="n">video_frame_videos_chunk</span><span class="p">,</span>
+                        <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">,</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caption_num</span><span class="p">):</span>
+                        <span class="n">generated_ids</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">,</span>
+                                                       <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+                                                       <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="n">generated_text</span> <span class="o">=</span> <span class="n">processor</span><span class="o">.</span><span class="n">batch_decode</span><span class="p">(</span>
+                            <span class="n">generated_ids</span><span class="p">,</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="n">generated_text_candidates_single_chunk</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="p">[</span>
+                            <span class="s1">&#39;. &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">txt</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">txt</span> <span class="ow">in</span> <span class="n">generated_text</span><span class="p">])</span>
+                        <span class="p">]</span>
+
+                <span class="c1"># 3. insert a list of generated captions into the positions of</span>
+                <span class="c1"># subsequent placeholders in the original string</span>
+                <span class="n">new_generated_text_all_videos</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="c1"># new_generated_text_all_videos is a helper array,</span>
+                <span class="c1"># element [i][j]</span>
+                <span class="c1"># denotes the reduced $i$-th result for the $j$-th video</span>
+
+                <span class="c1"># reduce the captions according to given mode video by video</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">video_count</span><span class="p">):</span>
+                    <span class="n">new_generated_text_per_video</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reduce_captions</span><span class="p">(</span>
+                        <span class="n">chunk</span><span class="p">,</span>
+                        <span class="p">[</span>
+                            <span class="n">captions</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="k">for</span> <span class="n">captions</span> <span class="ow">in</span>
+                            <span class="n">generated_text_candidates_single_chunk</span>
+                        <span class="p">],</span>
+                    <span class="p">)</span>
+                    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+                        <span class="n">new_generated_text_per_video</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">new_generated_text_per_video</span><span class="p">)):</span>
+                        <span class="n">new_generated_text_all_videos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">new_generated_text_per_video</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+                <span class="c1"># insert the captions according to given mode</span>
+                <span class="n">place_holders</span> <span class="o">=</span> <span class="p">[</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">]</span> <span class="o">*</span> <span class="n">video_count</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_newly_generated_samples</span><span class="p">):</span>
+                    <span class="n">generated_text_per_chunk</span> <span class="o">=</span> <span class="n">insert_texts_after_placeholders</span><span class="p">(</span>
+                        <span class="n">original_string</span><span class="o">=</span><span class="n">text_with_only_special_tokens</span><span class="p">,</span>
+                        <span class="n">placeholders</span><span class="o">=</span><span class="n">place_holders</span><span class="p">,</span>
+                        <span class="n">new_texts</span><span class="o">=</span><span class="n">new_generated_text_all_videos</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="p">)</span>
+                    <span class="n">generated_samples</span><span class="p">[</span><span class="n">i</span><span class="p">][</span>
+                        <span class="bp">self</span><span class="o">.</span>
+                        <span class="n">text_key</span><span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">generated_text_per_chunk</span><span class="si">}</span><span class="s1">&#39;</span> \
+                                     <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="si">}</span><span class="s1">&#39;</span>
+
+                <span class="n">offset</span> <span class="o">+=</span> <span class="n">video_count</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">vid_key</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
+                <span class="n">videos</span><span class="p">[</span><span class="n">vid_key</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">generated_samples</span>
+
+    <span class="k">def</span> <span class="nf">_reduce_captions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">generated_text_candidates_single_chunk</span><span class="p">):</span>
+        <span class="n">generated_text_per_chunk</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">==</span> <span class="s1">&#39;random_any&#39;</span><span class="p">:</span>
+            <span class="n">generated_text_per_chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">generated_text_candidates_single_chunk</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+            <span class="n">generated_text_per_chunk</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="n">generated_text_candidates_single_chunk</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">==</span> <span class="s1">&#39;similar_one_simhash&#39;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">simhash</span> <span class="kn">import</span> <span class="n">num_differing_bits</span>
+
+            <span class="kn">from</span> <span class="nn">..deduplicator.document_simhash_deduplicator</span> <span class="kn">import</span> \
+                <span class="n">DocumentSimhashDeduplicator</span>
+
+            <span class="n">ori_normal_text</span> <span class="o">=</span> <span class="n">remove_special_tokens</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+            <span class="c1"># using a simhash OP to calculate their similarity</span>
+            <span class="c1"># NOTE: simhash is just one method to calculate the similarities</span>
+            <span class="c1"># between texts, but not the most accurate one. More methods (e.g.</span>
+            <span class="c1"># embedding-based, ...) will be added.</span>
+            <span class="n">op_simhash</span> <span class="o">=</span> <span class="n">DocumentSimhashDeduplicator</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                                     <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span><span class="p">)</span>
+            <span class="n">ori_text_hash</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span>
+                <span class="n">op_simhash</span><span class="o">.</span><span class="n">compute_hash</span><span class="p">({</span><span class="n">op_simhash</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span>
+                                         <span class="n">ori_normal_text</span><span class="p">})[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">])</span>
+            <span class="n">generated_text_hashes</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span>
+                    <span class="n">op_simhash</span><span class="o">.</span><span class="n">compute_hash</span><span class="p">(</span>
+                        <span class="p">{</span><span class="n">op_simhash</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span>
+                         <span class="n">candidate_text</span><span class="p">})[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">candidate_text</span> <span class="ow">in</span> <span class="n">generated_text_candidates_single_chunk</span>
+            <span class="p">]</span>
+            <span class="n">hamming_distances</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">num_differing_bits</span><span class="p">(</span><span class="n">ori_text_hash</span><span class="p">,</span> <span class="n">generated_text_hash</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">generated_text_hash</span> <span class="ow">in</span> <span class="n">generated_text_hashes</span>
+            <span class="p">]</span>
+            <span class="n">max_index</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hamming_distances</span><span class="p">)),</span>
+                            <span class="n">key</span><span class="o">=</span><span class="n">hamming_distances</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">)</span>
+            <span class="n">generated_text_per_chunk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">generated_text_candidates_single_chunk</span><span class="p">[</span><span class="n">max_index</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">generated_text_per_chunk</span>
+
+<div class="viewcode-block" id="VideoCaptioningFromFramesMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoCaptioningFromFramesMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param samples:</span>
+<span class="sd">        :return:</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This is a batched_OP, whose the input and output type are</span>
+<span class="sd">            both list. Suppose there are $N$ input sample list with batch</span>
+<span class="sd">            size as $b$, and denote caption_num as $M$.</span>
+<span class="sd">            the number of total samples after generation is $2Nb$</span>
+<span class="sd">            for &#39;random_any&#39; and &#39;similar_one&#39; mode,</span>
+<span class="sd">            and $(1+M)Nb$ for &#39;all&#39; mode.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># reconstruct samples from &quot;dict of lists&quot; to &quot;list of dicts&quot;</span>
+        <span class="n">reconstructed_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])):</span>
+            <span class="n">reconstructed_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">})</span>
+        <span class="n">samples_after_generation</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># do generation for each sample within the batch</span>
+        <span class="k">for</span> <span class="n">ori_sample</span> <span class="ow">in</span> <span class="n">reconstructed_samples</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span><span class="p">:</span>
+                <span class="n">samples_after_generation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">)</span>
+            <span class="n">generated_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">,</span>
+                                                            <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+                                                            <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">generated_samples</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">samples_after_generation</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">generated_samples</span><span class="p">)</span>
+        <span class="c1"># reconstruct samples from &quot;list of dicts&quot; to &quot;dict of lists&quot;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">samples_after_generation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">res_samples</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">res_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">samples_after_generation</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">res_samples</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
