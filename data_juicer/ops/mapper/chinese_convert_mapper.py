@@ -11,9 +11,15 @@ OPENCC_CONVERTER = None
 
 
 def prepare_converter(mode):
+    mode_path = mode + '.json'
     global OPENCC_CONVERTER
     if OPENCC_CONVERTER is None:
-        OPENCC_CONVERTER = opencc.OpenCC(mode + '.json')
+        # empty converter
+        OPENCC_CONVERTER = opencc.OpenCC(mode_path)
+    if not OPENCC_CONVERTER.config.endswith(mode_path):
+        # the config is actually a config path
+        # update and get a new converter with specified mode
+        OPENCC_CONVERTER = opencc.OpenCC(mode_path)
 
 
 @OPERATORS.register_module(OP_NAME)
