@@ -268,10 +268,8 @@ def init_configs(args=None):
 
     try:
         cfg = parser.parse_args(args=args)
-      
         cfg = init_setup_from_cfg(cfg)
         cfg = update_op_process(cfg, parser)
-
 
         # copy the config file into the work directory
         config_backup(cfg)
