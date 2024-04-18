@@ -1,8 +1,6 @@
 import math
 import subprocess
 
-import psutil
-import torch
 from loguru import logger
 
 from data_juicer import cuda_device_count, use_cuda
@@ -10,6 +8,7 @@ from data_juicer import cuda_device_count, use_cuda
 
 def get_min_cuda_memory():
     # get cuda memory info using "nvidia-smi" command
+    import torch
     min_cuda_memory = torch.cuda.get_device_properties(
         0).total_memory / 1024**2
     nvidia_smi_output = subprocess.check_output([
@@ -23,6 +22,8 @@ def get_min_cuda_memory():
 
 
 def calculate_np(num_proc, op, op_name):
+    """Calculate the optimum number of processes for the given OP"""
+    import psutil
     if num_proc is None:
         num_proc = psutil.cpu_count()
     if use_cuda() and op._accelerator == 'cuda':
