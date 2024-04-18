@@ -7,10 +7,13 @@ OP_NAME = 'chinese_convert_mapper'
 with AvailabilityChecking(['opencc'], OP_NAME):
     import opencc  # noqa: F401
 
+OPENCC_CONVERTER = None
+
 
 def prepare_converter(mode):
     global OPENCC_CONVERTER
-    OPENCC_CONVERTER = opencc.OpenCC(mode + '.json')
+    if OPENCC_CONVERTER is None:
+        OPENCC_CONVERTER = opencc.OpenCC(mode + '.json')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -70,9 +73,11 @@ class ChineseConvertMapper(Mapper):
         ]
         assert mode in mode_list, 'Please make sure mode is one of {}'.format(
             mode_list)
-        prepare_converter(mode)
+        self.mode = mode
+        prepare_converter(self.mode)
 
     def process(self, sample):
+        prepare_converter(self.mode)
 
         sample[self.text_key] = OPENCC_CONVERTER.convert(sample[self.text_key])
         return sample
