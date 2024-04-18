@@ -22,7 +22,7 @@ class BaseEvaluator(object):
 
 class Gpt3QualityEvaluator(BaseEvaluator):
 
-    def run(self, eval_type, eval_obj, export_path='', **kwargs):
+    def run(self, eval_type, eval_obj, **kwargs):
         if eval_type == 'data':
             # eval_obj is the path to the dataset to be evaluated
             assert isinstance(eval_obj, str)

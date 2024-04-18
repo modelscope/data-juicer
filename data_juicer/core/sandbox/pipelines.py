@@ -2,12 +2,12 @@ import asyncio
 import os.path
 from typing import List
 
-import wandb
 import yaml
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import namespace_to_dict
 from loguru import logger
 
+import wandb
 from data_juicer.config import init_configs, merge_config
 from data_juicer.core import Analyser
 from data_juicer.core import Executor as DjExecutor
@@ -242,7 +242,9 @@ class SandBoxExecutor:
             'work_dir':
             os.path.join(self.dj_cfg.work_dir, 'model_trainer_outputs'),
         }
-        asyncio.run(self.model_trainer.run(None, training_args, **kwargs))
+        asyncio.run(
+            self.model_trainer.run(self.model_trainer.model_config['type'],
+                                   training_args, **kwargs))
 
     def hook_evaluate_data(self, args: dict, **kwargs):
         if not self.data_evaluator:
@@ -252,10 +254,8 @@ class SandBoxExecutor:
         # users can customize this freely
         logger.info('Begin to evaluate the data with given evaluator config')
         processed_dataset = self.dj_cfg.dataset_path
-        export_path = os.path.dirname(processed_dataset)
         eval_res = self.data_evaluator.run(eval_type='data',
                                            eval_obj=processed_dataset,
-                                           export_path=export_path,
                                            **kwargs)
         self.watcher.watch(eval_res, args['res_name'])
 
