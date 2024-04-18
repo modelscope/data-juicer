@@ -9,17 +9,11 @@ doc, please run the following commands:
 # 1. install the sphinx requirements and init the sphinx-quickstart
 pip install sphinx sphinx-autobuild sphinx_rtd_theme recommonmark
 # or pip install -r ../../environments/dev_requires
-sphinx-quickstart
 
-# 2. auto generate the doc files for all sub modules (*.rst) from source codes
-sphinx-apidoc -o source ../../data_juicer
+# 2. auto generate and build the doc
+./build_doc.sh
 
-# 3. modify the auto-generated files according to your requirements
-vim source/modules.rst
-
-# 4. finalize the doc, which is stored in the `build/html` directory
-make clean
-make html
+# 3. finalize the doc, which is stored in the `build/html` directory
 mv build/html position_to_publish
 ```
 

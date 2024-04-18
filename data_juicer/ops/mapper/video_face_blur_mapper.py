@@ -32,7 +32,7 @@ class VideoFaceBlurMapper(Mapper):
         Initialization method.
 
         :param blur_type: Type of blur kernel, including
-        ['mean', 'box', 'gaussian'].
+            ['mean', 'box', 'gaussian'].
         :param radius: Radius of blur kernel.
         :param args: extra args
         :param kwargs: extra args
