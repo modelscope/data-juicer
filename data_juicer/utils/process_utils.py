@@ -1,6 +1,7 @@
 import math
 import subprocess
 
+import psutil
 from loguru import logger
 
 from data_juicer import cuda_device_count, use_cuda
@@ -23,7 +24,6 @@ def get_min_cuda_memory():
 
 def calculate_np(num_proc, op, op_name):
     """Calculate the optimum number of processes for the given OP"""
-    import psutil
     if num_proc is None:
         num_proc = psutil.cpu_count()
     if use_cuda() and op._accelerator == 'cuda':
