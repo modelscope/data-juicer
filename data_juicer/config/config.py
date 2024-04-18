@@ -268,8 +268,10 @@ def init_configs(args=None):
 
     try:
         cfg = parser.parse_args(args=args)
-        cfg = update_op_process(cfg, parser)
+      
         cfg = init_setup_from_cfg(cfg)
+        cfg = update_op_process(cfg, parser)
+
 
         # copy the config file into the work directory
         config_backup(cfg)
@@ -422,16 +424,15 @@ def init_setup_from_cfg(cfg):
                     'audio_key': cfg.audio_key,
                     'video_key': cfg.video_key,
                 }
-            elif args['text_key'] is None:
-                args['text_key'] = text_key
-                args['image_key'] = cfg.image_key
-                args['audio_key'] = cfg.audio_key
-                args['video_key'] = cfg.video_key
-            if text_key:
-                args['text_key'] = text_key
-                args['image_key'] = cfg.image_key
-                args['audio_key'] = cfg.audio_key
-                args['video_key'] = cfg.video_key
+            else:
+                if 'text_key' not in args or args['text_key'] is None:
+                    args['text_key'] = text_key
+                if 'image_key' not in args or args['image_key'] is None:
+                    args['image_key'] = cfg.image_key
+                if 'audio_key' not in args or args['audio_key'] is None:
+                    args['audio_key'] = cfg.audio_key
+                if 'video_key' not in args or args['video_key'] is None:
+                    args['video_key'] = cfg.video_key
             op[op_name] = args
 
     return cfg
