@@ -2,12 +2,12 @@ import asyncio
 import os.path
 from typing import List
 
+import wandb
 import yaml
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import namespace_to_dict
 from loguru import logger
 
-import wandb
 from data_juicer.config import init_configs, merge_config
 from data_juicer.core import Analyser
 from data_juicer.core import Executor as DjExecutor
@@ -195,7 +195,8 @@ class SandBoxExecutor:
                 sample_ratio=self.dj_cfg.data_probe_ratio,
                 sample_algo=self.dj_cfg.data_probe_algo,
             )
-            res_type, infer_res = self.model_infer_executor.run(sampled_data)
+            res_type, infer_res = self.model_infer_executor.run(
+                self.model_infer_executor.model_config['type'], sampled_data)
             self.watcher.watch({args['res_name']: infer_res})
 
     def hook_refine_recipe_via_k_sigma(self, args: dict, **kwargs):
