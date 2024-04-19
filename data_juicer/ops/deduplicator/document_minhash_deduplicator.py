@@ -163,6 +163,7 @@ class DocumentMinhashDeduplicator(Deduplicator):
             logger.warning('Be careful that tokenization with punctuations '
                            'won\'t work if the ignore pattern includes '
                            'punctuations.')
+        self.punctuation_pattern = regex.compile(r'\p{P}')
 
         if self.tokenization == 'sentencepiece':
             if tokenizer_model is None:
