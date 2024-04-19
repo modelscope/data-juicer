@@ -202,7 +202,6 @@ class ModelscopeTrainExecutor(ModelScopeExecutor):
         self.executor.train()
 
 
-# TODO: add watcher for the re-directed output streams and log parsers
 class EasySoraExecutor(BaseModelExecutor):
 
     def __init__(self, model_config: dict):
