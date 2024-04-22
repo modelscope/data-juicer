@@ -1,21 +1,24 @@
-import math
 import os
-import subprocess
 from time import time
 
-import psutil
-import torch
 from loguru import logger
 
-from data_juicer import cuda_device_count, use_cuda
+from data_juicer import use_cuda
 from data_juicer.config import init_configs
+from data_juicer.core.data import Dataset
 from data_juicer.format.load import load_formatter
+from data_juicer.format.mixture_formatter import MixtureFormatter
 from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
                              load_ops)
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.process_utils import calculate_np
 
+from ..ops.selector.frequency_specified_field_selector import \
+    FrequencySpecifiedFieldSelector
+from ..ops.selector.topk_specified_field_selector import \
+    TopkSpecifiedFieldSelector
 from .data import add_same_content_to_new_column
 from .exporter import Exporter
 from .tracer import Tracer
@@ -89,53 +92,51 @@ class Executor:
                 logger.info('Trace for all ops.')
                 self.op_list_to_trace = set(OPERATORS.modules.keys())
 
-    def get_min_cuda_memory(self):
-        # get cuda memory info using "nvidia-smi" command
-        min_cuda_memory = torch.cuda.get_device_properties(
-            0).total_memory / 1024**2
-        nvidia_smi_output = subprocess.check_output([
-            'nvidia-smi', '--query-gpu=memory.free',
-            '--format=csv,noheader,nounits'
-        ]).decode('utf-8')
-        for line in nvidia_smi_output.strip().split('\n'):
-            free_memory = int(line)
-            min_cuda_memory = min(min_cuda_memory, free_memory)
-        return min_cuda_memory
+    def sample_data(self,
+                    dataset_to_sample: Dataset = None,
+                    load_data_np=None,
+                    sample_ratio: float = 1.0,
+                    sample_algo: str = 'uniform',
+                    **kwargs):
+        """
+        Sample a subset from the given dataset.
 
-    def calculate_np(self, op, op_name):
-        if use_cuda() and op._accelerator == 'cuda':
-            cuda_mem_available = self.get_min_cuda_memory() / 1024
-            op_proc = min(
-                self.cfg.np,
-                math.floor(cuda_mem_available / (op.mem_required + 0.1)) *
-                cuda_device_count())
-            if op_proc < 1.0:
-                logger.warning(
-                    f'The required cuda memory:{op.mem_required}GB might '
-                    f'be more than the available cuda memory:'
-                    f'{cuda_mem_available}GB.'
-                    f'This Op [{op_name}] might '
-                    f'require more resource to run.')
-            op_proc = max(op_proc, 1)
-            return op_proc
+        :param dataset_to_sample: Dataset to sample from. If None, will use
+            the formatter linked by the executor. Default is None.
+        :param load_data_np: number of workers when loading the dataset.
+        :param sample_ratio: The ratio of the sample size to the original
+            dataset size. Default is 1.0 (no sampling).
+        :param sample_algo: Sampling algorithm to use. Options are "uniform",
+            "frequency_specified_field_selector", or
+            "topk_specified_field_selector".
+            Default is "uniform".
+        :return: A sampled Dataset.
+        """
+        # Determine the dataset to sample from
+        if dataset_to_sample is not None:
+            dataset = dataset_to_sample
+        elif self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
+            logger.info('Loading dataset from checkpoint...')
+            dataset = self.ckpt_manager.load_ckpt()
+        elif hasattr(self, 'formatter'):
+            logger.info('Loading dataset from data formatter...')
+            if load_data_np is None:
+                load_data_np = self.cfg.np
+            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
         else:
-            op_proc = self.cfg.np
-            cpu_available = psutil.cpu_count()
-            mem_available = psutil.virtual_memory().available
-            mem_available = mem_available / 1024**3
-            op_proc = min(op_proc, math.floor(cpu_available / op.cpu_required))
-            op_proc = min(op_proc,
-                          math.floor(mem_available / (op.mem_required + 0.1)))
-            if op_proc < 1.0:
-                logger.warning(
-                    f'The required CPU number:{op.cpu_required} '
-                    f'and memory:{op.mem_required}GB might '
-                    f'be more than the available CPU:{cpu_available} '
-                    f'and memory :{mem_available}GB.'
-                    f'This Op [{op_name}] might '
-                    f'require more resource to run.')
-            op_proc = max(op_proc, 1)
-            return op_proc
+            raise ValueError('No dataset available to sample from.')
+
+        # Perform sampling based on the specified algorithm
+        if sample_algo == 'uniform':
+            return MixtureFormatter.random_sample(dataset, sample_ratio)
+        elif sample_algo == 'frequency_specified_field_selector':
+            dj_op = FrequencySpecifiedFieldSelector(**kwargs)
+            return dj_op.process(dataset)
+        elif sample_algo == 'topk_specified_field_selector':
+            dj_op = TopkSpecifiedFieldSelector(**kwargs)
+            return dj_op.process(dataset)
+        else:
+            raise ValueError(f'Unsupported sample_algo: {sample_algo}')
 
     def run(self, load_data_np=None):
         """
@@ -174,7 +175,7 @@ class Executor:
                 logger.info(f'Op [{op_name}] running with sepcified '
                             f'number of procs:{op.spec_numprocs}')
             else:
-                op_proc = self.calculate_np(op, op_name)
+                op_proc = calculate_np(self.cfg.np, op, op_name)
             try:
                 if isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,

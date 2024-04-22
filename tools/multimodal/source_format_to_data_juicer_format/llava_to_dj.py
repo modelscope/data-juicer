@@ -116,9 +116,7 @@ def main(
         which only covers a limited number of questions and the corresponding
         answers are the captions of images. For fine-tuning dataset, there
         are some multi-turn dialogs which might not be suitable for setting
-        this argument to True. This argument will be added to the converted
-        samples as an extra meta field for restoring the questions in the
-        llava_to_dj tool. Default: False.
+        this argument to True. Default: False.
     """
     # ----- Constant settings. Better not to change them. -----
     text_key = 'text'  # default key of field to store the sample text
@@ -193,10 +191,7 @@ def main(
             if len(conversations) > 2 and only_keep_caption:
                 logger.warning(f'There are multi-turn-dialog sample with id '
                                f'[{id}] in this dataset. So this dataset '
-                               f'might be a fine-tuning dataset and we set '
-                               f'only_keep_caption to False for the rest of '
-                               f'dataset.')
-                only_keep_caption = False
+                               f'might be a fine-tuning dataset.')
 
             # image list
             images = []
@@ -287,7 +282,6 @@ def main(
                 'id': id,
                 text_key: text,
                 image_key: images,
-                'only_caption': only_keep_caption,
             }
             writer.write(new_sample)
     logger.info(f'Store the target dataset into [{target_ds_path}].')

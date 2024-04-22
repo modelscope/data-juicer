@@ -24,3 +24,4 @@ streamlit
 spacy==3.5.0
 multiprocess==0.70.12
 dill==0.3.4
+psutil

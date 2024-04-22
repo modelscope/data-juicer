@@ -8,10 +8,19 @@ Welcome to data-juicer's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: References:
+   :glob:
+   :caption: Data-Juicer API Reference
 
-.. include:: modules.rst
-
+   data_juicer.core
+   data_juicer.ops
+   data_juicer.ops.filter
+   data_juicer.ops.mapper
+   data_juicer.ops.deduplicator
+   data_juicer.ops.selector
+   data_juicer.ops.common
+   data_juicer.analysis
+   data_juicer.config
+   data_juicer.format
 
 Indices and tables
 ==================

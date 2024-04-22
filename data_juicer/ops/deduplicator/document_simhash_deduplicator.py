@@ -69,6 +69,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
             logger.warning('Be careful that tokenization with punctuations '
                            'won\'t work if the ignore pattern includes '
                            'punctuations.')
+        self.punctuation_pattern = regex.compile(r'\p{P}')
 
         # about deduplication
         self.num_blocks = num_blocks

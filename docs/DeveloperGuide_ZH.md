@@ -187,9 +187,14 @@ class StatsKeys(object):
 3. 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
 
 ```python
-from . import (...,              # other ops
-               text_length_filter)  # import this new op module
-
+from . import (...,              # other OPs
+               text_length_filter)  # import this new OP module
+# other OPs
+from text_length_filter import TextLengthFilter  # import this new OP class
+__all__ = [
+    # other Ops
+    text_length_filter,  # add this new Op to __all__
+]
 ```
 
 4. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
@@ -268,7 +273,6 @@ if __name__ == '__main__':
 
    3. `docs/Operators_ZH.md`：该文档为6.ii中`docs/Operators.md`文档的中文版，需要更新相同位置处的中文内容。
 
-   4. `docs/sphinx_doc/source/data_juicer.ops.{filter | mapper | deduplicator | selector}.rst`: 该文档为 API 文档索引，在修改算子文件名称或增删算子文件的情况下需要对应更新文件中对应的条目。
 
 ### （可选）使新算子可以进行算子融合
 
