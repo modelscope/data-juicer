@@ -69,7 +69,7 @@ from tqdm import tqdm
 from data_juicer.utils.mm_utils import SpecialTokens
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(
     llava_ds_path: str,
     target_ds_path: str,
