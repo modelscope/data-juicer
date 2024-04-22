@@ -2,11 +2,16 @@ __version__ = '0.2.0'
 
 import os
 import subprocess
+import sys
 
 import multiprocess as mp
 from loguru import logger
 
 from data_juicer.utils.availability_utils import _is_package_available
+
+# for now, only INFO will be shown
+logger.remove()
+logger.add(sys.stderr, level='INFO')
 
 
 def _cuda_device_count():
