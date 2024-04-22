@@ -23,7 +23,8 @@ class ProcessDataTest(DataJuicerTestCaseBase):
         shutil.rmtree(self.tmp_dir)
 
     def _test_status_code(self, yaml_file, output_path, text_keys):
-        data_path = 'demos/data/demo-dataset.jsonl'
+        data_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))),
+            'demos', 'data', 'demo-dataset.jsonl')
         yaml_config = {
             'dataset_path': data_path,
             'text_keys': text_keys,
