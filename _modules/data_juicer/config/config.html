@@ -669,7 +669,8 @@
     <span class="n">target_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">))</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Back up the input config file [</span><span class="si">{</span><span class="n">cfg_path</span><span class="si">}</span><span class="s1">] into the &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;work_dir [</span><span class="si">{</span><span class="n">work_dir</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
-    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">,</span> <span class="n">target_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">target_path</span><span class="p">):</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">,</span> <span class="n">target_path</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">display_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
