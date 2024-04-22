@@ -10,7 +10,7 @@ export_path: '/path/to/result/dataset.jsonl'                # path to processed 
 export_shard_size: 0                                        # shard size of exported dataset in Byte. In default, it's 0, which means export the whole dataset into only one file. If it's set a positive number, the exported dataset will be split into several dataset shards, and the max size of each shard won't larger than the export_shard_size
 export_in_parallel: false                                   # whether to export the result dataset in parallel to a single file, which usually takes less time. It only works when export_shard_size is 0, and its default number of processes is the same as the argument np. **Notice**: If it's True, sometimes exporting in parallel might require much more time due to the IO blocking, especially for very large datasets. When this happens, False is a better choice, although it takes more time.
 np: 4                                                       # number of subprocess to process your dataset
-text_keys: 'content'                                        # the key name of field where the sample texts to be processed, e.g., `text`, `instruction`, `output`, ...
+text_keys: 'text'                                           # the key name of field where the sample texts to be processed, e.g., `text`, `instruction`, `output`, ...
                                                             # Note: currently, we support specify only ONE key for each op, for cases requiring multiple keys, users can specify the op multiple times. We will only use the first key of `text_keys` when you set multiple keys.
 suffixes: []                                                # the suffix of files that will be read. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
 use_cache: true                                             # whether to use the cache management of Hugging Face datasets. It might take up lots of disk space when using cache
@@ -22,6 +22,8 @@ op_list_to_trace: []                                        # only ops in this l
 trace_num: 10                                               # number of samples to show the differences between datasets before and after each op. Only available when tracer is opened.
 op_fusion: false                                            # whether to fuse operators that share the same intermediate variables automatically. Op fusion might reduce the memory requirements slightly but speed up the whole process.
 cache_compress: null                                        # the compression method of the cache file, which can be specified in ['gzip', 'zstd', 'lz4']. If this parameter is None, the cache file will not be compressed. We recommend you turn on this argument when your input dataset is larger than tens of GB and your disk space is not enough.
+keep_stats_in_res_ds: false                                 # whether to keep the computed stats in the result dataset. The intermediate fields to store the stats computed by Filters will be removed if it's False. It's False in default.
+keep_hashes_in_res_ds: false                                # whether to keep the computed hashes in the result dataset. The intermediate fields to store the hashes computed by Deduplicators will be removed if it's False. It's False in default.
 
 # for multimodal data processing
 image_key: 'images'                                         # key name of field to store the list of sample image paths.
@@ -39,6 +41,18 @@ ray_address: auto                                           # the address of the
 
 # only for data analysis
 save_stats_in_one_file: false                               # whether to store all stats result into one file
+
+# for sandbox or hpo
+model_infer_config: null                                    # path or dict to model inference configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
+model_train_config: null                                    # path or dict to model training configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
+model_eval_config: null                                     # path or dict to model evaluation configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
+data_eval_config: null                                      # path or dict to data evaluation configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
+data_probe_algo: 'uniform'                                  # sampling algorithm for dataset. Should be one of ["uniform", "frequency_specified_field_selector", "topk_specified_field_selector"]. It's "uniform" in default. Only used for dataset sampling.
+data_probe_ratio: 1.0                                       # the sampling ratio to the original dataset size. It's 1.0 in default. Only used for dataset sampling.
+path_k_sigma_recipe: null                                   # path to save a configuration file when using k-sigma tool to refine processing recipes
+path_model_feedback_recipe: null                            # path to save a configuration file refined by model feedback
+hpo_config: null                                            # path to a configuration file when using auto-HPO tool.
+
 
 # process schedule: a list of several process operators with their arguments
 process:

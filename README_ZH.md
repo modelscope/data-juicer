@@ -67,6 +67,7 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
     - [数据分析](#数据分析)
     - [数据可视化](#数据可视化)
     - [构建配置文件](#构建配置文件)
+    - [沙盒实验室](#沙盒实验室)
     - [预处理原始数据（可选）](#预处理原始数据可选)
     - [对于 Docker 用户](#对于-docker-用户)
   - [数据处理菜谱](#数据处理菜谱)
@@ -80,15 +81,15 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
 
 ![Overview](https://img.alicdn.com/imgextra/i4/O1CN01WYQP3Z1JHsaXaQDK6_!!6000000001004-0-tps-3640-1812.jpg)
 
-* **系统化 & 可复用**：为用户提供系统化且可复用的80+核心[算子](docs/Operators_ZH.md)，20+[配置菜谱](configs/README_ZH.md)和20+专用[工具池](#documentation)，旨在让数据处理独立于特定的大语言模型数据集和处理流水线。
+* **系统化 & 可复用**：为用户提供系统化且可复用的80+核心[算子](docs/Operators_ZH.md)，20+[配置菜谱](configs/README_ZH.md)和20+专用[工具池](#documentation)，旨在让多模态数据处理独立于特定的大语言模型数据集和处理流水线。
 
-* **数据反馈回路**：支持详细的数据分析，并提供自动报告生成功能，使您深入了解您的数据集。结合多维度自动评估功能，支持在 LLM 开发过程的多个阶段进行及时反馈循环。  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
+* **数据反馈回路 & 沙盒实验室**：支持一站式数据-模型协同开发，通过[沙盒实验室](docs/Sandbox-ZH.md)快速迭代，基于数据和模型反馈回路、可视化和多维度自动评估等功能，使您更了解和改进您的数据和模型。  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
+
+* **效率增强**：提供高效并行化的数据处理流水线（Aliyun-PAI\Ray\Slurm\CUDA\算子融合），减少内存占用和CPU开销，提高生产力。  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 * **全面的数据处理菜谱**：为pre-training、fine-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。 在LLaMA、LLaVA等模型上有效验证。 ![exp_llama](https://img.alicdn.com/imgextra/i2/O1CN019WtUPP1uhebnDlPR8_!!6000000006069-2-tps-2530-1005.png)
 
-* **效率增强**：提供高效的数据处理流水线，减少内存占用和CPU开销，提高生产力。  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
-
-* **用户友好**：设计简单易用，提供全面的[文档](#documentation)、简易[入门指南](#快速上手)和[演示配置](configs/README_ZH.md)，并且可以轻松地添加/删除[现有配置](configs/config_all.yaml)中的算子。
+* **用户友好**：设计简单易用，提供全面的[文档](#documents)、简易[入门指南](#快速上手)和[演示配置](configs/README_ZH.md)，并且可以轻松地添加/删除[现有配置](configs/config_all.yaml)中的算子。
 
 * **灵活 & 易扩展**：支持大多数数据格式（如jsonl、parquet、csv等），并允许灵活组合算子。支持[自定义算子](docs/DeveloperGuide_ZH.md#构建自己的算子)，以执行定制化的数据处理。
 
@@ -294,6 +295,19 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 * 基础的配置项格式及定义如下图所示
 
   ![基础配置项格式及定义样例](https://img.alicdn.com/imgextra/i4/O1CN01xPtU0t1YOwsZyuqCx_!!6000000003050-0-tps-1692-879.jpg "基础配置文件样例")
+
+### 沙盒实验室
+
+数据沙盒实验室 (DJ-Sandbox) 为用户提供了持续生产数据菜谱的最佳实践，其具有低开销、可迁移、有指导性等特点。
+- 用户在沙盒中可以基于一些小规模数据集、模型对数据菜谱进行快速实验、迭代、优化，再迁移到更大尺度上，大规模生产高质量数据以服务大模型。
+- 用户在沙盒中，除了Data-Juicer基础的数据优化与数据菜谱微调功能外，还可以便捷地使用数据洞察与分析、沙盒模型训练与评测、基于数据和模型反馈优化数据菜谱等可配置组件，共同组成完整的一站式数据-模型研发流水线。
+
+沙盒默认通过如下命令运行，更多介绍和细节请参阅[沙盒文档](docs/Sandbox-ZH.md).
+```shell
+python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
+```
+
+
 
 ### 预处理原始数据（可选）
 

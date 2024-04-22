@@ -1,0 +1,27 @@
+# Sandbox config example for dataset
+
+# global parameters
+project_name: 'demo-sandbox'
+dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
+np: 4  # number of subprocess to process your dataset
+
+export_path: './outputs/demo-sandbox/demo-sandbox.jsonl'
+
+# sandbox configs
+# for refining recipe using k-sigma rules
+path_k_sigma_recipe: './outputs/demo-sandbox/k_sigma_new_recipe.yaml'
+
+# for gpt3 quality classifier as data evaluator
+data_eval_config: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
+#data_eval_config:
+#  type: dj_text_quality_classifier
+
+# for gpt3 model training
+model_train_config: 'configs/demo/sandbox/gpt3_extra_train_config.json'
+
+# process schedule
+# a list of several process operators with their arguments
+process:
+  - language_id_score_filter:
+      lang: 'zh'
+      min_score: 0.5

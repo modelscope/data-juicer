@@ -88,7 +88,8 @@ class MixtureFormatter(BaseFormatter):
                 prefixes.append(value)
         return prefixes, weights
 
-    def _random_sample(self, dataset, weight=1.0, sample_number=0, seed=None):
+    @classmethod
+    def random_sample(cls, dataset, weight=1.0, sample_number=0, seed=None):
         """
         Randomly sample a subset from a dataset with weight or number,
         if sample number is bigger than 0, we will use sample
@@ -132,7 +133,7 @@ class MixtureFormatter(BaseFormatter):
                                                  self.sample_numbers,
                                                  self.formatters):
             dataset = formatter.load_dataset(num_proc, global_cfg)
-            sampled = self._random_sample(dataset, weight, sample_num)
+            sampled = self.random_sample(dataset, weight, sample_num)
             logger.info(f'sampled {len(sampled)} from '
                         f'{len(dataset)}')
             dataset_list.append(sampled)

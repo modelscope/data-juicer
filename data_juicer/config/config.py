@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Union
 
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
                           namespace_to_dict)
-from jsonargparse.typing import NonNegativeInt, PositiveInt
+from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS
@@ -32,7 +32,7 @@ def init_configs(args=None):
 
     parser.add_argument('--config',
                         action=ActionConfigFile,
-                        help='Path to a configuration file.',
+                        help='Path to a dj basic configuration file.',
                         required=True)
 
     parser.add_argument(
@@ -41,9 +41,58 @@ def init_configs(args=None):
         help='Path to a configuration file when using auto-HPO tool.',
         required=False)
     parser.add_argument(
-        '--path_3sigma_recipe',
+        '--path_k_sigma_recipe',
         type=str,
-        help='Path to save a configuration file when using 3-sigma tool.',
+        help='Path to save a configuration file when using k-sigma tool.',
+        required=False)
+    parser.add_argument(
+        '--path_model_feedback_recipe',
+        type=str,
+        help='Path to save a configuration file refined by model feedback.',
+        required=False)
+    parser.add_argument(
+        '--model_infer_config',
+        type=Union[str, dict],
+        help='Path or a dict to model inference configuration file when '
+        'calling model executor in sandbox. If not specified, the model '
+        'inference related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--model_train_config',
+        type=Union[str, dict],
+        help='Path or a dict to model training configuration file when '
+        'calling model executor in sandbox. If not specified, the model '
+        'training related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--data_eval_config',
+        type=Union[str, dict],
+        help='Path or a dict to eval configuration file when calling '
+        'auto-evaluator for data in sandbox. '
+        'If not specified, the eval related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--model_eval_config',
+        type=Union[str, dict],
+        help='Path or a dict to eval configuration file when calling '
+        'auto-evaluator for model in sandbox. '
+        'If not specified, the eval related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--data_probe_algo',
+        type=str,
+        default='uniform',
+        help='Sampling algorithm to use. Options are "uniform", '
+        '"frequency_specified_field_selector", or '
+        '"topk_specified_field_selector". Default is "uniform". Only '
+        'used for dataset sampling',
+        required=False)
+    parser.add_argument(
+        '--data_probe_ratio',
+        type=ClosedUnitInterval,
+        default=1.0,
+        help='The ratio of the sample size to the original dataset size. '
+        'Default is 1.0 (no sampling). Only used for dataset sampling',
         required=False)
 
     # basic global paras with extended type hints
@@ -440,7 +489,7 @@ def _collect_config_info_from_class_docs(configurable_ops, parser):
     """
     Add ops and its params to parser for command line.
 
-    :param configurable_ops: a list of ops to be to added, each item is
+    :param configurable_ops: a list of ops to be added, each item is
         a pair of op_name and op_class
     :param parser: jsonargparse parser need to update
     """
