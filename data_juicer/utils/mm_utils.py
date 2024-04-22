@@ -162,18 +162,19 @@ def load_videos(paths):
     return [load_video(path) for path in paths]
 
 
-def load_video(path):
+def load_video(path, mode='r'):
     """
     Load a video using its path.
 
     :param path: the path to this video.
+    :param mode: the loading mode. It's "r" in default.
     :return: a container object form PyAv library, which contains all streams
         in this video (video/audio/...) and can be used to decode these streams
         to frames.
     """
     if not os.path.exists(path):
         raise ValueError(f'Video [{path}] does not exist!')
-    container = av.open(path)
+    container = av.open(path, mode)
     return container
 
 
