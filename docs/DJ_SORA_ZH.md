@@ -94,7 +94,7 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
   - [✅] **Youku-mPLUG-CN**: 36TB video-caption data：`{<caption, video_id>}`
   - [✅] **InternVid**: 234M data sample:`{<caption, youtube_id, start/end_time>}`
   - [✅] **MSR-VTT**: 10K video-caption data：`{<caption, video_id>}`
-  - [WIP] ModelScope数据集集成
+  - [ ] [WIP] ModelScope数据集集成
   - [ ] VideoInstruct-100K, Panda70M, ......
 - [ ] 大规模高质量DJ-SORA数据集
   - [✅] (Data sandbox) 基于DJ-video算子构建和优化多模态数据菜谱 (算子同期持续完善)

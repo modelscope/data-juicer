@@ -74,6 +74,7 @@ Table of Contents
     - [Data Analysis](#data-analysis)
     - [Data Visualization](#data-visualization)
     - [Build Up Config Files](#build-up-config-files)
+    - [Sandbox](#sandbox)
     - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
     - [For Docker Users](#for-docker-users)
   - [Data Recipes](#data-recipes)
@@ -90,25 +91,25 @@ Table of Contents
 - **Systematic & Reusable**:
   Empowering users with a systematic library of 80+ core [OPs](docs/Operators.md), 20+ reusable [config recipes](configs), and 20+ feature-rich
   dedicated [toolkits](#documentation), designed to
-  function independently of specific LLM datasets and processing pipelines.
+  function independently of specific multimodal LLM datasets and processing pipelines.
 
-- **Data-in-the-loop**: Allowing detailed data analyses with an automated
-  report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.
+- **Data-in-the-loop & Sandbox**: Supporting one-stop data-model collaborative development, enabling rapid iteration 
+  through the [sandbox laboratory](docs/Sandbox.md), and providing features such as feedback loops based on data and model, 
+  visualization, and multidimensional automatic evaluation, so that you can better understand and improve your data and models.
   ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
+
+- **Enhanced Efficiency**: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
+  requiring less memory and CPU usage, optimized for maximum productivity.
+  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data
   processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on
   reference LLaMA and LLaVA models.
   ![exp_llama](https://img.alicdn.com/imgextra/i2/O1CN019WtUPP1uhebnDlPR8_!!6000000006069-2-tps-2530-1005.png)
 
-- **Enhanced Efficiency**: Providing a speedy data processing pipeline
-  requiring less memory and CPU usage, optimized for maximum productivity.
-  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
-
-
 - **Flexible & Extensible**: Accommodating most types of data formats (e.g., jsonl, parquet, csv, ...) and allowing flexible combinations of OPs. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
 
-- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documentation), [easy start guides](#quick-start) and [demo configs](configs/README.md), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
+- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documents), [easy start guides](#quick-start) and [demo configs](configs/README.md), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
 
 
 
@@ -319,6 +320,18 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 - The basic config format and definition is shown below.
 
   ![Basic config example of format and definition](https://img.alicdn.com/imgextra/i1/O1CN01uXgjgj1khWKOigYww_!!6000000004715-0-tps-1745-871.jpg "Basic config file example")
+
+### Sandbox
+
+The data sandbox laboratory (DJ-Sandbox) provides users with the best practices for continuously producing data recipes. It features low overhead, portability, and guidance.
+
+- In the sandbox, users can quickly experiment, iterate, and refine data recipes based on small-scale datasets and models, before scaling up to produce high-quality data to serve large-scale models.
+- In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probe and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form a complete one-stop data-model research and development pipeline.
+
+The sandbox is run using the following commands by default, and for more information and details, please refer to the [sandbox documentation](docs/Sandbox.md).
+```shell
+python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
+```
 
 ### Preprocess Raw Data (Optional)
 - Our formatters support some common input dataset formats for now:

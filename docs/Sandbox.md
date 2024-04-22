@@ -2,7 +2,7 @@
 ## What is DJ-Sandbox?
 In Data-Juicer, the data sandbox laboratory provides users with the best practices for continuously producing data recipes. It features low overhead, portability, and guidance. In the sandbox, users can quickly experiment, iterate, and refine data recipes based on small-scale datasets and models, before scaling up to produce high-quality data to serve large-scale models.
 
-In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probe and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form a complete one-stop sandbox pipeline.
+In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probe and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form a complete one-stop data-model research and development pipeline.
 ## Quick Start
 ### Prepare Configuration Files for Sandbox
 The configuration file of the sandbox includes several additional parameters in addition to the configuration of Data-Juicer. These parameters are used to specify the configuration information for model training, inference, evaluation, and other steps that may run in the sandbox pipeline. For the complete set of additional parameters, please refer to the "for sandbox or hpo" section in the [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml). An example of a sandbox configuration file can be found in `configs/demo/sandbox/sandbox.yaml`:
