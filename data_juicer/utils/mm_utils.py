@@ -173,7 +173,7 @@ def load_video(path, mode='r'):
         to frames.
     """
     if not os.path.exists(path) and 'r' in mode:
-        raise ValueError(f'Video [{path}] does not exist!')
+        raise FileNotFoundError(f'Video [{path}] does not exist!')
     container = av.open(path, mode)
     return container
 

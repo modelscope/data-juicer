@@ -9,7 +9,8 @@ from loguru import logger
 
 from data_juicer.utils.availability_utils import _is_package_available
 
-# for now, only INFO will be shown
+# For now, only INFO will be shown. Later the severity level will be changed
+# when setup_logger is called to initialize the logger.
 logger.remove()
 logger.add(sys.stderr, level='INFO')
 
