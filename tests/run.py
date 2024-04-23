@@ -11,6 +11,8 @@ import os
 import sys
 import unittest
 
+from loguru import logger
+
 from data_juicer.utils.unittest_utils import SKIPPED_TESTS
 
 file_dir = os.path.join(os.path.dirname(__file__), '..')
@@ -35,6 +37,7 @@ def gather_test_cases(test_dir, pattern, list_tests):
     for suite_discovered in discover:
 
         for test_case in suite_discovered:
+            logger.info(f'Prepare for test [{test_case}]')
             # filter out those tests that need to be skipped
             filtered_test_suite = unittest.TestSuite()
             for tc in test_case:

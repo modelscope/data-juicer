@@ -104,7 +104,7 @@ def get_all_files(dirname):
     return result
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(
     wavcaps_json_path: str,
     wavcaps_audio_path: str,

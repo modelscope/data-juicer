@@ -8,6 +8,8 @@ DJ-SORA is based on Data-Juicer (including hundreds of dedicated video, image, a
 
 This project is being actively updated and maintained. We eagerly invite you to participate and jointly create a more open and higher-quality multi-modal data ecosystem to unleash the unlimited potential of large models!
 
+![Overview](https://img.alicdn.com/imgextra/i2/O1CN01YMO2p31MsT5PKu7fh_!!6000000001490-0-tps-2134-1518.jpg)
+
 # Motivation
 - SORA only briefly mentions using DALLE-3 to generate captions and can handle varying durations, resolutions and aspect ratios.
 - High-quality large-scale fine-grained data helps to densify data points, aiding models to better learn the conditional mapping of "text -> spacetime token", and solve a series of existing challenges in text-to-video models:
@@ -35,7 +37,7 @@ This project is being actively updated and maintained. We eagerly invite you to 
    - [✅] GPU utilization
    - [✅] Ray based multi-machine distributed running
    - [✅] Aliyun PAI-DLC & Slurm based multi-machine distributed running
-- [ ] [WIP] Distributed scheduling optimization (OP-aware, automated load balancing) --> Aliyun PAI-DLC
+- [✅] Distributed scheduling optimization (OP-aware, automated load balancing) --> Aliyun PAI-DLC
 - [ ] [WIP] Distributed storage optimization
 
 ## Basic Operators (video spatio-temporal dimension)
@@ -88,21 +90,20 @@ This project is being actively updated and maintained. We eagerly invite you to 
   - [✅] **Youku-mPLUG-CN**: 36TB video-caption data: `{<caption, video_id>}`
   - [✅] **InternVid**: 234M data sample: `{<caption, youtube_id, start/end_time>}`
   - [✅] **MSR-VTT**: 10K video-caption data: `{<caption, video_id>}`
+  - [ ] [WIP] ModelScope's datasets integration
   - [ ] VideoInstruct-100K, Panda70M, ......
-  - [ ] ModelScope's datasets integration
 - [ ] Large-scale high-quality DJ-SORA dataset
+  - [✅] (Data sandbox) Building and optimizing multimodal data recipes with DJ-video operators (which are also being continuously extended and improved).
   - [ ] [WIP] Continuous expansion of data sources: open-datasets, Youku, web, ...
-  - [ ] [WIP] (Data sandbox) Building and optimizing multimodal data recipes with DJ-video operators (which are also being continuously extended and improved).
-  - [ ] [WIP] Large-scale analysis and cleaning of high-quality multimodal datasets based on DJ recipes
-  - [ ] [WIP] Large-scale generation of high-quality multimodal datasets based on DJ recipes.
+  - [ ] [WIP] Large-scale analysis, cleaning, and generation of high-quality multimodal datasets based on DJ recipes (OpenVideos, ...)
+  - [ ] [WIP] Large-scale generation of 3DPatch datasets based on DJ recipes.
   - ...
 
 ## DJ-SORA Data Validation and Model Training
-  - [ ] [WIP] Exploring and refining multimodal data evaluation metrics and techniques, establishing benchmarks and insights.
+  - [ ] [WIP] (DJ-Bench101) Exploring and refining the collaborative development of multimodal data and model, establishing benchmarks and insights.
   - [ ] [WIP] Integration of SORA-like model training pipelines
-    - VideoDIT
-    - VQVAE
+    - [EasyAnimate](https://github.com/aigc-apps/EasyAnimate)
     - ...
-  - [ ] [WIP] (Model-Data sandbox) With relatively small models and the DJ-SORA dataset, exploring low-cost, transferable, and instructive data-model co-design, configurations and checkpoints. 
-  - [ ] Training SORA-like models with DJ-SORA data on  larger scales and in more scenarios to improve model performance.
+  - [✅] (Model-Data sandbox) With relatively small models and the DJ-SORA dataset, exploring low-cost, transferable, and instructive data-model co-design, configurations and checkpoints. 
+  - [ ] [WIP] Training SORA-like models with DJ-SORA data on  larger scales and in more scenarios to improve model performance.
   - ...

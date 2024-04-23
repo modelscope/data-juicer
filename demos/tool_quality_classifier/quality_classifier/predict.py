@@ -64,7 +64,7 @@ from qc_utils import (export_result, init_spark, load_dataset, predict,
                       prepare_model)
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(dataset_path,
          result_path,
          model='gpt3',
