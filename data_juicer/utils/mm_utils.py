@@ -172,7 +172,7 @@ def load_video(path, mode='r'):
         in this video (video/audio/...) and can be used to decode these streams
         to frames.
     """
-    if not os.path.exists(path):
+    if not os.path.exists(path) and 'r' in mode:
         raise ValueError(f'Video [{path}] does not exist!')
     container = av.open(path, mode)
     return container
