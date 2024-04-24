@@ -41,7 +41,7 @@ from tools.multimodal.utils import (check_args_load_to_dj_data,
                                     convert_text_to_dj)
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(
     video_chatgpt_ds_path: str,
     target_ds_dj_path: str,

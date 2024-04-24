@@ -23,7 +23,7 @@ from loguru import logger
 from tqdm import tqdm
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def get_sites_count(path, topk=28):
     """
     Take top-K sites(`.xml`) by its size of content
@@ -57,7 +57,7 @@ def get_sites_count(path, topk=28):
     return counts, sites
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def get_parents(site, counts):
     """
     Find all answers's parent id, and groups by parent id
@@ -90,7 +90,7 @@ def get_parents(site, counts):
     return parents
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def get_qapairs(site, counts, parents):
     """
     Find and group all matched pairs of question and answer in site file
@@ -140,7 +140,7 @@ def get_qapairs(site, counts, parents):
     return qa_pairs
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def process_qa_pair(pair, site_name, site_count):
     """
     Sort answers by their score for question in qa pair sample,
@@ -171,7 +171,7 @@ def process_qa_pair(pair, site_name, site_count):
     }
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def process_site(site, counts, src_dir, target_dir, num_proc=24):
     """
     Convert one raw Stack Exchange site data to jsonl file.
@@ -207,7 +207,7 @@ def process_site(site, counts, src_dir, target_dir, num_proc=24):
             f.write(json.dumps(result) + '\n')
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(src_dir, target_dir, topk=28, num_proc=1):
     """
     Convert the raw Stack Exchange data downloaded from from Archive

@@ -65,7 +65,7 @@ from tools.quality_classifier.qc_utils import (export_result, init_spark,
                                                prepare_model)
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def predict_score(dataset_path,
                   result_path,
                   model='gpt3',

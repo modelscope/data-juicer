@@ -75,7 +75,7 @@ from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(
     dj_ds_path: str,
     target_wavcaps_ds_path: str,

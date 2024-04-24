@@ -25,7 +25,7 @@ import jsonlines as jl
 from loguru import logger
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def tex_proj_loader(file_or_dir_path: pathlib.Path):
     """
     Load the tex files from a tar file or a gzip file.
@@ -69,7 +69,7 @@ def tex_proj_loader(file_or_dir_path: pathlib.Path):
     return files_and_content
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def convert_tar_to_jsonl(tar_fp, jsonl_fp, tmp_dir):
     """
     Extract the contents of tex files from tar file, convert and
