@@ -23,17 +23,17 @@ jobs:
         path: dj-${{ github.run_id }}
 
     - name: Setup docker compose
-      working-directory: .github/workflows/docker
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         docker compose up -d
 
     - name: Install data-juicer
-      working-directory: .github/workflows/docker
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         docker compose exec ray-head pip install -e .\[all\]
 
     - name: Remove docker compose
-      working-directory: .github/workflows/docker
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       if: always()
       run: |
         docker compose down --remove-orphans
