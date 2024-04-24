@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        path: ${{ runner.temp }}/dj-${{ github.run_id }}
+        path: dj-${{ github.run_id }}
 
     - name: Setup docker compose
       working-directory: .github/workflows/docker
@@ -41,4 +41,4 @@ jobs:
     - name: Cleanup workspace
       if: always()
       run: |
-        rm -rf ${{ runner.temp }}/dj-${{ github.run_id }}
+        rm -rf  dj-${{ github.run_id }}
