@@ -18,14 +18,16 @@ jobs:
     runs-on: [self-hosted, linux, GPU]
     steps:
     - uses: actions/checkout@v3
+
     - name: Setup docker compose
       working-directory: .github/workflows/docker
       run: |
         docker compose up -d
+
     - name: Install data-juicer
       run: |
-        docker compose exec ray-head cd workspace && pip install -v -e .[all]
-      
+        docker compose exec ray-head cd /workspace && pip install -v -e .[all]
+
     - name: Remove docker compose
       working-directory: .github/workflows/docker
       run: |
