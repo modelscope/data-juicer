@@ -2,11 +2,17 @@ __version__ = '0.2.0'
 
 import os
 import subprocess
+import sys
 
 import multiprocess as mp
 from loguru import logger
 
 from data_juicer.utils.availability_utils import _is_package_available
+
+# For now, only INFO will be shown. Later the severity level will be changed
+# when setup_logger is called to initialize the logger.
+logger.remove()
+logger.add(sys.stderr, level='INFO')
 
 
 def _cuda_device_count():
