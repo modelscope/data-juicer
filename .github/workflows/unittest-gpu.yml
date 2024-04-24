@@ -27,7 +27,7 @@ jobs:
 
     - name: Install data-juicer
       run: |
-        docker compose exec ray-head pip install -v -e .[all]
+        docker compose exec ray-head pip install -v -e .\[all\]
 
     - name: Remove docker compose
       working-directory: .github/workflows/docker
