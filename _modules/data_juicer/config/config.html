@@ -394,6 +394,10 @@
                         <span class="n">default</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The address of the Ray cluster.&#39;</span><span class="p">)</span>
 
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--debug&#39;</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Whether to run in debug mode.&#39;</span><span class="p">)</span>
+
     <span class="c1"># add all parameters of the registered ops class to the parser,</span>
     <span class="c1"># and these op parameters can be modified through the command line,</span>
     <span class="n">ops_sorted_by_types</span> <span class="o">=</span> <span class="n">sort_op_by_types_and_names</span><span class="p">(</span><span class="n">OPERATORS</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
@@ -413,6 +417,9 @@
         <span class="k">global</span> <span class="n">global_cfg</span><span class="p">,</span> <span class="n">global_parser</span>
         <span class="n">global_cfg</span> <span class="o">=</span> <span class="n">cfg</span>
         <span class="n">global_parser</span> <span class="o">=</span> <span class="n">parser</span>
+
+        <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;In DEBUG mode.&#39;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">cfg</span>
     <span class="k">except</span> <span class="n">ArgumentError</span><span class="p">:</span>
@@ -462,6 +469,7 @@
     <span class="n">logfile_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;export_</span><span class="si">{</span><span class="n">export_rel_path</span><span class="si">}</span><span class="s1">_time_</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s1">.txt&#39;</span>
     <span class="n">setup_logger</span><span class="p">(</span><span class="n">save_dir</span><span class="o">=</span><span class="n">log_dir</span><span class="p">,</span>
                  <span class="n">filename</span><span class="o">=</span><span class="n">logfile_name</span><span class="p">,</span>
+                 <span class="n">level</span><span class="o">=</span><span class="s1">&#39;DEBUG&#39;</span> <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="s1">&#39;INFO&#39;</span><span class="p">,</span>
                  <span class="n">redirect</span><span class="o">=</span><span class="n">cfg</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">==</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
 
     <span class="c1"># check and get dataset dir</span>
