@@ -5,6 +5,7 @@ name: unittest-gpu
 
 on:
   workflow_dispatch:
+  pull_request:
   push:
     branches:
       - main
@@ -15,7 +16,7 @@ permissions:
 jobs:
   unittest:
     runs-on: [self-hosted, linux, GPU]
-    environment: testing
+    environment: Testing
     steps:
     - uses: actions/checkout@v3
 
