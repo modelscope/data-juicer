@@ -16,6 +16,9 @@ permissions:
 jobs:
   unittest:
     runs-on: [self-hosted, linux, GPU]
+    defaults:
+      run:
+        working-directory: ./${{ github.event.pull_request.head.ref }}
     environment: Testing
     steps:
     - uses: actions/checkout@v3
