@@ -183,6 +183,7 @@ The dependency options are listed below:
 | `.[dist]`      | Install dependencies for distributed data processing. (Experimental)                         |
 | `.[dev]`       | Install dependencies for developing the package as contributors.                             |
 | `.[tools]`     | Install dependencies for dedicated tools, such as quality classifiers.                       |
+| `.[sandbox]`   | Install dependencies for sandbox, such as VBench for video evaluation.                       |
 
 ### Using pip
 

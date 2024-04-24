@@ -75,6 +75,7 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 | 组件 | 功能 | `run`方法说明 | 参考材料 |
 | --- | --- | --- | --- |
 | `Gpt3QualityEvaluator` | 使用Data-Juicer复现的GPT-3文本质量分类器对数据集进行质量评估 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：待评估的数据集路径<br />- 返回值：待评估数据集样本质量打分均值<br /> | [Data-Juicer质量分类器工具集](https://github.com/modelscope/data-juicer/tree/main/tools/quality_classifier) |
+| `VBenchEvaluator` | 使用VBench对基于prompt生成的视频进行多维度的评估 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：待评生成视频集各维度打分均值<br /> | [VBench论文](https://arxiv.org/abs/2311.17982) |
 
 - 模型训练工厂 -- ModelTrainExecutorFactory
 
