@@ -18,10 +18,6 @@ jobs:
     runs-on: [self-hosted, linux, GPU]
     environment: Testing
     steps:
-    - name: Set up unique working directory
-      run: mkdir ${{ runner.temp }}/dj-${{ github.run_id }}
-      shell: bash
-
     - uses: actions/checkout@v3
       with:
         path: ${{ runner.temp }}/dj-${{ github.run_id }}
