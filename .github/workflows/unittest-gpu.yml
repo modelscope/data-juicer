@@ -14,8 +14,8 @@ permissions:
 
 jobs:
   unittest:
-
     runs-on: [self-hosted, linux, GPU]
+    environment: testing
     steps:
     - uses: actions/checkout@v3
 
