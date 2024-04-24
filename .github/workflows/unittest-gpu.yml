@@ -26,6 +26,7 @@ jobs:
         docker compose up -d
 
     - name: Install data-juicer
+      working-directory: .github/workflows/docker
       run: |
         docker compose exec ray-head pip install -v -e .\[all\]
 
