@@ -4,6 +4,19 @@ In Data-Juicer, the data sandbox laboratory provides users with the best practic
 
 In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probe and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form a complete one-stop data-model research and development pipeline.
 ## Quick Start
+### Requirements
+Before using sandbox, you might need to install sandbox-related third-party dependencies by running the command below:
+```shell
+pip install -v -e .[sandbox]
+
+# or install all dependencies
+pip install -v -e .[all]
+```
+
+**NOTICE**: some sandbox-related dependencies require extra domain dependencies. For example, if users want to train an NLP model from ModelScope
+in the sandbox, you might need to install extra `nlp` dependencies for `modelscope` library (see the [installation docs](https://modelscope.cn/docs/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85)).
+So if some Module-Not-Found errors are raised by these third-party libraries when running the sandbox, users need to check their docs first.
+
 ### Prepare Configuration Files for Sandbox
 The configuration file of the sandbox includes several additional parameters in addition to the configuration of Data-Juicer. These parameters are used to specify the configuration information for model training, inference, evaluation, and other steps that may run in the sandbox pipeline. For the complete set of additional parameters, please refer to the "for sandbox or hpo" section in the [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml). An example of a sandbox configuration file can be found in `configs/demo/sandbox/sandbox.yaml`:
 ```yaml
