@@ -1,24 +1,28 @@
 import os
 import shutil
 import unittest
-from datasets import Dataset
+
 import ray.data as rd
+from datasets import Dataset
 
 from data_juicer.ops import Filter
-from data_juicer.utils.registry import Registry
 from data_juicer.utils.constant import Fields
-
+from data_juicer.utils.registry import Registry
 
 SKIPPED_TESTS = Registry('SkippedTests')
+
 
 def TEST_TAG(*tags):
     """Tags for test case.
     Currently, `standalone`, `ray`, `standalone-gpu`, `ray-gpu` are supported.
     """
+
     def decorator(func):
-        setattr(func, "tags", tags)
+        setattr(func, '__test_tags__', tags)
         return func
+
     return decorator
+
 
 class DataJuicerTestCaseBase(unittest.TestCase):
 
@@ -47,30 +51,30 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
 
     @classmethod
-    def generate_dataset(cls, data, type="hf"):
+    def generate_dataset(cls, data, type='hf'):
         """Generate dataset for a specific executor.
 
         Args:
             type (str, optional): `hf` or `ray`. Defaults to "hf".
         """
-        if type == "hf":
+        if type == 'hf':
             return Dataset.from_list(data)
-        elif type == "ray":
+        elif type == 'ray':
             return rd.from_items(data)
 
     @classmethod
-    def run_single_op(cls, dataset, op, type="hf"):
+    def run_single_op(cls, dataset, op, type='hf'):
         """Run operator in the specific executor."""
-        if type == "hf":
+        if type == 'hf':
             if isinstance(op, Filter) and Fields.stats not in dataset.features:
                 # TODO:
                 # this is a temp solution,
                 # only add stats when calling filter op
                 dataset = dataset.add_column(name=Fields.stats,
-                                            column=[{}] * dataset.num_rows)
+                                             column=[{}] * dataset.num_rows)
             dataset = dataset.map(op.compute_stats)
             dataset = dataset.filter(op.process)
             dataset = dataset.select_columns(column_names=['text'])
             return dataset.to_list()
-        elif type == "ray":
+        elif type == 'ray':
             pass

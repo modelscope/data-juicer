@@ -40,7 +40,7 @@ jobs:
     - name: Run unittest standalone
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        docker compose exec ray-head python tests/run.py --tag standalone-gpu
+        docker compose exec ray-head python tests/run.py --tag standalone
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker

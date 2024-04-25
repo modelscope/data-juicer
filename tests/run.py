@@ -29,24 +29,37 @@ parser.add_argument('--test_dir',
                     help='directory to be tested')
 args = parser.parse_args()
 
+
+class TaggedTestLoader(unittest.TestLoader):
+    def __init__(self, tag=None):
+        super().__init__()
+        self.tag = tag
+    
+    def loadTestsFromTestCase(self, testCaseClass):
+
+        test_names = self.getTestCaseNames(testCaseClass)
+        loaded_suite = self.suiteClass()
+        for test_name in test_names:
+            test_case = testCaseClass(test_name)
+            test_method = getattr(test_case, test_name)
+            if hasattr(test_method, '__test_tags__') and self.tag in test_method.__test_tags__:
+                loaded_suite.addTest(test_case)
+        return loaded_suite
+
 def gather_test_cases(test_dir, pattern, list_tests, tag):
     test_to_run = unittest.TestSuite()
-    discover = unittest.defaultTestLoader.discover(test_dir,
-                                                   pattern=pattern,
-                                                   top_level_dir=None)
+    test_loader = TaggedTestLoader(tag)
+    discover = test_loader.discover(test_dir, pattern=pattern, top_level_dir=None)
     print(f'These tests will be skipped due to some reasons: '
           f'{SKIPPED_TESTS.modules}')
     for suite_discovered in discover:
-
         for test_suite in suite_discovered:
-            logger.info(f'Prepare for test suite [{test_suite}]')
             for test_case in test_suite:
                 if type(test_case) in SKIPPED_TESTS.modules.values():
                     continue
-                if tag in getattr(test_case, "tags", ["standalone"]):
-                    test_to_run.addTest(test_case)
-                    if list_tests:
-                        logger.info(f"add test case [{test_case}]")
+                if list_tests:
+                    logger.info(f'Add test case [{str(test_case)}]')
+                test_to_run.addTest(test_case)
     return test_to_run
 
 

@@ -9,7 +9,7 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
 class AlphanumericFilterTest(DataJuicerTestCaseBase):
 
-    @TEST_TAG("standalone-gpu")
+    @TEST_TAG("single")
     def test_case(self):
 
         ds_list = [{
@@ -43,6 +43,7 @@ class AlphanumericFilterTest(DataJuicerTestCaseBase):
         result = DataJuicerTestCaseBase.run_single_op(dataset, op)
         self.assertEqual(result, tgt_list)
 
+    @TEST_TAG("single")
     def test_token_case(self):
 
         ds_list = [{
