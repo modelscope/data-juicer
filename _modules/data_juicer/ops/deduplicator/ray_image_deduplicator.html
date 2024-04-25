@@ -95,14 +95,21 @@
 <span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;ray_image_deduplicator&#39;</span>
 
 <span class="k">with</span> <span class="n">AvailabilityChecking</span><span class="p">([</span><span class="s1">&#39;imagededup&#39;</span><span class="p">],</span> <span class="n">OP_NAME</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">imagededup.methods</span> <span class="kn">import</span> <span class="n">AHash</span><span class="p">,</span> <span class="n">DHash</span><span class="p">,</span> <span class="n">PHash</span><span class="p">,</span> <span class="n">WHash</span>
+    <span class="kn">import</span> <span class="nn">imagededup</span>  <span class="c1"># noqa: F401</span>
 
-    <span class="n">HASH_METHOD</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;phash&#39;</span><span class="p">:</span> <span class="n">PHash</span><span class="p">,</span>
-        <span class="s1">&#39;dhash&#39;</span><span class="p">:</span> <span class="n">DHash</span><span class="p">,</span>
-        <span class="s1">&#39;whash&#39;</span><span class="p">:</span> <span class="n">WHash</span><span class="p">,</span>
-        <span class="s1">&#39;ahash&#39;</span><span class="p">:</span> <span class="n">AHash</span>
-    <span class="p">}</span>
+    <span class="n">HASH_METHOD</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;phash&#39;</span><span class="p">,</span> <span class="s1">&#39;dhash&#39;</span><span class="p">,</span> <span class="s1">&#39;whash&#39;</span><span class="p">,</span> <span class="s1">&#39;ahash&#39;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">get_hash_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">imagededup.methods</span> <span class="kn">import</span> <span class="n">AHash</span><span class="p">,</span> <span class="n">DHash</span><span class="p">,</span> <span class="n">PHash</span><span class="p">,</span> <span class="n">WHash</span>
+
+        <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;phash&#39;</span><span class="p">:</span> <span class="n">PHash</span><span class="p">,</span>
+            <span class="s1">&#39;dhash&#39;</span><span class="p">:</span> <span class="n">DHash</span><span class="p">,</span>
+            <span class="s1">&#39;whash&#39;</span><span class="p">:</span> <span class="n">WHash</span><span class="p">,</span>
+            <span class="s1">&#39;ahash&#39;</span><span class="p">:</span> <span class="n">AHash</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">mapping</span><span class="p">[</span><span class="n">method_name</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="RayImageDeduplicator"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayImageDeduplicator">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
@@ -130,10 +137,10 @@
                          <span class="n">redis_port</span><span class="o">=</span><span class="n">redis_port</span><span class="p">,</span>
                          <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                          <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">HASH_METHOD</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">HASH_METHOD</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Keep strategy [</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1">] is not supported. &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;Can only be one of </span><span class="si">{</span><span class="n">HASH_METHOD</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hasher</span> <span class="o">=</span> <span class="n">HASH_METHOD</span><span class="p">[</span><span class="n">method</span><span class="p">]()</span></div>
+                             <span class="sa">f</span><span class="s1">&#39;Can only be one of </span><span class="si">{</span><span class="n">HASH_METHOD</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hasher</span> <span class="o">=</span> <span class="n">get_hash_method</span><span class="p">(</span><span class="n">method</span><span class="p">)()</span></div>
 
 <div class="viewcode-block" id="RayImageDeduplicator.calculate_hash"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayImageDeduplicator.calculate_hash">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]:</span>
