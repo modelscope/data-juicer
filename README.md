@@ -175,14 +175,15 @@ pip install -v -e .[tools] # install a subset of tools dependencies
 
 The dependency options are listed below:
 
-| Tag          | Description                                                                                  |
-|--------------|----------------------------------------------------------------------------------------------|
+| Tag              | Description                                                                                  |
+|------------------|----------------------------------------------------------------------------------------------|
 | `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                                          |
-| `.[all]`       | Install all optional dependencies (including minimal dependencies and all of the following). |
-| `.[sci]`       | Install all dependencies for all OPs.                                                        |
-| `.[dist]`      | Install dependencies for distributed data processing. (Experimental)                         |
-| `.[dev]`       | Install dependencies for developing the package as contributors.                             |
-| `.[tools]`     | Install dependencies for dedicated tools, such as quality classifiers.                       |
+| `.[all]`         | Install all optional dependencies (including minimal dependencies and all of the following). |
+| `.[sci]`         | Install all dependencies for all OPs.                                                        |
+| `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
+| `.[dist]`        | Install dependencies for distributed data processing. (Experimental)                         |
+| `.[dev]`         | Install dependencies for developing the package as contributors.                             |
+| `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers.                       |
 
 ### Using pip
 

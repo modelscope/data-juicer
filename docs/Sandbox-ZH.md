@@ -4,6 +4,19 @@
 
 用户在沙盒中，除了Data-Juicer基础的数据优化与数据菜谱微调功能外，还可以便捷地使用数据洞察与分析、沙盒模型训练与评测、基于数据和模型反馈优化数据菜谱等可配置组件，共同组成完整的一站式数据-模型研发流水线。
 ## 快速上手
+### 依赖准备
+在使用沙盒实验室前，你可能需要使用如下命令安装沙盒相关的第三方依赖：
+```shell
+pip install -v -e .[sandbox]
+
+# 或者直接安装全量依赖
+pip install -v -e .[all]
+```
+
+**注意**：一些沙盒的依赖还需要额外的领域依赖。例如，如果用户想要在沙盒中训练一个 ModelScope 平台的NLP模型，那可能需要为 `modelscope` 库
+安装额外的 `nlp` 领域依赖（参考其[安装文档](https://modelscope.cn/docs/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85) ）。
+因此如果使用沙盒过程中，这些第三方依赖抛出了一些"未找到模块（Module-Not-Found）"的报错时，用户需要先检查这些库的文档以寻求帮助。
+
 ### 准备沙盒配置文件
 沙盒的主配置文件除了Data-Juicer的配置文件外，还包括了若干额外的参数用于指定沙盒流水线中可能会运行的模型训练、推理、评测等步骤的配置信息，完整的额外参数可参考 [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml) 中的“for sandbox or hpo”部分参数。一个sandbox的配置文件示例可参考`configs/demo/sandbox/sandbox.yaml`：
 ```yaml
