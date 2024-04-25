@@ -1,8 +1,13 @@
 import os
 import shutil
 import unittest
+from datasets import Dataset
+import ray.data as rd
 
+from data_juicer.ops import Filter
 from data_juicer.utils.registry import Registry
+from data_juicer.utils.constant import Fields
+
 
 SKIPPED_TESTS = Registry('SkippedTests')
 
@@ -32,3 +37,32 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             if os.path.exists(transformers.TRANSFORMERS_CACHE):
                 print('CLEAN all TRANSFORMERS_CACHE')
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
+
+    @classmethod
+    def generate_dataset(cls, data, type="hf"):
+        """Generate dataset for a specific executor.
+
+        Args:
+            type (str, optional): `hf` or `ray`. Defaults to "hf".
+        """
+        if type == "hf":
+            return Dataset.from_list(data)
+        elif type == "ray":
+            return rd.from_items(data)
+
+    @classmethod
+    def run_single_op(cls, dataset, op, type="hf"):
+        """Run operator in the specific executor."""
+        if type == "hf":
+            if isinstance(op, Filter) and Fields.stats not in dataset.features:
+                # TODO:
+                # this is a temp solution,
+                # only add stats when calling filter op
+                dataset = dataset.add_column(name=Fields.stats,
+                                            column=[{}] * dataset.num_rows)
+            dataset = dataset.map(op.compute_stats)
+            dataset = dataset.filter(op.process)
+            dataset = dataset.select_columns(column_names=['text'])
+            return dataset.to_list()
+        elif type == "ray":
+            pass
