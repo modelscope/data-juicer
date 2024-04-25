@@ -11,6 +11,14 @@ from data_juicer.utils.constant import Fields
 
 SKIPPED_TESTS = Registry('SkippedTests')
 
+def TEST_TAG(*tags):
+    """Tags for test case.
+    Currently, `standalone`, `ray`, `standalone-gpu`, `ray-gpu` are supported.
+    """
+    def decorator(func):
+        setattr(func, "tags", tags)
+        return func
+    return decorator
 
 class DataJuicerTestCaseBase(unittest.TestCase):
 

@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: unittest-gpu
+name: unittest
 
 on:
   workflow_dispatch:
@@ -14,8 +14,8 @@ permissions:
   contents: read
 
 jobs:
-  unittest:
-    runs-on: [self-hosted, linux, GPU]
+  unittest-single:
+    runs-on: [self-hosted, linux]
     environment: Testing
     steps:
     - uses: actions/checkout@v3
@@ -31,6 +31,16 @@ jobs:
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         docker compose exec ray-head pip install -e .\[all\]
+
+    - name: Clean dataset cache
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head rm -rf /data/huggingface/dataset
+
+    - name: Run unittest standalone
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head python tests/run.py --tag standalone-gpu
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker

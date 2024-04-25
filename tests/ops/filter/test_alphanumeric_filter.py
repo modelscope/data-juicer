@@ -4,24 +4,12 @@ from datasets import Dataset
 
 from data_juicer.ops.filter.alphanumeric_filter import AlphanumericFilter
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
 
 class AlphanumericFilterTest(DataJuicerTestCaseBase):
 
-    def _run_alphanumeric_filter(self, dataset: Dataset, target_list, op):
-        if Fields.stats not in dataset.features:
-            # TODO:
-            # this is a temp solution,
-            # only add stats when calling filter op
-            dataset = dataset.add_column(name=Fields.stats,
-                                         column=[{}] * dataset.num_rows)
-        dataset = dataset.map(op.compute_stats)
-        dataset = dataset.filter(op.process)
-        dataset = dataset.select_columns(column_names=['text'])
-        res_list = dataset.to_list()
-        self.assertEqual(res_list, target_list)
-
+    @TEST_TAG("standalone-gpu")
     def test_case(self):
 
         ds_list = [{

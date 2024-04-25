@@ -1,11 +1,14 @@
 version: '3'
 services:
   ray-head:
-    image: data-juicer-unittest:v0.2.0
+    image: data-juicer-unittest:0.2.0
     pull_policy: never
     command: ray start --head --dashboard-host 0.0.0.0 --include-dashboard true --block
     environment:
       - HF_HOME=/data/huggingface
+      - TORCH_HOME=/data/torch
+      - NLTK_DATA=/data/nltk
+      - DATA_JUICER_CACHE_HOME=/data/dj
       - RAY_ADDRESS=auto
     working_dir: /workspace
     networks:
@@ -26,11 +29,14 @@ services:
             capabilities: [gpu]
 
   ray-worker:
-    image: data-juicer-unittest:v0.2.0
+    image: data-juicer-unittest:0.2.0
     pull_policy: never
     command: ray start --address=ray-head:6379 --block
     environment:
       - HF_HOME=/data/huggingface
+      - TORCH_HOME=/data/torch
+      - NLTK_DATA=/data/nltk
+      - DATA_JUICER_CACHE_HOME=/data/dj
     working_dir: /workspace
     volumes:
       - huggingface_cache:/data
@@ -54,3 +60,4 @@ networks:
 
 volumes:
   huggingface_cache:
+    external: true
