@@ -42,7 +42,7 @@ class TaggedTestLoader(unittest.TestLoader):
         for test_name in test_names:
             test_case = testCaseClass(test_name)
             test_method = getattr(test_case, test_name)
-            if hasattr(test_method, '__test_tags__') and self.tag in test_method.__test_tags__:
+            if self.tag in getattr(test_method, '__test_tags__', ["standalone"]):
                 loaded_suite.addTest(test_case)
         return loaded_suite
 
