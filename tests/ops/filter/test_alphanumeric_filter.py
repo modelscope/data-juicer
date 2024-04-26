@@ -9,7 +9,7 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
 class AlphanumericFilterTest(DataJuicerTestCaseBase):
 
-    @TEST_TAG("single")
+    @TEST_TAG("standalone")
     def test_case(self):
 
         ds_list = [{
@@ -40,10 +40,10 @@ class AlphanumericFilterTest(DataJuicerTestCaseBase):
         }]
         dataset = DataJuicerTestCaseBase.generate_dataset(ds_list)
         op = AlphanumericFilter(min_ratio=0.2, max_ratio=0.9)
-        result = DataJuicerTestCaseBase.run_single_op(dataset, op)
+        result = DataJuicerTestCaseBase.run_single_op(dataset, op, AlphanumericFilterTest.current_tag,)
         self.assertEqual(result, tgt_list)
 
-    @TEST_TAG("single")
+    @TEST_TAG("standalone")
     def test_token_case(self):
 
         ds_list = [{

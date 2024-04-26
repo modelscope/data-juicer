@@ -51,30 +51,31 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
 
     @classmethod
-    def generate_dataset(cls, data, type='hf'):
+    def generate_dataset(cls, data, type='standalone'):
         """Generate dataset for a specific executor.
 
         Args:
             type (str, optional): `hf` or `ray`. Defaults to "hf".
         """
-        if type == 'hf':
+        if type.startswith('standalone'):
             return Dataset.from_list(data)
-        elif type == 'ray':
+        elif type.startswith('ray'):
             return rd.from_items(data)
+        else:
+            raise ValueError("Unsupported type")
 
     @classmethod
-    def run_single_op(cls, dataset, op, type='hf'):
+    def run_single_op(cls, dataset, op, type='standalone'):
         """Run operator in the specific executor."""
-        if type == 'hf':
+        if type.startswith('standalone'):
             if isinstance(op, Filter) and Fields.stats not in dataset.features:
-                # TODO:
-                # this is a temp solution,
-                # only add stats when calling filter op
                 dataset = dataset.add_column(name=Fields.stats,
                                              column=[{}] * dataset.num_rows)
             dataset = dataset.map(op.compute_stats)
             dataset = dataset.filter(op.process)
             dataset = dataset.select_columns(column_names=['text'])
             return dataset.to_list()
-        elif type == 'ray':
-            pass
+        elif type.startswith('ray'):
+            raise ValueError("Unsupported type")
+        else:
+            raise ValueError("Unsupported type")
