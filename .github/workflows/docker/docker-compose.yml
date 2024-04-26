@@ -6,7 +6,7 @@ services:
     command: ray start --head --dashboard-host 0.0.0.0 --include-dashboard true --block
     environment:
       - HF_HOME=/data/huggingface
-      - HF_ENDPOINT="https://hf-mirror.com"
+      - HF_ENDPOINT=https://hf-mirror.com
       - TORCH_HOME=/data/torch
       - NLTK_DATA=/data/nltk
       - DATA_JUICER_CACHE_HOME=/data/dj
@@ -35,7 +35,7 @@ services:
     command: ray start --address=ray-head:6379 --block
     environment:
       - HF_HOME=/data/huggingface
-      - HF_ENDPOINT="https://hf-mirror.com"
+      - HF_ENDPOINT=https://hf-mirror.com
       - TORCH_HOME=/data/torch
       - NLTK_DATA=/data/nltk
       - DATA_JUICER_CACHE_HOME=/data/dj
