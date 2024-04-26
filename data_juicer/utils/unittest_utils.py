@@ -62,7 +62,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         elif type.startswith('ray'):
             return rd.from_items(data)
         else:
-            raise ValueError("Unsupported type")
+            raise ValueError('Unsupported type')
 
     @classmethod
     def run_single_op(cls, dataset, op, type='standalone'):
@@ -76,6 +76,6 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             dataset = dataset.select_columns(column_names=['text'])
             return dataset.to_list()
         elif type.startswith('ray'):
-            raise ValueError("Unsupported type")
+            raise ValueError('Unsupported type')
         else:
-            raise ValueError("Unsupported type")
+            raise ValueError('Unsupported type')
