@@ -311,6 +311,10 @@ def init_configs(args=None):
                         default='auto',
                         help='The address of the Ray cluster.')
 
+    parser.add_argument('--debug',
+                        action='store_true',
+                        help='Whether to run in debug mode.')
+
     # add all parameters of the registered ops class to the parser,
     # and these op parameters can be modified through the command line,
     ops_sorted_by_types = sort_op_by_types_and_names(OPERATORS.modules.items())
@@ -330,6 +334,9 @@ def init_configs(args=None):
         global global_cfg, global_parser
         global_cfg = cfg
         global_parser = parser
+
+        if cfg.debug:
+            logger.debug('In DEBUG mode.')
 
         return cfg
     except ArgumentError:
@@ -379,6 +386,7 @@ def init_setup_from_cfg(cfg):
     logfile_name = f'export_{export_rel_path}_time_{timestamp}.txt'
     setup_logger(save_dir=log_dir,
                  filename=logfile_name,
+                 level='DEBUG' if cfg.debug else 'INFO',
                  redirect=cfg.executor_type == 'default')
 
     # check and get dataset dir

@@ -96,6 +96,7 @@ def setup_logger(save_dir,
                  distributed_rank=0,
                  filename='log.txt',
                  mode='o',
+                 level='INFO',
                  redirect=False):
     """
     Setup logger for training and testing.
@@ -104,7 +105,8 @@ def setup_logger(save_dir,
     :param distributed_rank: device rank when multi-gpu environment
     :param filename: log file name to save
     :param mode: log file write mode, `append` or `override`. default is `o`.
-    :param redirect: whether to redirect system stdout/stderr into the logger
+    :param level: log severity level. It's "INFO" in default.
+    :param redirect: whether to redirect system output
     :return: logger instance.
     """
     global LOGGER_SETUP
@@ -127,14 +129,14 @@ def setup_logger(save_dir,
         logger.add(
             sys.stderr,
             format=loguru_format,
-            level='INFO',
+            level=level,
             enqueue=True,
         )
         logger.add(save_file)
 
     # redirect stdout/stderr to loguru
     if redirect:
-        redirect_sys_output('INFO')
+        redirect_sys_output(level)
     LOGGER_SETUP = True
 
 

@@ -1,7 +1,7 @@
 fsspec==2023.5.0
 pyarrow<=12.0.0
-pandas==2.0.0
-datasets==2.11.0
+pandas==2.0.3
+datasets==2.18.0
 av
 soundfile
 librosa
