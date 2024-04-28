@@ -364,8 +364,8 @@ def init_setup_from_cfg(cfg):
     2. update cache directory
     3. update checkpoint and `temp_dir` of tempfile
 
-    :param cfg: a original cfg
-    :param cfg: a updated cfg
+    :param cfg: an original cfg
+    :param cfg: an updated cfg
     """
 
     cfg.export_path = os.path.abspath(cfg.export_path)
@@ -578,23 +578,30 @@ def update_op_process(cfg, parser):
             namespace_to_dict(internal_op_para)
         }
 
-    # check the op params via typing hints
+    # check the op params via type hint
     temp_parser = copy.deepcopy(parser)
-    temp_args = (['--config', temp_cfg.config[0].absolute] +
-                 namespace_to_arg_list(temp_cfg))
+    recognized_args = set(
+        [action.dest for action in parser._actions if hasattr(action, 'dest')])
+    temp_args = namespace_to_arg_list(temp_cfg,
+                                      includes=recognized_args,
+                                      excludes=['config'])
+    temp_args = ['--config', temp_cfg.config[0].absolute] + temp_args
     temp_parser.parse_args(temp_args)
     return cfg
 
 
-def namespace_to_arg_list(namespace, prefix=''):
+def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
     arg_list = []
 
     for key, value in vars(namespace).items():
+        if includes is not None and key not in includes:
+            continue
+        if excludes is not None and key in excludes:
+            continue
+
         if issubclass(type(value), Namespace):
             nested_args = namespace_to_arg_list(value, f'{prefix}{key}.')
             arg_list.extend(nested_args)
-        elif key in ['config', 'work_dir']:
-            continue
         elif value is not None:
             arg_list.append(f'--{prefix}{key}')
             arg_list.append(f'{value}')

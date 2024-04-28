@@ -96,7 +96,7 @@ def setup_logger(save_dir,
                  distributed_rank=0,
                  filename='log.txt',
                  mode='o',
-                 redirect=True):
+                 redirect=False):
     """
     Setup logger for training and testing.
 
@@ -104,7 +104,7 @@ def setup_logger(save_dir,
     :param distributed_rank: device rank when multi-gpu environment
     :param filename: log file name to save
     :param mode: log file write mode, `append` or `override`. default is `o`.
-    :param redirect: whether to redirect system output
+    :param redirect: whether to redirect system stdout/stderr into the logger
     :return: logger instance.
     """
     global LOGGER_SETUP
