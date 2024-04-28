@@ -7,6 +7,7 @@ from typing import Dict, List, Tuple, Union
 
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
                           namespace_to_dict)
+from jsonargparse.typehints import ActionTypeHint
 from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
 
@@ -588,8 +589,11 @@ def update_op_process(cfg, parser):
 
     # check the op params via type hint
     temp_parser = copy.deepcopy(parser)
-    recognized_args = set(
-        [action.dest for action in parser._actions if hasattr(action, 'dest')])
+    recognized_args = set([
+        action.dest for action in parser._actions
+        if hasattr(action, 'dest') and isinstance(action, ActionTypeHint)
+    ])
+
     temp_args = namespace_to_arg_list(temp_cfg,
                                       includes=recognized_args,
                                       excludes=['config'])
@@ -602,16 +606,17 @@ def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
     arg_list = []
 
     for key, value in vars(namespace).items():
-        if includes is not None and key not in includes:
-            continue
-        if excludes is not None and key in excludes:
-            continue
 
         if issubclass(type(value), Namespace):
             nested_args = namespace_to_arg_list(value, f'{prefix}{key}.')
             arg_list.extend(nested_args)
         elif value is not None:
-            arg_list.append(f'--{prefix}{key}')
+            concat_key = f'{prefix}{key}'
+            if includes is not None and concat_key not in includes:
+                continue
+            if excludes is not None and concat_key in excludes:
+                continue
+            arg_list.append(f'--{concat_key}')
             arg_list.append(f'{value}')
 
     return arg_list
