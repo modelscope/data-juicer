@@ -214,6 +214,8 @@ pip install py-data-juicer
     ```shell
     docker build -t datajuicer/data-juicer:<version_tag> .
     ```
+  
+  - The format of `<version_tag>` is like `v0.2.0`, which is the same as release version tag.
 
 ### Installation check
 
