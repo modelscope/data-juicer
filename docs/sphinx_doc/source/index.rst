@@ -6,6 +6,10 @@
 Welcome to data-juicer's documentation!
 =======================================
 
+We will give a tutorial on KDD'24, Multi-modal Data Processing for Foundation Models: Practical Guidances and Use Cases, see more details ` here <../_static/my_standalone.html>`_ !
+
+
+
 .. toctree::
    :maxdepth: 2
    :glob:
