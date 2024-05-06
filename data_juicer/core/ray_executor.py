@@ -188,6 +188,9 @@ class RayExecutor:
                     else:
                         dataset = dataset.map(op.compute_stats,
                                               num_gpus=num_gpus)
+                    if op.stats_export_path is not None:
+                        dataset.write_json(op.stats_export_path,
+                                           force_ascii=False)
                     dataset = dataset.filter(op.process)
                 else:
                     logger.error(
