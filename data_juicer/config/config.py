@@ -1,11 +1,13 @@
+import copy
 import os
 import shutil
 import time
-from argparse import ArgumentError
+from argparse import ArgumentError, Namespace
 from typing import Dict, List, Tuple, Union
 
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
                           namespace_to_dict)
+from jsonargparse.typehints import ActionTypeHint
 from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
 
@@ -370,8 +372,8 @@ def init_setup_from_cfg(cfg):
     2. update cache directory
     3. update checkpoint and `temp_dir` of tempfile
 
-    :param cfg: a original cfg
-    :param cfg: a updated cfg
+    :param cfg: an original cfg
+    :param cfg: an updated cfg
     """
 
     cfg.export_path = os.path.abspath(cfg.export_path)
@@ -552,16 +554,16 @@ def update_op_process(cfg, parser):
     # e.g.
     # `python demo.py --config demo.yaml
     #  --language_id_score_filter.lang en`
+    temp_cfg = cfg
     for i, op_in_process in enumerate(cfg.process):
         op_in_process_name = list(op_in_process.keys())[0]
 
-        temp_cfg = cfg
         if op_in_process_name not in option_in_commands:
 
             # update op params to temp cfg if set
             if op_in_process[op_in_process_name]:
                 temp_cfg = parser.merge_config(
-                    dict_to_namespace(op_in_process), cfg)
+                    dict_to_namespace(op_in_process), temp_cfg)
         else:
 
             # args in the command line override the ones in `cfg.process`
@@ -584,7 +586,40 @@ def update_op_process(cfg, parser):
             None if internal_op_para is None else
             namespace_to_dict(internal_op_para)
         }
+
+    # check the op params via type hint
+    temp_parser = copy.deepcopy(parser)
+    recognized_args = set([
+        action.dest for action in parser._actions
+        if hasattr(action, 'dest') and isinstance(action, ActionTypeHint)
+    ])
+
+    temp_args = namespace_to_arg_list(temp_cfg,
+                                      includes=recognized_args,
+                                      excludes=['config'])
+    temp_args = ['--config', temp_cfg.config[0].absolute] + temp_args
+    temp_parser.parse_args(temp_args)
     return cfg
+
+
+def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
+    arg_list = []
+
+    for key, value in vars(namespace).items():
+
+        if issubclass(type(value), Namespace):
+            nested_args = namespace_to_arg_list(value, f'{prefix}{key}.')
+            arg_list.extend(nested_args)
+        elif value is not None:
+            concat_key = f'{prefix}{key}'
+            if includes is not None and concat_key not in includes:
+                continue
+            if excludes is not None and concat_key in excludes:
+                continue
+            arg_list.append(f'--{concat_key}')
+            arg_list.append(f'{value}')
+
+    return arg_list
 
 
 def config_backup(cfg):
