@@ -279,6 +279,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_export_impl</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
                           <span class="bp">self</span><span class="o">.</span><span class="n">export_stats</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Exporter.export_compute_stats"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Exporter.export_compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">export_compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export method for saving compute status in filters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keep_stats_in_res_ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_stats_in_res_ds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_stats_in_res_ds</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_export_impl</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>
+                          <span class="n">export_path</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
+                          <span class="n">export_stats</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_stats_in_res_ds</span> <span class="o">=</span> <span class="n">keep_stats_in_res_ds</span></div>
+
 <div class="viewcode-block" id="Exporter.to_jsonl"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Exporter.to_jsonl">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">to_jsonl</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">export_path</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
