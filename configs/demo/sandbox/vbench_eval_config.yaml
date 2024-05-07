@@ -17,10 +17,11 @@ load_ckpt_from_local: false
 
 # The dimensions considered in this eval.
 # All dimensions include: ['subject_consistency', 'background_consistency',
-#       'temporal_flickering', 'motion_smoothness', 'dynamic_degree', 
-#       'aesthetic_quality', 'imaging_quality', 'object_class',
-#       'multiple_objects', 'human_action', 'color', 'spatial_relationship',
-#       'scene', 'temporal_style', 'appearance_style', 'overall_consistency']
+#       'temporal_flickering', 'dynamic_degree', 'aesthetic_quality', 
+#       'object_class', 'multiple_objects', 'human_action', 'color',
+#       'spatial_relationship', 'scene', 'temporal_style', 
+#       'appearance_style', 'overall_consistency']
+# NOTE: the evaluation of motion_smoothness and imaging_quality has bug in the pipy vbench repository.
 dimension_list:
-  -subject_consistency
-  -dynamic_degree
+  - subject_consistency
+  - dynamic_degree

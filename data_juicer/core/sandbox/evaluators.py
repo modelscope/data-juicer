@@ -1,5 +1,6 @@
 import os
 import shutil
+import torch
 from vbench import VBench
 
 from data_juicer import cuda_device_count
@@ -101,7 +102,7 @@ class VBenchEvaluator(BaseEvaluator):
             else:
                 device = torch.device("cpu")
             my_vbench = VBench(device, prompt_path, result_dir)
-            my_VBench.evaluate(
+            my_vbench.evaluate(
                 videos_path = videos_path,
                 name = name,
                 dimension_list = dimension_list,
