@@ -15,10 +15,5 @@ pip install sphinx sphinx-autobuild sphinx_rtd_theme recommonmark
 mv build/html position_to_publish
 ```
 
-- 为了方便起见（不必再次从头开始编译），可以按如下方式下载构建的目录（包括 html 文件）：
-
-```bash
-# cd docs/sphinx_doc 
-wget https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/sphinx_API_build_0801.zip
-unzip sphinx_API_build_0801.zip
-```
+Github上的自动化部署配置可参考 [该处](
+https://github.com/modelscope/data-juicer/blob/main/.github/workflows/deploy_sphinx_docs.yml).
