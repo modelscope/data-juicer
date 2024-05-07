@@ -3,8 +3,8 @@ import shutil
 import unittest
 
 import numpy
-import ray.data as rd
 import pyarrow as pa
+import ray.data as rd
 from datasets import Dataset
 
 from data_juicer.ops import Filter
@@ -16,7 +16,7 @@ SKIPPED_TESTS = Registry('SkippedTests')
 
 def TEST_TAG(*tags):
     """Tags for test case.
-    Currently, `standalone`, `ray`, `standalone-gpu`, `ray-gpu` are supported.
+    Currently, `standalone`, `ray` are supported.
     """
 
     def decorator(func):
@@ -56,13 +56,15 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         """Generate dataset for a specific executor.
 
         Args:
-            type (str, optional): "standalone" or "ray". Defaults to "standalone".
+            type (str, optional): "standalone" or "ray".
+            Defaults to "standalone".
         """
         if self.current_tag.startswith('standalone'):
             return Dataset.from_list(data)
         elif self.current_tag.startswith('ray'):
             dataset = rd.from_items(data)
             if Fields.stats not in dataset.columns(fetch_if_missing=False):
+
                 def process_batch_arrow(table: pa.Table) -> pa.Table:
                     new_column_data = [{} for _ in range(len(table))]
                     new_talbe = table.append_column(Fields.stats,
@@ -70,7 +72,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                     return new_talbe
 
                 dataset = dataset.map_batches(process_batch_arrow,
-                                            batch_format='pyarrow')
+                                              batch_format='pyarrow')
             return dataset
         else:
             raise ValueError('Unsupported type')
@@ -91,15 +93,17 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             dataset = dataset.to_pandas().get(column_names)
             if dataset is None:
                 return []
-            return dataset.to_dict(orient="records")
+            return dataset.to_dict(orient='records')
         else:
             raise ValueError('Unsupported type')
 
     def assertDatasetEqual(self, first, second):
+
         def convert_record(rec):
             for key in rec.keys():
                 # Convert incomparable `list` to comparable `tuple`
-                if isinstance(rec[key], numpy.ndarray) or isinstance(rec[key], list):
+                if isinstance(rec[key], numpy.ndarray) or isinstance(
+                        rec[key], list):
                     rec[key] = tuple(rec[key])
             return rec
 

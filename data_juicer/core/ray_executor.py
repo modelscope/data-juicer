@@ -122,38 +122,33 @@ class RayExecutor:
                             batch_size=1)
                         # The batch size here is same as in data.py
                     else:
-                        dataset = dataset.map_batches(
-                            partial(ray_batch_mapper_wrapper,
-                                    fn=op.process),
-                            batch_format='pyarrow',
-                            num_gpus=num_gpus,
-                            batch_size=1)
+                        dataset = dataset.map_batches(partial(
+                            ray_batch_mapper_wrapper, fn=op.process),
+                                                      batch_format='pyarrow',
+                                                      num_gpus=num_gpus,
+                                                      batch_size=1)
                         # The batch size here is same as in data.py
                 else:
                     if use_actor:
-                        dataset = dataset.map(
-                            op_cls,
-                            compute=ActorPoolStrategy(),
-                            concurrency=op_proc,
-                            fn_constructor_kwargs=op_args,
-                            num_gpus=num_gpus)
+                        dataset = dataset.map(op_cls,
+                                              compute=ActorPoolStrategy(),
+                                              concurrency=op_proc,
+                                              fn_constructor_kwargs=op_args,
+                                              num_gpus=num_gpus)
                     else:
-                        dataset = dataset.map(op.process,
-                                                num_gpus=num_gpus)
+                        dataset = dataset.map(op.process, num_gpus=num_gpus)
 
             elif isinstance(op, Filter):
                 if use_actor:
                     dataset = dataset.map(op_cls,
-                                            compute=ActorPoolStrategy(),
-                                            concurrency=op_proc,
-                                            fn_constructor_kwargs=op_args,
-                                            num_gpus=num_gpus)
+                                          compute=ActorPoolStrategy(),
+                                          concurrency=op_proc,
+                                          fn_constructor_kwargs=op_args,
+                                          num_gpus=num_gpus)
                 else:
-                    dataset = dataset.map(op.compute_stats,
-                                            num_gpus=num_gpus)
+                    dataset = dataset.map(op.compute_stats, num_gpus=num_gpus)
                 if op.stats_export_path is not None:
-                    dataset.write_json(op.stats_export_path,
-                                        force_ascii=False)
+                    dataset.write_json(op.stats_export_path, force_ascii=False)
                 dataset = dataset.filter(op.process)
             else:
                 logger.error(

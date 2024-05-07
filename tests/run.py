@@ -19,7 +19,7 @@ file_dir = os.path.join(os.path.dirname(__file__), '..')
 sys.path.append(file_dir)
 
 parser = argparse.ArgumentParser('test runner')
-parser.add_argument('--tag', choices=["standalone", "standalone-gpu", "ray", "ray-gpu"],
+parser.add_argument('--tag', choices=["standalone", "ray"],
                     default="standalone",
                     help="the tag of tests being run")
 parser.add_argument('--pattern', default='test_*.py', help='test file pattern')
@@ -30,7 +30,7 @@ args = parser.parse_args()
 
 
 class TaggedTestLoader(unittest.TestLoader):
-    def __init__(self, tag=None):
+    def __init__(self, tag="standalone"):
         super().__init__()
         self.tag = tag
     

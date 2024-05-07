@@ -42,6 +42,11 @@ jobs:
       run: |
         docker compose exec ray-head python tests/run.py --tag standalone
 
+    - name: Run unittest ray
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      run: |
+        docker compose exec ray-head python tests/run.py --tag ray
+
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       if: always()
