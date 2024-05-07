@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'data_juicer'
-copyright = '2023, Data-Juicer Team'
+copyright = '2024, Data-Juicer Team'
 author = 'Data-Juicer Team'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

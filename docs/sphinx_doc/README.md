@@ -17,10 +17,4 @@ pip install sphinx sphinx-autobuild sphinx_rtd_theme recommonmark
 mv build/html position_to_publish
 ```
 
-- For convenience (you don’t have to compile from scratch again), the built 
-  directory (including the html files) can be download as follows:
-```bash
-# cd docs/sphinx_doc 
-wget https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/sphinx_API_build_0801.zip
-unzip sphinx_API_build_0801.zip
-```
+Automatic action in github can be found in [here](https://github.com/modelscope/data-juicer/blob/main/.github/workflows/deploy_sphinx_docs.yml).
