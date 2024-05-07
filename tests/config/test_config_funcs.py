@@ -1,6 +1,6 @@
 import os
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, redirect_stderr
 from io import StringIO
 
 from jsonargparse import Namespace
@@ -11,6 +11,9 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 test_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                               'demo_4_test.yaml')
+
+test_bad_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                              'demo_4_test_bad_val.yaml')
 
 
 class ConfigTest(DataJuicerTestCaseBase):
@@ -61,6 +64,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'video_key': 'videos',
                         'accelerator': 'cpu',
                         'spec_numprocs': 0,
+                        'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'use_actor': False,
@@ -69,6 +73,34 @@ class ConfigTest(DataJuicerTestCaseBase):
 
             _, op_from_cfg = load_ops(cfg.process)
             self.assertTrue(len(op_from_cfg) == 3)
+
+    def test_val_range_check_cmd(self):
+        out = StringIO()
+        err_msg_head = ("language_id_score_filter.min_score")
+        err_msg = ("Not of type ClosedUnitInterval: 1.1 does not conform to "
+                   "restriction v>=0 and v<=1")
+        with redirect_stdout(out), redirect_stderr(out):
+            with self.assertRaises(SystemExit) as cm:
+                init_configs(
+                    args=f'--config {test_yaml_path} '
+                          '--language_id_score_filter.min_score 1.1'.split())
+            self.assertEqual(cm.exception.code, 2)
+        out_str = out.getvalue()
+        self.assertIn(err_msg_head, out_str)
+        self.assertIn(err_msg, out_str)
+
+    def test_val_range_check_yaml(self):
+        out = StringIO()
+        err_msg_head = ("language_id_score_filter.min_score")
+        err_msg = ("Not of type ClosedUnitInterval: 1.1 does not conform to "
+                   "restriction v>=0 and v<=1")
+        with redirect_stdout(out), redirect_stderr(out):
+            with self.assertRaises(SystemExit) as cm:
+                init_configs(args=f'--config {test_bad_yaml_path}'.split())
+            self.assertEqual(cm.exception.code, 2)
+        out_str = out.getvalue()
+        self.assertIn(err_msg_head, out_str)
+        self.assertIn(err_msg, out_str)
 
     def test_mixture_cfg(self):
         out = StringIO()
@@ -99,6 +131,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'video_key': 'videos',
                         'accelerator': 'cpu',
                         'spec_numprocs': 0,
+                        'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'use_actor': False,
@@ -115,6 +148,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'video_key': 'videos',
                         'accelerator': 'cpu',
                         'spec_numprocs': 0,
+                        'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'use_actor': False,
@@ -131,6 +165,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'video_key': 'videos',
                         'accelerator': 'cpu',
                         'spec_numprocs': 0,
+                        'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'use_actor': False,
@@ -147,6 +182,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'video_key': 'videos',
                         'accelerator': 'cpu',
                         'spec_numprocs': 0,
+                        'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'use_actor': False,
@@ -163,6 +199,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'video_key': 'videos',
                         'accelerator': 'cpu',
                         'spec_numprocs': 0,
+                        'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'use_actor': False,

@@ -1,6 +1,9 @@
 torch
-vbench
 wandb
 fire
 pyspark
-detectron2@git+https://github.com/facebookresearch/detectron2.git@v0.6
+# vbench-related
+detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
+vbench
+# modelscope-related
+modelscope

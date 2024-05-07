@@ -1,5 +1,7 @@
+import json
 import os
 import shutil
+
 import torch
 from vbench import VBench
 
@@ -76,6 +78,7 @@ class Gpt4VEvaluator(BaseEvaluator):
         raise NotImplementedError(
             'To be refactored from gpt4v related operators/tools.')
 
+
 class VBenchEvaluator(BaseEvaluator):
 
     def merge_results(self, result_path):
@@ -98,25 +101,25 @@ class VBenchEvaluator(BaseEvaluator):
             dimension_list = self.eval_config.dimension_list
             local = self.eval_config.load_ckpt_from_local
             if cuda_device_count() > 0:
-                device = torch.device("cuda")
+                device = torch.device('cuda')
             else:
-                device = torch.device("cpu")
+                device = torch.device('cpu')
             my_vbench = VBench(device, prompt_path, result_dir)
-            my_vbench.evaluate(
-                videos_path = videos_path,
-                name = name,
-                dimension_list = dimension_list,
-                local = local
-            )
-            result_dict = self.merge_results(os.path.join(result_dir,
-                                name+'_eval_results.json'))
-            
+            my_vbench.evaluate(videos_path=videos_path,
+                               name=name,
+                               dimension_list=dimension_list,
+                               local=local)
+            result_dict = self.merge_results(
+                os.path.join(result_dir, name + '_eval_results.json'))
+
+            with open(os.path.join(result_dir, name + '_merged_results.json'),
+                      'w') as f:
+                json.dump(result_dict, f)
+
             return float(result_dict['mean_score'])
         else:
             raise NotImplementedError(
                 'Unsupported evaluation type: {}'.format(eval_type))
-    
-
 
 
 class LmHarnessEvaluator(BaseEvaluator):

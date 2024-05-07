@@ -1,8 +1,8 @@
 import json
 
 import yaml
-from loguru import logger
 from jsonargparse import dict_to_namespace
+from loguru import logger
 
 from data_juicer.config import init_configs
 from data_juicer.core.sandbox.pipelines import SandBoxExecutor
