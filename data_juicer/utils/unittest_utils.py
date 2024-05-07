@@ -50,7 +50,6 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                 print('CLEAN all TRANSFORMERS_CACHE')
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
 
-    @classmethod
     def generate_dataset(cls, data, type='standalone'):
         """Generate dataset for a specific executor.
 
@@ -64,8 +63,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         else:
             raise ValueError('Unsupported type')
 
-    @classmethod
-    def run_single_op(cls, dataset, op, type='standalone'):
+    def run_single_op(cls, dataset, op, column_names, type='standalone'):
         """Run operator in the specific executor."""
         if type.startswith('standalone'):
             if isinstance(op, Filter) and Fields.stats not in dataset.features:
@@ -73,7 +71,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                                              column=[{}] * dataset.num_rows)
             dataset = dataset.map(op.compute_stats)
             dataset = dataset.filter(op.process)
-            dataset = dataset.select_columns(column_names=['text'])
+            dataset = dataset.select_columns(column_names=column_names)
             return dataset.to_list()
         elif type.startswith('ray'):
             raise ValueError('Unsupported type')
