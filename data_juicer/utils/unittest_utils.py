@@ -2,7 +2,9 @@ import os
 import shutil
 import unittest
 
+import numpy
 import ray.data as rd
+import pyarrow as pa
 from datasets import Dataset
 
 from data_juicer.ops import Filter
@@ -50,22 +52,32 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                 print('CLEAN all TRANSFORMERS_CACHE')
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
 
-    def generate_dataset(cls, data, type='standalone'):
+    def generate_dataset(self, data):
         """Generate dataset for a specific executor.
 
         Args:
-            type (str, optional): `hf` or `ray`. Defaults to "hf".
+            type (str, optional): "standalone" or "ray". Defaults to "standalone".
         """
-        if type.startswith('standalone'):
+        if self.current_tag.startswith('standalone'):
             return Dataset.from_list(data)
-        elif type.startswith('ray'):
-            return rd.from_items(data)
+        elif self.current_tag.startswith('ray'):
+            dataset = rd.from_items(data)
+            if Fields.stats not in dataset.columns(fetch_if_missing=False):
+                def process_batch_arrow(table: pa.Table) -> pa.Table:
+                    new_column_data = [{} for _ in range(len(table))]
+                    new_talbe = table.append_column(Fields.stats,
+                                                    [new_column_data])
+                    return new_talbe
+
+                dataset = dataset.map_batches(process_batch_arrow,
+                                            batch_format='pyarrow')
+            return dataset
         else:
             raise ValueError('Unsupported type')
 
-    def run_single_op(cls, dataset, op, column_names, type='standalone'):
+    def run_single_op(self, dataset, op, column_names):
         """Run operator in the specific executor."""
-        if type.startswith('standalone'):
+        if self.current_tag.startswith('standalone'):
             if isinstance(op, Filter) and Fields.stats not in dataset.features:
                 dataset = dataset.add_column(name=Fields.stats,
                                              column=[{}] * dataset.num_rows)
@@ -73,7 +85,26 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             dataset = dataset.filter(op.process)
             dataset = dataset.select_columns(column_names=column_names)
             return dataset.to_list()
-        elif type.startswith('ray'):
-            raise ValueError('Unsupported type')
+        elif self.current_tag.startswith('ray'):
+            dataset = dataset.map(op.compute_stats)
+            dataset = dataset.filter(op.process)
+            dataset = dataset.to_pandas().get(column_names)
+            if dataset is None:
+                return []
+            return dataset.to_dict(orient="records")
         else:
             raise ValueError('Unsupported type')
+
+    def assertDatasetEqual(self, first, second):
+        def convert_record(rec):
+            for key in rec.keys():
+                # Convert incomparable `list` to comparable `tuple`
+                if isinstance(rec[key], numpy.ndarray) or isinstance(rec[key], list):
+                    rec[key] = tuple(rec[key])
+            return rec
+
+        first = [convert_record(d) for d in first]
+        second = [convert_record(d) for d in second]
+        first = sorted(first, key=lambda x: tuple(sorted(x.items())))
+        second = sorted(second, key=lambda x: tuple(sorted(x.items())))
+        return self.assertEqual(first, second)

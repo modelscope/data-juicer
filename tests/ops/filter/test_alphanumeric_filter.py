@@ -38,10 +38,10 @@ class AlphanumericFilterTest(DataJuicerTestCaseBase):
         }, {
             'text': 'emoji表情测试下😊，😸31231\n'
         }]
-        dataset = DataJuicerTestCaseBase.generate_dataset(ds_list)
+        dataset = self.generate_dataset(ds_list)
         op = AlphanumericFilter(min_ratio=0.2, max_ratio=0.9)
-        result = DataJuicerTestCaseBase.run_single_op(dataset, op, ["text"], self.current_tag)
-        self.assertEqual(result, tgt_list)
+        result = self.run_single_op(dataset, op, ["text"])
+        self.assertDatasetEqual(result, tgt_list)
 
     @TEST_TAG("standalone", "ray")
     def test_token_case(self):
@@ -66,10 +66,10 @@ class AlphanumericFilterTest(DataJuicerTestCaseBase):
         }, {
             'text': 'Do you need a cup of coffee?'
         }]
-        dataset = DataJuicerTestCaseBase.generate_dataset(ds_list)
+        dataset = self.generate_dataset(ds_list)
         op = AlphanumericFilter(tokenization=True, min_ratio=1.5)
-        result = DataJuicerTestCaseBase.run_single_op(dataset, op, ["text"], self.current_tag)
-        self.assertEqual(result, tgt_list)
+        result = self.run_single_op(dataset, op, ["text"])
+        self.assertDatasetEqual(result, tgt_list)
 
 
 if __name__ == '__main__':
