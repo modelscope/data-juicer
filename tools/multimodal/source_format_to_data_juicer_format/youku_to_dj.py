@@ -62,7 +62,7 @@ from tools.multimodal.utils import (check_args_load_to_dj_data,
                                     convert_text_to_dj)
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(
     youku_ds_path: str,
     target_ds_path: str,

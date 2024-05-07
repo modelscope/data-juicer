@@ -134,8 +134,8 @@ def get_words_from_document(
 
     :param document: document that need to split words.
     :param token_func: function of tokenizer, if specified, the function
-        will be used for split document into different tokens.
-    :param new_line: whether to use `\\\\n' to split words.
+     will be used for split document into different tokens.
+    :param new_line: whether to use '\\\\n' to split words.
     :param tab: whether to use '\\\\t' to split words.
     :return: word list obtained from document
     """

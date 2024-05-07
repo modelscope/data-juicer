@@ -8,6 +8,9 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
 
 本项目正在积极更新和维护中，我们热切地邀请您参与，共同打造一个更开放、更高质的多模态数据生态系统，激发大模型无限潜能！
 
+![Overview](https://img.alicdn.com/imgextra/i4/O1CN01XphcBN2ACXcS6S1JH_!!6000000008167-2-tps-2289-1620.png)
+
+
 # 动机 
 - SORA仅简略提及使用了DALLE-3来生成高质量caption，且模型输入数据有变化的时长、分辨率和宽高比。
 - 高质量大规模细粒度数据有助于稠密化数据点，帮助模型学好“文本 -> spacetime token”的条件映射，解决text-2-video模型的一系列现有挑战：
@@ -33,7 +36,8 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
   - [✅] 支持单机多核  
   - [✅] GPU调用  
   - [✅] Ray多机分布式  
-- [ ] [WIP] 分布式调度优化（OP-aware、自动化负载均衡）-->  Aliyun PAI-DLC
+  - [✅] 基于阿里云PAI-DLC和Slurm的多机分布式 
+- [✅] 分布式调度优化（OP-aware、自动化负载均衡）-->  Aliyun PAI-DLC
 - [ ] [WIP] 分布式存储优化  
 
 ## 基础算子（视频时空维度）
@@ -55,11 +59,11 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
   - [✅] video_frames_text_similarity_filter（在时空一致性维度过滤，计算关键/指定帧 和文本的匹配分）
 - 面向数据多样性及数量
   - [✅] video_tagging_from_frames_mapper (轻量图生文模型，密集帧生成空间  概要信息)
-  - [ ] [WIP] video_captioning_from_frames_mapper（更重的图生文模型，少量帧生  成更详细空间信息）
+  - [✅] video_captioning_from_frames_mapper（更重的图生文模型，少量帧生  成更详细空间信息）
   - [✅] video_tagging_from_audio_mapper (引入audio classification/category等meta信息)
   - [✅] video_captioning_from_audio_mapper（引入人声/对话等信息；  AudioCaption环境、场景等全局信息）
   - [✅] video_captioning_from_video_mapper（视频生文模型，连续帧生成时序信息）
-  - [ ] [WIP] video_captioning_from_summarizer_mapper（基于上述子能力的组合，使用纯文本大模型对不同种caption信息去噪、摘要）
+  - [✅] video_captioning_from_summarizer_mapper（基于上述子能力的组合，使用纯文本大模型对不同种caption信息去噪、摘要）
   - [ ] [WIP] video_interleaved_mapper（在ICL、时间和跨模态维度增强），`interleaved_modes` include
     - text_image_interleaved（按时序交叉放置同一视频的的caption和frames）
     - text_audio_interleaved（按时序交叉放置同一视频的的ASR文本和frames）
@@ -73,9 +77,9 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
   - video_ffmpeg_wrapped_mapper
 - [WIP] 视频内容合规和隐私保护算子（图像、文字、音频）：
   - [✅] 马赛克
-  - [ ] 版权水印
-  - [ ] 人脸模糊
-  - [ ] 黄暴恐
+  - [✅] 版权水印
+  - [✅] 人脸模糊
+  - [✅] 黄暴恐
 - [ ] [TODO] (Beyond Interpolation) 增强数据真实性和稠密性 
   - 碰撞、光影、重力、3D、场景切换（phase tranisition）、景深等
   - [ ] Filter类算子: caption是否描述真实性，该描述的相关性得分/正确性得分
@@ -86,26 +90,26 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
 
 ## DJ-SORA数据菜谱及数据集
 - 支持代表性数据的统一加载和转换（other-data <-> dj-data），方便DJ算子处理及扩展数据集
-  - [✅] **Video-ChatGPT**: 100k video-instruction data:`{<question, answer, youtube_id>}`
+  - [✅] **Video-ChatGPT**: 100K video-instruction data:`{<question, answer, youtube_id>}`
   - [✅] **Youku-mPLUG-CN**: 36TB video-caption data：`{<caption, video_id>}`
   - [✅] **InternVid**: 234M data sample:`{<caption, youtube_id, start/end_time>}`
-  - [ ] VideoInstruct-100K, Panda70M, MSR-VTT, ......
-  - [ ] ModelScope数据集集成
+  - [✅] **MSR-VTT**: 10K video-caption data：`{<caption, video_id>}`
+  - [ ] [WIP] ModelScope数据集集成
+  - [ ] VideoInstruct-100K, Panda70M, ......
 - [ ] 大规模高质量DJ-SORA数据集
-   - [ ] [WIP] 数据源持续扩充：open-datasets, youku, web， ...
-  - [ ] [WIP] (Data sandbox) 基于DJ-video算子构建和优化多模态数据菜谱 (算子同期持续完善)
-  - [ ] [WIP] 基于DJ菜谱规模化分析、清洗高质量多模态数据集
-  - [ ] [WIP] 基于DJ菜谱规模化生成高质量多模态数据集
+  - [✅] (Data sandbox) 基于DJ-video算子构建和优化多模态数据菜谱 (算子同期持续完善)
+  - [ ] [WIP] 数据源持续扩充：open-datasets, youku, web， ...
+  - [ ] [WIP] 基于DJ菜谱规模化分析、清洗、生成高质量多模态数据集 (OpenVideo, ...)
+  - [ ] [WIP] 基于DJ菜谱形成大规模3DPatch数仓
   - ...
 
 ## DJ-SORA数据验证及模型训练
-  - [ ] [WIP] 探索及完善多模态数据的评估指标和评估技术，形成benchmark和insights
+  - [ ] [WIP] (DJ-Bench101) 探索及完善多模态数据和模型的协同开发，形成benchmark和insights
   - [ ] [WIP] 类SORA模型训练pipeline集成
-    - VideoDIT
-    - VQVAE
+    - [EasyAnimate](https://github.com/aigc-apps/EasyAnimate)
     - ...
-  - [ ] [WIP] (Model-Data sandbox) 在相对小的模型和DJ-SORA数据集上，探索形成低开销、可迁移、有指导性的data-model co-design、配置及检查点
-  - [ ] 更大规模、更多场景使用DJ-SORA数据训练类SORA模型，提高模型性能
+  - [✅] (Model-Data sandbox) 在相对小的模型和DJ-SORA数据集上，探索形成低开销、可迁移、有指导性的data-model co-design、配置及检查点
+  - [ ] [WIP] 更大规模、更多场景使用DJ-SORA数据训练类SORA模型，提高模型性能
   - ...
 
 

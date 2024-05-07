@@ -162,16 +162,19 @@ def load_videos(paths):
     return [load_video(path) for path in paths]
 
 
-def load_video(path):
+def load_video(path, mode='r'):
     """
     Load a video using its path.
 
     :param path: the path to this video.
+    :param mode: the loading mode. It's "r" in default.
     :return: a container object form PyAv library, which contains all streams
         in this video (video/audio/...) and can be used to decode these streams
         to frames.
     """
-    container = av.open(path)
+    if not os.path.exists(path) and 'r' in mode:
+        raise FileNotFoundError(f'Video [{path}] does not exist!')
+    container = av.open(path, mode)
     return container
 
 
@@ -188,7 +191,7 @@ def get_video_duration(input_video: Union[str, av.container.InputContainer],
     :return: duration of the video in second
     """
     if isinstance(input_video, str):
-        container = av.open(input_video)
+        container = load_video(input_video)
     elif isinstance(input_video, av.container.InputContainer):
         container = input_video
     else:
@@ -215,7 +218,7 @@ def get_decoded_frames_from_video(
     :return: an iterator of all the frames of the video
     """
     if isinstance(input_video, str):
-        container = av.open(input_video)
+        container = load_video(input_video)
     elif isinstance(input_video, av.container.InputContainer):
         container = input_video
     stream = container.streams.video[video_stream_index]
@@ -243,12 +246,12 @@ def cut_video_by_seconds(
     """
     # open the original video
     if isinstance(input_video, str):
-        container = av.open(input_video)
+        container = load_video(input_video)
     else:
         container = input_video
 
     # create the output video
-    output_container = av.open(output_video, 'w')
+    output_container = load_video(output_video, 'w')
 
     # add the video stream into the output video according to input video
     input_video_stream = container.streams.video[0]
@@ -340,12 +343,12 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
 
     # open the original video
     if isinstance(input_video, str):
-        container = av.open(input_video)
+        container = load_video(input_video)
     else:
         container = input_video
 
     # create the output video
-    output_container = av.open(output_video, 'w')
+    output_container = load_video(output_video, 'w')
 
     # add the audio stream into the output video with template of input audio
     for input_audio_stream in container.streams.audio:
@@ -394,14 +397,15 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
 
 def extract_key_frames(input_video: Union[str, av.container.InputContainer]):
     """
-    Extract key frames from the input video.
+    Extract key frames from the input video. If there is no keyframes in the
+    video, return the first frame.
 
     :param input_video: input video path or container.
     :return: a list of key frames.
     """
     # load the input video
     if isinstance(input_video, str):
-        container = av.open(input_video)
+        container = load_video(input_video)
     elif isinstance(input_video, av.container.InputContainer):
         container = input_video
     else:
@@ -414,11 +418,19 @@ def extract_key_frames(input_video: Union[str, av.container.InputContainer]):
     ori_skip_method = input_video_stream.codec_context.skip_frame
     input_video_stream.codec_context.skip_frame = 'NONKEY'
     # restore to the beginning of the video
-    container.seek(0, backward=False, any_frame=False)
+    container.seek(0)
     for frame in container.decode(input_video_stream):
         key_frames.append(frame)
     # restore to the original skip_type
     input_video_stream.codec_context.skip_frame = ori_skip_method
+
+    if len(key_frames) == 0:
+        logger.warning(f'No keyframes in this video [{input_video}]. Return '
+                       f'the first frame instead.')
+        container.seek(0)
+        for frame in container.decode(input_video_stream):
+            key_frames.append(frame)
+            break
 
     if isinstance(input_video, str):
         container.close()
@@ -453,7 +465,7 @@ def extract_video_frames_uniformly(
     """
     # load the input video
     if isinstance(input_video, str):
-        container = av.open(input_video)
+        container = load_video(input_video)
     elif isinstance(input_video, av.container.InputContainer):
         container = input_video
     else:
@@ -514,7 +526,7 @@ def extract_video_frames_uniformly(
             continue
         if key_frame_second == 0.0:
             # search from the beginning
-            container.seek(0, backward=False, any_frame=True)
+            container.seek(0)
             search_idx = 0
             curr_pts = second_group[search_idx] / time_base
             for frame in container.decode(input_video_stream):
@@ -578,7 +590,7 @@ def extract_audio_from_video(
         all audio streams will be extracted. Default: None.
     """
     if isinstance(input_video, str):
-        input_container = av.open(input_video)
+        input_container = load_video(input_video)
     elif isinstance(input_video, av.container.InputContainer):
         input_container = input_video
     else:
@@ -618,7 +630,7 @@ def extract_audio_from_video(
         if output_audio:
             # if the output_audio is not None, prepare the output audio file
             this_output_audio = add_suffix_to_filename(output_audio, f'_{idx}')
-            output_container = av.open(this_output_audio, 'w')
+            output_container = load_video(this_output_audio, 'w')
             output_stream = output_container.add_stream('mp3')
 
         # get the start/end pts

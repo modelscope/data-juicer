@@ -34,7 +34,7 @@ from tools.quality_classifier.qc_utils import (eval, init_spark, load_datasets,
                                                shuffle, train)
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(positive_datasets,
          negative_datasets,
          output_model_path='my_quality_model',

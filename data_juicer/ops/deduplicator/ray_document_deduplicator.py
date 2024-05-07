@@ -29,7 +29,7 @@ class RayDocumentDeduplicator(RayBasicDeduplicator):
         :param redis_port: the port of redis server
         :param lowercase: Whether to convert sample text to lower case
         :param ignore_non_character: Whether to ignore non-alphabet
-            characters, including whitespaces, digits, and punctuations
+        characters, including whitespaces, digits, and punctuations
         :param args: extra args
         :param kwargs: extra args.
         """

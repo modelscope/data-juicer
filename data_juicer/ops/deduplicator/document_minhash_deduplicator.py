@@ -14,6 +14,7 @@ from tqdm import tqdm
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import UnionFind, split_on_whitespace
@@ -113,6 +114,7 @@ class DocumentMinhashDeduplicator(Deduplicator):
         jaccard_threshold: ClosedUnitInterval = 0.7,
         num_bands: PositiveInt = None,
         num_rows_per_band: PositiveInt = None,
+        tokenizer_model: str = None,
         *args,
         **kwargs,
     ):
@@ -120,9 +122,12 @@ class DocumentMinhashDeduplicator(Deduplicator):
         Initialization method.
 
         :param tokenization: tokenization method for sample texts. It
-            should be one of [space, punctuation, character]. For
-            English-like languages, we recommend to use 'space'. And for
-            Chinese-like languages, we recommend to use 'character'
+            should be one of [space, punctuation, character,
+            sentencepiece]. For English-like languages, we recommend
+            to use 'space', for Chinese-like languages, we recommend
+            to use 'character', and for multiple languages, we recommend
+            to use 'sentencepiece'. If using 'sentencepiece', please
+            provided the model path in the 'tokenizer_model' field.
         :param window_size: window size of shingling
         :param lowercase: whether to convert text to lower case first
         :param ignore_pattern: whether to ignore sub-strings with
@@ -141,6 +146,8 @@ class DocumentMinhashDeduplicator(Deduplicator):
         :param num_rows_per_band: number of rows in each band in LSH.
             Default it's None, and it will be determined by an optimal
             params computation algorithm
+        :param tokenizer_model: path for the sentencepiece model, used for
+            sentencepiece tokenization.
         """
         super().__init__(*args, **kwargs)
         # about minhash computation
@@ -156,6 +163,15 @@ class DocumentMinhashDeduplicator(Deduplicator):
             logger.warning('Be careful that tokenization with punctuations '
                            'won\'t work if the ignore pattern includes '
                            'punctuations.')
+        self.punctuation_pattern = regex.compile(r'\p{P}')
+
+        if self.tokenization == 'sentencepiece':
+            if tokenizer_model is None:
+                raise ValueError("To use 'sentencepiece' tokenization, "
+                                 "'tokenizer_model' is required.")
+            self.tokenizer = prepare_sentencepiece_model(tokenizer_model)
+        else:
+            self.tokenizer = None
 
         # about deduplication
         self.num_permutation = num_permutations
@@ -222,6 +238,12 @@ class DocumentMinhashDeduplicator(Deduplicator):
             tokens = split_on_whitespace(text)
             tokens = {
                 str.encode(' '.join(tokens[i:i + self.window_size]))
+                for i in range(len(tokens) - self.window_size)
+            }
+        elif self.tokenization == 'sentencepiece':
+            tokens = self.tokenizer.encode(text, out_type=str)
+            tokens = {
+                str.encode(''.join(tokens[i:i + self.window_size]))
                 for i in range(len(tokens) - self.window_size)
             }
         else:

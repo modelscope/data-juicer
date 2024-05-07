@@ -4,7 +4,7 @@ from data_juicer.config import init_configs
 from data_juicer.core import Executor
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main():
     cfg = init_configs()
     if cfg.executor_type == 'default':

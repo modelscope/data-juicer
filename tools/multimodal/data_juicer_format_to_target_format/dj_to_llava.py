@@ -68,7 +68,7 @@ from tqdm import tqdm
 from data_juicer.utils.mm_utils import SpecialTokens
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(
     dj_ds_path: str,
     target_llava_ds_path: str,
@@ -76,7 +76,7 @@ def main(
     eoc_special_token: str = SpecialTokens.eoc,
     image_special_token: str = '<image>',
     sent_seperator: str = '\n',
-    convert_to_relative_paths: bool = False,
+    restore_questions: bool = False,
     original_llava_ds_path: str = None,
 ):
     """
@@ -96,11 +96,9 @@ def main(
         own LLaVA-like datasets but should be careful of possible compatibility
         problems that come from this change. Default: <image>.
     :param sent_seperator: seperator to split different sentences. Default: \n.
-    :param convert_to_relative_paths: whether convert the image paths in this
-        dataset to relative paths to the original dataset. If it's True, an
-        extra argument original_llava_ds_path is required. When the processed
-        and converted dataset will be used in another machine, it's better to
-        set this argument to True. Default: False.
+    :param restore_questions: need to restore human questions if only keep
+        caption when converting the LLaVA-like dataset to Data-Juicer-format.
+        If it's True, an extra argument original_llava_ds_path is required.
     :param original_llava_ds_path: path to the original unprocessed LLaVA
         dataset, which is used to help to recover the relative image paths for
         better migration. Default: None.
@@ -135,45 +133,30 @@ def main(
                        'token. There might be some compatibility problem if '
                        'you change it.')
 
-    # if convert_to_relative_paths is True, check if the original_llava_ds_path
-    # is provided as well.
-    if not original_llava_ds_path:
-        raise ValueError('When convert_to_relative_paths is set to True, '
-                         'the original_llava_ds_path must be provided '
-                         'for recovering the relative paths. Please '
-                         'check and retry.')
-    original_llava_ds_path = os.path.abspath(original_llava_ds_path)
-    # prepare id2idx dict
-    ori_ds = json.load(open(original_llava_ds_path, 'r', encoding='utf-8'))
-    id2idx = {str(s['id']): idx for idx, s in enumerate(ori_ds)}
-    # if provided original_llava_ds_path is the dataset file path, only
-    # keep the directory path.
-    if os.path.isfile(original_llava_ds_path):
-        original_llava_ds_path = os.path.dirname(original_llava_ds_path)
+    # if restore_questions is True, check if
+    # the original_llava_ds_path is provided as well.
+    if restore_questions:
+        if not original_llava_ds_path:
+            raise ValueError('When restore_questions is set to True, '
+                             'the original_llava_ds_path must be provided '
+                             'for recovering the relative paths. Please '
+                             'check and retry.')
+        original_llava_ds_path = os.path.abspath(original_llava_ds_path)
+        # prepare id2idx dict
+        ori_ds = json.load(open(original_llava_ds_path, 'r', encoding='utf-8'))
+        id2idx = {str(s['id']): idx for idx, s in enumerate(ori_ds)}
 
     logger.info('Start to convert.')
     samples = []
     with jl.open(dj_ds_path, 'r') as reader:
         for sample in tqdm(reader):
             sid = sample['id']
-            if sid in id2idx:
-                id = ori_ds[id2idx[sid]]['id']
-            elif str(sid) in id2idx:
-                id = ori_ds[id2idx[str(sid)]]['id']
-            else:
-                raise ValueError(f'The id [{sid}] in the sample cannot be '
-                                 f'aligned with any samples in the original '
-                                 f'dataset. Please check and fix it and '
-                                 f'retry.')
             images = list(set(sample.get(image_key, [])))
             text = sample[text_key]
-            # if there are only caption in this sample, we need to restore its
-            # question
-            restore_questions = sample['only_caption']
 
             if len(images) > 1:
                 raise ValueError(f'There are more than 1 distinct images in '
-                                 f'the sample with id [{id}], which is not '
+                                 f'the sample with id [{sid}], which is not '
                                  f'compatible with LLaVA dataset format. '
                                  f'Please check and fix it and retry.')
 
@@ -201,6 +184,16 @@ def main(
 
             conversations = []
             if restore_questions:
+                if sid in id2idx:
+                    sid = ori_ds[id2idx[sid]]['id']
+                elif str(sid) in id2idx:
+                    sid = ori_ds[id2idx[str(sid)]]['id']
+                else:
+                    raise ValueError(
+                        f'The id [{sid}] in the sample cannot be '
+                        f'aligned with any samples in the original '
+                        f'dataset. Please check and fix it and '
+                        f'retry.')
                 # need to restore questions for samples with only captions
                 ori_convs = ori_ds[id2idx[str(id)]]['conversations']
                 conversations.append(ori_convs[0])  # add question
@@ -217,7 +210,7 @@ def main(
                     parts = parts[1:]
                 if len(parts) % 4 != 0:
                     raise ValueError(f'The conversations in the sample text '
-                                     f'with id [{id}] contains unbalance '
+                                     f'with id [{sid}] contains unbalance '
                                      f'(human, robot) conversation round '
                                      f'(number of conversation is '
                                      f'[{len(parts)}]). Please check and fix '
@@ -233,23 +226,9 @@ def main(
                     conversations.append(conversation)
 
             # make up the new sample
-            new_sample = {'id': id, 'conversations': conversations}
+            new_sample = {'id': sid, 'conversations': conversations}
             if len(images) == 1:
                 image_path = images[0]
-                if convert_to_relative_paths:
-                    if image_path.startswith(original_llava_ds_path):
-                        image_path = os.path.relpath(image_path,
-                                                     original_llava_ds_path)
-                    else:
-                        raise ValueError(f'The original_llava_ds_path '
-                                         f'[{original_llava_ds_path}] is not '
-                                         f'the directory that contains the '
-                                         f'image [{image_path}] in the sample '
-                                         f'with id [{id}]. Please check if '
-                                         f'the correct original_llava_ds_path '
-                                         f'is provided or something wrong '
-                                         f'with this sample, and try again '
-                                         f'later.')
                 new_sample['image'] = image_path
             samples.append(new_sample)
 

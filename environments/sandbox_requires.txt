@@ -1,0 +1,3 @@
+wandb
+# modelscope-related
+modelscope

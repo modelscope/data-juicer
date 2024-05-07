@@ -123,7 +123,7 @@ class ImageTextSimilarityFilter(Filter):
                                    padding=True).to(model.device)
 
                 outputs = model(**inputs)
-                chunk_logits = outputs.logits_per_text.detach().cpu() / 100.0
+                chunk_logits = outputs.logits_per_text / 100.0
 
                 if self.reduce_mode == 'avg':
                     chunk_similarity = chunk_logits.mean()

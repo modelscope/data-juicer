@@ -1,4 +1,4 @@
-[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://alibaba.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
+[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
 
 # Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
@@ -18,7 +18,7 @@
 
 [![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documents)
 [![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documents)
-[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://alibaba.github.io/data-juicer/)
+[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://modelscope.github.io/data-juicer/)
 [![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 
 
@@ -30,11 +30,11 @@ juicier, and more digestible for LLMs.
 Data-Juicer (including [DJ-SORA](docs/DJ_SORA.md)) is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets. 
 We welcome you to join us in promoting LLM data development and research!
 
-If you find Data-Juicer useful for your research or development, please kindly 
-cite our [work](#references). Welcome to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw), [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11), or WeChat group (scan the QR code below with WeChat) for discussion.
+We provide a [Playground](http://8.130.100.170/) with a managed JupyterLab. [Try Data-Juicer](http://8.130.100.170/) straight away in your browser!
 
- <img src="https://img.alicdn.com/imgextra/i3/O1CN01QbwHJa1EV5uZwmU9c_!!6000000000356-2-tps-400-400.png" width = "100" height = "100" alt="QR Code for WeChat group" align=center />
-
+If you find Data-Juicer useful for your research or development, please kindly cite our [work](#references).
+Welcome any issues/PRs and to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw) 
+or [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) for discussion!
 
 ----
 
@@ -74,6 +74,7 @@ Table of Contents
     - [Data Analysis](#data-analysis)
     - [Data Visualization](#data-visualization)
     - [Build Up Config Files](#build-up-config-files)
+    - [Sandbox](#sandbox)
     - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
     - [For Docker Users](#for-docker-users)
   - [Data Recipes](#data-recipes)
@@ -85,30 +86,30 @@ Table of Contents
 
 ## Features
 
-![Overview](https://img.alicdn.com/imgextra/i2/O1CN01IMPeD11xYRUYLmXKO_!!6000000006455-2-tps-3620-1604.png)
+![Overview](https://img.alicdn.com/imgextra/i4/O1CN01WYQP3Z1JHsaXaQDK6_!!6000000001004-0-tps-3640-1812.jpg)
 
 - **Systematic & Reusable**:
   Empowering users with a systematic library of 80+ core [OPs](docs/Operators.md), 20+ reusable [config recipes](configs), and 20+ feature-rich
   dedicated [toolkits](#documentation), designed to
-  function independently of specific LLM datasets and processing pipelines.
+  function independently of specific multimodal LLM datasets and processing pipelines.
 
-- **Data-in-the-loop**: Allowing detailed data analyses with an automated
-  report generation feature for a deeper understanding of your dataset. Coupled with multi-dimension automatic evaluation capabilities, it supports a timely feedback loop at multiple stages in the LLM development process.
-  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i1/O1CN011E99C01ndLZ55iCUS_!!6000000005112-0-tps-2701-1050.jpg)
+- **Data-in-the-loop & Sandbox**: Supporting one-stop data-model collaborative development, enabling rapid iteration 
+  through the [sandbox laboratory](docs/Sandbox.md), and providing features such as feedback loops based on data and model, 
+  visualization, and multidimensional automatic evaluation, so that you can better understand and improve your data and models.
+  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
+
+- **Enhanced Efficiency**: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
+  requiring less memory and CPU usage, optimized for maximum productivity.
+  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data
   processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on
   reference LLaMA and LLaVA models.
   ![exp_llama](https://img.alicdn.com/imgextra/i2/O1CN019WtUPP1uhebnDlPR8_!!6000000006069-2-tps-2530-1005.png)
 
-- **Enhanced Efficiency**: Providing a speedy data processing pipeline
-  requiring less memory and CPU usage, optimized for maximum productivity.
-  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
-
-
 - **Flexible & Extensible**: Accommodating most types of data formats (e.g., jsonl, parquet, csv, ...) and allowing flexible combinations of OPs. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
 
-- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documentation), [easy start guides](#quick-start) and [demo configs](configs/README.md), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
+- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documents), [easy start guides](#quick-start) and [demo configs](configs/README.md), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
 
 
 
@@ -125,7 +126,7 @@ Table of Contents
   - [Preprocess](tools/preprocess/README.md)
   - [Postprocess](tools/postprocess/README.md)
 - [Third-parties (LLM Ecosystems)](thirdparty/README.md)
-- [API references](https://alibaba.github.io/data-juicer/)
+- [API references](https://modelscope.github.io/data-juicer/)
 - [Awesome LLM-Data](docs/awesome_llm_data.md)
 - [DJ-SORA](docs/DJ_SORA.md)
 
@@ -174,14 +175,15 @@ pip install -v -e .[tools] # install a subset of tools dependencies
 
 The dependency options are listed below:
 
-| Tag          | Description                                                                                  |
-|--------------|----------------------------------------------------------------------------------------------|
+| Tag              | Description                                                                                  |
+|------------------|----------------------------------------------------------------------------------------------|
 | `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                                          |
-| `.[all]`       | Install all optional dependencies (including minimal dependencies and all of the following). |
-| `.[sci]`       | Install all dependencies for all OPs.                                                        |
-| `.[dist]`      | Install dependencies for distributed data processing. (Experimental)                         |
-| `.[dev]`       | Install dependencies for developing the package as contributors.                             |
-| `.[tools]`     | Install dependencies for dedicated tools, such as quality classifiers.                       |
+| `.[all]`         | Install all optional dependencies (including minimal dependencies and all of the following). |
+| `.[sci]`         | Install all dependencies for all OPs.                                                        |
+| `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
+| `.[dist]`        | Install dependencies for distributed data processing. (Experimental)                         |
+| `.[dev]`         | Install dependencies for developing the package as contributors.                             |
+| `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers.                       |
 
 ### Using pip
 
@@ -212,6 +214,8 @@ pip install py-data-juicer
     ```shell
     docker build -t datajuicer/data-juicer:<version_tag> .
     ```
+  
+  - The format of `<version_tag>` is like `v0.2.0`, which is the same as release version tag.
 
 ### Installation check
 
@@ -245,6 +249,8 @@ dj-process --config configs/demo/process.yaml
 
 - **Note:** For some operators that involve third-party models or resources which are not stored locally on your computer, it might be slow for the first running because these ops need to download corresponding resources into a directory first.
 The default download cache directory is `~/.cache/data_juicer`. Change the cache location by setting the shell environment variable, `DATA_JUICER_CACHE_HOME` to another directory, and you can also change `DATA_JUICER_MODELS_CACHE` or `DATA_JUICER_ASSETS_CACHE` in the same way:
+
+- **Note:** When using operators with third-party models, it's necessary to declare the corresponding `mem_required` in the configuration file (you can refer to the settings in the `config_all.yaml` file). During runtime, Data-Juicer will control the number of processes based on memory availability and the memory requirements of the operator models to achieve better data processing efficiency. When running with CUDA environment, if the mem_required for an operator is not declared correctly, it could potentially lead to a CUDA Out of Memory issue.
 
 ```shell
 # cache home
@@ -317,6 +323,18 @@ python xxx.py --config configs/demo/process.yaml --language_id_score_filter.lang
 - The basic config format and definition is shown below.
 
   ![Basic config example of format and definition](https://img.alicdn.com/imgextra/i1/O1CN01uXgjgj1khWKOigYww_!!6000000004715-0-tps-1745-871.jpg "Basic config file example")
+
+### Sandbox
+
+The data sandbox laboratory (DJ-Sandbox) provides users with the best practices for continuously producing data recipes. It features low overhead, portability, and guidance.
+
+- In the sandbox, users can quickly experiment, iterate, and refine data recipes based on small-scale datasets and models, before scaling up to produce high-quality data to serve large-scale models.
+- In addition to the basic data optimization and recipe refinement features offered by Data-Juicer, users can seamlessly use configurable components such as data probe and analysis, model training and evaluation, and data and model feedback-based recipe refinement to form a complete one-stop data-model research and development pipeline.
+
+The sandbox is run using the following commands by default, and for more information and details, please refer to the [sandbox documentation](docs/Sandbox.md).
+```shell
+python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
+```
 
 ### Preprocess Raw Data (Optional)
 - Our formatters support some common input dataset formats for now:

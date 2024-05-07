@@ -3,15 +3,22 @@ from time import time
 
 from loguru import logger
 
-from data_juicer import cuda_device_count, use_cuda
+from data_juicer import use_cuda
 from data_juicer.config import init_configs
+from data_juicer.core.data import Dataset
 from data_juicer.format.load import load_formatter
+from data_juicer.format.mixture_formatter import MixtureFormatter
 from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
                              load_ops)
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.process_utils import calculate_np
 
+from ..ops.selector.frequency_specified_field_selector import \
+    FrequencySpecifiedFieldSelector
+from ..ops.selector.topk_specified_field_selector import \
+    TopkSpecifiedFieldSelector
 from .data import add_same_content_to_new_column
 from .exporter import Exporter
 from .tracer import Tracer
@@ -85,6 +92,52 @@ class Executor:
                 logger.info('Trace for all ops.')
                 self.op_list_to_trace = set(OPERATORS.modules.keys())
 
+    def sample_data(self,
+                    dataset_to_sample: Dataset = None,
+                    load_data_np=None,
+                    sample_ratio: float = 1.0,
+                    sample_algo: str = 'uniform',
+                    **kwargs):
+        """
+        Sample a subset from the given dataset.
+
+        :param dataset_to_sample: Dataset to sample from. If None, will use
+            the formatter linked by the executor. Default is None.
+        :param load_data_np: number of workers when loading the dataset.
+        :param sample_ratio: The ratio of the sample size to the original
+            dataset size. Default is 1.0 (no sampling).
+        :param sample_algo: Sampling algorithm to use. Options are "uniform",
+            "frequency_specified_field_selector", or
+            "topk_specified_field_selector".
+            Default is "uniform".
+        :return: A sampled Dataset.
+        """
+        # Determine the dataset to sample from
+        if dataset_to_sample is not None:
+            dataset = dataset_to_sample
+        elif self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
+            logger.info('Loading dataset from checkpoint...')
+            dataset = self.ckpt_manager.load_ckpt()
+        elif hasattr(self, 'formatter'):
+            logger.info('Loading dataset from data formatter...')
+            if load_data_np is None:
+                load_data_np = self.cfg.np
+            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+        else:
+            raise ValueError('No dataset available to sample from.')
+
+        # Perform sampling based on the specified algorithm
+        if sample_algo == 'uniform':
+            return MixtureFormatter.random_sample(dataset, sample_ratio)
+        elif sample_algo == 'frequency_specified_field_selector':
+            dj_op = FrequencySpecifiedFieldSelector(**kwargs)
+            return dj_op.process(dataset)
+        elif sample_algo == 'topk_specified_field_selector':
+            dj_op = TopkSpecifiedFieldSelector(**kwargs)
+            return dj_op.process(dataset)
+        else:
+            raise ValueError(f'Unsupported sample_algo: {sample_algo}')
+
     def run(self, load_data_np=None):
         """
         Running the dataset process pipeline.
@@ -116,12 +169,13 @@ class Executor:
         for op_cfg, op in zip(self.process_list, self.ops):
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
-            if use_cuda() and op._accelerator == 'cuda':
-                op_proc = min(cuda_device_count(), self.cfg.np)
-                with_rank = True
+            with_rank = use_cuda() and op._accelerator == 'cuda'
+            if op.spec_numprocs != 0:
+                op_proc = op.spec_numprocs
+                logger.info(f'Op [{op_name}] running with sepcified '
+                            f'number of procs:{op.spec_numprocs}')
             else:
-                op_proc = self.cfg.np
-                with_rank = False
+                op_proc = calculate_np(self.cfg.np, op, op_name)
             try:
                 if isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,
@@ -155,6 +209,9 @@ class Executor:
                                           desc=op_name + '_compute_stats')
                     if self.cfg.use_checkpoint:
                         prev = dataset
+                    if op.stats_export_path is not None:
+                        self.exporter.export_compute_stats(
+                            dataset, op.stats_export_path)
                     tmp = dataset.filter(op.process,
                                          num_proc=self.cfg.np,
                                          desc=op_name + '_process')

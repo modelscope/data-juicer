@@ -6,14 +6,32 @@
 Welcome to data-juicer's documentation!
 =======================================
 
+Tutorial
+---------------------------------------
+
+We will give a tutorial on KDD'24, Multi-modal Data Processing for Foundation Models: Practical Guidances and Use Cases, see more details `here <_static/tutorial_kdd24.html>`_!
+
+
+
+
+
 .. toctree::
    :maxdepth: 2
-   :caption: References:
+   :glob:
+   :caption: API Reference
 
-.. include:: modules.rst
+   data_juicer.core
+   data_juicer.ops
+   data_juicer.ops.filter
+   data_juicer.ops.mapper
+   data_juicer.ops.deduplicator
+   data_juicer.ops.selector
+   data_juicer.ops.common
+   data_juicer.analysis
+   data_juicer.config
+   data_juicer.format
 
-
-Indices and tables
+Indices and Tables
 ==================
 
 * :ref:`genindex`

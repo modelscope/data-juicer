@@ -1,12 +1,14 @@
+import copy
 import os
 import shutil
 import time
-from argparse import ArgumentError
+from argparse import ArgumentError, Namespace
 from typing import Dict, List, Tuple, Union
 
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
                           namespace_to_dict)
-from jsonargparse.typing import NonNegativeInt, PositiveInt
+from jsonargparse.typehints import ActionTypeHint
+from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS
@@ -32,7 +34,7 @@ def init_configs(args=None):
 
     parser.add_argument('--config',
                         action=ActionConfigFile,
-                        help='Path to a configuration file.',
+                        help='Path to a dj basic configuration file.',
                         required=True)
 
     parser.add_argument(
@@ -41,9 +43,58 @@ def init_configs(args=None):
         help='Path to a configuration file when using auto-HPO tool.',
         required=False)
     parser.add_argument(
-        '--path_3sigma_recipe',
+        '--path_k_sigma_recipe',
         type=str,
-        help='Path to save a configuration file when using 3-sigma tool.',
+        help='Path to save a configuration file when using k-sigma tool.',
+        required=False)
+    parser.add_argument(
+        '--path_model_feedback_recipe',
+        type=str,
+        help='Path to save a configuration file refined by model feedback.',
+        required=False)
+    parser.add_argument(
+        '--model_infer_config',
+        type=Union[str, dict],
+        help='Path or a dict to model inference configuration file when '
+        'calling model executor in sandbox. If not specified, the model '
+        'inference related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--model_train_config',
+        type=Union[str, dict],
+        help='Path or a dict to model training configuration file when '
+        'calling model executor in sandbox. If not specified, the model '
+        'training related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--data_eval_config',
+        type=Union[str, dict],
+        help='Path or a dict to eval configuration file when calling '
+        'auto-evaluator for data in sandbox. '
+        'If not specified, the eval related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--model_eval_config',
+        type=Union[str, dict],
+        help='Path or a dict to eval configuration file when calling '
+        'auto-evaluator for model in sandbox. '
+        'If not specified, the eval related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--data_probe_algo',
+        type=str,
+        default='uniform',
+        help='Sampling algorithm to use. Options are "uniform", '
+        '"frequency_specified_field_selector", or '
+        '"topk_specified_field_selector". Default is "uniform". Only '
+        'used for dataset sampling',
+        required=False)
+    parser.add_argument(
+        '--data_probe_ratio',
+        type=ClosedUnitInterval,
+        default=1.0,
+        help='The ratio of the sample size to the original dataset size. '
+        'Default is 1.0 (no sampling). Only used for dataset sampling',
         required=False)
 
     # basic global paras with extended type hints
@@ -261,6 +312,10 @@ def init_configs(args=None):
                         default='auto',
                         help='The address of the Ray cluster.')
 
+    parser.add_argument('--debug',
+                        action='store_true',
+                        help='Whether to run in debug mode.')
+
     # add all parameters of the registered ops class to the parser,
     # and these op parameters can be modified through the command line,
     ops_sorted_by_types = sort_op_by_types_and_names(OPERATORS.modules.items())
@@ -268,8 +323,8 @@ def init_configs(args=None):
 
     try:
         cfg = parser.parse_args(args=args)
-        cfg = update_op_process(cfg, parser)
         cfg = init_setup_from_cfg(cfg)
+        cfg = update_op_process(cfg, parser)
 
         # copy the config file into the work directory
         config_backup(cfg)
@@ -280,6 +335,9 @@ def init_configs(args=None):
         global global_cfg, global_parser
         global_cfg = cfg
         global_parser = parser
+
+        if cfg.debug:
+            logger.debug('In DEBUG mode.')
 
         return cfg
     except ArgumentError:
@@ -314,8 +372,8 @@ def init_setup_from_cfg(cfg):
     2. update cache directory
     3. update checkpoint and `temp_dir` of tempfile
 
-    :param cfg: a original cfg
-    :param cfg: a updated cfg
+    :param cfg: an original cfg
+    :param cfg: an updated cfg
     """
 
     cfg.export_path = os.path.abspath(cfg.export_path)
@@ -329,6 +387,7 @@ def init_setup_from_cfg(cfg):
     logfile_name = f'export_{export_rel_path}_time_{timestamp}.txt'
     setup_logger(save_dir=log_dir,
                  filename=logfile_name,
+                 level='DEBUG' if cfg.debug else 'INFO',
                  redirect=cfg.executor_type == 'default')
 
     # check and get dataset dir
@@ -422,11 +481,15 @@ def init_setup_from_cfg(cfg):
                     'audio_key': cfg.audio_key,
                     'video_key': cfg.video_key,
                 }
-            elif args['text_key'] is None:
-                args['text_key'] = text_key
-                args['image_key'] = cfg.image_key
-                args['audio_key'] = cfg.audio_key
-                args['video_key'] = cfg.video_key
+            else:
+                if 'text_key' not in args or args['text_key'] is None:
+                    args['text_key'] = text_key
+                if 'image_key' not in args or args['image_key'] is None:
+                    args['image_key'] = cfg.image_key
+                if 'audio_key' not in args or args['audio_key'] is None:
+                    args['audio_key'] = cfg.audio_key
+                if 'video_key' not in args or args['video_key'] is None:
+                    args['video_key'] = cfg.video_key
             op[op_name] = args
 
     return cfg
@@ -436,7 +499,7 @@ def _collect_config_info_from_class_docs(configurable_ops, parser):
     """
     Add ops and its params to parser for command line.
 
-    :param configurable_ops: a list of ops to be to added, each item is
+    :param configurable_ops: a list of ops to be added, each item is
         a pair of op_name and op_class
     :param parser: jsonargparse parser need to update
     """
@@ -491,16 +554,16 @@ def update_op_process(cfg, parser):
     # e.g.
     # `python demo.py --config demo.yaml
     #  --language_id_score_filter.lang en`
+    temp_cfg = cfg
     for i, op_in_process in enumerate(cfg.process):
         op_in_process_name = list(op_in_process.keys())[0]
 
-        temp_cfg = cfg
         if op_in_process_name not in option_in_commands:
 
             # update op params to temp cfg if set
             if op_in_process[op_in_process_name]:
                 temp_cfg = parser.merge_config(
-                    dict_to_namespace(op_in_process), cfg)
+                    dict_to_namespace(op_in_process), temp_cfg)
         else:
 
             # args in the command line override the ones in `cfg.process`
@@ -523,7 +586,40 @@ def update_op_process(cfg, parser):
             None if internal_op_para is None else
             namespace_to_dict(internal_op_para)
         }
+
+    # check the op params via type hint
+    temp_parser = copy.deepcopy(parser)
+    recognized_args = set([
+        action.dest for action in parser._actions
+        if hasattr(action, 'dest') and isinstance(action, ActionTypeHint)
+    ])
+
+    temp_args = namespace_to_arg_list(temp_cfg,
+                                      includes=recognized_args,
+                                      excludes=['config'])
+    temp_args = ['--config', temp_cfg.config[0].absolute] + temp_args
+    temp_parser.parse_args(temp_args)
     return cfg
+
+
+def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
+    arg_list = []
+
+    for key, value in vars(namespace).items():
+
+        if issubclass(type(value), Namespace):
+            nested_args = namespace_to_arg_list(value, f'{prefix}{key}.')
+            arg_list.extend(nested_args)
+        elif value is not None:
+            concat_key = f'{prefix}{key}'
+            if includes is not None and concat_key not in includes:
+                continue
+            if excludes is not None and concat_key in excludes:
+                continue
+            arg_list.append(f'--{concat_key}')
+            arg_list.append(f'{value}')
+
+    return arg_list
 
 
 def config_backup(cfg):
@@ -532,7 +628,8 @@ def config_backup(cfg):
     target_path = os.path.join(work_dir, os.path.basename(cfg_path))
     logger.info(f'Back up the input config file [{cfg_path}] into the '
                 f'work_dir [{work_dir}]')
-    shutil.copyfile(cfg_path, target_path)
+    if not os.path.exists(target_path):
+        shutil.copyfile(cfg_path, target_path)
 
 
 def display_config(cfg):

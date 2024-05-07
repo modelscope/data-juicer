@@ -128,23 +128,20 @@ class StatsKeys(object):
 
     - If the operator processes data in batches rather than a single sample, it is necessary to declare `self._batched_op = True`.
     ```python
-    # ... (same as above)
-
-    @OPERATORS.register_module('text_length_filter')
-    class TextLengthFilter(Filter):
+    # ... (import some other libraries)
+    OP_NAME = 'image_diffusion_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_IMAGES.register_module(OP_NAME)
+    class ImageDiffusionMapper(Mapper):
         def __init__(self,
-                    min_len: PositiveInt = 10,
-                    max_len: PositiveInt = sys.maxsize,
-                    *args,
-                    **kwargs):
-            # ... (same as above)
+                 # ... (OP parameters)
+                 *args,
+                 **kwargs):
+            super().__init__(*args, **kwargs)
             self._batched_op = True
 
-        def compute_stats(self, sample):
-            # ... (same as above)
-
-        def process(self, sample):
-            # ... (same as above)
+        def process(self, samples):
+            # ... (some codes)
     ```
 
     - In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra datas. The format of the saving path is `{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`, where the `HASH_VALUE` is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. For convenience, we can call `self.remove_extra_parameters(locals())` at the beginning of the initiation to get the init parameters. At the same time, we can call `self.add_parameters` to add related parameters with the produced extra datas from each sample. Take the operator which enhances the images with diffusion models as example:
@@ -199,6 +196,12 @@ class StatsKeys(object):
 ```python
 from . import (...,              # other OPs
                text_length_filter)  # import this new OP module
+# other OPs
+from text_length_filter import TextLengthFilter  # import this new OP class
+__all__ = [
+    # other Ops
+    text_length_filter,  # add this new Op to __all__
+]
 ```
 
 4. Now you can use this new OP with custom arguments in your own config files!
@@ -282,7 +285,6 @@ the corresponding documents, including the following docs:
    3. `docs/Operators_ZH.md`: this doc is the Chinese version of the doc in 6.ii, so we need to update the Chinese content at
    the same positions.
 
-   4. `docs/sphinx_doc/source/data_juicer.ops.{filter | mapper | deduplicator | selector}.rst`: this doc is the index of API reference. When the operator file name is modified or an operator file is added or deleted, the corresponding entries in the file need to be updated accordingly.
 
 ### (Optional) Make your OP fusible
 

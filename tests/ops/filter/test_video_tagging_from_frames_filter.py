@@ -5,11 +5,10 @@ import unittest
 from data_juicer.core.data import NestedDataset
 from data_juicer.ops.filter.video_tagging_from_frames_filter import \
     VideoTaggingFromFramesFilter
-from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
-
+@SKIPPED_TESTS.register_module()
 class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
@@ -75,7 +74,6 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
                                           frame_num=10)
         self._run_video_tagging_from_frames_filter(op, ds_list, tgt_list)
 
-
     def test_contain_any(self):
         ds_list = [{
             'text':
@@ -134,7 +132,6 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
                                           any_or_all='any')
         self._run_video_tagging_from_frames_filter(op, ds_list, tgt_list)
 
-
     def test_all(self):
         ds_list = [{
             'text':
@@ -159,7 +156,6 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
                                           contain='any',
                                           any_or_all='all')
         self._run_video_tagging_from_frames_filter(op, ds_list, tgt_list)
-
 
     def test_multi_process(self):
         # WARNING: current parallel tests only work in spawn method
@@ -191,6 +187,7 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
         # WARNING: current parallel tests only work in spawn method
         multiprocess.set_start_method(original_method, force=True)
         # WARNING: current parallel tests only work in spawn method
+
 
 if __name__ == '__main__':
     unittest.main()

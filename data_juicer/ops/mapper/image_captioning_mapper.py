@@ -192,7 +192,7 @@ class ImageCaptioningMapper(Mapper):
             for i in range(self.caption_num):
                 generated_ids = model.generate(**inputs,
                                                max_new_tokens=128,
-                                               do_sample=True).to(model.device)
+                                               do_sample=True)
                 generated_text = processor.batch_decode(
                     generated_ids, skip_special_tokens=True)
                 generated_text_candidates_single_chunk[i] = generated_text

@@ -94,7 +94,7 @@ from tqdm import tqdm
 from data_juicer.utils.mm_utils import SpecialTokens
 
 
-@logger.catch
+@logger.catch(reraise=True)
 def main(
     dj_ds_path: str,
     target_mmc4_ds_path: str,
@@ -102,8 +102,6 @@ def main(
     image_special_token: str = SpecialTokens.image,
     sent_seperator: str = ' ',
     keep_dj_fields: bool = False,
-    convert_to_relative_paths: bool = False,
-    original_mmc4_ds_path: str = None,
 ):
     """
     Convert a Data-Juicer-format dataset to an MMC4-like format. Notice: if
@@ -126,14 +124,6 @@ def main(
     :param sent_seperator: seperator to split different sentences. Default: " "
     :param keep_dj_fields: whether to keep intermediate fields from
         Data-Juicer, such as "images", "text", ... Default: False.
-    :param convert_to_relative_paths: whether convert the image paths in this
-        dataset to relative paths to the original dataset. If it's True, an
-        extra argument original_mmc4_ds_path is required. When the processed
-        and converted dataset will be used in another machine, it's better to
-        set this argument to True. Default: False.
-    :param original_mmc4_ds_path: path to the original unprocessed MMC4
-        dataset, which is used to help to recover the relative image paths for
-        better migration. Default: None.
     """
     # ----- Constant settings. Better not to change them. -----
     # default key of field to store the sample text
@@ -156,20 +146,6 @@ def main(
             f'Create directory [{os.path.dirname(target_mmc4_ds_path)}] for '
             f'the target dataset.')
         os.makedirs(os.path.dirname(target_mmc4_ds_path))
-
-    # if convert_to_relative_paths is True, check if the original_mmc4_ds_path
-    # is provided as well.
-    if convert_to_relative_paths:
-        if not original_mmc4_ds_path:
-            raise ValueError('When convert_to_relative_paths is set to True, '
-                             'the original_llava_ds_path must be provided '
-                             'for recovering the relative paths. Please '
-                             'check and retry.')
-        original_mmc4_ds_path = os.path.abspath(original_mmc4_ds_path)
-        # if provided original_mmc4_ds_path is the dataset file path, only
-        # keep the directory path.
-        if os.path.isfile(original_mmc4_ds_path):
-            original_mmc4_ds_path = os.path.dirname(original_mmc4_ds_path)
 
     # whether to keep dj fields
     if keep_dj_fields:
@@ -259,24 +235,6 @@ def main(
                                                f'unaligned numbers of images '
                                                f'and image tokens. Please '
                                                f'check and retry if needed.')
-
-                # convert image_name to relative paths
-                if convert_to_relative_paths:
-                    for idx in range(len(image_infos)):
-                        img_name = image_infos[idx]['image_name']
-                        if img_name.startswith(original_mmc4_ds_path):
-                            image_infos[idx]['image_name'] = os.path.relpath(
-                                img_name, original_mmc4_ds_path)
-                        else:
-                            raise ValueError(
-                                f'The original_mmc4_ds_path '
-                                f'[{original_mmc4_ds_path}] is not the '
-                                f'directory that contains the image '
-                                f'[{img_name}] in the sample of line number '
-                                f'[{line_num}]. Please check if the correct '
-                                f'original_llava_ds_path is provided or '
-                                f'something wrong with this sample, and try '
-                                f'again later.')
 
                 # reorder image_info to the same order as the original dataset
                 final_image_info = []

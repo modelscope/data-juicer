@@ -11,14 +11,21 @@ from .ray_basic_deduplicator import RayBasicDeduplicator
 OP_NAME = 'ray_image_deduplicator'
 
 with AvailabilityChecking(['imagededup'], OP_NAME):
-    from imagededup.methods import AHash, DHash, PHash, WHash
+    import imagededup  # noqa: F401
 
-    HASH_METHOD = {
-        'phash': PHash,
-        'dhash': DHash,
-        'whash': WHash,
-        'ahash': AHash
-    }
+    HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
+
+    def get_hash_method(method_name):
+        from imagededup.methods import AHash, DHash, PHash, WHash
+
+        mapping = {
+            'phash': PHash,
+            'dhash': DHash,
+            'whash': WHash,
+            'ahash': AHash
+        }
+
+        return mapping[method_name]
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -46,10 +53,10 @@ class RayImageDeduplicator(RayBasicDeduplicator):
                          redis_port=redis_port,
                          *args,
                          **kwargs)
-        if method not in HASH_METHOD.keys():
+        if method not in HASH_METHOD:
             raise ValueError(f'Keep strategy [{method}] is not supported. '
-                             f'Can only be one of {HASH_METHOD.keys()}.')
-        self.hasher = HASH_METHOD[method]()
+                             f'Can only be one of {HASH_METHOD}.')
+        self.hasher = get_hash_method(method)()
 
     def calculate_hash(self, sample, context=False):
         if self.image_key not in sample or not sample[self.image_key]:

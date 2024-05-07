@@ -49,3 +49,11 @@ We use simple 3-σ rule to set the hyperparameters for ops in each recipe.
 |-------------------------------|-------| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | LLaVA-1.5-13B <br> (baseline) | **80.0**  | 63.3 | 53.6 | 71.6 | **61.3** | 85.9 | 1531.3 | 67.7 | 63.6 | 61.6 | 72.5 | 36.1 |
 | LLaVA-1.5-13B <br> (refined pretrain dataset) | 79.94 | **63.5** | **54.09** | **74.20** | 60.82 | **86.67** | **1565.53** | **68.2** | **63.9** | **61.8** | **75.9** | **37.4** |
+
+## For Video Dataset
+
+We provide a video dataset processing recipe example for users to better utilize video-related OPs in [general-video-refine-example.yaml](general-video-refine-example.yaml). Here we apply three types of OPs:
+- Text-Only: to improve the dataset quality according to the video captions.
+- Video-Only: to improve the dataset quality according to the video features.
+- Text-Video: to improve the dataset quality according to the alignment between text and videos.
+Users can start to process their video datasets based on this recipe.
