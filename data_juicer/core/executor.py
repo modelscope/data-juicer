@@ -209,6 +209,9 @@ class Executor:
                                           desc=op_name + '_compute_stats')
                     if self.cfg.use_checkpoint:
                         prev = dataset
+                    if op.stats_export_path is not None:
+                        self.exporter.export_compute_stats(
+                            dataset, op.stats_export_path)
                     tmp = dataset.filter(op.process,
                                          num_proc=self.cfg.np,
                                          desc=op_name + '_process')

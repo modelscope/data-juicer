@@ -153,6 +153,7 @@ class Filter(OP):
 
         from data_juicer.core.data import wrap_func_with_nested_access
         self.compute_stats = wrap_func_with_nested_access(self.compute_stats)
+        self.stats_export_path = kwargs.get('stats_export_path', None)
 
     def compute_stats(self, sample, context=False):
         """
