@@ -41,8 +41,6 @@ extra_requires = {
     'tools':
     get_install_requirements(
         ['preprocess_requires.txt', 'quality_classifier_requires.txt']),
-    'sandbox':
-    get_install_requirements(['sandbox_requires.txt']),
 }
 extra_requires['all'] = [v for v in extra_requires.values()]
 extra_requires['sandbox'] = get_install_requirements(['sandbox_requires.txt'])
