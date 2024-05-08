@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 torch>=1.11.0,<2.0.0
+=======
+torch>=1.11.0
+>>>>>>> 17c2c763572058d43197a8af19595398bd6eee17
 torchaudio
 easyocr
 fasttext-wheel
