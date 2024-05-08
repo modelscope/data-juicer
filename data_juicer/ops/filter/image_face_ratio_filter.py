@@ -46,10 +46,10 @@ class ImageFaceRatioFilter(Filter):
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
 
-        self.extra_kwargs = {
-            k: kwargs.get(k, v)
-            for k, v in self._default_kwargs.items()
-        }
+        self.extra_kwargs = self._default_kwargs
+        for key in kwargs:
+            if key in self.extra_kwargs:
+                self.extra_kwargs[key] = kwargs[key]
 
         if any_or_all not in ['any', 'all']:
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '

@@ -206,6 +206,27 @@ class ConfigTest(DataJuicerTestCaseBase):
                     }
                 })
 
+    def test_op_params_parsing(self):
+        from jsonargparse import ArgumentParser
+        from data_juicer.config.config import (sort_op_by_types_and_names, _collect_config_info_from_class_docs)
+        from data_juicer.ops.base_op import OPERATORS
+
+        base_class_params = {
+            'text_key', 'image_key', 'audio_key', 'video_key', 'accelerator',
+            'spec_numprocs', 'cpu_required', 'mem_required', 'use_actor',
+        }
+
+        parser = ArgumentParser(default_env=True, default_config_files=None)
+        ops_sorted_by_types = sort_op_by_types_and_names(
+            OPERATORS.modules.items())
+        op_params = _collect_config_info_from_class_docs(ops_sorted_by_types,
+                                                         parser)
+
+        for op_name, params in op_params.items():
+            for base_param in base_class_params:
+                base_param_key = f'{op_name}.{base_param}'
+                self.assertIn(base_param_key, params)
+
 
 if __name__ == '__main__':
     unittest.main()
