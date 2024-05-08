@@ -31,6 +31,7 @@ jobs:
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         docker compose exec ray-head pip install -e .\[all\]
+        docker compose exec ray-worker pip install -e .\[all\]
 
     - name: Clean dataset cache
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
