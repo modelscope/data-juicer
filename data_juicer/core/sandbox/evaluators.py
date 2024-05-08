@@ -4,6 +4,7 @@ import shutil
 # TODO: cannot import tools correctly if DJ is installed by pypi. Maybe we need
 #       other importing methods.
 from tools.quality_classifier.predict import predict_score
+from tools.mm_eval.inception_metrics.calc_metrics_for_videos import calc_metrics
 
 
 class BaseEvaluator(object):
@@ -46,6 +47,30 @@ class Gpt3QualityEvaluator(BaseEvaluator):
         else:
             raise NotImplementedError(
                 'Unsupported evaluation type: {}'.format(eval_type))
+
+
+class InceptionEvaluator(BaseEvaluator):
+    def run(self, eval_type, eval_obj, **kwargs):
+        if eval_type == 'data':
+            result_dict = calc_metrics(
+                fake_data_path = self.eval_config.fake_data_path
+                real_data_path = self.eval_config.real_data_path
+                metric = self.eval_config.metric
+                detector_path = self.eval_config.detector_path
+                result_path = self.eval_config.result_path
+                num_runs = self.eval_config.num_runs
+                height = self.eval_config.height
+                width = self.eval_config.width
+                replace_cache = self.eval_config.replace_cache
+                verbose = self.eval_config.verbose
+                seed = self.eval_config.seed
+            )
+
+            return result_dict
+        else:
+            raise NotImplementedError(
+                'Unsupported evaluation type: {}'.format(eval_type))
+
 
 
 class HelmEvaluator(BaseEvaluator):

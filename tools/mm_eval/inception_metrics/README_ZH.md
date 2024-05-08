@@ -10,14 +10,17 @@
 python tools/video_metrics/calc_metrics_for_dataset.py        \
     --fake_data_path    <fake_data_path>        \
     --real_data_path    <real_data_path>        \
+    [--fake_mm_dir      <fake_mm_dir>]          \
+    [--real_mm_dir      <real_mm_dir>]          \
     --metric            <metric>                \
-    --detector_path     <detector_path>         \
+    [--detector_path    <detector_path>]        \
     --result_path       <result_path>           \
     --num_runs          <num_runs>              \
     --height            <height>                \
     --width             <width>                 \
     --replace_cache     <replace_cache>         \
     --verbose           <verbose>               \
+    --seed              <seed>
 
 # get help
 python tools/video_metrics/calc_metrics_for_dataset.py --help

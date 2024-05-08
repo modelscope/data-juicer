@@ -10,14 +10,17 @@ Use [calc_metrics_for_dataset.py](calc_metrics_for_dataset.py) to compute FVD/IS
 python tools/video_metrics/calc_metrics_for_dataset.py        \
     --fake_data_path    <fake_data_path>        \
     --real_data_path    <real_data_path>        \
+    [--fake_mm_dir      <fake_mm_dir>]          \
+    [--real_mm_dir      <real_mm_dir>]          \
     --metric            <metric>                \
-    --detector_path     <detector_path>         \
+    [--detector_path    <detector_path>]        \
     --result_path       <result_path>           \
     --num_runs          <num_runs>              \
     --height            <height>                \
     --width             <width>                 \
     --replace_cache     <replace_cache>         \
     --verbose           <verbose>               \
+    --seed              <seed>
 
 # get help
 python tools/video_metrics/calc_metrics_for_dataset.py --help
@@ -62,13 +65,13 @@ The Inception Score of Videos (ISV)<sup>[2](#reference)</sup> evaluates the gene
 The Precision/Recall of Videos (PRV) is the video version of Precision/Recall (PR)<sup>[5](#reference)</sup>, which extract features from videos by an I3D model, trained on Kinetics-400, containing 400 human action classes.
 
 ### FID
-The Frechet Inception Distance (FID)<sup>[3](#reference)</sup> shares similarities with FVD in its approach, evaluating videos by analyzing the features of individual frames derived from a image classification model trained on ImageNet.
+The Frechet Inception Distance (FID)<sup>[3](#reference)</sup> shares similarities with FVD in its approach, evaluating videos by analyzing the features of individual frames derived from an image classification model trained on ImageNet.
 
 ### KID
 The Kernel Inception Distance (KID)<sup>[4](#reference)</sup> is similar to FID and quantifies the dissimilarity between two sets of videos by computing the squared maximum mean discrepancy of the features of frames through multiple samplings. Unlike FID, KID utilizes an unbiased estimator with a third-degree kernel, aligning more consistently with human perception. The applied image classification model is same as the model FID applied.
 
 ### IS
-The Inception Score (IS)<sup>[2](#reference)</sup> shares similarities with ISV in its approach, evaluating videos by analyzing the predictions of individual frames derived from a image classification model trained on ImageNet.
+The Inception Score (IS)<sup>[2](#reference)</sup> shares similarities with ISV in its approach, evaluating videos by analyzing the predictions of individual frames derived from an image classification model trained on ImageNet.
 
 ### PR
 The Precision/Recall (PR)<sup>[5](#reference)</sup> estimates the distribution of features of frames in the feature space by demarcating a region within the distance to the k-nearest neighbor features. It then assesses the precision and recall of frame generation by determining whether samples fall within the distributions of the real and fake datasets. The features are extracted from the VGG image classification model<sup>[6](#reference)</sup> trained on ILSVRC-2012.

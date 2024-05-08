@@ -119,6 +119,8 @@ def calc_metrics(
         with open(result_path, "at") as fp:
             fp.write(f"{json_line}\n")
 
+    return result_dict
+
 
 if __name__ == "__main__":
     fire.Fire(calc_metrics)

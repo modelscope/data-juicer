@@ -88,6 +88,7 @@ The currently supported component factories and the components supported within 
 | Component | Function | Desc. of Method `run` | Reference Materials |
 | --- | --- | --- | --- |
 | `Gpt3QualityEvaluator` | Evaluate the quality of a dataset using the GPT-3 text quality classifier reproduced by Data-Juicer. | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`.<br />- `eval_obj`: The path to the dataset to be evaluated.<br />- Return: The average quality score of the dataset samples.<br /> | [Data-Juicer Quality Classifier Toolkit](https://github.com/modelscope/data-juicer/tree/main/tools/quality_classifier) |
+| `InceptionEvaluator` | Evaluate the generated videos by features extracted from video classification models. | <br />- `eval_type`: The type of the object to be evaluated by the evaluator, currently only supports `"data"`<br />- `eval_obj`: A useless parameter<br />- Return: A dictionary of scores in the given metric. <br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
 
 - ModelTrainExecutorFactory
 
