@@ -18,6 +18,7 @@
 import inspect
 import os
 import sys
+from io import StringIO
 
 from loguru import logger
 from loguru._file_sink import FileSink
@@ -52,12 +53,14 @@ class StreamToLoguru:
                     Default value: (apex, pycocotools).
         """
         self.level = level
-        self.linebuf = ''
         self.caller_names = caller_names
+        self.buffer = StringIO()
+        self.BUFFER_SIZE = 1024 * 1024
 
     def write(self, buf):
         full_name = get_caller_name(depth=1)
         module_name = full_name.rsplit('.', maxsplit=-1)[0]
+        self.buffer.write(buf)
         if module_name in self.caller_names:
             for line in buf.rstrip().splitlines():
                 # use caller level log
@@ -66,8 +69,13 @@ class StreamToLoguru:
             # sys.__stdout__.write(buf)
             logger.opt(raw=True).info(buf)
 
+        self.buffer.truncate(self.BUFFER_SIZE)
+
+    def getvalue(self):
+        return self.buffer.getvalue()
+
     def flush(self):
-        pass
+        self.buffer.flush()
 
 
 def redirect_sys_output(log_level='INFO'):
@@ -76,7 +84,7 @@ def redirect_sys_output(log_level='INFO'):
 
     :param log_level: log level string of loguru. Default value: "INFO".
     """
-    redirect_logger = StreamToLoguru(log_level)
+    redirect_logger = StreamToLoguru(level=log_level)
     sys.stderr = redirect_logger
     sys.stdout = redirect_logger
 

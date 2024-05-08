@@ -16,6 +16,9 @@ ENV JAVA_HOME=/opt/jdk
 
 WORKDIR /data-juicer
 
+# install requirements which need to be installed from source
+RUN pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000
+
 # install requirements first to better reuse installed library cache
 COPY environments/ environments/
 RUN cat environments/* | xargs pip install --default-timeout 1000
@@ -23,6 +26,7 @@ RUN cat environments/* | xargs pip install --default-timeout 1000
 # install data-juicer then
 COPY . .
 RUN pip install -v -e .[all]
+RUN pip install -v -e .[sandbox]
 
 # install 3rd-party system dependencies
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y

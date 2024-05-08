@@ -195,6 +195,18 @@ class Exporter:
         self._export_impl(dataset, self.export_path, self.suffix,
                           self.export_stats)
 
+    def export_compute_stats(self, dataset, export_path):
+        """
+        Export method for saving compute status in filters
+        """
+        keep_stats_in_res_ds = self.keep_stats_in_res_ds
+        self.keep_stats_in_res_ds = True
+        self._export_impl(dataset,
+                          export_path,
+                          self.suffix,
+                          export_stats=False)
+        self.keep_stats_in_res_ds = keep_stats_in_res_ds
+
     @staticmethod
     def to_jsonl(dataset, export_path, num_proc=1, **kwargs):
         """

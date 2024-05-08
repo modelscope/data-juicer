@@ -1,2 +1,9 @@
-torch
+torch>=1.11.0,<2.0.0
+wandb
+fire
+pyspark
+# vbench-related
+detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
 vbench
+# modelscope-related
+modelscope
