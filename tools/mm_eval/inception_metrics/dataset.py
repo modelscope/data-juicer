@@ -73,7 +73,7 @@ class VideoDataset(Dataset):
         assert frame_id >= total_frame_num, 'frame num error'
         return sampled_frames, spacing
         
-    def __getitem__(self, index: int) -> dict[str, Any]:
+    def __getitem__(self, index: int) -> dict:
         video_path = self.video_paths[index]
         frames, spacing = self.sample_frames(video_path)
         video = torch.stack(frames, dim=1)
@@ -141,7 +141,7 @@ class VideoDatasetPerImage(Dataset):
         container.close()
         return sampled_frames
 
-    def __getitem__(self, index: int) -> dict[str, Any]:
+    def __getitem__(self, index: int) -> dict:
         video_path, start_frame, num_samples_from_source = self.start_frames[index]
         frames = self.read_frames(video_path, start_frame)
         video = torch.stack(frames, dim=1)
