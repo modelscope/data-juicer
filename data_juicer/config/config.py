@@ -502,15 +502,19 @@ def _collect_config_info_from_class_docs(configurable_ops, parser):
     :param configurable_ops: a list of ops to be added, each item is
         a pair of op_name and op_class
     :param parser: jsonargparse parser need to update
+    :return: all params of each OP in a dictionary
     """
 
+    op_params = {}
     for op_name, op_class in configurable_ops:
-        parser.add_class_arguments(
+        params = parser.add_class_arguments(
             theclass=op_class,
             nested_key=op_name,
             fail_untyped=False,
             instantiate=False,
         )
+        op_params[op_name] = params
+    return op_params
 
 
 def sort_op_by_types_and_names(op_name_classes):
