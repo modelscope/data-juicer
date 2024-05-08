@@ -142,10 +142,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">blur_type</span> <span class="o">=</span> <span class="n">blur_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_kwargs</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
         <span class="c1"># Initialize face detector</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">.</span><span class="n">get_frontal_face_detector</span><span class="p">()</span></div>

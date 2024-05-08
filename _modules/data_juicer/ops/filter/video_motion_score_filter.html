@@ -150,10 +150,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span> <span class="o">=</span> <span class="n">max_score</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sampling_fps</span> <span class="o">=</span> <span class="n">sampling_fps</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_kwargs</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">extra_kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">any_or_all</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;any&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Keep strategy [</span><span class="si">{</span><span class="n">any_or_all</span><span class="si">}</span><span class="s1">] is not supported. &#39;</span>
