@@ -30,7 +30,6 @@ jobs:
         sudo apt-get install ffmpeg
         python -m pip install --upgrade pip
         pip install -v -e .[all]
-        pip install -v -e .[sandbox]
     - name: Increase swapfile
       run: |
         df -h
