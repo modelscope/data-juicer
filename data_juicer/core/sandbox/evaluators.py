@@ -1,6 +1,12 @@
+import json
 import os
 import shutil
 
+import torch
+from loguru import logger
+from vbench import VBench
+
+from data_juicer import cuda_device_count
 from tools.mm_eval.inception_metrics.calc_metrics_for_videos import \
     calc_metrics
 # TODO: cannot import tools correctly if DJ is installed by pypi. Maybe we need
@@ -99,6 +105,50 @@ class Gpt4VEvaluator(BaseEvaluator):
     def run(self, eval_type, eval_obj, **kwargs):
         raise NotImplementedError(
             'To be refactored from gpt4v related operators/tools.')
+
+
+class VBenchEvaluator(BaseEvaluator):
+
+    def get_score(self, result_path, dimension):
+        cur_result = json.load(open(result_path))
+        return cur_result[dimension][0]
+
+    def run(self, eval_type, eval_obj, **kwargs):
+        if eval_type == 'data':
+            prompt_path = self.eval_config.prompt_path
+            videos_path = self.eval_config.videos_path
+            result_dir = self.eval_config.result_dir
+            name = self.eval_config.eval_name
+            dimension_list = self.eval_config.dimension_list
+            local = self.eval_config.load_ckpt_from_local
+            if cuda_device_count() > 0:
+                device = torch.device('cuda')
+            else:
+                device = torch.device('cpu')
+            my_vbench = VBench(device, prompt_path, result_dir)
+            result_dict = {'mean_score': 0, 'detail': {}}
+            scores = []
+            for dimension in dimension_list:
+                logger.info(f'Evaluating for {dimension}')
+                my_vbench.evaluate(videos_path=videos_path,
+                                   name=f'{name}-{dimension}',
+                                   dimension_list=[dimension],
+                                   local=local)
+                score = self.get_score(result_path=os.path.join(
+                    result_dir, f'{name}-{dimension}_eval_results.json'),
+                                       dimension=dimension)
+                result_dict['detail'][dimension] = score
+                scores.append(score)
+            result_dict['mean_score'] = sum(scores) / len(scores)
+
+            with open(os.path.join(result_dir, name + '_merged_results.json'),
+                      'w') as f:
+                json.dump(result_dict, f)
+
+            return float(result_dict['mean_score'])
+        else:
+            raise NotImplementedError(
+                'Unsupported evaluation type: {}'.format(eval_type))
 
 
 class LmHarnessEvaluator(BaseEvaluator):

@@ -178,12 +178,12 @@ The dependency options are listed below:
 | Tag              | Description                                                                                  |
 |------------------|----------------------------------------------------------------------------------------------|
 | `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                                          |
-| `.[all]`         | Install all optional dependencies (including minimal dependencies and all of the following). |
+| `.[all]`         | Install all dependencies except sandbox.                                                     |
 | `.[sci]`         | Install all dependencies for all OPs.                                                        |
-| `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
 | `.[dist]`        | Install dependencies for distributed data processing. (Experimental)                         |
 | `.[dev]`         | Install dependencies for developing the package as contributors.                             |
 | `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers.                       |
+| `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
 
 ### Using pip
 
