@@ -1,6 +1,6 @@
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
-                                                 VBenchEvaluator,
-                                                 InceptionEvaluator)
+                                                 InceptionEvaluator,
+                                                 VBenchEvaluator)
 from data_juicer.core.sandbox.model_executors import (ModelscopeInferExecutor,
                                                       ModelscopeTrainExecutor)
 
