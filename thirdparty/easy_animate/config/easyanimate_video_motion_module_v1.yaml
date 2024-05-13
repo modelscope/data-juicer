@@ -1,0 +1,24 @@
+transformer_additional_kwargs:
+  patch_3d:                                   false
+  fake_3d:                                    false
+  basic_block_type:                           "motionmodule"
+  time_position_encoding_before_transformer:  false
+  motion_module_type:                         "VanillaGrid"
+  
+  motion_module_kwargs:
+    num_attention_heads:                8
+    num_transformer_block:              1
+    attention_block_types:              [ "Temporal_Self", "Temporal_Self" ]
+    temporal_position_encoding:         true
+    temporal_position_encoding_max_len: 4096
+    temporal_attention_dim_div:         1
+    block_size:                         2
+
+noise_scheduler_kwargs:
+  beta_start:    0.0001
+  beta_end:      0.02
+  beta_schedule: "linear"
+  steps_offset:  1
+
+vae_kwargs:
+  enable_magvit: false

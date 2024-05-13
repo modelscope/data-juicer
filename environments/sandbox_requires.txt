@@ -1,3 +1,17 @@
 wandb
 # modelscope-related
 modelscope
+# easyanimate-related
+Pillow
+deepspeed
+safetensors
+timm
+xformers
+decord
+opencv-python
+omegaconf
+imageio[ffmpeg]
+imageio[pyav]
+tensorboard
+diffusers==0.27.0
+transformers==4.37.2

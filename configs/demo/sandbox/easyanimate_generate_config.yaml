@@ -1,0 +1,24 @@
+type: easyanimate
+model_name: "easyanimate"
+infer_name: "easyanimate-lora-generate"
+train:
+  model_path:
+    # path to the pixart model or the hugging face model
+    pretrained_model_name_or_path: "PixArt-alpha/PixArt-XL-2-512x512"
+    # path to pretrained easyanimate checkpoint. Following are the links to available checkpoints.
+    # https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/dj-competition/modelscope_sora/models/easyanimate_mm_16x256x256_pretrain.safetensors
+    # https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/dj-competition/modelscope_sora/models/easyanimate_mm_16x512x512_pretrain.safetensors
+    transformer_path: "/path/to/easyanimate_mm_16x256x256_pretrain.safetensors"
+    lora_path: "/path/to/lora_model/output/dir/checkpoint.safetensors"
+
+  infer_config:
+    # must match the pretrained easyanimate checkpoint.
+    image_size: 256
+    prompt_info_path: "../../tools/mm_eval/vbench_metrics/VBench_full_info.json"
+    gpu_num: 1
+    batch_size: 8
+    mixed_precision: "bf16"
+    video_num_per_prompt: 5
+
+  saving_config:
+    output_video_dir: "/path/to/output/video/dir"

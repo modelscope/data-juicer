@@ -2,6 +2,7 @@
 
 # global parameters
 project_name: 'demo-sandbox'
+experiment_name: 'demo-experiment-1'
 dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
 np: 4  # number of subprocess to process your dataset
 

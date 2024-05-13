@@ -9,19 +9,19 @@ $$P(|x-\mu| > 3\sigma) \leq 0.003$$
 为了自动化该过程，我们提供了相应工具：
 ```shell
 # cd tools/hpo
-# usage 1: do not save the refined recipe 
-python execute_hpo_3sigma.py --config <data-process-cfg-file-path> 
+# usage 1: do not save the refined recipe
+python execute_hpo_3sigma.py --config <data-process-cfg-file-path>
 # usage 2: save the refined recipe at the given path
-python execute_hpo_3sigma.py --config <data-process-cfg-file-path> --path_3sigma_recipe <data-process-cfg-file-after-refined-path> 
+python execute_hpo_3sigma.py --config <data-process-cfg-file-path> --path_3sigma_recipe <data-process-cfg-file-after-refined-path>
 
 # e.g., usage 1
-python execute_hpo_3sigma.py --config configs/process.yaml 
+python execute_hpo_3sigma.py --config configs/process.yaml
 # e.g., usage 2
-python execute_hpo_3sigma.py --config configs/process.yaml --path_3sigma_recipe configs/process_3sigma.yaml 
+python execute_hpo_3sigma.py --config configs/process.yaml --path_3sigma_recipe configs/process_3sigma.yaml
 ```
 
 
-## 基于WandB进行Auto-HPO 
+## 基于WandB进行Auto-HPO
 
 我们将自动化 HPO (hyper-parameters optimization) 工具 WandB [Sweep](https://docs.wandb.ai/guides/sweeps) 结合到
 Data-Juicer 中，以简化改良数据处理超参数的过程。
@@ -60,7 +60,7 @@ python execute_hpo_wandb.py --config configs/process.yaml --hpo_config configs/q
 ```
 
 对于数据菜谱的配置，即`<data-process-cfg-file-path>`，
-请参阅我们的 [指南](https://github.com/alibaba/data-juicer/blob/main/README_ZH.md#%E6%9E%84%E5%BB%BA%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6) 
+请参阅我们的 [指南](https://github.com/alibaba/data-juicer/blob/main/README_ZH.md#%E6%9E%84%E5%BB%BA%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6)
 获取更多详细信息。
 对于HPO的配置，即`<hpo-cfg-file-path>`，请参阅Sweep提供的 [指南](https://docs.wandb.ai/guides/sweeps/define-sweep-configuration) 。
 

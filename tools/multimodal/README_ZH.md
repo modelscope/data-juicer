@@ -163,7 +163,7 @@ python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --hel
         "id": "2219",
         "duration": 14.1424375,
         "audio": "wav_path",
-        "download_link": "http://soundbible.com/grab.php?id=2219&type=wav"}]    
+        "download_link": "http://soundbible.com/grab.php?id=2219&type=wav"}]
 }
 
 # 转换后数据集
@@ -179,7 +179,7 @@ python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --hel
         "audio": "wav_path",
         "download_link": "http://soundbible.com/grab.php?id=2219&type=wav",
         "category": "",
-        "tags": "" }]    
+        "tags": "" }]
 }
 ```
 

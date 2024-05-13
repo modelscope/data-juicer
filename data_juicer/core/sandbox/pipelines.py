@@ -12,6 +12,7 @@ from data_juicer.config import init_configs, merge_config
 from data_juicer.core import Analyser
 from data_juicer.core import Executor as DjExecutor
 from data_juicer.core.sandbox.factories import (data_evaluator_factory,
+                                                data_generate_executor_factory,
                                                 mode_infer_executor_factory,
                                                 model_evaluator_factory,
                                                 model_train_executor_factory)
@@ -32,10 +33,11 @@ class SandBoxWatcher:
 
         # the web-ui and experiment versioning is based on WandB
         project_name = dj_cfg.project_name
+        experiment_name = dj_cfg.experiment_name
         hpo_config = dj_cfg.hpo_config
         self.dj_cfg = dj_cfg
 
-        self.wandb_run = wandb.init(project=project_name)
+        self.wandb_run = wandb.init(project=project_name, name=experiment_name)
         if (hpo_config is not None and 'metric' in hpo_config
                 and 'name' in hpo_config['metric']):
             self.object_name_in_hpo = hpo_config['metric']['name']
@@ -126,6 +128,7 @@ class SandBoxExecutor:
         dj_cfg=None,
         model_infer_cfg=None,
         model_train_cfg=None,
+        data_generate_cfg=None,
         data_eval_cfg=None,
         model_eval_cfg=None,
     ):
@@ -138,6 +141,8 @@ class SandBoxExecutor:
             an integrated model inference utility.
         :param model_train_cfg: configuration of
             an integrated model training utility.
+        :param data_generate_cfg: configuration of
+            an integrated data generating utility from a generation model.
         :param data_eval_cfg: configuration of an
             integrated auto-evaluation utility for data.
         :param model_eval_cfg: configuration of an
@@ -151,6 +156,7 @@ class SandBoxExecutor:
             (dj_cfg, 'data_juicer'),
             (model_infer_cfg, 'model_infer'),
             (model_train_cfg, 'model_train'),
+            (data_generate_cfg, 'data_generate'),
             (data_eval_cfg, 'data_eval'),
             (model_eval_cfg, 'model_eval'),
         ])
@@ -160,6 +166,8 @@ class SandBoxExecutor:
             model_infer_cfg)
         self.model_trainer = model_train_executor_factory(model_train_cfg,
                                                           watcher=self.watcher)
+        self.data_generator = data_generate_executor_factory(
+            data_generate_cfg, watcher=self.watcher)
         self.data_evaluator = data_evaluator_factory(data_eval_cfg)
         self.model_evaluator = model_evaluator_factory(model_eval_cfg)
 
@@ -247,6 +255,18 @@ class SandBoxExecutor:
             self.model_trainer.run(self.model_trainer.model_config['type'],
                                    training_args, **kwargs))
 
+    def hook_generate_data(self, args: dict, **kwargs):
+        if not self.data_generator:
+            return
+
+        # basic routine to train model via the processed data,
+        # users can customize this freely
+        logger.info('Begin to generate data via a generation model')
+        asyncio.run(
+            self.data_generator.run(self.data_generator.model_config['type'],
+                                    run_obj=None,
+                                    **kwargs))
+
     def hook_evaluate_data(self, args: dict, **kwargs):
         if not self.data_evaluator:
             return
@@ -285,6 +305,7 @@ class SandBoxExecutor:
 
         self.execution_jobs.append((self.hook_process_data, None))
         self.execution_jobs.append((self.hook_train_model, None))
+        self.execution_jobs.append((self.hook_generate_data, None))
 
         self.evaluation_jobs.append((self.hook_probe_via_analyzer, {
             'res_name': 'analysis_processed_data'

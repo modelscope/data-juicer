@@ -48,6 +48,9 @@ def split_configs(cfg):
     if cfg.model_train_config:
         configs['model_train_cfg'] = prepare_side_configs(
             cfg.model_train_config)
+    if cfg.data_generate_config:
+        configs['data_generate_cfg'] = prepare_side_configs(
+            cfg.data_generate_config)
     if cfg.data_eval_config:
         configs['data_eval_cfg'] = prepare_side_configs(cfg.data_eval_config)
     if cfg.model_eval_config:

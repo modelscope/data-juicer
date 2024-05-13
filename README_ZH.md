@@ -1,4 +1,4 @@
-[[English Page]](README.md) | [[文档]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md) 
+[[English Page]](README.md) | [[文档]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md)
 
 # Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据
 
@@ -38,7 +38,7 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-02-05] 我们的论文被SIGMOD'24 industrial track接收！
 - [2024-01-10] 开启“数据混合”新视界——第二届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532174)，了解赛事详情。
 
--[2024-01-05] 现在，我们发布了 **Data-Juicer v0.1.3** 版本！ 
+-[2024-01-05] 现在，我们发布了 **Data-Juicer v0.1.3** 版本！
 在这个新版本中，我们支持了**更多Python版本**（3.8-3.10），同时支持了**多模态**数据集的[转换](tools/multimodal/README_ZH.md)和[处理](docs/Operators_ZH.md)（包括文本、图像和音频。更多模态也将会在之后支持）。
 此外，我们的论文也更新到了[第三版](https://arxiv.org/abs/2309.02033) 。
 
@@ -193,7 +193,7 @@ pip install py-data-juicer
     ```shell
     docker build -t datajuicer/data-juicer:<version_tag> .
     ```
-  
+
   - `<version_tag>`的格式类似于`v0.2.0`，与发布（Release）的版本号相同。
 
 ### 安装校验

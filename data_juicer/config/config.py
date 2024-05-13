@@ -67,6 +67,13 @@ def init_configs(args=None):
         'training related hooks will be disabled.',
         required=False)
     parser.add_argument(
+        '--data_generate_config',
+        type=Union[str, dict],
+        help='Path or a dict to data generation configuration file when '
+        'calling model executor in sandbox. If not specified, the data '
+        'generation related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
         '--data_eval_config',
         type=Union[str, dict],
         help='Path or a dict to eval configuration file when calling '
@@ -108,6 +115,10 @@ def init_configs(args=None):
                         type=str,
                         default='hello_world',
                         help='Name of your data process project.')
+    parser.add_argument('--experiment_name',
+                        type=str,
+                        default=None,
+                        help='Experiment name for wandb record.')
     parser.add_argument(
         '--executor_type',
         type=str,

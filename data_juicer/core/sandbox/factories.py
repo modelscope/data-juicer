@@ -1,7 +1,8 @@
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  InceptionEvaluator)
-from data_juicer.core.sandbox.model_executors import (ModelscopeInferExecutor,
-                                                      ModelscopeTrainExecutor)
+from data_juicer.core.sandbox.model_executors import (
+    EasyAnimateGenerateExecutor, EasyAnimateTrainExecutor,
+    ModelscopeInferExecutor, ModelscopeTrainExecutor)
 
 
 class DataEvaluatorFactory(object):
@@ -67,8 +68,25 @@ class ModelTrainExecutorFactory(object):
 
         if model_cfg.type == 'modelscope':
             return ModelscopeTrainExecutor(model_cfg, **kwargs)
+        elif model_cfg.type == 'easyanimate':
+            return EasyAnimateTrainExecutor(model_cfg, **kwargs)
 
         # add more model trainer here freely
 
 
 model_train_executor_factory = ModelTrainExecutorFactory()
+
+
+class DataGenerateExecutorFactory(object):
+
+    def __call__(self, generate_cfg: dict = None, *args, **kwargs):
+        if generate_cfg is None:
+            return None
+
+        if generate_cfg.type == 'easyanimate':
+            return EasyAnimateGenerateExecutor(generate_cfg, **kwargs)
+
+        # add more data generation here freely
+
+
+data_generate_executor_factory = DataGenerateExecutorFactory()
