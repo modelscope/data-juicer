@@ -9,8 +9,7 @@
 ```shell
 pip install -v -e .[sandbox]
 
-# 或者直接安装全量依赖
-pip install -v -e .[all]
+pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
 ```
 
 **注意**：一些沙盒的依赖还需要额外的领域依赖。例如，如果用户想要在沙盒中训练一个 ModelScope 平台的NLP模型，那可能需要为 `modelscope` 库

@@ -9,8 +9,7 @@ Before using sandbox, you might need to install sandbox-related third-party depe
 ```shell
 pip install -v -e .[sandbox]
 
-# or install all dependencies
-pip install -v -e .[all]
+pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
 ```
 
 **NOTICE**: some sandbox-related dependencies require extra domain dependencies. For example, if users want to train an NLP model from ModelScope
