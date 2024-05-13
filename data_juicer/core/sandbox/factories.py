@@ -1,5 +1,6 @@
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
-                                                 InceptionEvaluator)
+                                                 InceptionEvaluator,
+                                                 VBenchEvaluator)
 from data_juicer.core.sandbox.model_executors import (
     EasyAnimateGenerateExecutor, EasyAnimateTrainExecutor,
     ModelscopeInferExecutor, ModelscopeTrainExecutor)
@@ -17,9 +18,11 @@ class DataEvaluatorFactory(object):
             return None
 
         evaluator = None
-        if eval_cfg.type == 'video_inception_evaluator':
+        if eval_cfg.type == 'vbench_video_evaluator':
+            evaluator = VBenchEvaluator(eval_cfg)
+        elif eval_cfg.type == 'video_inception_evaluator':
             evaluator = InceptionEvaluator(eval_cfg)
-        if eval_cfg.type == 'dj_text_quality_classifier':
+        elif eval_cfg.type == 'dj_text_quality_classifier':
             evaluator = Gpt3QualityEvaluator(eval_cfg)
 
         return evaluator
