@@ -39,5 +39,6 @@ exclude: |
     docs/.*|
     tests/.*|
     demos/.*|
+    tools/mm_eval/inception_metrics.*|
     .*\.md
   )$
