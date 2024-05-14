@@ -51,12 +51,14 @@ class Analyser:
         # (export_ds=False). Instead, only need to export stats
         # (export_stats=True).
         logger.info('Preparing exporter...')
-        self.exporter = Exporter(self.cfg.export_path,
-                                 self.cfg.export_shard_size,
-                                 self.cfg.export_in_parallel,
-                                 self.cfg.np,
-                                 export_ds=False,
-                                 export_stats=True)
+        self.exporter = Exporter(
+            self.cfg.export_path,
+            self.cfg.export_shard_size,
+            self.cfg.export_in_parallel,
+            self.cfg.np,
+            export_ds=self.cfg.export_original_dataset,
+            keep_stats_in_res_ds=self.cfg.export_original_dataset,
+            export_stats=True)
 
         # parsed_res
         self.overall_result = None
@@ -121,8 +123,10 @@ class Analyser:
 
         logger.info('Applying overall analysis on stats...')
         overall_analysis = OverallAnalysis(dataset, self.analysis_path)
-        self.overall_result = overall_analysis.analyse(num_proc=self.cfg.np,
-                                                       skip_export=skip_export)
+        self.overall_result = overall_analysis.analyse(
+            percentiles=self.cfg.percentiles,
+            num_proc=self.cfg.np,
+            skip_export=skip_export)
 
         logger.info(f'The overall analysis results are: {self.overall_result}')
 

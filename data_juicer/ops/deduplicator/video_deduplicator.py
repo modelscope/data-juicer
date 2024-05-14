@@ -1,12 +1,13 @@
 import hashlib
 from collections import defaultdict
-from typing import Dict, Set
+from typing import Dict, Set, Tuple
 
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.mm_utils import load_data_with_context, load_video
 
 from ..base_op import OPERATORS, Deduplicator
 from ..op_fusion import LOADED_VIDEOS
+from .document_deduplicator import DocumentDeduplicator
 
 OP_NAME = 'video_deduplicator'
 
@@ -19,14 +20,20 @@ class VideoDeduplicator(Deduplicator):
     of videos between documents.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, consider_text: bool = False, *args, **kwargs):
         """
         Initialization.
 
+        :param consider_text: whether to consider text hash together with video
+            hash when applying deduplication.
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self.consider_text = consider_text
+        self.text_dedup_op = None
+        if self.consider_text:
+            self.text_dedup_op = DocumentDeduplicator(**kwargs)
 
     def compute_hash(self, sample, context=False):
         # check if it's computed already
@@ -52,6 +59,8 @@ class VideoDeduplicator(Deduplicator):
                     md5_hash.update(bytes(packet))
 
         sample[HashKeys.videohash] = md5_hash.hexdigest()
+        if self.consider_text:
+            sample = self.text_dedup_op.compute_hash(sample)
         return sample
 
     def process(self, dataset, show_num=0):
@@ -70,8 +79,14 @@ class VideoDeduplicator(Deduplicator):
         dup_hashes = None
         if show_num > 0:
             # sample duplicate pairs
-            hash2ids: Dict[int, Set[int]] = defaultdict(set)
-            for sid, hash_val in enumerate(dataset[HashKeys.videohash]):
+            if self.consider_text:
+                hash2ids: Dict[Tuple[int], Set[int]] = defaultdict(set)
+                hashes = zip(dataset[HashKeys.videohash],
+                             dataset[HashKeys.hash])
+            else:
+                hash2ids: Dict[int, Set[int]] = defaultdict(set)
+                hashes = dataset[HashKeys.videohash]
+            for sid, hash_val in enumerate(hashes):
                 if hash_val:
                     hash2ids[hash_val].add(sid)
             dup_samples = sorted(list(hash2ids.items()),
@@ -82,7 +97,10 @@ class VideoDeduplicator(Deduplicator):
             ][:show_num])
 
         def _filter_dup_helper(sample, hashes):
-            hash = sample[HashKeys.videohash]
+            if self.consider_text:
+                hash = (sample[HashKeys.videohash], sample[HashKeys.hash])
+            else:
+                hash = sample[HashKeys.videohash]
             if not hash:
                 return True
             if show_num > 0 and hash in dup_hashes \
