@@ -386,6 +386,19 @@
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;List of several operators with their arguments, these ops will &#39;</span>
         <span class="s1">&#39;be applied to dataset in order&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--percentiles&#39;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+        <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Percentiles to analyse the dataset distribution. Only used in &#39;</span>
+        <span class="s1">&#39;Analysis.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--export_original_dataset&#39;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;whether to export the original dataset with stats. If you only &#39;</span>
+        <span class="s1">&#39;need the stats of the dataset, setting it to false could speed &#39;</span>
+        <span class="s1">&#39;up the exporting..&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;--save_stats_in_one_file&#39;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>

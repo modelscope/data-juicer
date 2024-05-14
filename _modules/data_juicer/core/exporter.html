@@ -209,8 +209,11 @@
                 <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span><span class="n">removed_fields</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_hashes_in_res_ds</span><span class="p">:</span>
                 <span class="n">extra_fields</span> <span class="o">=</span> <span class="p">{</span>
-                    <span class="n">HashKeys</span><span class="o">.</span><span class="n">hash</span><span class="p">,</span> <span class="n">HashKeys</span><span class="o">.</span><span class="n">minhash</span><span class="p">,</span> <span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">,</span>
-                    <span class="n">HashKeys</span><span class="o">.</span><span class="n">imagehash</span>
+                    <span class="n">HashKeys</span><span class="o">.</span><span class="n">hash</span><span class="p">,</span>
+                    <span class="n">HashKeys</span><span class="o">.</span><span class="n">minhash</span><span class="p">,</span>
+                    <span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">,</span>
+                    <span class="n">HashKeys</span><span class="o">.</span><span class="n">imagehash</span><span class="p">,</span>
+                    <span class="n">HashKeys</span><span class="o">.</span><span class="n">videohash</span><span class="p">,</span>
                 <span class="p">}</span>
                 <span class="n">feature_fields</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
                 <span class="n">removed_fields</span> <span class="o">=</span> <span class="n">extra_fields</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">feature_fields</span><span class="p">)</span>
