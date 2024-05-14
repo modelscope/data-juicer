@@ -480,7 +480,9 @@ process:
       ignore_pattern: null                                    # whether to ignore sub-strings with specific pattern when computing simhash.
   - image_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of images between documents.
       method: phash                                           # hash method for image. One of [phash, dhash, whash, ahash]
+      consider_text: false                                    # whether to consider text hash together with image hash when applying deduplication.
   - video_deduplicator:                                     # deduplicator to deduplicate samples at document-level using exact matching of videos between documents.
+      consider_text: false                                    # whether to consider text hash together with video hash when applying deduplication.
   - ray_video_deduplicator:                                 # the simple video deduplicator that can run on multi-nodes using md5 hashing exact matching method
       redis_host: 'redis_host'                              # the host of the redis instance
       redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
