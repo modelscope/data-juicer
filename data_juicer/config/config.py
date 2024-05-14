@@ -302,6 +302,19 @@ def init_configs(args=None):
         help='List of several operators with their arguments, these ops will '
         'be applied to dataset in order')
     parser.add_argument(
+        '--percentiles',
+        type=List[float],
+        default=[],
+        help='Percentiles to analyse the dataset distribution. Only used in '
+        'Analysis.')
+    parser.add_argument(
+        '--export_original_dataset',
+        type=bool,
+        default=False,
+        help='whether to export the original dataset with stats. If you only '
+        'need the stats of the dataset, setting it to false could speed '
+        'up the exporting..')
+    parser.add_argument(
         '--save_stats_in_one_file',
         type=bool,
         default=False,
