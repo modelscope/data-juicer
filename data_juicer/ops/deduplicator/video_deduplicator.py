@@ -36,6 +36,9 @@ class VideoDeduplicator(Deduplicator):
             self.text_dedup_op = DocumentDeduplicator(**kwargs)
 
     def compute_hash(self, sample, context=False):
+        # get hash of text first
+        if self.consider_text:
+            sample = self.text_dedup_op.compute_hash(sample)
         # check if it's computed already
         if HashKeys.videohash in sample:
             return sample
@@ -59,8 +62,6 @@ class VideoDeduplicator(Deduplicator):
                     md5_hash.update(bytes(packet))
 
         sample[HashKeys.videohash] = md5_hash.hexdigest()
-        if self.consider_text:
-            sample = self.text_dedup_op.compute_hash(sample)
         return sample
 
     def process(self, dataset, show_num=0):
