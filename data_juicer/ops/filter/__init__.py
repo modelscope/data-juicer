@@ -17,7 +17,8 @@ from . import (alphanumeric_filter, audio_duration_filter,
                video_frames_text_similarity_filter, video_motion_score_filter,
                video_nsfw_filter, video_ocr_area_ratio_filter,
                video_resolution_filter, video_tagging_from_frames_filter,
-               video_watermark_filter, word_num_filter, word_repetition_filter)
+               video_watermark_filter, word_num_filter, word_repetition_filter,
+               video_face_ratio_filter)
 from .alphanumeric_filter import AlphanumericFilter
 from .audio_duration_filter import AudioDurationFilter
 from .audio_nmf_snr_filter import AudioNMFSNRFilter
