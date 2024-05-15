@@ -59,10 +59,10 @@ class VideoFaceRatioFilter(Filter):
         for video_key in loaded_video_keys:
             container = av.open(video_key)
 
-            # 获取视频流信息
+            # getting video stream
             video_stream = next(s for s in container.streams if s.type == 'video')
 
-            # 遍历视频帧，检测人脸
+            # iterate over the video frame and detect faces
             total_frames = 0
             frames_with_face = 0
 
@@ -75,7 +75,7 @@ class VideoFaceRatioFilter(Filter):
                     if faces:
                         frames_with_face += 1
             
-            # 计算人脸帧数占比
+            # calculate the proportion of the number of face frames
             if total_frames > 0:
                 face_ratio = frames_with_face / total_frames
             else:
