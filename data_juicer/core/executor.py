@@ -1,6 +1,8 @@
+import math
 import os
 from time import time
 
+from datasets import load_dataset
 from loguru import logger
 
 from data_juicer import use_cuda
@@ -12,7 +14,8 @@ from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
                              load_ops)
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.file_utils import add_suffix_to_filename
 from data_juicer.utils.process_utils import calculate_np
 
 from ..ops.selector.frequency_specified_field_selector import \
@@ -92,6 +95,116 @@ class Executor:
                 logger.info('Trace for all ops.')
                 self.op_list_to_trace = set(OPERATORS.modules.keys())
 
+    def export_dataset(self, exporter, dataset):
+        """
+            export the dataset
+        """
+        logger.info('Exporting dataset to disk...')
+        try:
+            exporter.export(dataset)
+        except:  # noqa: E722
+            logger.error('An error occurred during exporting the processed '
+                         'dataset.')
+            import traceback
+            traceback.print_exc()
+            if self.cfg.use_checkpoint:
+                logger.info('Writing checkpoint of dataset processed by '
+                            'last op...')
+                dataset.cleanup_cache_files()
+                self.ckpt_manager.save_ckpt(dataset)
+        # compress the last dataset after exporting
+        if self.cfg.use_cache and self.cfg.cache_compress:
+            from data_juicer.utils.compress import compress
+            compress(dataset)
+
+    def divide_by_percentiles(self,
+                              load_data_np=None,
+                              analyser_results=None,
+                              **kwargs):
+        """
+        Running the dataset process pipeline.
+
+        :param load_data_np: number of workers when loading the dataset.
+        :param analyser_results: the overall analysis results from analyser
+        :return: processed dataset.
+        """
+        # 1. load dataset with stats
+        dataset = load_dataset('json',
+                               data_files=self.cfg.export_path)['train']
+
+        # 2. get the first stats key which has the mean val as the dimension
+        #    for partitioning
+        op_name_to_stats_key = StatsKeys.get_access_log(dj_cfg=self.cfg)
+        mean_series = analyser_results[analyser_results.index == 'mean']
+        stats_key_to_mean = mean_series.iloc[0, :].to_dict()
+        stats_key_for_partition = None
+        for process in self.cfg.process:
+            op_name, args = list(process.items())[0]
+            if op_name not in op_name_to_stats_key:
+                # skip the op such as `clean_email_mapper`
+                continue
+            for stats_key in op_name_to_stats_key[op_name]:
+                if stats_key in stats_key_to_mean and not math.isnan(
+                        stats_key_to_mean[stats_key]):
+                    stats_key_for_partition = stats_key
+                    break
+
+        # 3. get all the partition points in analyser_results
+        def convert_string_to_float(s):
+            new_s = s.replace(',', '').replace('%', '').replace('$', '')
+            try:
+                value = float(new_s)
+                return value / 100 if '%' in s else value
+            except ValueError:
+                return None
+
+        all_partition_points = {}
+        for index, val in analyser_results[stats_key_for_partition].items():
+            index_float = convert_string_to_float(index)
+            if index_float is not None:
+                all_partition_points[index_float] = val
+
+        # 4. shift the partition_points according percentiles
+        partition_vals = []
+        for percentile in self.cfg.percentiles:
+            all_percentiles = list(all_partition_points.keys())
+            closest_percentile = min(all_percentiles,
+                                     key=lambda p: abs(p - percentile))
+            partition_vals.append(all_partition_points[closest_percentile])
+        partition_vals.sort()
+
+        # 5. partision dataset
+        # TODO: reduce following as a selector op
+        left_dataset = dataset
+        partitions = []
+        for partition_val in partition_vals:
+            print(dataset[0])
+            select_index = [
+                i for i in range(len(left_dataset)) if left_dataset[i][
+                    Fields.stats][stats_key_for_partition] < partition_val
+            ]
+            left_index = [
+                i for i in range(len(left_dataset)) if left_dataset[i][
+                    Fields.stats][stats_key_for_partition] >= partition_val
+            ]
+            partitions.append(left_dataset.select(select_index))
+            left_dataset = left_dataset.select(left_index)
+        partitions.append(left_dataset)
+
+        # 6. data export
+        logger.info('Exporting partition dataset to disk...')
+        for i, dataset in enumerate(partitions):
+            exporter = Exporter(
+                add_suffix_to_filename(self.cfg.export_path, f'_part{i}'),
+                self.cfg.export_shard_size,
+                self.cfg.export_in_parallel,
+                self.cfg.np,
+                keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
+                keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds)
+            self.export_dataset(exporter, dataset)
+
+        return left_dataset
+
     def sample_data(self,
                     dataset_to_sample: Dataset = None,
                     load_data_np=None,
@@ -128,17 +241,21 @@ class Executor:
 
         # Perform sampling based on the specified algorithm
         if sample_algo == 'uniform':
-            return MixtureFormatter.random_sample(dataset, sample_ratio)
+            dataset = MixtureFormatter.random_sample(dataset, sample_ratio)
         elif sample_algo == 'frequency_specified_field_selector':
             dj_op = FrequencySpecifiedFieldSelector(**kwargs)
-            return dj_op.process(dataset)
+            dataset = dj_op.process(dataset)
         elif sample_algo == 'topk_specified_field_selector':
             dj_op = TopkSpecifiedFieldSelector(**kwargs)
-            return dj_op.process(dataset)
+            dataset = dj_op.process(dataset)
         else:
             raise ValueError(f'Unsupported sample_algo: {sample_algo}')
 
-    def run(self, load_data_np=None):
+        self.export_dataset(self.exporter, dataset)
+
+        return dataset
+
+    def run(self, load_data_np=None, **kwargs):
         """
         Running the dataset process pipeline.
 
@@ -259,21 +376,5 @@ class Executor:
         logger.info(f'All Ops are done in {"%.3f" % (tend - tstart)}(s).')
 
         # 4. data export
-        logger.info('Exporting dataset to disk...')
-        try:
-            self.exporter.export(dataset)
-        except:  # noqa: E722
-            logger.error('An error occurred during exporting the processed '
-                         'dataset.')
-            import traceback
-            traceback.print_exc()
-            if self.cfg.use_checkpoint:
-                logger.info('Writing checkpoint of dataset processed by '
-                            'last op...')
-                dataset.cleanup_cache_files()
-                self.ckpt_manager.save_ckpt(dataset)
-        # compress the last dataset after exporting
-        if self.cfg.use_cache and self.cfg.cache_compress:
-            from data_juicer.utils.compress import compress
-            compress(dataset)
+        self.export_dataset(self.exporter, dataset)
         return dataset

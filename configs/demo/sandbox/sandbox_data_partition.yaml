@@ -5,11 +5,11 @@ project_name: 'demo-sandbox'
 dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
 np: 4  # number of subprocess to process your dataset
 
-export_path: './outputs/demo-sandbox/demo-sandbox.jsonl'
+export_path: './outputs/demo-sandbox-data-partition/demo-sandbox.jsonl'
 
 # only for data analysis
 # percentiles to analyse the dataset distribution
-percentiles: [0.25, 0.5, 0.75]
+percentiles: [0.333, 0.666]
 # whether to export the original dataset with stats. If you only need the stats of the dataset, setting it to false could speed up the exporting.
 export_original_dataset: true
 # whether to store all stats result into one file
@@ -17,17 +17,7 @@ save_stats_in_one_file: true
 
 # sandbox configs
 # choose one data process for sandbox. Should be one of ["data_juicer_run", "data_sample", "divide_by_percentiles"]. The "data_juicer_run" for running setting ops in process, "data_sample" for data sampling, "divide_by_percentiles" for data partitioning.
-data_process_type: 'data_juicer_run'
-# for refining recipe using k-sigma rules
-path_k_sigma_recipe: './outputs/demo-sandbox/k_sigma_new_recipe.yaml'
-
-# for gpt3 quality classifier as data evaluator
-data_eval_config: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
-#data_eval_config:
-#  type: dj_text_quality_classifier
-
-# for gpt3 model training
-model_train_config: 'configs/demo/sandbox/gpt3_extra_train_config.json'
+data_process_type: 'divide_by_percentiles'
 
 # process schedule
 # a list of several process operators with their arguments
