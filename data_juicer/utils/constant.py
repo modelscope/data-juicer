@@ -152,6 +152,7 @@ class StatsKeysConstant(object):
     video_motion_score = 'video_motion_score'
     video_nsfw_score = 'video_nsfw_score'
     video_watermark_prob = 'video_watermark_prob'
+    video_face_exist = 'video_face_exist'
 
     # multimodal
     # image-text
