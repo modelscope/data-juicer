@@ -62,6 +62,13 @@ def init_configs(args=None):
         'data partitioning.',
         required=False)
     parser.add_argument(
+        '--fix_data_num',
+        type=int,
+        help='fix data num in each partition by uniform sample when the '
+        'data_process_type is "divide_by_percentiles", keep the origin '
+        'data num if it is null',
+        required=False)
+    parser.add_argument(
         '--model_infer_config',
         type=Union[str, dict],
         help='Path or a dict to model inference configuration file when '

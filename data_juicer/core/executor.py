@@ -194,6 +194,9 @@ class Executor:
         # 6. data export
         logger.info('Exporting partition dataset to disk...')
         for i, dataset in enumerate(partitions):
+            # fix the data num for each partition if necessary
+            if self.cfg.fix_data_num is not None:
+                dataset = MixtureFormatter.random_sample(dataset, sample_number=self.cfg.fix_data_num)
             exporter = Exporter(
                 add_suffix_to_filename(self.cfg.export_path, f'_part{i}'),
                 self.cfg.export_shard_size,
