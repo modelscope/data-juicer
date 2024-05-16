@@ -13,6 +13,7 @@ from data_juicer.core import Analyser
 from data_juicer.core import Executor as DjExecutor
 from data_juicer.core.sandbox.factories import (data_evaluator_factory,
                                                 data_generate_executor_factory,
+                                                data_processor_factory,
                                                 mode_infer_executor_factory,
                                                 model_evaluator_factory,
                                                 model_train_executor_factory)
@@ -160,10 +161,14 @@ class SandBoxExecutor:
             (data_eval_cfg, 'data_eval'),
             (model_eval_cfg, 'model_eval'),
         ])
-
         self.data_executor = DjExecutor(self.dj_cfg)
+        self.data_processor = data_processor_factory(
+            self.data_executor, self.dj_cfg.data_process_type)
         self.model_infer_executor = mode_infer_executor_factory(
             model_infer_cfg)
+        if self.model_infer_executor is not None:
+            self.data_sampler = data_processor_factory(self.data_executor,
+                                                       'data_sample')
         self.model_trainer = model_train_executor_factory(model_train_cfg,
                                                           watcher=self.watcher)
         self.data_generator = data_generate_executor_factory(
@@ -199,7 +204,7 @@ class SandBoxExecutor:
         # original data, such that we know what is the "hard" data for
         # the model and how to process the data accordingly
         if self.model_infer_executor is not None:
-            sampled_data = self.data_executor.sample_data(
+            sampled_data = self.data_sampler(
                 sample_ratio=self.dj_cfg.data_probe_ratio,
                 sample_algo=self.dj_cfg.data_probe_algo,
             )
@@ -229,7 +234,8 @@ class SandBoxExecutor:
     def hook_process_data(self, args: dict, **kwargs):
         # basic routine to process data, users can customize this freely
         logger.info('Begin to process the data with given dj recipe')
-        self.data_executor.run()
+        self.data_processor(
+            analyser_results=self.watcher.query(args['res_name']))
         # update the input dataset path to the processed dataset path
         processed_ds_path = self.dj_cfg.export_path
         new_analyzed_ds = add_suffix_to_filename(processed_ds_path,
@@ -303,7 +309,9 @@ class SandBoxExecutor:
         self.refine_recipe_jobs.append(
             (self.hook_refine_recipe_via_model_feedback, None))
 
-        self.execution_jobs.append((self.hook_process_data, None))
+        self.execution_jobs.append((self.hook_process_data, {
+            'res_name': 'analysis_ori_data'
+        }))
         self.execution_jobs.append((self.hook_train_model, None))
         self.execution_jobs.append((self.hook_generate_data, None))
 

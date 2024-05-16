@@ -93,3 +93,22 @@ class DataGenerateExecutorFactory(object):
 
 
 data_generate_executor_factory = DataGenerateExecutorFactory()
+
+
+class DataProcessorFactory(object):
+
+    def __call__(self, dj_executor, process_type: str = None, *args, **kwargs):
+        if process_type is None:
+            return None
+
+        if process_type == 'data_juicer_run':
+            return dj_executor.run
+        elif process_type == 'data_sample':
+            return dj_executor.sample_data
+        elif process_type == 'divide_by_percentiles':
+            return dj_executor.divide_by_percentiles
+
+        # add more data processor here freely
+
+
+data_processor_factory = DataProcessorFactory()

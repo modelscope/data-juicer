@@ -32,10 +32,12 @@ class ImageDeduplicatorTest(DataJuicerTestCaseBase):
         os.symlink(img6_path, img7_path)
 
     def _run_image_deduplicator(self, dataset: Dataset, target_list, op):
+        key_list = [op.image_key, op.text_key] \
+            if op.consider_text else [op.image_key]
 
         dataset = dataset.map(op.compute_hash)
         dataset, _ = op.process(dataset)
-        dataset = dataset.select_columns(column_names=[op.image_key])
+        dataset = dataset.select_columns(column_names=key_list)
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
 
@@ -101,6 +103,50 @@ class ImageDeduplicatorTest(DataJuicerTestCaseBase):
         op = ImageDeduplicator()
         self._run_image_deduplicator(dataset, tgt_list, op)
 
+    def test_3_consider_text(self):
+
+        ds_list = [{
+            'images': [self.img1_path],
+            'text': '<video> text1'
+        }, {
+            'images': [self.img2_path],
+            'text': '<video> text2'
+        }, {
+            'images': [self.img3_path],
+            'text': '<video> text3'
+        }, {
+            'images': [self.img4_path],
+            'text': '<video> text1'
+        }, {
+            'images': [self.img5_path],
+            'text': '<video> text5'
+        }, {
+            'images': [self.img6_path],
+            'text': '<video> text3'
+        }, {
+            'images': [self.img7_path],
+            'text': '<video> text7'
+        }]
+        tgt_list = [{
+            'images': [self.img1_path],
+            'text': '<video> text1'
+        }, {
+            'images': [self.img2_path],
+            'text': '<video> text2'
+        }, {
+            'images': [self.img3_path],
+            'text': '<video> text3'
+        }, {
+            'images': [self.img5_path],
+            'text': '<video> text5'
+        }, {
+            'images': [self.img7_path],
+            'text': '<video> text7'
+        }]
+        dataset = Dataset.from_list(ds_list)
+        op = ImageDeduplicator(consider_text=True)
+        self._run_image_deduplicator(dataset, tgt_list, op)
+
     def test_4(self):
 
         ds_list = [{
@@ -119,6 +165,35 @@ class ImageDeduplicatorTest(DataJuicerTestCaseBase):
         }]
         dataset = Dataset.from_list(ds_list)
         op = ImageDeduplicator()
+        self._run_image_deduplicator(dataset, tgt_list, op)
+
+    def test_4_consider_text(self):
+
+        ds_list = [{
+            'images': [self.img1_path, self.img2_path, self.img3_path],
+            'text': '<image> text1 <image> text2 <image> text3',
+        }, {
+            'images': [self.img4_path, self.img5_path, self.img6_path],
+            'text': '<image> text1 <image> text5 <image> text3',
+        }, {
+            'images': [self.img7_path],
+            'text': '<image> text6',
+        }, {
+            'images': [self.img6_path],
+            'text': '<image> text6',
+        }]
+        tgt_list = [{
+            'images': [self.img1_path, self.img2_path, self.img3_path],
+            'text': '<image> text1 <image> text2 <image> text3',
+        }, {
+            'images': [self.img4_path, self.img5_path, self.img6_path],
+            'text': '<image> text1 <image> text5 <image> text3',
+        }, {
+            'images': [self.img7_path],
+            'text': '<image> text6',
+        }]
+        dataset = Dataset.from_list(ds_list)
+        op = ImageDeduplicator(consider_text=True)
         self._run_image_deduplicator(dataset, tgt_list, op)
 
     def test_5(self):

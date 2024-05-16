@@ -53,6 +53,15 @@ def init_configs(args=None):
         help='Path to save a configuration file refined by model feedback.',
         required=False)
     parser.add_argument(
+        '--data_process_type',
+        type=Union[str, dict],
+        help='Choose one data process for sandbox. Should be one of '
+        '["data_juicer_run", "data_sample", "divide_by_percentiles"]. '
+        'The "data_juicer_run" for running setting ops in process, '
+        '"data_sample" for data sampling, "divide_by_percentiles" for '
+        'data partitioning.',
+        required=False)
+    parser.add_argument(
         '--model_infer_config',
         type=Union[str, dict],
         help='Path or a dict to model inference configuration file when '
@@ -312,6 +321,19 @@ def init_configs(args=None):
         type=List[Dict],
         help='List of several operators with their arguments, these ops will '
         'be applied to dataset in order')
+    parser.add_argument(
+        '--percentiles',
+        type=List[float],
+        default=[],
+        help='Percentiles to analyse the dataset distribution. Only used in '
+        'Analysis.')
+    parser.add_argument(
+        '--export_original_dataset',
+        type=bool,
+        default=False,
+        help='whether to export the original dataset with stats. If you only '
+        'need the stats of the dataset, setting it to false could speed '
+        'up the exporting..')
     parser.add_argument(
         '--save_stats_in_one_file',
         type=bool,
