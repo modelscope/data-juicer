@@ -178,15 +178,17 @@ class Executor:
         # TODO: reduce following as a selector op
         partitions = []
         stats_vals = [
-                np.asarray(dataset[i][Fields.stats][stats_key_for_partition]).mean() for i in range(len(dataset))
-            ]
+            np.asarray(
+                dataset[i][Fields.stats][stats_key_for_partition]).mean()
+            for i in range(len(dataset))
+        ]
         sort_index = np.argsort(np.array(stats_vals))
         each_num = len(stats_vals) // (len(partition_vals) + 1)
         base = 0
         for _ in partition_vals:
-            partitions.append(dataset.select(sort_index[base : base+each_num]))
-            base = base+each_num
-        partitions.append(dataset.select(sort_index[base : ]))
+            partitions.append(dataset.select(sort_index[base:base + each_num]))
+            base = base + each_num
+        partitions.append(dataset.select(sort_index[base:]))
 
         # 6. data export
         logger.info('Exporting partition dataset to disk...')
@@ -210,7 +212,7 @@ class Executor:
                 keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds)
             self.export_dataset(exporter, dataset)
 
-        return left_dataset
+        return dataset
 
     def sample_data(self,
                     dataset_to_sample: Dataset = None,
