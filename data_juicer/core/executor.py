@@ -201,6 +201,9 @@ class Executor:
         for i, dataset in enumerate(partitions):
             # fix the data num for each partition if necessary
             if self.cfg.fix_data_num is not None:
+                if len(dataset) < self.cfg.fix_data_num:
+                    logger.warning(f'dataset size {len(dataset)}'
+                                   f' < fix num {self.cfg.fix_data_num}')
                 dataset = MixtureFormatter.random_sample(
                     dataset, sample_number=self.cfg.fix_data_num)
                 suffix = f'_part{i}_num{self.cfg.fix_data_num}'
