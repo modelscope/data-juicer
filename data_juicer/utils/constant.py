@@ -19,6 +19,9 @@ class Fields(object):
     video_frame_tags = DEFAULT_PREFIX + 'video_frame_tags__'
     video_audio_tags = DEFAULT_PREFIX + 'video_audio_tags__'
 
+    # the name of the original file from which this sample was derived.
+    source_file = DEFAULT_PREFIX + 'source_file__'
+
     # the name of diretory to store the produced multimodal data
     multimodal_data_output_dir = DEFAULT_PREFIX + 'produced_data__'
 

@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.logger_utils import HiddenPrints
 
@@ -50,8 +51,12 @@ class AudioFFmpegWrappedMapper(Mapper):
     def process(self, sample):
         # there is no audio in this sample
         if self.audio_key not in sample or not sample[self.audio_key]:
+            sample[Fields.source_file] = []
             return sample
 
+        if Fields.source_file not in sample or not sample[Fields.source_file]:
+            sample[Fields.source_file] = sample[self.audio_key]
+            
         if self.filter_name is None:
             return sample
 
@@ -70,6 +75,12 @@ class AudioFFmpegWrappedMapper(Mapper):
             stream.run(capture_stderr=self.capture_stderr,
                        overwrite_output=self.overwrite_output)
             processed[audio_key] = output_key
+
+        # when the file is modified, its source file needs to be updated.
+        for i, value in enumerate(loaded_audio_keys):
+            if sample[Fields.source_file][i] != value:
+                if processed[value] != value:
+                    sample[Fields.source_file][i] = value
 
         sample[self.audio_key] = [processed[key] for key in loaded_audio_keys]
         return sample
