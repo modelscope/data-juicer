@@ -176,25 +176,17 @@ class Executor:
 
         # 5. partision dataset
         # TODO: reduce following as a selector op
-        left_dataset = dataset
         partitions = []
-        for partition_val in partition_vals:
-            stats_vals = [
-                np.asarray(left_dataset[i][Fields.stats]
-                           [stats_key_for_partition]).mean()
-                for i in range(len(left_dataset))
+        stats_vals = [
+                np.asarray(dataset[i][Fields.stats][stats_key_for_partition]).mean() for i in range(len(dataset))
             ]
-            select_index = [
-                i for i in range(len(left_dataset))
-                if stats_vals[i] < partition_val
-            ]
-            left_index = [
-                i for i in range(len(left_dataset))
-                if stats_vals[i] >= partition_val
-            ]
-            partitions.append(left_dataset.select(select_index))
-            left_dataset = left_dataset.select(left_index)
-        partitions.append(left_dataset)
+        sort_index = np.argsort(np.array(stats_vals))
+        each_num = len(stats_vals) // (len(partition_vals) + 1)
+        base = 0
+        for _ in partition_vals:
+            partitions.append(dataset.select(sort_index[base : base+each_num]))
+            base = base+each_num
+        partitions.append(dataset.select(sort_index[base : ]))
 
         # 6. data export
         logger.info('Exporting partition dataset to disk...')
