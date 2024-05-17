@@ -2,6 +2,10 @@ type: easyanimate
 model_name: "easyanimate"
 trainer_name: "easyanimate-lora-trainer"
 train:
+  tracker_config:
+    # config for wandb
+    project_name: "demo-sandbox"
+    experiment_name: 'demo-experiment-1_model-train'
   model_path:
     # path to the pixart model or the hugging face model
     pretrained_model_name_or_path: "PixArt-alpha/PixArt-XL-2-512x512"
@@ -10,17 +14,17 @@ train:
     # https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/dj-competition/modelscope_sora/models/easyanimate_mm_16x512x512_pretrain.safetensors
     transformer_path: "/path/to/easyanimate_mm_16x256x256_pretrain.safetensors"
   dataset_path:
-    # The root diretory to videos. If it is not none, the paths in jsonl file at dataset_meta_name are relative paths on it, else are absolute path.
-    dataset_name: "/path/to/data_juicer/produced/videos"
+    # The root diretory to videos. Set empty if it is the absolute path in the dataset.
+    dataset_name: ""
     # path to the Data-Juicer dataset
-    dataset_meta_name: "/path/to/data_juicer/produced/dataset.jsonl"
+    dataset_meta_name: "../../outputs/demo-sandbox-data-partition/demo-sandbox-videos_part0_num8.jsonl"
   training_config:
     # image size, must match the pretrained easyanimate checkpoint.
     sample_size: 256
     mixed_precision: "bf16"
-    batch_size_per_gpu: 1
+    batch_size_per_gpu: 8
     gradient_accumulation_steps: 1
     num_train_epochs: 1
     dataloader_num_workers: 8
   saving_config:
-    output_dir: "/path/to/lora_model/output/dir"
+    output_dir: "../../outputs/demo-sandbox-data-partition/models"

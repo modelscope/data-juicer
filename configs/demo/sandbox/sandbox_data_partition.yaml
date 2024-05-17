@@ -2,10 +2,11 @@
 
 # global parameters
 project_name: 'demo-sandbox'
-dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
+experiment_name: 'demo-experiment-2'
+dataset_path: './demos/data/demo-dataset-videos.jsonl'  # path to your dataset directory or file
 np: 4  # number of subprocess to process your dataset
 
-export_path: './outputs/demo-sandbox-data-partition/demo-sandbox.jsonl'
+export_path: './outputs/demo-sandbox-data-partition/demo-sandbox-videos.jsonl'
 
 # only for data analysis
 # percentiles to analyse the dataset distribution
@@ -19,7 +20,16 @@ save_stats_in_one_file: true
 # choose one data process for sandbox. Should be one of ["data_juicer_run", "data_sample", "divide_by_percentiles"]. The "data_juicer_run" for running setting ops in process, "data_sample" for data sampling, "divide_by_percentiles" for data partitioning.
 data_process_type: 'divide_by_percentiles'
 # fix data num for each partition
-fix_data_num: 4
+fix_data_num: 8
+
+# model train configs
+model_train_config: 'configs/demo/sandbox/easyanimate_training_config.yaml'
+
+# model generate configs
+data_generate_config: 'configs/demo/sandbox/easyanimate_generate_config.yaml'
+
+# evaluation configs
+data_eval_config: 'configs/demo/sandbox/vbench_eval_config.yaml'
 
 # process schedule
 # a list of several process operators with their arguments

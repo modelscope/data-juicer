@@ -238,7 +238,9 @@ class EasyAnimateTrainExecutor(BaseModelExecutor):
             config.training_config.gradient_accumulation_steps,
             config.training_config.num_train_epochs,
             config.training_config.dataloader_num_workers,
-            config.saving_config.output_dir
+            config.saving_config.output_dir,
+            config.tracker_config.project_name,
+            config.tracker_config.experiment_name
         ]
         self.run_subprocess(self.script_path, run_args, self.working_dir)
 

@@ -2,6 +2,7 @@ import math
 import os
 from time import time
 
+import numpy as np
 from datasets import load_dataset
 from loguru import logger
 
@@ -178,14 +179,18 @@ class Executor:
         left_dataset = dataset
         partitions = []
         for partition_val in partition_vals:
-            print(dataset[0])
+            stats_vals = [
+                np.asarray(left_dataset[i][Fields.stats]
+                           [stats_key_for_partition]).mean()
+                for i in range(len(left_dataset))
+            ]
             select_index = [
-                i for i in range(len(left_dataset)) if left_dataset[i][
-                    Fields.stats][stats_key_for_partition] < partition_val
+                i for i in range(len(left_dataset))
+                if stats_vals[i] < partition_val
             ]
             left_index = [
-                i for i in range(len(left_dataset)) if left_dataset[i][
-                    Fields.stats][stats_key_for_partition] >= partition_val
+                i for i in range(len(left_dataset))
+                if stats_vals[i] >= partition_val
             ]
             partitions.append(left_dataset.select(select_index))
             left_dataset = left_dataset.select(left_index)
@@ -198,8 +203,11 @@ class Executor:
             if self.cfg.fix_data_num is not None:
                 dataset = MixtureFormatter.random_sample(
                     dataset, sample_number=self.cfg.fix_data_num)
+                suffix = f'_part{i}_num{self.cfg.fix_data_num}'
+            else:
+                suffix = f'_part{i}'
             exporter = Exporter(
-                add_suffix_to_filename(self.cfg.export_path, f'_part{i}'),
+                add_suffix_to_filename(self.cfg.export_path, suffix),
                 self.cfg.export_shard_size,
                 self.cfg.export_in_parallel,
                 self.cfg.np,

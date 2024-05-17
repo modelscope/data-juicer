@@ -458,6 +458,13 @@ def parse_args():
          " more information see https://huggingface.co/docs/accelerate/v0.17.0/en/package_reference/accelerator#accelerate.Accelerator"
          ),
     )
+    parser.add_argument(
+        "--tracker_experiment_name",
+        type=str,
+        default="experiment1",
+        help=
+        ("The name for wandb init"),
+    )
 
     parser.add_argument(
         "--rank",
@@ -559,6 +566,9 @@ def main():
             "You cannot use both --report_to=wandb and --hub_token due to a security risk of exposing your token."
             " Please use `huggingface-cli login` to authenticate with the Hub."
         )
+    
+    if args.report_to == "wandb":
+        wandb.init(project=args.tracker_project_name, name=args.tracker_experiment_name)
 
     if args.non_ema_revision is not None:
         deprecate(

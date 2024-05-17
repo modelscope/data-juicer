@@ -20,6 +20,10 @@ OUTPUT_DIR=${11}
 CHECKPOINTING_STEPS=5000
 VALIDATION_STEPS=500
 VALIDATION_PROMPTS="A soaring drone footage captures the majestic beauty of a coastal cliff, its red and yellow stratified rock faces rich in color and against the vibrant turquoise of the sea. Seabirds can be seen taking flight around the cliff\'s precipices. As the drone slowly moves from different angles, the changing sunlight casts shifting shadows that highlight the rugged textures of the cliff and the surrounding calm sea. The water gently laps at the rock base and the greenery that clings to the top of the cliff, and the scene gives a sense of peaceful isolation at the fringes of the ocean. The video captures the essence of pristine natural beauty untouched by human structures."
+
+# tracer config
+PROJECT_NAME=${12}
+EXPERIMENT_NAME=${13}
 ##########################################################
 
 
@@ -47,4 +51,6 @@ accelerate launch --mixed_precision=$MIXED_PRECISION train_lora.py \
   --adam_weight_decay=3e-2 \
   --adam_epsilon=1e-10 \
   --vae_mini_batch=1 \
-  --report_to="wandb"
+  --report_to="wandb" \
+  --tracker_project_name=$PROJECT_NAME \
+  --tracker_experiment_name=$EXPERIMENT_NAME
