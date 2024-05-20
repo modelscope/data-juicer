@@ -89,7 +89,7 @@ class VideoResizeResolutionMapper(Mapper):
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []
             return sample
-        
+
         if Fields.source_file not in sample or not sample[Fields.source_file]:
             sample[Fields.source_file] = sample[self.video_key]
 

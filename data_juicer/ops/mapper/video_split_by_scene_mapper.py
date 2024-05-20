@@ -4,8 +4,8 @@ from itertools import chain
 
 from jsonargparse.typing import NonNegativeFloat, NonNegativeInt
 
-from data_juicer.utils.constant import Fields
 from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
 from data_juicer.utils.mm_utils import SpecialTokens
@@ -142,7 +142,8 @@ class VideoSplitBySceneMapper(Mapper):
         # when the file is modified, its source file needs to be updated.
         sample[Fields.source_file] = []
         for value in loaded_video_keys:
-            sample[Fields.source_file].extend([value]*len(output_video_keys[value]))
+            sample[Fields.source_file].extend([value] *
+                                              len(output_video_keys[value]))
 
         sample[self.video_key] = list(
             chain.from_iterable(

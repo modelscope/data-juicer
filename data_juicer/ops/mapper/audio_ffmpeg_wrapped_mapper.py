@@ -56,7 +56,7 @@ class AudioFFmpegWrappedMapper(Mapper):
 
         if Fields.source_file not in sample or not sample[Fields.source_file]:
             sample[Fields.source_file] = sample[self.audio_key]
-            
+
         if self.filter_name is None:
             return sample
 

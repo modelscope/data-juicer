@@ -104,7 +104,8 @@ class VideoSplitByKeyFrameMapper(Mapper):
                     split_video_keys.extend(new_video_keys)
                     place_holders.append(SpecialTokens.video *
                                          len(new_video_keys))
-                    split_sample[Fields.source_file].extend([video_key]*len(new_video_keys))
+                    split_sample[Fields.source_file].extend(
+                        [video_key] * len(new_video_keys))
 
                 # insert the generated text according to given mode
                 replacer_function = create_replacer(place_holders)

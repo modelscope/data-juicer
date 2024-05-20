@@ -88,7 +88,7 @@ class VideoSplitByDurationMapper(Mapper):
                 self.video_key] is None or len(sample[self.video_key]) == 0:
             sample[Fields.source_file] = []
             return []
-        
+
         if Fields.source_file not in sample or not sample[Fields.source_file]:
             sample[Fields.source_file] = sample[self.video_key]
 
@@ -125,7 +125,8 @@ class VideoSplitByDurationMapper(Mapper):
                     split_video_keys.extend(new_video_keys)
                     place_holders.append(SpecialTokens.video *
                                          len(new_video_keys))
-                    split_sample[Fields.source_file].extend([video_key]*len(new_video_keys))
+                    split_sample[Fields.source_file].extend(
+                        [video_key] * len(new_video_keys))
 
                 # insert the generated text according to given mode
                 replacer_function = create_replacer(place_holders)
