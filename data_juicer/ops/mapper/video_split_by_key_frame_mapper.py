@@ -72,6 +72,9 @@ class VideoSplitByKeyFrameMapper(Mapper):
             sample[Fields.source_file] = []
             return []
 
+        if Fields.source_file not in sample or not sample[Fields.source_file]:
+            sample[Fields.source_file] = sample[self.video_key]
+            
         # the split results
         split_sample = copy.deepcopy(sample)
         split_sample[self.text_key] = ''
