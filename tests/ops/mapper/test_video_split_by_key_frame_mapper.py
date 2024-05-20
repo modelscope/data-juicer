@@ -65,7 +65,6 @@ class VideoSplitByKeyFrameMapperTest(DataJuicerTestCaseBase):
         dataset = NestedDataset.from_list(source_list)
         dataset = dataset.map(op.process, num_proc=num_proc)
         res_list = self._get_res_list(dataset, source_list)
-        print(dataset, res_list)
         self.assertEqual(res_list, target_list)
 
     def test(self):
