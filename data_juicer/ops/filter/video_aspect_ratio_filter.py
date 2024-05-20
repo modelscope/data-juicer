@@ -64,9 +64,7 @@ class VideoAspectRatioFilter(Filter):
         video_aspect_ratios = {}
         for key, video in videos.items():
             stream = video.streams.video[0]
-            video_aspect_ratios[key] = str(
-                Fraction(stream.codec_context.width,
-                         stream.codec_context.height))
+            video_aspect_ratios[key] = stream.codec_context.width / stream.codec_context.height
             if not context:
                 video.close()
 
