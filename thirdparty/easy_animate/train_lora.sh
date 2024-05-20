@@ -17,7 +17,7 @@ DATALOADER_NUM_WORKERS=${10}
 
 # saving config
 OUTPUT_DIR=${11}
-CHECKPOINTING_STEPS=5000
+CHECKPOINTING_STEPS=1000
 VALIDATION_STEPS=500
 VALIDATION_PROMPTS="A soaring drone footage captures the majestic beauty of a coastal cliff, its red and yellow stratified rock faces rich in color and against the vibrant turquoise of the sea. Seabirds can be seen taking flight around the cliff\'s precipices. As the drone slowly moves from different angles, the changing sunlight casts shifting shadows that highlight the rugged textures of the cliff and the surrounding calm sea. The water gently laps at the rock base and the greenery that clings to the top of the cliff, and the scene gives a sense of peaceful isolation at the fringes of the ocean. The video captures the essence of pristine natural beauty untouched by human structures."
 
