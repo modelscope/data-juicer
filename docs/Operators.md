@@ -138,7 +138,7 @@ All the specific operators are listed below, each featured with several capabili
 | video_resolution_filter        | Video      | -      | Keeps samples containing videos with horizontal and vertical resolutions within the specified range                                                 |
 | video_watermark_filter         | Video      | -      | Keeps samples containing videos with predicted watermark probabilities below the threshold                                                               |
 | video_tagging_from_frames_filter  | Video   | -      | Keep samples containing videos with given tags |
-| word_num_filter                | General    | en, zh | Keeps samples with word count within the specified range                                                                                            |
+| words_num_filter               | General    | en, zh | Keeps samples with word count within the specified range                                                                                            |
 | word_repetition_filter         | General    | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range                                                                    |
 
 
