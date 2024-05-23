@@ -144,7 +144,7 @@ class VideoNSFWFilter(Filter):
             cur_scores = torch.Tensor(cur_scores)
 
             if self.reduce_mode == 'avg':
-                cur_score = cur_scores.mean() 
+                cur_score = cur_scores.mean()
             elif self.reduce_mode == 'max':
                 cur_score = cur_scores.max()
             else:

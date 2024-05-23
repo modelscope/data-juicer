@@ -77,7 +77,9 @@ class ImageNSFWFilter(Filter):
         inputs = processor(images=images, return_tensors='pt').to(model.device)
         outputs = model(**inputs)
         logits = outputs.logits
-        nsfw_scores = [float(scores[1]) for scores in torch.softmax(logits, dim=-1)]
+        nsfw_scores = [
+            float(scores[1]) for scores in torch.softmax(logits, dim=-1)
+        ]
 
         sample[Fields.stats][StatsKeys.image_nsfw_score] = nsfw_scores
 
