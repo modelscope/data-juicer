@@ -81,7 +81,9 @@ class ImageWatermarkFilter(Filter):
         inputs = processor(images=images, return_tensors='pt').to(model.device)
         outputs = model(**inputs)
         logits = outputs.logits
-        watermark_probs = [probs[1] for probs in torch.softmax(logits, dim=-1)]
+        watermark_probs = [
+            float(probs[1]) for probs in torch.softmax(logits, dim=-1)
+        ]
 
         sample[Fields.stats][StatsKeys.image_watermark_prob] = watermark_probs
 
