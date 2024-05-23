@@ -1,5 +1,6 @@
+from typing import List, Union
+
 import regex as re
-from typing import Union, List
 
 from ..base_op import OPERATORS, Mapper
 
@@ -10,12 +11,16 @@ class ReplaceContentMapper(Mapper):
     a specific regular expression pattern with a designated
     replacement string."""
 
-    def __init__(self, pattern: Union[str, List[str]] = None, repl: Union[str, List[str]] = '', *args, **kwargs):
+    def __init__(self,
+                 pattern: Union[str, List[str]] = None,
+                 repl: Union[str, List[str]] = '',
+                 *args,
+                 **kwargs):
         """
         Initialization method.
 
-        :param pattern: regular expression pattern(s) to search for within text.
-        :param repl: replacement string(s), default is empty string.
+        :param pattern: regular expression pattern(s) to search for within text
+        :param repl: replacement string(s), default is empty string
         :param args: extra args
         :param kwargs: extra args
         """
