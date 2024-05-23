@@ -19,7 +19,7 @@ with AvailabilityChecking(['sentencepiece'], OP_NAME):
 
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
-class WordNumFilter(Filter):
+class WordsNumFilter(Filter):
     """Filter to keep samples with total words number within a specific
     range."""
 

@@ -289,7 +289,7 @@ the corresponding documents, including the following docs:
 ### (Optional) Make your OP fusible
 
 - If the calculation process of some intermediate variables in the new OP is reused in other existing OPs, this new OP can be
-added to the fusible OPs to accelerate the whole data processing with OP fusion technology. (e.g. both the `word_num_filter`
+added to the fusible OPs to accelerate the whole data processing with OP fusion technology. (e.g. both the `words_num_filter`
 and `word_repetition_filter` need to split the input text into words)
 - When opening OP fusion, these reused calculation processes and intermediate variables can be shared in the `context` between
 OPs, thus reducing repeated calculations.
@@ -332,7 +332,7 @@ to this intermediate variable, indicating that the intermediate variable may be 
 ...
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)  # register this new OP into the registry group
-class WordNumFilter(Filter):
+class WordsNumFilter(Filter):
 ...
 ```
 
