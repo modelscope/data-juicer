@@ -39,7 +39,7 @@ some OPs work well on some datasets but might be useless on others.
 | `perplexity_filter`           | [LCS-558K](#llava-15-pretrain-dataset), [Books](#books), [ArXiv](#arxiv)                                            |
 | `special_characters_filter`   | [Wikipedia](#wikipedia), [Books](#books)                                                                            |
 | `text_length_filter`          | [Wikipedia](#wikipedia), [ArXiv](#arxiv), [Github Code](#github-code)                                               |
-| `word_num_filter`             | [Stack Exchange](#stack-exchange)                                                                                   |
+| `words_num_filter`            | [Stack Exchange](#stack-exchange)                                                                                   |
 | `word_repetition_filter`      | [MMC4](#mmc4), [Wikipedia](#wikipedia)                                                                              |
 
 - Everyone from community is welcome to continue to add examples to this table.
@@ -298,7 +298,7 @@ The pretraining dataset of LLaVA-1.5
 
 | item      | value                                                            |
 |-----------|------------------------------------------------------------------|
-| from OP   | `word_num_filter`                                                |
+| from OP   | `words_num_filter`                                               |
 | num_words | 2                                                                |
 | text      | <details><summary>text</summary> <pre>Q: Append</pre> </details> |
 | comments  | Texts with too few words might be missing content                |
