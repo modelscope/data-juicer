@@ -6,8 +6,8 @@ from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (load_data_with_context, load_image,
-                                        pil_to_opencv)
+from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
+                                        load_image)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
@@ -95,17 +95,8 @@ class ImageFaceRatioFilter(Filter):
         # detect faces
         face_detections = {}
         for key, image in images.items():
-            img = pil_to_opencv(image)
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            dets = model.detectMultiScale(gray, **self.extra_kwargs)
-            rectified_dets = []
-            for (x, y, w, h) in dets:
-                x = max(x, 0)
-                y = max(y, 0)
-                w = min(w, image.width - x)
-                h = min(h, image.height - y)
-                rectified_dets.append([x, y, w, h])
-            face_detections[key] = rectified_dets
+            face_detections[key] = detect_faces(image, model,
+                                                **self.extra_kwargs)
         logger.debug(f'detections: {face_detections}')
 
         # compute face area ratios for each image considering the largest face

@@ -127,6 +127,22 @@ def pil_to_opencv(pil_image):
     return opencv_image
 
 
+def detect_faces(image, detector, **extra_kwargs):
+    import cv2
+
+    img = pil_to_opencv(image)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    dets = detector.detectMultiScale(gray, **extra_kwargs)
+    rectified_dets = []
+    for (x, y, w, h) in dets:
+        x = max(x, 0)
+        y = max(y, 0)
+        w = min(w, image.width - x)
+        h = min(h, image.height - y)
+        rectified_dets.append([x, y, w, h])
+    return rectified_dets
+
+
 def get_file_size(path):
     import os
     return os.path.getsize(path)
