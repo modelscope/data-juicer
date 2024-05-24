@@ -148,9 +148,8 @@
         <span class="n">video_aspect_ratios</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">videos</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">stream</span> <span class="o">=</span> <span class="n">video</span><span class="o">.</span><span class="n">streams</span><span class="o">.</span><span class="n">video</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">video_aspect_ratios</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
-                <span class="n">Fraction</span><span class="p">(</span><span class="n">stream</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">width</span><span class="p">,</span>
-                         <span class="n">stream</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">height</span><span class="p">))</span>
+            <span class="n">video_aspect_ratios</span><span class="p">[</span>
+                <span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">stream</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="n">stream</span><span class="o">.</span><span class="n">codec_context</span><span class="o">.</span><span class="n">height</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">:</span>
                 <span class="n">video</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
