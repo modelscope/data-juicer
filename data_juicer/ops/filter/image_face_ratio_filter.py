@@ -8,6 +8,7 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (load_data_with_context, load_image,
                                         pil_to_opencv)
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
@@ -16,14 +17,6 @@ OP_NAME = 'image_face_ratio_filter'
 
 with AvailabilityChecking(['opencv-python'], OP_NAME):
     import cv2
-
-OPENCV_DETECTOR = None
-
-
-def prepare_detector(cv_classifier):
-    global OPENCV_DETECTOR
-    if OPENCV_DETECTOR is None:
-        OPENCV_DETECTOR = cv2.CascadeClassifier(cv_classifier)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -65,8 +58,6 @@ class ImageFaceRatioFilter(Filter):
         if cv_classifier == '':
             cv_classifier = os.path.join(cv2.data.haarcascades,
                                          'haarcascade_frontalface_alt.xml')
-        self.cv_classifier = cv_classifier
-
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
 
@@ -79,7 +70,9 @@ class ImageFaceRatioFilter(Filter):
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
-        prepare_detector(self.cv_classifier)
+
+        self.model_key = prepare_model(model_type='opencv_classifier',
+                                       model_path=cv_classifier)
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
@@ -97,13 +90,14 @@ class ImageFaceRatioFilter(Filter):
         sample, images = load_data_with_context(sample, context,
                                                 loaded_image_keys, load_image)
 
+        model = get_model(self.model_key)
+
         # detect faces
-        prepare_detector(self.cv_classifier)
         face_detections = {}
         for key, image in images.items():
             img = pil_to_opencv(image)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            dets = OPENCV_DETECTOR.detectMultiScale(gray, **self.extra_kwargs)
+            dets = model.detectMultiScale(gray, **self.extra_kwargs)
             rectified_dets = []
             for (x, y, w, h) in dets:
                 x = max(x, 0)
