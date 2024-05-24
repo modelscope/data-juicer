@@ -49,6 +49,10 @@ class ReplaceContentMapper(Mapper):
         for i, pattern in enumerate(self.compiled_patterns):
             if isinstance(self.repl, list) and i < len(self.repl):
                 replacement = self.repl[i]
+            elif isinstance(self.repl, list) and i >= len(self.repl):
+                raise ValueError(f"pattern length: {len(self.pattern)} '"
+                                 f'must be equal to '
+                                 f'repl length: {len(self.repl)}')
             else:
                 replacement = self.repl
 
