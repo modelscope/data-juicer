@@ -71,6 +71,9 @@ class VideoFaceBlurMapperTest(DataJuicerTestCaseBase):
         self._run_helper(op, ds_list)
 
     def test_gaussian_radius_parallel(self):
+        import multiprocess as mp
+        mp.set_start_method('forkserver', force=True)
+    
         ds_list = [{
             'videos': [self.vid1_path]
         }, {
