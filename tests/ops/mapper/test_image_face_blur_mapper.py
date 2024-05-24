@@ -94,6 +94,9 @@ class ImageFaceBlurMapperTest(DataJuicerTestCaseBase):
         self._run_helper(op, ds_list)
 
     def test_gaussian_radius_parallel(self):
+        import multiprocess as mp
+        mp.set_start_method('forkserver', force=True)
+    
         ds_list = [{
             'images': [self.img1_path]
         }, {
