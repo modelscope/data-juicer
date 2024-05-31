@@ -238,7 +238,7 @@ class EasyAnimateTrainExecutor(BaseModelExecutor):
             config.training_config.gradient_accumulation_steps,
             config.training_config.num_train_epochs,
             config.training_config.dataloader_num_workers,
-            config.saving_config.output_dir,
+            config.training_config.seed, config.saving_config.output_dir,
             config.tracker_config.project_name,
             config.tracker_config.experiment_name
         ]
@@ -264,7 +264,7 @@ class EasyAnimateGenerateExecutor(BaseModelExecutor):
             config.infer_config.prompt_info_path, config.infer_config.gpu_num,
             config.infer_config.batch_size,
             config.infer_config.mixed_precision,
-            config.infer_config.video_num_per_prompt,
+            config.infer_config.video_num_per_prompt, config.infer_config.seed,
             config.saving_config.output_video_dir
         ]
         self.run_subprocess(self.script_path, run_args, self.working_dir)

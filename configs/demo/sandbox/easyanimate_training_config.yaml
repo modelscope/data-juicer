@@ -26,5 +26,6 @@ train:
     gradient_accumulation_steps: 1
     num_train_epochs: 1
     dataloader_num_workers: 8
+    seed: 42
   saving_config:
     output_dir: "../../outputs/demo-sandbox-data-partition/models"

@@ -14,9 +14,10 @@ GPU_NUM=$6
 BATCH_SIZE=$7
 MIXED_PRECISION=$8
 VIDEO_NUM_PER_PROMPT=$9
+SEED=${10}
 
 # saving config
-OUTPUT_VIDEO_DIR=${10}
+OUTPUT_VIDEO_DIR=${11}
 
 ##########################################################
 
@@ -38,7 +39,7 @@ for (( i = 0; i < GPU_NUM; i++ )); do
       --video_num_per_prompt=$VIDEO_NUM_PER_PROMPT \
       --mixed_precision=$MIXED_PRECISION \
       --save_path=$OUTPUT_VIDEO_DIR \
-      --seed=43
+      --seed=$SEED
 } &   
 done
 

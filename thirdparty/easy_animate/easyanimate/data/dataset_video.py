@@ -10,8 +10,10 @@ import torch
 import torchvision.transforms as transforms
 from decord import VideoReader
 from einops import rearrange
+from func_timeout import FunctionTimedOut, func_timeout
 from torch.utils.data.dataset import Dataset
 
+VIDEO_READER_TIMEOUT = 10
 
 def get_random_mask(shape):
     f, c, h, w = shape
@@ -56,6 +58,10 @@ def get_random_mask(shape):
     else:
         raise ValueError(f"The mask_index {mask_index} is not define")
     return mask
+
+
+def get_video_reader_batch(video_reader, batch_index):
+    return video_reader.get_batch(batch_index).asnumpy()
 
 
 class VideoDataset(Dataset):
@@ -121,14 +127,23 @@ class VideoDataset(Dataset):
                                   self.sample_n_frames,
                                   dtype=int)
 
+        try:
+            sample_args = (video_reader, batch_index)
+            pixel_values = func_timeout(
+                VIDEO_READER_TIMEOUT,
+                get_video_reader_batch,
+                args=sample_args
+            )
+        except FunctionTimedOut:
+            raise ValueError(f"Read {idx} timeout.")
+        except Exception as e:
+            raise ValueError(f"Failed to extract frames from video. Error is {e}.")
+
         if not self.enable_bucket:
-            pixel_values = torch.from_numpy(
-                video_reader.get_batch(batch_index).asnumpy()).permute(
+            pixel_values = torch.from_numpy(pixel_values).permute(
                     0, 3, 1, 2).contiguous()
             pixel_values = pixel_values / 255.
             del video_reader
-        else:
-            pixel_values = video_reader.get_batch(batch_index).asnumpy()
 
         # remove special token
         name = name.replace('<__dj__video>', '').replace('<|__dj__eoc|>',

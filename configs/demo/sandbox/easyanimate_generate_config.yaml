@@ -19,6 +19,7 @@ train:
     batch_size: 8
     mixed_precision: "bf16"
     video_num_per_prompt: 5
+    seed: 43
 
   saving_config:
     output_video_dir: "../../outputs/demo-sandbox-data-partition/generate_videos"
