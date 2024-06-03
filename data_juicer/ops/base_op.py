@@ -2,11 +2,48 @@ import copy
 
 import pandas as pd
 import pyarrow as pa
+from loguru import logger
 
 from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
+
+
+def convert_list_dict_to_dict_list(samples):
+    # reconstruct samples from "list of dicts" to "dict of lists"
+    keys = samples[0].keys()
+    res_samples = {}
+    for key in keys:
+        res_samples[key] = [s[key] for s in samples]
+    return res_samples
+
+
+def convert_dict_list_to_list_dict(samples, text_key='text_key'):
+    # reconstruct samples from "dict of lists" to "list of dicts"
+    reconstructed_samples = []
+    for i in range(len(samples[text_key])):
+        reconstructed_samples.append({key: samples[key][i] for key in samples})
+    return reconstructed_samples
+
+
+def catch_exception_mapper_process(method):
+    """
+    For mapper sample level fault torelerance.
+    """
+
+    def wrapper(self, *args, **kwargs):
+        try:
+            sample = args[0]
+            return method(self, *args, **kwargs)
+        except Exception as e:
+            sample = copy.deepcopy(args[0])
+            logger.error(
+                f'An error occurred in mapper operation when processing'
+                f'sample {sample}, {type(e)}: {e}')
+            return {}
+
+    return wrapper
 
 
 class OP:
@@ -87,6 +124,7 @@ def ray_batch_mapper_wrapper(samples, fn):
     return pa.Table.from_pandas(res)
 
 
+# @mapper_fault_tolerance
 class Mapper(OP):
 
     def __init__(self, *args, **kwargs):
@@ -134,6 +172,7 @@ class Mapper(OP):
             return self.process(sample)
 
 
+# @filter_fault_tolerance
 class Filter(OP):
 
     def __init__(self, *args, **kwargs):
