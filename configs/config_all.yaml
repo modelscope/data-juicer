@@ -103,6 +103,7 @@ process:
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
       mem_required: '25GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_face_blur_mapper:                                 # blur faces detected in images
+      cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
   - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library
@@ -199,6 +200,7 @@ process:
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
       mem_required: '20GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_face_blur_mapper:                                 # blur faces detected in videos
+      cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
   - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
@@ -283,6 +285,7 @@ process:
       max_ratio: 3.0                                          # the max aspect ratio of filter range
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
   - image_face_ratio_filter:                                # filter samples according to the face area ratios in images (r=face_area/image_area). If multiple faces are available, we use the largest one.
+      cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       min_ratio: 0.0                                          # the min face area ratio of filter range
       max_ratio: 0.4                                          # the max face area ratio of filter range
   - image_nsfw_filter:                                      # filter samples according to the nsfw scores of images in them

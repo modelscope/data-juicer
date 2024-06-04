@@ -18,7 +18,6 @@ accelerate
 tiktoken
 opencc==1.1.6
 imagededup
-dlib
 spacy-pkuseg==0.0.32
 diffusers
 simple-aesthetics-predictor
