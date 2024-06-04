@@ -34,10 +34,9 @@ def catch_exception_mapper_process(method):
 
     def wrapper(self, *args, **kwargs):
         try:
-            sample = args[0]
             return method(self, *args, **kwargs)
         except Exception as e:
-            sample = copy.deepcopy(args[0])
+            sample = args[0]
             logger.error(
                 f'An error occurred in mapper operation when processing'
                 f'sample {sample}, {type(e)}: {e}')
