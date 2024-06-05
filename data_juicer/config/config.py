@@ -3,8 +3,10 @@ import os
 import shutil
 import time
 from argparse import ArgumentError, Namespace
+from collections import defaultdict
 from typing import Dict, List, Tuple, Union
 
+import yaml
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
                           namespace_to_dict)
 from jsonargparse.typehints import ActionTypeHint
@@ -555,14 +557,15 @@ def sort_op_by_types_and_names(op_name_classes):
 
 def update_op_process(cfg, parser):
     op_keys = list(OPERATORS.modules.keys())
-    args = [
-        arg.split('--')[1] for arg in parser.args
-        if arg.startswith('--') and arg.split('--')[1].split('.')[0] in op_keys
-    ]
-    option_in_commands = list(set([''.join(arg.split('.')[0])
-                                   for arg in args]))
-    full_option_in_commands = list(
-        set([''.join(arg.split('=')[0]) for arg in args]))
+
+    # filter out unused
+    option_in_commands = defaultdict(list)
+    for arg in parser.args:
+        if arg.startswith('--'):
+            option_full = arg.lstrip('-').split('=')[0]
+            op_name, *op_args = option_full.split('.')
+            if op_name in op_keys:
+                option_in_commands[op_name].append('.'.join(op_args))
 
     if cfg.process is None:
         cfg.process = []
@@ -573,27 +576,25 @@ def update_op_process(cfg, parser):
     #  --language_id_score_filter.lang en`
     temp_cfg = cfg
     for i, op_in_process in enumerate(cfg.process):
-        op_in_process_name = list(op_in_process.keys())[0]
-
-        if op_in_process_name not in option_in_commands:
-
-            # update op params to temp cfg if set
-            if op_in_process[op_in_process_name]:
-                temp_cfg = parser.merge_config(
-                    dict_to_namespace(op_in_process), temp_cfg)
-        else:
-
+        # only one item is expected
+        (op_in_process_name, op_in_process_conf), *_ = op_in_process.items()
+        # expand op_config
+        op_config_path = op_in_process_conf.pop('op_config', None)
+        if op_config_path is not None and os.path.isfile(op_config_path):
+            with open(op_config_path, 'r') as file:
+                op_config_data = yaml.safe_load(file)
+            op_in_process_conf.update({**op_config_data, **op_in_process_conf})
+        if op_in_process_name in option_in_commands:
             # args in the command line override the ones in `cfg.process`
-            for full_option_in_command in full_option_in_commands:
-
-                key = full_option_in_command.split('.')[1]
-                if op_in_process[op_in_process_name] and key in op_in_process[
-                        op_in_process_name].keys():
-                    op_in_process[op_in_process_name].pop(key)
-
-            if op_in_process[op_in_process_name]:
-                temp_cfg = parser.merge_config(
-                    dict_to_namespace(op_in_process), temp_cfg)
+            for op_arg in option_in_commands[op_in_process_name]:
+                if op_arg == '':
+                    op_in_process_conf.clear()
+                    break
+                if op_arg in op_in_process_conf.keys():
+                    op_in_process_conf.pop(op_arg)
+        if op_in_process_conf:
+            temp_cfg = parser.merge_config(dict_to_namespace(op_in_process),
+                                           temp_cfg)
 
         # update op params of cfg.process
         internal_op_para = temp_cfg.get(op_in_process_name)
@@ -623,9 +624,9 @@ def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
     arg_list = []
 
     for key, value in vars(namespace).items():
-
         if issubclass(type(value), Namespace):
-            nested_args = namespace_to_arg_list(value, f'{prefix}{key}.')
+            nested_args = namespace_to_arg_list(value, f'{prefix}{key}.',
+                                                includes, excludes)
             arg_list.extend(nested_args)
         elif value is not None:
             concat_key = f'{prefix}{key}'

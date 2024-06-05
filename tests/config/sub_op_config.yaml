@@ -1,0 +1,2 @@
+lowercase: true    # will be overwritten
+ignore_non_character: true

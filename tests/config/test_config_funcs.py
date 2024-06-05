@@ -11,7 +11,8 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 test_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                               'demo_4_test.yaml')
-
+test_sub_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                              'demo_4_test_sub.yaml')
 test_bad_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                               'demo_4_test_bad_val.yaml')
 
@@ -73,6 +74,29 @@ class ConfigTest(DataJuicerTestCaseBase):
 
             _, op_from_cfg = load_ops(cfg.process)
             self.assertTrue(len(op_from_cfg) == 3)
+
+    def test_sub_yaml_cfg_file(self):
+        out = StringIO()
+        with redirect_stdout(out):
+            cfg = init_configs(args=f'--config {test_sub_yaml_path}'.split())
+            self.assertDictEqual(
+                cfg.process[0], {
+                    'document_deduplicator': {
+                        'lowercase': False,
+                        'ignore_non_character': True,
+                        'text_key': 'text',
+                        'image_key': 'images',
+                        'audio_key': 'audios',
+                        'video_key': 'videos',
+                        'accelerator': 'cpu',
+                        'spec_numprocs': 0,
+                        'cpu_required': 1,
+                        'mem_required': 0,
+                        'use_actor': False,
+                    }
+                })
+            _, op_from_cfg = load_ops(cfg.process)
+            self.assertTrue(len(op_from_cfg) == 1)
 
     def test_val_range_check_cmd(self):
         out = StringIO()
