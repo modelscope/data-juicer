@@ -19,10 +19,12 @@ def convert_list_dict_to_dict_list(samples):
     return res_samples
 
 
-def convert_dict_list_to_list_dict(samples, text_key='text_key'):
+def convert_dict_list_to_list_dict(samples):
     # reconstruct samples from "dict of lists" to "list of dicts"
     reconstructed_samples = []
-    for i in range(len(samples[text_key])):
+    keys = list(samples.keys())
+    # take any key, since they should be of same length
+    for i in range(len(samples[keys[0]])):
         reconstructed_samples.append({key: samples[key][i] for key in samples})
     return reconstructed_samples
 
@@ -36,10 +38,35 @@ def catch_exception_mapper_process(method):
         try:
             return method(self, *args, **kwargs)
         except Exception as e:
-            sample = args[0]
+            samples = args[0]
             logger.error(
                 f'An error occurred in mapper operation when processing'
-                f'sample {sample}, {type(e)}: {e}')
+                f'sample {samples}, {type(e)}: {e}')
+            return {}
+
+    return wrapper
+
+
+def catch_exception_mapper_process_single(method):
+    """
+    For mapper process_single,
+    turn it into batch_size = 1, and enable fault torelerance.
+    """
+
+    def wrapper(self, *args, **kwargs):
+        try:
+            args = list(args)
+            samples = args[0]
+            sample = convert_dict_list_to_list_dict(samples)[0]
+            args[0] = sample
+            args = tuple(args)
+            res_sample = method(self, *args, **kwargs)
+            return convert_list_dict_to_dict_list([res_sample])
+        except Exception as e:
+            samples = args[0]
+            logger.error(
+                f'An error occurred in mapper operation when processing'
+                f'sample {samples}, {type(e)}: {e}')
             return {}
 
     return wrapper
