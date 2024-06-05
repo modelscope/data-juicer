@@ -26,9 +26,8 @@ class WhitespaceNormalizationMapper(Mapper):
         super().__init__(*args, **kwargs)
 
     @catch_exception_mapper_process_single
-    def process(
-            self,
-            sample):  # remove whitespaces before and after the main content
+    def process(self, sample):
+        # remove whitespaces before and after the main content
         text = sample[self.text_key].strip()
 
         # replace all kinds of whitespaces with ' '
