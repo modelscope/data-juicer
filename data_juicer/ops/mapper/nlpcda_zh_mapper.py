@@ -5,7 +5,7 @@ from loguru import logger
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.logger_utils import HiddenPrints
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process
 
 OP_NAME = 'nlpcda_zh_mapper'
 
@@ -128,6 +128,7 @@ class NlpcdaZhMapper(Mapper):
                 self.aug_pipeline.append(
                     nlpcda.EquivalentChar(create_num=create_num))
 
+    @catch_exception_mapper_process
     def process(self, samples):
         # no augmentation methods are opened
         if len(self.aug_pipeline) == 0:

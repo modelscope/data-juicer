@@ -1,7 +1,7 @@
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 from ..common import get_sentences_from_document
 
 OP_NAME = 'sentence_split_mapper'
@@ -26,8 +26,8 @@ class SentenceSplitMapper(Mapper):
         self.lang = lang
         self.model_key = prepare_model(model_type='nltk', lang=lang)
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
-
         nltk_model = get_model(self.model_key)
         sample[self.text_key] = get_sentences_from_document(
             sample[self.text_key],

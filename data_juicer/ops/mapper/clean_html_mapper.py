@@ -4,7 +4,7 @@
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 OP_NAME = 'clean_html_mapper'
 
@@ -25,6 +25,7 @@ class CleanHtmlMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
 
         def _clean_html(raw_html):

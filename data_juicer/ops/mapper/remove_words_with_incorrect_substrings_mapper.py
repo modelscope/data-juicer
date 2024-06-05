@@ -3,7 +3,7 @@ from jsonargparse.typing import List
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       merge_on_whitespace_tab_newline,
                       split_on_newline_tab_whitespace, strip)
@@ -48,6 +48,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
         should_keep = all([(i_substr not in word) for i_substr in substrings])
         return should_keep
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
         if self.tokenization:
             tokenizer = get_model(self.model_key)

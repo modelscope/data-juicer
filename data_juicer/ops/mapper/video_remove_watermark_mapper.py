@@ -12,7 +12,7 @@ from data_juicer.utils.mm_utils import (extract_video_frames_uniformly,
                                         parse_string_to_roi,
                                         process_each_frame)
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_remove_watermark_mapper'
@@ -199,6 +199,7 @@ class VideoRemoveWatermarkMapper(Mapper):
         new_np_frame = cv.inpaint(np_frame, watermark_mask, 3, cv.INPAINT_NS)
         return av.VideoFrame.from_ndarray(new_np_frame, format='bgr24')
 
+    @catch_exception_mapper_process_single
     def process(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:

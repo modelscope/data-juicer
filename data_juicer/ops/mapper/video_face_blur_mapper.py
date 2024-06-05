@@ -5,7 +5,7 @@ from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.mm_utils import (load_data_with_context, load_video,
                                         pil_to_opencv, process_each_frame)
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_face_blur_mapper'
@@ -65,6 +65,7 @@ class VideoFaceBlurMapper(Mapper):
         # Initialize face detector
         self.detector = dlib.get_frontal_face_detector()
 
+    @catch_exception_mapper_process_single
     def process(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:

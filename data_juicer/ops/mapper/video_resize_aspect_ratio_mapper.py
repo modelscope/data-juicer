@@ -98,12 +98,10 @@ class VideoResizeAspectRatioMapper(Mapper):
         self.min_ratio = Fraction(str(min_ratio).replace(':', '/'))
         self.max_ratio = Fraction(str(max_ratio).replace(':', '/'))
         self.strategy = strategy
-        self._batched_op = True
 
     # turned into batched processing and with catch
     @catch_exception_mapper_process_single
-    def process(self, sample):
-        # there is no video in this sample
+    def process(self, sample):  # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             return sample
 

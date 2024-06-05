@@ -4,7 +4,7 @@ from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 OP_NAME = 'nlpaug_en_mapper'
 
@@ -122,6 +122,7 @@ class NlpaugEnMapper(Mapper):
         else:
             self.aug = aug_pipeline
 
+    @catch_exception_mapper_process_single
     def process(self, samples):
         # no augmentation methods are opened
         if len(self.aug) == 0:

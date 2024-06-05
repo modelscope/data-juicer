@@ -9,7 +9,7 @@ from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import load_video
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_resize_resolution_mapper'
@@ -83,6 +83,7 @@ class VideoResizeResolutionMapper(Mapper):
         self.force_original_aspect_ratio = force_original_aspect_ratio
         self.force_divisible_by = force_divisible_by
 
+    @catch_exception_mapper_process_single
     def process(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:

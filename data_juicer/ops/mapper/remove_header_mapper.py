@@ -4,7 +4,7 @@
 
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('remove_header_mapper')
@@ -34,8 +34,8 @@ class RemoveHeaderMapper(Mapper):
 
         self.drop_no_head = drop_no_head
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
-
         if not re.search(self.pattern, sample[self.text_key], flags=re.DOTALL):
             if self.drop_no_head:
                 sample[self.text_key] = ''

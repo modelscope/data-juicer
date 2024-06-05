@@ -7,7 +7,7 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.mm_utils import SpecialTokens, extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process
 
 NAME = 'video_captioning_from_audio_mapper'
 CHECK_PKGS = [
@@ -122,6 +122,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
         captioned_sample[self.video_key] = left_video_keys
         return [captioned_sample]
 
+    @catch_exception_mapper_process
     def process(self, samples, rank=None):
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []

@@ -2,7 +2,7 @@
 # https://github.com/bigscience-workshop/data-preparation
 # --------------------------------------------------------
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 from ..common.special_characters import VARIOUS_WHITESPACES
 
 
@@ -25,8 +25,10 @@ class WhitespaceNormalizationMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
 
-    def process(self, sample):
-        # remove whitespaces before and after the main content
+    @catch_exception_mapper_process_single
+    def process(
+            self,
+            sample):  # remove whitespaces before and after the main content
         text = sample[self.text_key].strip()
 
         # replace all kinds of whitespaces with ' '

@@ -2,7 +2,7 @@ from typing import List, Union
 
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('remove_specific_chars_mapper')
@@ -28,8 +28,8 @@ class RemoveSpecificCharsMapper(Mapper):
         else:
             self.pattern = None
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
-
         if self.pattern is None:
             return sample
 

@@ -1,6 +1,6 @@
 from data_juicer.utils.availability_utils import AvailabilityChecking
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 OP_NAME = 'fix_unicode_mapper'
 
@@ -33,6 +33,7 @@ class FixUnicodeMapper(Mapper):
                              'supported. Can only be one of '
                              '["NFC", "NFKC", "NFD", "NFKD"]')
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
         sample[self.text_key] = ftfy.fix_text(sample[self.text_key],
                                               normalization=self.normalization)

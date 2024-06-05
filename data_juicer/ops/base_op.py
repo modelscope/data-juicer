@@ -169,7 +169,9 @@ class Mapper(OP):
         super(Mapper, self).__init__(*args, **kwargs)
 
         # In default, it's a normal OP instead of batched OP
-        self._batched_op = kwargs.get('batched_op', False)
+        # self._batched_op = kwargs.get('batched_op', False)
+        # Aftet the refactor, we want all ops to be batched OP by default
+        self._batched_op = kwargs.get('batched_op', True)
 
     def process(self, sample):
         """
