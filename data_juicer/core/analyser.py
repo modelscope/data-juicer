@@ -2,12 +2,14 @@ import os
 
 from loguru import logger
 
+from data_juicer import use_cuda
 from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
 from data_juicer.format import load_formatter
 from data_juicer.ops import Filter, load_ops
 from data_juicer.utils import cache_utils
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.process_utils import calculate_np
 
 from .data import add_same_content_to_new_column
 from .exporter import Exporter
@@ -89,6 +91,13 @@ class Analyser:
         stats_collected = False
         for op_cfg, op in zip(self.cfg.process, self.ops):
             op_name = list(op_cfg.keys())[0]
+            with_rank = use_cuda() and op._accelerator == 'cuda'
+            if op.spec_numprocs != 0:
+                op_proc = op.spec_numprocs
+                logger.info(f'Op [{op_name}] running with sepcified '
+                            f'number of procs:{op.spec_numprocs}')
+            else:
+                op_proc = calculate_np(self.cfg.np, op, op_name)
             if isinstance(op, Filter):
                 if Fields.stats not in dataset.features:
                     # only add stats when calling filter op
@@ -101,6 +110,7 @@ class Analyser:
                                           desc='Adding new column for stats')
                 dataset = dataset.map(op.compute_stats,
                                       num_proc=self.cfg.np,
+                                      with_rank=with_rank,
                                       desc=op_name + '_compute_stats')
                 stats_collected = True
         if not stats_collected:
