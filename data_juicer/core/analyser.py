@@ -109,7 +109,7 @@ class Analyser:
                                           num_proc=self.cfg.np,
                                           desc='Adding new column for stats')
                 dataset = dataset.map(op.compute_stats,
-                                      num_proc=self.cfg.np,
+                                      num_proc=op_proc,
                                       with_rank=with_rank,
                                       desc=op_name + '_compute_stats')
                 stats_collected = True
