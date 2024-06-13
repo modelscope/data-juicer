@@ -8,52 +8,69 @@
 在使用沙盒实验室前，你可能需要使用如下命令安装沙盒相关的第三方依赖：
 ```shell
 pip install -v -e .[sandbox]
-
-pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
 ```
 
 **注意**：一些沙盒的依赖还需要额外的领域依赖。例如，如果用户想要在沙盒中训练一个 ModelScope 平台的NLP模型，那可能需要为 `modelscope` 库
 安装额外的 `nlp` 领域依赖（参考其[安装文档](https://modelscope.cn/docs/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85) ）。
+再比如，使用VBench测评视频时需要安装Detectron2，推荐安装如下分支。
+```shell
+pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
+```
 因此如果使用沙盒过程中，这些第三方依赖抛出了一些"未找到模块（Module-Not-Found）"的报错时，用户需要先检查这些库的文档以寻求帮助。
 
 ### 准备沙盒配置文件
-沙盒的主配置文件除了Data-Juicer的配置文件外，还包括了若干额外的参数用于指定沙盒流水线中可能会运行的模型训练、推理、评测等步骤的配置信息，完整的额外参数可参考 [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml) 中的“for sandbox or hpo”部分参数。一个sandbox的配置文件示例可参考`configs/demo/sandbox/sandbox.yaml`：
+沙河实验总共会依次执行四类任务：探索任务（`probe_job_configs`）、菜谱优化任务（`refine_recipe_job_configs`）、执行任务（`execution_job_configs`）、测评任务（`evaluation_job_configs`）。每类任务中，按照配置文件的任务列表依次执行。每个任务需要指定需要指定：挂载这个任务的钩子（`hooker`），记录中间结果的标记名(`res_name`)，Data-Juicer数据处理参数（`dj_configs`），以及该任务其他的特定参数（`other_configs`）。这些参数中`hooker`是必须指定的，其他允许置空。`dj_configs`可以参考完整的Data-Juicer数据处理参数 [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml)。`other_configs`为任务特定的参数，没有限定，可以是模型训练、推理、评测等参数，比用`path_k_sigma_recipe`指定利用k-sigma方法微调后的数据菜谱保存路径。一个sandbox的配置文件示例可参考`configs/demo/sandbox/sandbox.yaml`：
 ```yaml
-# Sandbox config example for dataset
+# Sandbox config example
 
 # global parameters
 project_name: 'demo-sandbox'
-dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
-np: 4  # number of subprocess to process your dataset
+experiment_name: 'demo-sandbox-run0'              # for wandb tracer name
+hpo_config: null                                  # path to a configuration file when using auto-HPO tool.
 
-export_path: './outputs/demo-sandbox/demo-sandbox.jsonl'
+# configs for each job, the jobs will be executed according to the order in the list
+probe_job_configs:
+  - hooker: 'ProbeViaAnalyserHooker'
+    res_name: 'analysis_ori_data'
+    dj_configs: 'configs/demo/process.yaml'
+    other_configs:
 
-# sandbox configs
-# for refining recipe using k-sigma rules
-path_k_sigma_recipe: './outputs/demo-sandbox/k_sigma_new_recipe.yaml'
+refine_recipe_job_configs:
+  - hooker: 'RefineRecipeViaKSigmaHooker'
+    res_name: 'analysis_ori_data'
+    dj_configs: 'configs/demo/process.yaml'
+    other_configs:
+      path_k_sigma_recipe: './outputs/demo-process/k_sigma_new_recipe.yaml'
 
-# for gpt3 quality classifier as data evaluator
-data_eval_config: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
-#data_eval_config:
-#  type: dj_text_quality_classifier
+execution_job_configs:
+  - hooker: 'ProcessDataHooker'
+    res_name:
+    dj_configs: './outputs/demo-process/k_sigma_new_recipe.yaml'
+    other_configs:
+  - hooker: 'TrainModelHooker'
+    res_name:
+    dj_configs:
+    other_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
 
-# for gpt3 model training
-model_train_config: 'configs/demo/sandbox/gpt3_extra_train_config.json'
+evaluation_job_configs:
+  - hooker: 'ProbeViaAnalyserHooker'
+    res_name: 'analysis_processed_data'
+    dj_configs: 'configs/demo/process.yaml'
+    other_configs:
+  - hooker: 'EvaluateDataHooker'
+    res_name: 'eval_data'
+    dj_configs:
+    other_configs: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
 
-# process schedule
-# a list of several process operators with their arguments
-process:
-  - language_id_score_filter:
-      lang: 'zh'
-      min_score: 0.5
 ```
-该配置文件的示例中，除了Data-Juicer数据处理相关的配置外，包含了三个额外参数：
+根据这个配置文件，sandbox：
 
-- `path_k_sigma_recipe`：用于指定利用k-sigma方法微调后的数据菜谱保存路径
-- `data_eval_config`：用于指定针对数据的评测步骤的配置文件路径。也可以直接将该部分配置以字典形式添加到该字段下
-- `model_train_config`：用于指定利用处理后的数据训练模型步骤的配置文件路径
+1. 先执行Data-Juicer数据分析功能，计算每条数据的指定指标，比如`configs/demo/process.yaml`中，指定`language_id_score_filter`计算了语言分
+2. 用k-sigma方法微调数据菜谱
+3. 用原来的菜谱执行Data-Juicer的数据筛选功能
+4. 训练模型
+5. 
 
-额外的配置文件可以支持YAML和JSON两种格式，其内容需要根据各个步骤中各个组件具体的实现以及模型、评测支持具体定义。上面例子中涉及到的若干步骤的具体配置内容可参考对应路径下的配置文件内容。
 ### 运行沙盒
 沙盒的运行入口为`tools/sandbox_starter.py`，使用方法和数据处理与分析工具类似，需要指定沙盒配置文件：
 ```yaml

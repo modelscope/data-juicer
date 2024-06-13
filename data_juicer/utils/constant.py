@@ -2,6 +2,7 @@ import copy
 import inspect
 import io
 import os
+from enum import Enum
 
 import zstandard as zstd
 from loguru import logger
@@ -89,6 +90,9 @@ class StatsKeysMeta(type):
                 tmp_dj_cfg.dataset_path = tmp_f_name
                 tmp_dj_cfg.use_cache = False
                 tmp_dj_cfg.use_checkpoint = False
+
+                from data_juicer.config import get_init_configs
+                tmp_dj_cfg = get_init_configs(tmp_dj_cfg)
 
                 from data_juicer.core import Analyser
                 tmp_analyzer = Analyser(tmp_dj_cfg)
@@ -202,3 +206,10 @@ class InterVars(object):
     # Key: {video_path}-{frame_sampling_method}[-{frame_num}]
     #   {frame_num} is only used when {frame_sampling_method} is "uniform"
     sampled_frames = DEFAULT_PREFIX + 'sampled_frames'
+
+
+class JobRequiredKeys(Enum):
+    hooker = 'hooker'
+    dj_configs = 'dj_configs'
+    res_name = 'res_name'
+    other_configs = 'other_configs'

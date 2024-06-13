@@ -1,27 +1,68 @@
-# Sandbox config example for dataset
+# Sandbox config example
 
 # global parameters
 project_name: 'demo-sandbox'
-dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
-np: 4  # number of subprocess to process your dataset
+experiment_name: 'demo-sandbox-run0'              # for wandb tracer name
+hpo_config: null                                  # path to a configuration file when using auto-HPO tool.
 
-export_path: './outputs/demo-sandbox/demo-sandbox.jsonl'
+# configs for each job, the jobs will be executed according to the order in the list
+probe_job_configs:
+  - hooker: 'ProbeViaAnalyserHooker'
+    res_name: 'analysis_ori_data'
+    dj_configs: 'configs/demo/process.yaml'
+    other_configs:
+  # - hooker: 'ProbeViaModelInferHooker'
+  #   res_name: 'analysis_ori_model'
+  #   dj_configs:
+  #     dataset_path: './demos/data/demo-dataset.jsonl'
+  #     export_path: './outputs/demo-sandbox/demo-sandbox.jsonl'
+  #     data_probe_algo: 'uniform'
+  #     data_probe_ratio: 0.5
+  #     other_configs:
+  #       (...model configs)
 
-# sandbox configs
-# for refining recipe using k-sigma rules
-path_k_sigma_recipe: './outputs/demo-sandbox/k_sigma_new_recipe.yaml'
+refine_recipe_job_configs:
+  - hooker: 'RefineRecipeViaKSigmaHooker'
+    res_name: 'analysis_ori_data'
+    dj_configs: 'configs/demo/process.yaml'
+    other_configs:
+      path_k_sigma_recipe: './outputs/demo-process/k_sigma_new_recipe.yaml'
+  # - hooker: 'RefineRecipeViaModelFeedbackHooker'
+  #   res_name:
+  #   dj_configs:
+  #   other_configs:
+  #     (...model configs)
 
-# for gpt3 quality classifier as data evaluator
-data_eval_config: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
-#data_eval_config:
-#  type: dj_text_quality_classifier
+execution_job_configs:
+  - hooker: 'ProcessDataHooker'
+    res_name:
+    dj_configs: 'configs/demo/process.yaml'
+    other_configs:
+  - hooker: 'TrainModelHooker'
+    res_name:
+    dj_configs:
+    other_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
 
-# for gpt3 model training
-model_train_config: 'configs/demo/sandbox/gpt3_extra_train_config.json'
-
-# process schedule
-# a list of several process operators with their arguments
-process:
-  - language_id_score_filter:
-      lang: 'zh'
-      min_score: 0.5
+evaluation_job_configs:
+  - hooker: 'ProbeViaAnalyserHooker'
+    res_name: 'analysis_processed_data'
+    dj_configs: 'configs/demo/process.yaml'
+    other_configs:
+  # - hooker: 'ProbeViaModelInferHooker'
+  #   res_name: 'analysis_trained_model'
+  #   dj_configs:
+  #     dataset_path: './demos/data/demo-dataset.jsonl'
+  #     export_path: './outputs/demo-sandbox/demo-sandbox.jsonl'
+  #     data_probe_algo: 'uniform'
+  #     data_probe_ratio: 0.5
+  #     other_configs:
+  #       (...model configs)
+  - hooker: 'EvaluateDataHooker'
+    res_name: 'eval_data'
+    dj_configs:
+    other_configs: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
+  # - hooker: 'EvaluateModelHooker'
+  #   res_name: 'eval_model'
+  #   dj_configs:
+  #   other_configs:
+  #     (...model configs)
