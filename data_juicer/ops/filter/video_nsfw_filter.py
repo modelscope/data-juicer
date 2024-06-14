@@ -134,21 +134,26 @@ class VideoNSFWFilter(Filter):
                     sample[Fields.context][sampled_frames_key] = frames
 
             frame_images = [frame.to_image() for frame in frames]
-            inputs = processor(images=frame_images, return_tensors='pt')
-            inputs = inputs.to(model.device)
-            outputs = model(**inputs)
-            logits = outputs.logits
-            cur_scores = [
-                scores[1] for scores in torch.softmax(logits, dim=-1)
-            ]
-            cur_scores = torch.Tensor(cur_scores)
 
-            if self.reduce_mode == 'avg':
-                cur_score = cur_scores.mean()
-            elif self.reduce_mode == 'max':
-                cur_score = cur_scores.max()
+            if len(frame_images) > 0:
+                inputs = processor(images=frame_images, return_tensors='pt')
+                inputs = inputs.to(model.device)
+                outputs = model(**inputs)
+                logits = outputs.logits
+                cur_scores = [
+                    scores[1] for scores in torch.softmax(logits, dim=-1)
+                ]
+                cur_scores = torch.Tensor(cur_scores)
+
+                if self.reduce_mode == 'avg':
+                    cur_score = cur_scores.mean()
+                elif self.reduce_mode == 'max':
+                    cur_score = cur_scores.max()
+                else:
+                    cur_score = cur_scores.min()
             else:
-                cur_score = cur_scores.min()
+                cur_score = 0.0
+
             nsfw_scores.append(float(cur_score))
 
         sample[Fields.stats][StatsKeys.video_nsfw_score] = nsfw_scores

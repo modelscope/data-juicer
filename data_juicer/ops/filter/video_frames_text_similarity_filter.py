@@ -169,23 +169,26 @@ class VideoFramesTextSimilarityFilter(Filter):
                             image = ImageOps.flip(image)
                         video_frame_images_chunk.append(image)
 
-                inputs = processor(text=text_chunk,
-                                   images=video_frame_images_chunk,
-                                   return_tensors='pt',
-                                   truncation=True,
-                                   max_length=model.config.text_config.
-                                   max_position_embeddings,
-                                   padding=True).to(model.device)
+                if len(video_frame_images_chunk) > 0:
+                    inputs = processor(text=text_chunk,
+                                    images=video_frame_images_chunk,
+                                    return_tensors='pt',
+                                    truncation=True,
+                                    max_length=model.config.text_config.
+                                    max_position_embeddings,
+                                    padding=True).to(model.device)
 
-                outputs = model(**inputs)
-                chunk_logits = outputs.logits_per_text / 100.0
+                    outputs = model(**inputs)
+                    chunk_logits = outputs.logits_per_text / 100.0
 
-                if self.reduce_mode == 'avg':
-                    chunk_similarity = chunk_logits.mean()
-                elif self.reduce_mode == 'max':
-                    chunk_similarity = chunk_logits.max()
+                    if self.reduce_mode == 'avg':
+                        chunk_similarity = chunk_logits.mean()
+                    elif self.reduce_mode == 'max':
+                        chunk_similarity = chunk_logits.max()
+                    else:
+                        chunk_similarity = chunk_logits.min()
                 else:
-                    chunk_similarity = chunk_logits.min()
+                    chunk_similarity = 0.0
 
                 similarity.append(float(chunk_similarity))
             offset += count
