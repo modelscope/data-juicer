@@ -7,7 +7,7 @@ from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class WordNumFilterTest(DataJuicerTestCaseBase):
+class TokenNumFilterTest(DataJuicerTestCaseBase):
 
     def test_token_num(self):
         src = [

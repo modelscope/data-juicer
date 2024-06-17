@@ -302,6 +302,19 @@ def init_configs(args=None):
         help='List of several operators with their arguments, these ops will '
         'be applied to dataset in order')
     parser.add_argument(
+        '--percentiles',
+        type=List[float],
+        default=[],
+        help='Percentiles to analyse the dataset distribution. Only used in '
+        'Analysis.')
+    parser.add_argument(
+        '--export_original_dataset',
+        type=bool,
+        default=False,
+        help='whether to export the original dataset with stats. If you only '
+        'need the stats of the dataset, setting it to false could speed '
+        'up the exporting..')
+    parser.add_argument(
         '--save_stats_in_one_file',
         type=bool,
         default=False,
@@ -502,15 +515,19 @@ def _collect_config_info_from_class_docs(configurable_ops, parser):
     :param configurable_ops: a list of ops to be added, each item is
         a pair of op_name and op_class
     :param parser: jsonargparse parser need to update
+    :return: all params of each OP in a dictionary
     """
 
+    op_params = {}
     for op_name, op_class in configurable_ops:
-        parser.add_class_arguments(
+        params = parser.add_class_arguments(
             theclass=op_class,
             nested_key=op_name,
             fail_untyped=False,
             instantiate=False,
         )
+        op_params[op_name] = params
+    return op_params
 
 
 def sort_op_by_types_and_names(op_name_classes):

@@ -125,8 +125,11 @@ class Exporter:
                 dataset = dataset.remove_columns(removed_fields)
             if not self.keep_hashes_in_res_ds:
                 extra_fields = {
-                    HashKeys.hash, HashKeys.minhash, HashKeys.simhash,
-                    HashKeys.imagehash
+                    HashKeys.hash,
+                    HashKeys.minhash,
+                    HashKeys.simhash,
+                    HashKeys.imagehash,
+                    HashKeys.videohash,
                 }
                 feature_fields = set(dataset.features.keys())
                 removed_fields = extra_fields.intersection(feature_fields)

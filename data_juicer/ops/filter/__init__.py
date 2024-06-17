@@ -17,7 +17,8 @@ from . import (alphanumeric_filter, audio_duration_filter,
                video_frames_text_similarity_filter, video_motion_score_filter,
                video_nsfw_filter, video_ocr_area_ratio_filter,
                video_resolution_filter, video_tagging_from_frames_filter,
-               video_watermark_filter, word_num_filter, word_repetition_filter)
+               video_watermark_filter, word_repetition_filter,
+               words_num_filter)
 from .alphanumeric_filter import AlphanumericFilter
 from .audio_duration_filter import AudioDurationFilter
 from .audio_nmf_snr_filter import AudioNMFSNRFilter
@@ -58,8 +59,8 @@ from .video_ocr_area_ratio_filter import VideoOcrAreaRatioFilter
 from .video_resolution_filter import VideoResolutionFilter
 from .video_tagging_from_frames_filter import VideoTaggingFromFramesFilter
 from .video_watermark_filter import VideoWatermarkFilter
-from .word_num_filter import WordNumFilter
 from .word_repetition_filter import WordRepetitionFilter
+from .words_num_filter import WordsNumFilter
 
 __all__ = [
     'ImageTextSimilarityFilter',
@@ -98,7 +99,7 @@ __all__ = [
     'SuffixFilter',
     'ImageSizeFilter',
     'VideoWatermarkFilter',
-    'WordNumFilter',
+    'WordsNumFilter',
     'ImageFaceRatioFilter',
     'FlaggedWordFilter',
     'WordRepetitionFilter',
