@@ -36,7 +36,7 @@ refine_recipe_job_configs:
 execution_job_configs:
   - hooker: 'ProcessDataHooker'
     res_name:
-    dj_configs: 'configs/demo/process.yaml'
+    dj_configs: './outputs/demo-process/k_sigma_new_recipe.yaml'
     other_configs:
   - hooker: 'TrainModelHooker'
     res_name:

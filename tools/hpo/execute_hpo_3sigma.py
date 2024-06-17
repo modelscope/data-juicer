@@ -1,5 +1,7 @@
 import copy
 import sys
+import yaml
+import json
 
 from loguru import logger
 
@@ -46,6 +48,8 @@ def modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe, k=3):
     op_name_to_stats_key = StatsKeys.get_access_log(dj_cfg=cfg)
     logger.info(f'Begin to modify the recipe with {k}-sigma rule')
     for process in cfg.process:
+        if isinstance(process, Namespace):
+            process = namespace_to_dict(process)
         op_name, args = list(process.items())[0]
         temp_args = copy.deepcopy(args)
         if op_name not in op_name_to_stats_key:
@@ -69,7 +73,16 @@ def modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe, k=3):
                                     f'{arg_name}={new_val}')
                         args[arg_name] = new_val
     if path_k_sigma_recipe:
-        export_config(cfg, path_k_sigma_recipe)
+        if path_k_sigma_recipe.endswith('.yaml') or path_k_sigma_recipe.endswith('.yml'):
+            with open(path_k_sigma_recipe, 'w') as fout:
+                yaml.safe_dump(cfg, fout)
+        elif ori_config.endswith('.json'):
+            with open(path_k_sigma_recipe, 'w') as fout:
+                json.dump(cfg, fout)
+        else:
+            raise TypeError(f'Unrecognized output file type: [{ori_config}]. '
+                            f'Should be one of the types [".yaml", ".yml", '
+                            f'".json"].')
 
 
 if __name__ == '__main__':
