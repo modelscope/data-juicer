@@ -267,12 +267,8 @@ class EasyAnimateGenerateExecutor(BaseModelExecutor):
             config.infer_config.gpu_num,
             config.infer_config.batch_size,
             config.infer_config.mixed_precision,
-<<<<<<< HEAD
-            config.infer_config.video_num_per_prompt, config.infer_config.seed,
-=======
             config.infer_config.video_num_per_prompt,
             config.infer_config.seed,
->>>>>>> db205f3315646b7dd37a1def698f30c0b989feb6
             config.saving_config.output_video_dir
         ]
         self.run_subprocess(self.script_path, run_args, self.working_dir)
