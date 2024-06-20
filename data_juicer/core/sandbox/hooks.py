@@ -1,18 +1,17 @@
-import os
 import asyncio
-import json
+import os
 
-from loguru import logger
 from jsonargparse import dict_to_namespace
+from loguru import logger
 
 from data_juicer.config import get_init_configs, prepare_side_configs
 from data_juicer.core import Analyser
 from data_juicer.core import Executor as DjExecutor
-from data_juicer.utils.constant import JobRequiredKeys
 from data_juicer.core.sandbox.factories import (data_evaluator_factory,
                                                 mode_infer_executor_factory,
                                                 model_evaluator_factory,
                                                 model_train_executor_factory)
+from data_juicer.utils.constant import JobRequiredKeys
 from tools.hpo.execute_hpo_3sigma import modify_recipe_k_sigma
 
 
@@ -53,7 +52,8 @@ class ProbeViaAnalyserHooker(BaseHooker):
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(ProbeViaAnalyserHooker, self).__init__(job_cfg, watcher, *args, **kwargs)
+        super(ProbeViaAnalyserHooker, self).__init__(job_cfg, watcher, *args,
+                                                     **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_other_configs()
@@ -80,7 +80,8 @@ class ProbeViaModelInferHooker(BaseHooker):
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(ProbeViaModelInferHooker, self).__init__(job_cfg, watcher, *args, **kwargs)
+        super(ProbeViaModelInferHooker, self).__init__(job_cfg, watcher, *args,
+                                                       **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_other_configs()
@@ -109,15 +110,15 @@ class RefineRecipeViaKSigmaHooker(BaseHooker):
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(RefineRecipeViaKSigmaHooker, self).__init__(job_cfg, watcher, *args, **kwargs)
+        super(RefineRecipeViaKSigmaHooker,
+              self).__init__(job_cfg, watcher, *args, **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_other_configs()
         path_k_sigma_recipe = self.other_cfg.path_k_sigma_recipe
         # use k-sigma strategy to modify the data recipe
-        modify_recipe_k_sigma(self.dj_cfg,
-                                self.watcher.query(self.res_name),
-                                path_k_sigma_recipe)
+        modify_recipe_k_sigma(self.dj_cfg, self.watcher.query(self.res_name),
+                              path_k_sigma_recipe)
         return kwargs
 
 
@@ -130,7 +131,8 @@ class RefineRecipeViaModelFeedbackHooker(BaseHooker):
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(RefineRecipeViaModelFeedbackHooker, self).__init__(job_cfg, watcher, *args, **kwargs)
+        super(RefineRecipeViaModelFeedbackHooker,
+              self).__init__(job_cfg, watcher, *args, **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_other_configs()
@@ -156,7 +158,8 @@ class ProcessDataHooker(BaseHooker):
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(ProcessDataHooker, self).__init__(job_cfg, watcher, *args, **kwargs)
+        super(ProcessDataHooker, self).__init__(job_cfg, watcher, *args,
+                                                **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_other_configs()
@@ -176,11 +179,13 @@ class TrainModelHooker(BaseHooker):
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(TrainModelHooker, self).__init__(job_cfg, watcher, *args, **kwargs)
+        super(TrainModelHooker, self).__init__(job_cfg, watcher, *args,
+                                               **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_other_configs()
-        model_trainer = model_train_executor_factory(self.other_cfg, watcher=watcher)
+        model_trainer = model_train_executor_factory(self.other_cfg,
+                                                     watcher=self.watcher)
         # basic routine to train model via the processed data,
         # users can customize this freely
         logger.info('Begin to train the model with given model config')
@@ -193,7 +198,7 @@ class TrainModelHooker(BaseHooker):
         }
         asyncio.run(
             model_trainer.run(model_trainer.model_config['type'],
-                                    training_args, **kwargs))
+                              training_args, **kwargs))
         return kwargs
 
 
@@ -206,7 +211,8 @@ class EvaluateDataHooker(BaseHooker):
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(EvaluateDataHooker, self).__init__(job_cfg, watcher, *args, **kwargs)
+        super(EvaluateDataHooker, self).__init__(job_cfg, watcher, *args,
+                                                 **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_other_configs()
@@ -231,7 +237,8 @@ class EvaluateModelHooker(BaseHooker):
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(EvaluateModelHooker, self).__init__(job_cfg, watcher, *args, **kwargs)
+        super(EvaluateModelHooker, self).__init__(job_cfg, watcher, *args,
+                                                  **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_other_configs()

@@ -1,11 +1,13 @@
 import copy
-import sys
-import yaml
 import json
+import sys
+from argparse import Namespace
 
+import yaml
+from jsonargparse import namespace_to_dict
 from loguru import logger
 
-from data_juicer.config import export_config, init_configs
+from data_juicer.config import init_configs
 from data_juicer.core import Analyser, Executor
 from data_juicer.utils.constant import StatsKeys
 
@@ -74,16 +76,18 @@ def modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe, k=3):
                                     f'{arg_name}={new_val}')
                         args[arg_name] = new_val
     if path_k_sigma_recipe:
-        if path_k_sigma_recipe.endswith('.yaml') or path_k_sigma_recipe.endswith('.yml'):
+        if path_k_sigma_recipe.endswith(
+                '.yaml') or path_k_sigma_recipe.endswith('.yml'):
             with open(path_k_sigma_recipe, 'w') as fout:
                 yaml.safe_dump(cfg, fout)
-        elif ori_config.endswith('.json'):
+        elif path_k_sigma_recipe.endswith('.json'):
             with open(path_k_sigma_recipe, 'w') as fout:
                 json.dump(cfg, fout)
         else:
-            raise TypeError(f'Unrecognized output file type: [{ori_config}]. '
-                            f'Should be one of the types [".yaml", ".yml", '
-                            f'".json"].')
+            raise TypeError(
+                f'Unrecognized output file type:'
+                f' [{path_k_sigma_recipe}]. Should be one of the types'
+                f' [".yaml", ".yml", ".json"].')
 
 
 if __name__ == '__main__':
