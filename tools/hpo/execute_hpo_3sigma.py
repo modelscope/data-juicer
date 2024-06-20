@@ -47,9 +47,10 @@ def modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe, k=3):
     stats_key_to_std = std_series.iloc[0, :].to_dict()
     op_name_to_stats_key = StatsKeys.get_access_log(dj_cfg=cfg)
     logger.info(f'Begin to modify the recipe with {k}-sigma rule')
+    for i in range(len(cfg.process)):
+        if isinstance(cfg.process[i], Namespace):
+            cfg.process[i] = namespace_to_dict(cfg.process[i])
     for process in cfg.process:
-        if isinstance(process, Namespace):
-            process = namespace_to_dict(process)
         op_name, args = list(process.items())[0]
         temp_args = copy.deepcopy(args)
         if op_name not in op_name_to_stats_key:
