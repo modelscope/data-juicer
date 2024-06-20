@@ -19,7 +19,7 @@ pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7
 因此如果使用沙盒过程中，这些第三方依赖抛出了一些"未找到模块（Module-Not-Found）"的报错时，用户需要先检查这些库的文档以寻求帮助。
 
 ### 准备沙盒配置文件
-沙河实验总共会依次执行四类任务：探索任务（`probe_job_configs`）、菜谱优化任务（`refine_recipe_job_configs`）、执行任务（`execution_job_configs`）、测评任务（`evaluation_job_configs`）。每类任务中，按照配置文件的任务列表依次执行。每个任务需要指定需要指定：挂载这个任务的钩子（`hooker`），记录中间结果的标记名(`res_name`)，Data-Juicer数据处理参数（`dj_configs`），以及该任务其他的特定参数（`other_configs`）。这些参数中`hooker`是必须指定的，其他允许置空。`dj_configs`可以参考完整的Data-Juicer数据处理参数 [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml)。`other_configs`为任务特定的参数，没有限定，可以是模型训练、推理、评测等参数，比用`path_k_sigma_recipe`指定利用k-sigma方法微调后的数据菜谱保存路径。一个sandbox的配置文件示例可参考`configs/demo/sandbox/sandbox.yaml`：
+沙河实验总共会依次执行四类任务：数据/模型洞察（`probe_job_configs`）、基于洞察结果的数据菜谱微调迭代（`refine_recipe_job_configs`）、数据处理与模型训练（`execution_job_configs`）和数据/模型评估（`evaluation_job_configs`）。每类任务中，按照配置文件的任务列表依次执行。每个任务需要指定：挂载这个任务的钩子（`hooker`），记录中间结果的标记名(`res_name`)，Data-Juicer数据处理参数（`dj_configs`），以及该任务其他的特定参数（`other_configs`）。这些参数中`hooker`是必须指定的，其他允许置空。`dj_configs`可以参考完整的Data-Juicer数据处理参数 [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml)。`other_configs`为任务特定的参数，没有限定，可以是模型训练、推理、评测等参数，比如用`path_k_sigma_recipe`指定利用k-sigma方法微调后的数据菜谱保存路径。一个sandbox的配置文件示例可参考`configs/demo/sandbox/sandbox.yaml`：
 ```yaml
 # Sandbox config example
 
@@ -65,11 +65,12 @@ evaluation_job_configs:
 ```
 根据这个配置文件，sandbox：
 
-1. 先执行Data-Juicer数据分析功能，计算每条数据的指定指标，比如`configs/demo/process.yaml`中，指定`language_id_score_filter`计算了语言分
-2. 用k-sigma方法微调数据菜谱
-3. 用原来的菜谱执行Data-Juicer的数据筛选功能
-4. 训练模型
-5. 
+1. 先执行Data-Juicer数据分析功能，计算每条数据的指定指标，比如`configs/demo/process.yaml`中，指定`language_id_score_filter`计算了语言分。
+2. 利用Data-Juicer数据分析的结果，用k-sigma方法微调数据菜谱。注意这里需要设置`res_name`与数据分析时的`res_name`相同才能利用到分析结果。
+3. 用k-sigma方法微调后的菜谱执行Data-Juicer的数据筛选功能。
+4. 用筛选后的数据训练模型。
+5. 分析筛选后的数据。
+6. 用打分器给筛选后的数据打分。
 
 ### 运行沙盒
 沙盒的运行入口为`tools/sandbox_starter.py`，使用方法和数据处理与分析工具类似，需要指定沙盒配置文件：
@@ -132,6 +133,7 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 - **执行器（Executor）**：由于数据执行器已经由Data-Juicer的Executor承担，因此此处的执行器特指模型的执行器，包括模型训练、推理、评估等执行器。代码位于`data_juicer/core/sandbox/model_executors.py`
 - **评估器（Evaluator）**：用于对数据集或者模型进行质量以及性能的评估。代码位于`data_juicer/core/sandbox/evaluators.py`
+- **流水线钩子（Hooker）**：用于将任务挂载到流水线中。代码位于`data_juicer/core/sandbox/hooks.py`
 
 ### 执行器
 模型执行器核心功能为对配置文件中指定的模型用指定的数据集进行训练、推理或评测。模型执行器需继承`BaseModelExecutor`并实现若干核心方法：
@@ -151,7 +153,7 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 - `eval_obj`：待评估的对象
 
 用户也可根据自己的实现方式对这两个参数进行扩展使用。
-## 流水线钩子与工作列表
+## 流水线钩子
 正如章节开始部分所说，在流水线中，我们需要实现若干钩子将组件与流水线执行步骤通过工作列表连接起来。被激活的钩子会在流水线的工作列表中进行注册，然后在流水线执行时依次对各个步骤工作列表中的钩子执行。四个步骤对应的工作列表分别如下：
 
 1. **数据/模型洞察**：洞察工作列表 -- probe_jobs
@@ -161,25 +163,22 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 通常情况下，我们只需要为一类组件工厂实现一种钩子函数即可。而除了依赖于组件的钩子外，还有一些依赖于Data-Juicer已有功能或工具以及其他第三方库的钩子。这些钩子与依赖的组件、工具以及工作列表的对应关系如下：
 
-| 钩子 | 功能 | 依赖的组件工厂 | 依赖的工具或库 | 注册工作列表 | 触发方式（默认流水线编排） |
+| 钩子 | 功能 | 依赖的组件工厂 | 依赖的工具或库 | 注册工作列表 |
 | --- | --- | --- | --- | --- | --- |
-| `hook_probe_via_analyzer` | 分析与洞察数据集质量、多样性等维度分布 | - | Data-Juicer分析器Analyser | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） | 恒定触发 |
-| `hook_probe_via_model_infer` | 分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据 | 模型推理工厂（ModelInferExecutorFactory） | - | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） | sandbox配置文件中包含有效的`model_infer_config`配置参数 |
-| `hook_refine_recipe_via_k_sigma` | 根据数据集洞察结果，利用k-sigma方法对数据菜谱超参进行微调 | - | Data-Juicer超参优化工具HPO中的k-sigma菜谱微调工具 | 菜谱微调工作列表（refine_recipe_jobs） | sandbox配置文件中用path_k_sigma_recipe参数指定了微调后菜谱的保存路径 |
-| `hook_refine_recipe_via_model_feedback` | 利用模型洞察与反馈结果对数据菜谱超参进行微调 | TODO | - | 菜谱微调工作列表（refine_recipe_jobs） | sandbox配置文件中用path_model_feedback_recipe参数指定了微调后菜谱的保存路径 |
-| `hook_process_data` | 基于当前数据菜谱对数据集进行处理与清洗 | - | Data-Juicer数据处理器Executor | 执行工作列表（execution_jobs） | 恒定触发 |
-| `hook_train_model` | 基于当前数据集训练一个模型 | 模型训练工厂（ModelTrainExecutorFactory） | - | 执行工作列表（execution_jobs） | sandbox配置文件中包含有效的model_train_config配置参数 |
-| `hook_evaluate_data` | 对当前数据集进行数据质量等维度的评估 | 数据评估工厂（DataEvaluatorFactory） | - | 评估工作列表（evaluation_jobs） | sandbox配置文件中包含有效的data_eval_config配置参数 |
-| `hook_evaluate_model` | 对当前训练后的模型进行评估 | 模型评估工厂（ModelEvaluatorFactory） | - | 评估工作列表（evaluation_jobs） | sandbox配置文件中包含有效的model_eval_config配置参数 |
+| `ProbeViaAnalyserHooker` | 分析与洞察数据集质量、多样性等维度分布 | - | Data-Juicer分析器Analyser | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
+| `ProbeViaModelInferHooker` | 分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据 | 模型推理工厂（ModelInferExecutorFactory） | - | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
+| `RefineRecipeViaKSigmaHooker` | 根据数据集洞察结果，利用k-sigma方法对数据菜谱超参进行微调 | - | Data-Juicer超参优化工具HPO中的k-sigma菜谱微调工具 | 菜谱微调工作列表（refine_recipe_jobs） |
+| `RefineRecipeViaModelFeedbackHooker` | 利用模型洞察与反馈结果对数据菜谱超参进行微调 | TODO | - | 菜谱微调工作列表（refine_recipe_jobs） |
+| `ProcessDataHooker` | 基于当前数据菜谱对数据集进行处理与清洗 | - | Data-Juicer数据处理器Executor | 执行工作列表（execution_jobs） |
+| `TrainModelHooker` | 基于当前数据集训练一个模型 | 模型训练工厂（ModelTrainExecutorFactory） | - | 执行工作列表（execution_jobs） |
+| `EvaluateDataHooker` | 对当前数据集进行数据质量等维度的评估 | 数据评估工厂（DataEvaluatorFactory） | - | 评估工作列表（evaluation_jobs） |
+| `EvaluateModelHooker` | 对当前训练后的模型进行评估 | 模型评估工厂（ModelEvaluatorFactory） | - | 评估工作列表（evaluation_jobs） |
 
 值得注意的是，一个钩子可以在多个工作列表进行注册，因为这个钩子在不同的流水线阶段可以扮演不同的角色，比如我们可以对处理前后的数据集都进行分析，以比较数据集处理前后的质量、多样性等维度的变化情况。
-## 自定义沙盒流水线
-除了沙盒自带的默认流水线过程，开发者还可以在`data_juicer/core/sandbox/pipelines.py`中实现自定义的流水线编排。结合前面几个章节所说，实现开发者自定义的流水线编排大致需要下面这些步骤：
 
-1. **实现自定义的组件**：开发者既可以基于已有的组件类别与工厂实现更多新的组件，也可以自行创建更多新类别的工厂以及其中的组件
-2. **根据自定义的组件，封装调用该组件的钩子**：可参考代码中的`hook_evaluate_data`方法，该方法调用数据评估器组件对数据集质量进行评估
-3. **将自定义的钩子注册到工作列表中**：可参考代码中的`register_default_jobs`方法，用户也可实现自定义的工作列表以及注册方法
-4. **实现自定义的流水线执行流程编排**：可参考代码中的`one_trial`方法，开发者可根据自己实现的钩子以及工作列表，定制化地调整、编排与构建流水线执行流程，实现自己的`one_trial`方法
+## 自定义沙盒流水线
+用户直接在参数配置文件中修改任务配置列表即可实现任务修改和编排。
+
 ## 监测器
 在上述章节中，反复提到“监测”这个概念。流水线会对各个步骤中产生的若干指标都进行监测，这些监测过程都依靠沙盒监测器`SandboxWatcher`实现的。
 
