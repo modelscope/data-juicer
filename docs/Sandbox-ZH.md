@@ -19,7 +19,7 @@ pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7
 因此如果使用沙盒过程中，这些第三方依赖抛出了一些"未找到模块（Module-Not-Found）"的报错时，用户需要先检查这些库的文档以寻求帮助。
 
 ### 准备沙盒配置文件
-沙河实验总共会依次执行四类任务：数据/模型洞察（`probe_job_configs`）、基于洞察结果的数据菜谱微调迭代（`refine_recipe_job_configs`）、数据处理与模型训练（`execution_job_configs`）和数据/模型评估（`evaluation_job_configs`）。每类任务中，按照配置文件的任务列表依次执行。每个任务需要指定：挂载这个任务的钩子（`hooker`），记录中间结果的标记名(`res_name`)，Data-Juicer数据处理参数（`dj_configs`），以及该任务其他的特定参数（`other_configs`）。这些参数中`hooker`是必须指定的，其他允许置空。`dj_configs`可以参考完整的Data-Juicer数据处理参数 [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml)。`other_configs`为任务特定的参数，没有限定，可以是模型训练、推理、评测等参数，比如用`path_k_sigma_recipe`指定利用k-sigma方法微调后的数据菜谱保存路径。一个sandbox的配置文件示例可参考`configs/demo/sandbox/sandbox.yaml`：
+沙河实验总共会依次执行四类任务：数据/模型洞察（`probe_job_configs`）、基于洞察结果的数据菜谱微调迭代（`refine_recipe_job_configs`）、数据处理与模型训练（`execution_job_configs`）和数据/模型评估（`evaluation_job_configs`）。每类任务中，任务按照配置的任务列表依次执行。每个任务需要指定：挂载这个任务的钩子（`hooker`），记录中间结果的标记名(`res_name`)，Data-Juicer数据处理参数（`dj_configs`），以及该任务其他的特定参数（`other_configs`）。这些参数中`hooker`是必须指定的，其他允许置空。`dj_configs`可以参考完整的Data-Juicer数据处理参数 [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml)。`other_configs`为任务特定的参数，没有限定，可以是模型训练、推理、评测等参数，比如用`path_k_sigma_recipe`指定利用k-sigma方法微调后的数据菜谱保存路径。一个sandbox的配置文件示例可参考`configs/demo/sandbox/sandbox.yaml`：
 ```yaml
 # Sandbox config example
 
@@ -61,15 +61,19 @@ evaluation_job_configs:
     res_name: 'eval_data'
     dj_configs:
     other_configs: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
-
 ```
 根据这个配置文件，sandbox：
 
 1. 先执行Data-Juicer数据分析功能，计算每条数据的指定指标，比如`configs/demo/process.yaml`中，指定`language_id_score_filter`计算了语言分。
+
 2. 利用Data-Juicer数据分析的结果，用k-sigma方法微调数据菜谱。注意这里需要设置`res_name`与数据分析时的`res_name`相同才能利用到分析结果。
+
 3. 用k-sigma方法微调后的菜谱执行Data-Juicer的数据筛选功能。
+
 4. 用筛选后的数据训练模型。
+
 5. 分析筛选后的数据。
+
 6. 用打分器给筛选后的数据打分。
 
 ### 运行沙盒
@@ -164,7 +168,7 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 通常情况下，我们只需要为一类组件工厂实现一种钩子函数即可。而除了依赖于组件的钩子外，还有一些依赖于Data-Juicer已有功能或工具以及其他第三方库的钩子。这些钩子与依赖的组件、工具以及工作列表的对应关系如下：
 
 | 钩子 | 功能 | 依赖的组件工厂 | 依赖的工具或库 | 注册工作列表 |
-| --- | --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | `ProbeViaAnalyserHooker` | 分析与洞察数据集质量、多样性等维度分布 | - | Data-Juicer分析器Analyser | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
 | `ProbeViaModelInferHooker` | 分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据 | 模型推理工厂（ModelInferExecutorFactory） | - | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
 | `RefineRecipeViaKSigmaHooker` | 根据数据集洞察结果，利用k-sigma方法对数据菜谱超参进行微调 | - | Data-Juicer超参优化工具HPO中的k-sigma菜谱微调工具 | 菜谱微调工作列表（refine_recipe_jobs） |
