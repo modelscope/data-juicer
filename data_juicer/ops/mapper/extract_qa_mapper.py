@@ -77,13 +77,12 @@ class ExtractQAMapper(Mapper):
         return qa_list
 
     def process(self, sample, rank=None):
-        self.model, self.processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank=rank)
 
-        inputs = self.processor(sample[self.text_key],
-                                return_tensors='pt').to(self.model.device)
-        response = self.model.generate(**inputs)
-        output = self.processor.decode(response.cpu()[0],
-                                       skip_special_tokens=True)
+        inputs = processor(sample[self.text_key],
+                           return_tensors='pt').to(model.device)
+        response = model.generate(**inputs)
+        output = processor.decode(response.cpu()[0], skip_special_tokens=True)
         qa_list = self._extract_qa(output)
 
         if not len(qa_list):
