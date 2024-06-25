@@ -172,6 +172,7 @@ class VideoMotionScoreFilter(Filter):
         sample[Fields.stats][StatsKeys.video_motion_score] = [
             unique_motion_scores[key] for key in loaded_video_keys
         ]
+        print(sample)
         return sample
 
     def process(self, sample):

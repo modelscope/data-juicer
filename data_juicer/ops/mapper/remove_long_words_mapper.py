@@ -7,8 +7,7 @@ import sys
 from jsonargparse.typing import PositiveInt
 
 from ..base_op import OPERATORS, Mapper
-from ..common import (SPECIAL_CHARACTERS, merge_on_whitespace_tab_newline,
-                      split_on_newline_tab_whitespace, strip)
+from ..common import SPECIAL_CHARACTERS, merge_on_whitespace_tab_newline, split_on_newline_tab_whitespace, strip
 
 
 @OPERATORS.register_module('remove_long_words_mapper')

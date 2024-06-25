@@ -60,9 +60,7 @@ import os
 import fire
 from loguru import logger
 
-from tools.quality_classifier.qc_utils import (export_result, init_spark,
-                                               load_dataset, predict,
-                                               prepare_model)
+from tools.quality_classifier.qc_utils import export_result, init_spark, load_dataset, predict, prepare_model
 
 
 @logger.catch(reraise=True)

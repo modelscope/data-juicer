@@ -37,8 +37,7 @@ from loguru import logger
 from tqdm import tqdm
 
 from data_juicer.utils.mm_utils import SpecialTokens
-from tools.multimodal.utils import (check_args_load_to_dj_data,
-                                    convert_text_to_dj)
+from tools.multimodal.utils import check_args_load_to_dj_data, convert_text_to_dj
 
 
 @logger.catch(reraise=True)

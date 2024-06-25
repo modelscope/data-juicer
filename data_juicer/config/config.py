@@ -5,8 +5,7 @@ import time
 from argparse import ArgumentError, Namespace
 from typing import Dict, List, Tuple, Union
 
-from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
-                          namespace_to_dict)
+from jsonargparse import ActionConfigFile, ArgumentParser, dict_to_namespace, namespace_to_dict
 from jsonargparse.typehints import ActionTypeHint
 from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger

@@ -9,8 +9,7 @@ from loguru import logger
 
 from data_juicer.core.data import add_same_content_to_new_column
 from data_juicer.format import load_formatter
-from data_juicer.ops.filter.language_id_score_filter import \
-    LanguageIDScoreFilter
+from data_juicer.ops.filter.language_id_score_filter import LanguageIDScoreFilter
 from data_juicer.utils.constant import Fields, StatsKeys
 
 

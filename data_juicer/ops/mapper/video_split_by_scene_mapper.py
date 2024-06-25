@@ -5,8 +5,7 @@ from itertools import chain
 from jsonargparse.typing import NonNegativeFloat, NonNegativeInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
-from data_juicer.utils.file_utils import (add_suffix_to_filename,
-                                          transfer_filename)
+from data_juicer.utils.file_utils import add_suffix_to_filename, transfer_filename
 from data_juicer.utils.mm_utils import SpecialTokens
 
 from ..base_op import OPERATORS, Mapper

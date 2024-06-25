@@ -7,10 +7,8 @@ from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.mm_utils import (SpecialTokens,
-                                        insert_texts_after_placeholders,
-                                        load_image, remove_non_special_tokens,
-                                        remove_special_tokens)
+from data_juicer.utils.mm_utils import (SpecialTokens, insert_texts_after_placeholders, load_image,
+                                        remove_non_special_tokens, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
@@ -243,8 +241,7 @@ class ImageCaptioningMapper(Mapper):
         elif self.keep_candidate_mode == 'similar_one_simhash':
             from simhash import num_differing_bits
 
-            from ..deduplicator.document_simhash_deduplicator import \
-                DocumentSimhashDeduplicator
+            from ..deduplicator.document_simhash_deduplicator import DocumentSimhashDeduplicator
             ori_normal_text = remove_special_tokens(chunk)
             # using a simhash OP to calculate their similarity
             # NOTE: simhash is just one method to calculate the similarities

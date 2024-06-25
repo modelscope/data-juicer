@@ -4,10 +4,8 @@ from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (SpecialTokens, extract_key_frames,
-                                        extract_video_frames_uniformly,
-                                        load_data_with_context, load_video,
-                                        remove_special_tokens)
+from data_juicer.utils.mm_utils import (SpecialTokens, extract_key_frames, extract_video_frames_uniformly,
+                                        load_data_with_context, load_video, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter

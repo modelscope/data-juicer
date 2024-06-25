@@ -4,11 +4,8 @@ import requests
 from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
-from data_juicer.utils.mm_utils import (SpecialTokens, image_byte_to_base64,
-                                        insert_texts_after_placeholders,
-                                        load_image_byte,
-                                        remove_non_special_tokens,
-                                        remove_special_tokens)
+from data_juicer.utils.mm_utils import (SpecialTokens, image_byte_to_base64, insert_texts_after_placeholders,
+                                        load_image_byte, remove_non_special_tokens, remove_special_tokens)
 
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES

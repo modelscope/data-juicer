@@ -136,32 +136,27 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         self.cap_op_list = []
         self.tag_op_list = []
         if consider_video_caption_from_video:
-            from .video_captioning_from_video_mapper import \
-                VideoCaptioningFromVideoMapper
+            from .video_captioning_from_video_mapper import VideoCaptioningFromVideoMapper
             self.cap_op_list.append(
                 VideoCaptioningFromVideoMapper(**self._prepare_op_args(
                     VideoCaptioningFromVideoMapper, vid_cap_from_vid_args)))
         if consider_video_caption_from_audio:
-            from .video_captioning_from_audio_mapper import \
-                VideoCaptioningFromAudioMapper
+            from .video_captioning_from_audio_mapper import VideoCaptioningFromAudioMapper
             self.cap_op_list.append(
                 VideoCaptioningFromAudioMapper(**self._prepare_op_args(
                     VideoCaptioningFromAudioMapper, {})))
         if consider_video_caption_from_frames:
-            from .video_captioning_from_frames_mapper import \
-                VideoCaptioningFromFramesMapper
+            from .video_captioning_from_frames_mapper import VideoCaptioningFromFramesMapper
             self.cap_op_list.append(
                 VideoCaptioningFromFramesMapper(**self._prepare_op_args(
                     VideoCaptioningFromFramesMapper, vid_cap_from_frm_args)))
         if consider_video_tags_from_audio:
-            from .video_tagging_from_audio_mapper import \
-                VideoTaggingFromAudioMapper
+            from .video_tagging_from_audio_mapper import VideoTaggingFromAudioMapper
             self.tag_op_list.append(
                 VideoTaggingFromAudioMapper(**self._prepare_op_args(
                     VideoTaggingFromAudioMapper, vid_tag_from_aud_args)))
         if consider_video_tags_from_frames:
-            from .video_tagging_from_frames_mapper import \
-                VideoTaggingFromFramesMapper
+            from .video_tagging_from_frames_mapper import VideoTaggingFromFramesMapper
             self.tag_op_list.append(
                 VideoTaggingFromFramesMapper(**self._prepare_op_args(
                     VideoTaggingFromFramesMapper, vid_tag_from_frm_args)))

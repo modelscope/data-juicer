@@ -2,8 +2,7 @@ import av
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.file_utils import transfer_filename
-from data_juicer.utils.mm_utils import (load_data_with_context, load_video,
-                                        pil_to_opencv, process_each_frame)
+from data_juicer.utils.mm_utils import load_data_with_context, load_video, pil_to_opencv, process_each_frame
 
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS

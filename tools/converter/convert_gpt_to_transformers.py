@@ -32,8 +32,7 @@ import re
 import torch
 from modeling_megatron_llama import MegatronLlamaConfig
 from transformers import AutoTokenizer
-from transformers.modeling_utils import (WEIGHTS_INDEX_NAME, WEIGHTS_NAME,
-                                         shard_checkpoint)
+from transformers.modeling_utils import WEIGHTS_INDEX_NAME, WEIGHTS_NAME, shard_checkpoint
 
 
 def add_checkpointing_args(parser):

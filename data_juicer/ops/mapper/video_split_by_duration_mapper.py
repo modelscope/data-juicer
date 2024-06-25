@@ -3,10 +3,8 @@ import re
 
 import numpy as np
 
-from data_juicer.utils.file_utils import (add_suffix_to_filename,
-                                          transfer_filename)
-from data_juicer.utils.mm_utils import (SpecialTokens, cut_video_by_seconds,
-                                        get_video_duration, load_video)
+from data_juicer.utils.file_utils import add_suffix_to_filename, transfer_filename
+from data_juicer.utils.mm_utils import SpecialTokens, cut_video_by_seconds, get_video_duration, load_video
 
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
