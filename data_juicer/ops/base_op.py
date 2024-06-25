@@ -34,7 +34,7 @@ class OP:
         self._accelerator = kwargs.get('accelerator', 'cpu')
 
         # parameters to determind the number of procs for this op
-        self.spec_numprocs = kwargs.get('spec_numprocs', 0)
+        self.num_proc = kwargs.get('num_proc', 0)
         self.cpu_required = kwargs.get('cpu_required', 1)
         self.mem_required = kwargs.get('mem_required', 0)
         if isinstance(self.mem_required, str):
