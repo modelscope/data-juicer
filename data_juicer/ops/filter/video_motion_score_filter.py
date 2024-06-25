@@ -1,8 +1,10 @@
 import sys
 from contextlib import contextmanager
+from typing import Optional
 
 import numpy as np
 from jsonargparse.typing import PositiveInt
+from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -43,7 +45,9 @@ class VideoMotionScoreFilter(Filter):
     def __init__(self,
                  min_score: float = 0.25,
                  max_score: float = sys.float_info.max,
-                 sampling_fps: PositiveInt = 2,
+                 sampling_fps: float = 2,
+                 target_size: Optional[PositiveInt] = None,
+                 normalize: bool = False,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -52,8 +56,12 @@ class VideoMotionScoreFilter(Filter):
 
         :param min_score: The minimum motion score to keep samples.
         :param max_score: The maximum motion score to keep samples.
-        :param sampling_fps: The samplig rate of frames_per_second to
-            compute optical flow.
+        :param sampling_fps: The samplig rate in frames per second for
+            optical flow calculations.
+        :param target_size: Resize frames along the smaller edge before
+            computing optical flow. Set to `None` to keep the original size.
+        :param normalize: If `True`, normalizes motion scores to a [0, 1]
+            range relative to the frame's diagonal length.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all videos. 'any': keep this sample if any videos meet the
             condition. 'all': keep this sample only if all videos meet the
@@ -65,6 +73,8 @@ class VideoMotionScoreFilter(Filter):
         self.min_score = min_score
         self.max_score = max_score
         self.sampling_fps = sampling_fps
+        self.target_size = target_size
+        self.normalize = normalize
 
         self.extra_kwargs = self._default_kwargs
         for key in kwargs:
@@ -98,11 +108,27 @@ class VideoMotionScoreFilter(Filter):
             video_motion_scores = []
             with VideoCapture(video_key) as cap:
                 fps = cap.get(cv2.CAP_PROP_FPS)
-                valid_fps = min(max(self.sampling_fps, 1), fps)
-                frame_interval = int(fps / valid_fps)
+                if fps <= 0:
+                    logger.warning(f'Failed to get FPS from video; skipping {video_key}.')
+                    break
+
+                sampling_fps = self.sampling_fps
+                if self.sampling_fps > fps:
+                    sampling_fps = fps
+                    logger.warning(
+                        f'sampling_fps {self.sampling_fps} is higher than video fps {fps};'
+                        'setting sampling_fps to video fp.')
+
+                sampling_stride = int(fps / sampling_fps)
                 total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                if total_frames <= 0:
+                    logger.warning(f'Video has no frames; skipping {video_key}.')
+                    break
+                elif total_frames == 1:
+                    video_motion_scores.append(0)
+                    break
                 # if cannot get the second frame, use the last one
-                frame_interval = min(frame_interval, total_frames - 1)
+                sampling_stride = min(sampling_stride, total_frames - 1)
 
                 prev_frame = None
                 frame_count = -1
@@ -115,9 +141,16 @@ class VideoMotionScoreFilter(Filter):
                         # a corrupt frame or reaching the end of the video.
                         break
 
-                    # skip middle frames
-                    if frame_count % frame_interval != 0:
+                    # skip intermediate frames
+                    if frame_count % sampling_stride != 0:
                         continue
+
+                    if self.target_size is not None:
+                        height, width, _ = frame.shape
+                        scale_ratio = self.target_size / min(width, height)
+                        new_width = int(width * scale_ratio)
+                        new_height = int(height * scale_ratio)
+                        frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_AREA)
 
                     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                     if prev_frame is None:
@@ -128,14 +161,13 @@ class VideoMotionScoreFilter(Filter):
                         prev_frame, gray_frame, None, **self.extra_kwargs)
                     mag, _ = cv2.cartToPolar(flow[..., 0], flow[..., 1])
                     frame_motion_score = np.mean(mag)
+                    if self.normalize:
+                        frame_motion_score /= np.hypot(*flow.shape[:2])
                     video_motion_scores.append(frame_motion_score)
                     prev_frame = gray_frame
 
-            # may due to frame corruption
-            if not video_motion_scores:
-                unique_motion_scores[video_key] = -1
-            else:
-                unique_motion_scores[video_key] = np.mean(video_motion_scores)
+            # set to -1 upon loop break
+            unique_motion_scores[video_key] = np.mean(video_motion_scores or [-1])
 
         sample[Fields.stats][StatsKeys.video_motion_score] = [
             unique_motion_scores[key] for key in loaded_video_keys

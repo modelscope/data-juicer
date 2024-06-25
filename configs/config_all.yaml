@@ -410,6 +410,8 @@ process:
       min_score: 0.25                                         # the minimum motion score to keep samples
       max_score: 10000.0                                      # the maximum motion score to keep samples
       sampling_fps: 2                                         # the samplig rate of frames_per_second to compute optical flow
+      target_size: null                                       # resize frames along the smaller edge before computing optical flow
+      normalize: false                                        # whether to normalize motion scores to [0, 1]
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
   - video_nsfw_filter:                                      # filter samples according to the nsfw scores of videos in them
       hf_nsfw_model: Falconsai/nsfw_image_detection           # Huggingface model name for nsfw classification
