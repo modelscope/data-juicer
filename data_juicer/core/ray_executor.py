@@ -102,6 +102,65 @@ class RayExecutor:
         proc_per_gpu = op_proc / cuda_device_count()
         return 1.0 / proc_per_gpu
 
+    def run_op(self, op, op_cfg, dataset):
+        op_name, op_args = list(op_cfg.items())[0]
+        op_cls = OPERATORS.modules[op_name]
+        op_proc = calculate_np(self.cfg.np, op, op_name)
+        num_gpus = self.get_num_gpus(op, op_proc)
+        use_actor = op.use_actor() or num_gpus
+        try:
+            if isinstance(op, Mapper):
+                if op.is_batched_op():
+                    if use_actor:
+                        dataset = dataset.map_batches(
+                            op_cls,
+                            compute=ActorPoolStrategy(),
+                            concurrency=op_proc,
+                            fn_constructor_kwargs=op_args,
+                            batch_format='pyarrow',
+                            num_gpus=num_gpus,
+                            batch_size=1)
+                        # The batch size here is same as in data.py
+                    else:
+                        dataset = dataset.map_batches(partial(
+                            ray_batch_mapper_wrapper, fn=op.process),
+                                                      batch_format='pyarrow',
+                                                      num_gpus=num_gpus,
+                                                      batch_size=1)
+                        # The batch size here is same as in data.py
+                else:
+                    if use_actor:
+                        dataset = dataset.map(op_cls,
+                                              compute=ActorPoolStrategy(),
+                                              concurrency=op_proc,
+                                              fn_constructor_kwargs=op_args,
+                                              num_gpus=num_gpus)
+                    else:
+                        dataset = dataset.map(op.process, num_gpus=num_gpus)
+
+            elif isinstance(op, Filter):
+                if use_actor:
+                    dataset = dataset.map(op_cls,
+                                          compute=ActorPoolStrategy(),
+                                          concurrency=op_proc,
+                                          fn_constructor_kwargs=op_args,
+                                          num_gpus=num_gpus)
+                else:
+                    dataset = dataset.map(op.compute_stats, num_gpus=num_gpus)
+                if op.stats_export_path is not None:
+                    dataset.write_json(op.stats_export_path, force_ascii=False)
+                dataset = dataset.filter(op.process)
+            else:
+                logger.error(
+                    'Ray executor only support Filter and Mapper OPs for '
+                    'now')
+                raise NotImplementedError
+        except:  # noqa: E722
+            logger.error(f'An error occurred during Op [{op_name}].')
+            import traceback
+            traceback.print_exc()
+            exit(1)
+
     def run(self, load_data_np=None):
         """
         Running the dataset process pipeline.
@@ -140,68 +199,7 @@ class RayExecutor:
         logger.info('Processing data...')
         tstart = time.time()
         for op_cfg, op in zip(self.process_list, self.ops):
-            op_name, op_args = list(op_cfg.items())[0]
-            op_cls = OPERATORS.modules[op_name]
-            op_proc = calculate_np(self.cfg.np, op, op_name)
-            num_gpus = self.get_num_gpus(op, op_proc)
-            use_actor = op.use_actor() or num_gpus
-            try:
-                if isinstance(op, Mapper):
-                    if op.is_batched_op():
-                        if use_actor:
-                            dataset = dataset.map_batches(
-                                op_cls,
-                                compute=ActorPoolStrategy(),
-                                concurrency=op_proc,
-                                fn_constructor_kwargs=op_args,
-                                batch_format='pyarrow',
-                                num_gpus=num_gpus,
-                                batch_size=1)
-                            # The batch size here is same as in data.py
-                        else:
-                            dataset = dataset.map_batches(
-                                partial(ray_batch_mapper_wrapper,
-                                        fn=op.process),
-                                batch_format='pyarrow',
-                                num_gpus=num_gpus,
-                                batch_size=1)
-                            # The batch size here is same as in data.py
-                    else:
-                        if use_actor:
-                            dataset = dataset.map(
-                                op_cls,
-                                compute=ActorPoolStrategy(),
-                                concurrency=op_proc,
-                                fn_constructor_kwargs=op_args,
-                                num_gpus=num_gpus)
-                        else:
-                            dataset = dataset.map(op.process,
-                                                  num_gpus=num_gpus)
-
-                elif isinstance(op, Filter):
-                    if use_actor:
-                        dataset = dataset.map(op_cls,
-                                              compute=ActorPoolStrategy(),
-                                              concurrency=op_proc,
-                                              fn_constructor_kwargs=op_args,
-                                              num_gpus=num_gpus)
-                    else:
-                        dataset = dataset.map(op.compute_stats,
-                                              num_gpus=num_gpus)
-                    if op.stats_export_path is not None:
-                        dataset.write_json(op.stats_export_path,
-                                           force_ascii=False)
-                    dataset = dataset.filter(op.process)
-                else:
-                    logger.error(
-                        'Ray executor only support Filter and Mapper OPs for '
-                        'now')
-                    raise NotImplementedError
-            except:  # noqa: E722
-                logger.error(f'An error occurred during Op [{op_name}].')
-                import traceback
-                traceback.print_exc()
-                exit(1)
+            dataset = self.run_op(op, op_cfg, dataset)
 
         # 4. data export
         logger.info('Exporting dataset to disk...')

@@ -167,10 +167,10 @@ class Executor:
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
             with_rank = use_cuda() and op._accelerator == 'cuda'
-            if op.spec_numprocs != 0:
-                op_proc = op.spec_numprocs
+            if op.num_proc != 0:
+                op_proc = op.num_proc
                 logger.info(f'Op [{op_name}] running with sepcified '
-                            f'number of procs:{op.spec_numprocs}')
+                            f'number of procs:{op.num_proc}')
             else:
                 op_proc = calculate_np(self.cfg.np, op, op_name)
             try:

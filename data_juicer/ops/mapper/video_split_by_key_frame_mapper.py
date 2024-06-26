@@ -1,6 +1,7 @@
 import copy
 import re
 
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import add_suffix_to_filename, transfer_filename
 from data_juicer.utils.mm_utils import SpecialTokens, cut_video_by_seconds, get_key_frame_seconds, load_video
 
@@ -66,11 +67,16 @@ class VideoSplitByKeyFrameMapper(Mapper):
         # there is no video in this sample
         if self.video_key not in sample or sample[
                 self.video_key] is None or len(sample[self.video_key]) == 0:
+            sample[Fields.source_file] = []
             return []
+
+        if Fields.source_file not in sample or not sample[Fields.source_file]:
+            sample[Fields.source_file] = sample[self.video_key]
 
         # the split results
         split_sample = copy.deepcopy(sample)
         split_sample[self.text_key] = ''
+        split_sample[Fields.source_file] = []
 
         # load all video(s)
         loaded_video_keys = sample[self.video_key]
@@ -99,6 +105,8 @@ class VideoSplitByKeyFrameMapper(Mapper):
                     split_video_keys.extend(new_video_keys)
                     place_holders.append(SpecialTokens.video *
                                          len(new_video_keys))
+                    split_sample[Fields.source_file].extend(
+                        [video_key] * len(new_video_keys))
 
                 # insert the generated text according to given mode
                 replacer_function = create_replacer(place_holders)

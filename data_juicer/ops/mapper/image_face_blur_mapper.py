@@ -68,7 +68,11 @@ class ImageFaceBlurMapper(Mapper):
     def process(self, sample, context=False):
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
+            sample[Fields.source_file] = []
             return sample
+
+        if Fields.source_file not in sample or not sample[Fields.source_file]:
+            sample[Fields.source_file] = sample[self.image_key]
 
         # load images
         loaded_image_keys = sample[self.image_key]
@@ -106,6 +110,12 @@ class ImageFaceBlurMapper(Mapper):
                     sample[Fields.context][blured_image_key] = blured_image
             else:
                 key_mapping[key] = key
+
+        # when the file is modified, its source file needs to be updated.
+        for i, value in enumerate(loaded_image_keys):
+            if sample[Fields.source_file][i] != value:
+                if key_mapping[value] != value:
+                    sample[Fields.source_file][i] = value
 
         sample[self.image_key] = [
             key_mapping[key] for key in loaded_image_keys
