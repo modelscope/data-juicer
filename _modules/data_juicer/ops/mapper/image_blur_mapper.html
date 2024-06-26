@@ -140,30 +140,43 @@
 <div class="viewcode-block" id="ImageBlurMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageBlurMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># there is no image in this sample</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]:</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">return</span> <span class="n">sample</span>
+
+        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]:</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span>
 
         <span class="c1"># load images</span>
         <span class="n">loaded_image_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span>
         <span class="n">sample</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span>
                                                 <span class="n">loaded_image_keys</span><span class="p">,</span> <span class="n">load_image</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_image_keys</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">():</span>
+        <span class="n">processed</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">image_key</span> <span class="ow">in</span> <span class="n">loaded_image_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">image_key</span> <span class="ow">in</span> <span class="n">processed</span><span class="p">:</span>
                 <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span> <span class="o">&lt;</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">():</span>
+                <span class="n">processed</span><span class="p">[</span><span class="n">image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">image_key</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">blured_image_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
+                <span class="n">blured_image_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">image_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
                                                      <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
                         <span class="n">blured_image_key</span><span class="p">)</span> <span class="ow">or</span> <span class="n">blured_image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
-                    <span class="n">blured_image</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">blured_image</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">image_key</span><span class="p">]</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">blur</span><span class="p">)</span>
                     <span class="n">images</span><span class="p">[</span><span class="n">blured_image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">blured_image</span>
                     <span class="n">blured_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">blured_image_key</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
                         <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">blured_image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">blured_image</span>
-                <span class="n">loaded_image_keys</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">blured_image_key</span>
+                <span class="n">processed</span><span class="p">[</span><span class="n">image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">blured_image_key</span>
 
-        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">loaded_image_keys</span>
+        <span class="c1"># when the file is modified, its source file needs to be updated.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_image_keys</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">processed</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">processed</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loaded_image_keys</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">sample</span></div></div>
 </pre></div>
 

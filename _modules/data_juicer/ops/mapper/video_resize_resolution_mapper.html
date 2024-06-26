@@ -89,6 +89,7 @@
 <span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
 
 <span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.file_utils</span> <span class="kn">import</span> <span class="n">transfer_filename</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.logger_utils</span> <span class="kn">import</span> <span class="n">HiddenPrints</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="n">load_video</span>
@@ -170,7 +171,11 @@
 <div class="viewcode-block" id="VideoResizeResolutionMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoResizeResolutionMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># there is no video in this sample</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]:</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">return</span> <span class="n">sample</span>
+
+        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]:</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
 
         <span class="n">loaded_video_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
 
@@ -246,6 +251,12 @@
                 <span class="n">stream</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
             <span class="n">loaded_video_keys</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">resized_video_key</span>
+
+        <span class="c1"># when the file is modified, its source file needs to be updated.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">loaded_video_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
         <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">loaded_video_keys</span>
         <span class="k">return</span> <span class="n">sample</span></div></div>
