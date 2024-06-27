@@ -1,25 +1,20 @@
 import os
-from time import time
+import traceback
 
 from loguru import logger
 
-from data_juicer import use_cuda
 from data_juicer.config import init_configs
 from data_juicer.core.data import Dataset
 from data_juicer.format.load import load_formatter
 from data_juicer.format.mixture_formatter import MixtureFormatter
-from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
-                             load_ops)
+from data_juicer.ops import OPERATORS, load_ops
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
-from data_juicer.utils.constant import Fields
-from data_juicer.utils.process_utils import calculate_np
 
 from ..ops.selector.frequency_specified_field_selector import \
     FrequencySpecifiedFieldSelector
 from ..ops.selector.topk_specified_field_selector import \
     TopkSpecifiedFieldSelector
-from .data import add_same_content_to_new_column
 from .exporter import Exporter
 from .tracer import Tracer
 
@@ -43,6 +38,8 @@ class Executor:
         self.work_dir = self.cfg.work_dir
 
         self.ops = None
+        self.tracer = None
+        self.ckpt_manager = None
 
         # only enable it when using cache
         if self.cfg.use_cache:
@@ -164,99 +161,7 @@ class Executor:
         # - If tracer is open, trace each op after it's processed
         # - If checkpoint is open, clean the cache files after each process
         logger.info('Processing data...')
-        start = time()
-        tstart = start
-        for op_cfg, op in zip(self.process_list, self.ops):
-            op_name, op_args = list(op_cfg.items())[0]
-            prev = dataset  # record last dataset
-            with_rank = use_cuda() and op._accelerator == 'cuda'
-            if op.num_proc != 0:
-                op_proc = op.num_proc
-                logger.info(f'Op [{op_name}] running with sepcified '
-                            f'number of procs:{op.num_proc}')
-            else:
-                op_proc = calculate_np(self.cfg.np, op, op_name)
-            try:
-                if isinstance(op, Mapper):
-                    tmp = dataset.map(function=op.process,
-                                      num_proc=op_proc,
-                                      with_rank=with_rank,
-                                      desc=op_name + '_process')
-                    if self.open_tracer and \
-                            op_name in self.op_list_to_trace:
-                        if op.is_batched_op():
-                            self.tracer.trace_batch_mapper(
-                                op_name, dataset, tmp, op.text_key)
-                        else:
-                            self.tracer.trace_mapper(op_name, dataset, tmp,
-                                                     op.text_key)
-                elif isinstance(op, Filter):
-                    if Fields.stats not in dataset.features:
-                        # only add stats when calling filter op
-                        dataset = dataset.map(
-                            add_same_content_to_new_column,
-                            fn_kwargs={
-                                'new_column_name': Fields.stats,
-                                'initial_value': {}
-                            },
-                            num_proc=self.cfg.np,
-                            desc='Adding new column for stats')
-                        if self.cfg.use_checkpoint:
-                            prev = dataset
-                    dataset = dataset.map(op.compute_stats,
-                                          num_proc=op_proc,
-                                          with_rank=with_rank,
-                                          desc=op_name + '_compute_stats')
-                    if self.cfg.use_checkpoint:
-                        prev = dataset
-                    if op.stats_export_path is not None:
-                        self.exporter.export_compute_stats(
-                            dataset, op.stats_export_path)
-                    tmp = dataset.filter(op.process,
-                                         num_proc=self.cfg.np,
-                                         desc=op_name + '_process')
-                    if self.open_tracer and op_name in self.op_list_to_trace:
-                        self.tracer.trace_filter(op_name, dataset, tmp)
-                elif isinstance(op, Selector):
-                    tmp = op.process(dataset)
-                    if self.open_tracer and op_name in self.op_list_to_trace:
-                        self.tracer.trace_filter(op_name, dataset, tmp)
-                elif isinstance(op, Deduplicator):
-                    dataset = dataset.map(op.compute_hash,
-                                          num_proc=op_proc,
-                                          with_rank=with_rank,
-                                          desc=op_name + '_compute_hash')
-                    if self.cfg.use_checkpoint:
-                        prev = dataset
-                    tmp, dup_pairs = op.process(
-                        dataset, self.tracer.show_num if self.open_tracer
-                        and op_name in self.op_list_to_trace else 0)
-                    if self.open_tracer and op_name in self.op_list_to_trace:
-                        self.tracer.trace_deduplicator(op_name, dup_pairs)
-                else:
-                    raise NotImplementedError
-                dataset = tmp
-            except:  # noqa: E722
-                logger.error(f'An error occurred during Op [{op_name}].')
-                import traceback
-                traceback.print_exc()
-                if self.cfg.use_checkpoint:
-                    logger.info('Writing checkpoint of dataset processed by '
-                                'last op...')
-                    prev.cleanup_cache_files()
-                    self.ckpt_manager.save_ckpt(prev)
-                exit(1)
-
-            # clean up cache files and record processed ops
-            if self.cfg.use_checkpoint:
-                self.ckpt_manager.record(op_name, op_args)
-
-            end = time()
-            logger.info(f'Op [{op_name}] Done in {"%.3f" % (end - start)}(s). '
-                        f'Left {len(dataset)} samples.')
-            start = end
-        tend = time()
-        logger.info(f'All Ops are done in {"%.3f" % (tend - tstart)}(s).')
+        dataset = dataset.process(self.ops, self.tracer, self.ckpt_manager)
 
         # 4. data export
         logger.info('Exporting dataset to disk...')
@@ -265,7 +170,6 @@ class Executor:
         except:  # noqa: E722
             logger.error('An error occurred during exporting the processed '
                          'dataset.')
-            import traceback
             traceback.print_exc()
             if self.cfg.use_checkpoint:
                 logger.info('Writing checkpoint of dataset processed by '

@@ -1,6 +1,7 @@
 import copy
 import inspect
 from functools import wraps
+from time import time
 from typing import Union
 
 from datasets import Dataset, DatasetDict, is_caching_enabled
@@ -138,6 +139,29 @@ class NestedDataset(Dataset):
             # or iter of indices or bools
             res = super().__getitem__(key)
         return nested_obj_factory(res)
+
+    def process(self, operator, tracer=None, ckpt_manager=None):
+        if operator is None:
+            return self
+
+        if not isinstance(operator, list):
+            ops = [operator]
+        else:
+            ops = operator
+
+        start = time()
+        tstart = start
+        dataset = self
+        for op in ops:
+            dataset = op(dataset, tracer, ckpt_manager)
+            end = time()
+            logger.info(
+                f'OP [{op._name}] Done in {"%.3f" % (end - start)}(s). '
+                f'Left {len(dataset)} samples.')
+            start = end
+        tend = time()
+        logger.info(f'All OPs are done in {"%.3f" % (tend - tstart)}(s).')
+        return dataset
 
     def map(self, *args, **kargs):
         """Override the map func, which is called by most common operations,
