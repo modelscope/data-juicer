@@ -59,9 +59,10 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             type (str, optional): "standalone" or "ray".
             Defaults to "standalone".
         """
-        if self.current_tag.startswith('standalone'):
+        current_tag = getattr(self, 'current_tag', 'standalone')
+        if current_tag.startswith('standalone'):
             return Dataset.from_list(data)
-        elif self.current_tag.startswith('ray'):
+        elif current_tag.startswith('ray'):
             dataset = rd.from_items(data)
             if Fields.stats not in dataset.columns(fetch_if_missing=False):
 
@@ -79,7 +80,8 @@ class DataJuicerTestCaseBase(unittest.TestCase):
 
     def run_single_op(self, dataset, op, column_names):
         """Run operator in the specific executor."""
-        if self.current_tag.startswith('standalone'):
+        current_tag = getattr(self, 'current_tag', 'standalone')
+        if current_tag.startswith('standalone'):
             if isinstance(op, Filter) and Fields.stats not in dataset.features:
                 dataset = dataset.add_column(name=Fields.stats,
                                              column=[{}] * dataset.num_rows)
@@ -87,7 +89,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             dataset = dataset.filter(op.process)
             dataset = dataset.select_columns(column_names=column_names)
             return dataset.to_list()
-        elif self.current_tag.startswith('ray'):
+        elif current_tag.startswith('ray'):
             dataset = dataset.map(op.compute_stats)
             dataset = dataset.filter(op.process)
             dataset = dataset.to_pandas().get(column_names)
