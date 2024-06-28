@@ -2,11 +2,8 @@ from typing import Any, Dict, List, Union
 
 import dill
 import xxhash
-from datasets.fingerprint import (_CACHING_ENABLED, fingerprint_warnings,
-                                  format_kwargs_for_fingerprint,
-                                  format_transform_for_fingerprint,
-                                  generate_random_fingerprint,
-                                  validate_fingerprint)
+from datasets.fingerprint import (_CACHING_ENABLED, fingerprint_warnings, format_kwargs_for_fingerprint,
+                                  format_transform_for_fingerprint, generate_random_fingerprint, validate_fingerprint)
 from loguru import logger
 
 

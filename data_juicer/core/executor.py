@@ -8,17 +8,14 @@ from data_juicer.config import init_configs
 from data_juicer.core.data import Dataset
 from data_juicer.format.load import load_formatter
 from data_juicer.format.mixture_formatter import MixtureFormatter
-from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
-                             load_ops)
+from data_juicer.ops import OPERATORS, Deduplicator, Filter, Mapper, Selector, load_ops
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.process_utils import calculate_np
 
-from ..ops.selector.frequency_specified_field_selector import \
-    FrequencySpecifiedFieldSelector
-from ..ops.selector.topk_specified_field_selector import \
-    TopkSpecifiedFieldSelector
+from ..ops.selector.frequency_specified_field_selector import FrequencySpecifiedFieldSelector
+from ..ops.selector.topk_specified_field_selector import TopkSpecifiedFieldSelector
 from .data import add_same_content_to_new_column
 from .exporter import Exporter
 from .tracer import Tracer

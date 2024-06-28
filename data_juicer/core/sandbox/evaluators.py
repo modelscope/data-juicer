@@ -7,8 +7,7 @@ from loguru import logger
 from vbench import VBench
 
 from data_juicer import cuda_device_count
-from tools.mm_eval.inception_metrics.calc_metrics_for_videos import \
-    calc_metrics
+from tools.mm_eval.inception_metrics.calc_metrics_for_videos import calc_metrics
 # TODO: cannot import tools correctly if DJ is installed by pypi. Maybe we need
 #       other importing methods.
 from tools.quality_classifier.predict import predict_score

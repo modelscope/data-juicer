@@ -4,8 +4,7 @@ from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (load_data_with_context, load_image,
-                                        pil_to_opencv)
+from data_juicer.utils.mm_utils import load_data_with_context, load_image, pil_to_opencv
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES

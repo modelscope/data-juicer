@@ -10,8 +10,7 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ...utils.asset_utils import ASSET_DIR, load_words_asset
 from ..base_op import OPERATORS, Filter
-from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
-                      words_refinement)
+from ..common import SPECIAL_CHARACTERS, get_words_from_document, words_refinement
 from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'flagged_words_filter'

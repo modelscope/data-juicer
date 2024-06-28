@@ -5,8 +5,7 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 
 from ..base_op import OPERATORS, Filter
-from ..mapper.video_tagging_from_frames_mapper import \
-    VideoTaggingFromFramesMapper
+from ..mapper.video_tagging_from_frames_mapper import VideoTaggingFromFramesMapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_tagging_from_frames_filter'

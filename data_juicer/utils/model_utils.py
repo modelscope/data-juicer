@@ -201,8 +201,7 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
     """
     import torch
     import torch.nn as nn
-    from transformers import (AutoModelForCausalLM, AutoModelForSeq2SeqLM,
-                              Blip2Config, Blip2ForConditionalGeneration,
+    from transformers import (AutoModelForCausalLM, AutoModelForSeq2SeqLM, Blip2Config, Blip2ForConditionalGeneration,
                               Blip2QFormerModel, Blip2VisionModel)
     from transformers.modeling_outputs import BaseModelOutputWithPooling
 
@@ -338,9 +337,7 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
     :return: a tuple (model, input processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
-    from aesthetics_predictor import (AestheticsPredictorV1,
-                                      AestheticsPredictorV2Linear,
-                                      AestheticsPredictorV2ReLU)
+    from aesthetics_predictor import AestheticsPredictorV1, AestheticsPredictorV2Linear, AestheticsPredictorV2ReLU
     from transformers import CLIPProcessor
 
     processor = CLIPProcessor.from_pretrained(pretrained_model_name_or_path)
@@ -454,9 +451,7 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
         :return: a Diffusion model.
     """
     import torch
-    from diffusers import (AutoPipelineForImage2Image,
-                           AutoPipelineForInpainting,
-                           AutoPipelineForText2Image)
+    from diffusers import AutoPipelineForImage2Image, AutoPipelineForInpainting, AutoPipelineForText2Image
 
     diffusion_type_to_pipeline = {
         'image2image': AutoPipelineForImage2Image,

@@ -8,9 +8,7 @@ from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
 from data_juicer.utils import cache_utils
-from data_juicer.utils.compress import (CompressionOff,
-                                        cleanup_compressed_cache_files,
-                                        compress, decompress)
+from data_juicer.utils.compress import CompressionOff, cleanup_compressed_cache_files, compress, decompress
 from data_juicer.utils.fingerprint_utils import generate_fingerprint
 
 

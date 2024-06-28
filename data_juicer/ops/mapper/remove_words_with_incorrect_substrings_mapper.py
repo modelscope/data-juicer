@@ -4,8 +4,7 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
-from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
-                      merge_on_whitespace_tab_newline,
+from ..common import (SPECIAL_CHARACTERS, get_words_from_document, merge_on_whitespace_tab_newline,
                       split_on_newline_tab_whitespace, strip)
 
 OP_NAME = 'remove_words_with_incorrect_substrings_mapper'

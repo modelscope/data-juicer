@@ -1,8 +1,5 @@
-from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
-                                                 InceptionEvaluator,
-                                                 VBenchEvaluator)
-from data_juicer.core.sandbox.model_executors import (ModelscopeInferExecutor,
-                                                      ModelscopeTrainExecutor)
+from data_juicer.core.sandbox.evaluators import Gpt3QualityEvaluator, InceptionEvaluator, VBenchEvaluator
+from data_juicer.core.sandbox.model_executors import ModelscopeInferExecutor, ModelscopeTrainExecutor
 
 
 class DataEvaluatorFactory(object):

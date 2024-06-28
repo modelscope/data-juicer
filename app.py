@@ -15,8 +15,7 @@ import streamlit as st
 import yaml
 from loguru import logger
 
-from data_juicer.analysis.diversity_analysis import (DiversityAnalysis,
-                                                     get_diversity)
+from data_juicer.analysis.diversity_analysis import DiversityAnalysis, get_diversity
 from data_juicer.config import init_configs
 from data_juicer.core import Analyser, Executor
 from data_juicer.ops.base_op import OPERATORS
