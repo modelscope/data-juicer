@@ -55,7 +55,7 @@ class OP:
 
     def runtime_np(self):
         return calculate_np(self._name, self.mem_required, self.cpu_required,
-                            self.num_proc, self.use_cuda)
+                            self.num_proc, self.use_cuda())
 
     def use_cuda(self):
         return self._accelerator == 'cuda'
