@@ -89,7 +89,7 @@ class OP:
         related_parameters.update(extra_param_dict)
         return related_parameters
 
-    def __call__(self, dataset, tracer=None, checkpointer=None):
+    def __call__(self, dataset, checkpointer=None, tracer=None):
         try:
             dataset = self.run(dataset, tracer)
             if checkpointer:
@@ -215,8 +215,6 @@ class Filter(OP):
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
                               desc=self._name + '_compute_stats')
-        if self.stats_export_path is not None:
-            self.exporter.export_compute_stats(dataset, self.stats_export_path)
         new_dataset = dataset.filter(self.process,
                                      num_proc=self.runtime_np(),
                                      desc=self._name + '_process')
