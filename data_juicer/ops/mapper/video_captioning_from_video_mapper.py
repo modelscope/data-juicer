@@ -16,7 +16,7 @@ from data_juicer.utils.mm_utils import (SpecialTokens, extract_key_frames,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_captioning_from_video_mapper'
@@ -336,6 +336,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
                 generated_text_candidates_single_chunk[max_index])
         return generated_text_per_chunk
 
+    @catch_exception_mapper_process
     def process(self, samples, rank=None, context=False):
         """
         :param samples:

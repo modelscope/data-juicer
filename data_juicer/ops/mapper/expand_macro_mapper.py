@@ -4,7 +4,7 @@
 
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('expand_macro_mapper')
@@ -55,6 +55,7 @@ class ExpandMacroMapper(Mapper):
                 macros[macro_name] = macro_val
         return macros
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
         non_arg_macros = self._build_non_arg_macros_dict(sample[self.text_key])
 

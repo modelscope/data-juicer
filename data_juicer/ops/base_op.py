@@ -2,11 +2,74 @@ import copy
 
 import pandas as pd
 import pyarrow as pa
+from loguru import logger
 
 from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
+
+
+def convert_list_dict_to_dict_list(samples):
+    # reconstruct samples from "list of dicts" to "dict of lists"
+    keys = samples[0].keys()
+    res_samples = {}
+    for key in keys:
+        res_samples[key] = [s[key] for s in samples]
+    return res_samples
+
+
+def convert_dict_list_to_list_dict(samples):
+    # reconstruct samples from "dict of lists" to "list of dicts"
+    reconstructed_samples = []
+    keys = list(samples.keys())
+    # take any key, since they should be of same length
+    for i in range(len(samples[keys[0]])):
+        reconstructed_samples.append({key: samples[key][i] for key in samples})
+    return reconstructed_samples
+
+
+def catch_exception_mapper_process(method):
+    """
+    For mapper sample level fault torelerance.
+    """
+
+    def wrapper(self, *args, **kwargs):
+        try:
+            return method(self, *args, **kwargs)
+        except Exception as e:
+            samples = args[0]
+            logger.error(
+                f'An error occurred in mapper operation when processing'
+                f'sample {samples}, {type(e)}: {e}')
+            return {}
+
+    return wrapper
+
+
+def catch_exception_mapper_process_single(method):
+    """
+    For mapper process_single,
+    turn it into batch_size = 1, and enable fault torelerance.
+    """
+
+    def wrapper(self, *args, **kwargs):
+        try:
+            args = list(args)
+            samples = args[0]
+            sample = convert_dict_list_to_list_dict(samples)[0]
+            args[0] = sample
+            args = tuple(args)
+            res_sample = method(self, *args, **kwargs)
+            return convert_list_dict_to_dict_list([res_sample])
+        except Exception as e:
+            samples = args[0]
+            logger.error(
+                f'An error occurred in mapper operation when processing'
+                f'sample {samples}, {type(e)}: {e}')
+            return {}
+
+    return wrapper
 
 
 class OP:
@@ -87,6 +150,7 @@ def ray_batch_mapper_wrapper(samples, fn):
     return pa.Table.from_pandas(res)
 
 
+# @mapper_fault_tolerance
 class Mapper(OP):
 
     def __init__(self, *args, **kwargs):
@@ -105,7 +169,9 @@ class Mapper(OP):
         super(Mapper, self).__init__(*args, **kwargs)
 
         # In default, it's a normal OP instead of batched OP
-        self._batched_op = kwargs.get('batched_op', False)
+        # self._batched_op = kwargs.get('batched_op', False)
+        # Aftet the refactor, we want all ops to be batched OP by default
+        self._batched_op = kwargs.get('batched_op', True)
 
     def process(self, sample):
         """
@@ -134,6 +200,7 @@ class Mapper(OP):
             return self.process(sample)
 
 
+# @filter_fault_tolerance
 class Filter(OP):
 
     def __init__(self, *args, **kwargs):

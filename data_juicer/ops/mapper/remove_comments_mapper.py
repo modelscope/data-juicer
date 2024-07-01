@@ -6,7 +6,7 @@ from typing import List, Union
 
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('remove_comments_mapper')
@@ -37,6 +37,7 @@ class RemoveCommentsMapper(Mapper):
         self.inline = inline
         self.multiline = multiline
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
         # TODO: remove different comments by sample type
 

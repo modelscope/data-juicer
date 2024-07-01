@@ -4,7 +4,7 @@
 
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('clean_copyright_mapper')
@@ -23,8 +23,8 @@ class CleanCopyrightMapper(Mapper):
         self.pat = re.compile('/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/')
         self.cpat = re.compile('copyright', re.IGNORECASE)
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
-
         r = self.pat.search(sample[self.text_key])
         if r:
             # found one, now see if it contains "copyright", if so strip it

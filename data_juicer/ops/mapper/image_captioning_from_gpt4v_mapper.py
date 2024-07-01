@@ -10,7 +10,7 @@ from data_juicer.utils.mm_utils import (SpecialTokens, image_byte_to_base64,
                                         remove_non_special_tokens,
                                         remove_special_tokens)
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process
 from ..op_fusion import LOADED_IMAGES
 
 SYSTEM_PROMPTS = {
@@ -244,6 +244,7 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
 
         return [generated_sample]
 
+    @catch_exception_mapper_process
     def process(self, samples):
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []

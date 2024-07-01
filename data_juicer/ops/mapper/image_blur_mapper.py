@@ -6,7 +6,7 @@ from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_blur_mapper'
@@ -53,6 +53,7 @@ class ImageBlurMapper(Mapper):
         else:
             self.blur = ImageFilter.GaussianBlur(radius)
 
+    @catch_exception_mapper_process_single
     def process(self, sample, context=False):
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:

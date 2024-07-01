@@ -9,7 +9,7 @@ from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
 from data_juicer.utils.mm_utils import SpecialTokens
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 OP_NAME = 'video_split_by_scene_mapper'
 
@@ -81,6 +81,7 @@ class VideoSplitBySceneMapper(Mapper):
             for key in avaliable_kwargs if key in kwargs
         }
 
+    @catch_exception_mapper_process_single
     def process(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:

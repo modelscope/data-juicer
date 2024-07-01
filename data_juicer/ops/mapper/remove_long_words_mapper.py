@@ -6,7 +6,7 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 from ..common import (SPECIAL_CHARACTERS, merge_on_whitespace_tab_newline,
                       split_on_newline_tab_whitespace, strip)
 
@@ -43,8 +43,8 @@ class RemoveLongWordsMapper(Mapper):
         else:
             return False
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
-
         sentences = split_on_newline_tab_whitespace(sample[self.text_key])
         sentences = [[[
             word for word in subsentence if self.should_keep_long_word(word)

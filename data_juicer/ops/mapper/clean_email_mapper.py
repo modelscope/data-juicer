@@ -1,6 +1,6 @@
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('clean_email_mapper')
@@ -28,8 +28,8 @@ class CleanEmailMapper(Mapper):
 
         self.repl = repl
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
-
         if not re.search(self.pattern, sample[self.text_key], flags=re.DOTALL):
             return sample
 

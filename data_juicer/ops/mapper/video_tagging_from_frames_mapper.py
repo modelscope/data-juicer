@@ -9,7 +9,7 @@ from data_juicer.utils.mm_utils import (extract_key_frames,
                                         load_data_with_context, load_video)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_tagging_from_frames_mapper'
@@ -68,6 +68,7 @@ class VideoTaggingFromFramesMapper(Mapper):
         from ram import get_transform
         self.transform = get_transform(image_size=384)
 
+    @catch_exception_mapper_process_single
     def process(self, sample, rank=None, context=False):
         # check if it's generated already
         if Fields.video_frame_tags in sample:

@@ -2,7 +2,7 @@ from typing import List, Union
 
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('replace_content_mapper')
@@ -42,6 +42,7 @@ class ReplaceContentMapper(Mapper):
             pattern = pattern[2:-1]
         return re.compile(pattern, flags=re.DOTALL)
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
         if self.pattern is None:
             return sample

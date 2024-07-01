@@ -1,6 +1,6 @@
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('remove_non_chinese_character_mapper')
@@ -33,8 +33,8 @@ class RemoveNonChineseCharacterlMapper(Mapper):
         else:
             self.pattern += u']'
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
-
         if not re.search(self.pattern, sample[self.text_key], flags=re.DOTALL):
             return sample
 

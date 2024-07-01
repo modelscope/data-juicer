@@ -1,6 +1,6 @@
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('clean_ip_mapper')
@@ -32,8 +32,8 @@ class CleanIpMapper(Mapper):
                 self.pattern = pattern[2:-1]
         self.repl = repl
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
-
         if not re.search(self.pattern, sample[self.text_key], flags=re.DOTALL):
             return sample
 

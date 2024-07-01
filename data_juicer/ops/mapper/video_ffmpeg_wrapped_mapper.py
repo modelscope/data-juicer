@@ -4,7 +4,7 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.logger_utils import HiddenPrints
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 OP_NAME = 'video_ffmpeg_wrapped_mapper'
 
@@ -47,8 +47,8 @@ class VideoFFmpegWrappedMapper(Mapper):
         self.capture_stderr = capture_stderr
         self.overwrite_output = overwrite_output
 
-    def process(self, sample):
-        # there is no video in this sample
+    @catch_exception_mapper_process_single
+    def process(self, sample):  # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             return sample
 

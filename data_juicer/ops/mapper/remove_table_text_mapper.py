@@ -1,7 +1,7 @@
 import regex as re
 from jsonargparse.typing import restricted_number_type
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 from_2_to_20 = restricted_number_type('from_2_to_20', int, [('>=', 2),
                                                             ('<=', 20)])
@@ -34,8 +34,8 @@ class RemoveTableTextMapper(Mapper):
         self.max_col = max_col
         self.pattern = r'(?<=\n)((\S+?)([ |\t](\S+?)){%d}\n+){2,}'
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
-
         text = sample[self.text_key]
         for i in range(self.min_col - 1, self.max_col):
             pattern = re.compile(self.pattern % i)

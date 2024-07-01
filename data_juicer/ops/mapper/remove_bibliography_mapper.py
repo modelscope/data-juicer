@@ -4,7 +4,7 @@
 
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('remove_bibliography_mapper')
@@ -27,6 +27,7 @@ class RemoveBibliographyMapper(Mapper):
         self.pattern += r'\\bibliography\{.*\}'
         self.pattern += r').*$'
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
         sample[self.text_key] = re.sub(pattern=self.pattern,
                                        repl=r'',

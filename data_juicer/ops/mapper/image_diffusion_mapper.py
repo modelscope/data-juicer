@@ -10,7 +10,7 @@ from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_diffusion_mapper'
@@ -209,6 +209,7 @@ class ImageDiffusionMapper(Mapper):
 
         return generated_samples
 
+    @catch_exception_mapper_process
     def process(self, samples, rank=None, context=False):
         """
             Note:

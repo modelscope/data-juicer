@@ -7,7 +7,7 @@ from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import load_video
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 OP_NAME = 'video_resize_aspect_ratio_mapper'
 
@@ -99,8 +99,9 @@ class VideoResizeAspectRatioMapper(Mapper):
         self.max_ratio = Fraction(str(max_ratio).replace(':', '/'))
         self.strategy = strategy
 
-    def process(self, sample):
-        # there is no video in this sample
+    # turned into batched processing and with catch
+    @catch_exception_mapper_process_single
+    def process(self, sample):  # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             return sample
 

@@ -6,7 +6,7 @@ from data_juicer.utils.file_utils import (add_suffix_to_filename,
 from data_juicer.utils.mm_utils import (SpecialTokens, cut_video_by_seconds,
                                         get_key_frame_seconds, load_video)
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process
 from ..op_fusion import LOADED_VIDEOS
 
 
@@ -114,6 +114,7 @@ class VideoSplitByKeyFrameMapper(Mapper):
         split_sample[self.video_key] = split_video_keys
         return [split_sample]
 
+    @catch_exception_mapper_process
     def process(self, samples):
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []

@@ -2,7 +2,7 @@
 # https://github.com/bigscience-workshop/data-preparation
 # --------------------------------------------------------
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 @OPERATORS.register_module('punctuation_normalization_mapper')
@@ -55,6 +55,7 @@ class PunctuationNormalizationMapper(Mapper):
             '►': '-',
         }
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
         sample[self.text_key] = ''.join([
             self.punctuation_unicode.get(c, c) for c in sample[self.text_key]

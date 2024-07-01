@@ -1,6 +1,6 @@
 import regex as re
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 
 def split_sentence(text):
@@ -43,8 +43,8 @@ class RemoveRepeatSentencesMapper(Mapper):
         self.remove_regex = re.compile(r'[^a-zA-Z0-9\u4e00-\u9fa5\n\t ]'
                                        ) if ignore_special_character else None
 
+    @catch_exception_mapper_process_single
     def process(self, sample):
-
         lines = [e for e in sample[self.text_key].split('\n')]
         new_lines = []
         hash_set = set([])

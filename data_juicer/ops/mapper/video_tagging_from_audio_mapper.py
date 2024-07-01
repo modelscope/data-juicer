@@ -5,7 +5,7 @@ from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process_single
 
 OP_NAME = 'video_tagging_from_audio_mapper'
 
@@ -40,6 +40,7 @@ class VideoTaggingFromAudioMapper(Mapper):
         self._model_sampling_rate = 16000
         self._no_audio_label = 'EMPTY'
 
+    @catch_exception_mapper_process_single
     def process(self, sample, rank=None):
         # check if it's generated already
         if Fields.video_audio_tags in sample:

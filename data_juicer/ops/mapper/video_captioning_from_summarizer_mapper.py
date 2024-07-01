@@ -8,7 +8,7 @@ from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens, remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper, catch_exception_mapper_process
 
 NAME = 'video_captioning_from_summarizer_mapper'
 CHECK_PKGS = [
@@ -249,6 +249,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         captioned_sample[self.text_key] = captioned_texts
         return [captioned_sample]
 
+    @catch_exception_mapper_process
     def process(self, samples, rank=None):
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []
