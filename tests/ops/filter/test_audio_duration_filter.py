@@ -120,7 +120,6 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
                                  max_duration=20,
                                  any_or_all='any')
         result = self.run_single_op(dataset, op, [op.audio_key])
-        print(result)
         self.assertDatasetEqual(result, tgt_list)
 
     @TEST_TAG("standalone", "ray")
