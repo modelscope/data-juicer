@@ -1,9 +1,14 @@
 import copy
+import functools
+import traceback
 
 import pandas as pd
 import pyarrow as pa
+from loguru import logger
 
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import size_to_bytes
+from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
@@ -34,7 +39,7 @@ class OP:
         self._accelerator = kwargs.get('accelerator', 'cpu')
 
         # parameters to determind the number of procs for this op
-        self.spec_numprocs = kwargs.get('spec_numprocs', 0)
+        self.num_proc = kwargs.get('num_proc', 0)
         self.cpu_required = kwargs.get('cpu_required', 1)
         self.mem_required = kwargs.get('mem_required', 0)
         if isinstance(self.mem_required, str):
@@ -48,6 +53,13 @@ class OP:
 
     def process(self, *args, **kwargs):
         raise NotImplementedError
+
+    def runtime_np(self):
+        return calculate_np(self._name, self.mem_required, self.cpu_required,
+                            self.num_proc, self.use_cuda())
+
+    def use_cuda(self):
+        return self._accelerator == 'cuda'
 
     def use_actor(self):
         return self._use_actor
@@ -78,6 +90,22 @@ class OP:
         related_parameters.update(extra_param_dict)
         return related_parameters
 
+    def __call__(self, dataset, checkpointer=None, tracer=None):
+        try:
+            dataset = self.run(dataset, tracer)
+            if checkpointer:
+                checkpointer.record(self._name, self._process_kwargs)
+            return dataset
+        except:  # noqa: E722
+            logger.error(f'An error occurred during Op [{self._name}].')
+            traceback.print_exc()
+            if checkpointer:
+                logger.info('Writing checkpoint of dataset processed by '
+                            'last op...')
+                dataset.cleanup_cache_files()
+                checkpointer.save_ckpt(dataset)
+            exit(1)
+
 
 def ray_batch_mapper_wrapper(samples, fn):
     samples = samples.to_pandas()
@@ -85,6 +113,80 @@ def ray_batch_mapper_wrapper(samples, fn):
     if not isinstance(res, pd.DataFrame):
         res = pd.DataFrame(res)
     return pa.Table.from_pandas(res)
+
+
+def convert_list_dict_to_dict_list(samples):
+    # reconstruct samples from "list of dicts" to "dict of lists"
+    keys = samples[0].keys()
+    res_samples = {}
+    for key in keys:
+        res_samples[key] = [s[key] for s in samples]
+    return res_samples
+
+
+def convert_dict_list_to_list_dict(samples):
+    # reconstruct samples from "dict of lists" to "list of dicts"
+    reconstructed_samples = []
+    keys = list(samples.keys())
+    # take any key, since they should be of same length
+    for i in range(len(samples[keys[0]])):
+        reconstructed_samples.append({key: samples[key][i] for key in samples})
+    return reconstructed_samples
+
+
+def catch_exception_mapper_process(method):
+    """
+    For mapper sample level fault torelerance.
+    """
+
+    @functools.wraps(method)
+    def wrapper(*args, **kwargs):
+        try:
+            samples = args[0]
+            return method(*args, **kwargs)
+        except Exception as e:
+            samples = args[0]
+            ret = {}
+            for key in samples.keys():
+                ret[key] = []
+            logger.error(
+                f'An error occurred in mapper operation when processing '
+                f'sample {samples}, {type(e)}: {e}')
+            ret[Fields.stats] = []
+            ret[Fields.source_file] = []
+            return ret
+
+    return wrapper
+
+
+def catch_exception_mapper_process_single(method):
+    """
+    For mapper process_single,
+    turn it into batch_size = 1, and enable fault torelerance.
+    """
+
+    def wrapper(*args, **kwargs):
+        try:
+            args = list(args)
+            samples = args[0]
+            sample = convert_dict_list_to_list_dict(samples)[0]
+            args[0] = sample
+            args = tuple(args)
+            res_sample = method(*args, **kwargs)
+            return convert_list_dict_to_dict_list([res_sample])
+        except Exception as e:
+            samples = args[0]
+            logger.error(
+                f'An error occurred in mapper operation when processing '
+                f'sample {samples}, {type(e)}: {e}')
+            return {
+                'videos': [],
+                'text': [],
+                Fields.source_file: [],
+                Fields.stats: []
+            }
+
+    return wrapper
 
 
 class Mapper(OP):
@@ -119,19 +221,30 @@ class Mapper(OP):
     def is_batched_op(self):
         return self._batched_op
 
-    def __call__(self, sample):
-        """
-        Make the class callable to enable ray actor usage
-        """
-        if self.is_batched_op():
-            # same logic as ray_batch_mapper_wrapper
-            samples = sample.to_pandas()
-            res = self.process(samples)
-            if not isinstance(res, pd.DataFrame):
-                res = pd.DataFrame(res)
-            return pa.Table.from_pandas(res)
+    def run(self, dataset, tracer=None):
+        if self._batched_op:
+            # wrapped_process = types.MethodType(
+            #     catch_exception_mapper_process(self.process), self)
+            self.process.op = self
+            wrapped_process = catch_exception_mapper_process(self.process)
+            # wrapped_process = self.process
         else:
-            return self.process(sample)
+            # wrapped_process = types.MethodType(
+            #     catch_exception_mapper_process_single(self.process), self)
+            wrapped_process = catch_exception_mapper_process_single(
+                self.process)
+        new_dataset = dataset.map(
+            # self.process,
+            wrapped_process,
+            num_proc=self.runtime_np(),
+            with_rank=self.use_cuda(),
+            desc=self._name + '_process',
+            # batched=True,
+        )
+        if tracer:
+            tracer.trace_mapper(self._name, dataset, new_dataset,
+                                self.text_key)
+        return new_dataset
 
 
 class Filter(OP):
@@ -176,11 +289,32 @@ class Filter(OP):
         """
         raise NotImplementedError
 
-    def __call__(self, sample):
-        """
-        Make the class callable to enable ray actor usage
-        """
-        return self.compute_stats(sample)
+    def run(self, dataset, tracer=None):
+        if Fields.stats not in dataset.features:
+            from data_juicer.core.data import add_same_content_to_new_column
+            dataset = dataset.map(add_same_content_to_new_column,
+                                  fn_kwargs={
+                                      'new_column_name': Fields.stats,
+                                      'initial_value': {}
+                                  },
+                                  num_proc=self.runtime_np(),
+                                  desc='Adding new column for stats')
+        wrapped_process = catch_exception_mapper_process_single(
+            self.compute_stats)
+        dataset = dataset.map(  
+            #self.compute_stats,
+            wrapped_process,
+            num_proc=self.runtime_np(),
+            with_rank=self.use_cuda(),
+            desc=self._name + '_compute_stats',
+            batched=True,
+            batch_size=1)
+        new_dataset = dataset.filter(self.process,
+                                     num_proc=self.runtime_np(),
+                                     desc=self._name + '_process')
+        if tracer:
+            tracer.trace_filter(self._name, dataset, new_dataset)
+        return new_dataset
 
 
 class Deduplicator(OP):
@@ -223,6 +357,17 @@ class Deduplicator(OP):
         """
         raise NotImplementedError
 
+    def run(self, dataset, tracer=None):
+        dataset = dataset.map(self.compute_hash,
+                              num_proc=self.runtime_np(),
+                              with_rank=self.use_cuda(),
+                              desc=self._name + '_compute_hash')
+        show_num = tracer.show_num if tracer else 0
+        new_dataset, dup_pairs = self.process(dataset, show_num)
+        if tracer:
+            tracer.trace_deduplicator(self._name, dup_pairs)
+        return new_dataset
+
 
 class Selector(OP):
 
@@ -249,3 +394,9 @@ class Selector(OP):
         :return: selected dataset.
         """
         raise NotImplementedError
+
+    def run(self, dataset, tracer=None):
+        new_dataset = self.process(dataset)
+        if tracer:
+            tracer.trace_filter(self._name, dataset, new_dataset)
+        return new_dataset

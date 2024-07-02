@@ -1,12 +1,14 @@
 import copy
 import inspect
 from functools import wraps
+from time import time
 from typing import Union
 
 from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
+from data_juicer.ops import Filter
 from data_juicer.utils import cache_utils
 from data_juicer.utils.compress import (CompressionOff,
                                         cleanup_compressed_cache_files,
@@ -139,6 +141,32 @@ class NestedDataset(Dataset):
             res = super().__getitem__(key)
         return nested_obj_factory(res)
 
+    def process(self, operator, exporter=None, checkpointer=None, tracer=None):
+        if operator is None:
+            return self
+
+        if not isinstance(operator, list):
+            ops = [operator]
+        else:
+            ops = operator
+
+        start = time()
+        tstart = start
+        dataset = self
+        for op in ops:
+            dataset = op(dataset, checkpointer, tracer)
+            # TODO: Export before actual filtering, not after, needs fixing
+            if isinstance(op, Filter) and op.stats_export_path is not None:
+                exporter.export_compute_stats(dataset, op.stats_export_path)
+            end = time()
+            logger.info(
+                f'OP [{op._name}] Done in {"%.3f" % (end - start)}(s). '
+                f'Left {len(dataset)} samples.')
+            start = end
+        tend = time()
+        logger.info(f'All OPs are done in {"%.3f" % (tend - tstart)}(s).')
+        return dataset
+
     def map(self, *args, **kargs):
         """Override the map func, which is called by most common operations,
         such that the processed samples can be accessed by nested manner."""
@@ -162,10 +190,13 @@ class NestedDataset(Dataset):
         while hasattr(called_func, '__wrapped__'):
             called_func = called_func.__wrapped__
         # Does the called function belong to a batched OP?
+        print('Call func is:', called_func)
+        # breakpoint()
         if inspect.ismethod(called_func) \
                 and 'is_batched_op' in dir(called_func.__self__) \
                 and callable(getattr(called_func.__self__, 'is_batched_op')) \
                 and called_func.__self__.is_batched_op():
+            print('INTO IF')
             kargs['batched'] = True
             kargs['batch_size'] = 1
 

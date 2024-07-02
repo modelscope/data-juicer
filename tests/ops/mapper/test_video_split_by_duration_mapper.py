@@ -28,7 +28,10 @@ class VideoSplitByDurationMapperTest(DataJuicerTestCaseBase):
 
             # for keep_original_sample=True
             if set(output_paths) <= set(origin_paths):
-                res_list.append(sample)
+                res_list.append({
+                    'text': sample['text'],
+                    'videos': sample['videos']
+                })
                 continue
 
             source = source_list[idx]

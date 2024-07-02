@@ -56,28 +56,41 @@ class ImageBlurMapper(Mapper):
     def process(self, sample, context=False):
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
+            sample[Fields.source_file] = []
             return sample
+
+        if Fields.source_file not in sample or not sample[Fields.source_file]:
+            sample[Fields.source_file] = sample[self.image_key]
 
         # load images
         loaded_image_keys = sample[self.image_key]
         sample, images = load_data_with_context(sample, context,
                                                 loaded_image_keys, load_image)
-
-        for index, value in enumerate(loaded_image_keys):
-            if self.p < np.random.rand():
+        processed = {}
+        for image_key in loaded_image_keys:
+            if image_key in processed:
                 continue
+
+            if self.p < np.random.rand():
+                processed[image_key] = image_key
             else:
-                blured_image_key = transfer_filename(value, OP_NAME,
+                blured_image_key = transfer_filename(image_key, OP_NAME,
                                                      **self._init_parameters)
                 if not os.path.exists(
                         blured_image_key) or blured_image_key not in images:
-                    blured_image = images[value].convert('RGB').filter(
+                    blured_image = images[image_key].convert('RGB').filter(
                         self.blur)
                     images[blured_image_key] = blured_image
                     blured_image.save(blured_image_key)
                     if context:
                         sample[Fields.context][blured_image_key] = blured_image
-                loaded_image_keys[index] = blured_image_key
+                processed[image_key] = blured_image_key
 
-        sample[self.image_key] = loaded_image_keys
+        # when the file is modified, its source file needs to be updated.
+        for i, value in enumerate(loaded_image_keys):
+            if sample[Fields.source_file][i] != value:
+                if processed[value] != value:
+                    sample[Fields.source_file][i] = value
+
+        sample[self.image_key] = [processed[key] for key in loaded_image_keys]
         return sample

@@ -84,6 +84,7 @@ class Registry(object):
                 f'{module_name} is already registered in {self._name}')
 
         self._modules[module_name] = module_cls
+        module_cls._name = module_name
 
     def register_module(self,
                         module_name: str = None,
