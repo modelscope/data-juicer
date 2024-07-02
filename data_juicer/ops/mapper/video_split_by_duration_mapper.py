@@ -141,6 +141,8 @@ class VideoSplitByDurationMapper(Mapper):
         return [split_sample]
 
     def process(self, samples):
+        print('samples are:', samples)
+        print('self.text_key is:', self.text_key)
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []
         for i in range(len(samples[self.text_key])):
@@ -160,5 +162,5 @@ class VideoSplitByDurationMapper(Mapper):
         res_samples = {}
         for key in keys:
             res_samples[key] = [s[key] for s in samples_after_split]
-
+        print('res :', res_samples)
         return res_samples

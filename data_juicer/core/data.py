@@ -190,10 +190,13 @@ class NestedDataset(Dataset):
         while hasattr(called_func, '__wrapped__'):
             called_func = called_func.__wrapped__
         # Does the called function belong to a batched OP?
+        print('Call func is:', called_func)
+        # breakpoint()
         if inspect.ismethod(called_func) \
                 and 'is_batched_op' in dir(called_func.__self__) \
                 and callable(getattr(called_func.__self__, 'is_batched_op')) \
                 and called_func.__self__.is_batched_op():
+            print('INTO IF')
             kargs['batched'] = True
             kargs['batch_size'] = 1
 

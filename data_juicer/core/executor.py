@@ -151,6 +151,7 @@ class Executor:
             if load_data_np is None:
                 load_data_np = self.cfg.np
             dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+            print('type dataset is', type(dataset))
 
         # 2. extract processes
         logger.info('Preparing process operators...')
