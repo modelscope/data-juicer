@@ -301,14 +301,12 @@ class Filter(OP):
                                   desc='Adding new column for stats')
         wrapped_process = catch_exception_mapper_process_single(
             self.compute_stats)
-        dataset = dataset.map(  
-            #self.compute_stats,
-            wrapped_process,
-            num_proc=self.runtime_np(),
-            with_rank=self.use_cuda(),
-            desc=self._name + '_compute_stats',
-            batched=True,
-            batch_size=1)
+        dataset = dataset.map(wrapped_process,
+                              num_proc=self.runtime_np(),
+                              with_rank=self.use_cuda(),
+                              desc=self._name + '_compute_stats',
+                              batched=True,
+                              batch_size=1)
         new_dataset = dataset.filter(self.process,
                                      num_proc=self.runtime_np(),
                                      desc=self._name + '_process')
