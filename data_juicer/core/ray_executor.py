@@ -1,14 +1,12 @@
 import os
 import time
-from functools import partial
 
-import pandas as pd
 import pyarrow as pa
 from loguru import logger
 
 from data_juicer import cuda_device_count, use_cuda
 from data_juicer.config import init_configs
-from data_juicer.ops import Filter, Mapper, load_ops
+from data_juicer.ops import Filter, Mapper, batch_mapper_wrapper, load_ops
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.process_utils import calculate_np
@@ -58,14 +56,6 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
         item, dataset_dir, [cfg.video_key, cfg.image_key, cfg.audio_key]))
     logger.info(f"transfer {dataset.count()} sample's paths")
     return dataset
-
-
-def ray_batch_mapper_wrapper(samples, fn):
-    samples = samples.to_pandas()
-    res = fn(samples)
-    if not isinstance(res, pd.DataFrame):
-        res = pd.DataFrame(res)
-    return pa.Table.from_pandas(res)
 
 
 class RayExecutor:
@@ -122,8 +112,8 @@ class RayExecutor:
                             batch_size=1)
                         # The batch size here is same as in data.py
                     else:
-                        dataset = dataset.map_batches(partial(
-                            ray_batch_mapper_wrapper, fn=op.process),
+                        dataset = dataset.map_batches(batch_mapper_wrapper(
+                            op.process),
                                                       batch_format='pyarrow',
                                                       num_gpus=num_gpus,
                                                       batch_size=1)

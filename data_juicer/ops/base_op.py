@@ -107,12 +107,16 @@ class OP:
             exit(1)
 
 
-def ray_batch_mapper_wrapper(samples, fn):
-    samples = samples.to_pandas()
-    res = fn(samples)
-    if not isinstance(res, pd.DataFrame):
-        res = pd.DataFrame(res)
-    return pa.Table.from_pandas(res)
+def batch_mapper_wrapper(fn):
+
+    def wrapper(samples):
+        samples = samples.to_pandas()
+        res = fn(samples)
+        if not isinstance(res, pd.DataFrame):
+            res = pd.DataFrame(res)
+        return pa.Table.from_pandas(res)
+
+    return wrapper
 
 
 def convert_list_dict_to_dict_list(samples):
@@ -136,7 +140,7 @@ def convert_dict_list_to_list_dict(samples):
 
 def catch_exception_mapper_process(method):
     """
-    For mapper sample level fault torelerance.
+    For mapper sample level fault tolerance.
     """
 
     @functools.wraps(method)
@@ -146,12 +150,10 @@ def catch_exception_mapper_process(method):
             return method(*args, **kwargs)
         except Exception as e:
             samples = args[0]
-            ret = {}
-            for key in samples.keys():
-                ret[key] = []
             logger.error(
                 f'An error occurred in mapper operation when processing '
                 f'sample {samples}, {type(e)}: {e}')
+            ret = {key: [] for key in samples.keys()}
             ret[Fields.stats] = []
             ret[Fields.source_file] = []
             return ret
@@ -162,7 +164,7 @@ def catch_exception_mapper_process(method):
 def catch_exception_mapper_process_single(method):
     """
     For mapper process_single,
-    turn it into batch_size = 1, and enable fault torelerance.
+    turn it into batch_size = 1, and enable fault tolerance.
     """
 
     def wrapper(*args, **kwargs):
@@ -179,12 +181,10 @@ def catch_exception_mapper_process_single(method):
             logger.error(
                 f'An error occurred in mapper operation when processing '
                 f'sample {samples}, {type(e)}: {e}')
-            return {
-                'videos': [],
-                'text': [],
-                Fields.source_file: [],
-                Fields.stats: []
-            }
+            ret = {key: [] for key in samples.keys()}
+            ret[Fields.stats] = []
+            ret[Fields.source_file] = []
+            return ret
 
     return wrapper
 
@@ -223,23 +223,16 @@ class Mapper(OP):
 
     def run(self, dataset, tracer=None):
         if self._batched_op:
-            # wrapped_process = types.MethodType(
-            #     catch_exception_mapper_process(self.process), self)
-            self.process.op = self
-            wrapped_process = catch_exception_mapper_process(self.process)
-            # wrapped_process = self.process
+            batched_process = batch_mapper_wrapper(self.process)
+            wrapped_process = catch_exception_mapper_process(batched_process)
         else:
-            # wrapped_process = types.MethodType(
-            #     catch_exception_mapper_process_single(self.process), self)
             wrapped_process = catch_exception_mapper_process_single(
                 self.process)
         new_dataset = dataset.map(
-            # self.process,
             wrapped_process,
             num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
             desc=self._name + '_process',
-            # batched=True,
         )
         if tracer:
             tracer.trace_mapper(self._name, dataset, new_dataset,
@@ -304,9 +297,7 @@ class Filter(OP):
         dataset = dataset.map(wrapped_process,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
-                              desc=self._name + '_compute_stats',
-                              batched=True,
-                              batch_size=1)
+                              desc=self._name + '_compute_stats')
         new_dataset = dataset.filter(self.process,
                                      num_proc=self.runtime_np(),
                                      desc=self._name + '_process')
