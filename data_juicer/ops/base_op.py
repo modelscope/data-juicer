@@ -1,4 +1,5 @@
 import copy
+import functools
 import traceback
 
 import pandas as pd
@@ -114,6 +115,80 @@ def ray_batch_mapper_wrapper(samples, fn):
     return pa.Table.from_pandas(res)
 
 
+def convert_list_dict_to_dict_list(samples):
+    # reconstruct samples from "list of dicts" to "dict of lists"
+    keys = samples[0].keys()
+    res_samples = {}
+    for key in keys:
+        res_samples[key] = [s[key] for s in samples]
+    return res_samples
+
+
+def convert_dict_list_to_list_dict(samples):
+    # reconstruct samples from "dict of lists" to "list of dicts"
+    reconstructed_samples = []
+    keys = list(samples.keys())
+    # take any key, since they should be of same length
+    for i in range(len(samples[keys[0]])):
+        reconstructed_samples.append({key: samples[key][i] for key in samples})
+    return reconstructed_samples
+
+
+def catch_exception_mapper_process(method):
+    """
+    For mapper sample level fault torelerance.
+    """
+
+    @functools.wraps(method)
+    def wrapper(*args, **kwargs):
+        try:
+            samples = args[0]
+            return method(*args, **kwargs)
+        except Exception as e:
+            samples = args[0]
+            ret = {}
+            for key in samples.keys():
+                ret[key] = []
+            logger.error(
+                f'An error occurred in mapper operation when processing '
+                f'sample {samples}, {type(e)}: {e}')
+            ret[Fields.stats] = []
+            ret[Fields.source_file] = []
+            return ret
+
+    return wrapper
+
+
+def catch_exception_mapper_process_single(method):
+    """
+    For mapper process_single,
+    turn it into batch_size = 1, and enable fault torelerance.
+    """
+
+    def wrapper(*args, **kwargs):
+        try:
+            args = list(args)
+            samples = args[0]
+            sample = convert_dict_list_to_list_dict(samples)[0]
+            args[0] = sample
+            args = tuple(args)
+            res_sample = method(*args, **kwargs)
+            return convert_list_dict_to_dict_list([res_sample])
+        except Exception as e:
+            samples = args[0]
+            logger.error(
+                f'An error occurred in mapper operation when processing '
+                f'sample {samples}, {type(e)}: {e}')
+            return {
+                'videos': [],
+                'text': [],
+                Fields.source_file: [],
+                Fields.stats: []
+            }
+
+    return wrapper
+
+
 class Mapper(OP):
 
     def __init__(self, *args, **kwargs):
@@ -147,11 +222,24 @@ class Mapper(OP):
         return self._batched_op
 
     def run(self, dataset, tracer=None):
+        if self._batched_op:
+            # wrapped_process = types.MethodType(
+            #     catch_exception_mapper_process(self.process), self)
+            self.process.op = self
+            wrapped_process = catch_exception_mapper_process(self.process)
+            # wrapped_process = self.process
+        else:
+            # wrapped_process = types.MethodType(
+            #     catch_exception_mapper_process_single(self.process), self)
+            wrapped_process = catch_exception_mapper_process_single(
+                self.process)
         new_dataset = dataset.map(
-            self.process,
+            # self.process,
+            wrapped_process,
             num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
             desc=self._name + '_process',
+            # batched=True,
         )
         if tracer:
             tracer.trace_mapper(self._name, dataset, new_dataset,
@@ -211,10 +299,16 @@ class Filter(OP):
                                   },
                                   num_proc=self.runtime_np(),
                                   desc='Adding new column for stats')
-        dataset = dataset.map(self.compute_stats,
-                              num_proc=self.runtime_np(),
-                              with_rank=self.use_cuda(),
-                              desc=self._name + '_compute_stats')
+        wrapped_process = catch_exception_mapper_process_single(
+            self.compute_stats)
+        dataset = dataset.map(  
+            #self.compute_stats,
+            wrapped_process,
+            num_proc=self.runtime_np(),
+            with_rank=self.use_cuda(),
+            desc=self._name + '_compute_stats',
+            batched=True,
+            batch_size=1)
         if self.stats_export_path is not None:
             self.exporter.export_compute_stats(dataset, self.stats_export_path)
         new_dataset = dataset.filter(self.process,
