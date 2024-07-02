@@ -162,7 +162,8 @@ class Executor:
         # - If tracer is open, trace each op after it's processed
         # - If checkpoint is open, clean the cache files after each process
         logger.info('Processing data...')
-        dataset = dataset.process(self.ops, self.tracer, self.ckpt_manager)
+        dataset = dataset.process(self.ops, self.exporter, self.ckpt_manager,
+                                  self.tracer)
 
         # 4. data export
         logger.info('Exporting dataset to disk...')

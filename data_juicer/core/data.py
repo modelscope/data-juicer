@@ -8,6 +8,7 @@ from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
+from data_juicer.ops import Filter
 from data_juicer.utils import cache_utils
 from data_juicer.utils.compress import (CompressionOff,
                                         cleanup_compressed_cache_files,
@@ -140,7 +141,7 @@ class NestedDataset(Dataset):
             res = super().__getitem__(key)
         return nested_obj_factory(res)
 
-    def process(self, operator, tracer=None, ckpt_manager=None):
+    def process(self, operator, exporter=None, checkpointer=None, tracer=None):
         if operator is None:
             return self
 
@@ -153,7 +154,10 @@ class NestedDataset(Dataset):
         tstart = start
         dataset = self
         for op in ops:
-            dataset = op(dataset, tracer, ckpt_manager)
+            dataset = op(dataset, checkpointer, tracer)
+            # TODO: Export before actual filtering, not after, needs fixing
+            if isinstance(op, Filter) and op.stats_export_path is not None:
+                exporter.export_compute_stats(dataset, op.stats_export_path)
             end = time()
             logger.info(
                 f'OP [{op._name}] Done in {"%.3f" % (end - start)}(s). '
