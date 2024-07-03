@@ -80,6 +80,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.VideoTaggingFromFramesMapper"><code class="docutils literal notranslate"><span class="pre">VideoTaggingFromFramesMapper</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.RemoveCommentsMapper"><code class="docutils literal notranslate"><span class="pre">RemoveCommentsMapper</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.ExpandMacroMapper"><code class="docutils literal notranslate"><span class="pre">ExpandMacroMapper</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.ExtractQAMapper"><code class="docutils literal notranslate"><span class="pre">ExtractQAMapper</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.ImageCaptioningMapper"><code class="docutils literal notranslate"><span class="pre">ImageCaptioningMapper</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.RemoveWordsWithIncorrectSubstringsMapper"><code class="docutils literal notranslate"><span class="pre">RemoveWordsWithIncorrectSubstringsMapper</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.VideoCaptioningFromVideoMapper"><code class="docutils literal notranslate"><span class="pre">VideoCaptioningFromVideoMapper</span></code></a></li>
@@ -1400,6 +1401,66 @@ samples.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.ExpandMacroMapper.process">
 <span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/expand_macro_mapper.html#ExpandMacroMapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.ExpandMacroMapper.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>For sample level, sample –&gt; sample</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – sample to process</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>processed sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.ExtractQAMapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.</span></span><span class="sig-name descname"><span class="pre">ExtractQAMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'alibaba-pai/pai-qwen1_5-7b-doc2qa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qa_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'chatml'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/extract_qa_mapper.html#ExtractQAMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.ExtractQAMapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
+<p>Mapper to extract question and answer pair from text samples.
+Recommended model list: [</p>
+<blockquote>
+<div><p>‘alibaba-pai/pai-llama3-8b-doc2qa’,
+‘alibaba-pai/pai-baichuan2-7b-doc2qa’,
+‘alibaba-pai/pai-qwen1_5-4b-doc2qa’,
+‘alibaba-pai/pai-qwen1_5-7b-doc2qa’,
+‘alibaba-pai/pai-qwen1_5-1b8-doc2qa’,
+‘alibaba-pai/pai-qwen1_5-0b5-doc2qa’</p>
+</div></blockquote>
+<p>]
+These recommended models are all trained with Chinese data
+and are suitable for Chinese.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.ExtractQAMapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'alibaba-pai/pai-qwen1_5-7b-doc2qa'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qa_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'chatml'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/extract_qa_mapper.html#ExtractQAMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.ExtractQAMapper.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.
+:param hf_model: Hugginface model id.
+:param pattern: regular expression pattern to search for within text.
+:param qa_format: Output format of question and answer pair.
+:param args: extra args
+:param kwargs: extra args</p>
+<p>The default data format parsed by this interface is as follows:
+Model Input:</p>
+<blockquote>
+<div><p>蒙古国的首都是乌兰巴托（Ulaanbaatar）
+冰岛的首都是雷克雅未克（Reykjavik）</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Model Output:</dt><dd><p>蒙古国的首都是乌兰巴托（Ulaanbaatar）
+冰岛的首都是雷克雅未克（Reykjavik）
+Human: 请问蒙古国的首都是哪里？
+Assistant: 你好，根据提供的信息，蒙古国的首都是乌兰巴托（Ulaanbaatar）。
+Human: 冰岛的首都是哪里呢？
+Assistant: 冰岛的首都是雷克雅未克（Reykjavik）。
+…</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.ExtractQAMapper.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/extract_qa_mapper.html#ExtractQAMapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.ExtractQAMapper.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; sample</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
