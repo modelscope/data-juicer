@@ -2,7 +2,6 @@ import copy
 import functools
 import traceback
 
-import pandas as pd
 import pyarrow as pa
 from loguru import logger
 
@@ -14,7 +13,85 @@ from data_juicer.utils.registry import Registry
 OPERATORS = Registry('Operators')
 
 
+def convert_list_dict_to_dict_list(samples):
+    # reconstruct samples from "list of dicts" to "dict of lists"
+    keys = samples[0].keys()
+    res_samples = {}
+    for key in keys:
+        res_samples[key] = [s[key] for s in samples]
+    return res_samples
+
+
+def convert_dict_list_to_list_dict(samples):
+    # reconstruct samples from "dict of lists" to "list of dicts"
+    reconstructed_samples = []
+    keys = list(samples.keys())
+    # take any key, since they should be of same length
+    for i in range(len(samples[keys[0]])):
+        reconstructed_samples.append({key: samples[key][i] for key in samples})
+    return reconstructed_samples
+
+
+def convert_arrow_to_python(func):
+
+    @functools.wraps(func)
+    def wrapper(self, sample, *args, **kwargs):
+        if isinstance(sample, pa.Table):
+            sample = sample.to_pydict()
+        return func(self, sample, *args, **kwargs)
+
+    return wrapper
+
+
+def catch_batched_process_exception(func):
+    """
+    For mapper sample level fault tolerance.
+    """
+
+    @functools.wraps(func)
+    def wrapper(samples, *args, **kwargs):
+        try:
+            return func(samples, *args, **kwargs)
+        except Exception as e:
+            samples = args[0]
+            logger.error(
+                f'An error occurred in mapper operation when processing '
+                f'sample {samples}, {type(e)}: {e}')
+            ret = {key: [] for key in samples.keys()}
+            ret[Fields.stats] = []
+            ret[Fields.source_file] = []
+            return ret
+
+    return wrapper
+
+
+def catch_single_process_exception(func):
+    """
+    For mapper process_single,
+    turn it into batch_size = 1, and enable fault tolerance.
+    """
+
+    @functools.wraps(func)
+    def wrapper(sample, *args, **kwargs):
+        try:
+            sample = convert_dict_list_to_list_dict(sample)[0]
+            res_sample = func(sample, *args, **kwargs)
+            return convert_list_dict_to_dict_list([res_sample])
+        except Exception as e:
+            logger.error(
+                f'An error occurred in mapper operation when processing '
+                f'sample {sample}, {type(e)}: {e}')
+            ret = {key: [] for key in sample.keys()}
+            ret[Fields.stats] = []
+            ret[Fields.source_file] = []
+            return ret
+
+    return wrapper
+
+
 class OP:
+
+    _batched_op = False
 
     def __init__(self, *args, **kwargs):
         """
@@ -48,21 +125,38 @@ class OP:
         # whether to use actor mode in ray
         self._use_actor = kwargs.get('use_actor', False)
 
-        from data_juicer.core.data import wrap_func_with_nested_access
-        self.process = wrap_func_with_nested_access(self.process)
+    def __call__(self, dataset, checkpointer=None, tracer=None):
+        try:
+            dataset = self.run(dataset, tracer)
+            if checkpointer:
+                checkpointer.record(self._name, self._process_kwargs)
+            return dataset
+        except:  # noqa: E722
+            logger.error(f'An error occurred during Op [{self._name}].')
+            traceback.print_exc()
+            if checkpointer:
+                logger.info('Writing checkpoint of dataset processed by '
+                            'last op...')
+                dataset.cleanup_cache_files()
+                checkpointer.save_ckpt(dataset)
+            exit(1)
+
+    @classmethod
+    def is_batched_op(cls):
+        return cls._batched_op
 
     def process(self, *args, **kwargs):
         raise NotImplementedError
-
-    def runtime_np(self):
-        return calculate_np(self._name, self.mem_required, self.cpu_required,
-                            self.num_proc, self.use_cuda())
 
     def use_cuda(self):
         return self._accelerator == 'cuda'
 
     def use_actor(self):
         return self._use_actor
+
+    def runtime_np(self):
+        return calculate_np(self._name, self.mem_required, self.cpu_required,
+                            self.num_proc, self.use_cuda())
 
     def remove_extra_parameters(self, param_dict, keys=None):
         """
@@ -90,106 +184,16 @@ class OP:
         related_parameters.update(extra_param_dict)
         return related_parameters
 
-    def __call__(self, dataset, checkpointer=None, tracer=None):
-        try:
-            dataset = self.run(dataset, tracer)
-            if checkpointer:
-                checkpointer.record(self._name, self._process_kwargs)
-            return dataset
-        except:  # noqa: E722
-            logger.error(f'An error occurred during Op [{self._name}].')
-            traceback.print_exc()
-            if checkpointer:
-                logger.info('Writing checkpoint of dataset processed by '
-                            'last op...')
-                dataset.cleanup_cache_files()
-                checkpointer.save_ckpt(dataset)
-            exit(1)
-
-
-def batch_mapper_wrapper(fn):
-
-    def wrapper(samples):
-        samples = samples.to_pandas()
-        res = fn(samples)
-        if not isinstance(res, pd.DataFrame):
-            res = pd.DataFrame(res)
-        return pa.Table.from_pandas(res)
-
-    return wrapper
-
-
-def convert_list_dict_to_dict_list(samples):
-    # reconstruct samples from "list of dicts" to "dict of lists"
-    keys = samples[0].keys()
-    res_samples = {}
-    for key in keys:
-        res_samples[key] = [s[key] for s in samples]
-    return res_samples
-
-
-def convert_dict_list_to_list_dict(samples):
-    # reconstruct samples from "dict of lists" to "list of dicts"
-    reconstructed_samples = []
-    keys = list(samples.keys())
-    # take any key, since they should be of same length
-    for i in range(len(samples[keys[0]])):
-        reconstructed_samples.append({key: samples[key][i] for key in samples})
-    return reconstructed_samples
-
-
-def catch_exception_mapper_process(method):
-    """
-    For mapper sample level fault tolerance.
-    """
-
-    @functools.wraps(method)
-    def wrapper(*args, **kwargs):
-        try:
-            samples = args[0]
-            return method(*args, **kwargs)
-        except Exception as e:
-            samples = args[0]
-            logger.error(
-                f'An error occurred in mapper operation when processing '
-                f'sample {samples}, {type(e)}: {e}')
-            ret = {key: [] for key in samples.keys()}
-            ret[Fields.stats] = []
-            ret[Fields.source_file] = []
-            return ret
-
-    return wrapper
-
-
-def catch_exception_mapper_process_single(method):
-    """
-    For mapper process_single,
-    turn it into batch_size = 1, and enable fault tolerance.
-    """
-
-    def wrapper(*args, **kwargs):
-        try:
-            args = list(args)
-            samples = args[0]
-            sample = convert_dict_list_to_list_dict(samples)[0]
-            args[0] = sample
-            args = tuple(args)
-            res_sample = method(*args, **kwargs)
-            return convert_list_dict_to_dict_list([res_sample])
-        except Exception as e:
-            samples = args[0]
-            logger.error(
-                f'An error occurred in mapper operation when processing '
-                f'sample {samples}, {type(e)}: {e}')
-            ret = {key: [] for key in samples.keys()}
-            ret[Fields.stats] = []
-            ret[Fields.source_file] = []
-            return ret
-
-    return wrapper
-
 
 class Mapper(OP):
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.process = convert_arrow_to_python(cls.process)
+        if cls.is_batched_op():
+            cls.process = catch_batched_process_exception(cls.process)
+        else:
+            cls.process = catch_single_process_exception(cls.process)
 
     def __init__(self, *args, **kwargs):
         """
@@ -206,9 +210,6 @@ class Mapper(OP):
         """
         super(Mapper, self).__init__(*args, **kwargs)
 
-        # In default, it's a normal OP instead of batched OP
-        self._batched_op = kwargs.get('batched_op', False)
-
     def process(self, sample):
         """
         For sample level, sample --> sample
@@ -218,18 +219,11 @@ class Mapper(OP):
         """
         raise NotImplementedError
 
-    def is_batched_op(self):
-        return self._batched_op
-
     def run(self, dataset, tracer=None):
-        if self._batched_op:
-            batched_process = batch_mapper_wrapper(self.process)
-            wrapped_process = catch_exception_mapper_process(batched_process)
-        else:
-            wrapped_process = catch_exception_mapper_process_single(
-                self.process)
         new_dataset = dataset.map(
-            wrapped_process,
+            self.process,
+            batched=True,
+            batch_size=1,
             num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
             desc=self._name + '_process',
@@ -241,6 +235,16 @@ class Mapper(OP):
 
 
 class Filter(OP):
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.compute_stats = convert_arrow_to_python(cls.compute_stats)
+        if cls.is_batched_op():
+            cls.compute_stats = catch_batched_process_exception(
+                cls.compute_stats)
+        else:
+            cls.compute_stats = catch_single_process_exception(
+                cls.compute_stats)
 
     def __init__(self, *args, **kwargs):
         """
@@ -256,9 +260,6 @@ class Filter(OP):
             to be processed
         """
         super(Filter, self).__init__(*args, **kwargs)
-
-        from data_juicer.core.data import wrap_func_with_nested_access
-        self.compute_stats = wrap_func_with_nested_access(self.compute_stats)
         self.stats_export_path = kwargs.get('stats_export_path', None)
 
     def compute_stats(self, sample, context=False):
@@ -292,9 +293,9 @@ class Filter(OP):
                                   },
                                   num_proc=self.runtime_np(),
                                   desc='Adding new column for stats')
-        wrapped_process = catch_exception_mapper_process_single(
-            self.compute_stats)
-        dataset = dataset.map(wrapped_process,
+        dataset = dataset.map(self.compute_stats,
+                              batched=True,
+                              batch_size=1,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
                               desc=self._name + '_compute_stats')
@@ -322,9 +323,6 @@ class Deduplicator(OP):
             to be processed
         """
         super(Deduplicator, self).__init__(*args, **kwargs)
-
-        from data_juicer.core.data import wrap_func_with_nested_access
-        self.compute_hash = wrap_func_with_nested_access(self.compute_hash)
 
     def compute_hash(self, sample):
         """

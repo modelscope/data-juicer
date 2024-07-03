@@ -6,7 +6,7 @@ from loguru import logger
 
 from data_juicer import cuda_device_count, use_cuda
 from data_juicer.config import init_configs
-from data_juicer.ops import Filter, Mapper, batch_mapper_wrapper, load_ops
+from data_juicer.ops import Filter, Mapper, load_ops
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.process_utils import calculate_np
@@ -95,7 +95,8 @@ class RayExecutor:
     def run_op(self, op, op_cfg, dataset):
         op_name, op_args = list(op_cfg.items())[0]
         op_cls = OPERATORS.modules[op_name]
-        op_proc = calculate_np(self.cfg.np, op, op_name)
+        op_proc = calculate_np(op_name, op.mem_required, op.cpu_required,
+                               self.cfg.np)
         num_gpus = self.get_num_gpus(op, op_proc)
         use_actor = op.use_actor() or num_gpus
         try:
@@ -112,8 +113,7 @@ class RayExecutor:
                             batch_size=1)
                         # The batch size here is same as in data.py
                     else:
-                        dataset = dataset.map_batches(batch_mapper_wrapper(
-                            op.process),
+                        dataset = dataset.map_batches(op.process,
                                                       batch_format='pyarrow',
                                                       num_gpus=num_gpus,
                                                       batch_size=1)
@@ -150,6 +150,7 @@ class RayExecutor:
             import traceback
             traceback.print_exc()
             exit(1)
+        return dataset
 
     def run(self, load_data_np=None):
         """

@@ -30,6 +30,8 @@ class VideoSplitByDurationMapper(Mapper):
     """Mapper to split video by duration.
     """
 
+    _batched_op = True
+
     def __init__(self,
                  split_duration: float = 10,
                  min_last_split_duration: float = 0,
@@ -52,7 +54,7 @@ class VideoSplitByDurationMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
-        self._batched_op = True
+
         self.split_duration = split_duration
         self.min_last_split_duration = min_last_split_duration
         self.keep_original_sample = keep_original_sample
