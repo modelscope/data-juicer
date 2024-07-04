@@ -155,6 +155,8 @@ class RayExecutor:
                     'Ray executor only support Filter and Mapper OPs for '
                     'now')
                 raise NotImplementedError
+
+            return dataset
         except:  # noqa: E722
             logger.error(f'An error occurred during Op [{op_name}].')
             import traceback
@@ -170,7 +172,17 @@ class RayExecutor:
         """
         # 1. load data
         logger.info('Loading dataset with Ray...')
-        dataset = rd.read_json(self.cfg.dataset_path)
+
+        if self.cfg.get('dataset_config', None):
+            dataset_config = self.cfg.dataset_config
+            assert isinstance(dataset_config,
+                              dict) and 'type' in dataset_config
+            args = dataset_config.copy()
+            obj_name = args.pop('type')
+            from data_juicer.format.formatter import FORMATTERS
+            dataset = FORMATTERS.modules[obj_name](**args).load_dataset()
+        else:
+            dataset = rd.read_json(self.cfg.dataset_path)
 
         # convert all the path in dataset to absolute path
         dataset = set_dataset_to_absolute_path(dataset, self.cfg.dataset_path,

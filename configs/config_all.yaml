@@ -71,6 +71,11 @@ process:
   - extract_qa_mapper:                                      # mapper to extract question and answer pair from text.
       hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'
   - fix_unicode_mapper:                                     # fix unicode errors in text.
+  - generate_instruction_mapper:                            # generate new instruction text data.
+      hf_model: 'Qwen/Qwen-7B-Chat'
+      seed_file: 'demos/data/demo-dataset-chatml.jsonl'
+      instruct_num: 3
+      similarity_threshold: 0.7
   - image_blur_mapper:                                      # mapper to blur images.
       p: 0.2                                                  # probability of the image being blured
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']

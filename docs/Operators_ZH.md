@@ -11,7 +11,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 类型                                | 数量 | 描述            |
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
-| [ Mapper ]( #mapper )              | 43 | 对数据样本进行编辑和转换  |
+| [ Mapper ]( #mapper )              | 45 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 41 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
@@ -57,7 +57,9 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | clean_ip_mapper                                     | General               | en, zh    | 删除 IP 地址                                               |
 | clean_links_mapper                                  | General, Code         | en, zh    | 删除链接，例如以 http 或 ftp 开头的                                |
 | expand_macro_mapper                                 | LaTeX                 | en, zh    | 扩展通常在 TeX 文档顶部定义的宏                                     |
+| extract_qa_mapper                                   | General               | en, zh    | 从文本中抽取问答对                                              |
 | fix_unicode_mapper                                  | General               | en, zh    | 修复损坏的 Unicode（借助 [ftfy](https://ftfy.readthedocs.io/)） |
+| generate_instruction_mapper                         | General               | en, zh    | 数据增强，生成新样本。                                           |
 | image_blur_mapper                                   | Image                 |  -        | 对图像进行模糊处理                                              |
 | image_captioning_from_gpt4v_mapper                  | Multimodal            |  -        | 基于gpt-4-vision和图像生成文本                                |
 | image_captioning_mapper                             | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（例如 blip2）和原始样本中的图形生成的。                                             |

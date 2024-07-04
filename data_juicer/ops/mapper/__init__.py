@@ -34,6 +34,7 @@ from .clean_links_mapper import CleanLinksMapper
 from .expand_macro_mapper import ExpandMacroMapper
 from .extract_qa_mapper import ExtractQAMapper
 from .fix_unicode_mapper import FixUnicodeMapper
+from .generate_instruction_mapper import GenerateInstructionMapper
 from .image_blur_mapper import ImageBlurMapper
 from .image_captioning_from_gpt4v_mapper import ImageCaptioningFromGPT4VMapper
 from .image_captioning_mapper import ImageCaptioningMapper
@@ -108,6 +109,7 @@ __all__ = [
     'RemoveWordsWithIncorrectSubstringsMapper',
     'VideoCaptioningFromVideoMapper',
     'VideoCaptioningFromSummarizerMapper',
+    'GenerateInstructionMapper',
     'FixUnicodeMapper',
     'NlpaugEnMapper',
     'VideoCaptioningFromFramesMapper',
