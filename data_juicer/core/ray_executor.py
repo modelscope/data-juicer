@@ -96,15 +96,21 @@ class RayExecutor:
         num_gpus = self.get_num_gpus(op, op_proc)
         try:
             if isinstance(op, Mapper):
-                dataset = dataset.map_batches(op.process,
-                                              batch_size=1,
-                                              batch_format='pyarrow',
-                                              num_gpus=num_gpus)
+                if op.is_batched_op():
+                    dataset = dataset.map_batches(op.process,
+                                                  batch_size=1,
+                                                  batch_format='pyarrow',
+                                                  num_gpus=num_gpus)
+                else:
+                    dataset = dataset.map(op.process, num_gpus=num_gpus)
             elif isinstance(op, Filter):
-                dataset = dataset.map_batches(op.compute_stats,
-                                              batch_size=1,
-                                              batch_format='pyarrow',
-                                              num_gpus=num_gpus)
+                if op.is_batched_op():
+                    dataset = dataset.map_batches(op.compute_stats,
+                                                  batch_size=1,
+                                                  batch_format='pyarrow',
+                                                  num_gpus=num_gpus)
+                else:
+                    dataset = dataset.map(op.compute_stats, num_gpus=num_gpus)
                 if op.stats_export_path is not None:
                     dataset.write_json(op.stats_export_path, force_ascii=False)
                 dataset = dataset.filter(op.process)

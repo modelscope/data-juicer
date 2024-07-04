@@ -189,11 +189,8 @@ class NestedDataset(Dataset):
         # For wrapped function, try to get its original unwrapped method
         while hasattr(called_func, '__wrapped__'):
             called_func = called_func.__wrapped__
-        # Does the called function belong to a batched OP?
-        if inspect.ismethod(called_func) \
-                and 'is_batched_op' in dir(called_func.__self__) \
-                and callable(getattr(called_func.__self__, 'is_batched_op')) \
-                and called_func.__self__.is_batched_op():
+        # Does the called function belong to an OP?
+        if inspect.ismethod(called_func):
             kargs['batched'] = True
             kargs['batch_size'] = kargs.pop('batch_size', 1)
 
