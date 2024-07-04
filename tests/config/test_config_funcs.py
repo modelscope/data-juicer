@@ -50,7 +50,6 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'cpu_required': 1,
                         'mem_required': 0,
                         'use_actor': False,
-                        'batched_op': False,
                     }
                 }, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
