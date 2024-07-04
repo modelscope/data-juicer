@@ -188,11 +188,11 @@ class Mapper(OP):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls.process = convert_arrow_to_python(cls.process)
         if cls.is_batched_op():
             cls.process = catch_batched_samples_exception(cls.process)
         else:
             cls.process = catch_single_sample_exception(cls.process)
+        cls.process = convert_arrow_to_python(cls.process)
 
     def __init__(self, *args, **kwargs):
         """
@@ -237,13 +237,13 @@ class Filter(OP):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls.compute_stats = convert_arrow_to_python(cls.compute_stats)
         if cls.is_batched_op():
             cls.compute_stats = catch_batched_samples_exception(
                 cls.compute_stats)
         else:
             cls.compute_stats = catch_single_sample_exception(
                 cls.compute_stats)
+        cls.compute_stats = convert_arrow_to_python(cls.compute_stats)
 
     def __init__(self, *args, **kwargs):
         """
