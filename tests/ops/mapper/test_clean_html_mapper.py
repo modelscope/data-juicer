@@ -11,7 +11,7 @@ class CleanHtmlMapperTest(DataJuicerTestCaseBase):
 
     def _run_helper(self, samples):
         for sample in samples:
-            result = self.op.process(sample)
+            result = self.op._process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_complete_html_text(self):

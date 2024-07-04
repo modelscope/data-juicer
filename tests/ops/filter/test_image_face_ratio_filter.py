@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.image_face_ratio_filter import ImageFaceRatioFilter
 from data_juicer.utils.constant import Fields

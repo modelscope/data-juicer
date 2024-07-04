@@ -188,6 +188,7 @@ class Mapper(OP):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
+        cls._process = cls.process
         if cls.is_batched_op():
             wrapped_process = catch_batched_samples_exception(cls.process)
         else:
@@ -236,6 +237,7 @@ class Filter(OP):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
+        cls._compute_stats = cls.compute_stats
         if cls.is_batched_op():
             wrapped_compute = catch_batched_samples_exception(
                 cls.compute_stats)

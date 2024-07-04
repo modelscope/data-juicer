@@ -3,7 +3,7 @@
 import os
 import unittest
 
-from data_juicer.core.data import NestedDataset
+from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.video_split_by_key_frame_mapper import \
     VideoSplitByKeyFrameMapper
 from data_juicer.utils.file_utils import add_suffix_to_filename
@@ -62,7 +62,7 @@ class VideoSplitByKeyFrameMapperTest(DataJuicerTestCaseBase):
                                              source_list,
                                              target_list,
                                              num_proc=1):
-        dataset = NestedDataset.from_list(source_list)
+        dataset = Dataset.from_list(source_list)
         dataset = dataset.map(op.process, num_proc=num_proc)
         res_list = self._get_res_list(dataset, source_list)
         self.assertEqual(res_list, target_list)

@@ -1,6 +1,6 @@
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.alphanumeric_filter import AlphanumericFilter
 from data_juicer.utils.constant import Fields

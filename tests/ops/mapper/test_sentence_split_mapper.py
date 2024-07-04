@@ -8,7 +8,7 @@ class SentenceSplitMapperTest(DataJuicerTestCaseBase):
 
     def _run_helper(self, op, samples):
         for sample in samples:
-            result = op.process(sample)
+            result = op._process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_en_text(self):

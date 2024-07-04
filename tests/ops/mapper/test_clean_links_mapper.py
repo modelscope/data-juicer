@@ -11,7 +11,7 @@ class CleanLinksMapperTest(DataJuicerTestCaseBase):
 
     def _run_clean_links(self, op, samples):
         for sample in samples:
-            result = op.process(sample)
+            result = op._process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_lower_ftp_links_text(self):

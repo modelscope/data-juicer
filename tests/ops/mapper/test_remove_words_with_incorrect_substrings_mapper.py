@@ -9,7 +9,7 @@ class RemoveWordsWithIncorrectSubstringsMapperTest(DataJuicerTestCaseBase):
 
     def _run_remove_words_with_incorrect_sbstrings(self, samples, op):
         for sample in samples:
-            result = op.process(sample)
+            result = op._process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_en_case(self):

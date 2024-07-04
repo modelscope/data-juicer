@@ -12,7 +12,7 @@ class WhitespaceNormalizationMapperTest(DataJuicerTestCaseBase):
 
     def _run_whitespace_normalization(self, samples):
         for sample in samples:
-            result = self.op.process(sample)
+            result = self.op._process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_case(self):

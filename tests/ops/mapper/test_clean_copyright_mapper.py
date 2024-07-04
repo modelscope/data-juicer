@@ -11,7 +11,7 @@ class CleanCopyrightMapperTest(DataJuicerTestCaseBase):
 
     def _run_clean_copyright(self, samples):
         for sample in samples:
-            result = self.op.process(sample)
+            result = self.op._process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_clean_copyright(self):

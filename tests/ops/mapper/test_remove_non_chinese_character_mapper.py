@@ -13,7 +13,7 @@ class RemoveNonChineseCharacterlMapperrTest(DataJuicerTestCaseBase):
 
     def _run_remove_non_chinese_character(self, samples):
         for sample in samples:
-            result = self.op.process(sample)
+            result = self.op._process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_remove_non_chinese_character(self):

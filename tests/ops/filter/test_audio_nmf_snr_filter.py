@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.audio_nmf_snr_filter import AudioNMFSNRFilter
 from data_juicer.utils.constant import Fields

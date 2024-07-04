@@ -5,8 +5,8 @@ import unittest
 import numpy
 import pyarrow as pa
 import ray.data as rd
-from datasets import Dataset
 
+from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops import Filter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.registry import Registry
@@ -90,7 +90,9 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             dataset = dataset.select_columns(column_names=column_names)
             return dataset.to_list()
         elif current_tag.startswith('ray'):
-            dataset = dataset.map(op.compute_stats)
+            dataset = dataset.map_batches(op.compute_stats,
+                                          batch_size=1,
+                                          batch_format='pyarrow')
             dataset = dataset.filter(op.process)
             dataset = dataset.to_pandas().get(column_names)
             if dataset is None:

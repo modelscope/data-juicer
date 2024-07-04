@@ -9,7 +9,7 @@ class RemoveLongWordsMapperTest(DataJuicerTestCaseBase):
 
     def _run_remove_long_words(self, samples, op):
         for sample in samples:
-            result = op.process(sample)
+            result = op._process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_normal_case(self):

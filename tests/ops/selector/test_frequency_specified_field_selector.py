@@ -1,6 +1,6 @@
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.selector.frequency_specified_field_selector import \
     FrequencySpecifiedFieldSelector

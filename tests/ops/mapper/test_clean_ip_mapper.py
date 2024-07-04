@@ -8,7 +8,7 @@ class CleanIpMapperTest(DataJuicerTestCaseBase):
 
     def _run_clean_ip(self, op, samples):
         for sample in samples:
-            result = op.process(sample)
+            result = op._process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_ipv4(self):

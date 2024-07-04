@@ -2,7 +2,7 @@ import os
 import unittest
 
 import ffmpeg
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.mapper.video_resize_resolution_mapper import \
     VideoResizeResolutionMapper
