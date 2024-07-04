@@ -155,6 +155,8 @@ class RayExecutor:
                     'Ray executor only support Filter and Mapper OPs for '
                     'now')
                 raise NotImplementedError
+
+            return dataset
         except:  # noqa: E722
             logger.error(f'An error occurred during Op [{op_name}].')
             import traceback
