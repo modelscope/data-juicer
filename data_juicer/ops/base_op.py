@@ -307,6 +307,16 @@ class Filter(OP):
 
 class Deduplicator(OP):
 
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls._compute_hash = cls.compute_hash
+        if cls.is_batched_op():
+            wrapped_compute = catch_batched_samples_exception(cls.compute_hash)
+        else:
+            wrapped_compute = catch_single_sample_exception(cls.compute_hash)
+        wrapped_compute = convert_arrow_to_python(wrapped_compute)
+        cls.compute_hash = wrapped_compute
+
     def __init__(self, *args, **kwargs):
         """
         Base class that conducts deduplication.
