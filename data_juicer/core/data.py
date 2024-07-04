@@ -186,10 +186,12 @@ class NestedDataset(Dataset):
                     kargs['function'])
             called_func = kargs['function']
 
-        # For wrapped function, try to get its original unwrapped method
-        while hasattr(called_func, '__wrapped__'):
+        # For wrapped function, try to get its unwrapped (bound) method
+        while not inspect.ismethod(called_func) and hasattr(
+                called_func, '__wrapped__'):
             called_func = called_func.__wrapped__
-        # Does the called function belong to an OP?
+
+        # Batched is always required for fault tolerance
         if inspect.ismethod(called_func):
             kargs['batched'] = True
             kargs['batch_size'] = kargs.pop('batch_size', 1)
