@@ -32,31 +32,30 @@ def convert_dict_list_to_list_dict(samples):
     return reconstructed_samples
 
 
-def convert_arrow_to_python(func):
+def convert_arrow_to_python(method):
 
-    @functools.wraps(func)
+    @functools.wraps(method)
     def wrapper(self, sample, *args, **kwargs):
         if isinstance(sample, pa.Table):
             sample = sample.to_pydict()
-        return func(self, sample, *args, **kwargs)
+        return method(self, sample, *args, **kwargs)
 
     return wrapper
 
 
-def catch_batched_process_exception(func):
+def catch_batched_samples_exception(method):
     """
-    For mapper sample level fault tolerance.
+    For batched-mapper sample-level fault tolerance.
     """
 
-    @functools.wraps(func)
-    def wrapper(samples, *args, **kwargs):
+    @functools.wraps(method)
+    def wrapper(self, samples, *args, **kwargs):
         try:
-            return func(samples, *args, **kwargs)
+            return method(self, samples, *args, **kwargs)
         except Exception as e:
-            samples = args[0]
             logger.error(
                 f'An error occurred in mapper operation when processing '
-                f'sample {samples}, {type(e)}: {e}')
+                f'samples {samples}, {type(e)}: {e}')
             ret = {key: [] for key in samples.keys()}
             ret[Fields.stats] = []
             ret[Fields.source_file] = []
@@ -65,17 +64,17 @@ def catch_batched_process_exception(func):
     return wrapper
 
 
-def catch_single_process_exception(func):
+def catch_single_sample_exception(method):
     """
-    For mapper process_single,
-    turn it into batch_size = 1, and enable fault tolerance.
+    For single-mapper sample-level fault tolerance.
+    The input sample is always expected batch_size = 1.
     """
 
-    @functools.wraps(func)
-    def wrapper(sample, *args, **kwargs):
+    @functools.wraps(method)
+    def wrapper(self, sample, *args, **kwargs):
         try:
             sample = convert_dict_list_to_list_dict(sample)[0]
-            res_sample = func(sample, *args, **kwargs)
+            res_sample = method(self, sample, *args, **kwargs)
             return convert_list_dict_to_dict_list([res_sample])
         except Exception as e:
             logger.error(
@@ -191,9 +190,9 @@ class Mapper(OP):
         super().__init_subclass__(**kwargs)
         cls.process = convert_arrow_to_python(cls.process)
         if cls.is_batched_op():
-            cls.process = catch_batched_process_exception(cls.process)
+            cls.process = catch_batched_samples_exception(cls.process)
         else:
-            cls.process = catch_single_process_exception(cls.process)
+            cls.process = catch_single_sample_exception(cls.process)
 
     def __init__(self, *args, **kwargs):
         """
@@ -240,10 +239,10 @@ class Filter(OP):
         super().__init_subclass__(**kwargs)
         cls.compute_stats = convert_arrow_to_python(cls.compute_stats)
         if cls.is_batched_op():
-            cls.compute_stats = catch_batched_process_exception(
+            cls.compute_stats = catch_batched_samples_exception(
                 cls.compute_stats)
         else:
-            cls.compute_stats = catch_single_process_exception(
+            cls.compute_stats = catch_single_sample_exception(
                 cls.compute_stats)
 
     def __init__(self, *args, **kwargs):
