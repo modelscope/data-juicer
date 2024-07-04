@@ -14,9 +14,6 @@ from data_juicer.utils.process_utils import calculate_np
 with AvailabilityChecking(['ray'], requires_type='dist'):
     import ray
     import ray.data as rd
-    from ray.data import ActorPoolStrategy
-
-from data_juicer.ops.base_op import OPERATORS
 
 
 def is_valid_path(item, dataset_dir):
@@ -93,52 +90,27 @@ class RayExecutor:
         return 1.0 / proc_per_gpu
 
     def run_op(self, op, op_cfg, dataset):
-        op_name, op_args = list(op_cfg.items())[0]
-        op_cls = OPERATORS.modules[op_name]
+        op_name = next(iter(op_cfg.keys()))
         op_proc = calculate_np(op_name, op.mem_required, op.cpu_required,
                                self.cfg.np)
         num_gpus = self.get_num_gpus(op, op_proc)
-        use_actor = op.use_actor() or num_gpus
         try:
             if isinstance(op, Mapper):
-                if use_actor:
-                    dataset = dataset.map_batches(
-                        op_cls,
-                        compute=ActorPoolStrategy(),
-                        concurrency=op_proc,
-                        fn_constructor_kwargs=op_args,
-                        batch_format='pyarrow',
-                        num_gpus=num_gpus,
-                        batch_size=1)
-                    # The batch size here is same as in data.py
-                else:
-                    dataset = dataset.map_batches(op.process,
-                                                  batch_format='pyarrow',
-                                                  num_gpus=num_gpus,
-                                                  batch_size=1)
-                    # The batch size here is same as in data.py
+                dataset = dataset.map_batches(op.process,
+                                              batch_size=1,
+                                              batch_format='pyarrow',
+                                              num_gpus=num_gpus)
             elif isinstance(op, Filter):
-                if use_actor:
-                    dataset = dataset.map_batches(
-                        op_cls,
-                        compute=ActorPoolStrategy(),
-                        concurrency=op_proc,
-                        fn_constructor_kwargs=op_args,
-                        batch_format='pyarrow',
-                        num_gpus=num_gpus,
-                        batch_size=1)
-                else:
-                    dataset = dataset.map_batches(op.compute_stats,
-                                                  batch_format='pyarrow',
-                                                  num_gpus=num_gpus,
-                                                  batch_size=1)
+                dataset = dataset.map_batches(op.compute_stats,
+                                              batch_size=1,
+                                              batch_format='pyarrow',
+                                              num_gpus=num_gpus)
                 if op.stats_export_path is not None:
                     dataset.write_json(op.stats_export_path, force_ascii=False)
                 dataset = dataset.filter(op.process)
             else:
                 logger.error(
-                    'Ray executor only support Filter and Mapper OPs for '
-                    'now')
+                    'Ray executor only support Filter and Mapper OPs for now')
                 raise NotImplementedError
         except:  # noqa: E722
             logger.error(f'An error occurred during Op [{op_name}].')
