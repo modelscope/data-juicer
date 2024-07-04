@@ -1,5 +1,4 @@
 import copy
-import functools
 import traceback
 
 import pyarrow as pa
@@ -34,7 +33,6 @@ def convert_dict_list_to_list_dict(samples):
 
 def convert_arrow_to_python(method):
 
-    @functools.wraps(method)
     def wrapper(self, sample, *args, **kwargs):
         if isinstance(sample, pa.Table):
             sample = sample.to_pydict()
@@ -48,7 +46,7 @@ def catch_batched_samples_exception(method):
     For batched-mapper sample-level fault tolerance.
     """
 
-    @functools.wraps(method)
+    @convert_arrow_to_python
     def wrapper(self, samples, *args, **kwargs):
         try:
             return method(self, samples, *args, **kwargs)
@@ -70,7 +68,7 @@ def catch_single_sample_exception(method):
     The input sample is always expected batch_size = 1.
     """
 
-    @functools.wraps(method)
+    @convert_arrow_to_python
     def wrapper(self, sample, *args, **kwargs):
         try:
             sample = convert_dict_list_to_list_dict(sample)[0]
@@ -115,7 +113,7 @@ class OP:
         self._accelerator = kwargs.get('accelerator', 'cpu')
 
         # parameters to determind the number of procs for this op
-        self.num_proc = kwargs.get('num_proc', 0)
+        self.num_proc = kwargs.get('num_proc', None)
         self.cpu_required = kwargs.get('cpu_required', 1)
         self.mem_required = kwargs.get('mem_required', 0)
         if isinstance(self.mem_required, str):
@@ -192,7 +190,6 @@ class Mapper(OP):
             cls.process = catch_batched_samples_exception(cls.process)
         else:
             cls.process = catch_single_sample_exception(cls.process)
-        cls.process = convert_arrow_to_python(cls.process)
 
     def __init__(self, *args, **kwargs):
         """
@@ -221,8 +218,6 @@ class Mapper(OP):
     def run(self, dataset, tracer=None):
         new_dataset = dataset.map(
             self.process,
-            batched=True,
-            batch_size=1,
             num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
             desc=self._name + '_process',
@@ -243,7 +238,6 @@ class Filter(OP):
         else:
             cls.compute_stats = catch_single_sample_exception(
                 cls.compute_stats)
-        cls.compute_stats = convert_arrow_to_python(cls.compute_stats)
 
     def __init__(self, *args, **kwargs):
         """
@@ -293,8 +287,6 @@ class Filter(OP):
                                   num_proc=self.runtime_np(),
                                   desc='Adding new column for stats')
         dataset = dataset.map(self.compute_stats,
-                              batched=True,
-                              batch_size=1,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
                               desc=self._name + '_compute_stats')
