@@ -38,10 +38,10 @@ def convert_dict_list_to_list_dict(samples):
 def convert_arrow_to_python(method):
 
     @wraps(method)
-    def wrapper(self, sample, *args, **kwargs):
+    def wrapper(sample, *args, **kwargs):
         if isinstance(sample, pa.Table):
             sample = sample.to_pydict()
-        return method(self, sample, *args, **kwargs)
+        return method(sample, *args, **kwargs)
 
     return wrapper
 
@@ -52,10 +52,11 @@ def catch_batched_samples_exception(method):
     """
 
     @wraps(method)
-    def wrapper(self, samples, *args, **kwargs):
+    def wrapper(samples, *args, **kwargs):
         try:
-            return method(self, samples, *args, **kwargs)
+            return method(samples, *args, **kwargs)
         except Exception as e:
+            from loguru import logger
             logger.error(
                 f'An error occurred in mapper operation when processing '
                 f'samples {samples}, {type(e)}: {e}')
@@ -84,13 +85,14 @@ def catch_single_sample_exception(method):
             for val in val_iter)
 
     @wraps(method)
-    def wrapper(self, sample, *args, **kwargs):
+    def wrapper(sample, *args, **kwargs):
         if is_batched(sample):
             try:
                 sample = convert_dict_list_to_list_dict(sample)[0]
-                res_sample = method(self, sample, *args, **kwargs)
+                res_sample = method(sample, *args, **kwargs)
                 return convert_list_dict_to_dict_list([res_sample])
             except Exception as e:
+                from loguru import logger
                 logger.error(
                     f'An error occurred in mapper operation when processing '
                     f'sample {sample}, {type(e)}: {e}')
@@ -100,7 +102,7 @@ def catch_single_sample_exception(method):
                 return ret
         else:
             # without fault tolerance
-            return method(self, sample, *args, **kwargs)
+            return method(sample, *args, **kwargs)
 
     return wrapper
 
@@ -141,8 +143,14 @@ class OP:
         # whether to use actor mode in ray
         self._use_actor = kwargs.get('use_actor', False)
 
+        # nested wrappers
         from data_juicer.core.data import wrap_func_with_nested_access
-        self.process = wrap_func_with_nested_access(self.process)
+        for name in ['process', 'compute_stats', 'compute_hash']:
+            method = getattr(self, name, None)
+            if method and callable(method):
+                setattr(self, f'_{name}', method)
+                method = wrap_func_with_nested_access(method)
+                setattr(self, name, method)
 
     def __call__(self, dataset, checkpointer=None, tracer=None):
         try:
@@ -206,19 +214,6 @@ class OP:
 
 class Mapper(OP):
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        for name in ('process', ):
-            method = getattr(cls, name, None)
-            if method and callable(method):
-                setattr(cls, f'_{name}', method)
-                if cls.is_batched_op():
-                    method = catch_batched_samples_exception(method)
-                else:
-                    method = catch_single_sample_exception(method)
-                method = convert_arrow_to_python(method)
-                setattr(cls, name, method)
-
     def __init__(self, *args, **kwargs):
         """
         Base class that conducts data editing.
@@ -233,6 +228,17 @@ class Mapper(OP):
             to be processed
         """
         super(Mapper, self).__init__(*args, **kwargs)
+
+        # runtime wrappers
+        for name in ['process']:
+            method = getattr(self, name, None)
+            if method and callable(method):
+                if self.is_batched_op():
+                    method = catch_batched_samples_exception(method)
+                else:
+                    method = catch_single_sample_exception(method)
+                method = convert_arrow_to_python(method)
+                setattr(self, name, method)
 
     def process(self, sample):
         """
@@ -258,19 +264,6 @@ class Mapper(OP):
 
 class Filter(OP):
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        for name in ('compute_stats', 'process'):
-            method = getattr(cls, name, None)
-            if method and callable(method):
-                setattr(cls, f'_{name}', method)
-                if cls.is_batched_op():
-                    method = catch_batched_samples_exception(method)
-                else:
-                    method = catch_single_sample_exception(method)
-                method = convert_arrow_to_python(method)
-                setattr(cls, name, method)
-
     def __init__(self, *args, **kwargs):
         """
         Base class that removes specific info.
@@ -287,8 +280,16 @@ class Filter(OP):
         super(Filter, self).__init__(*args, **kwargs)
         self.stats_export_path = kwargs.get('stats_export_path', None)
 
-        from data_juicer.core.data import wrap_func_with_nested_access
-        self.compute_stats = wrap_func_with_nested_access(self.compute_stats)
+        # runtime wrappers
+        for name in ['compute_stats', 'process']:
+            method = getattr(self, name, None)
+            if method and callable(method):
+                if self.is_batched_op():
+                    method = catch_batched_samples_exception(method)
+                else:
+                    method = catch_single_sample_exception(method)
+                method = convert_arrow_to_python(method)
+                setattr(self, name, method)
 
     def compute_stats(self, sample, context=False):
         """
@@ -335,19 +336,6 @@ class Filter(OP):
 
 class Deduplicator(OP):
 
-    def __init_subclass__(cls, **kwargs):
-        super().__init_subclass__(**kwargs)
-        for name in ('compute_hash', ):
-            method = getattr(cls, name, None)
-            if method and callable(method):
-                setattr(cls, f'_{name}', method)
-                if cls.is_batched_op():
-                    method = catch_batched_samples_exception(method)
-                else:
-                    method = catch_single_sample_exception(method)
-                method = convert_arrow_to_python(method)
-                setattr(cls, name, method)
-
     def __init__(self, *args, **kwargs):
         """
         Base class that conducts deduplication.
@@ -363,8 +351,16 @@ class Deduplicator(OP):
         """
         super(Deduplicator, self).__init__(*args, **kwargs)
 
-        from data_juicer.core.data import wrap_func_with_nested_access
-        self.compute_hash = wrap_func_with_nested_access(self.compute_hash)
+        # runtime wrappers
+        for name in ['compute_hash']:
+            method = getattr(self, name, None)
+            if method and callable(method):
+                if self.is_batched_op():
+                    method = catch_batched_samples_exception(method)
+                else:
+                    method = catch_single_sample_exception(method)
+                method = convert_arrow_to_python(method)
+                setattr(self, name, method)
 
     def compute_hash(self, sample):
         """
