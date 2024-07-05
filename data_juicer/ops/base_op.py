@@ -14,6 +14,9 @@ OPERATORS = Registry('Operators')
 
 
 def convert_list_dict_to_dict_list(samples):
+    # special case: filters return bool
+    if not isinstance(samples[0], dict):
+        return samples
     # reconstruct samples from "list of dicts" to "dict of lists"
     keys = samples[0].keys()
     res_samples = {}
@@ -138,6 +141,9 @@ class OP:
         # whether to use actor mode in ray
         self._use_actor = kwargs.get('use_actor', False)
 
+        from data_juicer.core.data import wrap_func_with_nested_access
+        self.process = wrap_func_with_nested_access(self.process)
+
     def __call__(self, dataset, checkpointer=None, tracer=None):
         try:
             dataset = self.run(dataset, tracer)
@@ -202,12 +208,16 @@ class Mapper(OP):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if cls.is_batched_op():
-            wrapped_process = catch_batched_samples_exception(cls.process)
-        else:
-            wrapped_process = catch_single_sample_exception(cls.process)
-        wrapped_process = convert_arrow_to_python(wrapped_process)
-        cls.process = wrapped_process
+        for name in ('process', ):
+            method = getattr(cls, name, None)
+            if method and callable(method):
+                setattr(cls, f'_{name}', method)
+                if cls.is_batched_op():
+                    method = catch_batched_samples_exception(method)
+                else:
+                    method = catch_single_sample_exception(method)
+                method = convert_arrow_to_python(method)
+                setattr(cls, name, method)
 
     def __init__(self, *args, **kwargs):
         """
@@ -250,13 +260,16 @@ class Filter(OP):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if cls.is_batched_op():
-            wrapped_compute = catch_batched_samples_exception(
-                cls.compute_stats)
-        else:
-            wrapped_compute = catch_single_sample_exception(cls.compute_stats)
-        wrapped_compute = convert_arrow_to_python(wrapped_compute)
-        cls.compute_stats = wrapped_compute
+        for name in ('compute_stats', 'process'):
+            method = getattr(cls, name, None)
+            if method and callable(method):
+                setattr(cls, f'_{name}', method)
+                if cls.is_batched_op():
+                    method = catch_batched_samples_exception(method)
+                else:
+                    method = catch_single_sample_exception(method)
+                method = convert_arrow_to_python(method)
+                setattr(cls, name, method)
 
     def __init__(self, *args, **kwargs):
         """
@@ -273,6 +286,9 @@ class Filter(OP):
         """
         super(Filter, self).__init__(*args, **kwargs)
         self.stats_export_path = kwargs.get('stats_export_path', None)
+
+        from data_juicer.core.data import wrap_func_with_nested_access
+        self.compute_stats = wrap_func_with_nested_access(self.compute_stats)
 
     def compute_stats(self, sample, context=False):
         """
@@ -321,12 +337,16 @@ class Deduplicator(OP):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        if cls.is_batched_op():
-            wrapped_compute = catch_batched_samples_exception(cls.compute_hash)
-        else:
-            wrapped_compute = catch_single_sample_exception(cls.compute_hash)
-        wrapped_compute = convert_arrow_to_python(wrapped_compute)
-        cls.compute_hash = wrapped_compute
+        for name in ('compute_hash', ):
+            method = getattr(cls, name, None)
+            if method and callable(method):
+                setattr(cls, f'_{name}', method)
+                if cls.is_batched_op():
+                    method = catch_batched_samples_exception(method)
+                else:
+                    method = catch_single_sample_exception(method)
+                method = convert_arrow_to_python(method)
+                setattr(cls, name, method)
 
     def __init__(self, *args, **kwargs):
         """
@@ -342,6 +362,9 @@ class Deduplicator(OP):
             to be processed
         """
         super(Deduplicator, self).__init__(*args, **kwargs)
+
+        from data_juicer.core.data import wrap_func_with_nested_access
+        self.compute_hash = wrap_func_with_nested_access(self.compute_hash)
 
     def compute_hash(self, sample):
         """
