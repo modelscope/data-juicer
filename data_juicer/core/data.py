@@ -226,24 +226,12 @@ class NestedDataset(Dataset):
                 args[0] = lambda x: nested_obj_factory(x)
             else:
                 args[0] = wrap_func_with_nested_access(args[0])
-            called_func = args[0]
         else:
             if 'function' not in kargs or kargs['function'] is None:
                 kargs['function'] = lambda x: nested_obj_factory(x)
             else:
                 kargs['function'] = wrap_func_with_nested_access(
                     kargs['function'])
-            called_func = kargs['function']
-
-        # For wrapped function, try to get its unwrapped (bound) method
-        while not inspect.ismethod(called_func) and hasattr(
-                called_func, '__wrapped__'):
-            called_func = called_func.__wrapped__
-
-        # Batched is always required for fault tolerance
-        if inspect.ismethod(called_func):
-            kargs['batched'] = True
-            kargs['batch_size'] = 1
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)

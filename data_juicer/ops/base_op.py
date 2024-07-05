@@ -14,9 +14,6 @@ OPERATORS = Registry('Operators')
 
 
 def convert_list_dict_to_dict_list(samples):
-    # special case: filters return bool
-    if not isinstance(samples[0], dict):
-        return samples
     # reconstruct samples from "list of dicts" to "dict of lists"
     keys = samples[0].keys()
     res_samples = {}
@@ -46,12 +43,13 @@ def convert_arrow_to_python(method):
     return wrapper
 
 
-def catch_batched_samples_exception(method):
+def catch_map_batches_exception(method):
     """
-    For batched-mapper sample-level fault tolerance.
+    For batched-map sample-level fault tolerance.
     """
 
     @wraps(method)
+    @convert_arrow_to_python
     def wrapper(samples, *args, **kwargs):
         try:
             return method(samples, *args, **kwargs)
@@ -68,10 +66,10 @@ def catch_batched_samples_exception(method):
     return wrapper
 
 
-def catch_single_sample_exception(method):
+def catch_map_single_exception(method):
     """
-    For single-mapper sample-level fault tolerance.
-    The input sample is always expected batch_size = 1.
+    For single-map sample-level fault tolerance.
+    The input sample is expected batch_size = 1.
     """
 
     def is_batched(sample):
@@ -85,6 +83,7 @@ def catch_single_sample_exception(method):
             for val in val_iter)
 
     @wraps(method)
+    @convert_arrow_to_python
     def wrapper(sample, *args, **kwargs):
         if is_batched(sample):
             try:
@@ -230,15 +229,10 @@ class Mapper(OP):
         super(Mapper, self).__init__(*args, **kwargs)
 
         # runtime wrappers
-        for name in ['process']:
-            method = getattr(self, name, None)
-            if method and callable(method):
-                if self.is_batched_op():
-                    method = catch_batched_samples_exception(method)
-                else:
-                    method = catch_single_sample_exception(method)
-                method = convert_arrow_to_python(method)
-                setattr(self, name, method)
+        if self.is_batched_op():
+            self.process = catch_map_batches_exception(self.process)
+        else:
+            self.process = catch_map_single_exception(self.process)
 
     def process(self, sample):
         """
@@ -281,15 +275,11 @@ class Filter(OP):
         self.stats_export_path = kwargs.get('stats_export_path', None)
 
         # runtime wrappers
-        for name in ['compute_stats', 'process']:
-            method = getattr(self, name, None)
-            if method and callable(method):
-                if self.is_batched_op():
-                    method = catch_batched_samples_exception(method)
-                else:
-                    method = catch_single_sample_exception(method)
-                method = convert_arrow_to_python(method)
-                setattr(self, name, method)
+        if self.is_batched_op():
+            self.compute_stats = catch_map_batches_exception(
+                self.compute_stats)
+        else:
+            self.compute_stats = catch_map_single_exception(self.compute_stats)
 
     def compute_stats(self, sample, context=False):
         """
@@ -352,15 +342,10 @@ class Deduplicator(OP):
         super(Deduplicator, self).__init__(*args, **kwargs)
 
         # runtime wrappers
-        for name in ['compute_hash']:
-            method = getattr(self, name, None)
-            if method and callable(method):
-                if self.is_batched_op():
-                    method = catch_batched_samples_exception(method)
-                else:
-                    method = catch_single_sample_exception(method)
-                method = convert_arrow_to_python(method)
-                setattr(self, name, method)
+        if self.is_batched_op():
+            self.compute_hash = catch_map_batches_exception(self.compute_hash)
+        else:
+            self.compute_hash = catch_map_single_exception(self.compute_hash)
 
     def compute_hash(self, sample):
         """
