@@ -8,7 +8,7 @@ class ReplaceContentMapperTest(DataJuicerTestCaseBase):
 
     def _run_helper(self, op, samples):
         for sample in samples:
-            result = op._process(sample)
+            result = op.process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_special_char_pattern_text(self):

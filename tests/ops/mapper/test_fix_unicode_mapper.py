@@ -11,7 +11,7 @@ class FixUnicodeMapperTest(DataJuicerTestCaseBase):
 
     def _run_fix_unicode(self, samples):
         for sample in samples:
-            result = self.op._process(sample)
+            result = self.op.process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_bad_unicode_text(self):

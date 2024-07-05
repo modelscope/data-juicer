@@ -70,20 +70,34 @@ def catch_single_sample_exception(method):
     The input sample is always expected batch_size = 1.
     """
 
+    def is_batched(sample):
+        val_iter = iter(sample.values())
+        first_val = next(val_iter)
+        if not isinstance(first_val, list):
+            return False
+        first_len = len(first_val)
+        return all(
+            isinstance(val, list) and len(val) == first_len
+            for val in val_iter)
+
     @wraps(method)
     def wrapper(self, sample, *args, **kwargs):
-        try:
-            sample = convert_dict_list_to_list_dict(sample)[0]
-            res_sample = method(self, sample, *args, **kwargs)
-            return convert_list_dict_to_dict_list([res_sample])
-        except Exception as e:
-            logger.error(
-                f'An error occurred in mapper operation when processing '
-                f'sample {sample}, {type(e)}: {e}')
-            ret = {key: [] for key in sample.keys()}
-            ret[Fields.stats] = []
-            ret[Fields.source_file] = []
-            return ret
+        if is_batched(sample):
+            try:
+                sample = convert_dict_list_to_list_dict(sample)[0]
+                res_sample = method(self, sample, *args, **kwargs)
+                return convert_list_dict_to_dict_list([res_sample])
+            except Exception as e:
+                logger.error(
+                    f'An error occurred in mapper operation when processing '
+                    f'sample {sample}, {type(e)}: {e}')
+                ret = {key: [] for key in sample.keys()}
+                ret[Fields.stats] = []
+                ret[Fields.source_file] = []
+                return ret
+        else:
+            # without fault tolerance
+            return method(self, sample, *args, **kwargs)
 
     return wrapper
 
@@ -188,7 +202,6 @@ class Mapper(OP):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls._process = cls.process
         if cls.is_batched_op():
             wrapped_process = catch_batched_samples_exception(cls.process)
         else:
@@ -237,7 +250,6 @@ class Filter(OP):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls._compute_stats = cls.compute_stats
         if cls.is_batched_op():
             wrapped_compute = catch_batched_samples_exception(
                 cls.compute_stats)
@@ -309,7 +321,6 @@ class Deduplicator(OP):
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
-        cls._compute_hash = cls.compute_hash
         if cls.is_batched_op():
             wrapped_compute = catch_batched_samples_exception(cls.compute_hash)
         else:

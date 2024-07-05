@@ -11,7 +11,7 @@ class ExpandMacroMapperTest(DataJuicerTestCaseBase):
 
     def _run_expand_macro(self, samples):
         for sample in samples:
-            result = self.op._process(sample)
+            result = self.op.process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_case(self):

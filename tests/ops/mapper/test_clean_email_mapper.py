@@ -8,7 +8,7 @@ class CleanEmailMapperTest(DataJuicerTestCaseBase):
 
     def _run_clean_email(self, op, samples):
         for sample in samples:
-            result = op._process(sample)
+            result = op.process(sample)
             self.assertEqual(result['text'], result['target'])
 
     def test_clean_email(self):
