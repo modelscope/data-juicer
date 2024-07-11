@@ -51,7 +51,6 @@ class ExtractQAMapper(Mapper):
         """
 
         super().__init__(*args, **kwargs)
-        self._batched_op = True
         self._accelerator = 'cuda'
 
         if pattern is None:
