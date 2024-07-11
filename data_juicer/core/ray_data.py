@@ -37,7 +37,7 @@ def convert_to_absolute_paths(dict_with_paths, dataset_dir, path_keys):
                                  dataset_dir) else dict_with_paths[key]
     return dict_with_paths
 
-
+# TODO: check path for nestdataset
 def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     """
     Set all the path in input data to absolute path.
@@ -77,8 +77,11 @@ def get_num_gpus(op, op_proc):
 
 class RayDataset(DJDataset):
 
-    def __init__(self, dataset: Dataset, dataset_path: str, cfg) -> None:
-        dataset = preprocess_dataset(dataset, dataset_path, cfg)
+    def __init__(self, dataset: Dataset, dataset_path: str = None, cfg = None) -> None:
+        if dataset_path:
+            self.data = preprocess_dataset(dataset, dataset_path, cfg)            
+        else:
+            self.data = dataset
 
     def process(self,
                 operators,
