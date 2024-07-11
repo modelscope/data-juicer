@@ -1,11 +1,24 @@
 import sys
+from functools import wraps
 
+import pyarrow as pa
 from loguru import logger
 
 from data_juicer.utils.availability_utils import UNAVAILABLE_OPERATORS
 
-from .base_op import OPERATORS
+from .base_op import OPERATORS, Mapper
 from .op_fusion import fuse_operators
+
+
+def convert_arrow_to_python(method):
+
+    @wraps(method)
+    def wrapper(sample, *args, **kwargs):
+        if isinstance(sample, pa.Table):
+            sample = sample.to_pydict()
+        return method(sample, *args, **kwargs)
+
+    return wrapper
 
 
 def load_ops(process_list, op_fusion=False):
@@ -25,7 +38,10 @@ def load_ops(process_list, op_fusion=False):
         if op_name in UNAVAILABLE_OPERATORS:
             logger.error(UNAVAILABLE_OPERATORS[op_name].get_warning_msg())
             sys.exit(UNAVAILABLE_OPERATORS[op_name].get_warning_msg())
-        ops.append(OPERATORS.modules[op_name](**args))
+        op = OPERATORS.modules[op_name](**args)
+        if isinstance(op, Mapper) and op.is_batched_op():
+            op.process = convert_arrow_to_python(op.process)
+        ops.append(op)
         new_process_list.append(process)
 
     # detect filter groups

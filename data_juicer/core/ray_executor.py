@@ -1,8 +1,6 @@
 import os
 import time
-from functools import partial
 
-import pandas as pd
 import pyarrow as pa
 from loguru import logger
 
@@ -60,14 +58,6 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     return dataset
 
 
-def ray_batch_mapper_wrapper(samples, fn):
-    samples = samples.to_pandas()
-    res = fn(samples)
-    if not isinstance(res, pd.DataFrame):
-        res = pd.DataFrame(res)
-    return pa.Table.from_pandas(res)
-
-
 class RayExecutor:
     """
     Executor based on Ray.
@@ -122,8 +112,7 @@ class RayExecutor:
                             batch_size=1)
                         # The batch size here is same as in data.py
                     else:
-                        dataset = dataset.map_batches(partial(
-                            ray_batch_mapper_wrapper, fn=op.process),
+                        dataset = dataset.map_batches(op.process,
                                                       batch_format='pyarrow',
                                                       num_gpus=num_gpus,
                                                       batch_size=1)
