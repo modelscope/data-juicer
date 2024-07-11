@@ -3,13 +3,10 @@ import shutil
 import unittest
 
 import numpy
-import pyarrow as pa
 import ray.data as rd
 
-from data_juicer.core.data import NestedDataset, DJDataset
+from data_juicer.core.data import DJDataset, NestedDataset
 from data_juicer.core.ray_data import RayDataset
-from data_juicer.ops import Filter
-from data_juicer.utils.constant import Fields
 from data_juicer.utils.registry import Registry
 
 SKIPPED_TESTS = Registry('SkippedTests')

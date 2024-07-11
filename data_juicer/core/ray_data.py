@@ -37,6 +37,7 @@ def convert_to_absolute_paths(dict_with_paths, dataset_dir, path_keys):
                                  dataset_dir) else dict_with_paths[key]
     return dict_with_paths
 
+
 # TODO: check path for nestdataset
 def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     """
@@ -54,7 +55,8 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
 
 
 def preprocess_dataset(dataset: Dataset, dataset_path, cfg) -> Dataset:
-    dataset = set_dataset_to_absolute_path(dataset, dataset_path, cfg)
+    if dataset_path:
+        dataset = set_dataset_to_absolute_path(dataset, dataset_path, cfg)
     if Fields.stats not in dataset.columns(fetch_if_missing=False):
         logger.info(f'columns {dataset.columns(fetch_if_missing=False)}')
 
@@ -77,11 +79,14 @@ def get_num_gpus(op, op_proc):
 
 class RayDataset(DJDataset):
 
-    def __init__(self, dataset: Dataset, dataset_path: str = None, cfg = None) -> None:
-        if dataset_path:
-            self.data = preprocess_dataset(dataset, dataset_path, cfg)            
-        else:
-            self.data = dataset
+    def __init__(self,
+                 dataset: Dataset,
+                 dataset_path: str = None,
+                 cfg=None) -> None:
+        self.data = preprocess_dataset(dataset, dataset_path, cfg)
+        self.num_proc = None
+        if cfg:
+            self.num_proc = cfg.np
 
     def process(self,
                 operators,
@@ -98,8 +103,8 @@ class RayDataset(DJDataset):
 
     def _run_single_op(self, op):
         op_proc = calculate_np(op._name, op.mem_required, op.cpu_required,
-                               self.cfg.np)
-        num_gpus = self.get_num_gpus(op, op_proc)
+                               self.num_proc)
+        num_gpus = get_num_gpus(op, op_proc)
         try:
             if isinstance(op, Mapper):
                 self.data = self.data.map_batches(op.process,
