@@ -12,6 +12,11 @@ with AvailabilityChecking(['ray'], requires_type='dist'):
     import ray.data as rd
 
 
+@ray.remote
+def read_json(data_path):
+    return rd.read_json(data_path)
+
+
 class RayExecutor:
     """
     Executor based on Ray.
@@ -49,7 +54,7 @@ class RayExecutor:
         """
         # 1. load data
         logger.info('Loading dataset with Ray...')
-        dataset = rd.read_json(self.cfg.dataset_path)
+        dataset = ray.get(read_json.remote(self.cfg.dataset_path))
 
         # convert all the path in dataset to absolute path
         dataset = RayDataset(dataset, self.cfg.dataset_path, self.cfg)
