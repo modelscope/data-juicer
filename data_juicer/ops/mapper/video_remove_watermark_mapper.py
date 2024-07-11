@@ -5,6 +5,7 @@ import numpy as np
 from jsonargparse.typing import List, PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import (extract_video_frames_uniformly,
@@ -202,7 +203,11 @@ class VideoRemoveWatermarkMapper(Mapper):
     def process(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
+            sample[Fields.source_file] = []
             return sample
+
+        if Fields.source_file not in sample or not sample[Fields.source_file]:
+            sample[Fields.source_file] = sample[self.video_key]
 
         loaded_video_keys = sample[self.video_key]
         sample, videos = load_data_with_context(sample, context,
@@ -229,6 +234,12 @@ class VideoRemoveWatermarkMapper(Mapper):
         if not context:
             for vid_key in videos:
                 videos[vid_key].close()
+
+        # when the file is modified, its source file needs to be updated.
+        for i, value in enumerate(sample[self.video_key]):
+            if sample[Fields.source_file][i] != value:
+                if loaded_video_keys[i] != value:
+                    sample[Fields.source_file][i] = value
 
         sample[self.video_key] = loaded_video_keys
         return sample

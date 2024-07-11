@@ -92,10 +92,10 @@ class Analyser:
         for op_cfg, op in zip(self.cfg.process, self.ops):
             op_name = list(op_cfg.keys())[0]
             with_rank = use_cuda() and op._accelerator == 'cuda'
-            if op.spec_numprocs != 0:
-                op_proc = op.spec_numprocs
+            if op.num_proc != 0:
+                op_proc = op.num_proc
                 logger.info(f'Op [{op_name}] running with sepcified '
-                            f'number of procs:{op.spec_numprocs}')
+                            f'number of procs:{op.num_proc}')
             else:
                 op_proc = calculate_np(self.cfg.np, op, op_name)
             if isinstance(op, Filter):

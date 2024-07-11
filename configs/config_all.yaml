@@ -68,6 +68,8 @@ process:
   - clean_links_mapper:                                     # remove web links from text.
   - clean_copyright_mapper:                                 # remove copyright comments.
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
+  - extract_qa_mapper:                                      # mapper to extract question and answer pair from text.
+      hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - image_blur_mapper:                                      # mapper to blur images.
       p: 0.2                                                  # probability of the image being blured

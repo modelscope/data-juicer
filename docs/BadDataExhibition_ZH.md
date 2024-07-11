@@ -35,7 +35,7 @@
 | `perplexity_filter`           | [LCS-558K](#llava-15-pretrain-dataset), [Books](#books), [ArXiv](#arxiv)                                            |
 | `special_characters_filter`   | [Wikipedia](#wikipedia), [Books](#books)                                                                            |
 | `text_length_filter`          | [Wikipedia](#wikipedia), [ArXiv](#arxiv), [Github Code](#github-code)                                               |
-| `word_num_filter`             | [Stack Exchange](#stack-exchange)                                                                                   |
+| `words_num_filter`            | [Stack Exchange](#stack-exchange)                                                                                   |
 | `word_repetition_filter`      | [MMC4](#mmc4), [Wikipedia](#wikipedia)                                                                              |
 
 - 欢迎大家持续补充这个表格。
@@ -292,7 +292,7 @@ LLaVA-1.5 的预训练数据集。
 
 | 数据项       | 值                                                                |
 |-----------|------------------------------------------------------------------|
-| 来源算子      | `word_num_filter`                                                |
+| 来源算子      | `words_num_filter`                                                |
 | num_words | 2                                                                |
 | 文本        | <details><summary>text</summary> <pre>Q: Append</pre> </details> |
 | 说明        | 单词数量过少的文本可能内容缺失                                                  |

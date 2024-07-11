@@ -123,7 +123,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         if vid_cap_from_vid_args is None:
             vid_cap_from_vid_args = {}
         if vid_cap_from_frm_args is None:
-            vid_tag_from_frm_args = {}
+            vid_cap_from_frm_args = {}
         if vid_tag_from_aud_args is None:
             vid_tag_from_aud_args = {}
         if vid_tag_from_frm_args is None:

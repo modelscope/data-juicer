@@ -145,11 +145,12 @@ class VideoWatermarkFilter(Filter):
             cur_probs = torch.Tensor(cur_probs)
 
             if self.reduce_mode == 'avg':
-                watermark_probs.append(cur_probs.mean())
+                cur_prob = cur_probs.mean()
             elif self.reduce_mode == 'max':
-                watermark_probs.append(cur_probs.max())
+                cur_prob = cur_probs.max()
             else:
-                watermark_probs.append(cur_probs.min())
+                cur_prob = cur_probs.min()
+            watermark_probs.append(float(cur_prob))
 
         sample[Fields.stats][StatsKeys.video_watermark_prob] = watermark_probs
 
