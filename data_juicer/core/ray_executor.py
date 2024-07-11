@@ -92,7 +92,7 @@ class RayExecutor:
     def run_op(self, op, op_cfg, dataset):
         op_name = next(iter(op_cfg.keys()))
         op_proc = calculate_np(op_name, op.mem_required, op.cpu_required,
-                               self.cfg.np)
+                               self.cfg.np, op.use_cuda())
         num_gpus = self.get_num_gpus(op, op_proc)
         try:
             if isinstance(op, Mapper):

@@ -5,6 +5,7 @@ from functools import wraps
 import pyarrow as pa
 from loguru import logger
 
+from data_juicer import use_cuda
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.process_utils import calculate_np
@@ -175,7 +176,7 @@ class OP:
         raise NotImplementedError
 
     def use_cuda(self):
-        return self._accelerator == 'cuda'
+        return self._accelerator == 'cuda' and use_cuda()
 
     def use_actor(self):
         return self._use_actor
