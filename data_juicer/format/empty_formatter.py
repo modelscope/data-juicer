@@ -12,6 +12,7 @@ class EmptyFormatter(BaseFormatter):
     """
     The class is used to create empty data.
     """
+    SUFFIXES = []
 
     def __init__(self, length, feature_keys: List[str] = [], *args, **kwargs):
         """
@@ -47,6 +48,7 @@ class RayEmptyFormatter(BaseFormatter):
     """
     The class is used to create empty data for ray.
     """
+    SUFFIXES = []
 
     def __init__(self, length, feature_keys: List[str] = [], *args, **kwargs):
         """
