@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import copy
 import inspect
+from abc import ABC, abstractmethod
 from functools import wraps
 from time import time
 from typing import Union
@@ -14,6 +17,20 @@ from data_juicer.utils.compress import (CompressionOff,
                                         cleanup_compressed_cache_files,
                                         compress, decompress)
 from data_juicer.utils.fingerprint_utils import generate_fingerprint
+
+
+class DJDataset(ABC):
+    """Base dataset of DJ"""
+
+    @abstractmethod
+    def process(
+            self,
+            operators,  # TODO: add type hint
+            exporter=None,
+            checkpointer=None,
+            tracer=None) -> DJDataset:
+        """process a list of operators on the dataset."""
+        pass
 
 
 def wrap_func_with_nested_access(f):
@@ -118,7 +135,7 @@ class NestedDatasetDict(DatasetDict):
         return super().map(**args)
 
 
-class NestedDataset(Dataset):
+class NestedDataset(Dataset, DJDataset):
     """Enhanced HuggingFace-Dataset for better usability and efficiency."""
 
     def __init__(self, *args, **kargs):
