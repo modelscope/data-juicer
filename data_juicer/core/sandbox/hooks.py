@@ -20,7 +20,7 @@ class BaseHooker:
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         self.job_cfg = job_cfg
         self.watcher = watcher
-        self.res_name = job_cfg[JobRequiredKeys.res_name.value]
+        self.meta_name = job_cfg[JobRequiredKeys.meta_name.value]
         self.dj_cfg = job_cfg[JobRequiredKeys.dj_configs.value]
         self.other_cfg = job_cfg[JobRequiredKeys.extra_configs.value]
 
@@ -67,7 +67,7 @@ class ProbeViaAnalyserHooker(BaseHooker):
         for row_name in string_rows:
             if row_name in analyser_res.index:
                 analyser_res = analyser_res.drop(row_name)
-        self.watcher.watch(analyser_res, self.res_name)
+        self.watcher.watch(analyser_res, self.meta_name)
         return kwargs
 
 
@@ -97,7 +97,7 @@ class ProbeViaModelInferHooker(BaseHooker):
         )
         res_type, infer_res = model_infer_executor.run(
             model_infer_executor.model_config['type'], sampled_data)
-        self.watcher.watch(infer_res, self.res_name)
+        self.watcher.watch(infer_res, self.meta_name)
         return kwargs
 
 
@@ -117,7 +117,7 @@ class RefineRecipeViaKSigmaHooker(BaseHooker):
         self.specify_dj_and_extra_configs()
         path_k_sigma_recipe = self.other_cfg.path_k_sigma_recipe
         # use k-sigma strategy to modify the data recipe
-        modify_recipe_k_sigma(self.dj_cfg, self.watcher.query(self.res_name),
+        modify_recipe_k_sigma(self.dj_cfg, self.watcher.query(self.meta_name),
                               path_k_sigma_recipe)
         return kwargs
 
@@ -224,7 +224,7 @@ class EvaluateDataHooker(BaseHooker):
         eval_res = data_evaluator.run(eval_type='data',
                                       eval_obj=processed_dataset,
                                       **kwargs)
-        self.watcher.watch(eval_res, self.res_name)
+        self.watcher.watch(eval_res, self.meta_name)
         return kwargs
 
 

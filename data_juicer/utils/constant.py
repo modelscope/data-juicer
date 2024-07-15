@@ -211,5 +211,5 @@ class InterVars(object):
 class JobRequiredKeys(Enum):
     hooker = 'hooker'
     dj_configs = 'dj_configs'
-    res_name = 'res_name'
+    meta_name = 'meta_name'
     extra_configs = 'extra_configs'

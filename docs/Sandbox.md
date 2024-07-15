@@ -20,7 +20,7 @@ pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7
 So if some Module-Not-Found errors are raised by these third-party libraries when running the sandbox, users need to check their docs first.
 
 ### Prepare Configuration Files for Sandbox
-The sandbox will sequentially execute four types of jobs: Data/Model Probe (`probe_job_configs`), Iterative Recipe Refinement based on Probe Results(`refine_recipe_job_configs`), Dataset Processing and Model Training (`execution_job_configs`) and Data/Model Evaluation (`evaluation_job_configs`). Within each category of jobs, jobs are carried out in the order specified by the configured job list. Each task requires specifying: the hook for mounting this job (`hooker`), the tag name for recording intermediate results (`res_name`), Data-Juicer data processing parameters (`dj_configs`), as well as other specific parameters for the job (`extra_configs`). Among these parameters, hooker is required, while others may be left empty. dj_configs can refer to the full Data-Juicer data processing parameters available in [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml). The `extra_configs` are task-specific parameters without restrictions. They can include parameters for model training, inference, evaluation, etc. For example, `path_k_sigma_recipe` can be used to specify the path for saving the data recipe refined using the k-sigma method. An example of a sandbox configuration file can be found at `configs/demo/sandbox/sandbox.yaml`:
+The sandbox will sequentially execute four types of jobs: Data/Model Probe (`probe_job_configs`), Iterative Recipe Refinement based on Probe Results(`refine_recipe_job_configs`), Dataset Processing and Model Training (`execution_job_configs`) and Data/Model Evaluation (`evaluation_job_configs`). Within each category of jobs, jobs are carried out in the order specified by the configured job list. Each task requires specifying: the hook for mounting this job (`hooker`), the tag name for recording intermediate results (`meta_name`), Data-Juicer data processing parameters (`dj_configs`), as well as other specific parameters for the job (`extra_configs`). Among these parameters, hooker is required, while others may be left empty. dj_configs can refer to the full Data-Juicer data processing parameters available in [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml). The `extra_configs` are task-specific parameters without restrictions. They can include parameters for model training, inference, evaluation, etc. For example, `path_k_sigma_recipe` can be used to specify the path for saving the data recipe refined using the k-sigma method. An example of a sandbox configuration file can be found at `configs/demo/sandbox/sandbox.yaml`:
 ```yaml
 # Sandbox config example
 
@@ -32,34 +32,34 @@ hpo_config: null                                  # path to a configuration file
 # configs for each job, the jobs will be executed according to the order in the list
 probe_job_configs:
   - hooker: 'ProbeViaAnalyserHooker'
-    res_name: 'analysis_ori_data'
+    meta_name: 'analysis_ori_data'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
 
 refine_recipe_job_configs:
   - hooker: 'RefineRecipeViaKSigmaHooker'
-    res_name: 'analysis_ori_data'
+    meta_name: 'analysis_ori_data'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
       path_k_sigma_recipe: './outputs/demo-process/k_sigma_new_recipe.yaml'
 
 execution_job_configs:
   - hooker: 'ProcessDataHooker'
-    res_name:
+    meta_name:
     dj_configs: './outputs/demo-process/k_sigma_new_recipe.yaml'
     extra_configs:
   - hooker: 'TrainModelHooker'
-    res_name:
+    meta_name:
     dj_configs:
     extra_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
 
 evaluation_job_configs:
   - hooker: 'ProbeViaAnalyserHooker'
-    res_name: 'analysis_processed_data'
+    meta_name: 'analysis_processed_data'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
   - hooker: 'EvaluateDataHooker'
-    res_name: 'eval_data'
+    meta_name: 'eval_data'
     dj_configs:
     extra_configs: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
 ```
@@ -67,7 +67,7 @@ Based on this configuration file, sandbox:
 
 1. Execute the Data-Juicer data analysis function to calculate specified metrics for each piece of data, for example, in `configs/demo/process.yaml`, the `language_id_score_filter` is designated to calculate language scores.
 
-2. With the results from Data-Juicer data analysis, fine-tune the data recipe using the k-sigma method. Note that the `res_name` here must be set the same as the `res_name` used during data analysis to utilize the results.
+2. With the results from Data-Juicer data analysis, fine-tune the data recipe using the k-sigma method. Note that the `meta_name` here must be set the same as the `meta_name` used during data analysis to utilize the results.
 
 3. Execute Data-Juicer's data filtering function with the data recipe fine-tuned by the k-sigma method.
 

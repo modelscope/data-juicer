@@ -34,13 +34,13 @@ class SandBoxWatcher:
             self.object_name_in_hpo = None
         self.logged_res = {}
 
-    def query(self, res_name: str):
+    def query(self, meta_name: str):
         """
         Query the result from the logged_res.
         """
-        return self.logged_res.get(res_name)
+        return self.logged_res.get(meta_name)
 
-    def watch(self, res, res_name: str = ''):
+    def watch(self, res, meta_name: str = ''):
         """
         Flatten the result in dot structure and log it into WandB.
         """
@@ -48,18 +48,18 @@ class SandBoxWatcher:
             for key, value in res.items():
                 # getting the left nodes of the given res dictionary.
                 if isinstance(value, dict):
-                    self.watch(value, f'{res_name}.{key}')
+                    self.watch(value, f'{meta_name}.{key}')
                 else:
-                    self.logged_res[f'{res_name}.{key}'] = value
-                    if self.object_name_in_hpo == f'{res_name}.{key}':
+                    self.logged_res[f'{meta_name}.{key}'] = value
+                    if self.object_name_in_hpo == f'{meta_name}.{key}':
                         # Ensuring float results for HPO experiments
                         value = float(value)
-                    self.wandb_run.log({f'{res_name}.{key}': value})
+                    self.wandb_run.log({f'{meta_name}.{key}': value})
         else:
-            self.logged_res[res_name] = res
-            if res_name == self.object_name_in_hpo:
+            self.logged_res[meta_name] = res
+            if meta_name == self.object_name_in_hpo:
                 res = float(res)
-            self.wandb_run.log({res_name: res})
+            self.wandb_run.log({meta_name: res})
 
     def setup_sweep(self, hpo_config: dict = None, project_name: str = None):
         """
