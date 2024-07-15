@@ -209,7 +209,7 @@ class InterVars(object):
 
 
 class JobRequiredKeys(Enum):
-    hooker = 'hooker'
+    hook = 'hook'
     dj_configs = 'dj_configs'
     meta_name = 'meta_name'
     extra_configs = 'extra_configs'

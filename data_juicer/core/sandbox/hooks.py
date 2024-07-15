@@ -15,7 +15,7 @@ from data_juicer.utils.constant import JobRequiredKeys
 from tools.hpo.execute_hpo_3sigma import modify_recipe_k_sigma
 
 
-class BaseHooker:
+class BaseHook:
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         self.job_cfg = job_cfg
@@ -43,16 +43,16 @@ class BaseHooker:
             self.other_cfg = dict_to_namespace(self.other_cfg)
 
 
-class ProbeViaAnalyserHooker(BaseHooker):
+class ProbeViaAnalyserHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         """
-        Initialize the hooker for probing the data via Analyser
+        Initialize the hook for probing the data via Analyser
 
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(ProbeViaAnalyserHooker, self).__init__(job_cfg, watcher, *args,
+        super(ProbeViaAnalyserHook, self).__init__(job_cfg, watcher, *args,
                                                      **kwargs)
 
     def hook(self, **kwargs):
@@ -71,16 +71,16 @@ class ProbeViaAnalyserHooker(BaseHooker):
         return kwargs
 
 
-class ProbeViaModelInferHooker(BaseHooker):
+class ProbeViaModelInferHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         """
-        Initialize the hooker for probing the data via Model Infer
+        Initialize the hook for probing the data via Model Infer
 
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(ProbeViaModelInferHooker, self).__init__(job_cfg, watcher, *args,
+        super(ProbeViaModelInferHook, self).__init__(job_cfg, watcher, *args,
                                                        **kwargs)
 
     def hook(self, **kwargs):
@@ -101,16 +101,16 @@ class ProbeViaModelInferHooker(BaseHooker):
         return kwargs
 
 
-class RefineRecipeViaKSigmaHooker(BaseHooker):
+class RefineRecipeViaKSigmaHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         """
-        Initialize the hooker for refining the recipe via K Sigma
+        Initialize the hook for refining the recipe via K Sigma
 
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(RefineRecipeViaKSigmaHooker,
+        super(RefineRecipeViaKSigmaHook,
               self).__init__(job_cfg, watcher, *args, **kwargs)
 
     def hook(self, **kwargs):
@@ -122,16 +122,16 @@ class RefineRecipeViaKSigmaHooker(BaseHooker):
         return kwargs
 
 
-class RefineRecipeViaModelFeedbackHooker(BaseHooker):
+class RefineRecipeViaModelFeedbackHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         """
-        Initialize the hooker for refining the recipe via Model Feedback
+        Initialize the hook for refining the recipe via Model Feedback
 
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(RefineRecipeViaModelFeedbackHooker,
+        super(RefineRecipeViaModelFeedbackHook,
               self).__init__(job_cfg, watcher, *args, **kwargs)
 
     def hook(self, **kwargs):
@@ -149,16 +149,16 @@ class RefineRecipeViaModelFeedbackHooker(BaseHooker):
         return kwargs
 
 
-class ProcessDataHooker(BaseHooker):
+class ProcessDataHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         """
-        Initialize the hooker for processing the data via Data-Juicer
+        Initialize the hook for processing the data via Data-Juicer
 
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(ProcessDataHooker, self).__init__(job_cfg, watcher, *args,
+        super(ProcessDataHook, self).__init__(job_cfg, watcher, *args,
                                                 **kwargs)
 
     def hook(self, **kwargs):
@@ -170,16 +170,16 @@ class ProcessDataHooker(BaseHooker):
         return kwargs
 
 
-class TrainModelHooker(BaseHooker):
+class TrainModelHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         """
-        Initialize the hooker for model training
+        Initialize the hook for model training
 
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(TrainModelHooker, self).__init__(job_cfg, watcher, *args,
+        super(TrainModelHook, self).__init__(job_cfg, watcher, *args,
                                                **kwargs)
 
     def hook(self, **kwargs):
@@ -202,16 +202,16 @@ class TrainModelHooker(BaseHooker):
         return kwargs
 
 
-class EvaluateDataHooker(BaseHooker):
+class EvaluateDataHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         """
-        Initialize the hooker for data evaluation
+        Initialize the hook for data evaluation
 
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(EvaluateDataHooker, self).__init__(job_cfg, watcher, *args,
+        super(EvaluateDataHook, self).__init__(job_cfg, watcher, *args,
                                                  **kwargs)
 
     def hook(self, **kwargs):
@@ -228,16 +228,16 @@ class EvaluateDataHooker(BaseHooker):
         return kwargs
 
 
-class EvaluateModelHooker(BaseHooker):
+class EvaluateModelHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         """
-        Initialize the hooker for model evaluation
+        Initialize the hook for model evaluation
 
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(EvaluateModelHooker, self).__init__(job_cfg, watcher, *args,
+        super(EvaluateModelHook, self).__init__(job_cfg, watcher, *args,
                                                   **kwargs)
 
     def hook(self, **kwargs):
@@ -250,19 +250,19 @@ class EvaluateModelHooker(BaseHooker):
         return kwargs
 
 
-HOOKER_DICT = {
-    'ProbeViaAnalyserHooker': ProbeViaAnalyserHooker,
-    'ProbeViaModelInferHooker': ProbeViaModelInferHooker,
-    'RefineRecipeViaKSigmaHooker': RefineRecipeViaKSigmaHooker,
-    'RefineRecipeViaModelFeedbackHooker': RefineRecipeViaModelFeedbackHooker,
-    'ProcessDataHooker': ProcessDataHooker,
-    'TrainModelHooker': TrainModelHooker,
-    'EvaluateDataHooker': EvaluateDataHooker,
-    'EvaluateModelHooker': EvaluateModelHooker,
+HOOK_DICT = {
+    'ProbeViaAnalyserHook': ProbeViaAnalyserHook,
+    'ProbeViaModelInferHook': ProbeViaModelInferHook,
+    'RefineRecipeViaKSigmaHook': RefineRecipeViaKSigmaHook,
+    'RefineRecipeViaModelFeedbackHook': RefineRecipeViaModelFeedbackHook,
+    'ProcessDataHook': ProcessDataHook,
+    'TrainModelHook': TrainModelHook,
+    'EvaluateDataHook': EvaluateDataHook,
+    'EvaluateModelHook': EvaluateModelHook,
 }
 
 
-def regist_hooker(job_cfg, watcher):
-    if job_cfg.hooker not in HOOKER_DICT:
-        raise ValueError('Undefined hooker: [{job_cfg.hooker}].')
-    return HOOKER_DICT[job_cfg.hooker](job_cfg, watcher)
+def regist_hook(job_cfg, watcher):
+    if job_cfg.hook not in HOOK_DICT:
+        raise ValueError('Undefined hook: [{job_cfg.hook}].')
+    return HOOK_DICT[job_cfg.hook](job_cfg, watcher)

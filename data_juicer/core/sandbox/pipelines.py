@@ -6,7 +6,7 @@ from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import namespace_to_dict
 
 from data_juicer.config import merge_config
-from data_juicer.core.sandbox.hooks import regist_hooker
+from data_juicer.core.sandbox.hooks import regist_hook
 
 
 class SandBoxWatcher:
@@ -140,20 +140,20 @@ class SandBoxExecutor:
 
         # register probe_jobs
         for job_cfg in self.cfg.probe_job_configs:
-            self.probe_jobs.append(regist_hooker(job_cfg, self.watcher))
+            self.probe_jobs.append(regist_hook(job_cfg, self.watcher))
 
         # register refine_recipe_jobs
         for job_cfg in self.cfg.refine_recipe_job_configs:
-            self.refine_recipe_jobs.append(regist_hooker(
+            self.refine_recipe_jobs.append(regist_hook(
                 job_cfg, self.watcher))
 
         # register execution_jobs
         for job_cfg in self.cfg.execution_job_configs:
-            self.execution_jobs.append(regist_hooker(job_cfg, self.watcher))
+            self.execution_jobs.append(regist_hook(job_cfg, self.watcher))
 
         # register evaluation_jobs
         for job_cfg in self.cfg.evaluation_job_configs:
-            self.evaluation_jobs.append(regist_hooker(job_cfg, self.watcher))
+            self.evaluation_jobs.append(regist_hook(job_cfg, self.watcher))
 
     def run(self):
         """
@@ -183,20 +183,20 @@ class SandBoxExecutor:
         job_infos = {}
 
         # ====== Data & model probe ======
-        for probe_hooker in self.probe_jobs:
-            job_infos = probe_hooker.hook(**job_infos)
+        for probe_hook in self.probe_jobs:
+            job_infos = probe_hook.hook(**job_infos)
 
         # ====== Data-model recipes iteration based on probe results ======
-        for refine_hooker in self.refine_recipe_jobs:
-            job_infos = refine_hooker.hook(**job_infos)
+        for refine_hook in self.refine_recipe_jobs:
+            job_infos = refine_hook.hook(**job_infos)
 
         # ====== Data processing & model training ======
-        for exec_hooker in self.execution_jobs:
-            job_infos = exec_hooker.hook(**job_infos)
+        for exec_hook in self.execution_jobs:
+            job_infos = exec_hook.hook(**job_infos)
 
         # ====== Evaluation on processed data or trained model ======
-        for eval_hooker in self.evaluation_jobs:
-            job_infos = eval_hooker.hook(**job_infos)
+        for eval_hook in self.evaluation_jobs:
+            job_infos = eval_hook.hook(**job_infos)
 
     def execute_hpo_wandb(self):
         """
