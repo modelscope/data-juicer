@@ -4,7 +4,7 @@
 A simple automatic hyper-parameter optimization method for data recipes is to assume that outlier data is harmful to training. 
 We thus can introduce the 3-sigma principle to automatically determine the hyper-parameters and filter the data. 
 
-Specifically, assuming that a certain analysis dimension of the original data obeys a normal distribution and has random errors, we can set the upper and lower bounds of the filtering OP in this dimension to three times the standard deviation based on the statistics produced by the DataJuicer's Analyzer.
+Specifically, assuming that a certain analysis dimension of the original data obeys a normal distribution and has random errors, we can set the upper and lower bounds of the filtering OP in this dimension to three times the standard deviation based on the statistics produced by the DataJuicer's Analyser.
 
 $$P(|x-\mu| > 3\sigma) \leq 0.003$$
 

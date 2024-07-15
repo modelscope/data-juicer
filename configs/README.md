@@ -8,7 +8,7 @@ This folder contains some configuration files to allow users to easily understan
 # To process your dataset.
 python tools/process_data.py --config xxx.yaml
 # To analyse your dataset.
-python tools/analyze_data.py --config xxx.yaml
+python tools/analyse_data.py --config xxx.yaml
 ```
 
 ## Categories

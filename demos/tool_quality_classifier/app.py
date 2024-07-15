@@ -57,7 +57,7 @@ def quality_classifier(dataset_file, model):
 
     del_file = False
 
-    logger.info('=========Stage: analyze original data=========')
+    logger.info('=========Stage: analyse original data=========')
     if dataset_file is not None:
         file_contents = dataset_file.getvalue()
         with open(dataset_file.name, 'wb') as f:
@@ -142,13 +142,13 @@ class Visualize:
         model_name = quality_model_map[selected_model]
 
         start_btn = st.button(
-            f'2. Start to analyze dataset with {selected_model}',
+            f'2. Start to analyse dataset with {selected_model}',
             use_container_width=True)
 
         with st.expander(f'{selected_model} Results', expanded=True):
 
             if start_btn:
-                with st.spinner('Wait for analyze...'):
+                with st.spinner('Wait for analyse...'):
                     quality_classifier(dataset_file, model_name)
 
             col1, col2 = st.columns(2)

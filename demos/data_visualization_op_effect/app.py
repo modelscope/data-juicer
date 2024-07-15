@@ -88,7 +88,7 @@ def parse_cfg():
         return str(e), pretty_out(specified_cfg), None
 
 
-def analyze_and_show_res(dataset_file):
+def analyse_and_show_res(dataset_file):
     images_ori = []
     cfg = st.session_state.get('cfg', parse_cfg()[2])
     if cfg is None:
@@ -105,18 +105,18 @@ def analyze_and_show_res(dataset_file):
         cfg.dataset_path = dataset_file.name
         del_file = True
 
-    analyzer = Analyser(cfg)
-    dataset = analyzer.run()
+    analyser = Analyser(cfg)
+    dataset = analyser.run()
 
-    overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
+    overall_file = os.path.join(analyser.analysis_path, 'overall.csv')
     analysis_res_ori = pd.DataFrame()
     if os.path.exists(overall_file):
         analysis_res_ori = pd.read_csv(overall_file)
 
-    if os.path.exists(analyzer.analysis_path):
-        for f_path in os.listdir(analyzer.analysis_path):
+    if os.path.exists(analyser.analysis_path):
+        for f_path in os.listdir(analyser.analysis_path):
             if '.png' in f_path and 'all-stats' in f_path:
-                images_ori.append(os.path.join(analyzer.analysis_path, f_path))
+                images_ori.append(os.path.join(analyser.analysis_path, f_path))
 
     st.session_state.dataset = dataset
     st.session_state.original_overall = analysis_res_ori
@@ -275,7 +275,7 @@ class Visualize:
         st.pyplot(fig)
 
     @staticmethod
-    def op_effect_analyze():
+    def op_effect_analyse():
         col1, col2, col3 = st.columns(3)
 
         with col1:
@@ -297,12 +297,12 @@ class Visualize:
                          disabled=True,
                          value='data/demo-dataset.jsonl')
 
-        start_btn = st.button('Start to analyze data (per filter op)',
+        start_btn = st.button('Start to analyse data (per filter op)',
                               use_container_width=True)
 
         if start_btn:
-            with st.spinner('Wait for analyze...'):
-                analyze_and_show_res(dataset_file)
+            with st.spinner('Wait for analyse...'):
+                analyse_and_show_res(dataset_file)
 
         with st.expander('Data Analysis Results', expanded=False):
             original_overall = st.session_state.get('original_overall', None)
@@ -316,7 +316,7 @@ class Visualize:
             if dataset:
                 Visualize.filter_dataset(dataset)
             else:
-                st.warning('Please analyze data first')
+                st.warning('Please analyse data first')
 
     @staticmethod
     def filter_dataset(dataset):
@@ -527,7 +527,7 @@ class Visualize:
     @staticmethod
     def visualize():
         Visualize.setup()
-        Visualize.op_effect_analyze()
+        Visualize.op_effect_analyse()
 
 
 def main():

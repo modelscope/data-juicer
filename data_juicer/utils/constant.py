@@ -95,9 +95,9 @@ class StatsKeysMeta(type):
                 tmp_dj_cfg = get_init_configs(tmp_dj_cfg)
 
                 from data_juicer.core import Analyser
-                tmp_analyzer = Analyser(tmp_dj_cfg)
+                tmp_analyser = Analyser(tmp_dj_cfg)
                 # do not overwrite the true analysis results
-                tmp_analyzer.run(skip_export=True)
+                tmp_analyser.run(skip_export=True)
 
                 os.remove(tmp_f_name)
             else:

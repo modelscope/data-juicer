@@ -20,9 +20,9 @@ def main():
         if sys.argv[i] == '--path_k_sigma_recipe':
             path_k_sigma_recipe = sys.argv[i + 1]
 
-    # 1. analyze using the given initial recipe
+    # 1. analyse using the given initial recipe
     cfg = init_configs()
-    logger.info('Begin to analyze data using the given initial recipe')
+    logger.info('Begin to analyse data using the given initial recipe')
 
     analyser = Analyser(cfg)
     analyser.run()

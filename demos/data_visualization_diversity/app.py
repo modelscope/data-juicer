@@ -104,10 +104,10 @@ def load_dataset(dataset_file):
         cfg.dataset_path = dataset_file.name
         del_file = True
 
-    logger.info('=========Stage: analyze original data=========')
-    analyzer = Analyser(cfg)
+    logger.info('=========Stage: analyse original data=========')
+    analyser = Analyser(cfg)
 
-    dataset = analyzer.formatter.load_dataset()
+    dataset = analyser.formatter.load_dataset()
     if del_file:
         os.remove(dataset_file.name)
     return dataset
@@ -192,7 +192,7 @@ class Visualize:
             raw_df = None
             if diversity_btn:
                 try:
-                    with st.spinner('Wait for analyze diversity...'):
+                    with st.spinner('Wait for analyse diversity...'):
                         dataset = load_dataset(dataset_file)
 
                         diversity_analysis = DiversityAnalysis(

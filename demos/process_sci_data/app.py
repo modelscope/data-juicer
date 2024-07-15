@@ -94,16 +94,16 @@ def process_and_show_res():
     cfg = init_configs(args=args_in_cmd)
     cfg.open_tracer = True
     cfg.np = 1
-    logger.info('=========Stage 1: analyze original data=========')
-    analyzer = Analyser(cfg)
-    analyzed_dataset = analyzer.run()
+    logger.info('=========Stage 1: analyse original data=========')
+    analyser = Analyser(cfg)
+    analysed_dataset = analyser.run()
 
     logger.info('=========Stage 2: process original data=========')
     executor = Executor(cfg)
     processed_dataset = executor.run()
     trace_dir = executor.tracer.work_dir
     trace_files = list(Path(trace_dir).glob('*jsonl'))
-    return analyzed_dataset, processed_dataset, trace_files
+    return analysed_dataset, processed_dataset, trace_files
 
 
 class Visualize:
@@ -145,27 +145,27 @@ class Visualize:
             show_yaml(config_file)
 
     @staticmethod
-    def analyze_process():
+    def analyse_process():
 
         start_btn_process = st.button('Start to process data',
                                       use_container_width=True)
 
         with st.expander('Data Processing Results', expanded=True):
-            analyzed_dataset = None
+            analysed_dataset = None
             processed_dataset = None
             trace_files = []
             if start_btn_process:
                 with st.spinner('Wait for process...'):
-                    analyzed_dataset, processed_dataset, trace_files = process_and_show_res(
+                    analysed_dataset, processed_dataset, trace_files = process_and_show_res(
                     )
 
             col1, col2 = st.columns(2)
             with col1:
                 st.header('Original Data')
-                st.dataframe(analyzed_dataset, use_container_width=True)
+                st.dataframe(analysed_dataset, use_container_width=True)
                 st.download_button('Download Original data as JSONL',
                                    data=convert_to_jsonl(
-                                       pd.DataFrame(analyzed_dataset)),
+                                       pd.DataFrame(analysed_dataset)),
                                    file_name='original_dataset.jsonl')
 
             with col2:
@@ -209,7 +209,7 @@ class Visualize:
     def visualize():
         Visualize.setup()
         Visualize.show_recipe()
-        Visualize.analyze_process()
+        Visualize.analyse_process()
 
 
 def main():

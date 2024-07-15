@@ -59,7 +59,7 @@ class ProbeViaAnalyserHook(BaseHook):
         self.specify_dj_and_extra_configs()
         analyser = Analyser(self.inited_dj_cfg)
         # probe the data via Analyser
-        logger.info('Begin to analyze data')
+        logger.info('Begin to analyse data')
         analyser.run()
         analyser_res = analyser.overall_result
         # drop string rows to avoid unaligned dtypes

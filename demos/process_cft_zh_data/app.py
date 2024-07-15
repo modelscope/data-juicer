@@ -96,14 +96,14 @@ def process_and_show_res():
     cfg.open_tracer = True
     cfg.np = 1
     cfg.process.pop(0)
-    logger.info('=========Stage 1: analyze original data=========')
-    analyzer = Analyser(cfg)
-    analyzed_dataset = analyzer.run()
+    logger.info('=========Stage 1: analsze original data=========')
+    analyser = Analyser(cfg)
+    analysed_dataset = analyser.run()
 
     logger.info('=========Stage 2: process original data=========')
     executor = Executor(cfg)
     processed_dataset = executor.run()
-    st.session_state.analyzed_dataset = analyzed_dataset
+    st.session_state.analysed_dataset = analysed_dataset
     st.session_state.processed_dataset = processed_dataset
 
     trace_dir = executor.tracer.work_dir
@@ -152,7 +152,7 @@ class Visualize:
             show_yaml(config_file)
 
     @staticmethod
-    def analyze_process():
+    def analyse_process():
 
         start_btn_process = st.button('Start to process data',
                                       use_container_width=True)
@@ -166,12 +166,12 @@ class Visualize:
             col1, col2 = st.columns(2)
             with col1:
                 st.header('Original Data')
-                analyzed_dataset = st.session_state.get(
-                    'analyzed_dataset', None)
-                st.dataframe(analyzed_dataset, use_container_width=True)
+                analysed_dataset = st.session_state.get(
+                    'analysed_dataset', None)
+                st.dataframe(analysed_dataset, use_container_width=True)
                 st.download_button('Download Original data as JSONL',
                                    data=convert_to_jsonl(
-                                       pd.DataFrame(analyzed_dataset)),
+                                       pd.DataFrame(analysed_dataset)),
                                    file_name='original_dataset.jsonl')
 
             with col2:
@@ -220,7 +220,7 @@ class Visualize:
     def visualize():
         Visualize.setup()
         Visualize.show_recipe()
-        Visualize.analyze_process()
+        Visualize.analyse_process()
 
 
 def main():

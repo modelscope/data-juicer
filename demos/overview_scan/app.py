@@ -47,10 +47,10 @@ python tools/process_data.py --config configs/demo/process.yaml
 ```
 
 ### Data Analysis
-- Run `analyze_data.py` tool with your config as the argument to analyse your dataset.
+- Run `analyse_data.py` tool with your config as the argument to analyse your dataset.
 
 ```shell
-python tools/analyze_data.py --config configs/demo/analyser.yaml
+python tools/analyse_data.py --config configs/demo/analyser.yaml
 ```
 
 - **Note:** Analyser only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
@@ -74,7 +74,7 @@ Data-Juicer provides some configuration files to allow users to easily understan
 # To process your dataset.
 python tools/process_data.py --config xxx.yaml
 # To analyse your dataset.
-python tools/analyze_data.py --config xxx.yaml
+python tools/analyse_data.py --config xxx.yaml
 ```
 '''
 
@@ -124,7 +124,7 @@ def run_demo():
     config_file = os.path.join(project_path, 'configs/demo/analyser.yaml')
     data_path = os.path.join(demo_path, 'data/demo-dataset.jsonl')
     st.markdown(f'dataset: `{data_path}`')
-    start_btn = st.button(' Start to analyze', use_container_width=True)
+    start_btn = st.button(' Start to analyse', use_container_width=True)
 
     cfg_cmd = f'--config {config_file} --dataset_path {data_path}'
     args_in_cmd = cfg_cmd.split()
@@ -134,21 +134,21 @@ def run_demo():
     cfg['save_stats_in_one_file'] = True
 
     if start_btn:
-        analyzer = Analyser(cfg)
+        analyser = Analyser(cfg)
 
-        with st.spinner('Wait for analyze...'):
-            analyzer.run()
+        with st.spinner('Wait for analyse...'):
+            analyser.run()
 
-        overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
+        overall_file = os.path.join(analyser.analysis_path, 'overall.csv')
         analysis_res_ori = pd.DataFrame()
         if os.path.exists(overall_file):
             analysis_res_ori = pd.read_csv(overall_file)
 
-        if os.path.exists(analyzer.analysis_path):
-            for f_path in os.listdir(analyzer.analysis_path):
+        if os.path.exists(analyser.analysis_path):
+            for f_path in os.listdir(analyser.analysis_path):
                 if '.png' in f_path and 'all-stats' in f_path:
                     images_ori.append(
-                        os.path.join(analyzer.analysis_path, f_path))
+                        os.path.join(analyser.analysis_path, f_path))
 
         st.subheader('Statistics')
         st.dataframe(analysis_res_ori, use_container_width=True)

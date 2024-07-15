@@ -51,7 +51,7 @@ class OverallAnalysis:
                            f'analysed for now.')
             return None
         if type(first) is str:
-            # describe(include = 'all') can analyze the string type
+            # describe(include = 'all') can analyse the string type
             return col
         elif type(first) is list:
             # flatten and infer the type
