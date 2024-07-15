@@ -10,7 +10,7 @@ probe_job_configs:
   - hooker: 'ProbeViaAnalyserHooker'
     res_name: 'analysis_ori_data'
     dj_configs: 'configs/demo/process.yaml'
-    other_configs:
+    extra_configs:
   # - hooker: 'ProbeViaModelInferHooker'
   #   res_name: 'analysis_ori_model'
   #   dj_configs:
