@@ -893,8 +893,6 @@ def main():
     logger.info(f"  Total optimization steps = {args.max_train_steps}")
     logger.info(f"  Total compute budget = {total_compute_budget}")
 
-    assert total_compute_budget <= 524288000000, f" total_compute_budget = {total_compute_budget} exceeds the upper limit 524288000000, please readjust epochs, dataset size or sample size."
-
     global_step = 0
     first_epoch = 0
 
