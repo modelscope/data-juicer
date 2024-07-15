@@ -53,7 +53,7 @@ class ProbeViaAnalyserHook(BaseHook):
         :param watcher: for watching the result
         """
         super(ProbeViaAnalyserHook, self).__init__(job_cfg, watcher, *args,
-                                                     **kwargs)
+                                                   **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
@@ -81,7 +81,7 @@ class ProbeViaModelInferHook(BaseHook):
         :param watcher: for watching the result
         """
         super(ProbeViaModelInferHook, self).__init__(job_cfg, watcher, *args,
-                                                       **kwargs)
+                                                     **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
@@ -159,7 +159,7 @@ class ProcessDataHook(BaseHook):
         :param watcher: for watching the result
         """
         super(ProcessDataHook, self).__init__(job_cfg, watcher, *args,
-                                                **kwargs)
+                                              **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
@@ -179,8 +179,7 @@ class TrainModelHook(BaseHook):
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(TrainModelHook, self).__init__(job_cfg, watcher, *args,
-                                               **kwargs)
+        super(TrainModelHook, self).__init__(job_cfg, watcher, *args, **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
@@ -212,7 +211,7 @@ class EvaluateDataHook(BaseHook):
         :param watcher: for watching the result
         """
         super(EvaluateDataHook, self).__init__(job_cfg, watcher, *args,
-                                                 **kwargs)
+                                               **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
@@ -238,7 +237,7 @@ class EvaluateModelHook(BaseHook):
         :param watcher: for watching the result
         """
         super(EvaluateModelHook, self).__init__(job_cfg, watcher, *args,
-                                                  **kwargs)
+                                                **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()

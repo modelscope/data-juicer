@@ -144,8 +144,7 @@ class SandBoxExecutor:
 
         # register refine_recipe_jobs
         for job_cfg in self.cfg.refine_recipe_job_configs:
-            self.refine_recipe_jobs.append(regist_hook(
-                job_cfg, self.watcher))
+            self.refine_recipe_jobs.append(regist_hook(job_cfg, self.watcher))
 
         # register execution_jobs
         for job_cfg in self.cfg.execution_job_configs:
