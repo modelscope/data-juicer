@@ -1,10 +1,37 @@
 import math
+import os
 import subprocess
 
+import multiprocess as mp
 import psutil
 from loguru import logger
 
-from data_juicer import cuda_device_count, use_cuda
+from data_juicer import cuda_device_count
+
+
+def setup_mp(method=None):
+    if mp.current_process().name != 'MainProcess':
+        return
+
+    if method is None:
+        method = ['fork', 'forkserver', 'spawn']
+    if not isinstance(method, (list, tuple)):
+        method = [method]
+    method = [m.lower() for m in method]
+
+    env_method = os.getenv('MP_START_METHOD', '').lower()
+    if env_method in method:
+        method = [env_method]
+
+    available_methods = mp.get_all_start_methods()
+    for m in method:
+        if m in available_methods:
+            try:
+                logger.debug(f"Setting multiprocess start method to '{m}'")
+                mp.set_start_method(m, force=True)
+            except RuntimeError as e:
+                logger.warning(f'Error setting multiprocess start method: {e}')
+            break
 
 
 def get_min_cuda_memory():
@@ -26,13 +53,13 @@ def calculate_np(num_proc, op, op_name):
     """Calculate the optimum number of processes for the given OP"""
     if num_proc is None:
         num_proc = psutil.cpu_count()
-    if use_cuda() and op._accelerator == 'cuda':
+    if op.use_cuda():
         cuda_mem_available = get_min_cuda_memory() / 1024
         op_proc = min(
             num_proc,
             math.floor(cuda_mem_available / (op.mem_required + 0.1)) *
             cuda_device_count())
-        if use_cuda() and op.mem_required == 0:
+        if op.use_cuda() and op.mem_required == 0:
             logger.warning(f'The required cuda memory of Op[{op_name}] '
                            f'has not been specified. '
                            f'Please specify the mem_required field in the '

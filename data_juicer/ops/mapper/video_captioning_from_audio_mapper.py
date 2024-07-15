@@ -66,7 +66,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
         loaded_video_keys = sample[self.video_key]
 
         # get models
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         offset = 0
         captioned_sample = copy.deepcopy(sample)

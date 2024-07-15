@@ -3,17 +3,16 @@ from time import time
 
 from loguru import logger
 
-from data_juicer import use_cuda
 from data_juicer.config import init_configs
 from data_juicer.core.data import Dataset
 from data_juicer.format.load import load_formatter
 from data_juicer.format.mixture_formatter import MixtureFormatter
-from data_juicer.ops import (OPERATORS, Deduplicator, Filter, Mapper, Selector,
-                             load_ops)
+from data_juicer.ops import (OPERATORS, UNFORKABLE, Deduplicator, Filter,
+                             Mapper, Selector, load_ops)
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.process_utils import calculate_np
+from data_juicer.utils.process_utils import calculate_np, setup_mp
 
 from ..ops.selector.frequency_specified_field_selector import \
     FrequencySpecifiedFieldSelector
@@ -159,6 +158,7 @@ class Executor:
         logger.info('Preparing process operators...')
         self.process_list, self.ops = load_ops(self.cfg.process,
                                                self.cfg.op_fusion)
+        unforkable_op_list = set(UNFORKABLE.modules.keys())
 
         # 3. data process
         # - If tracer is open, trace each op after it's processed
@@ -169,13 +169,16 @@ class Executor:
         for op_cfg, op in zip(self.process_list, self.ops):
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
-            with_rank = use_cuda() and op._accelerator == 'cuda'
+            with_rank = op.use_cuda()
             if op.num_proc != 0:
                 op_proc = op.num_proc
                 logger.info(f'Op [{op_name}] running with sepcified '
                             f'number of procs:{op.num_proc}')
             else:
                 op_proc = calculate_np(self.cfg.np, op, op_name)
+            mp_method = ['forkserver', 'spawn'
+                         ] if op_name in unforkable_op_list else None
+            setup_mp(mp_method)
             try:
                 if isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,

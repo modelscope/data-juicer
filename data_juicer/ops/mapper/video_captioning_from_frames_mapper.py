@@ -179,7 +179,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
 
         text = sample[self.text_key]
         offset = 0
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         for chunk in text.split(SpecialTokens.eoc):
 

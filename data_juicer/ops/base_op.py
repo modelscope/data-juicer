@@ -3,10 +3,12 @@ import copy
 import pandas as pd
 import pyarrow as pa
 
+from data_juicer import is_cuda_available
 from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
+UNFORKABLE = Registry('Unforkable')
 
 
 class OP:
@@ -48,6 +50,9 @@ class OP:
 
     def process(self, *args, **kwargs):
         raise NotImplementedError
+
+    def use_cuda(self):
+        return self._accelerator == 'cuda' and is_cuda_available()
 
     def use_actor(self):
         return self._use_actor

@@ -153,7 +153,7 @@ class ImageCaptioningMapper(Mapper):
         # the generated text will be placed following each SpecialTokens.img
         # and the original special tokens are kept in an order-preserving way.
 
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         # do generation for each image chunk by chunk
         for chunk in ori_sample[self.text_key].split(SpecialTokens.eoc):

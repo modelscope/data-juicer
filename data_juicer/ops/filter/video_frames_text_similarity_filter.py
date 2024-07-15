@@ -127,7 +127,7 @@ class VideoFramesTextSimilarityFilter(Filter):
         text = sample[self.text_key]
         offset = 0
         similarity = []
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         for chunk in text.split(SpecialTokens.eoc):
             count = chunk.count(SpecialTokens.video)

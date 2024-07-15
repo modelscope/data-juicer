@@ -190,7 +190,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         loaded_video_keys = sample[self.video_key]
 
         # get models
-        model, tokenizer = get_model(self.model_key, rank=rank)
+        model, tokenizer = get_model(self.model_key, rank, self.use_cuda())
 
         captioned_sample = copy.deepcopy(sample)
         # generate for each video chunk by chunk

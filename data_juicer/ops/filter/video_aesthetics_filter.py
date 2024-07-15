@@ -155,7 +155,7 @@ class VideoAestheticsFilter(Filter):
             frame_images = [frame.to_image() for frame in frames]
 
             # compute aesthetics_scores
-            model, processor = get_model(self.model_key, rank=rank)
+            model, processor = get_model(self.model_key, rank, self.use_cuda())
             inputs = processor(images=frame_images,
                                return_tensors='pt').to(model.device)
             with torch.no_grad():

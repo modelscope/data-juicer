@@ -75,7 +75,7 @@ class ImageWatermarkFilter(Filter):
         sample, images = load_data_with_context(sample, context,
                                                 loaded_image_keys, load_image)
 
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         images = [images[key] for key in images]
         inputs = processor(images=images, return_tensors='pt').to(model.device)

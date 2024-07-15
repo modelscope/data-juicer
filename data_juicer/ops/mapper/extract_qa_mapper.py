@@ -77,7 +77,7 @@ class ExtractQAMapper(Mapper):
         return qa_list
 
     def process(self, sample, rank=None):
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         inputs = processor(sample[self.text_key],
                            return_tensors='pt').to(model.device)

@@ -115,7 +115,7 @@ class VideoWatermarkFilter(Filter):
                                                 loaded_video_keys, load_video)
 
         watermark_probs = []
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         for video_key, video in videos.items():
             sampled_frames_key = video_key + self.sampled_frames_key_suffix
