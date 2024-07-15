@@ -18,36 +18,36 @@ probe_job_configs:
   #     export_path: './outputs/demo-sandbox/demo-sandbox.jsonl'
   #     data_probe_algo: 'uniform'
   #     data_probe_ratio: 0.5
-  #     other_configs:
+  #     extra_configs:
   #       (...model configs)
 
 refine_recipe_job_configs:
   - hooker: 'RefineRecipeViaKSigmaHooker'
     res_name: 'analysis_ori_data'
     dj_configs: 'configs/demo/process.yaml'
-    other_configs:
+    extra_configs:
       path_k_sigma_recipe: './outputs/demo-process/k_sigma_new_recipe.yaml'
   # - hooker: 'RefineRecipeViaModelFeedbackHooker'
   #   res_name:
   #   dj_configs:
-  #   other_configs:
+  #   extra_configs:
   #     (...model configs)
 
 execution_job_configs:
   - hooker: 'ProcessDataHooker'
     res_name:
     dj_configs: './outputs/demo-process/k_sigma_new_recipe.yaml'
-    other_configs:
+    extra_configs:
   - hooker: 'TrainModelHooker'
     res_name:
     dj_configs:
-    other_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
+    extra_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
 
 evaluation_job_configs:
   - hooker: 'ProbeViaAnalyserHooker'
     res_name: 'analysis_processed_data'
     dj_configs: 'configs/demo/process.yaml'
-    other_configs:
+    extra_configs:
   # - hooker: 'ProbeViaModelInferHooker'
   #   res_name: 'analysis_trained_model'
   #   dj_configs:
@@ -55,14 +55,14 @@ evaluation_job_configs:
   #     export_path: './outputs/demo-sandbox/demo-sandbox.jsonl'
   #     data_probe_algo: 'uniform'
   #     data_probe_ratio: 0.5
-  #     other_configs:
+  #     extra_configs:
   #       (...model configs)
   - hooker: 'EvaluateDataHooker'
     res_name: 'eval_data'
     dj_configs:
-    other_configs: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
+    extra_configs: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
   # - hooker: 'EvaluateModelHooker'
   #   res_name: 'eval_model'
   #   dj_configs:
-  #   other_configs:
+  #   oextra_configs:
   #     (...model configs)

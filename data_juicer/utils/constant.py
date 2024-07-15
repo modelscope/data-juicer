@@ -212,4 +212,4 @@ class JobRequiredKeys(Enum):
     hooker = 'hooker'
     dj_configs = 'dj_configs'
     res_name = 'res_name'
-    other_configs = 'other_configs'
+    extra_configs = 'extra_configs'

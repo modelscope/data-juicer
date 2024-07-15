@@ -22,12 +22,12 @@ class BaseHooker:
         self.watcher = watcher
         self.res_name = job_cfg[JobRequiredKeys.res_name.value]
         self.dj_cfg = job_cfg[JobRequiredKeys.dj_configs.value]
-        self.other_cfg = job_cfg[JobRequiredKeys.other_configs.value]
+        self.other_cfg = job_cfg[JobRequiredKeys.extra_configs.value]
 
     def hook(self, **kwargs):
         raise NotImplementedError
 
-    def specify_dj_and_other_configs(self):
+    def specify_dj_and_extra_configs(self):
         if self.dj_cfg:
             logger.info('Parsing Data-Juicer configs in the job.')
             self.dj_cfg = prepare_side_configs(self.dj_cfg)
@@ -56,7 +56,7 @@ class ProbeViaAnalyserHooker(BaseHooker):
                                                      **kwargs)
 
     def hook(self, **kwargs):
-        self.specify_dj_and_other_configs()
+        self.specify_dj_and_extra_configs()
         analyser = Analyser(self.inited_dj_cfg)
         # probe the data via Analyser
         logger.info('Begin to analyze data')
@@ -84,7 +84,7 @@ class ProbeViaModelInferHooker(BaseHooker):
                                                        **kwargs)
 
     def hook(self, **kwargs):
-        self.specify_dj_and_other_configs()
+        self.specify_dj_and_extra_configs()
         data_executor = DjExecutor(self.inited_dj_cfg)
         model_infer_executor = mode_infer_executor_factory(self.other_cfg)
         # TODO
@@ -114,7 +114,7 @@ class RefineRecipeViaKSigmaHooker(BaseHooker):
               self).__init__(job_cfg, watcher, *args, **kwargs)
 
     def hook(self, **kwargs):
-        self.specify_dj_and_other_configs()
+        self.specify_dj_and_extra_configs()
         path_k_sigma_recipe = self.other_cfg.path_k_sigma_recipe
         # use k-sigma strategy to modify the data recipe
         modify_recipe_k_sigma(self.dj_cfg, self.watcher.query(self.res_name),
@@ -135,7 +135,7 @@ class RefineRecipeViaModelFeedbackHooker(BaseHooker):
               self).__init__(job_cfg, watcher, *args, **kwargs)
 
     def hook(self, **kwargs):
-        self.specify_dj_and_other_configs()
+        self.specify_dj_and_extra_configs()
         # TODO
         # use model-feedback-based strategy to modify the data recipe,
         # e.g., more mapper on the "hard" or "sensitive" data, those were
@@ -162,7 +162,7 @@ class ProcessDataHooker(BaseHooker):
                                                 **kwargs)
 
     def hook(self, **kwargs):
-        self.specify_dj_and_other_configs()
+        self.specify_dj_and_extra_configs()
         data_executor = DjExecutor(self.inited_dj_cfg)
         # basic routine to process data, users can customize this freely
         logger.info('Begin to process the data with given dj recipe')
@@ -183,7 +183,7 @@ class TrainModelHooker(BaseHooker):
                                                **kwargs)
 
     def hook(self, **kwargs):
-        self.specify_dj_and_other_configs()
+        self.specify_dj_and_extra_configs()
         model_trainer = model_train_executor_factory(self.other_cfg,
                                                      watcher=self.watcher)
         # basic routine to train model via the processed data,
@@ -215,7 +215,7 @@ class EvaluateDataHooker(BaseHooker):
                                                  **kwargs)
 
     def hook(self, **kwargs):
-        self.specify_dj_and_other_configs()
+        self.specify_dj_and_extra_configs()
         data_evaluator = data_evaluator_factory(self.other_cfg)
         # basic routine to evaluate the given data,
         # users can customize this freely
@@ -241,7 +241,7 @@ class EvaluateModelHooker(BaseHooker):
                                                   **kwargs)
 
     def hook(self, **kwargs):
-        self.specify_dj_and_other_configs()
+        self.specify_dj_and_extra_configs()
         model_evaluator = model_evaluator_factory(self.other_cfg)
         # basic routine to evaluate the given model,
         # users can customize this freely
