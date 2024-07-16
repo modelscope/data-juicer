@@ -249,7 +249,7 @@ class EvaluateModelHook(BaseHook):
         return kwargs
 
 
-HOOK_DICT = {
+HOOK_MAPPING = {
     'ProbeViaAnalyzerHook': ProbeViaAnalyzerHook,
     'ProbeViaModelInferHook': ProbeViaModelInferHook,
     'RefineRecipeViaKSigmaHook': RefineRecipeViaKSigmaHook,
@@ -261,7 +261,7 @@ HOOK_DICT = {
 }
 
 
-def regist_hook(job_cfg, watcher):
-    if job_cfg.hook not in HOOK_DICT:
+def register_hook(job_cfg, watcher):
+    if job_cfg.hook not in HOOK_MAPPING:
         raise ValueError('Undefined hook: [{job_cfg.hook}].')
-    return HOOK_DICT[job_cfg.hook](job_cfg, watcher)
+    return HOOK_MAPPING[job_cfg.hook](job_cfg, watcher)
