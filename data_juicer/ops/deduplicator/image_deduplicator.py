@@ -64,6 +64,9 @@ class ImageDeduplicator(Deduplicator):
             self.text_dedup_op = DocumentDeduplicator(**kwargs)
 
     def compute_hash(self, sample, context=False):
+        # get hash of text first
+        if self.consider_text:
+            sample = self.text_dedup_op.compute_hash(sample)
         # check if it's computed already
         if HashKeys.imagehash in sample:
             return sample
@@ -82,8 +85,6 @@ class ImageDeduplicator(Deduplicator):
         for key in images:
             sample[HashKeys.imagehash] += self.hasher.encode_image(
                 image_array=np.array(images[key]))
-        if self.consider_text:
-            sample = self.text_dedup_op.compute_hash(sample)
         return sample
 
     def process(self, dataset, show_num=0):

@@ -62,6 +62,8 @@ process:
   - clean_links_mapper:                                     # remove web links from text.
   - clean_copyright_mapper:                                 # remove copyright comments.
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
+  - extract_qa_mapper:                                      # mapper to extract question and answer pair from text.
+      hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - image_blur_mapper:                                      # mapper to blur images.
       p: 0.2                                                  # probability of the image being blured
@@ -84,7 +86,7 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True in default.
       prompt: null                                            # a string prompt to guide the generation of blip2 model for all samples globally. It's None in default, which means no prompt provided.
       prompt_key: null                                        # the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default.
-      mem_required: '20GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
+      mem_required: '16GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_diffusion_mapper:                                 # generate images by diffusion model
       hf_diffusion: 'CompVis/stable-diffusion-v1-4'           # stable diffusion model name on huggingface to generate image
       torch_dtype: 'fp32'                                     # the floating point type used to load the diffusion model. Can be one of ['fp32', 'fp16', 'bf16']
@@ -95,7 +97,7 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
       caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
-      mem_required: '25GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
+      mem_required: '8GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_face_blur_mapper:                                 # blur faces detected in images
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
@@ -327,7 +329,7 @@ process:
       lang: en                                                # compute perplexity in what language
       max_ppl: 1500                                           # the max perplexity score to filter text
   - phrase_grounding_recall_filter:                         # filter samples according to the locating recall of phrases extracted from text in the images.
-      hf_owlvit: openai/clip-vit-base-patch32                 # name of used Hugging Face Owl-ViT
+      hf_owlvit: google/owlvit-base-patch32                   # name of used Hugging Face Owl-ViT
       min_recall: 0.1                                         # the min phrase grounding recall of filter range
       max_recall: 1.0                                         # the max phrase grounding recall of filter range
       horizontal_flip: false                                  # flip image horizontally (left to right).

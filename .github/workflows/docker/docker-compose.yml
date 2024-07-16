@@ -1,0 +1,65 @@
+version: '3'
+services:
+  ray-head:
+    image: data-juicer-unittest:0.2.0
+    pull_policy: never
+    command: ray start --head --dashboard-host 0.0.0.0 --include-dashboard true --block
+    environment:
+      - HF_HOME=/data/huggingface
+      - HF_ENDPOINT=https://hf-mirror.com
+      - TORCH_HOME=/data/torch
+      - NLTK_DATA=/data/nltk
+      - DATA_JUICER_CACHE_HOME=/data/dj
+      - RAY_ADDRESS=auto
+    working_dir: /workspace
+    networks:
+      - ray-network
+    volumes:
+      - huggingface_cache:/data
+      - ../../..:/workspace
+    ports:
+      - "6379:6379"
+      - "8265:8265"
+    shm_size: "64G"
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['0', '1']
+            capabilities: [gpu]
+
+  ray-worker:
+    image: data-juicer-unittest:0.2.0
+    pull_policy: never
+    command: ray start --address=ray-head:6379 --block
+    environment:
+      - HF_HOME=/data/huggingface
+      - HF_ENDPOINT=https://hf-mirror.com
+      - TORCH_HOME=/data/torch
+      - NLTK_DATA=/data/nltk
+      - DATA_JUICER_CACHE_HOME=/data/dj
+    working_dir: /workspace
+    volumes:
+      - huggingface_cache:/data
+      - ../../..:/workspace
+    depends_on:
+      - ray-head
+    networks:
+      - ray-network
+    shm_size: "64G"
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids: ['2', '3']
+            capabilities: [gpu]
+
+networks:
+  ray-network:
+    driver: bridge
+
+volumes:
+  huggingface_cache:
+    external: true

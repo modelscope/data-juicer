@@ -1,58 +1,63 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Unit Test
+name: unittest
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
 
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  unittest-single:
+    runs-on: [self-hosted, linux]
+    environment: Testing
     steps:
     - uses: actions/checkout@v3
-    - name: Check disk space
-      run: |
-        df -h
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v3
       with:
-        python-version: "3.8"
-    - name: Check disk space
+        path: dj-${{ github.run_id }}
+
+    - name: Setup docker compose
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        df -h
-    - name: Install dependencies
+        docker compose up -d
+
+    - name: Install data-juicer
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        sudo apt-get install ffmpeg
-        python -m pip install --upgrade pip
-        pip install -v -e .[all]
-        pip install -v -e .[sandbox]
-    - name: Increase swapfile
+        docker compose exec ray-head pip install -e .\[all\]
+        docker compose exec ray-worker pip install -e .\[all\]
+
+    - name: Clean dataset cache
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        df -h
-        free -h
-        sudo swapoff -a
-        sudo fallocate -l 12G /mnt/swapfile
-        sudo chmod 600 /mnt/swapfile
-        sudo mkswap /mnt/swapfile
-        sudo swapon /mnt/swapfile
-        sudo swapon --show
-    - name: Clean data-juicer assets and models after cached
-      uses: webiny/action-post-run@3.1.0
-      with:
-        run: rm -rf ~/.cache/data_juicer
-    - name: Cache data-juicer assets and models
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/data_juicer
-        key: dj-assets-models
-    - name: Check disk space
+        docker compose exec ray-head rm -rf /data/huggingface/dataset
+
+    - name: Run unittest standalone
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        df -h
-    - name: Run the test
+        docker compose exec ray-head python tests/run.py --tag standalone
+
+    - name: Run unittest ray
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        python tests/run.py
+        docker compose exec ray-head python tests/run.py --tag ray
+
+    - name: Remove docker compose
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
+      if: always()
+      run: |
+        docker compose down --remove-orphans
+
+    - name: Cleanup workspace
+      if: always()
+      run: |
+        rm -rf  dj-${{ github.run_id }}

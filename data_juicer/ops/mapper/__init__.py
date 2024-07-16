@@ -2,7 +2,7 @@
 from . import (audio_ffmpeg_wrapped_mapper, chinese_convert_mapper,
                clean_copyright_mapper, clean_email_mapper, clean_html_mapper,
                clean_ip_mapper, clean_links_mapper, expand_macro_mapper,
-               fix_unicode_mapper, image_blur_mapper,
+               extract_qa_mapper, fix_unicode_mapper, image_blur_mapper,
                image_captioning_from_gpt4v_mapper, image_captioning_mapper,
                image_diffusion_mapper, image_face_blur_mapper,
                nlpaug_en_mapper, nlpcda_zh_mapper,
@@ -32,6 +32,7 @@ from .clean_html_mapper import CleanHtmlMapper
 from .clean_ip_mapper import CleanIpMapper
 from .clean_links_mapper import CleanLinksMapper
 from .expand_macro_mapper import ExpandMacroMapper
+from .extract_qa_mapper import ExtractQAMapper
 from .fix_unicode_mapper import FixUnicodeMapper
 from .image_blur_mapper import ImageBlurMapper
 from .image_captioning_from_gpt4v_mapper import ImageCaptioningFromGPT4VMapper
@@ -102,6 +103,7 @@ __all__ = [
     'VideoTaggingFromFramesMapper',
     'RemoveCommentsMapper',
     'ExpandMacroMapper',
+    'ExtractQAMapper',
     'ImageCaptioningMapper',
     'RemoveWordsWithIncorrectSubstringsMapper',
     'VideoCaptioningFromVideoMapper',
