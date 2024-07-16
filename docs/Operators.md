@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
-| [ Mapper ]( #mapper )             |   45   | Edits and transforms samples                    |
+| [ Mapper ]( #mapper )             |   46   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
@@ -68,6 +68,7 @@ All the specific operators are listed below, each featured with several capabili
 | image_face_blur_mapper                              | Image              |  -     | Blur faces detected in images                                                                                 |
 | nlpaug_en_mapper                                    | General            | en     | Simply augments texts in English based on the `nlpaug` library                                                | 
 | nlpcda_zh_mapper                                    | General            | zh     | Simply augments texts in Chinese based on the `nlpcda` library                                                | 
+| optimize_instruction_mapper                         | General            | en, zh | Optimize instruction text samples.|
 | punctuation_normalization_mapper                    | General            | en, zh | Normalizes various Unicode punctuations to their ASCII equivalents                                            |
 | remove_bibliography_mapper                          | LaTeX              | en, zh | Removes the bibliography of TeX documents                                                                     |
 | remove_comments_mapper                              | LaTeX              | en, zh | Removes the comments of TeX documents                                                                         |

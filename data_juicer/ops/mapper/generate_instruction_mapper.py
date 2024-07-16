@@ -43,6 +43,8 @@ class GenerateInstructionMapper(Mapper):
                  instruct_num,
                  similarity_threshold=0.7,
                  prompt_template=None,
+                 enable_vllm=False,
+                 tensor_parallel_size=1,
                  *args,
                  **kwargs):
         """
@@ -61,6 +63,8 @@ class GenerateInstructionMapper(Mapper):
         :param prompt_template: Prompt template for generate samples.
             Please make sure the template contains "{augmented_data}",
             which corresponds to the augmented samples.
+        :param enable_vllm: Whether to use vllm for inference acceleration.
+        :param tensor_parallel_size: It is only valid when enable_vllm is True.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -74,9 +78,17 @@ class GenerateInstructionMapper(Mapper):
         if prompt_template is None:
             prompt_template = DEFAULT_PROMPT_TEMPLATE
         self.prompt_template = prompt_template
+        self.enable_vllm = enable_vllm
 
-        self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_model)
+        if enable_vllm:
+            self.model_key = prepare_model(
+                model_type='vllm',
+                pretrained_model_name_or_path=hf_model,
+                tensor_parallel_size=tensor_parallel_size)
+        else:
+            self.model_key = prepare_model(
+                model_type='huggingface',
+                pretrained_model_name_or_path=hf_model)
 
         self.seed_qa_samples = self.load_seed_qa_samples(seed_file)
 
@@ -168,30 +180,35 @@ class GenerateInstructionMapper(Mapper):
                                           self.instruct_num)
         input_prompt = self.build_prompt(random_qa_samples,
                                          self.prompt_template)
-        inputs = processor(input_prompt, return_tensors='pt').to(model.device)
-        response = model.generate(**inputs)
-        output_response = processor.decode(response.cpu()[0],
-                                           skip_special_tokens=True)
-        if output_response:
-            out_qa_pairs, response_str = self.parse_response(output_response)
+        if self.enable_vllm:
+            response = model.generate([input_prompt])
+            response_str = response[0].outputs[0].text
+        else:
+            inputs = processor(input_prompt,
+                               return_tensors='pt').to(model.device)
+            response = model.generate(**inputs)
+            response_str = processor.decode(response.cpu()[0],
+                                            skip_special_tokens=True)
 
-            if self.similarity_type == 'rouge_l':
-                sim_score = self.max_rouge_l_score(response_str,
-                                                   self.reference_samples)
-            else:
-                raise ValueError(
-                    f'Not support similarity type "{self.similarity_type}"!')
+        message_list = []
+        out_qa_pairs, response_str = self.parse_response(response_str)
 
-            message_list = []
-            if sim_score <= self.similarity_threshold:
-                for question, answer in out_qa_pairs:
-                    message_list.append({'role': 'user', 'content': question})
-                    message_list.append({
-                        'role': 'assistant',
-                        'content': answer
-                    })
-            else:
-                logging.info('Filter one instance due to similarity.')
+        if not response_str:
+            return {self.text_key: json.dumps({'messages': message_list})}
+
+        if self.similarity_type == 'rouge_l':
+            sim_score = self.max_rouge_l_score(response_str,
+                                               self.reference_samples)
+        else:
+            raise ValueError(
+                f'Not support similarity type "{self.similarity_type}"!')
+
+        if sim_score <= self.similarity_threshold:
+            for question, answer in out_qa_pairs:
+                message_list.append({'role': 'user', 'content': question})
+                message_list.append({'role': 'assistant', 'content': answer})
+        else:
+            logging.info('Filter this generated sample due to similarity.')
 
         return {
             self.text_key:

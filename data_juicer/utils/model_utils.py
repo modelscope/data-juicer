@@ -400,6 +400,34 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
     return (model, processor) if return_model else processor
 
 
+def prepare_vllm_model(pretrained_model_name_or_path,
+                       return_model=True,
+                       trust_remote_code=False,
+                       tensor_parallel_size=1):
+    """
+    Prepare and load a HuggingFace model with the correspoding processor.
+
+    :param pretrained_model_name_or_path: model name or path
+    :param return_model: return model or not
+    :param trust_remote_code: passed to transformers
+    :param tensor_parallel_size: The number of GPUs to use for distributed
+        execution with tensor parallelism.
+    :return: a tuple (model, input processor) if `return_model` is True;
+        otherwise, only the processor is returned.
+    """
+    from transformers import AutoProcessor
+    from vllm import LLM as vLLM
+
+    processor = AutoProcessor.from_pretrained(
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+
+    if return_model:
+        model = vLLM(model=pretrained_model_name_or_path,
+                     tensor_parallel_size=tensor_parallel_size)
+
+    return (model, processor) if return_model else processor
+
+
 def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
     """
     Prepare spacy model for specific language.
@@ -530,7 +558,8 @@ MODEL_FUNCTION_MAPPING = {
     'spacy': prepare_spacy_model,
     'diffusion': prepare_diffusion_model,
     'video_blip': prepare_video_blip_model,
-    'recognizeAnything': prepare_recognizeAnything_model
+    'recognizeAnything': prepare_recognizeAnything_model,
+    'vllm': prepare_vllm_model
 }
 
 

@@ -69,13 +69,13 @@ process:
   - clean_copyright_mapper:                                 # remove copyright comments.
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
   - extract_qa_mapper:                                      # mapper to extract question and answer pair from text.
-      hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'
+      hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'         # model name on huggingface to extract question and answer pair.
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - generate_instruction_mapper:                            # generate new instruction text data.
-      hf_model: 'Qwen/Qwen-7B-Chat'
-      seed_file: 'demos/data/demo-dataset-chatml.jsonl'
-      instruct_num: 3
-      similarity_threshold: 0.7
+      hf_model: 'Qwen/Qwen-7B-Chat'                         # model name on huggingface to generate instruction.
+      seed_file: 'demos/data/demo-dataset-chatml.jsonl'     # Seed file as instruction samples to generate new instructions, chatml format.
+      instruct_num: 3                                       # the number of generated samples.
+      similarity_threshold: 0.7                             # the similarity score threshold between the generated samples and the seed samples.Range from 0 to 1. Samples with similarity score less than this threshold will be kept.
   - image_blur_mapper:                                      # mapper to blur images.
       p: 0.2                                                  # probability of the image being blured
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
@@ -134,6 +134,10 @@ process:
       delete_random_char: false                               # whether to open the augmentation method of deleting random characters from the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的数据增强"
       swap_random_char: false                                 # whether to open the augmentation method of swapping random contiguous characters in the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的数据强增方法"
       replace_equivalent_num: false                           # whether to open the augmentation method of replacing random numbers with their equivalent representations in the original texts. **Notice**: Only for numbers for now. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有伍种不同的数据增强方法"
+  - optimize_instruction_mapper:                            # optimize instruction.
+      hf_model: 'alibaba-pai/Qwen2-7B-Instruct-Refine'      # model name on huggingface to optimize instruction
+      enable_vllm: false                                    # whether to use vllm for inference acceleration.
+      tensor_parallel_size: 1                               # it is only valid when enable_vllm is True. The number of GPUs to use for distributed execution with tensor parallelism.
   - punctuation_normalization_mapper:                       # normalize unicode punctuations to English punctuations.
   - remove_bibliography_mapper:                             # remove bibliography from Latex text.
   - remove_comments_mapper:                                 # remove comments from Latex text, code, etc.

@@ -26,6 +26,8 @@ class ExtractQAMapper(Mapper):
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
                  pattern: str = None,
                  qa_format: str = 'chatml',
+                 enable_vllm=False,
+                 tensor_parallel_size=1,
                  *args,
                  **kwargs):
         """
@@ -33,6 +35,8 @@ class ExtractQAMapper(Mapper):
         :param hf_model: Hugginface model id.
         :param pattern: regular expression pattern to search for within text.
         :param qa_format: Output format of question and answer pair.
+        :param enable_vllm: Whether to use vllm for inference acceleration.
+        :param tensor_parallel_size: It is only valid when enable_vllm is True.
         :param args: extra args
         :param kwargs: extra args
 
@@ -59,8 +63,17 @@ class ExtractQAMapper(Mapper):
             self.pattern = pattern
 
         self.qa_format = qa_format
-        self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_model)
+        self.enable_vllm = enable_vllm
+
+        if enable_vllm:
+            self.model_key = prepare_model(
+                model_type='vllm',
+                pretrained_model_name_or_path=hf_model,
+                tensor_parallel_size=tensor_parallel_size)
+        else:
+            self.model_key = prepare_model(
+                model_type='huggingface',
+                pretrained_model_name_or_path=hf_model)
 
     def _extract_qa(self, output):
         """Extract qestion and answer pair from model output response."""
@@ -78,10 +91,16 @@ class ExtractQAMapper(Mapper):
     def process(self, sample, rank=None):
         model, processor = get_model(self.model_key, rank=rank)
 
-        inputs = processor(sample[self.text_key],
-                           return_tensors='pt').to(model.device)
-        response = model.generate(**inputs)
-        output = processor.decode(response.cpu()[0], skip_special_tokens=True)
+        if self.enable_vllm:
+            response = model.generate([sample[self.text_key]])
+            output = response[0].outputs[0].text
+        else:
+            inputs = processor(sample[self.text_key],
+                               return_tensors='pt').to(model.device)
+            response = model.generate(**inputs)
+            output = processor.decode(response.cpu()[0],
+                                      skip_special_tokens=True)
+
         qa_list = self._extract_qa(output)
 
         if not len(qa_list):

@@ -11,11 +11,12 @@ class GenerateInstructionMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
 
-    def test_generate_instruction(self):
+    def _run_generate_instruction(self, enable_vllm=False):
         op = GenerateInstructionMapper(
-            hf_model='Qwen/Qwen-7B-Chat', 
+            hf_model='Qwen/Qwen-7B-Chat',
             seed_file='demos/data/demo-dataset-chatml.jsonl',
-            instruct_num=2
+            instruct_num=2,
+            enable_vllm=enable_vllm
         )
 
         from data_juicer.format.empty_formatter import EmptyFormatter
@@ -28,6 +29,12 @@ class GenerateInstructionMapperTest(DataJuicerTestCaseBase):
             # test one output qa sample
             self.assertIn('role', out_sample['messages'][0])
             self.assertIn('content', out_sample['messages'][0])
+        
+    def test_generate_instruction(self):
+        self._run_generate_instruction()
+
+    def test_generate_instruction_vllm(self):
+        self._run_generate_instruction(enable_vllm=True)
 
 
 if __name__ == '__main__':

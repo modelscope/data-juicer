@@ -5,7 +5,7 @@ from . import (audio_ffmpeg_wrapped_mapper, chinese_convert_mapper,
                extract_qa_mapper, fix_unicode_mapper, image_blur_mapper,
                image_captioning_from_gpt4v_mapper, image_captioning_mapper,
                image_diffusion_mapper, image_face_blur_mapper,
-               nlpaug_en_mapper, nlpcda_zh_mapper,
+               nlpaug_en_mapper, nlpcda_zh_mapper, optimize_instruction_mapper,
                punctuation_normalization_mapper, remove_bibliography_mapper,
                remove_comments_mapper, remove_header_mapper,
                remove_long_words_mapper, remove_non_chinese_character_mapper,
@@ -42,6 +42,7 @@ from .image_diffusion_mapper import ImageDiffusionMapper
 from .image_face_blur_mapper import ImageFaceBlurMapper
 from .nlpaug_en_mapper import NlpaugEnMapper
 from .nlpcda_zh_mapper import NlpcdaZhMapper
+from .optimize_instruction_mapper import OptimizeInstructionMapper
 from .punctuation_normalization_mapper import PunctuationNormalizationMapper
 from .remove_bibliography_mapper import RemoveBibliographyMapper
 from .remove_comments_mapper import RemoveCommentsMapper
@@ -93,6 +94,7 @@ __all__ = [
     'VideoFFmpegWrappedMapper',
     'ChineseConvertMapper',
     'NlpcdaZhMapper',
+    'OptimizeInstructionMapper',
     'ImageBlurMapper',
     'CleanCopyrightMapper',
     'RemoveNonChineseCharacterlMapper',
