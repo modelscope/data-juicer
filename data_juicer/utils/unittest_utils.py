@@ -37,10 +37,14 @@ class DataJuicerTestCaseBase(unittest.TestCase):
 
         if is_cuda_available():
             import multiprocess
+            cls.original_mp_method = multiprocess.get_start_method()
             multiprocess.set_start_method('spawn', force=True)
 
     @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
+        import multiprocess
+        multiprocess.set_start_method(cls.original_mp_method, force=True)
+
         # clean the huggingface model cache files
         import transformers
         if hf_model_name:
