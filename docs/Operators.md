@@ -52,7 +52,7 @@ All the specific operators are listed below, each featured with several capabili
 |-----------------------------------------------------|--------------------|--------|---------------------------------------------------------------------------------------------------------------|
 | audio_ffmpeg_wrapped_mapper                         | Audio              | -      | Simple wrapper to run a FFmpeg audio filter                                                                   |
 | chinese_convert_mapper                              | General            | zh     | Converts Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji (by [opencc](https://github.com/BYVoid/OpenCC))                |
-| clean_copyright_mapper                              | Code               | en, zh | Removes copyright notice at the beginning of code files (:warning: must contain the word *copyright*)         |
+| clean_copyright_mapper                              | Code               | en, zh | Removes copyright notice at the beginning of code files (must contain the word *copyright*)         |
 | clean_email_mapper                                  | General            | en, zh | Removes email information                                                                                     |
 | clean_html_mapper                                   | General            | en, zh | Removes HTML tags and returns plain text of all the nodes                                                     |
 | clean_ip_mapper                                     | General            | en, zh | Removes IP addresses                                                                                          |
@@ -127,16 +127,16 @@ All the specific operators are listed below, each featured with several capabili
 | stopwords_filter               | General    | en, zh | Keeps samples with stopword ratio above the specified threshold                                                                                     |
 | suffix_filter                  | General    | en, zh | Keeps samples with specified suffixes                                                                                                               |
 | text_action_filter             | General    | en, zh | Keeps samples containing action verbs in their texts                                                                                                |
-| text_entity_dependency_filter  | General    | en, zh | Keeps samples containing entity nouns related to other tokens in the dependency tree of the texts                                                   |
+| text_entity_dependency_filter  | General    | en, zh | Keeps samples containing dependency edges for an entity in the dependency tree of the texts                                                   |
 | text_length_filter             | General    | en, zh | Keeps samples with total text length within the specified range                                                                                     |
 | token_num_filter               | General    | en, zh | Keeps samples with token count within the specified range                                                                                           |
 | video_aesthetics_filter        | Video      | -      | Keeps samples whose specified frames have aesthetics scores within the specified range     |
 | video_aspect_ratio_filter      | Video      | -      | Keeps samples containing videos with aspect ratios within the specified range                                                                       |
-| video_duration_filter          | Video      | -      | Keep data samples whose videos' durations are within a specified range ｜                                                                            
-| video_frames_text_similarity_filter    | Multimodal | -      | Keep data samples whose similarities between sampled video frame images and text are within a specific range ｜
-| video_motion_score_filter      | Video      | -      | Keep samples with video motion scores within a specific range ｜
+| video_duration_filter          | Video      | -      | Keep data samples whose videos' durations are within a specified range |                                                                            
+| video_frames_text_similarity_filter    | Multimodal | -      | Keep data samples whose similarities between sampled video frame images and text are within a specific range |
+| video_motion_score_filter      | Video      | -      | Keep samples with video motion scores within a specific range |
 | video_nsfw_filter              | Video      | -      | Keeps samples containing videos with NSFW scores below the threshold                                                               |
-| video_ocr_area_ratio_filter    | Video      | -      | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range ｜                                  
+| video_ocr_area_ratio_filter    | Video      | -      | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range |                                  
 | video_resolution_filter        | Video      | -      | Keeps samples containing videos with horizontal and vertical resolutions within the specified range                                                 |
 | video_watermark_filter         | Video      | -      | Keeps samples containing videos with predicted watermark probabilities below the threshold                                                               |
 | video_tagging_from_frames_filter  | Video   | -      | Keep samples containing videos with given tags |

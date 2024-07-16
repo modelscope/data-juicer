@@ -6,8 +6,12 @@ import sys
 
 import multiprocess as mp
 from loguru import logger
+# allow loading truncated images for some too large images.
+from PIL import ImageFile
 
 from data_juicer.utils.availability_utils import _is_package_available
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # For now, only INFO will be shown. Later the severity level will be changed
 # when setup_logger is called to initialize the logger.
