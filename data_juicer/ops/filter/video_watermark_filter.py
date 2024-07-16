@@ -137,19 +137,23 @@ class VideoWatermarkFilter(Filter):
                     sample[Fields.context][sampled_frames_key] = frames
 
             frame_images = [frame.to_image() for frame in frames]
-            inputs = processor(images=frame_images, return_tensors='pt')
-            inputs = inputs.to(model.device)
-            outputs = model(**inputs)
-            logits = outputs.logits
-            cur_probs = [probs[1] for probs in torch.softmax(logits, dim=-1)]
-            cur_probs = torch.Tensor(cur_probs)
 
-            if self.reduce_mode == 'avg':
-                cur_prob = cur_probs.mean()
-            elif self.reduce_mode == 'max':
-                cur_prob = cur_probs.max()
+            if len(frame_images) > 0:
+                inputs = processor(images=frame_images, return_tensors='pt')
+                inputs = inputs.to(model.device)
+                outputs = model(**inputs)
+                logits = outputs.logits
+                cur_probs = [probs[1] for probs in torch.softmax(logits, dim=-1)]
+                cur_probs = torch.Tensor(cur_probs)
+
+                if self.reduce_mode == 'avg':
+                    cur_prob = cur_probs.mean()
+                elif self.reduce_mode == 'max':
+                    cur_prob = cur_probs.max()
+                else:
+                    cur_prob = cur_probs.min()
             else:
-                cur_prob = cur_probs.min()
+                cur_prob = 0.0
             watermark_probs.append(float(cur_prob))
 
         sample[Fields.stats][StatsKeys.video_watermark_prob] = watermark_probs

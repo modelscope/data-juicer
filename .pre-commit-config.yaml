@@ -39,6 +39,7 @@ exclude: |
     docs/.*|
     tests/.*|
     demos/.*|
-    tools/mm_eval/inception_metrics.*|
+    tools/mm_eval/inception_metrics/.*|
+    thirdparty/easy_animate/.*|
     .*\.md
   )$

@@ -118,12 +118,14 @@ The currently supported component factories and the components supported within 
 | Component | Function | Desc. of Method `run` | Reference Materials |
 | --- | --- | --- | --- |
 | `ModelscopeTrainExecutor` | Perform a training task on a model from the ModelScope platform using specified datasets, and monitor the change in training loss. | <br />- `run_type`: Type of model training. We need to set `type`  arg as `"modelscope"` in the component configuration file to activate this component.<br />- `run_obj`: Additional training configurations. Apart from the component configuration, this includes the dataset paths and the working directory for storing the training output. As they may change during the pipeline run, they are set dynamically within the pipeline.<br /> | [ModelScope Docs of Model Training](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train) |
+| `EasyAnimateTrainExecutor` | Perform a LoRA training task on EasyAnimate text-to-video model, and monitor the change in training loss. | <br />- `run_type`: Type of model training. We need to set `type`  arg as `"easyanimate"` in the component configuration file to activate this component.<br />- `run_obj`: An useless parameter.<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
 
 - ModelInferExecutorFactory
 
 | Component | Function | Desc. of Method `run` | Reference Materials |
 | --- | --- | --- | --- |
-| `ModelscopeInferExecutor` | Perform inference on a model from the ModelScope platform using a specified sampled dataset, and return the inference results. | <br />- `run_type`: Type of model inference. We need to set `type`  arg as `"infer_on_data"` in the component configuration file to activate this component.<br />- `run_obj`: Sampled dataset to be fed into model inference.<br /> | [ModelScope Docs of Model Inference](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8E%A8%E7%90%86Pipeline) |
+| `ModelscopeInferExecutor` | Perform inference on a model from the ModelScope platform using a specified sampled dataset, and return the inference results. | <br />- `run_type`: Type of model inference. We need to set `type`  arg as `"modelscope"` in the component configuration file to activate this component.<br />- `run_obj`: Sampled dataset to be fed into model inference.<br /> | [ModelScope Docs of Model Inference](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8E%A8%E7%90%86Pipeline) |
+| `ModelscopeInferExecutor` | Perform inference on EasyAnimate text-to-video model with the prompts from VBench, and save the generated videos. | <br />- `run_type`: Type of model inference. We need to set `type`  arg as `"easyanimate"` in the component configuration file to activate this component.<br />- `run_obj`: An useless parameter.<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
 
 - ModelEvaluatorFactory
    - TBD

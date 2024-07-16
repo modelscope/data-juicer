@@ -1,8 +1,9 @@
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  InceptionEvaluator,
                                                  VBenchEvaluator)
-from data_juicer.core.sandbox.model_executors import (ModelscopeInferExecutor,
-                                                      ModelscopeTrainExecutor)
+from data_juicer.core.sandbox.model_executors import (
+    EasyAnimateGenerateExecutor, EasyAnimateTrainExecutor,
+    ModelscopeInferExecutor, ModelscopeTrainExecutor)
 
 
 class DataEvaluatorFactory(object):
@@ -70,8 +71,44 @@ class ModelTrainExecutorFactory(object):
 
         if model_cfg.type == 'modelscope':
             return ModelscopeTrainExecutor(model_cfg, **kwargs)
+        elif model_cfg.type == 'easyanimate':
+            return EasyAnimateTrainExecutor(model_cfg, **kwargs)
 
         # add more model trainer here freely
 
 
 model_train_executor_factory = ModelTrainExecutorFactory()
+
+
+class DataGenerateExecutorFactory(object):
+
+    def __call__(self, generate_cfg: dict = None, *args, **kwargs):
+        if generate_cfg is None:
+            return None
+
+        if generate_cfg.type == 'easyanimate':
+            return EasyAnimateGenerateExecutor(generate_cfg, **kwargs)
+
+        # add more data generation here freely
+
+
+data_generate_executor_factory = DataGenerateExecutorFactory()
+
+
+class DataProcessorFactory(object):
+
+    def __call__(self, dj_executor, process_type: str = None, *args, **kwargs):
+        if process_type is None:
+            return None
+
+        if process_type == 'data_juicer_run':
+            return dj_executor.run
+        elif process_type == 'data_sample':
+            return dj_executor.sample_data
+        elif process_type == 'divide_by_percentiles':
+            return dj_executor.divide_by_percentiles
+
+        # add more data processor here freely
+
+
+data_processor_factory = DataProcessorFactory()

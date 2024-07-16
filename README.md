@@ -44,7 +44,7 @@ In this new version, we support more features for **multimodal data (including v
 - [2024-02-20] We have actively maintained an *awesome list of LLM-Data*, welcome to [visit](docs/awesome_llm_data.md) and contribute!
 - [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
 - [2024-01-10] Discover new horizons in "Data Mixture"—Our second data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532174) for more information.
-- [2024-01-05] We release **Data-Juicer v0.1.3** now! 
+- [2024-01-05] We release **Data-Juicer v0.1.3** now!
 In this new version, we support **more Python versions** (3.8-3.10), and support **multimodal** dataset [converting](tools/multimodal/README.md)/[processing](docs/Operators.md) (Including texts, images, and audios. More modalities will be supported in the future).
 Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 - [2023-10-13] Our first data-centric LLM competition begins! Please
@@ -90,8 +90,8 @@ Table of Contents
   dedicated [toolkits](#documentation), designed to
   function independently of specific multimodal LLM datasets and processing pipelines.
 
-- **Data-in-the-loop & Sandbox**: Supporting one-stop data-model collaborative development, enabling rapid iteration 
-  through the [sandbox laboratory](docs/Sandbox.md), and providing features such as feedback loops based on data and model, 
+- **Data-in-the-loop & Sandbox**: Supporting one-stop data-model collaborative development, enabling rapid iteration
+  through the [sandbox laboratory](docs/Sandbox.md), and providing features such as feedback loops based on data and model,
   visualization, and multidimensional automatic evaluation, so that you can better understand and improve your data and models.
   ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
@@ -190,11 +190,11 @@ The dependency options are listed below:
 pip install py-data-juicer
 ```
 
-- **Note**: 
+- **Note**:
   - only the basic APIs in `data_juicer` and two basic tools
     (data [processing](#data-processing) and [analysis](#data-analysis)) are available in this way. If you want customizable
     and complete functions, we recommend you install `data_juicer` [from source](#from-source).
-  - The release versions from pypi have a certain lag compared to the latest version from source. 
+  - The release versions from pypi have a certain lag compared to the latest version from source.
     So if you want to follow the latest functions of `data_juicer`, we recommend you install [from source](#from-source).
 
 ### Using Docker
@@ -211,7 +211,7 @@ pip install py-data-juicer
     ```shell
     docker build -t datajuicer/data-juicer:<version_tag> .
     ```
-  
+
   - The format of `<version_tag>` is like `v0.2.0`, which is the same as release version tag.
 
 ### Installation check
@@ -388,20 +388,20 @@ docker exec -it <container_id> bash
 Data-Juicer is released under Apache License 2.0.
 
 ## Contributing
-We are in a rapidly developing field and greatly welcome contributions of new 
-features, bug fixes and better documentations. Please refer to 
+We are in a rapidly developing field and greatly welcome contributions of new
+features, bug fixes and better documentations. Please refer to
 [How-to Guide for Developers](docs/DeveloperGuide.md).
 
 If you have any questions, please join our [discussion groups](README.md).
 
 ## Acknowledgement
 Data-Juicer is used across various LLM products and research initiatives,
-including industrial LLMs from Alibaba Cloud's Tongyi, such as Dianjin for 
-financial analysis, and Zhiwen for reading assistant, as well as the Alibaba 
+including industrial LLMs from Alibaba Cloud's Tongyi, such as Dianjin for
+financial analysis, and Zhiwen for reading assistant, as well as the Alibaba
 Cloud's platform for AI (PAI).
 We look forward to more of your experience, suggestions and discussions for collaboration!
 
-Data-Juicer thanks and refers to several community projects, such as 
+Data-Juicer thanks and refers to several community projects, such as
 [Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Pile](https://huggingface.co/datasets/EleutherAI/pile), [Alpaca-Cot](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT), [Megatron-LM](https://github.com/NVIDIA/Megatron-LM), [DeepSpeed](https://www.deepspeed.ai/), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), [Beam](https://github.com/apache/beam),  [LM-Harness](https://github.com/EleutherAI/lm-evaluation-harness), [HELM](https://github.com/stanford-crfm/helm), ....
 
 

@@ -1,10 +1,13 @@
 import asyncio
-import os.path
+import os
 import re
+import stat
+import subprocess
 import sys
 import time
 
-from data_juicer.config.config import namespace_to_dict
+from jsonargparse import namespace_to_dict
+
 from data_juicer.utils.file_utils import follow_read
 
 
@@ -55,6 +58,11 @@ class BaseModelExecutor(object):
                 sys.stdout = original_stdout
                 sys.stderr = original_stderr
             return summarized_watched_res
+
+    def run_subprocess(self, script_path, run_args, working_dir, cmd='bash'):
+        run_args = [str(arg) for arg in run_args]
+        args = [cmd, script_path] + run_args
+        subprocess.run(args, cwd=working_dir)
 
     async def _run(self, run_type, run_obj, **kwargs):
         raise NotImplementedError
@@ -202,11 +210,68 @@ class ModelscopeTrainExecutor(ModelScopeExecutor):
         self.executor.train()
 
 
-class EasySoraExecutor(BaseModelExecutor):
+class EasyAnimateTrainExecutor(BaseModelExecutor):
 
-    def __init__(self, model_config: dict):
-        super().__init__(model_config)
-        raise NotImplementedError('To be implemented from easysora.')
+    def __init__(self, model_config: dict, watcher=None):
+        super().__init__(model_config, watcher)
+        cur_working_dir = os.getcwd()
+        self.script_path = os.path.join(
+            cur_working_dir, 'thirdparty/easy_animate/train_lora.sh')
+        self.working_dir = os.path.join(cur_working_dir,
+                                        'thirdparty/easy_animate/')
+        # make sure executable
+        current_permissions = os.stat(self.script_path).st_mode
+        os.chmod(
+            self.script_path,
+            current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+    async def _run(self, run_type, run_obj, **kwargs):
+        config = self.model_config.train
+        run_args = [
+            config.model_path.pretrained_model_name_or_path,
+            config.model_path.transformer_path,
+            config.dataset_path.dataset_name,
+            config.dataset_path.dataset_meta_name,
+            config.training_config.sample_size,
+            config.training_config.mixed_precision,
+            config.training_config.batch_size_per_gpu,
+            config.training_config.gradient_accumulation_steps,
+            config.training_config.num_train_epochs,
+            config.training_config.dataloader_num_workers,
+            config.training_config.seed,
+            config.saving_config.output_dir,
+            config.tracker_config.project_name,
+            config.tracker_config.experiment_name
+        ]
+        self.run_subprocess(self.script_path, run_args, self.working_dir)
+
+
+class EasyAnimateGenerateExecutor(BaseModelExecutor):
+
+    def __init__(self, model_config: dict, watcher=None):
+        super().__init__(model_config, watcher)
+        cur_working_dir = os.getcwd()
+        self.script_path = os.path.join(
+            cur_working_dir, 'thirdparty/easy_animate/infer_lora.sh')
+        self.working_dir = os.path.join(cur_working_dir,
+                                        './thirdparty/easy_animate/')
+
+    async def _run(self, run_type, run_obj, **kwargs):
+        config = self.model_config.train
+        run_args = [
+            config.model_path.pretrained_model_name_or_path,
+            config.model_path.transformer_path,
+            config.model_path.lora_path,
+            config.infer_config.image_size,
+            config.infer_config.prompt_info_path,
+            config.infer_config.gpu_num,
+            config.infer_config.batch_size,
+            config.infer_config.mixed_precision,
+            config.infer_config.video_num_per_prompt,
+            config.infer_config.seed,
+            config.saving_config.output_video_dir
+        ]
+        self.run_subprocess(self.script_path, run_args, self.working_dir)
 
 
 class LLaVAExecutor(BaseModelExecutor):

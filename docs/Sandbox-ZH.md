@@ -116,13 +116,15 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 | 组件 | 功能 | `run`方法说明 | 参考材料 |
 | --- | --- | --- | --- |
-| `ModelscopeTrainExecutor` | 用数据集对ModelScope平台上的模型进行训练任务，并监测loss变化信息 | <br />- `run_type`：训练模型类型。需要在组件配置文件中设置`type`参数为`"modelscope"`来激活该组件<br />- `run_obj`：额外训练配置。除了组件配置之外的额外配置信息，包括数据集路径以及存放训练产出的工作路径等，由于他们会随着流水线运行发生变化，因此他们会在流水线中动态设置<br /> | [ModelScope模型训练文档](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train) |
+| `ModelscopeTrainExecutor` | 用Data-Juicer产出的数据集训练ModelScope平台上的模型，并监测loss变化信息 | <br />- `run_type`：训练模型类型。需要在组件配置文件中设置`type`参数为`"modelscope"`来激活该组件<br />- `run_obj`：额外训练配置。除了组件配置之外的额外配置信息，包括数据集路径以及存放训练产出的工作路径等，由于他们会随着流水线运行发生变化，因此他们会在流水线中动态设置<br /> | [ModelScope模型训练文档](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train) |
+| `EasyAnimateTrainExecutor` | 用Data-Juicer产出的数据集训练文生视频模型EasyAnimate的LoRA模型，并监测loss变化信息  | <br />- `run_type`：训练模型类型。需要在组件配置文件中设置`type`参数为`"easyanimate"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
 
 - 模型推理工厂 -- ModelInferExecutorFactory
 
 | 组件 | 功能 | `run`方法说明 | 参考材料 |
 | --- | --- | --- | --- |
-| `ModelscopeInferExecutor` | 用数据集对ModelScope平台上的模型进行推理，并返回推理结果 | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"infer_on_data"`来激活该组件<br />- `run_obj`：需要送入模型推理的采样数据集<br /> | [ModelScope模型推理文档](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8E%A8%E7%90%86Pipeline) |
+| `ModelscopeInferExecutor` | 用数据集对ModelScope平台上的模型进行推理，并返回推理结果 | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"modelscope"`来激活该组件<br />- `run_obj`：需要送入模型推理的采样数据集<br /> | [ModelScope模型推理文档](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8E%A8%E7%90%86Pipeline) |
+| `ModelscopeInferExecutor` | 用VBench的prompt数据集对EasyAnimate模型进行推理，并存储生成的视频 | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"easyanimate"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
 
 - 模型评估工厂 -- ModelEvaluatorFactory
    - TBD

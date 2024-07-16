@@ -1,0 +1,109 @@
+[
+    {
+        "prompt_en": "A tranquil tableau of in the serene courtyard, a centuries-old stone well stood as a symbol of a bygone era, its mossy stones bearing witness to the passage of time",
+        "dimension": [
+            "temporal_flickering"
+        ]
+    },
+    {
+        "prompt_en": "a person and a sink",
+        "dimension": [
+            "multiple_objects"
+        ],
+        "auxiliary_info": {
+            "multiple_objects": {
+                "object": "person and sink"
+            }
+        }
+    },
+    {
+        "prompt_en": "A person is sailing",
+        "dimension": [
+            "human_action"
+        ]
+    },
+    {
+        "prompt_en": "a giraffe running to join a herd of its kind",
+        "dimension": [
+            "subject_consistency",
+            "dynamic_degree",
+            "motion_smoothness"
+        ]
+    },
+    {
+        "prompt_en": "a toothbrush",
+        "dimension": [
+            "object_class"
+        ],
+        "auxiliary_info": {
+            "object_class": {
+                "object": "toothbrush"
+            }
+        }
+    },
+    {
+        "prompt_en": "a white vase",
+        "dimension": [
+            "color"
+        ],
+        "auxiliary_info": {
+            "color": {
+                "color": "white"
+            }
+        }
+    },
+    {
+        "prompt_en": "Snow rocky mountains peaks canyon. snow blanketed rocky mountains surround and shadow deep canyons. the canyons twist and bend through the high elevated mountain peaks, surrealism style",
+        "dimension": [
+            "appearance_style"
+        ],
+        "auxiliary_info": {
+            "appearance_style": {
+                "appearance_style": "surrealism style"
+            }
+        }
+    },
+    {
+        "prompt_en": "Snow rocky mountains peaks canyon. snow blanketed rocky mountains surround and shadow deep canyons. the canyons twist and bend through the high elevated mountain peaks, racking focus",
+        "dimension": [
+            "temporal_style"
+        ]
+    },
+    {
+        "prompt_en": "Yellow flowers swing in the wind",
+        "dimension": [
+            "overall_consistency",
+            "aesthetic_quality",
+            "imaging_quality"
+        ]
+    },
+    {
+        "prompt_en": "windmill",
+        "dimension": [
+            "scene",
+            "background_consistency"
+        ],
+        "auxiliary_info": {
+            "scene": {
+                "scene": {
+                    "scene": "windmill"
+                }
+            }
+        }
+    },
+    {
+        "prompt_en": "a surfboard on the bottom of skis, front view",
+        "dimension": [
+            "spatial_relationship"
+        ],
+        "auxiliary_info": {
+            "spatial_relationship": {
+                "spatial_relationship": {
+                    "object_a": "surfboard",
+                    "object_b": "skis",
+                    "relationship": "on the bottom of"
+                }
+            }
+        }
+    }
+]
