@@ -54,7 +54,6 @@ def gather_test_cases(test_dir, pattern, tag):
           f'{SKIPPED_TESTS.modules}')
     for suite_discovered in discover:
         for test_suite in suite_discovered:
-            breakpoint()
             for test_case in test_suite:
                 if type(test_case) in SKIPPED_TESTS.modules.values():
                     continue
