@@ -81,12 +81,7 @@ class VideoOcrAreaRatioFilter(Filter):
         # initialize easyocr reader
         if isinstance(languages_to_detect, str):
             languages_to_detect = [languages_to_detect]
-        self.reader = easyocr.Reader(
-            lang_list=languages_to_detect,
-            recognizer=False,
-            verbose=False,
-            gpu=False,
-        )
+        self.languages_to_detect = languages_to_detect
 
         # only uniformly sampling method is supported in this OP
         self.sampled_frames_key_suffix = f'-uniform-{frame_sample_num}'
@@ -94,8 +89,19 @@ class VideoOcrAreaRatioFilter(Filter):
     def get_reader(self, rank):
         if self.use_cuda():
             device = f'cuda:{rank % cuda_device_count()}'
-            self.reader = self.reader.detector.to(device)
-            self.reader.device = device
+            self.reader = easyocr.Reader(
+            lang_list=self.languages_to_detect,
+            recognizer=False,
+            verbose=False,
+            gpu=device,
+        )
+        else:
+            self.reader = easyocr.Reader(
+            lang_list=self.languages_to_detect,
+            recognizer=False,
+            verbose=False,
+            gpu=False,
+        )
         return self.reader
 
     def compute_stats(self, sample, rank=None, context=False):
