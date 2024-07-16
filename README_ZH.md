@@ -388,8 +388,8 @@ Data-Juicer 感谢并参考了社区开源项目：
 
 ```
 @inproceedings{chen2024datajuicer,
-title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
-author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
+  title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
+  author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
   booktitle={International Conference on Management of Data},
   year={2024}
 }

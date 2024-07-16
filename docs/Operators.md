@@ -52,7 +52,7 @@ All the specific operators are listed below, each featured with several capabili
 |-----------------------------------------------------|--------------------|--------|---------------------------------------------------------------------------------------------------------------|
 | audio_ffmpeg_wrapped_mapper                         | Audio              | -      | Simple wrapper to run a FFmpeg audio filter                                                                   |
 | chinese_convert_mapper                              | General            | zh     | Converts Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji (by [opencc](https://github.com/BYVoid/OpenCC))                |
-| clean_copyright_mapper                              | Code               | en, zh | Removes copyright notice at the beginning of code files (:warning: must contain the word *copyright*)         |
+| clean_copyright_mapper                              | Code               | en, zh | Removes copyright notice at the beginning of code files (must contain the word *copyright*)         |
 | clean_email_mapper                                  | General            | en, zh | Removes email information                                                                                     |
 | clean_html_mapper                                   | General            | en, zh | Removes HTML tags and returns plain text of all the nodes                                                     |
 | clean_ip_mapper                                     | General            | en, zh | Removes IP addresses                                                                                          |

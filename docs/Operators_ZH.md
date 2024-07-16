@@ -51,7 +51,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 |-----------------------------------------------------|-----------------------|-----------|--------------------------------------------------------|
 | audio_ffmpeg_wrapped_mapper                         | Audio                 | -         | 运行 FFmpeg 语音过滤器的简单封装                         |
 | chinese_convert_mapper                              | General               | zh        | 用于在繁体中文、简体中文和日文汉字之间进行转换（借助 [opencc](https://github.com/BYVoid/OpenCC)）        |
-| clean_copyright_mapper                              | Code                  | en, zh    | 删除代码文件开头的版权声明 (:warning: 必须包含单词 *copyright*)           |
+| clean_copyright_mapper                              | Code                  | en, zh    | 删除代码文件开头的版权声明 (必须包含单词 *copyright*)           |
 | clean_email_mapper                                  | General               | en, zh    | 删除邮箱信息                                                 |
 | clean_html_mapper                                   | General               | en, zh    | 删除 HTML 标签并返回所有节点的纯文本                                  |
 | clean_ip_mapper                                     | General               | en, zh    | 删除 IP 地址                                               |
