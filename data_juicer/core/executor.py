@@ -170,15 +170,16 @@ class Executor:
             op_name, op_args = list(op_cfg.items())[0]
             prev = dataset  # record last dataset
             with_rank = op.use_cuda()
+            if op.use_cuda() or op_name in unforkable_op_list:
+                setup_mp(['forkserver', 'spawn'])
+            else:
+                setup_mp()
             if op.num_proc != 0:
                 op_proc = op.num_proc
                 logger.info(f'Op [{op_name}] running with sepcified '
                             f'number of procs:{op.num_proc}')
             else:
                 op_proc = calculate_np(self.cfg.np, op, op_name)
-            mp_method = ['forkserver', 'spawn'
-                         ] if op_name in unforkable_op_list else None
-            setup_mp(mp_method)
             try:
                 if isinstance(op, Mapper):
                     tmp = dataset.map(function=op.process,
