@@ -6,7 +6,7 @@ from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import namespace_to_dict
 
 from data_juicer.config import merge_config
-from data_juicer.core.sandbox.hooks import regist_hook
+from data_juicer.core.sandbox.hooks import register_hook
 
 
 class SandBoxWatcher:
@@ -140,19 +140,20 @@ class SandBoxExecutor:
 
         # register probe_jobs
         for job_cfg in self.cfg.probe_job_configs:
-            self.probe_jobs.append(regist_hook(job_cfg, self.watcher))
+            self.probe_jobs.append(register_hook(job_cfg, self.watcher))
 
         # register refine_recipe_jobs
         for job_cfg in self.cfg.refine_recipe_job_configs:
-            self.refine_recipe_jobs.append(regist_hook(job_cfg, self.watcher))
+            self.refine_recipe_jobs.append(register_hook(
+                job_cfg, self.watcher))
 
         # register execution_jobs
         for job_cfg in self.cfg.execution_job_configs:
-            self.execution_jobs.append(regist_hook(job_cfg, self.watcher))
+            self.execution_jobs.append(register_hook(job_cfg, self.watcher))
 
         # register evaluation_jobs
         for job_cfg in self.cfg.evaluation_job_configs:
-            self.evaluation_jobs.append(regist_hook(job_cfg, self.watcher))
+            self.evaluation_jobs.append(register_hook(job_cfg, self.watcher))
 
     def run(self):
         """
