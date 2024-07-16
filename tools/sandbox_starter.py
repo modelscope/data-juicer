@@ -18,7 +18,7 @@ def init_sandbox_configs(args=None):
         4. hard-coded defaults
 
     :param args: list of params, e.g., ['--conifg', 'cfg.yaml'], defaut None.
-    :return: a global cfg object used by the Executor or Analyser
+    :return: a global cfg object used by the Executor or Analyzer
     """
     parser = ArgumentParser(default_env=True, default_config_files=None)
 

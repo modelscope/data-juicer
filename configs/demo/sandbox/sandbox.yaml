@@ -7,7 +7,7 @@ hpo_config: null                                  # path to a configuration file
 
 # configs for each job, the jobs will be executed according to the order in the list
 probe_job_configs:
-  - hook: 'ProbeViaAnalyserHook'
+  - hook: 'ProbeViaAnalyzerHook'
     meta_name: 'analysis_ori_data'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
@@ -44,7 +44,7 @@ execution_job_configs:
     extra_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
 
 evaluation_job_configs:
-  - hook: 'ProbeViaAnalyserHook'
+  - hook: 'ProbeViaAnalyzerHook'
     meta_name: 'analysis_processed_data'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:

@@ -9,7 +9,7 @@
 python tools/process_data.py --config xxx.yaml
 
 ＃分析数据集
-python tools/analyse_data.py --config xxx.yaml
+python tools/analyze_data.py --config xxx.yaml
 ```
 
 ## 分类

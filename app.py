@@ -18,7 +18,7 @@ from loguru import logger
 from data_juicer.analysis.diversity_analysis import (DiversityAnalysis,
                                                      get_diversity)
 from data_juicer.config import init_configs
-from data_juicer.core import Analyser, Executor
+from data_juicer.core import Analyzer, Executor
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.logger_utils import get_log_file_path
@@ -125,7 +125,7 @@ def parse_cfg():
         return str(e), pretty_out(specified_cfg), None
 
 
-def analyse_and_show_res():
+def analyze_and_show_res():
     images_ori = []
     cfg = st.session_state.get('cfg', parse_cfg()[2])
     if cfg is None:
@@ -133,19 +133,19 @@ def analyse_and_show_res():
     # force generating separate figures
     cfg['save_stats_in_one_file'] = True
 
-    logger.info('=========Stage 1: analyse original data=========')
-    analyser = Analyser(cfg)
-    dataset = analyser.run()
+    logger.info('=========Stage 1: analyze original data=========')
+    analyzer = Analyzer(cfg)
+    dataset = analyzer.run()
 
-    overall_file = os.path.join(analyser.analysis_path, 'overall.csv')
+    overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
     analysis_res_ori = pd.DataFrame()
     if os.path.exists(overall_file):
         analysis_res_ori = pd.read_csv(overall_file)
 
-    if os.path.exists(analyser.analysis_path):
-        for f_path in os.listdir(analyser.analysis_path):
+    if os.path.exists(analyzer.analysis_path):
+        for f_path in os.listdir(analyzer.analysis_path):
             if '.png' in f_path and 'all-stats' in f_path:
-                images_ori.append(os.path.join(analyser.analysis_path, f_path))
+                images_ori.append(os.path.join(analyzer.analysis_path, f_path))
 
     st.session_state.dataset = dataset
     st.session_state.original_overall = analysis_res_ori
@@ -163,7 +163,7 @@ def process_and_show_res():
     executor = Executor(cfg)
     dataset = executor.run()
 
-    logger.info('=========Stage 3: analyse the processed data==========')
+    logger.info('=========Stage 3: analyze the processed data==========')
     analysis_res_processed = pd.DataFrame()
     try:
         cfg_for_processed_data = copy.deepcopy(cfg)
@@ -171,20 +171,20 @@ def process_and_show_res():
 
         cfg_for_processed_data.export_path = os.path.dirname(
             cfg.export_path) + '_processed/data.jsonl'
-        analyser = Analyser(cfg_for_processed_data)
-        analyser.analysis_path = os.path.dirname(
+        analyzer = Analyzer(cfg_for_processed_data)
+        analyzer.analysis_path = os.path.dirname(
             cfg_for_processed_data.export_path) + '/analysis'
-        analyser.run()
+        analyzer.run()
 
-        overall_file = os.path.join(analyser.analysis_path, 'overall.csv')
+        overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
         if os.path.exists(overall_file):
             analysis_res_processed = pd.read_csv(overall_file)
 
-        if os.path.exists(analyser.analysis_path):
-            for f_path in os.listdir(analyser.analysis_path):
+        if os.path.exists(analyzer.analysis_path):
+            for f_path in os.listdir(analyzer.analysis_path):
                 if '.png' in f_path and 'all-stats' in f_path:
                     images_processed.append(
-                        os.path.join(analyser.analysis_path, f_path))
+                        os.path.join(analyzer.analysis_path, f_path))
     except Exception as e:
         st.warning(f'Something error with {str(e)}')
 
@@ -460,7 +460,7 @@ class Visualize:
                                           max_value=100,
                                           step=1)
 
-                diversity_btn = st.button('Analyse_diversity',
+                diversity_btn = st.button('Analyze_diversity',
                                           use_container_width=True)
                 output_path = os.path.join(os.path.dirname(cfg.export_path),
                                            'analysis')
@@ -469,7 +469,7 @@ class Visualize:
                     try:
                         diversity_analysis = DiversityAnalysis(
                             dataset, output_path)
-                        with st.spinner('Wait for analyse diversity...'):
+                        with st.spinner('Wait for analyze diversity...'):
                             raw_df = diversity_analysis.compute(
                                 lang_or_model=get_diversity_model(lang_select),
                                 column_name=text_key)
@@ -498,7 +498,7 @@ class Visualize:
                         mime='text/csv',
                     )
             else:
-                st.warning('Please analyse original data first')
+                st.warning('Please analyze original data first')
 
     @staticmethod
     def draw_sunburst(df, path, values):
@@ -693,9 +693,9 @@ class Visualize:
                 st.text_area(label='Specified Cfg (in yaml file)', value=text2)
 
     @staticmethod
-    def analyse_process():
+    def analyze_process():
         start_btn = st.button(
-            '2. Start to analyse original data (per filter op)',
+            '2. Start to analyze original data (per filter op)',
             use_container_width=True)
         start_btn_process = st.button('3. Start to process data',
                                       use_container_width=True)
@@ -707,8 +707,8 @@ class Visualize:
         with st.expander('Data Analysis Results', expanded=False):
 
             if start_btn:
-                with st.spinner('Wait for analyse...'):
-                    analyse_and_show_res()
+                with st.spinner('Wait for analyze...'):
+                    analyze_and_show_res()
 
             if start_btn_process:
                 with st.spinner('Wait for process...'):
@@ -739,7 +739,7 @@ class Visualize:
             if dataset:
                 Visualize.filter_dataset(dataset)
             else:
-                st.warning('Please analyse original data first')
+                st.warning('Please analyze original data first')
 
     @staticmethod
     def auxiliary():
@@ -770,7 +770,7 @@ class Visualize:
     def visualize():
         Visualize.setup()
         Visualize.parser()
-        Visualize.analyse_process()
+        Visualize.analyze_process()
         Visualize.filter()
         Visualize.diversity()
         Visualize.auxiliary()

@@ -5,7 +5,7 @@ from jsonargparse import dict_to_namespace
 from loguru import logger
 
 from data_juicer.config import get_init_configs, prepare_side_configs
-from data_juicer.core import Analyser
+from data_juicer.core import Analyzer
 from data_juicer.core import Executor as DjExecutor
 from data_juicer.core.sandbox.factories import (data_evaluator_factory,
                                                 mode_infer_executor_factory,
@@ -43,31 +43,31 @@ class BaseHook:
             self.other_cfg = dict_to_namespace(self.other_cfg)
 
 
-class ProbeViaAnalyserHook(BaseHook):
+class ProbeViaAnalyzerHook(BaseHook):
 
     def __init__(self, job_cfg, watcher, *args, **kwargs):
         """
-        Initialize the hook for probing the data via Analyser
+        Initialize the hook for probing the data via Analyzer
 
         :param job_cfg: the job configs
         :param watcher: for watching the result
         """
-        super(ProbeViaAnalyserHook, self).__init__(job_cfg, watcher, *args,
+        super(ProbeViaAnalyzerHook, self).__init__(job_cfg, watcher, *args,
                                                    **kwargs)
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
-        analyser = Analyser(self.inited_dj_cfg)
-        # probe the data via Analyser
-        logger.info('Begin to analyse data')
-        analyser.run()
-        analyser_res = analyser.overall_result
+        analyzer = Analyzer(self.inited_dj_cfg)
+        # probe the data via Analyzer
+        logger.info('Begin to analyze data')
+        analyzer.run()
+        analyzer_res = analyzer.overall_result
         # drop string rows to avoid unaligned dtypes
         string_rows = ['unique', 'top', 'freq']
         for row_name in string_rows:
-            if row_name in analyser_res.index:
-                analyser_res = analyser_res.drop(row_name)
-        self.watcher.watch(analyser_res, self.meta_name)
+            if row_name in analyzer_res.index:
+                analyzer_res = analyzer_res.drop(row_name)
+        self.watcher.watch(analyzer_res, self.meta_name)
         return kwargs
 
 
@@ -250,7 +250,7 @@ class EvaluateModelHook(BaseHook):
 
 
 HOOK_DICT = {
-    'ProbeViaAnalyserHook': ProbeViaAnalyserHook,
+    'ProbeViaAnalyzerHook': ProbeViaAnalyzerHook,
     'ProbeViaModelInferHook': ProbeViaModelInferHook,
     'RefineRecipeViaKSigmaHook': RefineRecipeViaKSigmaHook,
     'RefineRecipeViaModelFeedbackHook': RefineRecipeViaModelFeedbackHook,

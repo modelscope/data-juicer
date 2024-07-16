@@ -6,7 +6,7 @@ import pandas as pd
 import streamlit as st
 
 from data_juicer.config import init_configs
-from data_juicer.core import Analyser
+from data_juicer.core import Analyzer
 from data_juicer.format.formatter import FORMATTERS
 from data_juicer.ops.base_op import OPERATORS
 
@@ -21,11 +21,11 @@ This project is being actively updated and maintained, and we will periodically 
 features_desc = '''
 - **Broad Range of Operators**: Equipped with 50+ core :blue[operators (OPs)], including `Formatters`, `Mappers`, `Filters`, `Deduplicators`, and beyond.
 
-- **Specialized Toolkits**: Feature-rich specialized toolkits such as `Text Quality Classifier`, `Dataset Splitter`, `Analysers`, `Evaluators`, and more that elevate your dataset handling capabilities.
+- **Specialized Toolkits**: Feature-rich specialized toolkits such as `Text Quality Classifier`, `Dataset Splitter`, `Analyzers`, `Evaluators`, and more that elevate your dataset handling capabilities.
 
 - **Systematic & Reusable**: Empowering users with a systematic library of reusable `config recipes` and `OPs`, designed to function independently of specific datasets, models, or tasks.
 
-- **Data-in-the-loop**: Allowing detailed data analyses with an automated report generation feature for a deeper understanding of your dataset. Coupled with timely multi-dimension automatic evaluation capabilities, it supports a feedback loop at multiple stages in the LLM development process.
+- **Data-in-the-loop**: Allowing detailed data analyzes with an automated report generation feature for a deeper understanding of your dataset. Coupled with timely multi-dimension automatic evaluation capabilities, it supports a feedback loop at multiple stages in the LLM development process.
 
 - **Comprehensive Processing Recipes**: Offering tens of `pre-built data processing recipes` for pre-training, CFT, en, zh, and more scenarios.
 
@@ -47,13 +47,13 @@ python tools/process_data.py --config configs/demo/process.yaml
 ```
 
 ### Data Analysis
-- Run `analyse_data.py` tool with your config as the argument to analyse your dataset.
+- Run `analyze_data.py` tool with your config as the argument to analyze your dataset.
 
 ```shell
-python tools/analyse_data.py --config configs/demo/analyser.yaml
+python tools/analyze_data.py --config configs/demo/analyzer.yaml
 ```
 
-- **Note:** Analyser only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
+- **Note:** Analyzer only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
 
 ### Data Visualization
 
@@ -73,8 +73,8 @@ Data-Juicer provides some configuration files to allow users to easily understan
 ```shell
 # To process your dataset.
 python tools/process_data.py --config xxx.yaml
-# To analyse your dataset.
-python tools/analyse_data.py --config xxx.yaml
+# To analyze your dataset.
+python tools/analyze_data.py --config xxx.yaml
 ```
 '''
 
@@ -121,10 +121,10 @@ demo_desc = '''
 
 def run_demo():
 
-    config_file = os.path.join(project_path, 'configs/demo/analyser.yaml')
+    config_file = os.path.join(project_path, 'configs/demo/analyzer.yaml')
     data_path = os.path.join(demo_path, 'data/demo-dataset.jsonl')
     st.markdown(f'dataset: `{data_path}`')
-    start_btn = st.button(' Start to analyse', use_container_width=True)
+    start_btn = st.button(' Start to analyze', use_container_width=True)
 
     cfg_cmd = f'--config {config_file} --dataset_path {data_path}'
     args_in_cmd = cfg_cmd.split()
@@ -134,21 +134,21 @@ def run_demo():
     cfg['save_stats_in_one_file'] = True
 
     if start_btn:
-        analyser = Analyser(cfg)
+        analyzer = Analyzer(cfg)
 
-        with st.spinner('Wait for analyse...'):
-            analyser.run()
+        with st.spinner('Wait for analyze...'):
+            analyzer.run()
 
-        overall_file = os.path.join(analyser.analysis_path, 'overall.csv')
+        overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
         analysis_res_ori = pd.DataFrame()
         if os.path.exists(overall_file):
             analysis_res_ori = pd.read_csv(overall_file)
 
-        if os.path.exists(analyser.analysis_path):
-            for f_path in os.listdir(analyser.analysis_path):
+        if os.path.exists(analyzer.analysis_path):
+            for f_path in os.listdir(analyzer.analysis_path):
                 if '.png' in f_path and 'all-stats' in f_path:
                     images_ori.append(
-                        os.path.join(analyser.analysis_path, f_path))
+                        os.path.join(analyzer.analysis_path, f_path))
 
         st.subheader('Statistics')
         st.dataframe(analysis_res_ori, use_container_width=True)

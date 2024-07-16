@@ -31,7 +31,7 @@ hpo_config: null                                  # path to a configuration file
 
 # configs for each job, the jobs will be executed according to the order in the list
 probe_job_configs:
-  - hook: 'ProbeViaAnalyserHook'
+  - hook: 'ProbeViaAnalyzerHook'
     meta_name: 'analysis_ori_data'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
@@ -54,7 +54,7 @@ execution_job_configs:
     extra_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
 
 evaluation_job_configs:
-  - hook: 'ProbeViaAnalyserHook'
+  - hook: 'ProbeViaAnalyzerHook'
     meta_name: 'analysis_processed_data'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
@@ -73,7 +73,7 @@ Based on this configuration file, sandbox:
 
 4. Train the model with the filtered data.
 
-5. Analyse the data after filtering.
+5. Analyze the data after filtering.
 
 6. Score the data after filtering with a scorer.
 
@@ -169,8 +169,8 @@ In general, we only need to implement one type of hook function for a type of co
 
 | Hook | Function | Dependent Component Factory | Dependent Tool or Library | Registered Job List |
 | --- | --- | --- | --- | --- |
-| `hook_probe_via_analyser` | Analyse and probe the quality and diversity distribution of the dataset | - | Data-Juicer Analyser | <br />- probe_jobs<br />- evaluation_jobs<br /> |
-| `hook_probe_via_model_infer` | Analyse and understand the impact of the dataset on the model, explore and probe "difficult" and "dirty" data | ModelInferExecutorFactory | - | <br />- probe_jobs<br />- evaluation_jobs<br /> |
+| `hook_probe_via_analyzer` | Analyze and probe the quality and diversity distribution of the dataset | - | Data-Juicer Analyzer | <br />- probe_jobs<br />- evaluation_jobs<br /> |
+| `hook_probe_via_model_infer` | Analyze and understand the impact of the dataset on the model, explore and probe "difficult" and "dirty" data | ModelInferExecutorFactory | - | <br />- probe_jobs<br />- evaluation_jobs<br /> |
 | `hook_refine_recipe_via_k_sigma` | Refine data recipe hyperparameters using the k-sigma method based on the probe results of the dataset | - | k-sigma recipe refinement tool of Data-Juicer Hyperparameter Optimization (HPO) toolkit | <br />- refine_recipe_jobs<br /> |
 | `hook_refine_recipe_via_model_feedback` | Refine data recipe hyperparameters using model probe and feedback results | TODO | - | <br />- refine_recipe_jobs<br /> |
 | `hook_process_data` | Process and clean the dataset based on the current data recipe | - | Data-Juicer Executor | <br />- execution_jobs<br /> | Always |
@@ -178,7 +178,7 @@ In general, we only need to implement one type of hook function for a type of co
 | `hook_evaluate_data` | Evaluate the dataset in terms of data quality and other dimensions | DataEvaluatorFactory | - | <br />- evaluation_jobs<br /> |
 | `hook_evaluate_model` | Evaluate the trained model | ModelEvaluatorFactory | - | <br />- evaluation_jobs<br /> |
 
-It is worth noting that a hook can be registered in multiple job lists, as this hook can play different roles in different steps of the pipeline. For example, we can analyse and probe both the pre-processed and post-processed datasets to compare the changes in quality, diversity, and other dimensions before and after data processing.
+It is worth noting that a hook can be registered in multiple job lists, as this hook can play different roles in different steps of the pipeline. For example, we can analyze and probe both the pre-processed and post-processed datasets to compare the changes in quality, diversity, and other dimensions before and after data processing.
 
 ## Customized Sandbox Pipeline
 Users can directly modify the job configuration list in the parameter configuration file to achieve task modification and orchestration.

@@ -68,7 +68,7 @@ setuptools.setup(
     entry_points={
         'console_scripts': [
             'dj-process = data_juicer.tools.process_data:main',
-            'dj-analyse = data_juicer.tools.analyse_data:main',
+            'dj-analyze = data_juicer.tools.analyze_data:main',
         ]
     },
     install_requires=min_requires,

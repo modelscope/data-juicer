@@ -31,7 +31,7 @@ def init_configs(args=None):
         4. hard-coded defaults
 
     :param args: list of params, e.g., ['--conifg', 'cfg.yaml'], defaut None.
-    :return: a global cfg object used by the Executor or Analyser
+    :return: a global cfg object used by the Executor or Analyzer
     """
     parser = ArgumentParser(default_env=True, default_config_files=None)
 
@@ -272,7 +272,7 @@ def init_configs(args=None):
         '--percentiles',
         type=List[float],
         default=[],
-        help='Percentiles to analyse the dataset distribution. Only used in '
+        help='Percentiles to analyze the dataset distribution. Only used in '
         'Analysis.')
     parser.add_argument(
         '--export_original_dataset',

@@ -261,17 +261,17 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 
 ### 数据分析
 
-- 以配置文件路径为参数运行 `analyse_data.py` 或者 `dj-analyse` 命令行工具来分析数据集。
+- 以配置文件路径为参数运行 `analyze_data.py` 或者 `dj-analyze` 命令行工具来分析数据集。
 
 ```shell
 # 适用于从源码安装
-python tools/analyse_data.py --config configs/demo/analyser.yaml
+python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # 使用命令行工具
-dj-analyse --config configs/demo/analyser.yaml
+dj-analyze --config configs/demo/analyzer.yaml
 ```
 
-* **注意**：Analyser 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
+* **注意**：Analyzer 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
 
 ### 数据可视化
 

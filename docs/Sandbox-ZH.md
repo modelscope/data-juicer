@@ -30,7 +30,7 @@ hpo_config: null                                  # path to a configuration file
 
 # configs for each job, the jobs will be executed according to the order in the list
 probe_job_configs:
-  - hook: 'ProbeViaAnalyserHook'
+  - hook: 'ProbeViaAnalyzerHook'
     meta_name: 'analysis_ori_data'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
@@ -53,7 +53,7 @@ execution_job_configs:
     extra_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
 
 evaluation_job_configs:
-  - hook: 'ProbeViaAnalyserHook'
+  - hook: 'ProbeViaAnalyzerHook'
     meta_name: 'analysis_processed_data'
     dj_configs: 'configs/demo/process.yaml'
     extra_configs:
@@ -169,7 +169,7 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 | 钩子 | 功能 | 依赖的组件工厂 | 依赖的工具或库 | 注册工作列表 |
 | --- | --- | --- | --- | --- |
-| `ProbeViaAnalyserHook` | 分析与洞察数据集质量、多样性等维度分布 | - | Data-Juicer分析器Analyser | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
+| `ProbeViaAnalyzerHook` | 分析与洞察数据集质量、多样性等维度分布 | - | Data-Juicer分析器Analyzer | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
 | `ProbeViaModelInferHook` | 分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据 | 模型推理工厂（ModelInferExecutorFactory） | - | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
 | `RefineRecipeViaKSigmaHook` | 根据数据集洞察结果，利用k-sigma方法对数据菜谱超参进行微调 | - | Data-Juicer超参优化工具HPO中的k-sigma菜谱微调工具 | 菜谱微调工作列表（refine_recipe_jobs） |
 | `RefineRecipeViaModelFeedbackHook` | 利用模型洞察与反馈结果对数据菜谱超参进行微调 | TODO | - | 菜谱微调工作列表（refine_recipe_jobs） |

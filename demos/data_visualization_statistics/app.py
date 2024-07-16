@@ -6,7 +6,7 @@ import yaml
 from loguru import logger
 
 from data_juicer.config import init_configs
-from data_juicer.core import Analyser
+from data_juicer.core import Analyzer
 from data_juicer.ops.base_op import OPERATORS
 
 
@@ -71,7 +71,7 @@ def parse_cfg():
         return str(e), pretty_out(specified_cfg), None
 
 
-def analyse_and_show_res(dataset_file):
+def analyze_and_show_res(dataset_file):
 
     images_ori = []
     cfg = st.session_state.get('cfg', parse_cfg()[2])
@@ -81,7 +81,7 @@ def analyse_and_show_res(dataset_file):
     cfg['save_stats_in_one_file'] = True
 
     del_file = False
-    logger.info('=========Stage: analyse original data=========')
+    logger.info('=========Stage: analyze original data=========')
     if dataset_file is not None:
 
         file_contents = dataset_file.getvalue()
@@ -90,18 +90,18 @@ def analyse_and_show_res(dataset_file):
         cfg.dataset_path = dataset_file.name
         del_file = True
 
-    analyser = Analyser(cfg)
-    dataset = analyser.run()
+    analyzer = Analyzer(cfg)
+    dataset = analyzer.run()
 
-    overall_file = os.path.join(analyser.analysis_path, 'overall.csv')
+    overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
     analysis_res_ori = pd.DataFrame()
     if os.path.exists(overall_file):
         analysis_res_ori = pd.read_csv(overall_file)
 
-    if os.path.exists(analyser.analysis_path):
-        for f_path in os.listdir(analyser.analysis_path):
+    if os.path.exists(analyzer.analysis_path):
+        for f_path in os.listdir(analyzer.analysis_path):
             if '.png' in f_path and 'all-stats' in f_path:
-                images_ori.append(os.path.join(analyser.analysis_path, f_path))
+                images_ori.append(os.path.join(analyzer.analysis_path, f_path))
 
     st.session_state.dataset = dataset
     st.session_state.original_overall = analysis_res_ori
@@ -135,7 +135,7 @@ class Visualize:
         )
 
     @staticmethod
-    def analyse_process():
+    def analyze_process():
         col1, col2 = st.columns(2)
         with col1:
             dataset_file = st.file_uploader(
@@ -147,14 +147,14 @@ class Visualize:
                          value='demo/demo-dataset.jsonl')
 
         start_btn = st.button(
-            '2. Start to analyse original data (per filter op)',
+            '2. Start to analyze original data (per filter op)',
             use_container_width=True)
 
         with st.expander('Data Analysis Results', expanded=True):
 
             if start_btn:
-                with st.spinner('Wait for analyse...'):
-                    analyse_and_show_res(dataset_file)
+                with st.spinner('Wait for analyze...'):
+                    analyze_and_show_res(dataset_file)
 
             original_overall = st.session_state.get('original_overall', None)
             original_imgs = st.session_state.get('original_imgs', [])
@@ -169,7 +169,7 @@ class Visualize:
     @staticmethod
     def visualize():
         Visualize.setup()
-        Visualize.analyse_process()
+        Visualize.analyze_process()
 
 
 def main():

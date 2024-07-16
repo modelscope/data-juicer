@@ -8,7 +8,7 @@ from loguru import logger
 from data_juicer.analysis.diversity_analysis import (DiversityAnalysis,
                                                      get_diversity)
 from data_juicer.config import init_configs
-from data_juicer.core import Analyser
+from data_juicer.core import Analyzer
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.model_utils import prepare_model, get_model
 
@@ -104,10 +104,10 @@ def load_dataset(dataset_file):
         cfg.dataset_path = dataset_file.name
         del_file = True
 
-    logger.info('=========Stage: analyse original data=========')
-    analyser = Analyser(cfg)
+    logger.info('=========Stage: analyze original data=========')
+    analyzer = Analyzer(cfg)
 
-    dataset = analyser.formatter.load_dataset()
+    dataset = analyzer.formatter.load_dataset()
     if del_file:
         os.remove(dataset_file.name)
     return dataset
@@ -181,7 +181,7 @@ class Visualize:
                                       value=0,
                                       max_value=100,
                                       step=1)
-        diversity_btn = st.button('Start to analyse Verb-Noun diversity',
+        diversity_btn = st.button('Start to analyze Verb-Noun diversity',
                                   use_container_width=True)
 
         with st.expander('Diversity Results ', expanded=True):
@@ -192,7 +192,7 @@ class Visualize:
             raw_df = None
             if diversity_btn:
                 try:
-                    with st.spinner('Wait for analyse diversity...'):
+                    with st.spinner('Wait for analyze diversity...'):
                         dataset = load_dataset(dataset_file)
 
                         diversity_analysis = DiversityAnalysis(

@@ -20,25 +20,25 @@ streamlit run app.py
   - This demo introduces the basic concepts and functions of Data-Juicer, such as features, configuration, operators, and so on.
 
 - Data process loop (`data_process_loop`)
-  - This demo analyses and processes a dataset, providing a comparison of statistical information before and after the processing.
+  - This demo analyzes and processes a dataset, providing a comparison of statistical information before and after the processing.
 
 - Data visualization diversity (`data_visualization_diversity`)
-  - This demo analyses the verb-noun structure of the CFT dataset and plots its diversity in sunburst format.
+  - This demo analyzes the verb-noun structure of the CFT dataset and plots its diversity in sunburst format.
 
 - Data visualization op effect (`data_visualization_op_effect`)
-  - This demo analyses the statistics of dataset, and displays the effect of each Filter op by setting different thresholds.
+  - This demo analyzes the statistics of dataset, and displays the effect of each Filter op by setting different thresholds.
 
 - Data visualization statistics (`data_visualization_statistics`)
-  - This demo analyses the dataset and obtain up to 13 statistics.
+  - This demo analyzes the dataset and obtain up to 13 statistics.
 
 - Process CFT Chinese data (`process_cft_zh_data`)
-  - This demos analyses and processes part of Chinese dataset in Alpaca-CoT to show how to process IFT or CFT data for LLM fine-tuning.
+  - This demos analyzes and processes part of Chinese dataset in Alpaca-CoT to show how to process IFT or CFT data for LLM fine-tuning.
 
 - Process SCI data (`process_sci_data`)
-  - This demos analyses and processes part of arXiv dataset to show how to process scientific literature data for LLM pre-training.
+  - This demos analyzes and processes part of arXiv dataset to show how to process scientific literature data for LLM pre-training.
 
 - Process code data (`process_code_data`)
-  - This demos analyses and processes part of Stack-Exchange dataset to show how to process code data for LLM pre-training.
+  - This demos analyzes and processes part of Stack-Exchange dataset to show how to process code data for LLM pre-training.
 
 - Text quality classifier (`tool_quality_classifier`)
   - This demo provides 3 text quality classifier to score the dataset.

@@ -40,7 +40,7 @@ executor_type: default                                      # type of executor, 
 ray_address: auto                                           # the address of the Ray cluster.
 
 # only for data analysis
-percentiles: [0.25, 0.5, 0.75]                              # percentiles to analyse the dataset distribution
+percentiles: [0.25, 0.5, 0.75]                              # percentiles to analyze the dataset distribution
 export_original_dataset: false                              # whether to export the original dataset with stats. If you only need the stats of the dataset, setting it to false could speed up the exporting.
 save_stats_in_one_file: false                               # whether to store all stats result into one file
 

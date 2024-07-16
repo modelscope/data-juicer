@@ -8,7 +8,7 @@ from jsonargparse import namespace_to_dict
 from loguru import logger
 
 from data_juicer.config import init_configs
-from data_juicer.core import Analyser, Executor
+from data_juicer.core import Analyzer, Executor
 from data_juicer.utils.constant import StatsKeys
 
 
@@ -20,13 +20,13 @@ def main():
         if sys.argv[i] == '--path_k_sigma_recipe':
             path_k_sigma_recipe = sys.argv[i + 1]
 
-    # 1. analyse using the given initial recipe
+    # 1. analyze using the given initial recipe
     cfg = init_configs()
-    logger.info('Begin to analyse data using the given initial recipe')
+    logger.info('Begin to analyze data using the given initial recipe')
 
-    analyser = Analyser(cfg)
-    analyser.run()
-    df = analyser.overall_result
+    analyzer = Analyzer(cfg)
+    analyzer.run()
+    df = analyzer.overall_result
 
     # 2. adjust the hyper-parameters of the given recipe with k-sigma rule
     modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe)
