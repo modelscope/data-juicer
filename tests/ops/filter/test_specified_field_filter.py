@@ -1,6 +1,6 @@
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.specified_field_filter import SpecifiedFieldFilter
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase

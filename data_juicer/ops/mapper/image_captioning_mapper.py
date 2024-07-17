@@ -34,6 +34,8 @@ class ImageCaptioningMapper(Mapper):
     """Mapper to generate samples whose captions are generated based on
     another model and the figure."""
 
+    _batched_op = True
+
     def __init__(self,
                  hf_img2seq='Salesforce/blip2-opt-2.7b',
                  caption_num: PositiveInt = 1,
@@ -84,7 +86,7 @@ class ImageCaptioningMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._batched_op = True
+
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'
         ]:
@@ -102,7 +104,6 @@ class ImageCaptioningMapper(Mapper):
         self.prompt = prompt
         self.prompt_key = prompt_key
         self.extra_args = kwargs
-
         if keep_candidate_mode in ['random_any', 'similar_one_simhash']:
             self.num_newly_generated_samples = 1
         elif keep_candidate_mode in ['all']:

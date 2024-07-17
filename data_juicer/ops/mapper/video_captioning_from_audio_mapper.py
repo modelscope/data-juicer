@@ -29,6 +29,8 @@ class VideoCaptioningFromAudioMapper(Mapper):
     Qwen-Audio model.
     """
 
+    _batched_op = True
+
     def __init__(self, keep_original_sample: bool = True, *args, **kwargs):
         """
         Initialization method.
@@ -41,7 +43,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._batched_op = True
+
         self.keep_original_sample = keep_original_sample
         self.extra_args = kwargs
 

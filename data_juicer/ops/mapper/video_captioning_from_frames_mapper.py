@@ -39,6 +39,8 @@ class VideoCaptioningFromFramesMapper(Mapper):
     an image-to-text model and sampled video frames. Captions from different
     frames will be concatenated to a single string."""
 
+    _batched_op = True
+
     def __init__(
         self,
         hf_img2seq='Salesforce/blip2-opt-2.7b',
@@ -111,7 +113,6 @@ class VideoCaptioningFromFramesMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
 
-        self._batched_op = True
         self._accelerator = 'cuda'
 
         if keep_candidate_mode not in [

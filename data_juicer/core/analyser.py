@@ -7,9 +7,7 @@ from data_juicer.config import init_configs
 from data_juicer.format import load_formatter
 from data_juicer.ops import Filter, load_ops
 from data_juicer.utils import cache_utils
-from data_juicer.utils.constant import Fields
 
-from .data import add_same_content_to_new_column
 from .exporter import Exporter
 
 
@@ -87,21 +85,12 @@ class Analyser:
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')
         stats_collected = False
-        for op_cfg, op in zip(self.cfg.process, self.ops):
-            op_name = list(op_cfg.keys())[0]
+        for op in self.ops:
             if isinstance(op, Filter):
-                if Fields.stats not in dataset.features:
-                    # only add stats when calling filter op
-                    dataset = dataset.map(add_same_content_to_new_column,
-                                          fn_kwargs={
-                                              'new_column_name': Fields.stats,
-                                              'initial_value': {}
-                                          },
-                                          num_proc=self.cfg.np,
-                                          desc='Adding new column for stats')
-                dataset = dataset.map(op.compute_stats,
-                                      num_proc=self.cfg.np,
-                                      desc=op_name + '_compute_stats')
+                original_process = op.process
+                op.process = None
+                dataset = dataset.process(op)
+                op.process = original_process
                 stats_collected = True
         if not stats_collected:
             logger.warning('No stats collected. Please add some Filter ops to '

@@ -2,7 +2,7 @@
 
 import unittest
 
-from data_juicer.core import NestedDataset
+from data_juicer.core import NestedDataset as Dataset
 from data_juicer.ops.mapper.nlpaug_en_mapper import NlpaugEnMapper
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
@@ -10,7 +10,7 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 class NlpaugEnMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
-        self.samples = NestedDataset.from_dict({
+        self.samples = Dataset.from_dict({
             'text': [
                 'I am a deep learning engineer. I love LLM.',
                 'A short test with numbers 2023'
