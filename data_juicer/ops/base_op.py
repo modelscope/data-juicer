@@ -140,9 +140,6 @@ class OP:
         if isinstance(self.mem_required, str):
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 
-        # whether to use actor mode in ray
-        self._use_actor = kwargs.get('use_actor', False)
-
         # nested wrappers
         from data_juicer.core.data import wrap_func_with_nested_access
         for name in ['process', 'compute_stats', 'compute_hash']:
@@ -177,9 +174,6 @@ class OP:
 
     def use_cuda(self):
         return self._accelerator == 'cuda' and use_cuda()
-
-    def use_actor(self):
-        return self._use_actor
 
     def runtime_np(self):
         return calculate_np(self._name, self.mem_required, self.cpu_required,
