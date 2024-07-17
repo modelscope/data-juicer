@@ -35,7 +35,11 @@ class OP:
         self.video_key = kwargs.get('video_key', 'videos')
 
         # whether the model can be accelerated using cuda
-        self.accelerator = kwargs.get('accelerator', self._accelerator)
+        _accelerator = kwargs.get('accelerator', None)
+        if _accelerator is not None:
+            self.accelerator = _accelerator
+        else:
+            self.accelerator = self._accelerator
 
         # parameters to determind the number of procs for this op
         self.num_proc = kwargs.get('num_proc', 0)
