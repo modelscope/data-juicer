@@ -7,7 +7,7 @@ import streamlit as st
 from loguru import logger
 
 from data_juicer.config import init_configs
-from data_juicer.core import Analyser, Executor
+from data_juicer.core import Analyzer, Executor
 from data_juicer.utils.constant import HashKeys
 
 demo_path = os.path.dirname(os.path.abspath(__file__))
@@ -96,8 +96,8 @@ def process_and_show_res():
     cfg.open_tracer = True
     cfg.np = 1
     cfg.process.pop(0)
-    logger.info('=========Stage 1: analyze original data=========')
-    analyzer = Analyser(cfg)
+    logger.info('=========Stage 1: analsze original data=========')
+    analyzer = Analyzer(cfg)
     analyzed_dataset = analyzer.run()
 
     logger.info('=========Stage 2: process original data=========')

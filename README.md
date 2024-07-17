@@ -276,17 +276,17 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 
 
 ### Data Analysis
-- Run `analyze_data.py` tool or `dj-analyze` command line tool with your config as the argument to analyse your dataset.
+- Run `analyze_data.py` tool or `dj-analyze` command line tool with your config as the argument to analyze your dataset.
 
 ```shell
 # only for installation from source
-python tools/analyze_data.py --config configs/demo/analyser.yaml
+python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # use command line tool
-dj-analyze --config configs/demo/analyser.yaml
+dj-analyze --config configs/demo/analyzer.yaml
 ```
 
-- **Note:** Analyser only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
+- **Note:** Analyzer only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
 
 ### Data Visualization
 

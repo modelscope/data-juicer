@@ -262,13 +262,13 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 
 ```shell
 # 适用于从源码安装
-python tools/analyze_data.py --config configs/demo/analyser.yaml
+python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # 使用命令行工具
-dj-analyze --config configs/demo/analyser.yaml
+dj-analyze --config configs/demo/analyzer.yaml
 ```
 
-* **注意**：Analyser 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
+* **注意**：Analyzer 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
 
 ### 数据可视化
 
