@@ -49,6 +49,8 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
     texts (captions from video/audio/frames, tags from audio/frames, ...)
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_summarizer: str = None,
                  consider_video_caption_from_video: bool = True,
@@ -110,7 +112,6 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         self._batched_op = True
         self.keep_original_sample = keep_original_sample
         self.extra_args = kwargs
-        self._accelerator = 'cuda'
 
         # prepare summarizer
         self._hf_summarizer = hf_summarizer if hf_summarizer else 'mrm8488/flan-t5-large-finetuned-openai-summarize_from_feedback'  # noqa: E501

@@ -34,6 +34,8 @@ class ImageCaptioningMapper(Mapper):
     """Mapper to generate samples whose captions are generated based on
     another model and the figure."""
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_img2seq='Salesforce/blip2-opt-2.7b',
                  caption_num: PositiveInt = 1,
@@ -95,7 +97,6 @@ class ImageCaptioningMapper(Mapper):
 
         self.model_key = prepare_model(
             model_type='huggingface', pretrained_model_name_or_path=hf_img2seq)
-        self._accelerator = 'cuda'
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode
         self.keep_original_sample = keep_original_sample

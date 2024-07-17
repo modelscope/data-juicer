@@ -39,6 +39,8 @@ class VideoOcrAreaRatioFilter(Filter):
     in the video are within a specified range.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  min_area_ratio: ClosedUnitInterval = 0,
                  max_area_ratio: ClosedUnitInterval = 1.0,
@@ -77,7 +79,6 @@ class VideoOcrAreaRatioFilter(Filter):
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
-        self._accelerator = 'cuda'
         # initialize easyocr reader
         if isinstance(languages_to_detect, str):
             languages_to_detect = [languages_to_detect]

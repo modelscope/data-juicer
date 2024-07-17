@@ -22,6 +22,8 @@ class ExtractQAMapper(Mapper):
     and are suitable for Chinese.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
                  pattern: str = None,
@@ -52,7 +54,6 @@ class ExtractQAMapper(Mapper):
 
         super().__init__(*args, **kwargs)
         self._batched_op = True
-        self._accelerator = 'cuda'
 
         if pattern is None:
             self.pattern = r'Human: (.*?)\nAssistant: (.*?)(?=\nHuman|$)'

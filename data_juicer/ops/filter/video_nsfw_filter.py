@@ -28,6 +28,8 @@ with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
 class VideoNSFWFilter(Filter):
     """Filter to keep samples whose videos have low nsfw scores."""
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_nsfw_model='Falconsai/nsfw_image_detection',
                  score_threshold: ClosedUnitInterval = 0.5,
@@ -85,7 +87,6 @@ class VideoNSFWFilter(Filter):
         self.model_key = prepare_model(
             model_type='huggingface',
             pretrained_model_name_or_path=hf_nsfw_model)
-        self._accelerator = 'cuda'
         self.reduce_mode = reduce_mode
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num

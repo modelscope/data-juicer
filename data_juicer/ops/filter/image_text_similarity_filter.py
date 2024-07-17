@@ -28,6 +28,8 @@ class ImageTextSimilarityFilter(Filter):
     """Filter to keep samples those similarities between image and text
     within a specific range."""
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_clip='openai/clip-vit-base-patch32',
                  min_score: ClosedUnitInterval = 0.1,
@@ -71,7 +73,6 @@ class ImageTextSimilarityFilter(Filter):
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(model_type='huggingface',
                                        pretrained_model_name_or_path=hf_clip)
-        self._accelerator = 'cuda'
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip

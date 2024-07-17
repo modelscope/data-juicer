@@ -13,6 +13,8 @@ UNFORKABLE = Registry('Unforkable')
 
 class OP:
 
+    _accelerator = 'cpu'
+
     def __init__(self, *args, **kwargs):
         """
         Base class of operators.
@@ -33,7 +35,7 @@ class OP:
         self.video_key = kwargs.get('video_key', 'videos')
 
         # whether the model can be accelerated using cuda
-        self._accelerator = kwargs.get('accelerator', 'cpu')
+        self.accelerator = kwargs.get('accelerator', self._accelerator)
 
         # parameters to determind the number of procs for this op
         self.num_proc = kwargs.get('num_proc', 0)
@@ -52,7 +54,7 @@ class OP:
         raise NotImplementedError
 
     def use_cuda(self):
-        return self._accelerator == 'cuda' and is_cuda_available()
+        return self.accelerator == 'cuda' and is_cuda_available()
 
     def use_actor(self):
         return self._use_actor
