@@ -48,7 +48,7 @@
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">data_juicer.core</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.core.Analyser"><code class="docutils literal notranslate"><span class="pre">Analyser</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data_juicer.core.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.core.NestedDataset"><code class="docutils literal notranslate"><span class="pre">NestedDataset</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.core.Executor"><code class="docutils literal notranslate"><span class="pre">Executor</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.core.Exporter"><code class="docutils literal notranslate"><span class="pre">Exporter</span></code></a></li>
@@ -93,18 +93,18 @@
   <section id="module-data_juicer.core">
 <span id="data-juicer-core"></span><h1>data_juicer.core<a class="headerlink" href="#module-data_juicer.core" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.Analyser">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.</span></span><span class="sig-name descname"><span class="pre">Analyser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/analyser.html#Analyser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Analyser" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.core.Analyzer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.</span></span><span class="sig-name descname"><span class="pre">Analyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/analyzer.html#Analyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Analyzer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This Analyser class is used to analyse a specific dataset.</p>
+<p>This Analyzer class is used to analyze a specific dataset.</p>
 <p>It will compute stats for all filter ops in the config file, apply
 multiple analysis (e.g. OverallAnalysis, ColumnWiseAnalysis, etc.)
 on these stats, and generate the analysis results (stats tables,
 distribution figures, etc.) to help users understand the input
 dataset better.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.Analyser.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/analyser.html#Analyser.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Analyser.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.core.Analyzer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/analyzer.html#Analyzer.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Analyzer.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -114,8 +114,8 @@ dataset better.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.Analyser.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load_data_np</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/analyser.html#Analyser.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Analyser.run" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.core.Analyzer.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">load_data_np</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/analyzer.html#Analyzer.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Analyzer.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Running the dataset analysis pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -125,7 +125,7 @@ dataset better.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>analysed dataset.</p>
+<dd class="field-even"><p>analyzed dataset.</p>
 </dd>
 </dl>
 </dd></dl>

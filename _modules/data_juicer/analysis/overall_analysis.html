@@ -105,7 +105,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
-<span class="sd">        :param dataset: the dataset to be analysed</span>
+<span class="sd">        :param dataset: the dataset to be analyzed</span>
 <span class="sd">        :param output_path: path to store the analysis results.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">])</span>
@@ -113,9 +113,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span>
 
-        <span class="c1"># default percentiles to analyse</span>
+        <span class="c1"># default percentiles to analyze</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_percentiles</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">]</span>
-        <span class="c1"># supported dtypes of column to be analysed</span>
+        <span class="c1"># supported dtypes of column to be analyzed</span>
         <span class="c1"># Notice: there won&#39;t be mixed types in a column because the stats is</span>
         <span class="c1"># obtained from Dataset, which doesn&#39;t allow mixed types.</span>
         <span class="c1"># Notice: for now, stats can only be:</span>
@@ -132,7 +132,7 @@
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">first</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_object_types</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There is a column of stats with type &#39;</span>
                            <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">first</span><span class="p">)</span><span class="si">}</span><span class="s1">], which is not supported to be &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;analysed for now.&#39;</span><span class="p">)</span>
+                           <span class="sa">f</span><span class="s1">&#39;analyzed for now.&#39;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">first</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
             <span class="c1"># describe(include = &#39;all&#39;) can analyze the string type</span>
@@ -142,13 +142,13 @@
             <span class="n">col</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">explode</span><span class="p">()</span><span class="o">.</span><span class="n">infer_objects</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">col</span></div>
 
-<div class="viewcode-block" id="OverallAnalysis.analyse"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.OverallAnalysis.analyse">[docs]</a>    <span class="k">def</span> <span class="nf">analyse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percentiles</span><span class="o">=</span><span class="p">[],</span> <span class="n">num_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">skip_export</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="OverallAnalysis.analyze"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.OverallAnalysis.analyze">[docs]</a>    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percentiles</span><span class="o">=</span><span class="p">[],</span> <span class="n">num_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">skip_export</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply overall analysis on the whole dataset based on the describe</span>
 <span class="sd">        method of pandas.</span>
 
-<span class="sd">        :param percentiles: percentiles to analyse</span>
-<span class="sd">        :param num_proc: number of processes to analyse the dataset</span>
+<span class="sd">        :param percentiles: percentiles to analyze</span>
+<span class="sd">        :param num_proc: number of processes to analyze the dataset</span>
 <span class="sd">        :param skip_export: whether export the results to disk</span>
 <span class="sd">        :return: the overall analysis result.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

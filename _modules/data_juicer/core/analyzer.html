@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.core.analyser &mdash; data_juicer 0.2.0 documentation</title>
+  <title>data_juicer.core.analyzer &mdash; data_juicer 0.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
 
@@ -72,7 +72,7 @@
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
           <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
-      <li class="breadcrumb-item active">data_juicer.core.analyser</li>
+      <li class="breadcrumb-item active">data_juicer.core.analyzer</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -81,7 +81,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for data_juicer.core.analyser</h1><div class="highlight"><pre>
+  <h1>Source code for data_juicer.core.analyzer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
@@ -99,9 +99,9 @@
 <span class="kn">from</span> <span class="nn">.exporter</span> <span class="kn">import</span> <span class="n">Exporter</span>
 
 
-<div class="viewcode-block" id="Analyser"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Analyser">[docs]</a><span class="k">class</span> <span class="nc">Analyser</span><span class="p">:</span>
+<div class="viewcode-block" id="Analyzer"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Analyzer">[docs]</a><span class="k">class</span> <span class="nc">Analyzer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This Analyser class is used to analyse a specific dataset.</span>
+<span class="sd">    This Analyzer class is used to analyze a specific dataset.</span>
 
 <span class="sd">    It will compute stats for all filter ops in the config file, apply</span>
 <span class="sd">    multiple analysis (e.g. OverallAnalysis, ColumnWiseAnalysis, etc.)</span>
@@ -110,7 +110,7 @@
 <span class="sd">    dataset better.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Analyser.__init__"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Analyser.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Analyzer.__init__"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Analyzer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -133,7 +133,7 @@
                                         <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">add_suffix</span><span class="p">)</span>
 
         <span class="c1"># prepare exporter and check export path suffix</span>
-        <span class="c1"># NOTICE: no need to export dataset texts for analyser</span>
+        <span class="c1"># NOTICE: no need to export dataset texts for analyzer</span>
         <span class="c1"># (export_ds=False). Instead, only need to export stats</span>
         <span class="c1"># (export_stats=True).</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Preparing exporter...&#39;</span><span class="p">)</span>
@@ -151,13 +151,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">overall_single_plot_path</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">analysis_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;analysis&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Analyser.run"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Analyser.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_data_np</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_export</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Analyzer.run"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Analyzer.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_data_np</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">skip_export</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Running the dataset analysis pipeline.</span>
 
 <span class="sd">        :param load_data_np: number of workers when loading the dataset.</span>
 <span class="sd">        :param skip_export: whether export the results into disk</span>
-<span class="sd">        :return: analysed dataset.</span>
+<span class="sd">        :return: analyzed dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># 1. format data</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading dataset from data formatter...&#39;</span><span class="p">)</span>
@@ -213,11 +213,11 @@
         <span class="c1"># 4.1. Only consider fields in Fields.stats</span>
         <span class="c1"># 4.2. For string fields, only consider its histogram</span>
         <span class="c1"># 4.3. For numeric fields, consider its histogram and box</span>
-        <span class="c1"># 4.4. Otherwise, DO NOT analyse</span>
+        <span class="c1"># 4.4. Otherwise, DO NOT analyze</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Applying overall analysis on stats...&#39;</span><span class="p">)</span>
         <span class="n">overall_analysis</span> <span class="o">=</span> <span class="n">OverallAnalysis</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis_path</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">overall_result</span> <span class="o">=</span> <span class="n">overall_analysis</span><span class="o">.</span><span class="n">analyse</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overall_result</span> <span class="o">=</span> <span class="n">overall_analysis</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span>
             <span class="n">percentiles</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">percentiles</span><span class="p">,</span>
             <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">np</span><span class="p">,</span>
             <span class="n">skip_export</span><span class="o">=</span><span class="n">skip_export</span><span class="p">)</span>
@@ -231,7 +231,7 @@
             <span class="n">overall_result</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">overall_result</span><span class="p">,</span>
             <span class="n">save_stats_in_one_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">save_stats_in_one_file</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">column_wise_analysis</span><span class="o">.</span><span class="n">analyse</span><span class="p">(</span><span class="n">skip_export</span><span class="o">=</span><span class="n">skip_export</span><span class="p">)</span>
+        <span class="n">column_wise_analysis</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">skip_export</span><span class="o">=</span><span class="n">skip_export</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">dataset</span></div></div>
 </pre></div>

@@ -146,7 +146,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method</span>
 
-<span class="sd">        :param dataset: the dataset to be analysed</span>
+<span class="sd">        :param dataset: the dataset to be analyzed</span>
 <span class="sd">        :param output_path: path to store the analysis results</span>
 <span class="sd">        :param overall_result: optional precomputed overall stats result</span>
 <span class="sd">        :param save_stats_in_one_file: whether save all analysis figures of all</span>
@@ -157,15 +157,15 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span>
 
-        <span class="c1"># if no overall description provided, analyse it from scratch</span>
+        <span class="c1"># if no overall description provided, analyze it from scratch</span>
         <span class="k">if</span> <span class="n">overall_result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">oa</span> <span class="o">=</span> <span class="n">OverallAnalysis</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
-            <span class="n">overall_result</span> <span class="o">=</span> <span class="n">oa</span><span class="o">.</span><span class="n">analyse</span><span class="p">()</span>
+            <span class="n">overall_result</span> <span class="o">=</span> <span class="n">oa</span><span class="o">.</span><span class="n">analyze</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">overall_result</span> <span class="o">=</span> <span class="n">overall_result</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">save_stats_in_one_file</span> <span class="o">=</span> <span class="n">save_stats_in_one_file</span></div>
 
-<div class="viewcode-block" id="ColumnWiseAnalysis.analyse"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.ColumnWiseAnalysis.analyse">[docs]</a>    <span class="k">def</span> <span class="nf">analyse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show_percentiles</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">skip_export</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="ColumnWiseAnalysis.analyze"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.ColumnWiseAnalysis.analyze">[docs]</a>    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show_percentiles</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">skip_export</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply analysis and draw the analysis figure for stats.</span>
 

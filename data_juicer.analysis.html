@@ -102,7 +102,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset</strong> – the dataset to be analysed</p></li>
+<li><p><strong>dataset</strong> – the dataset to be analyzed</p></li>
 <li><p><strong>output_path</strong> – path to store the analysis results</p></li>
 <li><p><strong>overall_result</strong> – optional precomputed overall stats result</p></li>
 <li><p><strong>save_stats_in_one_file</strong> – whether save all analysis figures of all
@@ -113,8 +113,8 @@ stats into one image file</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.analysis.ColumnWiseAnalysis.analyse">
-<span class="sig-name descname"><span class="pre">analyse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_percentiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/column_wise_analysis.html#ColumnWiseAnalysis.analyse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.ColumnWiseAnalysis.analyse" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.analysis.ColumnWiseAnalysis.analyze">
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">show_percentiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/column_wise_analysis.html#ColumnWiseAnalysis.analyze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.ColumnWiseAnalysis.analyze" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply analysis and draw the analysis figure for stats.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -185,7 +185,7 @@ result.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.analysis.DiversityAnalysis.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lang_or_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'en'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/diversity_analysis.html#DiversityAnalysis.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.DiversityAnalysis.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialization method :param dataset: the dataset to be analysed
+<dd><p>Initialization method :param dataset: the dataset to be analyzed
 :param output_path: path to store the analysis results :param
 lang_or_model: the diversity model or a specific language used to load
 the diversity model.</p>
@@ -200,7 +200,7 @@ the diversity model.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lang_or_model</strong> – the diversity model or a specific language
 used to load the diversity model</p></li>
-<li><p><strong>column_name</strong> – the name of column to be analysed</p></li>
+<li><p><strong>column_name</strong> – the name of column to be analyzed</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -210,16 +210,16 @@ used to load the diversity model</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.analysis.DiversityAnalysis.analyse">
-<span class="sig-name descname"><span class="pre">analyse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang_or_model=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name='text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postproc_func=&lt;function</span> <span class="pre">get_diversity&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**postproc_kwarg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/diversity_analysis.html#DiversityAnalysis.analyse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.DiversityAnalysis.analyse" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.analysis.DiversityAnalysis.analyze">
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lang_or_model=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name='text'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postproc_func=&lt;function</span> <span class="pre">get_diversity&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**postproc_kwarg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/diversity_analysis.html#DiversityAnalysis.analyze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.DiversityAnalysis.analyze" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply diversity analysis on the whole dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lang_or_model</strong> – the diversity model or a specific language
 used to load the diversity model</p></li>
-<li><p><strong>column_name</strong> – the name of column to be analysed</p></li>
-<li><p><strong>postproc_func</strong> – function to analyse diversity. In default,
+<li><p><strong>column_name</strong> – the name of column to be analyzed</p></li>
+<li><p><strong>postproc_func</strong> – function to analyze diversity. In default,
 it’s function get_diversity</p></li>
 <li><p><strong>postproc_kwarg</strong> – arguments of the postproc_func</p></li>
 </ul>
@@ -245,7 +245,7 @@ etc.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset</strong> – the dataset to be analysed</p></li>
+<li><p><strong>dataset</strong> – the dataset to be analyzed</p></li>
 <li><p><strong>output_path</strong> – path to store the analysis results.</p></li>
 </ul>
 </dd>
@@ -258,15 +258,15 @@ etc.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.analysis.OverallAnalysis.analyse">
-<span class="sig-name descname"><span class="pre">analyse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percentiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/overall_analysis.html#OverallAnalysis.analyse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.OverallAnalysis.analyse" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.analysis.OverallAnalysis.analyze">
+<span class="sig-name descname"><span class="pre">analyze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">percentiles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_export</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/overall_analysis.html#OverallAnalysis.analyze"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.OverallAnalysis.analyze" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply overall analysis on the whole dataset based on the describe
 method of pandas.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>percentiles</strong> – percentiles to analyse</p></li>
-<li><p><strong>num_proc</strong> – number of processes to analyse the dataset</p></li>
+<li><p><strong>percentiles</strong> – percentiles to analyze</p></li>
+<li><p><strong>num_proc</strong> – number of processes to analyze the dataset</p></li>
 <li><p><strong>skip_export</strong> – whether export the results to disk</p></li>
 </ul>
 </dd>

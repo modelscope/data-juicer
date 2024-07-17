@@ -123,9 +123,9 @@
 <span class="sd">    Find the verb and its object closest to the root of lexical tree of input</span>
 <span class="sd">    string.</span>
 
-<span class="sd">    :param nlp: the diversity model to analyse the diversity strings</span>
-<span class="sd">    :param s: the string to be analysed</span>
-<span class="sd">    :param first_sent: whether to analyse the first sentence in the</span>
+<span class="sd">    :param nlp: the diversity model to analyze the diversity strings</span>
+<span class="sd">    :param s: the string to be analyzed</span>
+<span class="sd">    :param first_sent: whether to analyze the first sentence in the</span>
 <span class="sd">        input string only. If it&#39;s true, return the analysis result of</span>
 <span class="sd">        the first sentence no matter it&#39;s valid or not. If it&#39;s false,</span>
 <span class="sd">        return the first valid result over all sentences</span>
@@ -171,7 +171,7 @@
 <span class="sd">    result.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="DiversityAnalysis.__init__"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">lang_or_model</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization method :param dataset: the dataset to be analysed</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization method :param dataset: the dataset to be analyzed</span>
 <span class="sd">        :param output_path: path to store the analysis results :param</span>
 <span class="sd">        lang_or_model: the diversity model or a specific language used to load</span>
 <span class="sd">        the diversity model.&quot;&quot;&quot;</span>
@@ -188,7 +188,7 @@
 
 <span class="sd">        :param lang_or_model: the diversity model or a specific language</span>
 <span class="sd">            used to load the diversity model</span>
-<span class="sd">        :param column_name: the name of column to be analysed</span>
+<span class="sd">        :param column_name: the name of column to be analyzed</span>
 <span class="sd">        :return: the analysis result.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># load diversity model</span>
@@ -213,7 +213,7 @@
         <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">find_verb_noun</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="DiversityAnalysis.analyse"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis.analyse">[docs]</a>    <span class="k">def</span> <span class="nf">analyse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="DiversityAnalysis.analyze"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis.analyze">[docs]</a>    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                 <span class="n">lang_or_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">column_name</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">,</span>
                 <span class="n">postproc_func</span><span class="o">=</span><span class="n">get_diversity</span><span class="p">,</span>
@@ -223,8 +223,8 @@
 
 <span class="sd">        :param lang_or_model: the diversity model or a specific language</span>
 <span class="sd">            used to load the diversity model</span>
-<span class="sd">        :param column_name: the name of column to be analysed</span>
-<span class="sd">        :param postproc_func: function to analyse diversity. In default,</span>
+<span class="sd">        :param column_name: the name of column to be analyzed</span>
+<span class="sd">        :param postproc_func: function to analyze diversity. In default,</span>
 <span class="sd">            it&#39;s function get_diversity</span>
 <span class="sd">        :param postproc_kwarg: arguments of the postproc_func</span>
 <span class="sd">        :return:</span>
