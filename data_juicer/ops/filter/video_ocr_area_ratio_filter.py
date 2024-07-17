@@ -94,7 +94,7 @@ class VideoOcrAreaRatioFilter(Filter):
     def get_reader(self, rank):
         if self.use_cuda():
             device = f'cuda:{rank % cuda_device_count()}'
-            self.reader = self.reader.detector.to(device)
+            self.reader.detector = self.reader.detector.to(device)
             self.reader.device = device
         return self.reader
 
@@ -114,6 +114,7 @@ class VideoOcrAreaRatioFilter(Filter):
         sample, videos = load_data_with_context(sample, context,
                                                 loaded_video_keys, load_video)
 
+        reader = self.get_reader(rank)
         # compute ocr area ratios
         video_ocr_area_ratios = {}
         for video_key, container in videos.items():
@@ -132,8 +133,7 @@ class VideoOcrAreaRatioFilter(Filter):
             for idx, image in enumerate(images):
                 # return horizontal detected results and free-form detected
                 # results
-                horizontal_list, free_list = self.get_reader(rank).detect(
-                    np.asarray(image))
+                horizontal_list, free_list = reader.detect(np.asarray(image))
                 total_area = image.width * image.height
                 # rectangles
                 rect_area = 0
