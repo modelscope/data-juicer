@@ -6,7 +6,7 @@ import yaml
 from loguru import logger
 
 from data_juicer.config import init_configs
-from data_juicer.core import Analyser
+from data_juicer.core import Analyzer
 from data_juicer.ops.base_op import OPERATORS
 
 
@@ -90,7 +90,7 @@ def analyze_and_show_res(dataset_file):
         cfg.dataset_path = dataset_file.name
         del_file = True
 
-    analyzer = Analyser(cfg)
+    analyzer = Analyzer(cfg)
     dataset = analyzer.run()
 
     overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')

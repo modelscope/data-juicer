@@ -40,19 +40,13 @@ executor_type: default                                      # type of executor, 
 ray_address: auto                                           # the address of the Ray cluster.
 
 # only for data analysis
-percentiles: [0.25, 0.5, 0.75]                              # percentiles to analyse the dataset distribution
+percentiles: [0.25, 0.5, 0.75]                              # percentiles to analyze the dataset distribution
 export_original_dataset: false                              # whether to export the original dataset with stats. If you only need the stats of the dataset, setting it to false could speed up the exporting.
 save_stats_in_one_file: false                               # whether to store all stats result into one file
 
 # for sandbox or hpo
-model_infer_config: null                                    # path or dict to model inference configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
-model_train_config: null                                    # path or dict to model training configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
-model_eval_config: null                                     # path or dict to model evaluation configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
-data_eval_config: null                                      # path or dict to data evaluation configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
 data_probe_algo: 'uniform'                                  # sampling algorithm for dataset. Should be one of ["uniform", "frequency_specified_field_selector", "topk_specified_field_selector"]. It's "uniform" in default. Only used for dataset sampling.
 data_probe_ratio: 1.0                                       # the sampling ratio to the original dataset size. It's 1.0 in default. Only used for dataset sampling.
-path_k_sigma_recipe: null                                   # path to save a configuration file when using k-sigma tool to refine processing recipes
-path_model_feedback_recipe: null                            # path to save a configuration file refined by model feedback
 hpo_config: null                                            # path to a configuration file when using auto-HPO tool.
 
 
@@ -92,7 +86,7 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True in default.
       prompt: null                                            # a string prompt to guide the generation of blip2 model for all samples globally. It's None in default, which means no prompt provided.
       prompt_key: null                                        # the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default.
-      mem_required: '20GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
+      mem_required: '16GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_diffusion_mapper:                                 # generate images by diffusion model
       hf_diffusion: 'CompVis/stable-diffusion-v1-4'           # stable diffusion model name on huggingface to generate image
       torch_dtype: 'fp32'                                     # the floating point type used to load the diffusion model. Can be one of ['fp32', 'fp16', 'bf16']
@@ -103,7 +97,7 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
       caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
-      mem_required: '25GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
+      mem_required: '8GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_face_blur_mapper:                                 # blur faces detected in images
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
@@ -335,7 +329,7 @@ process:
       lang: en                                                # compute perplexity in what language
       max_ppl: 1500                                           # the max perplexity score to filter text
   - phrase_grounding_recall_filter:                         # filter samples according to the locating recall of phrases extracted from text in the images.
-      hf_owlvit: openai/clip-vit-base-patch32                 # name of used Hugging Face Owl-ViT
+      hf_owlvit: google/owlvit-base-patch32                   # name of used Hugging Face Owl-ViT
       min_recall: 0.1                                         # the min phrase grounding recall of filter range
       max_recall: 1.0                                         # the max phrase grounding recall of filter range
       horizontal_flip: false                                  # flip image horizontally (left to right).

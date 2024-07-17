@@ -62,7 +62,7 @@ class ColumnWiseAnalysis:
         """
         Initialization method
 
-        :param dataset: the dataset to be analysed
+        :param dataset: the dataset to be analyzed
         :param output_path: path to store the analysis results
         :param overall_result: optional precomputed overall stats result
         :param save_stats_in_one_file: whether save all analysis figures of all
@@ -73,15 +73,15 @@ class ColumnWiseAnalysis:
         if not os.path.exists(self.output_path):
             os.makedirs(self.output_path)
 
-        # if no overall description provided, analyse it from scratch
+        # if no overall description provided, analyze it from scratch
         if overall_result is None:
             oa = OverallAnalysis(dataset, output_path)
-            overall_result = oa.analyse()
+            overall_result = oa.analyze()
         self.overall_result = overall_result
 
         self.save_stats_in_one_file = save_stats_in_one_file
 
-    def analyse(self, show_percentiles=False, show=False, skip_export=False):
+    def analyze(self, show_percentiles=False, show=False, skip_export=False):
         """
         Apply analysis and draw the analysis figure for stats.
 
