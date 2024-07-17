@@ -33,6 +33,8 @@ class ImageDiffusionMapper(Mapper):
         Generate image by diffusion model
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_diffusion: str = 'CompVis/stable-diffusion-v1-4',
                  torch_dtype: str = 'fp32',
@@ -98,7 +100,6 @@ class ImageDiffusionMapper(Mapper):
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
         self._batched_op = True
-        self._accelerator = 'cuda'
         self.strength = strength
         self.guidance_scale = guidance_scale
         self.aug_num = aug_num

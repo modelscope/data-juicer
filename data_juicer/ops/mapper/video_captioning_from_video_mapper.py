@@ -38,6 +38,8 @@ class VideoCaptioningFromVideoMapper(Mapper):
     """Mapper to generate samples whose captions are generated based on
     a video-to-text model and sampled video frame."""
 
+    _accelerator = 'cuda'
+
     def __init__(
         self,
         hf_video_blip='kpyu/video-blip-opt-2.7b-ego4d',
@@ -112,7 +114,6 @@ class VideoCaptioningFromVideoMapper(Mapper):
         super().__init__(*args, **kwargs)
 
         self._batched_op = True
-        self._accelerator = 'cuda'
 
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'
@@ -179,7 +180,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
 
         text = sample[self.text_key]
         offset = 0
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         for chunk in text.split(SpecialTokens.eoc):
 

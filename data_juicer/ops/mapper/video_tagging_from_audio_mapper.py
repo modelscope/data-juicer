@@ -24,6 +24,8 @@ class VideoTaggingFromAudioMapper(Mapper):
     using the Audio Spectrogram Transformer.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_ast='MIT/ast-finetuned-audioset-10-10-0.4593',
                  *args,
@@ -53,7 +55,8 @@ class VideoTaggingFromAudioMapper(Mapper):
         # load video paths
         loaded_video_keys = sample[self.video_key]
 
-        model, feature_extractor = get_model(self.model_key, rank=rank)
+        model, feature_extractor = get_model(self.model_key, rank,
+                                             self.use_cuda())
         video_audio_tags = []
         for video_path in loaded_video_keys:
             # only extract audio data and sr for index 0 for now

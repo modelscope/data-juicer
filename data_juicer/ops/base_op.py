@@ -3,13 +3,17 @@ import copy
 import pandas as pd
 import pyarrow as pa
 
+from data_juicer import is_cuda_available
 from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
+UNFORKABLE = Registry('Unforkable')
 
 
 class OP:
+
+    _accelerator = 'cpu'
 
     def __init__(self, *args, **kwargs):
         """
@@ -31,7 +35,11 @@ class OP:
         self.video_key = kwargs.get('video_key', 'videos')
 
         # whether the model can be accelerated using cuda
-        self._accelerator = kwargs.get('accelerator', 'cpu')
+        _accelerator = kwargs.get('accelerator', None)
+        if _accelerator is not None:
+            self.accelerator = _accelerator
+        else:
+            self.accelerator = self._accelerator
 
         # parameters to determind the number of procs for this op
         self.num_proc = kwargs.get('num_proc', 0)
@@ -48,6 +56,9 @@ class OP:
 
     def process(self, *args, **kwargs):
         raise NotImplementedError
+
+    def use_cuda(self):
+        return self.accelerator == 'cuda' and is_cuda_available()
 
     def use_actor(self):
         return self._use_actor

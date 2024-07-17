@@ -6,7 +6,7 @@ import pandas as pd
 import pyarrow as pa
 from loguru import logger
 
-from data_juicer import cuda_device_count, use_cuda
+from data_juicer import cuda_device_count
 from data_juicer.config import init_configs
 from data_juicer.ops import Filter, Mapper, load_ops
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -97,7 +97,7 @@ class RayExecutor:
         self.process_list = self.cfg.process
 
     def get_num_gpus(self, op, op_proc):
-        if not use_cuda() or not op._accelerator == 'cuda':
+        if not op.use_cuda():
             return 0
         proc_per_gpu = op_proc / cuda_device_count()
         return 1.0 / proc_per_gpu

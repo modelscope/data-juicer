@@ -7,6 +7,7 @@ import pyarrow as pa
 import ray.data as rd
 from datasets import Dataset
 
+from data_juicer import is_cuda_available
 from data_juicer.ops import Filter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.registry import Registry
@@ -34,8 +35,16 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         max_diff = os.getenv('TEST_MAX_DIFF', 'None')
         cls.maxDiff = None if max_diff == 'None' else int(max_diff)
 
+        if is_cuda_available():
+            import multiprocess
+            cls.original_mp_method = multiprocess.get_start_method()
+            multiprocess.set_start_method('spawn', force=True)
+
     @classmethod
     def tearDownClass(cls, hf_model_name=None) -> None:
+        import multiprocess
+        multiprocess.set_start_method(cls.original_mp_method, force=True)
+
         # clean the huggingface model cache files
         import transformers
         if hf_model_name:

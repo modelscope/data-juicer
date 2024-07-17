@@ -33,6 +33,8 @@ class VideoAestheticsFilter(Filter):
     in the videos within a specific range.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_scorer_model='',
                  min_score: ClosedUnitInterval = 0.4,
@@ -107,7 +109,6 @@ class VideoAestheticsFilter(Filter):
         # the original score predicted by laion-ai's scorer is within [0, 10]
         self.need_normalized_by_ten = ('shunk031/aesthetics-predictor'
                                        in hf_scorer_model)
-        self._accelerator = 'cuda'
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num
 
@@ -155,7 +156,7 @@ class VideoAestheticsFilter(Filter):
             frame_images = [frame.to_image() for frame in frames]
 
             # compute aesthetics_scores
-            model, processor = get_model(self.model_key, rank=rank)
+            model, processor = get_model(self.model_key, rank, self.use_cuda())
             inputs = processor(images=frame_images,
                                return_tensors='pt').to(model.device)
             with torch.no_grad():
