@@ -14,7 +14,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | [ Mapper ]( #mapper )             |   43   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
-| [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
+| [ Selector ]( #selector )         |   3    | Selects top samples based on ranking            |
 
 
 All the specific operators are listed below, each featured with several capability tags.
@@ -161,6 +161,7 @@ All the specific operators are listed below, each featured with several capabili
 |------------------------------------|---------|--------|-----------------------------------------------------------------------|
 | frequency_specified_field_selector | General | en, zh | Selects top samples by comparing the frequency of the specified field |
 | topk_specified_field_selector      | General | en, zh | Selects top samples by comparing the values of the specified field    |
+| range_specified_field_selector     | General | en, zh | Selects samples within a specified range by comparing the values of the specified field    |
 
 
 ## Contributing

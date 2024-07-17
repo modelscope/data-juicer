@@ -1,5 +1,6 @@
-from . import frequency_specified_field_selector, topk_specified_field_selector
+from . import frequency_specified_field_selector, topk_specified_field_selector, range_specified_field_selector
 from .frequency_specified_field_selector import FrequencySpecifiedFieldSelector
 from .topk_specified_field_selector import TopkSpecifiedFieldSelector
+from .range_specified_field_selector import RangeSpecifiedFieldSelector
 
-__all__ = ['FrequencySpecifiedFieldSelector', 'TopkSpecifiedFieldSelector']
+__all__ = ['FrequencySpecifiedFieldSelector', 'TopkSpecifiedFieldSelector', 'RangeSpecifiedFieldSelector']

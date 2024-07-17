@@ -1,0 +1,46 @@
+# Sandbox config example
+
+# global parameters
+project_name: 'demo-bench'
+experiment_name: 'single_op_language_score'              # for wandb tracer name
+
+# configs for each job, the jobs will be executed according to the order in the list
+probe_job_configs:
+  - hook: 'ProbeViaAnalyzerHook'
+    meta_name: 'analysis_ori_data'
+    dj_configs: 'configs/demo/bench/single_op/language_score_dj_prob.yaml'
+    extra_configs:
+
+# execution_job_configs:
+#   - hook: 'ProcessDataHook'
+#     meta_name:
+#     dj_configs: './outputs/demo-process/k_sigma_new_recipe.yaml'
+#     extra_configs:
+#   - hook: 'TrainModelHook'
+#     meta_name:
+#     dj_configs:
+#     extra_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
+
+# evaluation_job_configs:
+#   - hook: 'ProbeViaAnalyzerHook'
+#     meta_name: 'analysis_processed_data'
+#     dj_configs: 'configs/demo/process.yaml'
+#     extra_configs:
+#   # - hook: 'ProbeViaModelInferHook'
+#   #   meta_name: 'analysis_trained_model'
+#   #   dj_configs:
+#   #     dataset_path: './demos/data/demo-dataset.jsonl'
+#   #     export_path: './outputs/demo-sandbox/demo-sandbox.jsonl'
+#   #     data_probe_algo: 'uniform'
+#   #     data_probe_ratio: 0.5
+#   #     extra_configs:
+#   #       (...model configs)
+#   - hook: 'EvaluateDataHook'
+#     meta_name: 'eval_data'
+#     dj_configs:
+#     extra_configs: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
+  # - hook: 'EvaluateModelHook'
+  #   meta_name: 'eval_model'
+  #   dj_configs:
+  #   oextra_configs:
+  #     (...model configs)
