@@ -115,6 +115,8 @@
 <span class="sd">        probability.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+
 <div class="viewcode-block" id="VideoWatermarkFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.VideoWatermarkFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_watermark_model</span><span class="o">=</span><span class="s1">&#39;amrul-hzz/watermark_detector&#39;</span><span class="p">,</span>
                  <span class="n">prob_threshold</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
@@ -173,7 +175,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
             <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
             <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_watermark_model</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reduce_mode</span> <span class="o">=</span> <span class="n">reduce_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">frame_sampling_method</span> <span class="o">=</span> <span class="n">frame_sampling_method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">frame_num</span> <span class="o">=</span> <span class="n">frame_num</span>
@@ -199,7 +200,7 @@
                                                 <span class="n">loaded_video_keys</span><span class="p">,</span> <span class="n">load_video</span><span class="p">)</span>
 
         <span class="n">watermark_probs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">model</span><span class="p">,</span> <span class="n">processor</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">processor</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
 
         <span class="k">for</span> <span class="n">video_key</span><span class="p">,</span> <span class="n">video</span> <span class="ow">in</span> <span class="n">videos</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">sampled_frames_key</span> <span class="o">=</span> <span class="n">video_key</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampled_frames_key_suffix</span>

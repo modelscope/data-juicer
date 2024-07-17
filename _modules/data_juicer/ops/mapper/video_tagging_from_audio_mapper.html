@@ -108,6 +108,8 @@
 <span class="sd">    using the Audio Spectrogram Transformer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+
 <div class="viewcode-block" id="VideoTaggingFromAudioMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoTaggingFromAudioMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_ast</span><span class="o">=</span><span class="s1">&#39;MIT/ast-finetuned-audioset-10-10-0.4593&#39;</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
@@ -137,7 +139,8 @@
         <span class="c1"># load video paths</span>
         <span class="n">loaded_video_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
 
-        <span class="n">model</span><span class="p">,</span> <span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
         <span class="n">video_audio_tags</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">video_path</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">:</span>
             <span class="c1"># only extract audio data and sr for index 0 for now</span>

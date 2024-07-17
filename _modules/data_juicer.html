@@ -87,7 +87,6 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
-<span class="kn">import</span> <span class="nn">multiprocess</span> <span class="k">as</span> <span class="nn">mp</span>
 <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
 <span class="c1"># allow loading truncated images for some too large images.</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">ImageFile</span>
@@ -126,53 +125,15 @@
         <span class="k">return</span> <span class="mi">0</span>
 
 
-<span class="n">_USE_CUDA</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="n">_CUDA_COUNT</span> <span class="o">=</span> <span class="n">_cuda_device_count</span><span class="p">()</span>
-
-
-<div class="viewcode-block" id="use_cuda"><a class="viewcode-back" href="../data_juicer.html#data_juicer.use_cuda">[docs]</a><span class="k">def</span> <span class="nf">use_cuda</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">_USE_CUDA</span></div>
+<span class="n">_CUDA_DEVICE_COUNT</span> <span class="o">=</span> <span class="n">_cuda_device_count</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="cuda_device_count"><a class="viewcode-back" href="../data_juicer.html#data_juicer.cuda_device_count">[docs]</a><span class="k">def</span> <span class="nf">cuda_device_count</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">_CUDA_COUNT</span></div>
+    <span class="k">return</span> <span class="n">_CUDA_DEVICE_COUNT</span></div>
 
 
-<div class="viewcode-block" id="setup_mp"><a class="viewcode-back" href="../data_juicer.html#data_juicer.setup_mp">[docs]</a><span class="k">def</span> <span class="nf">setup_mp</span><span class="p">():</span>
-    <span class="n">method</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;MP_START_METHOD&#39;</span><span class="p">,</span> <span class="s1">&#39;auto&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;auto&#39;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">_CUDA_COUNT</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="c1"># forkserver is more lightweight</span>
-            <span class="n">method</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;forkserver&#39;</span> <span class="k">if</span> <span class="s1">&#39;forkserver&#39;</span>
-                      <span class="ow">in</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_all_start_methods</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;spawn&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;fork&#39;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting multiprocess start method to &#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
-        <span class="n">mp</span><span class="o">.</span><span class="n">set_start_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error setting multiprocess start method: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="setup_cuda"><a class="viewcode-back" href="../data_juicer.html#data_juicer.setup_cuda">[docs]</a><span class="k">def</span> <span class="nf">setup_cuda</span><span class="p">():</span>
-    <span class="k">global</span> <span class="n">_USE_CUDA</span>
-
-    <span class="n">method</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;fork&#39;</span> <span class="ow">and</span> <span class="n">_CUDA_COUNT</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">_USE_CUDA</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">_USE_CUDA</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;_USE_CUDA: </span><span class="si">{</span><span class="n">_USE_CUDA</span><span class="si">}</span><span class="s1"> | MP: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1"> &#39;</span>
-                 <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">mp</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="initialize"><a class="viewcode-back" href="../data_juicer.html#data_juicer.initialize">[docs]</a><span class="k">def</span> <span class="nf">initialize</span><span class="p">():</span>
-    <span class="k">if</span> <span class="n">mp</span><span class="o">.</span><span class="n">current_process</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;MainProcess&#39;</span><span class="p">:</span>
-        <span class="n">setup_mp</span><span class="p">()</span>
-    <span class="n">setup_cuda</span><span class="p">()</span></div>
-
-
-<span class="n">initialize</span><span class="p">()</span>
+<div class="viewcode-block" id="is_cuda_available"><a class="viewcode-back" href="../data_juicer.html#data_juicer.is_cuda_available">[docs]</a><span class="k">def</span> <span class="nf">is_cuda_available</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">_CUDA_DEVICE_COUNT</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
 </pre></div>
 
            </div>

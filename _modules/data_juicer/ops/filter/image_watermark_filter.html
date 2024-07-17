@@ -111,6 +111,8 @@
 <span class="sd">        probability.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+
 <div class="viewcode-block" id="ImageWatermarkFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_watermark_model</span><span class="o">=</span><span class="s1">&#39;amrul-hzz/watermark_detector&#39;</span><span class="p">,</span>
                  <span class="n">prob_threshold</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
@@ -140,8 +142,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">any</span> <span class="o">=</span> <span class="p">(</span><span class="n">any_or_all</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
             <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
-            <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_watermark_model</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span></div>
+            <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_watermark_model</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ImageWatermarkFilter.compute_stats"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
@@ -159,7 +160,7 @@
         <span class="n">sample</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span>
                                                 <span class="n">loaded_image_keys</span><span class="p">,</span> <span class="n">load_image</span><span class="p">)</span>
 
-        <span class="n">model</span><span class="p">,</span> <span class="n">processor</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">processor</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
 
         <span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="n">images</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">images</span><span class="p">]</span>
         <span class="n">inputs</span> <span class="o">=</span> <span class="n">processor</span><span class="p">(</span><span class="n">images</span><span class="o">=</span><span class="n">images</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>

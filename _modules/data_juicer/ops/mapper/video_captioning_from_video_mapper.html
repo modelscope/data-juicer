@@ -122,6 +122,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to generate samples whose captions are generated based on</span>
 <span class="sd">    a video-to-text model and sampled video frame.&quot;&quot;&quot;</span>
 
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+
 <div class="viewcode-block" id="VideoCaptioningFromVideoMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoCaptioningFromVideoMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">hf_video_blip</span><span class="o">=</span><span class="s1">&#39;kpyu/video-blip-opt-2.7b-ego4d&#39;</span><span class="p">,</span>
@@ -196,7 +198,6 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
 
         <span class="k">if</span> <span class="n">keep_candidate_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
                 <span class="s1">&#39;random_any&#39;</span><span class="p">,</span> <span class="s1">&#39;similar_one_simhash&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span>
@@ -263,7 +264,7 @@
 
         <span class="n">text</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">model</span><span class="p">,</span> <span class="n">processor</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">processor</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
 
         <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="p">):</span>
 
