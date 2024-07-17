@@ -1,4 +1,7 @@
 # User Guide
+## Applications and Achievements
+Leveraging the Data-Juicer Sandbox Laboratory Suite, we systematically fine-tuned data and models through a dedicated research and development workflow between data and models. For more detailed information, please refer to our [paper](http://arxiv.org/abs/2407.11784). In our work, we have secured a new leading position on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard, and the model is now publicly available on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms. The associated sandbox experiment scripts and datasets are being actively prepared for release, so please look forward to it.
+
 ## What is DJ-Sandbox?
 In Data-Juicer, the data sandbox laboratory provides users with the best practices for continuously producing data recipes. It features low overhead, portability, and guidance. In the sandbox, users can quickly experiment, iterate, and refine data recipes based on small-scale datasets and models, before scaling up to produce high-quality data to serve large-scale models.
 

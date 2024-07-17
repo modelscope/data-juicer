@@ -1,4 +1,7 @@
 # 用户指南
+## 应用和成果
+我们利用Data-Juicer沙盒实验室套件，通过数据与模型间的系统性研发工作流，调优数据和模型，相关工作请参考[论文](http://arxiv.org/abs/2407.11784)。在本工作中，我们在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首，模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布。相关的沙盒实验脚本和数据集正在紧锣密鼓整理中，敬请期待。
+
 ## 什么是沙盒实验室（DJ-Sandbox）？
 在Data-Juicer中，数据沙盒实验室为用户提供了持续生产数据菜谱的最佳实践，其具有低开销、可迁移、有指导性等特点，用户在沙盒中基于一些小规模数据集、模型对数据菜谱进行快速实验、迭代、优化，再迁移到更大尺度上，大规模生产高质量数据以服务大模型。
 
