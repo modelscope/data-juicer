@@ -24,6 +24,8 @@ class VideoTaggingFromAudioMapper(Mapper):
     using the Audio Spectrogram Transformer.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_ast='MIT/ast-finetuned-audioset-10-10-0.4593',
                  *args,

@@ -176,6 +176,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         for key in temp_args:
             if key not in required_args:
                 args_dict.pop(key)
+        args_dict['accelerator'] = self.accelerator
         return args_dict
 
     def _process_single_sample(self, sample, rank=None):

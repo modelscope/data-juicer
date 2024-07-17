@@ -31,6 +31,8 @@ class VideoTaggingFromFramesMapper(Mapper):
     """Mapper to generate video tags from frames extract by video.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,

@@ -28,6 +28,8 @@ class VideoTaggingFromFramesFilter(Filter):
     """Filter to keep samples whose videos contain the given tags.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  tags: List[str] = ['people'],
                  contain: str = 'any',
@@ -81,6 +83,7 @@ class VideoTaggingFromFramesFilter(Filter):
         self.tagging_producer = VideoTaggingFromFramesMapper(
             frame_sampling_method=frame_sampling_method,
             frame_num=frame_num,
+            accelerator=self.accelerator,
         )
 
     def compute_stats(self, sample, rank=None, context=False):
