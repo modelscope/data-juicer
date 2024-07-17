@@ -149,9 +149,14 @@ class OP:
                 method = wrap_func_with_nested_access(method)
                 setattr(self, name, method)
 
-    def __call__(self, dataset, checkpointer=None, tracer=None):
+    def __call__(self,
+                 dataset,
+                 *,
+                 exporter=None,
+                 checkpointer=None,
+                 tracer=None):
         try:
-            dataset = self.run(dataset, tracer)
+            dataset = self.run(dataset, exporter=exporter, tracer=tracer)
             if checkpointer:
                 checkpointer.record(self._name, self._process_kwargs)
             return dataset
@@ -238,7 +243,7 @@ class Mapper(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, tracer=None):
+    def run(self, dataset, *, exporter=None, tracer=None):
         new_dataset = dataset.map(
             self.process,
             num_proc=self.runtime_np(),
@@ -297,7 +302,7 @@ class Filter(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, tracer=None):
+    def run(self, dataset, *, exporter=None, tracer=None):
         if Fields.stats not in dataset.features:
             from data_juicer.core.data import add_same_content_to_new_column
             dataset = dataset.map(add_same_content_to_new_column,
@@ -311,6 +316,8 @@ class Filter(OP):
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
                               desc=self._name + '_compute_stats')
+        if self.stats_export_path is not None:
+            exporter.export_compute_stats(dataset, self.stats_export_path)
         new_dataset = dataset.filter(self.process,
                                      num_proc=self.runtime_np(),
                                      desc=self._name + '_process')
@@ -362,7 +369,7 @@ class Deduplicator(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, tracer=None):
+    def run(self, dataset, *, exporter=None, tracer=None):
         dataset = dataset.map(self.compute_hash,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
@@ -400,7 +407,7 @@ class Selector(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, tracer=None):
+    def run(self, dataset, *, exporter=None, tracer=None):
         new_dataset = self.process(dataset)
         if tracer:
             tracer.trace_filter(self._name, dataset, new_dataset)

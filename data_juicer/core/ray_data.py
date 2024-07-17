@@ -90,6 +90,7 @@ class RayDataset(DJDataset):
 
     def process(self,
                 operators,
+                *,
                 exporter=None,
                 checkpointer=None,
                 tracer=None) -> DJDataset:
