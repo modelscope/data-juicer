@@ -39,6 +39,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
     a video-to-text model and sampled video frame."""
 
     _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(
         self,
@@ -112,8 +113,6 @@ class VideoCaptioningFromVideoMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-
-        self._batched_op = True
 
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'

@@ -40,6 +40,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
     frames will be concatenated to a single string."""
 
     _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(
         self,
@@ -112,8 +113,6 @@ class VideoCaptioningFromFramesMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-
-        self._batched_op = True
 
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'

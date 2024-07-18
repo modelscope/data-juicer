@@ -3,13 +3,11 @@ import shutil
 import unittest
 
 import numpy
-import pyarrow as pa
 import ray.data as rd
-from datasets import Dataset
 
 from data_juicer import is_cuda_available
-from data_juicer.ops import Filter
-from data_juicer.utils.constant import Fields
+from data_juicer.core.data import DJDataset, NestedDataset
+from data_juicer.core.ray_data import RayDataset
 from data_juicer.utils.registry import Registry
 
 SKIPPED_TESTS = Registry('SkippedTests')
@@ -61,7 +59,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
                 print('CLEAN all TRANSFORMERS_CACHE')
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
 
-    def generate_dataset(self, data):
+    def generate_dataset(self, data) -> DJDataset:
         """Generate dataset for a specific executor.
 
         Args:
@@ -70,38 +68,22 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         """
         current_tag = getattr(self, 'current_tag', 'standalone')
         if current_tag.startswith('standalone'):
-            return Dataset.from_list(data)
+            return NestedDataset.from_list(data)
         elif current_tag.startswith('ray'):
             dataset = rd.from_items(data)
-            if Fields.stats not in dataset.columns(fetch_if_missing=False):
-
-                def process_batch_arrow(table: pa.Table) -> pa.Table:
-                    new_column_data = [{} for _ in range(len(table))]
-                    new_talbe = table.append_column(Fields.stats,
-                                                    [new_column_data])
-                    return new_talbe
-
-                dataset = dataset.map_batches(process_batch_arrow,
-                                              batch_format='pyarrow')
-            return dataset
+            return RayDataset(dataset)
         else:
             raise ValueError('Unsupported type')
 
-    def run_single_op(self, dataset, op, column_names):
+    def run_single_op(self, dataset: DJDataset, op, column_names):
         """Run operator in the specific executor."""
         current_tag = getattr(self, 'current_tag', 'standalone')
+        dataset = dataset.process(op)
         if current_tag.startswith('standalone'):
-            if isinstance(op, Filter) and Fields.stats not in dataset.features:
-                dataset = dataset.add_column(name=Fields.stats,
-                                             column=[{}] * dataset.num_rows)
-            dataset = dataset.map(op.compute_stats)
-            dataset = dataset.filter(op.process)
             dataset = dataset.select_columns(column_names=column_names)
             return dataset.to_list()
         elif current_tag.startswith('ray'):
-            dataset = dataset.map(op.compute_stats)
-            dataset = dataset.filter(op.process)
-            dataset = dataset.to_pandas().get(column_names)
+            dataset = dataset.data.to_pandas().get(column_names)
             if dataset is None:
                 return []
             return dataset.to_dict(orient='records')

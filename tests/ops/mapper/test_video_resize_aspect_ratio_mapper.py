@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.mapper.video_resize_aspect_ratio_mapper import \
     VideoResizeAspectRatioMapper

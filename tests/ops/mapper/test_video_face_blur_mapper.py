@@ -2,7 +2,7 @@ import os
 import shutil
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.mapper.video_face_blur_mapper import VideoFaceBlurMapper
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase

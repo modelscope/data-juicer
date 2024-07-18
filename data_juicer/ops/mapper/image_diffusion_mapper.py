@@ -34,6 +34,7 @@ class ImageDiffusionMapper(Mapper):
     """
 
     _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(self,
                  hf_diffusion: str = 'CompVis/stable-diffusion-v1-4',
@@ -99,7 +100,6 @@ class ImageDiffusionMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
-        self._batched_op = True
         self.strength = strength
         self.guidance_scale = guidance_scale
         self.aug_num = aug_num
@@ -112,7 +112,6 @@ class ImageDiffusionMapper(Mapper):
                 hf_img2seq=hf_img2seq,
                 keep_original_sample=False,
                 prompt=self.prompt)
-
         self.model_key = prepare_model(
             model_type='diffusion',
             pretrained_model_name_or_path=hf_diffusion,

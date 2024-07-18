@@ -2,7 +2,7 @@ import os
 import unittest
 
 import librosa
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.mapper.audio_ffmpeg_wrapped_mapper import \
     AudioFFmpegWrappedMapper

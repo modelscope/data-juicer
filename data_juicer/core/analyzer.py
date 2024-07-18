@@ -5,12 +5,9 @@ from loguru import logger
 from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
 from data_juicer.format import load_formatter
-from data_juicer.ops import UNFORKABLE, Filter, load_ops
+from data_juicer.ops import Filter, load_ops
 from data_juicer.utils import cache_utils
-from data_juicer.utils.constant import Fields
-from data_juicer.utils.process_utils import calculate_np, setup_mp
 
-from .data import add_same_content_to_new_column
 from .exporter import Exporter
 
 
@@ -84,37 +81,16 @@ class Analyzer:
         logger.info('Preparing process operators...')
         self.cfg.process, self.ops = load_ops(self.cfg.process,
                                               self.cfg.op_fusion)
-        unforkable_op_list = set(UNFORKABLE.modules.keys())
 
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')
         stats_collected = False
-        for op_cfg, op in zip(self.cfg.process, self.ops):
-            op_name = list(op_cfg.keys())[0]
-            with_rank = op.use_cuda()
-            if op.num_proc != 0:
-                op_proc = op.num_proc
-                logger.info(f'Op [{op_name}] running with sepcified '
-                            f'number of procs:{op.num_proc}')
-            else:
-                op_proc = calculate_np(self.cfg.np, op, op_name)
-            mp_method = ['forkserver', 'spawn'
-                         ] if op_name in unforkable_op_list else None
-            setup_mp(mp_method)
+        for op in self.ops:
             if isinstance(op, Filter):
-                if Fields.stats not in dataset.features:
-                    # only add stats when calling filter op
-                    dataset = dataset.map(add_same_content_to_new_column,
-                                          fn_kwargs={
-                                              'new_column_name': Fields.stats,
-                                              'initial_value': {}
-                                          },
-                                          num_proc=self.cfg.np,
-                                          desc='Adding new column for stats')
-                dataset = dataset.map(op.compute_stats,
-                                      num_proc=op_proc,
-                                      with_rank=with_rank,
-                                      desc=op_name + '_compute_stats')
+                original_process = op.process
+                op.process = None
+                dataset = dataset.process(op)
+                op.process = original_process
                 stats_collected = True
         if not stats_collected:
             logger.warning('No stats collected. Please add some Filter ops to '

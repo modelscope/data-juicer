@@ -3,7 +3,7 @@ import shutil
 import unittest
 
 from data_juicer import _cuda_device_count
-from data_juicer.core.data import NestedDataset
+from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.image_diffusion_mapper import ImageDiffusionMapper
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
@@ -33,7 +33,7 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
         super().tearDownClass(cls.hf_img2seq)
 
     def _run_mapper(self,
-                    dataset: NestedDataset,
+                    dataset: Dataset,
                     op,
                     move_to_dir,
                     num_proc=1,
@@ -61,7 +61,7 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
             'images': [self.cat_path]
         }]
         aug_num = 3
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageDiffusionMapper(hf_diffusion=self.hf_diffusion,
                                   strength=1.0,
                                   aug_num=aug_num,
@@ -81,7 +81,7 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
         }]
 
         aug_num = 2
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageDiffusionMapper(hf_diffusion=self.hf_diffusion,
                                   aug_num=aug_num,
                                   keep_original_sample=False,
@@ -103,7 +103,7 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
         }]
 
         aug_num = 1
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageDiffusionMapper(hf_diffusion=self.hf_diffusion,
                                   aug_num=aug_num,
                                   keep_original_sample=False,
@@ -125,7 +125,7 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
         }]
 
         aug_num = 2
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageDiffusionMapper(hf_diffusion=self.hf_diffusion,
                                   aug_num=aug_num,
                                   keep_original_sample=False,
@@ -147,7 +147,7 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
         }]
 
         aug_num = 1
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageDiffusionMapper(hf_diffusion=self.hf_diffusion,
                                   torch_dtype='fp16',
                                   revision='fp16',
@@ -171,7 +171,7 @@ class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
         }]
 
         aug_num = 1
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageDiffusionMapper(hf_diffusion=self.hf_diffusion,
                                   aug_num=aug_num,
                                   keep_original_sample=False,

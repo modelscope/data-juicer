@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from data_juicer.core.data import NestedDataset
+from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.video_tagging_from_audio_mapper import \
     VideoTaggingFromAudioMapper
 from data_juicer.utils.constant import Fields
@@ -30,7 +30,7 @@ class VideoTaggingFromAudioMapperTest(DataJuicerTestCaseBase):
                                              source_list,
                                              target_list,
                                              num_proc=1):
-        dataset = NestedDataset.from_list(source_list)
+        dataset = Dataset.from_list(source_list)
         dataset = dataset.map(op.process, num_proc=num_proc)
         res_list = dataset.select_columns([Fields.video_audio_tags
                                            ])[Fields.video_audio_tags]

@@ -49,31 +49,34 @@ def get_min_cuda_memory():
     return min_cuda_memory
 
 
-def calculate_np(num_proc, op, op_name):
+def calculate_np(name,
+                 mem_required,
+                 cpu_required,
+                 num_proc=None,
+                 use_cuda=False):
     """Calculate the optimum number of processes for the given OP"""
     if num_proc is None:
         num_proc = psutil.cpu_count()
-    if op.use_cuda():
+    if use_cuda:
         cuda_mem_available = get_min_cuda_memory() / 1024
         op_proc = min(
             num_proc,
-            math.floor(cuda_mem_available / (op.mem_required + 0.1)) *
+            math.floor(cuda_mem_available / (mem_required + 0.1)) *
             cuda_device_count())
-        if op.use_cuda() and op.mem_required == 0:
-            logger.warning(f'The required cuda memory of Op[{op_name}] '
+        if use_cuda and mem_required == 0:
+            logger.warning(f'The required cuda memory of Op[{name}] '
                            f'has not been specified. '
                            f'Please specify the mem_required field in the '
                            f'config file, or you might encounter CUDA '
                            f'out of memory error. You can reference '
                            f'the mem_required field in the '
-                           f'config_all.yaml file. ')
+                           f'config_all.yaml file.')
         if op_proc < 1.0:
-            logger.warning(
-                f'The required cuda memory:{op.mem_required}GB might '
-                f'be more than the available cuda memory:'
-                f'{cuda_mem_available}GB.'
-                f'This Op [{op_name}] might '
-                f'require more resource to run.')
+            logger.warning(f'The required cuda memory:{mem_required}GB might '
+                           f'be more than the available cuda memory:'
+                           f'{cuda_mem_available}GB.'
+                           f'This Op[{name}] might '
+                           f'require more resource to run.')
         op_proc = max(op_proc, 1)
         return op_proc
     else:
@@ -81,15 +84,15 @@ def calculate_np(num_proc, op, op_name):
         cpu_available = psutil.cpu_count()
         mem_available = psutil.virtual_memory().available
         mem_available = mem_available / 1024**3
-        op_proc = min(op_proc, math.floor(cpu_available / op.cpu_required))
+        op_proc = min(op_proc, math.floor(cpu_available / cpu_required))
         op_proc = min(op_proc,
-                      math.floor(mem_available / (op.mem_required + 0.1)))
+                      math.floor(mem_available / (mem_required + 0.1)))
         if op_proc < 1.0:
-            logger.warning(f'The required CPU number:{op.cpu_required} '
-                           f'and memory:{op.mem_required}GB might '
+            logger.warning(f'The required CPU number:{cpu_required} '
+                           f'and memory:{mem_required}GB might '
                            f'be more than the available CPU:{cpu_available} '
                            f'and memory :{mem_available}GB.'
-                           f'This Op [{op_name}] might '
+                           f'This Op [{name}] might '
                            f'require more resource to run.')
         op_proc = max(op_proc, 1)
         return op_proc
