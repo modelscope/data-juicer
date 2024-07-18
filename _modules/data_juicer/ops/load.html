@@ -116,6 +116,9 @@
     <span class="k">if</span> <span class="n">op_fusion</span><span class="p">:</span>
         <span class="n">new_process_list</span><span class="p">,</span> <span class="n">ops</span> <span class="o">=</span> <span class="n">fuse_operators</span><span class="p">(</span><span class="n">new_process_list</span><span class="p">,</span> <span class="n">ops</span><span class="p">)</span>
 
+    <span class="k">for</span> <span class="n">process</span><span class="p">,</span> <span class="n">op</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">new_process_list</span><span class="p">,</span> <span class="n">ops</span><span class="p">):</span>
+        <span class="n">op</span><span class="o">.</span><span class="n">_process_kwargs</span> <span class="o">=</span> <span class="n">process</span>
+
     <span class="k">return</span> <span class="n">new_process_list</span><span class="p">,</span> <span class="n">ops</span></div>
 </pre></div>
 

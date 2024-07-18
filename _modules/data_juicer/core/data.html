@@ -82,20 +82,41 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.core.data</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetDict</span><span class="p">,</span> <span class="n">is_caching_enabled</span>
 <span class="kn">from</span> <span class="nn">datasets.formatting.formatting</span> <span class="kn">import</span> <span class="n">LazyBatch</span>
 <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
 
+<span class="kn">from</span> <span class="nn">data_juicer.ops</span> <span class="kn">import</span> <span class="n">UNFORKABLE</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils</span> <span class="kn">import</span> <span class="n">cache_utils</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.compress</span> <span class="kn">import</span> <span class="p">(</span><span class="n">CompressionOff</span><span class="p">,</span>
                                         <span class="n">cleanup_compressed_cache_files</span><span class="p">,</span>
                                         <span class="n">compress</span><span class="p">,</span> <span class="n">decompress</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.fingerprint_utils</span> <span class="kn">import</span> <span class="n">generate_fingerprint</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.process_utils</span> <span class="kn">import</span> <span class="n">setup_mp</span>
+
+
+<span class="k">class</span> <span class="nc">DJDataset</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base dataset of DJ&quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">operators</span><span class="p">,</span>  <span class="c1"># TODO: add type hint</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">exporter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">checkpointer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">tracer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DJDataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;process a list of operators on the dataset.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
 
 
 <span class="k">def</span> <span class="nf">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
@@ -200,7 +221,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="NestedDataset"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset">[docs]</a><span class="k">class</span> <span class="nc">NestedDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<div class="viewcode-block" id="NestedDataset"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset">[docs]</a><span class="k">class</span> <span class="nc">NestedDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">DJDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced HuggingFace-Dataset for better usability and efficiency.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="NestedDataset.__init__"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
@@ -223,6 +244,40 @@
             <span class="n">res</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 
+<div class="viewcode-block" id="NestedDataset.process"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">operators</span><span class="p">,</span>
+                <span class="o">*</span><span class="p">,</span>
+                <span class="n">exporter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">checkpointer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">tracer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">operators</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">operators</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">operators</span> <span class="o">=</span> <span class="p">[</span><span class="n">operators</span><span class="p">]</span>
+        <span class="n">unforkable_operators</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">UNFORKABLE</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operators</span><span class="p">:</span>
+            <span class="n">mp_context</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;forkserver&#39;</span><span class="p">,</span> <span class="s1">&#39;spawn&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()</span> <span class="ow">or</span> <span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">unforkable_operators</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">setup_mp</span><span class="p">(</span><span class="n">mp_context</span><span class="p">)</span>
+
+            <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="c1"># run single op</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>
+                         <span class="n">exporter</span><span class="o">=</span><span class="n">exporter</span><span class="p">,</span>
+                         <span class="n">checkpointer</span><span class="o">=</span><span class="n">checkpointer</span><span class="p">,</span>
+                         <span class="n">tracer</span><span class="o">=</span><span class="n">tracer</span><span class="p">)</span>
+            <span class="c1"># record processed ops</span>
+            <span class="k">if</span> <span class="n">checkpointer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">checkpointer</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>
+                                    <span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;OP [</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s1">] Done in </span><span class="si">{</span><span class="n">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">s. &#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;Left </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span></div>
+
 <div class="viewcode-block" id="NestedDataset.map"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.map">[docs]</a>    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the map func, which is called by most common operations,</span>
 <span class="sd">        such that the processed samples can be accessed by nested manner.&quot;&quot;&quot;</span>
@@ -242,16 +297,16 @@
                     <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">])</span>
             <span class="n">called_func</span> <span class="o">=</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span>
 
-        <span class="c1"># For wrapped function, try to get its original unwrapped method</span>
-        <span class="k">while</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">called_func</span><span class="p">,</span> <span class="s1">&#39;__wrapped__&#39;</span><span class="p">):</span>
+        <span class="c1"># For wrapped function, try to get its unwrapped (bound) method</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">called_func</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
+                <span class="n">called_func</span><span class="p">,</span> <span class="s1">&#39;__wrapped__&#39;</span><span class="p">):</span>
             <span class="n">called_func</span> <span class="o">=</span> <span class="n">called_func</span><span class="o">.</span><span class="n">__wrapped__</span>
-        <span class="c1"># Does the called function belong to a batched OP?</span>
-        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">called_func</span><span class="p">)</span> \
-                <span class="ow">and</span> <span class="s1">&#39;is_batched_op&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">)</span> \
-                <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span> <span class="s1">&#39;is_batched_op&#39;</span><span class="p">))</span> \
-                <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
+
+        <span class="c1"># Batched is always required for fault tolerance</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">called_func</span><span class="p">):</span>
             <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batched&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+                <span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">()</span> <span class="k">else</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="s1">&#39;new_fingerprint&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">new_fingerprint</span> <span class="o">=</span> <span class="n">generate_fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
