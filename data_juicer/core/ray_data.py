@@ -96,7 +96,7 @@ class RayDataset(DJDataset):
                 tracer=None) -> DJDataset:
         if operators is None:
             return self
-        elif not isinstance(operators, list):
+        if not isinstance(operators, list):
             operators = [operators]
         for op in operators:
             self._run_single_op(op)

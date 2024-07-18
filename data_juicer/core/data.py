@@ -11,11 +11,13 @@ from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
+from data_juicer.ops import UNFORKABLE
 from data_juicer.utils import cache_utils
 from data_juicer.utils.compress import (CompressionOff,
                                         cleanup_compressed_cache_files,
                                         compress, decompress)
 from data_juicer.utils.fingerprint_utils import generate_fingerprint
+from data_juicer.utils.process_utils import setup_mp
 
 
 class DJDataset(ABC):
@@ -159,34 +161,37 @@ class NestedDataset(Dataset, DJDataset):
         return nested_obj_factory(res)
 
     def process(self,
-                operator,
+                operators,
                 *,
                 exporter=None,
                 checkpointer=None,
                 tracer=None):
-        if operator is None:
+        if operators is None:
             return self
 
-        if not isinstance(operator, list):
-            ops = [operator]
-        else:
-            ops = operator
+        if not isinstance(operators, list):
+            operators = [operators]
+        unforkable_operators = set(UNFORKABLE.modules.keys())
 
-        start = time()
-        tstart = start
         dataset = self
-        for op in ops:
+        for op in operators:
+            mp_context = ['forkserver', 'spawn'] if (
+                op.use_cuda() or op._name in unforkable_operators) else None
+            setup_mp(mp_context)
+
+            start = time()
+            # run single op
             dataset = op(dataset,
                          exporter=exporter,
                          checkpointer=checkpointer,
                          tracer=tracer)
+            # record processed ops
+            if checkpointer is not None:
+                checkpointer.record(op._name,
+                                    list(op._process_kwargs.values())[0])
             end = time()
-            logger.info(
-                f'OP [{op._name}] Done in {"%.3f" % (end - start)}(s). '
-                f'Left {len(dataset)} samples.')
-            start = end
-        tend = time()
-        logger.info(f'All OPs are done in {"%.3f" % (tend - tstart)}(s).')
+            logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
+                        f'Left {len(dataset)} samples.')
         return dataset
 
     def map(self, *args, **kargs):

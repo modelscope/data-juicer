@@ -1,4 +1,5 @@
-[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
+[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://modelscope.github.io/data-juicer) |  [[DJ-SORA]](docs/DJ_SORA.md) | [[Awesome List]](docs/awesome_llm_data.md)
+
 
 # Data-Juicer:  A One-Stop Data Processing System for Large Language Models
 
@@ -27,32 +28,28 @@
 Data-Juicer is a one-stop **multimodal** data processing system to make data higher-quality,
 juicier, and more digestible for LLMs.
 
-Data-Juicer (including [DJ-SORA](docs/DJ_SORA.md)) is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets. 
-We welcome you to join us in promoting LLM data development and research!
 
-We provide a [Playground](http://8.130.100.170/) with a managed JupyterLab. [Try Data-Juicer](http://8.130.100.170/) straight away in your browser!
+We provide a [playground](http://8.130.100.170/) with a managed JupyterLab. [Try Data-Juicer](http://8.130.100.170/) straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly cite our [work](#references).
 
-If you find Data-Juicer useful for your research or development, please kindly cite our [work](#references).
-Welcome any issues/PRs and to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw) 
-or [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) for discussion!
+Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets. 
+We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw)  channel, [DingDing](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) group, ...), in promoting data-model co-development along with research and applications of (multimodal) LLMs!
 
 ----
 
 ## News
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-17] We utilized the Data-Juicer [Sandbox Laboratory Suite](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox.md) to systematically optimize data and models through an co-development workflow between data and models, achieving a new top spot on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard. The related achievements have been compiled and published in a [paper](http://arxiv.org/abs/2407.11784), and the model has been released on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms.
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-12] Our *awesome list of MLLM-Data* has evolved into a systemic [survey](https://arxiv.org/abs/2407.08583) from model-data co-development perspective. Welcome to [explore](docs/awesome_llm_data.md) and contribute!
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-06-01] ModelScope-Sora "Data Directors" creative sprint—Our third data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532219) for more information.
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)** now! 
+- [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)** now! 
 In this new version, we support more features for **multimodal data (including video now)**, and introduce **[DJ-SORA](docs/DJ_SORA.md)** to provide open large-scale, high-quality datasets for SORA-like models.
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-02-20] We have actively maintained an *awesome list of LLM-Data*, welcome to [visit](docs/awesome_llm_data.md) and contribute!
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
+- [2024-02-20] We have actively maintained an *awesome list of LLM-Data*, welcome to [visit](docs/awesome_llm_data.md) and contribute!
+- [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
 - [2024-01-10] Discover new horizons in "Data Mixture"—Our second data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532174) for more information.
 - [2024-01-05] We release **Data-Juicer v0.1.3** now! 
 In this new version, we support **more Python versions** (3.8-3.10), and support **multimodal** dataset [converting](tools/multimodal/README.md)/[processing](docs/Operators.md) (Including texts, images, and audios. More modalities will be supported in the future).
 Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
-
 - [2023-10-13] Our first data-centric LLM competition begins! Please
   visit the competition's official websites, FT-Data Ranker ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), for more information.
-
-- [2023-10-8] We update our paper to the 2nd version and release the corresponding version 0.1.2 of Data-Juicer!
 
 Table of Contents
 =================
@@ -280,17 +277,17 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 
 
 ### Data Analysis
-- Run `analyze_data.py` tool or `dj-analyze` command line tool with your config as the argument to analyse your dataset.
+- Run `analyze_data.py` tool or `dj-analyze` command line tool with your config as the argument to analyze your dataset.
 
 ```shell
 # only for installation from source
-python tools/analyze_data.py --config configs/demo/analyser.yaml
+python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # use command line tool
-dj-analyze --config configs/demo/analyser.yaml
+dj-analyze --config configs/demo/analyzer.yaml
 ```
 
-- **Note:** Analyser only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
+- **Note:** Analyzer only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
 
 ### Data Visualization
 
@@ -414,8 +411,8 @@ Data-Juicer thanks and refers to several community projects, such as
 If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2309.02033).
 ```
 @inproceedings{chen2024datajuicer,
-title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
-author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
+  title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
+  author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
   booktitle={International Conference on Management of Data},
   year={2024}
 }

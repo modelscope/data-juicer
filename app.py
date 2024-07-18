@@ -18,7 +18,7 @@ from loguru import logger
 from data_juicer.analysis.diversity_analysis import (DiversityAnalysis,
                                                      get_diversity)
 from data_juicer.config import init_configs
-from data_juicer.core import Analyser, Executor
+from data_juicer.core import Analyzer, Executor
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.logger_utils import get_log_file_path
@@ -134,7 +134,7 @@ def analyze_and_show_res():
     cfg['save_stats_in_one_file'] = True
 
     logger.info('=========Stage 1: analyze original data=========')
-    analyzer = Analyser(cfg)
+    analyzer = Analyzer(cfg)
     dataset = analyzer.run()
 
     overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
@@ -171,7 +171,7 @@ def process_and_show_res():
 
         cfg_for_processed_data.export_path = os.path.dirname(
             cfg.export_path) + '_processed/data.jsonl'
-        analyzer = Analyser(cfg_for_processed_data)
+        analyzer = Analyzer(cfg_for_processed_data)
         analyzer.analysis_path = os.path.dirname(
             cfg_for_processed_data.export_path) + '/analysis'
         analyzer.run()
@@ -460,7 +460,7 @@ class Visualize:
                                           max_value=100,
                                           step=1)
 
-                diversity_btn = st.button('Analyse_diversity',
+                diversity_btn = st.button('Analyze_diversity',
                                           use_container_width=True)
                 output_path = os.path.join(os.path.dirname(cfg.export_path),
                                            'analysis')

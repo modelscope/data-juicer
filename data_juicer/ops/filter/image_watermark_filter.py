@@ -27,6 +27,8 @@ class ImageWatermarkFilter(Filter):
         probability.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_watermark_model='amrul-hzz/watermark_detector',
                  prob_threshold: ClosedUnitInterval = 0.8,
@@ -57,7 +59,6 @@ class ImageWatermarkFilter(Filter):
         self.model_key = prepare_model(
             model_type='huggingface',
             pretrained_model_name_or_path=hf_watermark_model)
-        self._accelerator = 'cuda'
 
     def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
@@ -75,7 +76,7 @@ class ImageWatermarkFilter(Filter):
         sample, images = load_data_with_context(sample, context,
                                                 loaded_image_keys, load_image)
 
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         images = [images[key] for key in images]
         inputs = processor(images=images, return_tensors='pt').to(model.device)

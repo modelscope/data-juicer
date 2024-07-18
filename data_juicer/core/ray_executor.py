@@ -62,10 +62,10 @@ class RayExecutor:
         logger.info('Processing data...')
         tstart = time.time()
         dataset.process(self.ops)
+        tend = time.time()
+        logger.info(f'All Ops are done in {tend - tstart:.3f}s.')
 
         # 4. data export
         logger.info('Exporting dataset to disk...')
         dataset.data.write_json(self.cfg.export_path, force_ascii=False)
-        tend = time.time()
-        logger.info(f'All Ops are done in {"%.3f" % (tend - tstart)}(s).')
         return dataset

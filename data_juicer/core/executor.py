@@ -1,5 +1,6 @@
 import os
 import traceback
+from time import time
 
 from loguru import logger
 
@@ -161,10 +162,13 @@ class Executor:
         # - If tracer is open, trace each op after it's processed
         # - If checkpoint is open, clean the cache files after each process
         logger.info('Processing data...')
+        tstart = time()
         dataset = dataset.process(self.ops,
                                   exporter=self.exporter,
                                   checkpointer=self.ckpt_manager,
                                   tracer=self.tracer)
+        tend = time()
+        logger.info(f'All OPs are done in {tend - tstart:.3f}s.')
 
         # 4. data export
         logger.info('Exporting dataset to disk...')

@@ -9,7 +9,7 @@ from data_juicer.utils.mm_utils import (extract_key_frames,
                                         load_data_with_context, load_video)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_tagging_from_frames_mapper'
@@ -24,11 +24,14 @@ with AvailabilityChecking(
     torch.set_num_threads(1)
 
 
+@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoTaggingFromFramesMapper(Mapper):
     """Mapper to generate video tags from frames extract by video.
     """
+
+    _accelerator = 'cuda'
 
     def __init__(self,
                  frame_sampling_method: str = 'all_keyframes',
@@ -83,7 +86,7 @@ class VideoTaggingFromFramesMapper(Mapper):
         sample, videos = load_data_with_context(sample, context,
                                                 loaded_video_keys, load_video)
 
-        model = get_model(self.model_key, rank=rank)
+        model = get_model(self.model_key, rank, self.use_cuda())
         video_tags = []
         for _, value in enumerate(loaded_video_keys):
             video = videos[value]

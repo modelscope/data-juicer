@@ -1,4 +1,8 @@
 # User Guide
+## Applications and Achievements
+Leveraging the Data-Juicer Sandbox Laboratory Suite, we systematically fine-tuned data and models through a dedicated research and development workflow between data and models. For more detailed information, please refer to our [paper](http://arxiv.org/abs/2407.11784). In our work, we have secured a new leading position on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard, and the model is now publicly available on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms. The associated sandbox experiment scripts and datasets are being actively prepared for release, so please look forward to it.
+![top-1_in_vbench](https://img.alicdn.com/imgextra/i3/O1CN01Ssg83y1EPbDgTzexn_!!6000000000344-2-tps-2966-1832.png)
+
 ## What is DJ-Sandbox?
 In Data-Juicer, the data sandbox laboratory provides users with the best practices for continuously producing data recipes. It features low overhead, portability, and guidance. In the sandbox, users can quickly experiment, iterate, and refine data recipes based on small-scale datasets and models, before scaling up to produce high-quality data to serve large-scale models.
 
@@ -9,51 +13,74 @@ Before using sandbox, you might need to install sandbox-related third-party depe
 ```shell
 pip install -v -e .[sandbox]
 
-pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
 ```
 
 **NOTICE**: some sandbox-related dependencies require extra domain dependencies. For example, if users want to train an NLP model from ModelScope
 in the sandbox, you might need to install extra `nlp` dependencies for `modelscope` library (see the [installation docs](https://modelscope.cn/docs/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85)).
+For example, when using VBench to benchmark videos, it is necessary to install Detectron2. The following branch is recommended for installation.
+```shell
+pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
+```
 So if some Module-Not-Found errors are raised by these third-party libraries when running the sandbox, users need to check their docs first.
 
 ### Prepare Configuration Files for Sandbox
-The configuration file of the sandbox includes several additional parameters in addition to the configuration of Data-Juicer. These parameters are used to specify the configuration information for model training, inference, evaluation, and other steps that may run in the sandbox pipeline. For the complete set of additional parameters, please refer to the "for sandbox or hpo" section in the [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml). An example of a sandbox configuration file can be found in `configs/demo/sandbox/sandbox.yaml`:
+The sandbox will sequentially execute four types of jobs: Data/Model Probe (`probe_job_configs`), Iterative Recipe Refinement based on Probe Results(`refine_recipe_job_configs`), Dataset Processing and Model Training (`execution_job_configs`) and Data/Model Evaluation (`evaluation_job_configs`). Within each category of jobs, jobs are carried out in the order specified by the configured job list. Each task requires specifying: the hook for mounting this job (`hook`), the tag name for recording intermediate results (`meta_name`), Data-Juicer data processing parameters (`dj_configs`), as well as other specific parameters for the job (`extra_configs`). Among these parameters, hook is required, while others may be left empty. dj_configs can refer to the full Data-Juicer data processing parameters available in [config_all.yaml](https://github.com/modelscope/data-juicer/blob/main/configs/config_all.yaml). The `extra_configs` are task-specific parameters without restrictions. They can include parameters for model training, inference, evaluation, etc. For example, `path_k_sigma_recipe` can be used to specify the path for saving the data recipe refined using the k-sigma method. An example of a sandbox configuration file can be found at `configs/demo/sandbox/sandbox.yaml`:
 ```yaml
-# Sandbox config example for dataset
+# Sandbox config example
 
 # global parameters
 project_name: 'demo-sandbox'
-dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
-np: 4  # number of subprocess to process your dataset
+experiment_name: 'demo-sandbox-run0'              # for wandb tracer name
+hpo_config: null                                  # path to a configuration file when using auto-HPO tool.
 
-export_path: './outputs/demo-sandbox/demo-sandbox.jsonl'
+# configs for each job, the jobs will be executed according to the order in the list
+probe_job_configs:
+  - hook: 'ProbeViaAnalyzerHook'
+    meta_name: 'analysis_ori_data'
+    dj_configs: 'configs/demo/process.yaml'
+    extra_configs:
 
-# sandbox configs
-# for refining recipe using k-sigma rules
-path_k_sigma_recipe: './outputs/demo-sandbox/k_sigma_new_recipe.yaml'
+refine_recipe_job_configs:
+  - hook: 'RefineRecipeViaKSigmaHook'
+    meta_name: 'analysis_ori_data'
+    dj_configs: 'configs/demo/process.yaml'
+    extra_configs:
+      path_k_sigma_recipe: './outputs/demo-process/k_sigma_new_recipe.yaml'
 
-# for gpt3 quality classifier as data evaluator
-data_eval_config: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
-#data_eval_config:
-#  type: dj_text_quality_classifier
+execution_job_configs:
+  - hook: 'ProcessDataHook'
+    meta_name:
+    dj_configs: './outputs/demo-process/k_sigma_new_recipe.yaml'
+    extra_configs:
+  - hook: 'TrainModelHook'
+    meta_name:
+    dj_configs:
+    extra_configs: 'configs/demo/sandbox/gpt3_extra_train_config.json'
 
-# for gpt3 model training
-model_train_config: 'configs/demo/sandbox/gpt3_extra_train_config.json'
-
-# process schedule
-# a list of several process operators with their arguments
-process:
-  - language_id_score_filter:
-      lang: 'zh'
-      min_score: 0.5
+evaluation_job_configs:
+  - hook: 'ProbeViaAnalyzerHook'
+    meta_name: 'analysis_processed_data'
+    dj_configs: 'configs/demo/process.yaml'
+    extra_configs:
+  - hook: 'EvaluateDataHook'
+    meta_name: 'eval_data'
+    dj_configs:
+    extra_configs: 'configs/demo/sandbox/gpt3_data_quality_eval_config.yaml'
 ```
-In the example configuration file, in addition to the Data-Juicer data processing related configurations, there are three additional parameters:
+Based on this configuration file, sandbox:
 
-- `path_k_sigma_recipe`: Used to specify the save path for the refined recipe using the k-sigma method.
-- `data_eval_config`: Used to specify the configuration file path for the data evaluation step. This part of the configuration can also be directly added as a dictionary under this field.
-- `model_train_config`: Used to specify the configuration file path for training models using the processed data.
+1. Execute the Data-Juicer data analysis function to calculate specified metrics for each piece of data, for example, in `configs/demo/process.yaml`, the `language_id_score_filter` is designated to calculate language scores.
 
-Additional configuration files can support both YAML and JSON formats, and their contents need to be specifically defined based on the implementation of each component used in each step, as well as the models and evaluation support. The specific configuration contents of the steps involved in this example above can be referred to as configuration file contents in the corresponding path.
+2. With the results from Data-Juicer data analysis, fine-tune the data recipe using the k-sigma method. Note that the `meta_name` here must be set the same as the `meta_name` used during data analysis to utilize the results.
+
+3. Execute Data-Juicer's data filtering function with the data recipe fine-tuned by the k-sigma method.
+
+4. Train the model with the filtered data.
+
+5. Analyze the data after filtering.
+
+6. Score the data after filtering with a scorer.
+
 ### Start Sandbox
 The entry point for running the sandbox is `tools/sandbox_starter.py`. The usage is similar to the data processing and analysis tool, requiring specifying the sandbox configuration file:
 ```yaml
@@ -115,6 +142,7 @@ Currently, components are mainly divided into two major categories:
 
 - **Executor**: Since the data executor is already handled by the Data-Juicer's Executor, the executor here specifically refers to the model executor, including model training, inference, evaluation, etc. The code is located in `data_juicer/core/sandbox/model_executors.py`.
 - **Evaluator**: Used for evaluating the quality and performance of datasets or models. The code is located in `data_juicer/core/sandbox/evaluators.py`.
+- **Hook**: Used to mount tasks onto the pipeline. The code is located in `data_juicer/core/sandbox/hooks.py`.
 ### Executor
 The core function of the model executor is to train, infer, or evaluate the model specified in the configuration file with the specified dataset. The model executor needs to inherit from `BaseModelExecutor` and implement several core methods:
 
@@ -133,7 +161,7 @@ The core function of the evaluator is to evaluate the quality and performance of
 - `eval_obj`: The object to be evaluated.
 
 Users can also extend the usage of these two parameters based on their implementation.
-## Pipeline Hook and Job List
+## Pipeline Hook
 As mentioned at the start of this section, in the pipeline, we need to implement several hooks to connect components with the pipeline execution steps through the job list. Activated hooks will be registered in the pipeline's job list and then executed one by one during the pipeline execution at each step. The job lists for the four corresponding steps are as follows:
 
 1. **Data/Model Probe**: Probe job list -- probe_jobs
@@ -143,25 +171,22 @@ As mentioned at the start of this section, in the pipeline, we need to implement
 
 In general, we only need to implement one type of hook function for a type of component factory. In addition to hooks that depend on components, some hooks depend on the existing functionality and tools of Data-Juicer or other third-party libraries. The correspondence among these hooks, dependent components, tools, and job lists is as follows:
 
-| Hook | Function | Dependent Component Factory | Dependent Tool or Library | Registered Job List | Activation Method<br />(Default Pipeline Orchestration) |
-| --- | --- | --- | --- | --- | --- |
-| `hook_probe_via_analyzer` | Analyse and probe the quality and diversity distribution of the dataset | - | Data-Juicer Analyser | <br />- probe_jobs<br />- evaluation_jobs<br /> | Always |
-| `hook_probe_via_model_infer` | Analyze and understand the impact of the dataset on the model, explore and probe "difficult" and "dirty" data | ModelInferExecutorFactory | - | <br />- probe_jobs<br />- evaluation_jobs<br /> | There are valid `model_infer_config` parameters in the sandbox configuration |
-| `hook_refine_recipe_via_k_sigma` | Refine data recipe hyperparameters using the k-sigma method based on the probe results of the dataset | - | k-sigma recipe refinement tool of Data-Juicer Hyperparameter Optimization (HPO) toolkit | <br />- refine_recipe_jobs<br /> | There are valid `path_k_sigma_recipe` parameters in the sandbox configuration to specify the path to save the refined recipe |
-| `hook_refine_recipe_via_model_feedback` | Refine data recipe hyperparameters using model probe and feedback results | TODO | - | <br />- refine_recipe_jobs<br /> | There are valid `path_model_feedback_recipe` parameters in the sandbox configuration to specify the path to save the refined recipe |
+| Hook | Function | Dependent Component Factory | Dependent Tool or Library | Registered Job List |
+| --- | --- | --- | --- | --- |
+| `hook_probe_via_analyzer` | Analyze and probe the quality and diversity distribution of the dataset | - | Data-Juicer Analyzer | <br />- probe_jobs<br />- evaluation_jobs<br /> |
+| `hook_probe_via_model_infer` | Analyze and understand the impact of the dataset on the model, explore and probe "difficult" and "dirty" data | ModelInferExecutorFactory | - | <br />- probe_jobs<br />- evaluation_jobs<br /> |
+| `hook_refine_recipe_via_k_sigma` | Refine data recipe hyperparameters using the k-sigma method based on the probe results of the dataset | - | k-sigma recipe refinement tool of Data-Juicer Hyperparameter Optimization (HPO) toolkit | <br />- refine_recipe_jobs<br /> |
+| `hook_refine_recipe_via_model_feedback` | Refine data recipe hyperparameters using model probe and feedback results | TODO | - | <br />- refine_recipe_jobs<br /> |
 | `hook_process_data` | Process and clean the dataset based on the current data recipe | - | Data-Juicer Executor | <br />- execution_jobs<br /> | Always |
-| `hook_train_model` | Train a model based on the current dataset | ModelTrainExecutorFactory | - | <br />- execution_jobs<br /> | There are valid `model_train_config` parameters in the sandbox configuration |
-| `hook_evaluate_data` | Evaluate the dataset in terms of data quality and other dimensions | DataEvaluatorFactory | - | <br />- evaluation_jobs<br /> | There are valid `data_eval_config` parameters in the sandbox configuration |
-| `hook_evaluate_model` | Evaluate the trained model | ModelEvaluatorFactory | - | <br />- evaluation_jobs<br /> | There are valid `model_eval_config` parameters in the sandbox configuration |
+| `hook_train_model` | Train a model based on the current dataset | ModelTrainExecutorFactory | - | <br />- execution_jobs<br /> |
+| `hook_evaluate_data` | Evaluate the dataset in terms of data quality and other dimensions | DataEvaluatorFactory | - | <br />- evaluation_jobs<br /> |
+| `hook_evaluate_model` | Evaluate the trained model | ModelEvaluatorFactory | - | <br />- evaluation_jobs<br /> |
 
 It is worth noting that a hook can be registered in multiple job lists, as this hook can play different roles in different steps of the pipeline. For example, we can analyze and probe both the pre-processed and post-processed datasets to compare the changes in quality, diversity, and other dimensions before and after data processing.
-## Customized Sandbox Pipeline
-In addition to the default sandbox pipeline, developers can also implement customized pipeline orchestration in `data_juicer/core/sandbox/pipelines.py`. Combining the concepts discussed in previous sections, implementing a customized pipeline orchestration by developers generally involves the following steps:
 
-1. **Implementing customized components**: Developers can create new components based on existing factories, or create new categories of factories and their components.
-2. **Encapsulate the hooks to call the customized components**: For example, reference the code in the method `hook_evaluate_data`, which calls the data evaluation component to evaluate the quality of datasets.
-3. **Register the customized hooks into the job list**: Developers can implement customized job lists and registration methods. Reference the code in the `register_default_jobs` method for guidance.
-4. **Implement a customized pipeline orchestration**: Based on the customized hooks and job lists, developers can customize, arrange, and build the pipeline execution process according to their specific requirements, as illustrated in the `one_trial` method in the pipeline.
+## Customized Sandbox Pipeline
+Users can directly modify the job configuration list in the parameter configuration file to achieve task modification and orchestration.
+
 ## Watcher
 In the above sections, the concept of "monitoring" is repeatedly mentioned. The pipeline will monitor several metrics produced in each step, and these monitoring processes are implemented by `SandboxWatcher`.
 

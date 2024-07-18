@@ -3,10 +3,8 @@
 import os
 import unittest
 
-from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.video_split_by_key_frame_mapper import \
     VideoSplitByKeyFrameMapper
-from data_juicer.utils.file_utils import add_suffix_to_filename
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 

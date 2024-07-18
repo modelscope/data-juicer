@@ -29,6 +29,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
     Qwen-Audio model.
     """
 
+    _accelerator = 'cuda'
     _batched_op = True
 
     def __init__(self, keep_original_sample: bool = True, *args, **kwargs):
@@ -46,8 +47,6 @@ class VideoCaptioningFromAudioMapper(Mapper):
 
         self.keep_original_sample = keep_original_sample
         self.extra_args = kwargs
-
-        self._accelerator = 'cuda'
 
         self._hf_qwen_audio = 'Qwen/Qwen-Audio'
         self.model_key = prepare_model(
@@ -68,7 +67,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
         loaded_video_keys = sample[self.video_key]
 
         # get models
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         offset = 0
         captioned_sample = copy.deepcopy(sample)

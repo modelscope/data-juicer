@@ -11,9 +11,9 @@ from data_juicer.utils import cache_utils
 from .exporter import Exporter
 
 
-class Analyser:
+class Analyzer:
     """
-    This Analyser class is used to analyse a specific dataset.
+    This Analyzer class is used to analyze a specific dataset.
 
     It will compute stats for all filter ops in the config file, apply
     multiple analysis (e.g. OverallAnalysis, ColumnWiseAnalysis, etc.)
@@ -45,7 +45,7 @@ class Analyser:
                                         self.cfg.add_suffix)
 
         # prepare exporter and check export path suffix
-        # NOTICE: no need to export dataset texts for analyser
+        # NOTICE: no need to export dataset texts for analyzer
         # (export_ds=False). Instead, only need to export stats
         # (export_stats=True).
         logger.info('Preparing exporter...')
@@ -69,7 +69,7 @@ class Analyser:
 
         :param load_data_np: number of workers when loading the dataset.
         :param skip_export: whether export the results into disk
-        :return: analysed dataset.
+        :return: analyzed dataset.
         """
         # 1. format data
         logger.info('Loading dataset from data formatter...')
@@ -108,11 +108,11 @@ class Analyser:
         # 4.1. Only consider fields in Fields.stats
         # 4.2. For string fields, only consider its histogram
         # 4.3. For numeric fields, consider its histogram and box
-        # 4.4. Otherwise, DO NOT analyse
+        # 4.4. Otherwise, DO NOT analyze
 
         logger.info('Applying overall analysis on stats...')
         overall_analysis = OverallAnalysis(dataset, self.analysis_path)
-        self.overall_result = overall_analysis.analyse(
+        self.overall_result = overall_analysis.analyze(
             percentiles=self.cfg.percentiles,
             num_proc=self.cfg.np,
             skip_export=skip_export)
@@ -126,6 +126,6 @@ class Analyser:
             overall_result=self.overall_result,
             save_stats_in_one_file=self.cfg.save_stats_in_one_file,
         )
-        column_wise_analysis.analyse(skip_export=skip_export)
+        column_wise_analysis.analyze(skip_export=skip_export)
 
         return dataset

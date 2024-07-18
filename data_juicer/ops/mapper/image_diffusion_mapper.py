@@ -33,6 +33,7 @@ class ImageDiffusionMapper(Mapper):
         Generate image by diffusion model
     """
 
+    _accelerator = 'cuda'
     _batched_op = True
 
     def __init__(self,
@@ -99,7 +100,6 @@ class ImageDiffusionMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
-        self._accelerator = 'cuda'
         self.strength = strength
         self.guidance_scale = guidance_scale
         self.aug_num = aug_num

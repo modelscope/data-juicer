@@ -1,66 +1,117 @@
-import json
+from argparse import ArgumentError
+from typing import List, Union
 
-import yaml
-from jsonargparse import dict_to_namespace
+from jsonargparse import ActionConfigFile, ArgumentParser, dict_to_namespace
 from loguru import logger
 
-from data_juicer.config import init_configs
+from data_juicer.config import prepare_side_configs
 from data_juicer.core.sandbox.pipelines import SandBoxExecutor
+from data_juicer.utils.constant import JobRequiredKeys
 
 
-def prepare_side_configs(config):
-    if isinstance(config, str):
-        # config path
-        if config.endswith('.yaml') or config.endswith('.yml'):
-            with open(config) as fin:
-                config = yaml.safe_load(fin)
-                return dict_to_namespace(config)
-        elif config.endswith('.json'):
-            with open(config) as fin:
-                config = json.load(fin)
-                return dict_to_namespace(config)
-        else:
-            raise TypeError(f'Unrecognized config file type [{config}]. '
-                            f'Should be one of the types [".yaml", ".yml", '
-                            f'".json"].')
-    elif isinstance(config, dict):
-        # config dict
-        config = dict_to_namespace(config)
-        return config
-    else:
-        raise TypeError(f'Unrecognized side config type: [{type(config)}.')
-
-
-def split_configs(cfg):
+def init_sandbox_configs(args=None):
     """
-    Split train/infer/eval configs from the original config. Other configs can
-    be specified by their dict objects or config file path strings.
+    initialize the jsonargparse parser and parse configs from one of:
+        1. POSIX-style commands line args;
+        2. config files in yaml (json and jsonnet supersets);
+        3. environment variables
+        4. hard-coded defaults
+
+    :param args: list of params, e.g., ['--conifg', 'cfg.yaml'], defaut None.
+    :return: a global cfg object used by the Executor or Analyzer
+    """
+    parser = ArgumentParser(default_env=True, default_config_files=None)
+
+    parser.add_argument('--config',
+                        action=ActionConfigFile,
+                        help='Path to a dj basic configuration file.',
+                        required=True)
+
+    parser.add_argument('--project_name',
+                        type=str,
+                        default='hello_world',
+                        help='Name of your data process project.')
+
+    parser.add_argument('--experiment_name',
+                        type=str,
+                        default='experiment1',
+                        help='For wandb tracer name.')
+
+    parser.add_argument(
+        '--hpo_config',
+        type=str,
+        help='Path to a configuration file when using auto-HPO tool.',
+        required=False)
+
+    parser.add_argument('--probe_job_configs',
+                        type=Union[List[str], List[dict]],
+                        default=[],
+                        help='List of params for each probe job.')
+
+    parser.add_argument('--refine_recipe_job_configs',
+                        type=Union[List[str], List[dict]],
+                        default=[],
+                        help='List of params for each refine-recipe jobs.')
+
+    parser.add_argument('--execution_job_configs',
+                        type=Union[List[str], List[dict]],
+                        default=[],
+                        help='List of params for each execution jobs.')
+
+    parser.add_argument('--evaluation_job_configs',
+                        type=Union[List[str], List[dict]],
+                        default=[],
+                        help='List of params for each evaluation jobs.')
+
+    try:
+        cfg = parser.parse_args(args=args)
+
+        return cfg
+    except ArgumentError:
+        logger.error('Config initialization failed')
+
+
+def specify_job_configs(ori_config):
+
+    config = prepare_side_configs(ori_config)
+
+    for key in JobRequiredKeys:
+        if key.value not in config:
+            raise ValueError(
+                f'Need to specify param "{key.value}" in [{ori_config}]')
+
+    return dict_to_namespace(config)
+
+
+def specify_jobs_configs(cfg):
+    """
+    Specify job configs by their dict objects or config file path strings.
 
     :param cfg: the original config
     :return: a dict of different configs.
     """
-    configs = {
-        'dj_cfg': cfg,
-    }
-    if cfg.model_infer_config:
-        configs['model_infer_cfg'] = prepare_side_configs(
-            cfg.model_infer_config)
-    if cfg.model_train_config:
-        configs['model_train_cfg'] = prepare_side_configs(
-            cfg.model_train_config)
-    if cfg.data_eval_config:
-        configs['data_eval_cfg'] = prepare_side_configs(cfg.data_eval_config)
-    if cfg.model_eval_config:
-        configs['model_eval_cfg'] = prepare_side_configs(cfg.model_eval_config)
+    cfg.probe_job_configs = [
+        specify_job_configs(job_cfg) for job_cfg in cfg.probe_job_configs
+    ]
+    cfg.refine_recipe_job_configs = [
+        specify_job_configs(job_cfg)
+        for job_cfg in cfg.refine_recipe_job_configs
+    ]
+    cfg.execution_job_configs = [
+        specify_job_configs(job_cfg) for job_cfg in cfg.execution_job_configs
+    ]
+    cfg.evaluation_job_configs = [
+        specify_job_configs(job_cfg) for job_cfg in cfg.evaluation_job_configs
+    ]
 
-    return configs
+    return cfg
 
 
 @logger.catch
 def main():
-    cfg = init_configs()
-    configs = split_configs(cfg)
-    sandbox_executor = SandBoxExecutor(**configs)
+    cfg = init_sandbox_configs()
+    cfg = specify_jobs_configs(cfg)
+    sandbox_executor = SandBoxExecutor(cfg)
     sandbox_executor.run()
 
 

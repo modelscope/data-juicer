@@ -5,13 +5,14 @@ from functools import wraps
 import pyarrow as pa
 from loguru import logger
 
-from data_juicer import use_cuda
+from data_juicer import is_cuda_available
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
+UNFORKABLE = Registry('Unforkable')
 
 
 def convert_list_dict_to_dict_list(samples):
@@ -109,6 +110,7 @@ def catch_map_single_exception(method):
 
 class OP:
 
+    _accelerator = 'cpu'
     _batched_op = False
 
     def __init__(self, *args, **kwargs):
@@ -131,10 +133,14 @@ class OP:
         self.video_key = kwargs.get('video_key', 'videos')
 
         # whether the model can be accelerated using cuda
-        self._accelerator = kwargs.get('accelerator', 'cpu')
+        _accelerator = kwargs.get('accelerator', None)
+        if _accelerator is not None:
+            self.accelerator = _accelerator
+        else:
+            self.accelerator = self._accelerator
 
         # parameters to determind the number of procs for this op
-        self.num_proc = kwargs.get('num_proc', 0)
+        self.num_proc = kwargs.get('num_proc', None)
         self.cpu_required = kwargs.get('cpu_required', 1)
         self.mem_required = kwargs.get('mem_required', 0)
         if isinstance(self.mem_required, str):
@@ -178,11 +184,15 @@ class OP:
         raise NotImplementedError
 
     def use_cuda(self):
-        return self._accelerator == 'cuda' and use_cuda()
+        return self.accelerator == 'cuda' and is_cuda_available()
 
     def runtime_np(self):
-        return calculate_np(self._name, self.mem_required, self.cpu_required,
-                            self.num_proc, self.use_cuda())
+        op_proc = calculate_np(self._name, self.mem_required,
+                               self.cpu_required, self.num_proc,
+                               self.use_cuda())
+        logger.debug(
+            f'Op [{self._name}] running with number of procs:{op_proc}')
+        return op_proc
 
     def remove_extra_parameters(self, param_dict, keys=None):
         """

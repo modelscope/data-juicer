@@ -1,11 +1,11 @@
-from .analyser import Analyser
+from .analyzer import Analyzer
 from .data import NestedDataset
 from .executor import Executor
 from .exporter import Exporter
 from .tracer import Tracer
 
 __all__ = [
-    'Analyser',
+    'Analyzer',
     'NestedDataset',
     'Executor',
     'Exporter',
