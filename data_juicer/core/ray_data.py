@@ -3,7 +3,7 @@ import os
 import pyarrow as pa
 from loguru import logger
 
-from data_juicer import cuda_device_count, use_cuda
+from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
 from data_juicer.ops import Filter, Mapper
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -71,7 +71,7 @@ def preprocess_dataset(dataset: Dataset, dataset_path, cfg) -> Dataset:
 
 
 def get_num_gpus(op, op_proc):
-    if not use_cuda() or not op._accelerator == 'cuda':
+    if op.use_cuda():
         return 0
     proc_per_gpu = op_proc / cuda_device_count()
     return 1.0 / proc_per_gpu

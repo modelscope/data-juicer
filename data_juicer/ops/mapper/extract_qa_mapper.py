@@ -23,6 +23,7 @@ class ExtractQAMapper(Mapper):
     """
 
     _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(self,
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
@@ -53,7 +54,6 @@ class ExtractQAMapper(Mapper):
         """
 
         super().__init__(*args, **kwargs)
-        self._batched_op = True
 
         if pattern is None:
             self.pattern = r'Human: (.*?)\nAssistant: (.*?)(?=\nHuman|$)'
