@@ -37,6 +37,8 @@ class ExtractQAMapper(Mapper):
         :param qa_format: Output format of question and answer pair.
         :param enable_vllm: Whether to use vllm for inference acceleration.
         :param tensor_parallel_size: It is only valid when enable_vllm is True.
+            The number of GPUs to use for distributed execution with tensor
+            parallelism.
         :param args: extra args
         :param kwargs: extra args
 
@@ -66,10 +68,12 @@ class ExtractQAMapper(Mapper):
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
+            from vllm import SamplingParams
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
                 tensor_parallel_size=tensor_parallel_size)
+            self.sampling_params = SamplingParams(max_tokens=2048)
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
@@ -92,7 +96,8 @@ class ExtractQAMapper(Mapper):
         model, processor = get_model(self.model_key, rank=rank)
 
         if self.enable_vllm:
-            response = model.generate([sample[self.text_key]])
+            response = model.generate([sample[self.text_key]],
+                                      self.sampling_params)
             output = response[0].outputs[0].text
         else:
             inputs = processor(sample[self.text_key],

@@ -19,6 +19,7 @@ class ExtractQAMapperTest(DataJuicerTestCaseBase):
         for sample in samples:
             result = op.process(sample)
             out_text = json.loads(result[self.text_key])
+            print(f'Output sample: {out_text}')
 
             # test one output qa sample
             qa_sample = out_text[0]

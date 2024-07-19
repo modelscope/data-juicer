@@ -22,6 +22,7 @@ class OptimizeInstructionMapperTest(DataJuicerTestCaseBase):
 
         for sample in samples:
             result = op.process(sample)
+            print(f'Output results: {result}')
             self.assertIn(self.text_key, result)
         
     def test_optimize_instruction(self):

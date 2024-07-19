@@ -423,6 +423,7 @@ def prepare_vllm_model(pretrained_model_name_or_path,
 
     if return_model:
         model = vLLM(model=pretrained_model_name_or_path,
+                     trust_remote_code=trust_remote_code,
                      tensor_parallel_size=tensor_parallel_size)
 
     return (model, processor) if return_model else processor

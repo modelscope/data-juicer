@@ -26,6 +26,7 @@ class GenerateInstructionMapperTest(DataJuicerTestCaseBase):
 
         for item in dataset:            
             out_sample = json.loads(item[self.text_key])
+            print(f'Output sample: {out_sample}')
             # test one output qa sample
             self.assertIn('role', out_sample['messages'][0])
             self.assertIn('content', out_sample['messages'][0])

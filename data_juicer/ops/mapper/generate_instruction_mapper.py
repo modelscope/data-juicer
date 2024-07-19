@@ -65,6 +65,8 @@ class GenerateInstructionMapper(Mapper):
             which corresponds to the augmented samples.
         :param enable_vllm: Whether to use vllm for inference acceleration.
         :param tensor_parallel_size: It is only valid when enable_vllm is True.
+            The number of GPUs to use for distributed execution with tensor
+            parallelism.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -81,10 +83,12 @@ class GenerateInstructionMapper(Mapper):
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
+            from vllm import SamplingParams
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
                 tensor_parallel_size=tensor_parallel_size)
+            self.sampling_params = SamplingParams(max_tokens=2048)
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
@@ -181,15 +185,16 @@ class GenerateInstructionMapper(Mapper):
         input_prompt = self.build_prompt(random_qa_samples,
                                          self.prompt_template)
         if self.enable_vllm:
-            response = model.generate([input_prompt])
+            response = model.generate([input_prompt], self.sampling_params)
             response_str = response[0].outputs[0].text
         else:
             inputs = processor(input_prompt,
                                return_tensors='pt').to(model.device)
-            response = model.generate(**inputs)
-            response_str = processor.decode(response.cpu()[0],
+            output_ids = model.generate(**inputs)
+            # remove the input prompt from the output
+            output_ids = output_ids[:, inputs.data['input_ids'].shape[1]:]
+            response_str = processor.decode(output_ids.cpu()[0],
                                             skip_special_tokens=True)
-
         message_list = []
         out_qa_pairs, response_str = self.parse_response(response_str)
 

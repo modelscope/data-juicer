@@ -39,10 +39,12 @@ class OptimizeInstructionMapper(Mapper):
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
+            from vllm import SamplingParams
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
                 tensor_parallel_size=tensor_parallel_size)
+            self.sampling_params = SamplingParams(max_tokens=2048)
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
@@ -62,12 +64,13 @@ class OptimizeInstructionMapper(Mapper):
             messages, tokenize=False, add_generation_prompt=True)
 
         if self.enable_vllm:
-            response = model.generate([input_prompt])
+            response = model.generate([input_prompt], self.sampling_params)
             output = response[0].outputs[0].text
         else:
             inputs = processor(input_prompt,
                                return_tensors='pt').to(model.device)
-            response = model.generate(**inputs)
+            response = model.generate(**inputs,
+                                      eos_token_id=processor.eos_token_id)
             output = processor.decode(response.cpu()[0],
                                       skip_special_tokens=True)
 
