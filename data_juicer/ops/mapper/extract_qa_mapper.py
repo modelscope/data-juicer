@@ -22,6 +22,9 @@ class ExtractQAMapper(Mapper):
     and are suitable for Chinese.
     """
 
+    _accelerator = 'cuda'
+    _batched_op = True
+
     def __init__(self,
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
                  pattern: str = None,
@@ -93,7 +96,7 @@ class ExtractQAMapper(Mapper):
         return qa_list
 
     def process(self, sample, rank=None):
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         if self.enable_vllm:
             response = model.generate([sample[self.text_key]],

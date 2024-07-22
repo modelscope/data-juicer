@@ -2,7 +2,7 @@ import os
 import unittest
 
 import numpy as np
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.mapper.image_blur_mapper import ImageBlurMapper
 from data_juicer.utils.mm_utils import load_image

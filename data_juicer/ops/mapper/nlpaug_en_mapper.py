@@ -19,6 +19,8 @@ with AvailabilityChecking(['nlpaug'], OP_NAME):
 class NlpaugEnMapper(Mapper):
     """Mapper to simply augment samples in English based on nlpaug library."""
 
+    _batched_op = True
+
     def __init__(self,
                  sequential: bool = False,
                  aug_num: int = 1,
@@ -84,7 +86,6 @@ class NlpaugEnMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._batched_op = True  # this is a batched OP
 
         self.aug_num = aug_num
         if aug_num >= 10:

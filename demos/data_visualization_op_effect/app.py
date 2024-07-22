@@ -12,7 +12,7 @@ import streamlit as st
 import yaml
 
 from data_juicer.config import init_configs
-from data_juicer.core import Analyser
+from data_juicer.core import Analyzer
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.constant import Fields, StatsKeys
 
@@ -105,7 +105,7 @@ def analyze_and_show_res(dataset_file):
         cfg.dataset_path = dataset_file.name
         del_file = True
 
-    analyzer = Analyser(cfg)
+    analyzer = Analyzer(cfg)
     dataset = analyzer.run()
 
     overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')

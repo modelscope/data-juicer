@@ -1,10 +1,14 @@
 import copy
+import json
 import sys
+from argparse import Namespace
 
+import yaml
+from jsonargparse import namespace_to_dict
 from loguru import logger
 
-from data_juicer.config import export_config, init_configs
-from data_juicer.core import Analyser, Executor
+from data_juicer.config import init_configs
+from data_juicer.core import Analyzer, Executor
 from data_juicer.utils.constant import StatsKeys
 
 
@@ -20,9 +24,9 @@ def main():
     cfg = init_configs()
     logger.info('Begin to analyze data using the given initial recipe')
 
-    analyser = Analyser(cfg)
-    analyser.run()
-    df = analyser.overall_result
+    analyzer = Analyzer(cfg)
+    analyzer.run()
+    df = analyzer.overall_result
 
     # 2. adjust the hyper-parameters of the given recipe with k-sigma rule
     modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe)
@@ -45,6 +49,9 @@ def modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe, k=3):
     stats_key_to_std = std_series.iloc[0, :].to_dict()
     op_name_to_stats_key = StatsKeys.get_access_log(dj_cfg=cfg)
     logger.info(f'Begin to modify the recipe with {k}-sigma rule')
+    for i in range(len(cfg.process)):
+        if isinstance(cfg.process[i], Namespace):
+            cfg.process[i] = namespace_to_dict(cfg.process[i])
     for process in cfg.process:
         op_name, args = list(process.items())[0]
         temp_args = copy.deepcopy(args)
@@ -69,7 +76,18 @@ def modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe, k=3):
                                     f'{arg_name}={new_val}')
                         args[arg_name] = new_val
     if path_k_sigma_recipe:
-        export_config(cfg, path_k_sigma_recipe)
+        if path_k_sigma_recipe.endswith(
+                '.yaml') or path_k_sigma_recipe.endswith('.yml'):
+            with open(path_k_sigma_recipe, 'w') as fout:
+                yaml.safe_dump(cfg, fout)
+        elif path_k_sigma_recipe.endswith('.json'):
+            with open(path_k_sigma_recipe, 'w') as fout:
+                json.dump(cfg, fout)
+        else:
+            raise TypeError(
+                f'Unrecognized output file type:'
+                f' [{path_k_sigma_recipe}]. Should be one of the types'
+                f' [".yaml", ".yml", ".json"].')
 
 
 if __name__ == '__main__':

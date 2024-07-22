@@ -98,6 +98,8 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
     """Mapper to generate samples whose texts are generated based on
     gpt-4-visison and the image."""
 
+    _batched_op = True
+
     def __init__(self,
                  mode: str = 'description',
                  api_key: str = '',
@@ -143,7 +145,7 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._batched_op = True
+
         if mode not in ['resoning', 'description', 'conversation', 'custom']:
             raise ValueError(
                 f'Mode [{mode}] is not supported. '

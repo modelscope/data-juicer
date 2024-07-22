@@ -2,22 +2,18 @@ import os
 
 from loguru import logger
 
-from data_juicer import use_cuda
 from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
 from data_juicer.format import load_formatter
 from data_juicer.ops import Filter, load_ops
 from data_juicer.utils import cache_utils
-from data_juicer.utils.constant import Fields
-from data_juicer.utils.process_utils import calculate_np
 
-from .data import add_same_content_to_new_column
 from .exporter import Exporter
 
 
-class Analyser:
+class Analyzer:
     """
-    This Analyser class is used to analyse a specific dataset.
+    This Analyzer class is used to analyze a specific dataset.
 
     It will compute stats for all filter ops in the config file, apply
     multiple analysis (e.g. OverallAnalysis, ColumnWiseAnalysis, etc.)
@@ -49,7 +45,7 @@ class Analyser:
                                         self.cfg.add_suffix)
 
         # prepare exporter and check export path suffix
-        # NOTICE: no need to export dataset texts for analyser
+        # NOTICE: no need to export dataset texts for analyzer
         # (export_ds=False). Instead, only need to export stats
         # (export_stats=True).
         logger.info('Preparing exporter...')
@@ -73,7 +69,7 @@ class Analyser:
 
         :param load_data_np: number of workers when loading the dataset.
         :param skip_export: whether export the results into disk
-        :return: analysed dataset.
+        :return: analyzed dataset.
         """
         # 1. format data
         logger.info('Loading dataset from data formatter...')
@@ -89,29 +85,12 @@ class Analyser:
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')
         stats_collected = False
-        for op_cfg, op in zip(self.cfg.process, self.ops):
-            op_name = list(op_cfg.keys())[0]
-            with_rank = use_cuda() and op._accelerator == 'cuda'
-            if op.num_proc != 0:
-                op_proc = op.num_proc
-                logger.info(f'Op [{op_name}] running with sepcified '
-                            f'number of procs:{op.num_proc}')
-            else:
-                op_proc = calculate_np(self.cfg.np, op, op_name)
+        for op in self.ops:
             if isinstance(op, Filter):
-                if Fields.stats not in dataset.features:
-                    # only add stats when calling filter op
-                    dataset = dataset.map(add_same_content_to_new_column,
-                                          fn_kwargs={
-                                              'new_column_name': Fields.stats,
-                                              'initial_value': {}
-                                          },
-                                          num_proc=self.cfg.np,
-                                          desc='Adding new column for stats')
-                dataset = dataset.map(op.compute_stats,
-                                      num_proc=op_proc,
-                                      with_rank=with_rank,
-                                      desc=op_name + '_compute_stats')
+                original_process = op.process
+                op.process = None
+                dataset = dataset.process(op)
+                op.process = original_process
                 stats_collected = True
         if not stats_collected:
             logger.warning('No stats collected. Please add some Filter ops to '
@@ -129,11 +108,11 @@ class Analyser:
         # 4.1. Only consider fields in Fields.stats
         # 4.2. For string fields, only consider its histogram
         # 4.3. For numeric fields, consider its histogram and box
-        # 4.4. Otherwise, DO NOT analyse
+        # 4.4. Otherwise, DO NOT analyze
 
         logger.info('Applying overall analysis on stats...')
         overall_analysis = OverallAnalysis(dataset, self.analysis_path)
-        self.overall_result = overall_analysis.analyse(
+        self.overall_result = overall_analysis.analyze(
             percentiles=self.cfg.percentiles,
             num_proc=self.cfg.np,
             skip_export=skip_export)
@@ -147,6 +126,6 @@ class Analyser:
             overall_result=self.overall_result,
             save_stats_in_one_file=self.cfg.save_stats_in_one_file,
         )
-        column_wise_analysis.analyse(skip_export=skip_export)
+        column_wise_analysis.analyze(skip_export=skip_export)
 
         return dataset

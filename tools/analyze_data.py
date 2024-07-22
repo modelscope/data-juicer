@@ -1,12 +1,12 @@
 from loguru import logger
 
-from data_juicer.core import Analyser
+from data_juicer.core import Analyzer
 
 
 @logger.catch(reraise=True)
 def main():
-    analyser = Analyser()
-    analyser.run()
+    analyzer = Analyzer()
+    analyzer.run()
 
 
 if __name__ == '__main__':

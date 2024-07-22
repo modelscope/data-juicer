@@ -31,6 +31,8 @@ class VideoWatermarkFilter(Filter):
         probability.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_watermark_model='amrul-hzz/watermark_detector',
                  prob_threshold: ClosedUnitInterval = 0.8,
@@ -89,7 +91,6 @@ class VideoWatermarkFilter(Filter):
         self.model_key = prepare_model(
             model_type='huggingface',
             pretrained_model_name_or_path=hf_watermark_model)
-        self._accelerator = 'cuda'
         self.reduce_mode = reduce_mode
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num
@@ -115,7 +116,7 @@ class VideoWatermarkFilter(Filter):
                                                 loaded_video_keys, load_video)
 
         watermark_probs = []
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         for video_key, video in videos.items():
             sampled_frames_key = video_key + self.sampled_frames_key_suffix

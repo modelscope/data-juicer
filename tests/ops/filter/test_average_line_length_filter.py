@@ -1,6 +1,6 @@
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.average_line_length_filter import \
     AverageLineLengthFilter

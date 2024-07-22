@@ -1,17 +1,38 @@
+from __future__ import annotations
+
 import copy
 import inspect
+from abc import ABC, abstractmethod
 from functools import wraps
+from time import time
 from typing import Union
 
 from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
+from data_juicer.ops import UNFORKABLE
 from data_juicer.utils import cache_utils
 from data_juicer.utils.compress import (CompressionOff,
                                         cleanup_compressed_cache_files,
                                         compress, decompress)
 from data_juicer.utils.fingerprint_utils import generate_fingerprint
+from data_juicer.utils.process_utils import setup_mp
+
+
+class DJDataset(ABC):
+    """Base dataset of DJ"""
+
+    @abstractmethod
+    def process(
+            self,
+            operators,  # TODO: add type hint
+            *,
+            exporter=None,
+            checkpointer=None,
+            tracer=None) -> DJDataset:
+        """process a list of operators on the dataset."""
+        pass
 
 
 def wrap_func_with_nested_access(f):
@@ -116,7 +137,7 @@ class NestedDatasetDict(DatasetDict):
         return super().map(**args)
 
 
-class NestedDataset(Dataset):
+class NestedDataset(Dataset, DJDataset):
     """Enhanced HuggingFace-Dataset for better usability and efficiency."""
 
     def __init__(self, *args, **kargs):
@@ -139,6 +160,40 @@ class NestedDataset(Dataset):
             res = super().__getitem__(key)
         return nested_obj_factory(res)
 
+    def process(self,
+                operators,
+                *,
+                exporter=None,
+                checkpointer=None,
+                tracer=None):
+        if operators is None:
+            return self
+
+        if not isinstance(operators, list):
+            operators = [operators]
+        unforkable_operators = set(UNFORKABLE.modules.keys())
+
+        dataset = self
+        for op in operators:
+            mp_context = ['forkserver', 'spawn'] if (
+                op.use_cuda() or op._name in unforkable_operators) else None
+            setup_mp(mp_context)
+
+            start = time()
+            # run single op
+            dataset = op(dataset,
+                         exporter=exporter,
+                         checkpointer=checkpointer,
+                         tracer=tracer)
+            # record processed ops
+            if checkpointer is not None:
+                checkpointer.record(op._name,
+                                    list(op._process_kwargs.values())[0])
+            end = time()
+            logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
+                        f'Left {len(dataset)} samples.')
+        return dataset
+
     def map(self, *args, **kargs):
         """Override the map func, which is called by most common operations,
         such that the processed samples can be accessed by nested manner."""
@@ -158,16 +213,16 @@ class NestedDataset(Dataset):
                     kargs['function'])
             called_func = kargs['function']
 
-        # For wrapped function, try to get its original unwrapped method
-        while hasattr(called_func, '__wrapped__'):
+        # For wrapped function, try to get its unwrapped (bound) method
+        while not inspect.ismethod(called_func) and hasattr(
+                called_func, '__wrapped__'):
             called_func = called_func.__wrapped__
-        # Does the called function belong to a batched OP?
-        if inspect.ismethod(called_func) \
-                and 'is_batched_op' in dir(called_func.__self__) \
-                and callable(getattr(called_func.__self__, 'is_batched_op')) \
-                and called_func.__self__.is_batched_op():
+
+        # Batched is always required for fault tolerance
+        if inspect.ismethod(called_func):
             kargs['batched'] = True
-            kargs['batch_size'] = 1
+            kargs['batch_size'] = kargs.pop(
+                'batch_size', 1) if called_func.__self__.is_batched_op() else 1
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)

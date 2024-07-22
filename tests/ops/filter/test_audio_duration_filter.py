@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.audio_duration_filter import AudioDurationFilter
 from data_juicer.utils.constant import Fields
@@ -120,7 +120,6 @@ class AudioDurationFilterTest(DataJuicerTestCaseBase):
                                  max_duration=20,
                                  any_or_all='any')
         result = self.run_single_op(dataset, op, [op.audio_key])
-        print(result)
         self.assertDatasetEqual(result, tgt_list)
 
     @TEST_TAG("standalone", "ray")

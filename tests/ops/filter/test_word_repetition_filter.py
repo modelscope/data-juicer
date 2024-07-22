@@ -1,6 +1,6 @@
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.word_repetition_filter import WordRepetitionFilter
 from data_juicer.utils.constant import Fields

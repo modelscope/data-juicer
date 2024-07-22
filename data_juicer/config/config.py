@@ -1,10 +1,13 @@
 import copy
+import json
 import os
 import shutil
+import tempfile
 import time
 from argparse import ArgumentError, Namespace
 from typing import Dict, List, Tuple, Union
 
+import yaml
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
                           namespace_to_dict)
 from jsonargparse.typehints import ActionTypeHint
@@ -28,7 +31,7 @@ def init_configs(args=None):
         4. hard-coded defaults
 
     :param args: list of params, e.g., ['--conifg', 'cfg.yaml'], defaut None.
-    :return: a global cfg object used by the Executor or Analyser
+    :return: a global cfg object used by the Executor or Analyzer
     """
     parser = ArgumentParser(default_env=True, default_config_files=None)
 
@@ -41,44 +44,6 @@ def init_configs(args=None):
         '--hpo_config',
         type=str,
         help='Path to a configuration file when using auto-HPO tool.',
-        required=False)
-    parser.add_argument(
-        '--path_k_sigma_recipe',
-        type=str,
-        help='Path to save a configuration file when using k-sigma tool.',
-        required=False)
-    parser.add_argument(
-        '--path_model_feedback_recipe',
-        type=str,
-        help='Path to save a configuration file refined by model feedback.',
-        required=False)
-    parser.add_argument(
-        '--model_infer_config',
-        type=Union[str, dict],
-        help='Path or a dict to model inference configuration file when '
-        'calling model executor in sandbox. If not specified, the model '
-        'inference related hooks will be disabled.',
-        required=False)
-    parser.add_argument(
-        '--model_train_config',
-        type=Union[str, dict],
-        help='Path or a dict to model training configuration file when '
-        'calling model executor in sandbox. If not specified, the model '
-        'training related hooks will be disabled.',
-        required=False)
-    parser.add_argument(
-        '--data_eval_config',
-        type=Union[str, dict],
-        help='Path or a dict to eval configuration file when calling '
-        'auto-evaluator for data in sandbox. '
-        'If not specified, the eval related hooks will be disabled.',
-        required=False)
-    parser.add_argument(
-        '--model_eval_config',
-        type=Union[str, dict],
-        help='Path or a dict to eval configuration file when calling '
-        'auto-evaluator for model in sandbox. '
-        'If not specified, the eval related hooks will be disabled.',
         required=False)
     parser.add_argument(
         '--data_probe_algo',
@@ -117,6 +82,7 @@ def init_configs(args=None):
     parser.add_argument(
         '--dataset_path',
         type=str,
+        default='',
         help='Path to datasets with optional weights(0.0-1.0), 1.0 as '
         'default. Accepted format:<w1> dataset1-path <w2> dataset2-path '
         '<w3> dataset3-path ...')
@@ -306,13 +272,14 @@ def init_configs(args=None):
     parser.add_argument(
         '--process',
         type=List[Dict],
+        default=[],
         help='List of several operators with their arguments, these ops will '
         'be applied to dataset in order')
     parser.add_argument(
         '--percentiles',
         type=List[float],
         default=[],
-        help='Percentiles to analyse the dataset distribution. Only used in '
+        help='Percentiles to analyze the dataset distribution. Only used in '
         'Analysis.')
     parser.add_argument(
         '--export_original_dataset',
@@ -417,6 +384,9 @@ def init_setup_from_cfg(cfg):
             cfg.dataset_dir = cfg.dataset_path
         else:
             cfg.dataset_dir = os.path.dirname(cfg.dataset_path)
+    elif cfg.dataset_path == '':
+        logger.warning('dataset_path is empty by default.')
+        cfg.dataset_dir = ''
     else:
         logger.warning(f'dataset_path [{cfg.dataset_path}] is not a valid '
                        f'local path. Please check and retry, otherwise we '
@@ -705,6 +675,8 @@ def export_config(cfg,
     global global_parser
     if not global_parser:
         init_configs()  # enable the customized type parser
+    if isinstance(cfg_to_export, Namespace):
+        cfg_to_export = namespace_to_dict(cfg_to_export)
     global_parser.save(cfg=cfg_to_export,
                        path=path,
                        format=format,
@@ -772,3 +744,50 @@ def merge_config(ori_cfg, new_cfg: Dict):
 
     except ArgumentError:
         logger.error('Config merge failed')
+
+
+def prepare_side_configs(ori_config):
+    """
+    parse the config if ori_config is a string of a config file path with
+        yaml, yml or json format
+
+    :param ori_config: a config dict or a string of a config file path with
+        yaml, yml or json format
+
+    :return: a config dict
+    """
+
+    if isinstance(ori_config, str):
+        # config path
+        if ori_config.endswith('.yaml') or ori_config.endswith('.yml'):
+            with open(ori_config) as fin:
+                config = yaml.safe_load(fin)
+        elif ori_config.endswith('.json'):
+            with open(ori_config) as fin:
+                config = json.load(fin)
+        else:
+            raise TypeError(f'Unrecognized config file type: [{ori_config}]. '
+                            f'Should be one of the types [".yaml", ".yml", '
+                            f'".json"].')
+    elif isinstance(ori_config, dict) or isinstance(ori_config, Namespace):
+        config = ori_config
+    else:
+        raise TypeError(
+            f'Unrecognized side config type: [{type(ori_config)}].')
+
+    return config
+
+
+def get_init_configs(cfg):
+    """
+    set init configs of datajucer for cfg
+    """
+    temp_dir = tempfile.gettempdir()
+    temp_file = os.path.join(temp_dir, 'job_dj_config.json')
+    if isinstance(cfg, Namespace):
+        cfg = namespace_to_dict(cfg)
+    # create an temp config file
+    with open(temp_file, 'w') as f:
+        json.dump(cfg, f)
+    inited_dj_cfg = init_configs(['--config', temp_file])
+    return inited_dj_cfg

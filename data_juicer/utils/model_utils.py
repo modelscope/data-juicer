@@ -1,13 +1,14 @@
 import fnmatch
 import os
 from functools import partial
+from pickle import UnpicklingError
 from typing import Optional, Union
 
 import multiprocess as mp
 import wget
 from loguru import logger
 
-from data_juicer import cuda_device_count, use_cuda
+from data_juicer import cuda_device_count, is_cuda_available
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 
@@ -505,7 +506,8 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
             'model. Can only be one of '
             '["fp32", "fp16", "bf16"].')
 
-    if not use_cuda() and (torch_dtype == 'fp16' or torch_dtype == 'bf16'):
+    if not is_cuda_available() and (torch_dtype == 'fp16'
+                                    or torch_dtype == 'bf16'):
         raise ValueError(
             'In cpu mode, only fp32 torch_dtype can be used for diffusion'
             ' model.')
@@ -540,7 +542,8 @@ def prepare_recognizeAnything_model(
         model = ram_plus(pretrained=check_model(pretrained_model_name_or_path),
                          image_size=input_size,
                          vit='swin_l')
-    except:  # noqa: E722
+    except (RuntimeError, UnpicklingError) as e:  # noqa: E722
+        logger.warning(e)
         model = ram_plus(pretrained=check_model(pretrained_model_name_or_path,
                                                 force=True),
                          image_size=input_size,
@@ -589,7 +592,7 @@ def move_to_cuda(model, rank):
             module.to(f'cuda:{rank}')
 
 
-def get_model(model_key=None, rank=None):
+def get_model(model_key=None, rank=None, use_cuda=False):
     if model_key is None:
         return None
 
@@ -599,7 +602,7 @@ def get_model(model_key=None, rank=None):
             f'{model_key} not found in MODEL_ZOO ({mp.current_process().name})'
         )
         MODEL_ZOO[model_key] = model_key()
-    if use_cuda():
+    if use_cuda:
         rank = 0 if rank is None else rank
         rank = rank % cuda_device_count()
         move_to_cuda(MODEL_ZOO[model_key], rank)

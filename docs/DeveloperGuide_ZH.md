@@ -121,19 +121,20 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
-    - 如果算子批量处理数据，输入不是一个样本而是一个batch，需要声明`self._batched_op = True`。
+    - 如果算子批量处理数据，输入不是一个样本而是一个batch，需要声明`_batched_op = True`。
     ```python
     # ... (import some other libraries)
     OP_NAME = 'image_diffusion_mapper'
     @OPERATORS.register_module(OP_NAME)
     @LOADED_IMAGES.register_module(OP_NAME)
     class ImageDiffusionMapper(Mapper):
+        _batched_op = True
+
         def __init__(self,
                  # ... (OP parameters)
                  *args,
                  **kwargs):
             super().__init__(*args, **kwargs)
-            self._batched_op = True
 
         def process(self, samples):
             # ... (some codes)
