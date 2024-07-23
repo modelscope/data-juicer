@@ -29,6 +29,8 @@ class ImageAestheticsFilter(Filter):
     """Filter to keep samples with aesthetics scores within a specific range.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_scorer_model='',
                  min_score: ClosedUnitInterval = 0.5,
@@ -71,7 +73,6 @@ class ImageAestheticsFilter(Filter):
         # the original score predicted by laion-ai's scorer is within [0, 10]
         self.need_normalized_by_ten = ('shunk031/aesthetics-predictor'
                                        in hf_scorer_model)
-        self._accelerator = 'cuda'
 
     def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
@@ -90,7 +91,7 @@ class ImageAestheticsFilter(Filter):
                                                 loaded_image_keys, load_image)
 
         # compute aesthetics_scores
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
         inputs = processor(images=list(images.values()),
                            return_tensors='pt').to(model.device)
         with torch.no_grad():

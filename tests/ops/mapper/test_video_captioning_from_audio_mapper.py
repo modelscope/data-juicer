@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from data_juicer.core.data import NestedDataset
+from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.video_captioning_from_audio_mapper import \
     VideoCaptioningFromAudioMapper
 from data_juicer.utils.mm_utils import SpecialTokens
@@ -35,7 +35,7 @@ class VideoCaptioningFromAudioMapperTest(DataJuicerTestCaseBase):
             cap_num += len(caps)
         return vid_num, cap_num
 
-    def _run_op(self, dataset: NestedDataset, caption_num, op, np=1):
+    def _run_op(self, dataset: Dataset, caption_num, op, np=1):
         dataset = dataset.map(op.process, num_proc=np)
         text_list = dataset.select_columns(column_names=['text']).to_list()
         for txt in text_list:
@@ -55,7 +55,7 @@ class VideoCaptioningFromAudioMapperTest(DataJuicerTestCaseBase):
             'text': f'{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。',
             'videos': [self.vid3_path]
         }]
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = VideoCaptioningFromAudioMapper()
         self._run_op(dataset, len(dataset) * 2, op)
 
@@ -75,7 +75,7 @@ class VideoCaptioningFromAudioMapperTest(DataJuicerTestCaseBase):
             f'两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.video} {SpecialTokens.eoc}',
             'videos': [self.vid3_path]
         }]
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = VideoCaptioningFromAudioMapper()
         self._run_op(dataset, len(dataset) * 2, op)
 
@@ -95,7 +95,7 @@ class VideoCaptioningFromAudioMapperTest(DataJuicerTestCaseBase):
             f'两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.video} {SpecialTokens.eoc}',
             'videos': [self.vid3_path]
         }]
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = VideoCaptioningFromAudioMapper(keep_original_sample=False)
         self._run_op(dataset, len(dataset), op)
 
@@ -113,7 +113,7 @@ class VideoCaptioningFromAudioMapperTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [self.vid3_path, self.vid1_path]
         }]
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = VideoCaptioningFromAudioMapper()
         self._run_op(dataset, len(dataset) * 2, op)
 
@@ -135,7 +135,7 @@ class VideoCaptioningFromAudioMapperTest(DataJuicerTestCaseBase):
             'videos':
             [self.vid3_path, self.vid1_path, self.vid2_path, self.vid1_path]
         }]
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = VideoCaptioningFromAudioMapper()
         self._run_op(dataset, len(dataset) * 2, op)
 
@@ -151,7 +151,7 @@ class VideoCaptioningFromAudioMapperTest(DataJuicerTestCaseBase):
             'text': f'{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。',
             'videos': [self.vid3_path]
         }]
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = VideoCaptioningFromAudioMapper()
         self._run_op(dataset, len(dataset) * 2, op, np=2)
 

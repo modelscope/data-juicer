@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.image_shape_filter import ImageShapeFilter
 from data_juicer.utils.constant import Fields

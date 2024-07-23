@@ -49,6 +49,9 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
     texts (captions from video/audio/frames, tags from audio/frames, ...)
     """
 
+    _accelerator = 'cuda'
+    _batched_op = True
+
     def __init__(self,
                  hf_summarizer: str = None,
                  consider_video_caption_from_video: bool = True,
@@ -107,10 +110,9 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._batched_op = True
+
         self.keep_original_sample = keep_original_sample
         self.extra_args = kwargs
-        self._accelerator = 'cuda'
 
         # prepare summarizer
         self._hf_summarizer = hf_summarizer if hf_summarizer else 'mrm8488/flan-t5-large-finetuned-openai-summarize_from_feedback'  # noqa: E501
@@ -175,6 +177,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         for key in temp_args:
             if key not in required_args:
                 args_dict.pop(key)
+        args_dict['accelerator'] = self.accelerator
         return args_dict
 
     def _process_single_sample(self, sample, rank=None):
@@ -190,7 +193,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         loaded_video_keys = sample[self.video_key]
 
         # get models
-        model, tokenizer = get_model(self.model_key, rank=rank)
+        model, tokenizer = get_model(self.model_key, rank, self.use_cuda())
 
         captioned_sample = copy.deepcopy(sample)
         # generate for each video chunk by chunk

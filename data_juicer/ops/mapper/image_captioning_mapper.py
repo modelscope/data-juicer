@@ -34,6 +34,9 @@ class ImageCaptioningMapper(Mapper):
     """Mapper to generate samples whose captions are generated based on
     another model and the figure."""
 
+    _accelerator = 'cuda'
+    _batched_op = True
+
     def __init__(self,
                  hf_img2seq='Salesforce/blip2-opt-2.7b',
                  caption_num: PositiveInt = 1,
@@ -84,7 +87,7 @@ class ImageCaptioningMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._batched_op = True
+
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'
         ]:
@@ -95,14 +98,12 @@ class ImageCaptioningMapper(Mapper):
 
         self.model_key = prepare_model(
             model_type='huggingface', pretrained_model_name_or_path=hf_img2seq)
-        self._accelerator = 'cuda'
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode
         self.keep_original_sample = keep_original_sample
         self.prompt = prompt
         self.prompt_key = prompt_key
         self.extra_args = kwargs
-
         if keep_candidate_mode in ['random_any', 'similar_one_simhash']:
             self.num_newly_generated_samples = 1
         elif keep_candidate_mode in ['all']:
@@ -153,7 +154,7 @@ class ImageCaptioningMapper(Mapper):
         # the generated text will be placed following each SpecialTokens.img
         # and the original special tokens are kept in an order-preserving way.
 
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         # do generation for each image chunk by chunk
         for chunk in ori_sample[self.text_key].split(SpecialTokens.eoc):

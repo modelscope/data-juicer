@@ -3,7 +3,7 @@
 import os
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer import _cuda_device_count
 from data_juicer.ops.filter.video_watermark_filter import VideoWatermarkFilter

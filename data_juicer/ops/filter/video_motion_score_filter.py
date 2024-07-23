@@ -7,7 +7,7 @@ from jsonargparse.typing import PositiveInt
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import OPERATORS, UNFORKABLE, Filter
 
 OP_NAME = 'video_motion_score_filter'
 
@@ -24,6 +24,7 @@ def VideoCapture(*args, **kwargs):
         cap.release()
 
 
+@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class VideoMotionScoreFilter(Filter):
     """Filter to keep samples with video motion scores within a specific range. The

@@ -4,7 +4,7 @@ from jsonargparse.typing import List, PositiveInt
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import OPERATORS, UNFORKABLE, Filter
 from ..mapper.video_tagging_from_frames_mapper import \
     VideoTaggingFromFramesMapper
 from ..op_fusion import LOADED_VIDEOS
@@ -21,11 +21,14 @@ with AvailabilityChecking(
     torch.set_num_threads(1)
 
 
+@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoTaggingFromFramesFilter(Filter):
     """Filter to keep samples whose videos contain the given tags.
     """
+
+    _accelerator = 'cuda'
 
     def __init__(self,
                  tags: List[str] = ['people'],
@@ -80,6 +83,7 @@ class VideoTaggingFromFramesFilter(Filter):
         self.tagging_producer = VideoTaggingFromFramesMapper(
             frame_sampling_method=frame_sampling_method,
             frame_num=frame_num,
+            accelerator=self.accelerator,
         )
 
     def compute_stats(self, sample, rank=None, context=False):

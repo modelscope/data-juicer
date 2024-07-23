@@ -33,6 +33,8 @@ class VideoAestheticsFilter(Filter):
     in the videos within a specific range.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_scorer_model='',
                  min_score: ClosedUnitInterval = 0.4,
@@ -107,7 +109,6 @@ class VideoAestheticsFilter(Filter):
         # the original score predicted by laion-ai's scorer is within [0, 10]
         self.need_normalized_by_ten = ('shunk031/aesthetics-predictor'
                                        in hf_scorer_model)
-        self._accelerator = 'cuda'
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num
 

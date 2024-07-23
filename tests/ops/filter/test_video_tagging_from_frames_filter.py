@@ -2,7 +2,7 @@
 import os
 import unittest
 
-from data_juicer.core.data import NestedDataset
+from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.filter.video_tagging_from_frames_filter import \
     VideoTaggingFromFramesFilter
 from data_juicer.utils.mm_utils import SpecialTokens
@@ -21,7 +21,7 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
                                               source_list,
                                               target_list,
                                               num_proc=1):
-        dataset = NestedDataset.from_list(source_list)
+        dataset = Dataset.from_list(source_list)
         dataset = dataset.map(op.compute_stats)
         dataset = dataset.filter(op.process)
         dataset = dataset.select_columns(column_names=['text', 'videos'])

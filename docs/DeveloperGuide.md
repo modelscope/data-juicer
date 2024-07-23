@@ -126,19 +126,20 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
-    - If the operator processes data in batches rather than a single sample, it is necessary to declare `self._batched_op = True`.
+    - If the operator processes data in batches rather than a single sample, it is necessary to declare `_batched_op = True`.
     ```python
     # ... (import some other libraries)
     OP_NAME = 'image_diffusion_mapper'
     @OPERATORS.register_module(OP_NAME)
     @LOADED_IMAGES.register_module(OP_NAME)
     class ImageDiffusionMapper(Mapper):
+        _batched_op = True
+
         def __init__(self,
                  # ... (OP parameters)
                  *args,
                  **kwargs):
             super().__init__(*args, **kwargs)
-            self._batched_op = True
 
         def process(self, samples):
             # ... (some codes)
