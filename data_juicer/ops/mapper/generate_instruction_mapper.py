@@ -2,9 +2,10 @@
 # https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/
 # --------------------------------------------------------
 import json
-import logging
 import random
 import re
+
+from loguru import logger
 
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -44,7 +45,7 @@ class GenerateInstructionMapper(Mapper):
                  similarity_threshold=0.7,
                  prompt_template=None,
                  enable_vllm=False,
-                 tensor_parallel_size=1,
+                 tensor_parallel_size=None,
                  *args,
                  **kwargs):
         """
@@ -83,7 +84,14 @@ class GenerateInstructionMapper(Mapper):
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
+            import torch
             from vllm import SamplingParams
+
+            assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
+            if not tensor_parallel_size:
+                tensor_parallel_size = torch.cuda.device_count()
+                logger.info(f'Set tensor_parallel_size to \
+                    {tensor_parallel_size} for vllm.')
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
@@ -160,8 +168,8 @@ class GenerateInstructionMapper(Mapper):
             response_str += question + '\n' + answer + '\n'
 
         if len(out_qa_pairs) == 0:
-            logging.error('Parse model response error! '
-                          'No data generated for the current response!')
+            logger.error('Parse model response error! '
+                         'No data generated for the current response!')
 
         return out_qa_pairs, response_str
 
@@ -213,7 +221,7 @@ class GenerateInstructionMapper(Mapper):
                 message_list.append({'role': 'user', 'content': question})
                 message_list.append({'role': 'assistant', 'content': answer})
         else:
-            logging.info('Filter this generated sample due to similarity.')
+            logger.info('Filter this generated sample due to similarity.')
 
         return {
             self.text_key:

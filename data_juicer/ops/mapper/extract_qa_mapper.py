@@ -1,6 +1,7 @@
 import json
-import logging
 import re
+
+from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -30,7 +31,7 @@ class ExtractQAMapper(Mapper):
                  pattern: str = None,
                  qa_format: str = 'chatml',
                  enable_vllm=False,
-                 tensor_parallel_size=1,
+                 tensor_parallel_size=None,
                  *args,
                  **kwargs):
         """
@@ -71,7 +72,14 @@ class ExtractQAMapper(Mapper):
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
+            import torch
             from vllm import SamplingParams
+
+            assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
+            if not tensor_parallel_size:
+                tensor_parallel_size = torch.cuda.device_count()
+                logger.info(f'Set tensor_parallel_size to \
+                    {tensor_parallel_size} for vllm.')
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
@@ -112,7 +120,7 @@ class ExtractQAMapper(Mapper):
         qa_list = self._extract_qa(output)
 
         if not len(qa_list):
-            logging.info(
+            logger.info(
                 'No question and answer data was extracted from this sample!')
 
         dialogue_data = []
