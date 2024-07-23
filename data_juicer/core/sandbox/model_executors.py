@@ -24,7 +24,7 @@ class BaseModelExecutor(object):
         self.END_OF_MODEL_EXEC = \
             "<DJ-Sandbox> End of ModelExecutor's running <DJ-Sandbox>"
 
-    async def run(self, run_type, run_obj, **kwargs):
+    async def run(self, run_type, run_obj=None, **kwargs):
         """
         conduct some model-related execution tasks
             given specified run_type and run_obj
@@ -43,7 +43,7 @@ class BaseModelExecutor(object):
                 timestamp = time.strftime('%Y%m%d%H%M%S',
                                           time.localtime(time.time()))
                 log_f_name = os.path.join(
-                    self.watcher.dj_cfg.work_dir,
+                    self.watcher.sandbox_cfg.work_dir,
                     f'model_exe_{run_type}_{timestamp}.log')
                 self.watcher.model_exe_log_file = log_f_name
                 with open(log_f_name, 'w') as log_f:
@@ -64,10 +64,10 @@ class BaseModelExecutor(object):
         args = [cmd, script_path] + run_args
         subprocess.run(args, cwd=working_dir)
 
-    async def _run(self, run_type, run_obj, **kwargs):
+    async def _run(self, run_type, run_obj=None, **kwargs):
         raise NotImplementedError
 
-    async def watch_run(self, run_type, run_obj, **kwargs):
+    async def watch_run(self, run_type, run_obj=None, **kwargs):
         """
         watch the running process in an online manner, and
             return the summarized results
@@ -133,7 +133,7 @@ class ModelScopeExecutor(BaseModelExecutor):
                 self.watcher.watch(loss_value, 'loss')
 
 
-class ModelscopeInferExecutor(ModelScopeExecutor):
+class ModelscopeInferProbeExecutor(ModelScopeExecutor):
 
     def __init__(self, model_config: dict):
         super().__init__(model_config)
@@ -143,7 +143,7 @@ class ModelscopeInferExecutor(ModelScopeExecutor):
         except ModuleNotFoundError:
             raise ModuleNotFoundError('modelscope package not installed')
 
-    async def _run(self, run_type, run_obj, **kwargs):
+    async def _run(self, run_type, run_obj=None, **kwargs):
         if run_type == 'infer_on_data':
             return self.executor(self.data_connector(run_obj), **kwargs)
         else:
@@ -183,7 +183,7 @@ class ModelscopeTrainExecutor(ModelScopeExecutor):
         except ModuleNotFoundError:
             raise ModuleNotFoundError('modelscope package not installed')
 
-    async def _run(self, run_type, run_obj, **kwargs):
+    async def _run(self, run_type, run_obj=None, **kwargs):
         # training cfg updated, such as datasets and training parameters
         builder_kwargs = {
             'model_name': self.model_config['model_name'],
@@ -193,18 +193,18 @@ class ModelscopeTrainExecutor(ModelScopeExecutor):
             key_remapping = self.model_config['key_remapping']
         else:
             key_remapping = None
-        if 'train_dataset' in run_obj:
+        if 'train_dataset' in self.model_config:
             builder_kwargs['train_dataset'] = self.data_connector(
-                run_obj['train_dataset'],
+                self.model_config['train_dataset'],
                 split='train',
                 key_remapping=key_remapping)
-        if 'eval_dataset' in run_obj:
+        if 'eval_dataset' in self.model_config:
             builder_kwargs['eval_dataset'] = self.data_connector(
-                run_obj['eval_dataset'],
+                self.model_config['eval_dataset'],
                 split='val',
                 key_remapping=key_remapping)
-        if 'work_dir' in run_obj:
-            builder_kwargs['work_dir'] = run_obj['work_dir']
+        if 'work_dir' in self.model_config:
+            builder_kwargs['work_dir'] = self.model_config['work_dir']
         self.work_dir = builder_kwargs['work_dir']
         self.build_executor(**builder_kwargs)
         self.executor.train()
@@ -225,7 +225,7 @@ class EasyAnimateTrainExecutor(BaseModelExecutor):
             self.script_path,
             current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
-    async def _run(self, run_type, run_obj, **kwargs):
+    async def _run(self, run_type, run_obj=None, **kwargs):
         config = self.model_config.train
         run_args = [
             config.model_path.pretrained_model_name_or_path,
@@ -246,7 +246,7 @@ class EasyAnimateTrainExecutor(BaseModelExecutor):
         self.run_subprocess(self.script_path, run_args, self.working_dir)
 
 
-class EasyAnimateGenerateExecutor(BaseModelExecutor):
+class EasyAnimateInferExecutor(BaseModelExecutor):
 
     def __init__(self, model_config: dict, watcher=None):
         super().__init__(model_config, watcher)
@@ -256,7 +256,7 @@ class EasyAnimateGenerateExecutor(BaseModelExecutor):
         self.working_dir = os.path.join(cur_working_dir,
                                         './thirdparty/easy_animate/')
 
-    async def _run(self, run_type, run_obj, **kwargs):
+    async def _run(self, run_type, run_obj=None, **kwargs):
         config = self.model_config.train
         run_args = [
             config.model_path.pretrained_model_name_or_path,

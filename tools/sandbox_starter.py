@@ -37,6 +37,11 @@ def init_sandbox_configs(args=None):
                         default='experiment1',
                         help='For wandb tracer name.')
 
+    parser.add_argument('--work_dir',
+                        type=str,
+                        default='./outputs/hello_world',
+                        help='Default output dir of meta infomations.')
+
     parser.add_argument(
         '--hpo_config',
         type=str,
@@ -90,19 +95,16 @@ def specify_jobs_configs(cfg):
     :param cfg: the original config
     :return: a dict of different configs.
     """
-    cfg.probe_job_configs = [
-        specify_job_configs(job_cfg) for job_cfg in cfg.probe_job_configs
-    ]
-    cfg.refine_recipe_job_configs = [
-        specify_job_configs(job_cfg)
-        for job_cfg in cfg.refine_recipe_job_configs
-    ]
-    cfg.execution_job_configs = [
-        specify_job_configs(job_cfg) for job_cfg in cfg.execution_job_configs
-    ]
-    cfg.evaluation_job_configs = [
-        specify_job_configs(job_cfg) for job_cfg in cfg.evaluation_job_configs
-    ]
+    def configs_to_job_list(cfgs):
+        job_cfgs = []
+        if cfgs:
+            job_cfgs = [specify_job_configs(job_cfg) for job_cfg in cfgs]
+        return job_cfgs
+
+    cfg.probe_job_configs = configs_to_job_list(cfg.probe_job_configs)
+    cfg.refine_recipe_job_configs = configs_to_job_list(cfg.refine_recipe_job_configs)
+    cfg.execution_job_configs = configs_to_job_list(cfg.execution_job_configs)
+    cfg.evaluation_job_configs = configs_to_job_list(cfg.evaluation_job_configs)
 
     return cfg
 

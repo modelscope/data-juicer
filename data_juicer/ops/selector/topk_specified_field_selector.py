@@ -1,5 +1,4 @@
 import heapq
-import sys
 
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 

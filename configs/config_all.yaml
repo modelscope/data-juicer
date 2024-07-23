@@ -500,14 +500,17 @@ process:
       top_ratio:                                              # ratio of selected top specified field value
       topk:                                                   # number of selected top specified field value
       reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
+  - random_selector:                                        # selector to random select samples
+      select_ratio:                                           # the ratio to be sampled
+      select_num:                                             # the number to be sampled
+  - range_specified_field_selector:                         # selector to select a range of samples based on the sorted specified field value from smallest to largest.
+      field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
+      lower_percentile:                                       # the lower bound of the percentile to be sampled
+      upper_percentile:                                       # the upper bound of the percentile to be sampled
+      lower_rank:                                             # the lower rank of the percentile to be sampled
+      upper_rank:                                             # the upper rank of the percentile to be sampled
   - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
       field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
       top_ratio:                                              # ratio of selected top samples
       topk:                                                   # number of selected top sample
       reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
-  - range_specified_field_selector:                          # selector to select a range of samples based on the sorted specified field value from smallest to largest.
-      field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
-      lower_percentile:                                       # the lower bound of the percentile to be sample
-      upper_percentile:                                       # the upper bound of the percentile to be sample
-      lower_rank:                                             # the lower rank of the percentile to be sample
-      upper_rank:                                             # the upper rank of the percentile to be sample

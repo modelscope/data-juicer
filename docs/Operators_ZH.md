@@ -14,7 +14,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | [ Mapper ]( #mapper )              | 43 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 41 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
-| [ Selector ]( #selector )          |  3 | 基于排序选取高质量样本   |
+| [ Selector ]( #selector )          |  4 | 基于排序选取高质量样本   |
 
 下面列出所有具体算子，每种算子都通过多个标签来注明其主要功能。
 
@@ -157,8 +157,9 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 算子                                  | 场景       | 语言      | 描述                                             |
 |-------------------------------------|----------|---------|------------------------------------------------|
 | frequency_specified_field_selector  | General  | en, zh  | 通过比较指定字段的频率选出前 k 个样本                           |
+| random_selector                     | General  | en, zh  | 随机筛选 k 个样本                            |
+| range_specified_field_selector      | General  | en, zh  | 通过比较指定字段的值选出指定范围的 k 个样本                            |
 | topk_specified_field_selector       | General  | en, zh  | 通过比较指定字段的值选出前 k 个样本                            |
-| range_specified_field_selector       | General  | en, zh  | 通过比较指定字段的值选出指定范围的 k 个样本                            |
 
 ## 贡献
 我们欢迎社区贡献新的算子，具体请参考[开发者指南](DeveloperGuide_ZH.md)。

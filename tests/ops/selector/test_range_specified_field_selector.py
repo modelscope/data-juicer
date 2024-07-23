@@ -165,7 +165,7 @@ class RangeSpecifiedFieldSelectorTest(DataJuicerTestCaseBase):
         }]
         dataset = Dataset.from_list(ds_list)
         op = RangeSpecifiedFieldSelector(field_key='meta.key1.count',
-                                        lower_percentile=0.8,
+                                        lower_percentile=0.78,
                                         upper_percentile=0.9,
                                         lower_rank=5,
                                         upper_rank=10)
@@ -322,7 +322,7 @@ class RangeSpecifiedFieldSelectorTest(DataJuicerTestCaseBase):
         op = RangeSpecifiedFieldSelector(field_key='meta.key1.key2.count',
                                         lower_percentile=0.3,
                                         upper_percentile=1.0,
-                                        lower_rank=8,
+                                        lower_rank=7,
                                         upper_rank=9)
         self._run_range_selector(dataset, tgt_list, op)
 
@@ -475,7 +475,7 @@ class RangeSpecifiedFieldSelectorTest(DataJuicerTestCaseBase):
         }]
         dataset = Dataset.from_list(ds_list)
         op = RangeSpecifiedFieldSelector(field_key='meta.key1.key2.count',
-                                        lower_percentile=0.8,
+                                        lower_percentile=0.7,
                                         upper_percentile=1.0,
                                         lower_rank=3,
                                         upper_rank=9)
@@ -632,7 +632,7 @@ class RangeSpecifiedFieldSelectorTest(DataJuicerTestCaseBase):
         op = RangeSpecifiedFieldSelector(field_key='meta.key1.key2.count',
                                         lower_percentile=0.0,
                                         upper_percentile=0.5,
-                                        lower_rank=3,
+                                        lower_rank=2,
                                         upper_rank=4)
         self._run_range_selector(dataset, tgt_list, op)
 

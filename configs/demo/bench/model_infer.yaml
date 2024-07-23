@@ -7,9 +7,9 @@ train:
     pretrained_model_name_or_path: "PixArt-alpha/PixArt-XL-2-512x512"
     # path to pretrained easyanimate checkpoint. Following are the links to available checkpoints.
     # https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/dj-competition/modelscope_sora/models/easyanimate_mm_16x256x256_pretrain.safetensors
-    # https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/dj-competition/modelscope_sora/models/easyanimate_mm_16x512x512_pretrain.safetensors
-    transformer_path: "/path/to/easyanimate_mm_16x256x256_pretrain.safetensors"
-    lora_path: "../../outputs/demo-sandbox-data-partition/models/checkpoint-1.safetensors"
+    transformer_path: "/PATH/TO/EASYANIMATE_MODEL"
+    # Note that the root path is in "thirdparth/easy_animate"
+    lora_path: "../../outputs/demo-bench/models/checkpoint-2.safetensors"
 
   infer_config:
     # must match the pretrained easyanimate checkpoint.
@@ -22,4 +22,4 @@ train:
     seed: 43
 
   saving_config:
-    output_video_dir: "../../outputs/demo-sandbox-data-partition/generate_videos"
+    output_video_dir: "../../outputs/demo-bench/generated_videos"

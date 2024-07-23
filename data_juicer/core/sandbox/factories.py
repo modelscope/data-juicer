@@ -2,8 +2,8 @@ from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  InceptionEvaluator,
                                                  VBenchEvaluator)
 from data_juicer.core.sandbox.model_executors import (
-    EasyAnimateGenerateExecutor, EasyAnimateTrainExecutor,
-    ModelscopeInferExecutor, ModelscopeTrainExecutor)
+    EasyAnimateInferExecutor, EasyAnimateTrainExecutor,
+    ModelscopeInferProbeExecutor, ModelscopeTrainExecutor)
 
 
 class DataEvaluatorFactory(object):
@@ -48,19 +48,19 @@ class ModelEvaluatorFactory(object):
 model_evaluator_factory = ModelEvaluatorFactory()
 
 
-class ModelInferExecutorFactory(object):
+class ModelInferProberFactory(object):
 
     def __call__(self, model_cfg: dict = None, *args, **kwargs):
         if model_cfg is None:
             return None
 
         if model_cfg.type == 'modelscope':
-            return ModelscopeInferExecutor(model_cfg)
+            return ModelscopeInferProbeExecutor(model_cfg)
 
         # add more model inference here freely
 
 
-mode_infer_executor_factory = ModelInferExecutorFactory()
+mode_infer_prober_factory = ModelInferProberFactory()
 
 
 class ModelTrainExecutorFactory(object):
@@ -80,19 +80,19 @@ class ModelTrainExecutorFactory(object):
 model_train_executor_factory = ModelTrainExecutorFactory()
 
 
-class DataGenerateExecutorFactory(object):
+class ModelInferExecutorFactory(object):
 
     def __call__(self, generate_cfg: dict = None, *args, **kwargs):
         if generate_cfg is None:
             return None
 
         if generate_cfg.type == 'easyanimate':
-            return EasyAnimateGenerateExecutor(generate_cfg, **kwargs)
+            return EasyAnimateInferExecutor(generate_cfg, **kwargs)
 
         # add more data generation here freely
 
 
-data_generate_executor_factory = DataGenerateExecutorFactory()
+model_infer_executor_factory = ModelInferExecutorFactory()
 
 
 class DataProcessorFactory(object):

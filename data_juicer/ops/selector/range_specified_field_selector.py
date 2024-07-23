@@ -1,5 +1,4 @@
 import heapq
-import sys
 
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
@@ -29,24 +28,24 @@ class RangeSpecifiedFieldSelector(Selector):
             separated by '.'.
         :param lower_percentile: The lower bound of the percentile to
             be sample, samples will be selected if their specified field
-            values are within the range. When both lower_percentile and
-            lower_rank are set, the value corresponding to the larger
-            number of samples will be applied.
+            values are greater than this lower bound. When both 
+            lower_percentile and lower_rank are set, the value corresponding
+            to the larger number of samples will be applied.
         :param upper_percentile: The upper bound of the percentile to
             be sample, samples will be selected if their specified field
-            values are within the range. When both upper_percentile and
-            upper_rank are set, the value corresponding to the smaller
-            number of samples will be applied.
+            values are less or equal to the upper bound. When both
+            upper_percentile and upper_rank are set, the value corresponding
+            to the smaller number of samples will be applied.
         :param lower_rank: The lower bound of the rank to be sample,
             samples will be selected if their specified field values are
-            within the range. When both lower_percentile and lower_rank
-            are set, the value corresponding to the larger number of
-            samples will be applied.
+            greater than this lower bound. When both lower_percentile and
+            lower_rank are set, the value corresponding to the larger number
+            of samples will be applied.
         :param upper_rank: The upper bound of the rank to be sample,
             samples will be selected if their specified field values are
-            within the range. When both upper_percentile and upper_rank
-            are set, the value corresponding to the smaller number of
-            samples will be applied.
+            less or equal to the upper bound. When both upper_percentile and
+            upper_rank are set, the value corresponding to the smaller number
+            of samples will be applied.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -66,13 +65,13 @@ class RangeSpecifiedFieldSelector(Selector):
         if self.upper_percentile is None and self.upper_rank is None:
             return dataset
 
-        lower_bound, upper_bound = 1, len(dataset)
+        lower_bound, upper_bound = 0, len(dataset)
         if self.lower_percentile is not None:
-            lower_bound = self.lower_percentile * len(dataset)
+            lower_bound = int(self.lower_percentile * len(dataset))
         if self.lower_rank is not None:
             lower_bound = max(lower_bound, self.lower_rank)
         if self.upper_percentile is not None:
-            upper_bound = self.upper_percentile * len(dataset)
+            upper_bound = int(self.upper_percentile * len(dataset))
         if self.upper_rank is not None:
             upper_bound = min(upper_bound, self.upper_rank)
         upper_bound = max(lower_bound, upper_bound)
@@ -103,7 +102,7 @@ class RangeSpecifiedFieldSelector(Selector):
         sub_dataset = dataset.select(select_index)
 
         field_value_list = get_field_value_list(sub_dataset, field_keys)
-        select_index = heapq.nlargest(int(upper_bound - lower_bound + 1),
+        select_index = heapq.nlargest(int(upper_bound - lower_bound),
                                         range(len(sub_dataset)),
                                         field_value_list.__getitem__)
         
