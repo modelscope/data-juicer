@@ -46,6 +46,7 @@ class GenerateInstructionMapper(Mapper):
                  prompt_template=None,
                  enable_vllm=False,
                  tensor_parallel_size=None,
+                 sampling_params={},
                  *args,
                  **kwargs):
         """
@@ -68,6 +69,8 @@ class GenerateInstructionMapper(Mapper):
         :param tensor_parallel_size: It is only valid when enable_vllm is True.
             The number of GPUs to use for distributed execution with tensor
             parallelism.
+        :param sampling_params: Sampling parameters for text generation.
+            e.g {'temperature': 0.9, 'top_p': 0.95}
         :param args: extra args
         :param kwargs: extra args
         """
@@ -96,11 +99,12 @@ class GenerateInstructionMapper(Mapper):
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
                 tensor_parallel_size=tensor_parallel_size)
-            self.sampling_params = SamplingParams(max_tokens=2048)
+            self.sampling_params = SamplingParams(**sampling_params)
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
                 pretrained_model_name_or_path=hf_model)
+            self.sampling_params = sampling_params
 
         self.seed_qa_samples = self.load_seed_qa_samples(seed_file)
 
@@ -198,7 +202,7 @@ class GenerateInstructionMapper(Mapper):
         else:
             inputs = processor(input_prompt,
                                return_tensors='pt').to(model.device)
-            output_ids = model.generate(**inputs)
+            output_ids = model.generate(**inputs, **self.sampling_params)
             # remove the input prompt from the output
             output_ids = output_ids[:, inputs.data['input_ids'].shape[1]:]
             response_str = processor.decode(output_ids.cpu()[0],
