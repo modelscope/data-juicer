@@ -10,11 +10,12 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 class ExtractQAMapperTest(DataJuicerTestCaseBase):
     text_key = 'text'
 
-    def _run_extract_qa(self, samples, enable_vllm=False):
+    def _run_extract_qa(self, samples, enable_vllm=False, sampling_params={}):
         op = ExtractQAMapper(
             hf_model='alibaba-pai/pai-qwen1_5-7b-doc2qa',
             qa_format='chatml',
-            enable_vllm=enable_vllm
+            enable_vllm=enable_vllm,
+            sampling_params=sampling_params
             )
         for sample in samples:
             result = op.process(sample)
@@ -38,7 +39,10 @@ class ExtractQAMapperTest(DataJuicerTestCaseBase):
             {
             self.text_key: '蒙古国的首都是乌兰巴托（Ulaanbaatar）\n冰岛的首都是雷克雅未克（Reykjavik）\n'
             }]
-        self._run_extract_qa(samples, enable_vllm=True)
+        self._run_extract_qa(
+            samples, 
+            enable_vllm=True,
+            sampling_params={'temperature': 0.9, 'top_p': 0.95, 'max_tokens': 256})
 
 
 if __name__ == '__main__':

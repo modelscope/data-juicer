@@ -32,6 +32,7 @@ class ExtractQAMapper(Mapper):
                  qa_format: str = 'chatml',
                  enable_vllm=False,
                  tensor_parallel_size=None,
+                 sampling_params={},
                  *args,
                  **kwargs):
         """
@@ -43,6 +44,8 @@ class ExtractQAMapper(Mapper):
         :param tensor_parallel_size: It is only valid when enable_vllm is True.
             The number of GPUs to use for distributed execution with tensor
             parallelism.
+        :param sampling_params: Sampling parameters for text generation.
+            e.g {'temperature': 0.9, 'top_p': 0.95}
         :param args: extra args
         :param kwargs: extra args
 
@@ -84,11 +87,12 @@ class ExtractQAMapper(Mapper):
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
                 tensor_parallel_size=tensor_parallel_size)
-            self.sampling_params = SamplingParams(max_tokens=2048)
+            self.sampling_params = SamplingParams(**sampling_params)
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
                 pretrained_model_name_or_path=hf_model)
+            self.sampling_params = sampling_params
 
     def _extract_qa(self, output):
         """Extract qestion and answer pair from model output response."""
@@ -113,7 +117,7 @@ class ExtractQAMapper(Mapper):
         else:
             inputs = processor(sample[self.text_key],
                                return_tensors='pt').to(model.device)
-            response = model.generate(**inputs)
+            response = model.generate(**inputs, **self.sampling_params)
             output = processor.decode(response.cpu()[0],
                                       skip_special_tokens=True)
 
