@@ -38,6 +38,7 @@ class GenerateInstructionMapper(Mapper):
     The number of samples generated is determined by
     the length of the empty dataset.
     """
+    _accelerator = 'cuda'
 
     def __init__(self,
                  hf_model,

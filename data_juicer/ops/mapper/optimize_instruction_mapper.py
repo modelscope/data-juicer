@@ -16,6 +16,7 @@ class OptimizeInstructionMapper(Mapper):
         alibaba-pai/Qwen2-7B-Instruct-Refine
     ]
     """
+    _accelerator = 'cuda'
 
     def __init__(self,
                  hf_model: str = 'alibaba-pai/Qwen2-7B-Instruct-Refine',
