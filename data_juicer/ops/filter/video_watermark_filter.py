@@ -144,7 +144,9 @@ class VideoWatermarkFilter(Filter):
                 inputs = inputs.to(model.device)
                 outputs = model(**inputs)
                 logits = outputs.logits
-                cur_probs = [probs[1] for probs in torch.softmax(logits, dim=-1)]
+                cur_probs = [
+                    probs[1] for probs in torch.softmax(logits, dim=-1)
+                ]
                 cur_probs = torch.Tensor(cur_probs)
 
                 if self.reduce_mode == 'avg':

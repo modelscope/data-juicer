@@ -3,6 +3,7 @@ import heapq
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
 from data_juicer.utils.common_utils import stats_to_number
+
 from ..base_op import OPERATORS, Selector
 
 
@@ -28,7 +29,7 @@ class RangeSpecifiedFieldSelector(Selector):
             separated by '.'.
         :param lower_percentile: The lower bound of the percentile to
             be sample, samples will be selected if their specified field
-            values are greater than this lower bound. When both 
+            values are greater than this lower bound. When both
             lower_percentile and lower_rank are set, the value corresponding
             to the larger number of samples will be applied.
         :param upper_percentile: The upper bound of the percentile to
@@ -79,7 +80,7 @@ class RangeSpecifiedFieldSelector(Selector):
         field_keys = self.field_key.split('.')
         assert field_keys[0] in dataset.features.keys(
         ), "'{}' not in {}".format(field_keys[0], dataset.features.keys())
-    
+
         def get_field_value_list(cur_dataset, field_keys):
             if len(field_keys) == 1:
                 field_value_list = cur_dataset[field_keys[0]]
@@ -88,22 +89,21 @@ class RangeSpecifiedFieldSelector(Selector):
                 for item in cur_dataset[field_keys[0]]:
                     field_value = item
                     for key in field_keys[1:]:
-                        assert key in field_value.keys(), "'{}' not in {}".format(
-                            key, field_value.keys())
+                        assert key in field_value.keys(
+                        ), "'{}' not in {}".format(key, field_value.keys())
                         field_value = field_value[key]
                     field_value_list.append(field_value)
             field_value_list = [stats_to_number(s) for s in field_value_list]
             return field_value_list
-        
+
         field_value_list = get_field_value_list(dataset, field_keys)
-        select_index = heapq.nsmallest(int(upper_bound),
-                                        range(len(dataset)),
-                                        field_value_list.__getitem__)
+        select_index = heapq.nsmallest(int(upper_bound), range(len(dataset)),
+                                       field_value_list.__getitem__)
         sub_dataset = dataset.select(select_index)
 
         field_value_list = get_field_value_list(sub_dataset, field_keys)
         select_index = heapq.nlargest(int(upper_bound - lower_bound),
-                                        range(len(sub_dataset)),
-                                        field_value_list.__getitem__)
-        
+                                      range(len(sub_dataset)),
+                                      field_value_list.__getitem__)
+
         return sub_dataset.select(select_index)

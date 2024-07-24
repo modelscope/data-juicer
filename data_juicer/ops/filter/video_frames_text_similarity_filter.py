@@ -172,12 +172,12 @@ class VideoFramesTextSimilarityFilter(Filter):
 
                 if len(video_frame_images_chunk) > 0:
                     inputs = processor(text=text_chunk,
-                                    images=video_frame_images_chunk,
-                                    return_tensors='pt',
-                                    truncation=True,
-                                    max_length=model.config.text_config.
-                                    max_position_embeddings,
-                                    padding=True).to(model.device)
+                                       images=video_frame_images_chunk,
+                                       return_tensors='pt',
+                                       truncation=True,
+                                       max_length=model.config.text_config.
+                                       max_position_embeddings,
+                                       padding=True).to(model.device)
 
                     outputs = model(**inputs)
                     chunk_logits = outputs.logits_per_text / 100.0

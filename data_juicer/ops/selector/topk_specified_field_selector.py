@@ -3,6 +3,7 @@ import heapq
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
 from data_juicer.utils.common_utils import stats_to_number
+
 from ..base_op import OPERATORS, Selector
 
 
@@ -75,7 +76,8 @@ class TopkSpecifiedFieldSelector(Selector):
                     assert key in field_value.keys(), "'{}' not in {}".format(
                         key, field_value.keys())
                     field_value = field_value[key]
-                field_value_list.append(stats_to_number(field_value, self.reverse))
+                field_value_list.append(
+                    stats_to_number(field_value, self.reverse))
 
         if self.reverse:
             select_index = heapq.nlargest(int(select_num), range(len(dataset)),

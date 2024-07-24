@@ -159,7 +159,7 @@ class VideoAestheticsFilter(Filter):
                 # compute aesthetics_scores
                 model, processor = get_model(self.model_key, rank=rank)
                 inputs = processor(images=frame_images,
-                                return_tensors='pt').to(model.device)
+                                   return_tensors='pt').to(model.device)
                 with torch.no_grad():
                     outputs = model(**inputs)
                 if self.need_normalized_by_ten:

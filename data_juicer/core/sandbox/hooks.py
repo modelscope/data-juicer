@@ -1,17 +1,17 @@
+# yapf: disable
 import asyncio
-import os
 
 from jsonargparse import dict_to_namespace
 from loguru import logger
 
 from data_juicer.config import get_init_configs, prepare_side_configs
-from data_juicer.core.sandbox.factories import (data_executor_factory,
-                                                data_analyzer_factory,
+from data_juicer.core.sandbox.factories import (data_analyzer_factory,
                                                 data_evaluator_factory,
+                                                data_executor_factory,
                                                 mode_infer_evaluator_factory,
                                                 model_evaluator_factory,
-                                                model_train_executor_factory,
-                                                model_infer_executor_factory)
+                                                model_infer_executor_factory,
+                                                model_train_executor_factory)
 from data_juicer.utils.constant import JobRequiredKeys
 from tools.hpo.execute_hpo_3sigma import modify_recipe_k_sigma
 
@@ -209,10 +209,11 @@ class InferModelHook(BaseHook):
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
         model_infer = model_infer_executor_factory(self.other_cfg,
-                                                     watcher=self.watcher)
+                                                   watcher=self.watcher)
 
         logger.info('Begin to infer the model with given model config')
-        asyncio.run(model_infer.run(model_infer.model_config['type'], **kwargs))
+        asyncio.run(model_infer.run(model_infer.model_config['type'],
+                                    **kwargs))
         return kwargs
 
 

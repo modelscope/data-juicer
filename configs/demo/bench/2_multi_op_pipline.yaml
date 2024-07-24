@@ -21,13 +21,13 @@ execution_job_configs:
       process:
         # select samples with high language score
         - language_id_score_filter:
-            lang: 
+            lang:
             min_score: 0.7206037306785583     # this value can be observed in the analysis result of the probe job in one op experiments
         # select samples with middle video duration
         - video_duration_filter:
             min_duration: 19.315000   # this value can be observed in the analysis result of the probe job in one op experiments
             max_duration: 32.045000   # this value can be observed in the analysis result of the probe job in one op experiments
-        
+
     extra_configs:
   - hook: 'ProcessDataHook'
     meta_name:

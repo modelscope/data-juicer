@@ -20,7 +20,7 @@ class DataExecutorFactory(object):
         return DjExecutor(dj_cfg)
 
 
-data_executor_factory = DataExecutorFactor()
+data_executor_factory = DataExecutorFactory()
 
 
 class DataAnalyzerFactory(object):
@@ -125,4 +125,3 @@ class ModelInferExecutorFactory(object):
 
 
 model_infer_executor_factory = ModelInferExecutorFactory()
-

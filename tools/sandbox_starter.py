@@ -95,6 +95,7 @@ def specify_jobs_configs(cfg):
     :param cfg: the original config
     :return: a dict of different configs.
     """
+
     def configs_to_job_list(cfgs):
         job_cfgs = []
         if cfgs:
@@ -102,9 +103,11 @@ def specify_jobs_configs(cfg):
         return job_cfgs
 
     cfg.probe_job_configs = configs_to_job_list(cfg.probe_job_configs)
-    cfg.refine_recipe_job_configs = configs_to_job_list(cfg.refine_recipe_job_configs)
+    cfg.refine_recipe_job_configs = configs_to_job_list(
+        cfg.refine_recipe_job_configs)
     cfg.execution_job_configs = configs_to_job_list(cfg.execution_job_configs)
-    cfg.evaluation_job_configs = configs_to_job_list(cfg.evaluation_job_configs)
+    cfg.evaluation_job_configs = configs_to_job_list(
+        cfg.evaluation_job_configs)
 
     return cfg
 

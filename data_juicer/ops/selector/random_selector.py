@@ -1,8 +1,8 @@
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
-from ..base_op import OPERATORS, Selector
-
 from data_juicer.format.mixture_formatter import MixtureFormatter
+
+from ..base_op import OPERATORS, Selector
 
 
 @OPERATORS.register_module('random_selector')
@@ -45,4 +45,5 @@ class RandomSelector(Selector):
             if self.select_num and self.select_num < select_num:
                 select_num = self.select_num
 
-        return MixtureFormatter.random_sample(dataset, sample_number=select_num)
+        return MixtureFormatter.random_sample(dataset,
+                                              sample_number=select_num)
