@@ -1,5 +1,6 @@
 import json
 import re
+from typing import Dict
 
 from loguru import logger
 
@@ -30,9 +31,11 @@ class ExtractQAMapper(Mapper):
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
                  pattern: str = None,
                  qa_format: str = 'chatml',
-                 enable_vllm=False,
-                 tensor_parallel_size=None,
-                 sampling_params={},
+                 enable_vllm: bool = False,
+                 tensor_parallel_size: int = None,
+                 max_model_len: int = None,
+                 max_num_seqs: int = 256,
+                 sampling_params: Dict = {},
                  *args,
                  **kwargs):
         """
@@ -44,6 +47,11 @@ class ExtractQAMapper(Mapper):
         :param tensor_parallel_size: It is only valid when enable_vllm is True.
             The number of GPUs to use for distributed execution with tensor
             parallelism.
+        :param max_model_len: It is only valid when enable_vllm is True.
+            Model context length. If unspecified, will be automatically
+            derived from the model config.
+        :param max_num_seqs: It is only valid when enable_vllm is True.
+            Maximum number of sequences to be processed in a single iteration.
         :param sampling_params: Sampling parameters for text generation.
             e.g {'temperature': 0.9, 'top_p': 0.95}
         :param args: extra args
@@ -86,7 +94,9 @@ class ExtractQAMapper(Mapper):
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
-                tensor_parallel_size=tensor_parallel_size)
+                tensor_parallel_size=tensor_parallel_size,
+                max_model_len=max_model_len,
+                max_num_seqs=max_num_seqs)
             self.sampling_params = SamplingParams(**sampling_params)
         else:
             self.model_key = prepare_model(
