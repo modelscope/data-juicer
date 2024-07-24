@@ -4,7 +4,6 @@
 
 # global parameters
 project_name: 'all'                                         # project name for distinguish your configs
-experiment_name: 'all-experiment-1'                         # experiment name for wandb record
 dataset_path: '/path/to/your/dataset'                       # path to your dataset directory or file with weights(0.0-1.0), 1.0 as default.
                                                             # accepted format: 'weight1(optional) dataset1-path weight2(optional) dataset2-path'
 export_path: '/path/to/result/dataset.jsonl'                # path to processed result dataset. Supported suffixes include ['jsonl', 'json', 'parquet']

@@ -73,10 +73,6 @@ def init_configs(args=None):
                         type=str,
                         default='hello_world',
                         help='Name of your data process project.')
-    parser.add_argument('--experiment_name',
-                        type=str,
-                        default=None,
-                        help='Experiment name for wandb record.')
     parser.add_argument(
         '--executor_type',
         type=str,
