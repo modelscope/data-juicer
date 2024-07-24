@@ -1,7 +1,9 @@
 # 用户指南
 ## 应用和成果
-我们利用Data-Juicer沙盒实验室套件，通过数据与模型间的系统性研发工作流，调优数据和模型，相关工作请参考[论文](http://arxiv.org/abs/2407.11784)。在本工作中，我们在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首，模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布。相关的沙盒实验脚本和数据集正在紧锣密鼓整理中，敬请期待。
+我们利用Data-Juicer沙盒实验室套件，通过数据与模型间的系统性研发工作流，调优数据和模型，相关工作请参考[论文](http://arxiv.org/abs/2407.11784)。在本工作中，我们在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布，训练模型的[数据集](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip)也已开源。
 ![top-1_in_vbench](https://img.alicdn.com/imgextra/i3/O1CN01Ssg83y1EPbDgTzexn_!!6000000000344-2-tps-2966-1832.png)
+复现论文实验请参考下面的sandbox使用指南，下图的实验流程，以及该流程的工作流的配置文件demo：[1_single_op_pipline.yaml](../configs/demo/bench/1_single_op_pipline.yaml)、[2_multi_op_pipline.yaml](../configs/demo/bench/2_multi_op_pipline.yaml)、[3_duplicate_pipline.yaml](../configs/demo/bench/3_duplicate_pipline.yaml)。
+![bench_bottom_up](https://img.alicdn.com/imgextra/i3/O1CN01ZwtQuG1sdPnbYYVhH_!!6000000005789-2-tps-7838-3861.png)
 
 ## 什么是沙盒实验室（DJ-Sandbox）？
 在Data-Juicer中，数据沙盒实验室为用户提供了持续生产数据菜谱的最佳实践，其具有低开销、可迁移、有指导性等特点，用户在沙盒中基于一些小规模数据集、模型对数据菜谱进行快速实验、迭代、优化，再迁移到更大尺度上，大规模生产高质量数据以服务大模型。
@@ -99,12 +101,14 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 在沙盒流水线的单次运行中，包括了四个大的步骤，其中涉及到如下一些可配置组件，他们分别对应了一个用于初始化这些组件的工厂类：
 
 - **数据处理（DataExecutor）**：数据处理的执行器，即Data-Juicer的executor
+- **数据分析（DataAnalyzer）**：数据分析器，即Data-Juicer的analyzer
 - **数据评估（DataEvaluator）**：数据集质量的评估器
+- **模型数据评估（ModelInferEvaluator）**：利用模型推理结果的数据集质量的评估器
 - **模型训练（ModelTrainExecutor）**：模型训练执行器
 - **模型推理（ModelInferExecutor）**：模型推理执行器
 - **模型评估（ModelEvaluator）**：模型性能的评估器
 
-除了DataExecutor，其余组件均可在配置文件中指定`type`参数来选择具体的执行或者评估类型，如数据评估组件支持`type`为`"dj_text_quality_classifier"`来使用Data-Juicer的质量分类器工具来对数据集进行评估，而模型训练组件`type`为`"modelscope"`来训练来自于ModelScope平台的模型。
+除了DataExecutor和DataAnalyzer，其余组件均可在配置文件中指定`type`参数来选择具体的执行或者评估类型，如数据评估组件支持`type`为`"dj_text_quality_classifier"`来使用Data-Juicer的质量分类器工具来对数据集进行评估，而模型训练组件`type`为`"modelscope"`来训练来自于ModelScope平台的模型。
 
 目前支持的组件工厂以及工厂中支持的组件包括：
 
@@ -112,23 +116,28 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 | 组件 | 功能 | `run`方法说明 | 参考材料 |
 | --- | --- | --- | --- |
-| `Gpt3QualityEvaluator` | 使用Data-Juicer复现的GPT-3文本质量分类器对数据集进行质量评估 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：待评估的数据集路径<br />- 返回值：待评估数据集样本质量打分均值<br /> | [Data-Juicer质量分类器工具集](https://github.com/modelscope/data-juicer/tree/main/tools/quality_classifier) |
+| `Gpt3QualityEvaluator` | 使用Data-Juicer复现的GPT-3文本质量分类器对数据集进行质量评估 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：待评估数据集样本质量打分均值<br /> | [Data-Juicer质量分类器工具集](https://github.com/modelscope/data-juicer/tree/main/tools/quality_classifier) |
 | `VBenchEvaluator` | 使用VBench对基于prompt生成的视频进行多维度的评估 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：待评生成视频集各维度打分均值<br /> | [VBench论文](https://arxiv.org/abs/2311.17982) |
 | `InceptionEvaluator` | 通过视频分类模型抽取特征测评生成的视频 | <br />- `eval_type`：该评估器评估对象类型，目前只支持`"data"`<br />- `eval_obj`：未使用的参数<br />- 返回值：根据给定的metric返回对应的字典<br /> | [Inception Metrics](https://github.com/NVlabs/long-video-gan/tree/main/metrics) |
+
+- 模型数据评估工厂 -- ModelInferEvaluatorFactory
+
+| 组件 | 功能 | `run`方法说明 | 参考材料 |
+| --- | --- | --- | --- |
+| `ModelscopeInferProbeExecutor` | 用数据集对ModelScope平台上的模型进行推理，并返回推理结果 | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"modelscope"`来激活该组件<br />- `run_obj`：需要送入模型推理的采样数据集<br /> | [ModelScope模型推理文档](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8E%A8%E7%90%86Pipeline) |
 
 - 模型训练工厂 -- ModelTrainExecutorFactory
 
 | 组件 | 功能 | `run`方法说明 | 参考材料 |
 | --- | --- | --- | --- |
-| `ModelscopeTrainExecutor` | 用Data-Juicer产出的数据集训练ModelScope平台上的模型，并监测loss变化信息 | <br />- `run_type`：训练模型类型。需要在组件配置文件中设置`type`参数为`"modelscope"`来激活该组件<br />- `run_obj`：额外训练配置。除了组件配置之外的额外配置信息，包括数据集路径以及存放训练产出的工作路径等，由于他们会随着流水线运行发生变化，因此他们会在流水线中动态设置<br /> | [ModelScope模型训练文档](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train) |
+| `ModelscopeTrainExecutor` | 用Data-Juicer产出的数据集训练ModelScope平台上的模型，并监测loss变化信息 | <br />- `run_type`：训练模型类型。需要在组件配置文件中设置`type`参数为`"modelscope"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | [ModelScope模型训练文档](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E8%AE%AD%E7%BB%83Train) |
 | `EasyAnimateTrainExecutor` | 用Data-Juicer产出的数据集训练文生视频模型EasyAnimate的LoRA模型，并监测loss变化信息  | <br />- `run_type`：训练模型类型。需要在组件配置文件中设置`type`参数为`"easyanimate"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
 
 - 模型推理工厂 -- ModelInferExecutorFactory
 
 | 组件 | 功能 | `run`方法说明 | 参考材料 |
 | --- | --- | --- | --- |
-| `ModelscopeInferExecutor` | 用数据集对ModelScope平台上的模型进行推理，并返回推理结果 | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"modelscope"`来激活该组件<br />- `run_obj`：需要送入模型推理的采样数据集<br /> | [ModelScope模型推理文档](https://modelscope.cn/docs/%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8E%A8%E7%90%86Pipeline) |
-| `ModelscopeInferExecutor` | 用VBench的prompt数据集对EasyAnimate模型进行推理，并存储生成的视频 | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"easyanimate"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
+| `EasyAnimateInferExecutor` | 用VBench的prompt数据集对EasyAnimate模型进行推理，并存储生成的视频 | <br />- `run_type`：推理类型。需要在组件配置文件中设置`type`参数为`"easyanimate"`来激活该组件<br />- `run_obj`：未使用的参数<br /> | [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) |
 
 - 模型评估工厂 -- ModelEvaluatorFactory
    - TBD
@@ -136,7 +145,7 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 详细定义可参考`data_juicer/core/sandbox/factories.py`。
 # 开发者指南
 正如上一章节所说，开发者可开发更多的可配置组件并将它们添加到对应的工厂类中，并用参数`type`进行实例化方法分配。实现了组件后，开发者可以将它们封装为钩子，并将钩子注册到工作列表中，工作列表在流水线中进行编排后，沙盒流水线执行时，会依次在每个步骤执行每个工作列表中的工作。这其中的每一个部分：组件、组件工厂、钩子、工作列表、流水线注册与执行流程编排，都可以由开发者自定义。各个部分的关系由下图示意。
-![sandbox-pipeline](https://img.alicdn.com/imgextra/i1/O1CN01JsgSuu22ycGdJFRdc_!!6000000007189-2-tps-3640-2048.png)
+![sandbox-pipeline](https://img.alicdn.com/imgextra/i2/O1CN01B3zR0t29noFoHGsyq_!!6000000008113-2-tps-3878-2212.png)
 
 ## 组件内部实现
 目前组件主要分为两个大类：
@@ -175,13 +184,14 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 
 | 钩子 | 功能 | 依赖的组件工厂 | 依赖的工具或库 | 注册工作列表 |
 | --- | --- | --- | --- | --- |
-| `ProbeViaAnalyzerHook` | 分析与洞察数据集质量、多样性等维度分布 | - | Data-Juicer分析器Analyzer | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
-| `ProbeViaModelInferHook` | 分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据 | 模型推理工厂（ModelInferExecutorFactory） | - | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
+| `ProbeViaAnalyzerHook` | 分析与洞察数据集质量、多样性等维度分布 | 数据分析工厂（DataAnalyzerFactory） | Data-Juicer分析器Analyzer | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
+| `ProbeViaModelInferHook` | 分析与洞察数据集对于模型的影响，挖掘与洞察“难”数据与“脏”数据 | 数据处理工厂（DataExecutorFactor）<br />模型数据评估工厂（ModelInferEvaluatorFactory） | Data-Juicer数据处理器Executor | 洞察工作列表（probe_jobs）<br />评估工作列表（evaluation_jobs） |
 | `RefineRecipeViaKSigmaHook` | 根据数据集洞察结果，利用k-sigma方法对数据菜谱超参进行微调 | - | Data-Juicer超参优化工具HPO中的k-sigma菜谱微调工具 | 菜谱微调工作列表（refine_recipe_jobs） |
 | `RefineRecipeViaModelFeedbackHook` | 利用模型洞察与反馈结果对数据菜谱超参进行微调 | TODO | - | 菜谱微调工作列表（refine_recipe_jobs） |
-| `ProcessDataHook` | 基于当前数据菜谱对数据集进行处理与清洗 | - | Data-Juicer数据处理器Executor | 执行工作列表（execution_jobs） |
-| `TrainModelHook` | 基于当前数据集训练一个模型 | 模型训练工厂（ModelTrainExecutorFactory） | - | 执行工作列表（execution_jobs） |
-| `EvaluateDataHook` | 对当前数据集进行数据质量等维度的评估 | 数据评估工厂（DataEvaluatorFactory） | - | 评估工作列表（evaluation_jobs） |
+| `ProcessDataHook` | 基于当前数据菜谱对数据集进行处理与清洗 | 数据处理工厂（DataExecutorFactor） | Data-Juicer数据处理器Executor | 执行工作列表（execution_jobs） |
+| `TrainModelHook` | 基于当前数据集训练一个模型 | 模型训练工厂（ModelTrainExecutorFactory） | [EasyAnimate](../thirdparty//easy_animate/README.md) | 执行工作列表（execution_jobs） |
+| `InferModelHook` | 模型基于给定输入让模型产生输出 | 模型推理工厂（ModelInferExecutorFactory） | [EasyAnimate](../thirdparty//easy_animate/README.md) | 执行工作列表（execution_jobs） |
+| `EvaluateDataHook` | 对当前数据集进行数据质量等维度的评估 | 数据评估工厂（DataEvaluatorFactory） | 图像或视频的[inception metrics](../tools/mm_eval/inception_metrics/README_ZH.md)，如FID、FVD <br /> [VBench](../tools/mm_eval/vbench_metrics/README_ZH.md) | 评估工作列表（evaluation_jobs） |
 | `EvaluateModelHook` | 对当前训练后的模型进行评估 | 模型评估工厂（ModelEvaluatorFactory） | - | 评估工作列表（evaluation_jobs） |
 
 值得注意的是，一个钩子可以在多个工作列表进行注册，因为这个钩子在不同的流水线阶段可以扮演不同的角色，比如我们可以对处理前后的数据集都进行分析，以比较数据集处理前后的质量、多样性等维度的变化情况。

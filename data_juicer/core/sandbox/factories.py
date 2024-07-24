@@ -1,9 +1,41 @@
+from data_juicer.core import Analyzer
+from data_juicer.core import Executor as DjExecutor
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  InceptionEvaluator,
                                                  VBenchEvaluator)
 from data_juicer.core.sandbox.model_executors import (
     EasyAnimateInferExecutor, EasyAnimateTrainExecutor,
     ModelscopeInferProbeExecutor, ModelscopeTrainExecutor)
+
+
+class DataExecutorFactory(object):
+    """
+    Factory for Data-Juicer executor.
+    """
+
+    def __call__(self, dj_cfg: dict = None, *args, **kwargs):
+        if dj_cfg is None:
+            return None
+
+        return DjExecutor(dj_cfg)
+
+
+data_executor_factory = DataExecutorFactor()
+
+
+class DataAnalyzerFactory(object):
+    """
+    Factory for Data-Juicer analyzer.
+    """
+
+    def __call__(self, dj_cfg: dict = None, *args, **kwargs):
+        if dj_cfg is None:
+            return None
+
+        return Analyzer(dj_cfg)
+
+
+data_analyzer_factory = DataAnalyzerFactory()
 
 
 class DataEvaluatorFactory(object):
@@ -48,7 +80,7 @@ class ModelEvaluatorFactory(object):
 model_evaluator_factory = ModelEvaluatorFactory()
 
 
-class ModelInferProberFactory(object):
+class ModelInferEvaluatorFactory(object):
 
     def __call__(self, model_cfg: dict = None, *args, **kwargs):
         if model_cfg is None:
@@ -60,7 +92,7 @@ class ModelInferProberFactory(object):
         # add more model inference here freely
 
 
-mode_infer_prober_factory = ModelInferProberFactory()
+mode_infer_evaluator_factory = ModelInferEvaluatorFactory()
 
 
 class ModelTrainExecutorFactory(object):
@@ -94,21 +126,3 @@ class ModelInferExecutorFactory(object):
 
 model_infer_executor_factory = ModelInferExecutorFactory()
 
-
-class DataProcessorFactory(object):
-
-    def __call__(self, dj_executor, process_type: str = None, *args, **kwargs):
-        if process_type is None:
-            return None
-
-        if process_type == 'data_juicer_run':
-            return dj_executor.run
-        elif process_type == 'data_sample':
-            return dj_executor.sample_data
-        elif process_type == 'divide_by_percentiles':
-            return dj_executor.divide_by_percentiles
-
-        # add more data processor here freely
-
-
-data_processor_factory = DataProcessorFactory()

@@ -49,8 +49,6 @@ save_stats_in_one_file: false                               # whether to store a
 data_probe_algo: 'uniform'                                  # sampling algorithm for dataset. Should be one of ["uniform", "frequency_specified_field_selector", "topk_specified_field_selector"]. It's "uniform" in default. Only used for dataset sampling.
 data_probe_ratio: 1.0                                       # the sampling ratio to the original dataset size. It's 1.0 in default. Only used for dataset sampling.
 hpo_config: null                                            # path to a configuration file when using auto-HPO tool.
-data_process_type: 'data_juicer_run'                        # choose one data process for sandbox. Should be one of ["data_juicer_run", "data_sample", "divide_by_percentiles"]. The "data_juicer_run" for running setting ops in process, "data_sample" for data sampling, "divide_by_percentiles" for data partitioning.
-fix_data_num: 40000                                         # fix data num in each partition by uniform sample when the data_process_type is "divide_by_percentiles", keep the origin data num if it is null
 
 # process schedule: a list of several process operators with their arguments
 process:

@@ -5,10 +5,10 @@ from jsonargparse import dict_to_namespace
 from loguru import logger
 
 from data_juicer.config import get_init_configs, prepare_side_configs
-from data_juicer.core import Analyzer
-from data_juicer.core import Executor as DjExecutor
-from data_juicer.core.sandbox.factories import (data_evaluator_factory,
-                                                mode_infer_prober_factory,
+from data_juicer.core.sandbox.factories import (data_executor_factory,
+                                                data_analyzer_factory,
+                                                data_evaluator_factory,
+                                                mode_infer_evaluator_factory,
                                                 model_evaluator_factory,
                                                 model_train_executor_factory,
                                                 model_infer_executor_factory)
@@ -58,7 +58,7 @@ class ProbeViaAnalyzerHook(BaseHook):
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
-        analyzer = Analyzer(self.inited_dj_cfg)
+        analyzer = data_analyzer_factory(self.inited_dj_cfg)
         # probe the data via Analyzer
         logger.info('Begin to analyze data')
         analyzer.run()
@@ -86,8 +86,8 @@ class ProbeViaModelInferHook(BaseHook):
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
-        data_executor = DjExecutor(self.inited_dj_cfg)
-        model_infer_executor = mode_infer_prober_factory(self.other_cfg)
+        data_executor = data_executor_factory(self.inited_dj_cfg)
+        model_infer_executor = mode_infer_evaluator_factory(self.other_cfg)
         # TODO
         # probe the model (calling inference sub-pipeline) based on
         # original data, such that we know what is the "hard" data for
@@ -164,7 +164,7 @@ class ProcessDataHook(BaseHook):
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
-        data_executor = DjExecutor(self.inited_dj_cfg)
+        data_executor = data_executor_factory(self.inited_dj_cfg)
         # basic routine to process data, users can customize this freely
         logger.info('Begin to process the data with given dj recipe')
         data_executor.run()
