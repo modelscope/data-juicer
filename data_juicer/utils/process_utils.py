@@ -49,14 +49,11 @@ def get_min_cuda_memory():
     return min_cuda_memory
 
 
-def calculate_np(name,
-                 mem_required,
-                 cpu_required,
-                 num_proc=None,
-                 use_cuda=False):
+def calculate_np(name, mem_required, cpu_required, use_cuda=False):
     """Calculate the optimum number of processes for the given OP"""
-    if num_proc is None:
-        num_proc = psutil.cpu_count()
+    from data_juicer.config.config import global_cfg
+    num_proc = global_cfg.np
+
     if use_cuda:
         cuda_mem_available = get_min_cuda_memory() / 1024
         op_proc = min(
