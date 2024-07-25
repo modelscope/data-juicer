@@ -10,7 +10,7 @@ from loguru import logger
 
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, UNFORKABLE, Mapper
 
 DEFAULT_PROMPT_TEMPLATE = """
 请你仔细观察多个示例数据的输入和输出，按照你的理解，总结出相应规矩，然后写出一个新的【问题】和【回答】。注意，新生成的【问题】和【回答】需要满足如下要求：
@@ -25,8 +25,11 @@ SAMPLE_INTRODUCTION_AND_QA_FORMAT = ('\n如下是一条示例数据：\n\n'
                                      '{qa_pairs}')
 QA_PAIR_FORMAT = '【问题】\n{}\n【回答】\n{}\n'
 
+OP_NAME = 'generate_instruction_mapper'
 
-@OPERATORS.register_module('generate_instruction_mapper')
+
+@UNFORKABLE.register_module(OP_NAME)
+@OPERATORS.register_module(OP_NAME)
 class GenerateInstructionMapper(Mapper):
     """Mapper to generate new instruction text data.
     You should configure an empty dataset in your yaml config file:
@@ -83,7 +86,7 @@ class GenerateInstructionMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, num_proc=1, **kwargs)
 
         self.instruct_num = instruct_num
         self.similarity_threshold = similarity_threshold

@@ -2,13 +2,16 @@ from typing import Dict
 
 from loguru import logger
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
+from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 DEFAULT_SYSTEM_PROMPT = '请优化这个指令，将其修改为一个更详细具体的指令。'
 
+OP_NAME = 'optimize_instruction_mapper'
 
-@OPERATORS.register_module('optimize_instruction_mapper')
+
+@UNFORKABLE.register_module(OP_NAME)
+@OPERATORS.register_module(OP_NAME)
 class OptimizeInstructionMapper(Mapper):
     """Mapper to optimize instruction.
     Recommended model list: [
@@ -46,7 +49,7 @@ class OptimizeInstructionMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, num_proc=1, **kwargs)
 
         if system_prompt is None:
             system_prompt = DEFAULT_SYSTEM_PROMPT

@@ -4,11 +4,14 @@ from typing import Dict
 
 from loguru import logger
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
+from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
 from data_juicer.utils.model_utils import get_model, prepare_model
 
+OP_NAME = 'extract_qa_mapper'
 
-@OPERATORS.register_module('extract_qa_mapper')
+
+@UNFORKABLE.register_module(OP_NAME)
+@OPERATORS.register_module(OP_NAME)
 class ExtractQAMapper(Mapper):
     """
     Mapper to extract question and answer pair from text samples.
@@ -70,7 +73,7 @@ class ExtractQAMapper(Mapper):
             ...
         """
 
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, num_proc=1, **kwargs)
         self._accelerator = 'cuda'
 
         if pattern is None:
