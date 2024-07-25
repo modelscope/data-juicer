@@ -37,6 +37,7 @@ We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/dat
 ----
 
 ## News
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-24] "Tianchi Better Synth Data Synthesis Competition for Multimodal Large Models" — Our 4-th data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532251) for more information.
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-17] We utilized the Data-Juicer [Sandbox Laboratory Suite](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox.md) to systematically optimize data and models through an co-development workflow between data and models, achieving a new top spot on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard. The related achievements have been compiled and published in a [paper](http://arxiv.org/abs/2407.11784), and the model has been released on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms.
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-12] Our *awesome list of MLLM-Data* has evolved into a systemic [survey](https://arxiv.org/abs/2407.08583) from model-data co-development perspective. Welcome to [explore](docs/awesome_llm_data.md) and contribute!
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-06-01] ModelScope-Sora "Data Directors" creative sprint—Our third data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532219) for more information.
@@ -96,8 +97,8 @@ Table of Contents
   visualization, and multidimensional automatic evaluation, so that you can better understand and improve your data and models.
   ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
-- **Enhanced Efficiency**: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
-  requiring less memory and CPU usage, optimized for maximum productivity.
+- **Towards production environment **: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
+  requiring less memory and CPU usage, optimized with automatic fault-toleration.
   ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data
@@ -154,7 +155,7 @@ Table of Contents
 
 ## Installation
 
-### From Source
+### From Source 
 
 - Run the following commands to install the latest basic `data_juicer` version in
   editable mode:
@@ -229,6 +230,15 @@ You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on De
 
 Check if your environment path is set correctly by running the ffmpeg command from the terminal.
 
+
+<br><hr>
+<div style="text-align: right;">
+
+[🔼 back to index](#documentation-index-a-namedocuments)
+
+</div>
+
+
 ## Quick Start
 
 
@@ -258,6 +268,20 @@ export DATA_JUICER_MODELS_CACHE="/path/to/another/directory/models"
 # cache assets
 export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 ```
+
+#### Flexible Programming Interface
+We provide various simple interfaces for users to choose from as follows. 
+```python
+#... init op & dataset ...
+
+# Chain call style, support single operator or operator list
+dataset = dataset.process(op)
+dataset = dataset.process([op1, op2])
+# Functional programming style for quick integration or script prototype iteration
+dataset = op(dataset)
+dataset = op.run(dataset)
+```
+
 
 ### Distributed Data Processing
 
@@ -376,6 +400,14 @@ docker run -dit \  # run the container in the background
 docker exec -it <container_id> bash
 ```
 
+
+<br><hr>
+<div style="text-align: right;">
+
+[🔼 back to index](#documentation-index-a-namedocuments)
+
+</div>
+
 ## Data Recipes
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
 - [Recipes for data process in RedPajama](configs/redpajama/README.md)
@@ -417,3 +449,24 @@ If you find our work useful for your research or development, please kindly cite
   year={2024}
 }
 ```
+
+<details>
+<summary> More related papers from Data-Juicer Team:
+</summary>>
+
+- [Data-Juicer Sandbox: A Comprehensive Suite for Multimodal Data-Model Co-development](https://arxiv.org/abs/2407.11784)
+
+- [The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective](https://arxiv.org/abs/2407.08583)
+
+- [Data Mixing Made Efficient: A Bivariate Scaling Law for Language Model Pretraining](https://arxiv.org/abs/2402.11505)
+
+</details>
+
+
+
+<br><hr>
+<div style="text-align: right;">
+
+[🔼 back to index](#documentation-index-a-namedocuments)
+
+</div>

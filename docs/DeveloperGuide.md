@@ -11,7 +11,7 @@
 ## Coding Style
 
 We define our styles in `.pre-commit-config.yaml`. Before committing,
-please install `pre-commit` tool to check and modify accordingly:
+please install `pre-commit` tool to automatically check and modify accordingly:
 
 ```shell
 # ===========install pre-commit tool===========

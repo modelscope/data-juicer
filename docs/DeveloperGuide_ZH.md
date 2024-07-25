@@ -10,7 +10,7 @@
 
 ## 编码规范
 
-我们将编码规范定义在 `.pre-commit-config.yaml` 中。在向仓库贡献代码之前，请使用 `pre-commit` 工具对代码进行规范化。
+我们将编码规范定义在 `.pre-commit-config.yaml` 中。在向仓库贡献代码之前，请使用 `pre-commit` 工具对代码进行自动规范化。
 
 ```shell
 # ===========install pre-commit tool===========

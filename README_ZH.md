@@ -31,6 +31,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 ----
 
 ## 新消息
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-24] “天池 Better Synth 多模态大模型数据合成赛”——第四届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532251)，了解赛事详情。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png)[2024-07-17] 我们利用Data-Juicer[沙盒实验室套件](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox-ZH.md)，通过数据与模型间的系统性研发工作流，调优数据和模型，在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。相关成果已经整理发表在[论文](http://arxiv.org/abs/2407.11784)中，并且模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png)[2024-07-12] 我们的MLLM-Data精选列表已经演化为一个模型-数据协同开发的角度系统性[综述](https://arxiv.org/abs/2407.08583)。欢迎[浏览](docs/awesome_llm_data.md)或参与贡献!
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-06-01] ModelScope-Sora“数据导演”创意竞速——第三届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532219)，了解赛事详情。
@@ -82,7 +83,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 * **数据反馈回路 & 沙盒实验室**：支持一站式数据-模型协同开发，通过[沙盒实验室](docs/Sandbox-ZH.md)快速迭代，基于数据和模型反馈回路、可视化和多维度自动评估等功能，使您更了解和改进您的数据和模型。  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
-* **效率增强**：提供高效并行化的数据处理流水线（Aliyun-PAI\Ray\Slurm\CUDA\算子融合），减少内存占用和CPU开销，提高生产力。  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
+* **面向生产环境**：提供高效并行化的数据处理流水线（Aliyun-PAI\Ray\Slurm\CUDA\算子融合），减少内存占用和CPU开销，支持自动化处理容错。  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 * **全面的数据处理菜谱**：为pre-training、fine-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。 在LLaMA、LLaVA等模型上有效验证。 ![exp_llama](https://img.alicdn.com/imgextra/i2/O1CN019WtUPP1uhebnDlPR8_!!6000000006069-2-tps-2530-1005.png)
 
@@ -235,6 +236,18 @@ export DATA_JUICER_MODELS_CACHE="/path/to/another/directory/models"
 export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 ```
 
+#### 灵活简洁的编程接口
+```python
+# ... init op & dataset ...
+
+# 链式调用风格，支持单算子或算子列表
+dataset = dataset.process(op)
+dataset = dataset.process([op1, op2])
+# 函数式编程风格，方便快速集成或脚本原型迭代
+dataset = op(dataset)
+dataset = op.run(dataset)
+```
+
 ### 分布式数据处理
 
 Data-Juicer 现在基于[RAY](https://www.ray.io/)实现了多机分布式数据处理。
@@ -277,6 +290,9 @@ dj-analyze --config configs/demo/analyzer.yaml
 ```shell
 streamlit run app.py
 ```
+
+
+
 
 ### 构建配置文件
 
@@ -380,8 +396,6 @@ Data-Juicer 被各种 LLM产品和研究工作使用，包括来自阿里云-通
 Data-Juicer 感谢并参考了社区开源项目：
 [Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Pile](https://huggingface.co/datasets/EleutherAI/pile), [Alpaca-Cot](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT), [Megatron-LM](https://github.com/NVIDIA/Megatron-LM), [DeepSpeed](https://www.deepspeed.ai/), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), [Beam](https://github.com/apache/beam),  [LM-Harness](https://github.com/EleutherAI/lm-evaluation-harness), [HELM](https://github.com/stanford-crfm/helm), ....
 
-
-
 ## 参考文献
 如果您发现我们的工作对您的研发有帮助，请引用以下[论文](https://arxiv.org/abs/2309.02033) 。
 
@@ -393,3 +407,23 @@ Data-Juicer 感谢并参考了社区开源项目：
   year={2024}
 }
 ```
+<details>
+<summary>更多Data-Juicer团队相关论文:
+</summary>>
+
+- [Data-Juicer Sandbox: A Comprehensive Suite for Multimodal Data-Model Co-development](https://arxiv.org/abs/2407.11784)
+
+- [The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective](https://arxiv.org/abs/2407.08583)
+
+- [Data Mixing Made Efficient: A Bivariate Scaling Law for Language Model Pretraining](https://arxiv.org/abs/2402.11505)
+
+</details>
+
+
+
+<br><hr>
+<div style="text-align: right;">
+
+[🔼 back to index](#documentation-index-a-namedocuments)
+
+</div>
