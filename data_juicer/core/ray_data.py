@@ -104,7 +104,7 @@ class RayDataset(DJDataset):
 
     def _run_single_op(self, op):
         op_proc = calculate_np(op._name, op.mem_required, op.cpu_required,
-                               op.use_cuda())
+                               self.num_proc, op.use_cuda())
         num_gpus = get_num_gpus(op, op_proc)
         try:
             if isinstance(op, Mapper):

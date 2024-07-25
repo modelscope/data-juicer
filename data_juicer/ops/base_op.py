@@ -187,8 +187,9 @@ class OP:
         return self.accelerator == 'cuda' and is_cuda_available()
 
     def runtime_np(self):
-        op_proc = self.num_proc or calculate_np(
-            self._name, self.mem_required, self.cpu_required, self.use_cuda())
+        op_proc = calculate_np(self._name, self.mem_required,
+                               self.cpu_required, self.num_proc,
+                               self.use_cuda())
         logger.debug(
             f'Op [{self._name}] running with number of procs:{op_proc}')
         return op_proc
