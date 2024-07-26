@@ -52,6 +52,8 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 - [2023-10-13] Our first data-centric LLM competition begins! Please
   visit the competition's official websites, FT-Data Ranker ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), for more information.
 
+<div id="table" align="center"></div>
+
 Table of Contents
 =================
 
@@ -226,17 +228,12 @@ print(dj.__version__)
 ### For Video-related Operators
 Before using video-related operators, **FFmpeg** should be installed and accessible via the $PATH environment variable.
 
-You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [offical ffmpeg link](https://ffmpeg.org/download.html).
+You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [official ffmpeg link](https://ffmpeg.org/download.html).
 
 Check if your environment path is set correctly by running the ffmpeg command from the terminal.
 
 
-<br><hr>
-<div style="text-align: right;">
-
-[🔼 back to index](#documentation-index-)
-
-</div>
+<p align="right"><a href="#table">🔼 back to index</a></p>
 
 
 ## Quick Start
@@ -401,12 +398,7 @@ docker exec -it <container_id> bash
 ```
 
 
-<br><hr>
-<div style="text-align: right;">
-
-[🔼 back to index](#documentation-index-)
-
-</div>
+<p align="right"><a href="#table">🔼 back to index</a></p>
 
 ## Data Recipes
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
@@ -464,9 +456,4 @@ If you find our work useful for your research or development, please kindly cite
 
 
 
-<br><hr>
-<div style="text-align: right;">
-
-[🔼 back to index](#documentation-index-)
-
-</div>
+<p align="right"><a href="#table">🔼 back to index</a></p>

@@ -45,6 +45,8 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 - [2023-10-13] 我们的第一届以数据为中心的 LLM 竞赛开始了！
   请访问大赛官网，FT-Data Ranker（[1B赛道](https://tianchi.aliyun.com/competition/entrance/532157) 、[7B赛道](https://tianchi.aliyun.com/competition/entrance/532158) ) ，了解更多信息。
 
+<div id="table" align="center"></div>
+
 目录
 ===
 - [Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据](#data-juicer-为大语言模型提供更高质量更丰富更易消化的数据)
@@ -209,6 +211,9 @@ print(dj.__version__)
 
 随后在终端运行 ffmpeg 命令检查环境是否设置正确。
 
+
+<p align="right"><a href="#table">🔼 back to index</a></p>
+
 ## 快速上手
 
 ### 数据处理
@@ -370,6 +375,8 @@ docker exec -it <container_id> bash
 ```
 
 
+<p align="right"><a href="#table">🔼 back to index</a></p>
+
 ## 数据处理菜谱
 
 * [BLOOM 数据处理菜谱](configs/reproduced_bloom/README_ZH.md)
@@ -422,9 +429,4 @@ Data-Juicer 感谢并参考了社区开源项目：
 
 
 
-<br><hr>
-<div style="text-align: right;">
-
-[🔼 back to index](#documentation-index-a-namedocuments)
-
-</div>
+<p align="right"><a href="#table">🔼 back to index</a></p>
