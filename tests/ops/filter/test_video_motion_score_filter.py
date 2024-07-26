@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from data_juicer.core.data import NestedDataset as Dataset
+from datasets import Dataset
 
 from data_juicer.ops.filter.video_motion_score_filter import \
     VideoMotionScoreFilter
@@ -29,7 +29,6 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         self.assertEqual(res_list, target_list)
 
     def test_default(self):
-
         ds_list = [{
             'videos': [self.vid1_path]
         }, {
@@ -47,8 +46,55 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         op = VideoMotionScoreFilter()
         self._run_helper(op, ds_list, tgt_list)
 
-    def test_high(self):
+    def test_downscale(self):
+        ds_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }, {
+            'videos': [self.vid3_path]
+        }]
+        tgt_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }]
+        op = VideoMotionScoreFilter(min_score=1.0, size=120)
+        self._run_helper(op, ds_list, tgt_list)
 
+    def test_downscale_max(self):
+        ds_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }, {
+            'videos': [self.vid3_path]
+        }]
+        tgt_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }]
+        op = VideoMotionScoreFilter(min_score=1.0, size=120, max_size=160)
+        self._run_helper(op, ds_list, tgt_list)
+
+    def test_downscale_relative(self):
+        ds_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }, {
+            'videos': [self.vid3_path]
+        }]
+        tgt_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }]
+        op = VideoMotionScoreFilter(min_score=0.005, size=(120, 160), relative=True)
+        self._run_helper(op, ds_list, tgt_list)
+
+    def test_high(self):
         ds_list = [{
             'videos': [self.vid1_path]
         }, {
@@ -61,7 +107,6 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         self._run_helper(op, ds_list, tgt_list)
 
     def test_low(self):
-
         ds_list = [{
             'videos': [self.vid1_path]
         }, {
@@ -74,7 +119,6 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         self._run_helper(op, ds_list, tgt_list)
 
     def test_middle(self):
-
         ds_list = [{
             'videos': [self.vid1_path]
         }, {
@@ -87,7 +131,6 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         self._run_helper(op, ds_list, tgt_list)
 
     def test_any(self):
-
         ds_list = [{
             'videos': [self.vid1_path, self.vid2_path]
         }, {
@@ -106,7 +149,6 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         self._run_helper(op, ds_list, tgt_list)
 
     def test_all(self):
-
         ds_list = [{
             'videos': [self.vid1_path, self.vid2_path]
         }, {
