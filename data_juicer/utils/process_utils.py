@@ -55,13 +55,16 @@ def calculate_np(name,
                  num_proc=None,
                  use_cuda=False):
     """Calculate the optimum number of processes for the given OP"""
+    eps = 1e-9  # about 1 byte
+
     if num_proc is None:
         num_proc = psutil.cpu_count()
+
     if use_cuda:
         cuda_mem_available = get_min_cuda_memory() / 1024
         op_proc = min(
             num_proc,
-            math.floor(cuda_mem_available / (mem_required + 0.1)) *
+            math.floor(cuda_mem_available / (mem_required + eps)) *
             cuda_device_count())
         if use_cuda and mem_required == 0:
             logger.warning(f'The required cuda memory of Op[{name}] '
@@ -84,9 +87,9 @@ def calculate_np(name,
         cpu_available = psutil.cpu_count()
         mem_available = psutil.virtual_memory().available
         mem_available = mem_available / 1024**3
-        op_proc = min(op_proc, math.floor(cpu_available / cpu_required))
+        op_proc = min(op_proc, math.floor(cpu_available / cpu_required + eps))
         op_proc = min(op_proc,
-                      math.floor(mem_available / (mem_required + 0.1)))
+                      math.floor(mem_available / (mem_required + eps)))
         if op_proc < 1.0:
             logger.warning(f'The required CPU number:{cpu_required} '
                            f'and memory:{mem_required}GB might '
