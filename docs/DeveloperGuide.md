@@ -11,7 +11,7 @@
 ## Coding Style
 
 We define our styles in `.pre-commit-config.yaml`. Before committing,
-please install `pre-commit` tool to check and modify accordingly:
+please install `pre-commit` tool to automatically check and modify accordingly:
 
 ```shell
 # ===========install pre-commit tool===========
@@ -104,20 +104,22 @@ class StatsKeys(object):
                 return False
     ```
 
-    - If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare `self._accelerator = 'cuda'` in the constructor, and ensure that `compute_stats` and `process` methods accept an additional positional argument `rank`.
+    - If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare `_accelerator = 'cuda'` in the constructor, and ensure that `compute_stats` and `process` methods accept an additional positional argument `rank`.
 
     ```python
     # ... (same as above)
 
     @OPERATORS.register_module('text_length_filter')
     class TextLengthFilter(Filter):
+   
+        _accelerator = 'cuda'
+   
         def __init__(self,
                     min_len: PositiveInt = 10,
                     max_len: PositiveInt = sys.maxsize,
                     *args,
                     **kwargs):
             # ... (same as above)
-            self._accelerator = 'cuda'
 
         def compute_stats(self, sample, rank=None):
             # ... (same as above)
