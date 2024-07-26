@@ -236,7 +236,8 @@ export DATA_JUICER_MODELS_CACHE="/path/to/another/directory/models"
 export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 ```
 
-#### 灵活简洁的编程接口
+#### 灵活的编程接口
+我们提供了各种层次的简单编程接口，以供用户选择：
 ```python
 # ... init op & dataset ...
 
