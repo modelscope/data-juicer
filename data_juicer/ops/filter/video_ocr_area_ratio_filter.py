@@ -94,6 +94,7 @@ class VideoOcrAreaRatioFilter(Filter):
 
     def get_reader(self, rank):
         if self.use_cuda():
+            rank = 0 if rank is None else rank
             device = f'cuda:{rank % cuda_device_count()}'
             self.reader.detector = self.reader.detector.to(device)
             self.reader.device = device
