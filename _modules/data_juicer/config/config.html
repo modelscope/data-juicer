@@ -651,12 +651,14 @@
 
         <span class="c1"># update op params of cfg.process</span>
         <span class="n">internal_op_para</span> <span class="o">=</span> <span class="n">temp_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op_in_process_name</span><span class="p">)</span>
-
-        <span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">op_in_process_name</span><span class="p">:</span>
-            <span class="kc">None</span> <span class="k">if</span> <span class="n">internal_op_para</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span>
-            <span class="n">namespace_to_dict</span><span class="p">(</span><span class="n">internal_op_para</span><span class="p">)</span>
-        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">internal_op_para</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">num_proc</span> <span class="o">=</span> <span class="n">internal_op_para</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_proc&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">in</span> <span class="n">internal_op_para</span><span class="p">:</span>
+                <span class="n">internal_op_para</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_proc</span> <span class="ow">or</span> <span class="n">cfg</span><span class="o">.</span><span class="n">np</span>
+            <span class="n">internal_op_para</span> <span class="o">=</span> <span class="n">namespace_to_dict</span><span class="p">(</span><span class="n">internal_op_para</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">internal_op_para</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">op_in_process_name</span><span class="p">:</span> <span class="n">internal_op_para</span><span class="p">}</span>
 
     <span class="c1"># check the op params via type hint</span>
     <span class="n">temp_parser</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
