@@ -234,7 +234,7 @@ Check if your environment path is set correctly by running the ffmpeg command fr
 <br><hr>
 <div style="text-align: right;">
 
-[🔼 back to index](#documentation-index-a-namedocuments)
+[🔼 back to index](#documentation-index-)
 
 </div>
 
@@ -404,7 +404,7 @@ docker exec -it <container_id> bash
 <br><hr>
 <div style="text-align: right;">
 
-[🔼 back to index](#documentation-index-a-namedocuments)
+[🔼 back to index](#documentation-index-)
 
 </div>
 
@@ -467,6 +467,6 @@ If you find our work useful for your research or development, please kindly cite
 <br><hr>
 <div style="text-align: right;">
 
-[🔼 back to index](#documentation-index-a-namedocuments)
+[🔼 back to index](#documentation-index-)
 
 </div>
