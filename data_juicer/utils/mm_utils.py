@@ -319,8 +319,8 @@ def cut_video_by_seconds(
 
     # close the output videos
     if isinstance(input_video, str):
-        container.close()
-    output_container.close()
+        close_video(container)
+    close_video(output_container)
     if not os.path.exists(output_video):
         logger.warning(f'This video could not be successfully cut in '
                        f'[{start_seconds}, {end_seconds}] seconds. '
@@ -384,8 +384,8 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
 
     # close the output videos
     if isinstance(input_video, str):
-        container.close()
-    output_container.close()
+        close_video(container)
+    close_video(output_container)
 
     if frame_modified:
         return output_video
@@ -433,7 +433,7 @@ def extract_key_frames(input_video: Union[str, av.container.InputContainer]):
             break
 
     if isinstance(input_video, str):
-        container.close()
+        close_video(container)
     return key_frames
 
 
@@ -559,7 +559,7 @@ def extract_video_frames_uniformly(
 
     # if the container is opened in this function, close it
     if isinstance(input_video, str):
-        container.close()
+        close_video(container)
     return extracted_frames
 
 
@@ -663,9 +663,9 @@ def extract_audio_from_video(
                 output_container.mux(packet)
 
         if isinstance(input_video, str):
-            input_container.close()
+            close_video(input_container)
         if output_audio:
-            output_container.close()
+            close_video(output_container)
         audio_data_list.append(np.concatenate(audio_data))
 
     return audio_data_list, audio_sampling_rate_list, valid_stream_indexes
@@ -786,3 +786,13 @@ def parse_string_to_roi(roi_string, roi_type='pixel'):
             '"[x1, y1, x2, y2]".')
         return None
     return None
+
+
+def close_video(container):
+    """
+    Close the video stream and container to avoid memory leak.
+
+    :param container: the video container.
+    """
+    container.streams.video[0].close()
+    container.close()

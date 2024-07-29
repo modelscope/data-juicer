@@ -8,7 +8,8 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.logger_utils import HiddenPrints
-from data_juicer.utils.mm_utils import (extract_video_frames_uniformly,
+from data_juicer.utils.mm_utils import (close_video,
+                                        extract_video_frames_uniformly,
                                         load_data_with_context, load_video,
                                         parse_string_to_roi,
                                         process_each_frame)
@@ -233,7 +234,7 @@ class VideoRemoveWatermarkMapper(Mapper):
 
         if not context:
             for vid_key in videos:
-                videos[vid_key].close()
+                close_video(videos[vid_key])
 
         # when the file is modified, its source file needs to be updated.
         for i, value in enumerate(sample[self.video_key]):

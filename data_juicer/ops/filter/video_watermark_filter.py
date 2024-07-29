@@ -3,7 +3,7 @@ from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (extract_key_frames,
+from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -157,7 +157,7 @@ class VideoWatermarkFilter(Filter):
 
         if not context:
             for vid_key in videos:
-                videos[vid_key].close()
+                close_video(videos[vid_key])
 
         return sample
 

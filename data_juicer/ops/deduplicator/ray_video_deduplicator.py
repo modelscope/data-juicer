@@ -2,7 +2,8 @@ import hashlib
 
 from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.mm_utils import load_data_with_context, load_video
+from data_juicer.utils.mm_utils import (close_video, load_data_with_context,
+                                        load_video)
 
 from ..base_op import OPERATORS
 from ..op_fusion import LOADED_VIDEOS
@@ -51,5 +52,8 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
             for packet in videos[key].demux():
                 if packet.stream.type == 'video':
                     md5_hash.update(bytes(packet))
+
+        for video in videos:
+            close_video(video)
 
         return md5_hash.hexdigest()

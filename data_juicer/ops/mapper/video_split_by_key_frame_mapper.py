@@ -4,7 +4,8 @@ import re
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
-from data_juicer.utils.mm_utils import (SpecialTokens, cut_video_by_seconds,
+from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
+                                        cut_video_by_seconds,
                                         get_key_frame_seconds, load_video)
 
 from ..base_op import OPERATORS, Mapper
@@ -105,7 +106,7 @@ class VideoSplitByKeyFrameMapper(Mapper):
                                                    video_count]:
                     video = videos[video_key]
                     new_video_keys = self.get_split_key_frame(video_key, video)
-                    video.close()
+                    close_video(video)
                     split_video_keys.extend(new_video_keys)
                     place_holders.append(SpecialTokens.video *
                                          len(new_video_keys))

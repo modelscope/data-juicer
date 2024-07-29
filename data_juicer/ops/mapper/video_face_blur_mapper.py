@@ -3,8 +3,9 @@ import av
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
-from data_juicer.utils.mm_utils import (load_data_with_context, load_video,
-                                        pil_to_opencv, process_each_frame)
+from data_juicer.utils.mm_utils import (close_video, load_data_with_context,
+                                        load_video, pil_to_opencv,
+                                        process_each_frame)
 
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
@@ -93,7 +94,7 @@ class VideoFaceBlurMapper(Mapper):
             processed_video_keys[video_key] = output_video_key
 
             if not context:
-                video.close()
+                close_video(video)
 
         # when the file is modified, its source file needs to be updated.
         for i, value in enumerate(loaded_video_keys):

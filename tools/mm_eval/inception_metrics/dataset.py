@@ -69,6 +69,7 @@ class VideoDataset(Dataset):
                     sampled_frames.append(tensor_frame)
                 frame_id += 1
         
+        container.streams.video[0].close()
         container.close()
         assert frame_id >= total_frame_num, 'frame num error'
         return sampled_frames, spacing
@@ -117,6 +118,7 @@ class VideoDatasetPerImage(Dataset):
                     num_samples_from_source = total_frame_num - self.seq_length + 1
                     for start_frame in range(0, num_samples_from_source):
                         self.start_frames.append((video_path, start_frame, num_samples_from_source))
+                    container.streams.video[0].close()
                     container.close()
 
     def read_frames(self, video_path, start_index):
@@ -138,6 +140,7 @@ class VideoDatasetPerImage(Dataset):
                     sampled_frames.append(tensor_frame)
                 frame_id += 1
         
+        container.streams.video[0].close()
         container.close()
         return sampled_frames
 

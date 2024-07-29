@@ -4,7 +4,8 @@ import numpy as np
 from jsonargparse.typing import NonNegativeInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import load_data_with_context, load_video
+from data_juicer.utils.mm_utils import (close_video, load_data_with_context,
+                                        load_video)
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_VIDEOS
@@ -68,7 +69,7 @@ class VideoDurationFilter(Filter):
             video_durations[video_key] = round(stream.duration *
                                                stream.time_base)
             if not context:
-                video.close()
+                close_video(video)
 
         # get video durations
         sample[Fields.stats][StatsKeys.video_duration] = [

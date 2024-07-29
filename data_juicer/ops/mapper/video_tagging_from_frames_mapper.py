@@ -4,7 +4,7 @@ from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.mm_utils import (extract_key_frames,
+from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -110,5 +110,10 @@ class VideoTaggingFromFramesMapper(Mapper):
             word_count = Counter(words)
             sorted_word_list = [item for item, _ in word_count.most_common()]
             video_tags.append(sorted_word_list)
+
+        if not context:
+            for vid_key in videos:
+                close_video(videos[vid_key])
+
         sample[Fields.video_frame_tags] = video_tags
         return sample

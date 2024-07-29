@@ -6,7 +6,8 @@ import numpy as np
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
-from data_juicer.utils.mm_utils import (SpecialTokens, cut_video_by_seconds,
+from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
+                                        cut_video_by_seconds,
                                         get_video_duration, load_video)
 
 from ..base_op import OPERATORS, Mapper
@@ -123,7 +124,7 @@ class VideoSplitByDurationMapper(Mapper):
                     video = videos[video_key]
                     new_video_keys = self.split_videos_by_duration(
                         video_key, video)
-                    video.close()
+                    close_video(video)
                     split_video_keys.extend(new_video_keys)
                     place_holders.append(SpecialTokens.video *
                                          len(new_video_keys))
