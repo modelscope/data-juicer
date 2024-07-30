@@ -1,5 +1,5 @@
 # Awesome Data-Model Co-Development of MLLMs [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
-Welcome to the "Awesome List" for data-model co-development of Multi-Modal Large Language Models (MLLMs), a continually updated resource tailored for the open-source community. This compilation features cutting-edge research, insightful articles focusing on improving MLLMs involving with the data-model co-development of MLLMs, and  tagged based on the proposed **taxonomy** from data-model co-development, as illustrated below.
+Welcome to the "Awesome List" for data-model co-development of Multi-Modal Large Language Models (MLLMs), a continually updated resource tailored for the open-source community. This compilation features cutting-edge research, insightful articles focusing on improving MLLMs involving with the data-model co-development of MLLMs, and  tagged based on the proposed **taxonomy** from our data-model co-development [survey](https://arxiv.org/abs/2407.08583), as illustrated below.
 
 ![Overview of Our Taxonomy](https://img.alicdn.com/imgextra/i1/O1CN01aN3TVo1mgGZAuSHJ4_!!6000000004983-2-tps-3255-1327.png)
 Soon we will provide a dynamic table of contents to help readers more easily navigate through the materials with features such as search, filter, and sort.

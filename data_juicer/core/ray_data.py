@@ -71,7 +71,7 @@ def preprocess_dataset(dataset: Dataset, dataset_path, cfg) -> Dataset:
 
 
 def get_num_gpus(op, op_proc):
-    if op.use_cuda():
+    if not op.use_cuda():
         return 0
     proc_per_gpu = op_proc / cuda_device_count()
     return 1.0 / proc_per_gpu

@@ -38,7 +38,8 @@ This project is being actively updated and maintained. We eagerly invite you to 
    - [✅] Ray based multi-machine distributed running
    - [✅] Aliyun PAI-DLC & Slurm based multi-machine distributed running
 - [✅] Distributed scheduling optimization (OP-aware, automated load balancing) --> Aliyun PAI-DLC
-- [ ] [WIP] Distributed storage optimization
+- [WIP] Low precision acceleration support for video related operators. (git tags: dj_op, dj_efficiency)
+- [WIP] SOTA model enhancement of existing video related operators. (git tags: dj_op, dj_sota_models)
 
 ## Basic Operators (video spatio-temporal dimension)
 - Towards Data Quality
@@ -90,20 +91,24 @@ This project is being actively updated and maintained. We eagerly invite you to 
   - [✅] **Youku-mPLUG-CN**: 36TB video-caption data: `{<caption, video_id>}`
   - [✅] **InternVid**: 234M data sample: `{<caption, youtube_id, start/end_time>}`
   - [✅] **MSR-VTT**: 10K video-caption data: `{<caption, video_id>}`
-  - [ ] [WIP] ModelScope's datasets integration
-  - [ ] VideoInstruct-100K, Panda70M, ......
+  - [✅] ModelScope's datasets integration
+  - [✅] VideoInstruct-100K, Panda70M, ......
 - [ ] Large-scale high-quality DJ-SORA dataset
   - [✅] (Data sandbox) Building and optimizing multimodal data recipes with DJ-video operators (which are also being continuously extended and improved).
-  - [ ] [WIP] Continuous expansion of data sources: open-datasets, Youku, web, ...
-  - [ ] [WIP] Large-scale analysis, cleaning, and generation of high-quality multimodal datasets based on DJ recipes (OpenVideos, ...)
-  - [ ] [WIP] Large-scale generation of 3DPatch datasets based on DJ recipes.
+  - [✅] Continuous expansion of data sources: open-datasets, Youku, web, ...
+  - [ ] Large-scale analysis, cleaning, and generation of high-quality multimodal datasets based on DJ recipes (OpenVideos, ...)
+    - [WIP] broad scenarios, high-dynamic
   - ...
 
 ## DJ-SORA Data Validation and Model Training
-  - [ ] [WIP] (DJ-Bench101) Exploring and refining the collaborative development of multimodal data and model, establishing benchmarks and insights.
+  - [ ] Exploring and refining the collaborative development of multimodal data and model, establishing benchmarks and insights. [paper](https://arxiv.org/abs/2407.11784)
   - [ ] [WIP] Integration of SORA-like model training pipelines
     - [EasyAnimate](https://github.com/aigc-apps/EasyAnimate)
+    - [✅] [T2V](https://t2v-turbo.github.io/)
+    - [✅] [V-Bench](https://vchitect.github.io/VBench-project/)
     - ...
   - [✅] (Model-Data sandbox) With relatively small models and the DJ-SORA dataset, exploring low-cost, transferable, and instructive data-model co-design, configurations and checkpoints. 
   - [ ] [WIP] Training SORA-like models with DJ-SORA data on  larger scales and in more scenarios to improve model performance.
+    - [✅] Data-Juicer-T2v, [V-Bench Top1 model](https://huggingface.co/datajuicer/Data-Juicer-T2V)
+    - ...
   - ...
