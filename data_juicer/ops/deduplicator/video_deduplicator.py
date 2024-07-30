@@ -62,8 +62,8 @@ class VideoDeduplicator(Deduplicator):
                 if packet.stream.type == 'video':
                     md5_hash.update(bytes(packet))
 
-        for video in videos:
-            close_video(video)
+        for key in videos:
+            close_video(videos[key])
 
         sample[HashKeys.videohash] = md5_hash.hexdigest()
         return sample

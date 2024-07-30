@@ -53,7 +53,7 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
                 if packet.stream.type == 'video':
                     md5_hash.update(bytes(packet))
 
-        for video in videos:
-            close_video(video)
+        for key in videos:
+            close_video(videos[key])
 
         return md5_hash.hexdigest()
