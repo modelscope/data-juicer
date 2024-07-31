@@ -11,6 +11,8 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
+from data_juicer.utils.mm_utils import load_video, close_video
+
 @dataclass
 class VideoDataset(Dataset):
     dataset_path: str
@@ -38,7 +40,7 @@ class VideoDataset(Dataset):
                     self.video_paths.append(video_path)
 
     def sample_frames(self, video_path):
-        container = av.open(video_path)
+        container = load_video(video_path)
         input_video_stream = container.streams.video[0]
         total_frame_num = input_video_stream.frames
 
@@ -69,8 +71,7 @@ class VideoDataset(Dataset):
                     sampled_frames.append(tensor_frame)
                 frame_id += 1
         
-        container.streams.video[0].close()
-        container.close()
+        close_video(container)
         assert frame_id >= total_frame_num, 'frame num error'
         return sampled_frames, spacing
         
@@ -112,17 +113,16 @@ class VideoDatasetPerImage(Dataset):
                 for video_path in data[self.video_key]:
                     if self.mm_dir is not None:
                         video_path = os.path.join(self.mm_dir, video_path)
-                    container = av.open(video_path)
+                    container = load_video(video_path)
                     input_video_stream = container.streams.video[0]
                     total_frame_num = input_video_stream.frames
                     num_samples_from_source = total_frame_num - self.seq_length + 1
                     for start_frame in range(0, num_samples_from_source):
                         self.start_frames.append((video_path, start_frame, num_samples_from_source))
-                    container.streams.video[0].close()
-                    container.close()
+                    close_video(container)
 
     def read_frames(self, video_path, start_index):
-        container = av.open(video_path)
+        container = load_video(video_path)
         input_video_stream = container.streams.video[0]
         sampled_idxs = set(range(start_index, start_index + self.seq_length))
 
@@ -140,8 +140,7 @@ class VideoDatasetPerImage(Dataset):
                     sampled_frames.append(tensor_frame)
                 frame_id += 1
         
-        container.streams.video[0].close()
-        container.close()
+        close_video(container)
         return sampled_frames
 
     def __getitem__(self, index: int) -> dict:

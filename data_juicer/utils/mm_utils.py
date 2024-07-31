@@ -794,5 +794,6 @@ def close_video(container):
 
     :param container: the video container.
     """
-    container.streams.video[0].close(strict=False)
+    for video_stream in container.streams.video:
+        video_stream.close(strict=False)
     container.close()
