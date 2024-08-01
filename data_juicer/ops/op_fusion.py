@@ -160,6 +160,7 @@ class FusedFilter(Filter):
         for context_key in sample[Fields.context]:
             if isinstance(sample[Fields.context][context_key],
                           av.container.InputContainer):
+                sample[Fields.context][context_key].streams.video[0].close()
                 sample[Fields.context][context_key].close()
         _ = sample.pop(Fields.context)
         return sample

@@ -60,6 +60,7 @@ def catch_map_batches_exception(method):
             logger.error(
                 f'An error occurred in mapper operation when processing '
                 f'samples {samples}, {type(e)}: {e}')
+            traceback.print_exc()
             ret = {key: [] for key in samples.keys()}
             ret[Fields.stats] = []
             ret[Fields.source_file] = []
@@ -97,6 +98,7 @@ def catch_map_single_exception(method):
                 logger.error(
                     f'An error occurred in mapper operation when processing '
                     f'sample {sample}, {type(e)}: {e}')
+                traceback.print_exc()
                 ret = {key: [] for key in sample.keys()}
                 ret[Fields.stats] = []
                 ret[Fields.source_file] = []

@@ -4,7 +4,8 @@ from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (SpecialTokens, extract_key_frames,
+from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
+                                        extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video,
                                         remove_special_tokens)
@@ -195,7 +196,7 @@ class VideoFramesTextSimilarityFilter(Filter):
 
         if not context:
             for vid_key in videos:
-                videos[vid_key].close()
+                close_video(videos[vid_key])
 
         return sample
 
