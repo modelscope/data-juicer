@@ -16,9 +16,19 @@
 pip install -v -e .[sandbox]
 ```
 
-**注意**：一些沙盒的依赖还需要额外的领域依赖。例如，如果用户想要在沙盒中训练一个 ModelScope 平台的NLP模型，那可能需要为 `modelscope` 库
+**注意**：一些沙盒的依赖还需要额外的领域依赖。
+
+1. 如果用户想要在沙盒中训练一个 ModelScope 平台的NLP模型，那可能需要为 `modelscope` 库
 安装额外的 `nlp` 领域依赖（参考其[安装文档](https://modelscope.cn/docs/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85) ）。
-再比如，使用VBench测评视频时需要安装Detectron2，推荐安装如下分支。
+
+2. 要使用[EasyAnimate](https://github.com/aigc-apps/EasyAnimate)时需要执行如下安装脚本：
+```shell
+cd thirdparty/models/
+bash setup_easyanimate.sh
+cd ../../
+```
+
+3. 使用VBench测评视频时需要安装Detectron2，推荐安装如下分支。
 ```shell
 pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
 ```

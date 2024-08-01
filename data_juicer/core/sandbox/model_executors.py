@@ -216,9 +216,9 @@ class EasyAnimateTrainExecutor(BaseModelExecutor):
         super().__init__(model_config, watcher)
         cur_working_dir = os.getcwd()
         self.script_path = os.path.join(
-            cur_working_dir, 'thirdparty/easy_animate/train_lora.sh')
+            cur_working_dir, 'thirdparty/models/EasyAnimate/train_lora.sh')
         self.working_dir = os.path.join(cur_working_dir,
-                                        'thirdparty/easy_animate/')
+                                        'thirdparty/models/EasyAnimate/')
         # make sure executable
         current_permissions = os.stat(self.script_path).st_mode
         os.chmod(
@@ -251,9 +251,9 @@ class EasyAnimateInferExecutor(BaseModelExecutor):
         super().__init__(model_config, watcher)
         cur_working_dir = os.getcwd()
         self.script_path = os.path.join(
-            cur_working_dir, 'thirdparty/easy_animate/infer_lora.sh')
+            cur_working_dir, 'thirdparty/models/EasyAnimate/infer_lora.sh')
         self.working_dir = os.path.join(cur_working_dir,
-                                        './thirdparty/easy_animate/')
+                                        './thirdparty/models/EasyAnimate/')
 
     async def _run(self, run_type, run_obj=None, **kwargs):
         config = self.model_config.train

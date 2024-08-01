@@ -17,9 +17,19 @@ pip install -v -e .[sandbox]
 
 ```
 
-**NOTICE**: some sandbox-related dependencies require extra domain dependencies. For example, if users want to train an NLP model from ModelScope
+**NOTICE**: some sandbox-related dependencies require extra domain dependencies. 
+
+1. If users want to train an NLP model from ModelScope
 in the sandbox, you might need to install extra `nlp` dependencies for `modelscope` library (see the [installation docs](https://modelscope.cn/docs/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85)).
-For example, when using VBench to benchmark videos, it is necessary to install Detectron2. The following branch is recommended for installation.
+
+2. To use [EasyAnimate](https://github.com/aigc-apps/EasyAnimate), you need to execute the following installation script:
+```shell
+cd thirdparty/models/
+bash setup_easyanimate.sh
+cd ../../
+```
+
+3. When using VBench to benchmark videos, it is necessary to install Detectron2. The following branch is recommended for installation.
 ```shell
 pip install detectron2@git+https://github.com/facebookresearch/detectron2.git@b7c7f4ba82192ff06f2bbb162b9f67b00ea55867
 ```
