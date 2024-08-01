@@ -82,7 +82,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.ops.mapper.video_captioning_from_frames_mapper</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span></span><span class="c1"># yapf: disable</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">random</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -92,7 +93,8 @@
 
 <span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">HashKeys</span>
-<span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SpecialTokens</span><span class="p">,</span> <span class="n">extract_key_frames</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SpecialTokens</span><span class="p">,</span> <span class="n">close_video</span><span class="p">,</span>
+                                        <span class="n">extract_key_frames</span><span class="p">,</span>
                                         <span class="n">extract_video_frames_uniformly</span><span class="p">,</span>
                                         <span class="n">insert_texts_after_placeholders</span><span class="p">,</span>
                                         <span class="n">load_data_with_context</span><span class="p">,</span> <span class="n">load_video</span><span class="p">,</span>
@@ -369,7 +371,7 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">vid_key</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
-                <span class="n">videos</span><span class="p">[</span><span class="n">vid_key</span><span class="p">]</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">close_video</span><span class="p">(</span><span class="n">videos</span><span class="p">[</span><span class="n">vid_key</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">generated_samples</span>
 
     <span class="k">def</span> <span class="nf">_reduce_captions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chunk</span><span class="p">,</span> <span class="n">generated_text_candidates_single_chunk</span><span class="p">):</span>

@@ -88,7 +88,8 @@
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.file_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">add_suffix_to_filename</span><span class="p">,</span>
                                           <span class="n">transfer_filename</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SpecialTokens</span><span class="p">,</span> <span class="n">cut_video_by_seconds</span><span class="p">,</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SpecialTokens</span><span class="p">,</span> <span class="n">close_video</span><span class="p">,</span>
+                                        <span class="n">cut_video_by_seconds</span><span class="p">,</span>
                                         <span class="n">get_key_frame_seconds</span><span class="p">,</span> <span class="n">load_video</span><span class="p">)</span>
 
 <span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
@@ -189,7 +190,7 @@
                                                    <span class="n">video_count</span><span class="p">]:</span>
                     <span class="n">video</span> <span class="o">=</span> <span class="n">videos</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span>
                     <span class="n">new_video_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_split_key_frame</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">video</span><span class="p">)</span>
-                    <span class="n">video</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="n">close_video</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
                     <span class="n">split_video_keys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_video_keys</span><span class="p">)</span>
                     <span class="n">place_holders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span> <span class="o">*</span>
                                          <span class="nb">len</span><span class="p">(</span><span class="n">new_video_keys</span><span class="p">))</span>
