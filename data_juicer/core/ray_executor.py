@@ -49,7 +49,17 @@ class RayExecutor:
         """
         # 1. load data
         logger.info('Loading dataset with Ray...')
-        dataset = rd.read_json(self.cfg.dataset_path)
+
+        if self.cfg.get('dataset_config', None):
+            dataset_config = self.cfg.dataset_config
+            assert isinstance(dataset_config,
+                              dict) and 'type' in dataset_config
+            args = dataset_config.copy()
+            obj_name = args.pop('type')
+            from data_juicer.format.formatter import FORMATTERS
+            dataset = FORMATTERS.modules[obj_name](**args).load_dataset()
+        else:
+            dataset = rd.read_json(self.cfg.dataset_path)
 
         # convert all the path in dataset to absolute path
         dataset = RayDataset(dataset, self.cfg.dataset_path, self.cfg)

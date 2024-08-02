@@ -10,14 +10,18 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 class ExtractQAMapperTest(DataJuicerTestCaseBase):
     text_key = 'text'
 
-    def _run_extract_qa(self, samples):
+    def _run_extract_qa(self, samples, enable_vllm=False, sampling_params={}, **kwargs):
         op = ExtractQAMapper(
             hf_model='alibaba-pai/pai-qwen1_5-7b-doc2qa',
-            qa_format='chatml'
+            qa_format='chatml',
+            enable_vllm=enable_vllm,
+            sampling_params=sampling_params,
+            **kwargs
             )
         for sample in samples:
             result = op.process(sample)
             out_text = json.loads(result[self.text_key])
+            print(f'Output sample: {out_text}')
 
             # test one output qa sample
             qa_sample = out_text[0]
@@ -30,6 +34,18 @@ class ExtractQAMapperTest(DataJuicerTestCaseBase):
             self.text_key: '蒙古国的首都是乌兰巴托（Ulaanbaatar）\n冰岛的首都是雷克雅未克（Reykjavik）\n'
             }]
         self._run_extract_qa(samples)
+
+    def test_extract_qa_vllm(self):
+        samples = [
+            {
+            self.text_key: '蒙古国的首都是乌兰巴托（Ulaanbaatar）\n冰岛的首都是雷克雅未克（Reykjavik）\n'
+            }]
+        self._run_extract_qa(
+            samples, 
+            enable_vllm=True,
+            max_model_len=1024,
+            max_num_seqs=16,
+            sampling_params={'temperature': 0.9, 'top_p': 0.95, 'max_tokens': 256})
 
 
 if __name__ == '__main__':
