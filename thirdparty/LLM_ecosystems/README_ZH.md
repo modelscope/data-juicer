@@ -1,4 +1,4 @@
-# 第三方库（大语言模型生态）
+# 大语言模型生态
 
 本目录包含了 Auto Evaluation Toolkit 的第三方依赖项，更多细节请参考 `tools/evaluator/README_ZH.md`。
 

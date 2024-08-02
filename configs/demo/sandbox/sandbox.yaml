@@ -3,6 +3,7 @@
 # global parameters
 project_name: 'demo-sandbox'
 experiment_name: 'demo-sandbox-run0'              # for wandb tracer name
+work_dir: './outputs/demo-sandbox'                # the default output dir for meta logging
 hpo_config: null                                  # path to a configuration file when using auto-HPO tool.
 
 # configs for each job, the jobs will be executed according to the order in the list

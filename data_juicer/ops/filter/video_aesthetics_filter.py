@@ -155,23 +155,27 @@ class VideoAestheticsFilter(Filter):
                     sample[Fields.context][sampled_frames_key] = frames
             frame_images = [frame.to_image() for frame in frames]
 
-            # compute aesthetics_scores
-            model, processor = get_model(self.model_key, rank, self.use_cuda())
-            inputs = processor(images=frame_images,
-                               return_tensors='pt').to(model.device)
-            with torch.no_grad():
-                outputs = model(**inputs)
-            if self.need_normalized_by_ten:
-                aesthetics_score = outputs.logits / 10.0
-            else:
-                aesthetics_score = outputs.logits
+            if len(frame_images) > 0:
+                # compute aesthetics_scores
+                model, processor = get_model(self.model_key, rank=rank)
+                inputs = processor(images=frame_images,
+                                   return_tensors='pt').to(model.device)
+                with torch.no_grad():
+                    outputs = model(**inputs)
+                if self.need_normalized_by_ten:
+                    aesthetics_score = outputs.logits / 10.0
+                else:
+                    aesthetics_score = outputs.logits
 
-            if self.reduce_mode == 'avg':
-                aesthetics_score = float(aesthetics_score.mean())
-            elif self.reduce_mode == 'max':
-                aesthetics_score = float(aesthetics_score.max())
+                if self.reduce_mode == 'avg':
+                    aesthetics_score = float(aesthetics_score.mean())
+                elif self.reduce_mode == 'max':
+                    aesthetics_score = float(aesthetics_score.max())
+                else:
+                    aesthetics_score = float(aesthetics_score.min())
             else:
-                aesthetics_score = float(aesthetics_score.min())
+                aesthetics_score = 0.0
+
             aesthetics_scores.append(aesthetics_score)
 
         logger.debug(f'aesthetics_score: {aesthetics_scores}')

@@ -15,27 +15,27 @@ python tools/multimodal/absolute_path_to_relative_path.py --help
 
 ## Dataset Format Conversion
 
-Due to large format diversity among different multimodal datasets and works, 
-Data-Juicer propose a novel intermediate text-based interleaved data format for multimodal dataset, which 
+Due to large format diversity among different multimodal datasets and works,
+Data-Juicer propose a novel intermediate text-based interleaved data format for multimodal dataset, which
 is based on chunk-wise formats such MMC4 dataset.
 
-In the Data-Juicer format, a multimodal sample or document is based on a text, 
+In the Data-Juicer format, a multimodal sample or document is based on a text,
 which consists of several text chunks. Each chunk is a semantic unit, and all the
 multimodal information in a chunk should talk about the same thing and be aligned
 with each other.
 
 Here is a multimodal sample example in Data-Juicer format below.
 - It includes 4 chunks split by the special token `<|__dj__eoc|>`.
-- In addition to texts, there are 3 other modalities: images, audios, videos. 
+- In addition to texts, there are 3 other modalities: images, audios, videos.
 They are stored on the disk and their paths are
 listed in the corresponding first-level fields in the sample.
-- Other modalities are represented as special tokens in the text (e.g. image -- `<__dj__image>`). 
-The special tokens of each modality correspond to the paths in the order of appearance. 
+- Other modalities are represented as special tokens in the text (e.g. image -- `<__dj__image>`).
+The special tokens of each modality correspond to the paths in the order of appearance.
 (e.g. the two image tokens in the third chunk are images of antarctica_map and europe_map respectively)
-- There could be multiple types of modalities and multiple modality special tokens in a single chunk, 
-and they are semantically aligned with each other and text in this chunk. 
+- There could be multiple types of modalities and multiple modality special tokens in a single chunk,
+and they are semantically aligned with each other and text in this chunk.
 The position of special tokens can be random in a chunk. (In general, they are usually before or after the text.)
-- For multimodal samples, unlike text-only samples, the computed stats for other 
+- For multimodal samples, unlike text-only samples, the computed stats for other
 modalities could be a list of stats for the list of multimodal data (e.g. image_widths in this sample).
 
 ```python
@@ -71,7 +71,7 @@ modalities could be a list of stats for the list of multimodal data (e.g. image_
 }
 ```
 
-According to this format, Data-Juicer provided several dataset format conversion tools for some popular multimodal 
+According to this format, Data-Juicer provided several dataset format conversion tools for some popular multimodal
 works.
 
 These tools consist of two types:
@@ -97,24 +97,24 @@ For all tools, you can run the following command to find out the usage of them:
 python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --help
 ```
 
-Before using these tools, you might need to take a glance at the reference 
-materials in the above tables for each format, to better know the detail format 
+Before using these tools, you might need to take a glance at the reference
+materials in the above tables for each format, to better know the detail format
 information and understand the arguments for each tool.
 
 ### Notice
-There might be some tiny differences after converting a source dataset to Data-Juicer 
-format and convert it back. However, these differences have nearly no effects 
-on the semantics of datasets. Here we will show these tiny differences in detail 
+There might be some tiny differences after converting a source dataset to Data-Juicer
+format and convert it back. However, these differences have nearly no effects
+on the semantics of datasets. Here we will show these tiny differences in detail
 for each source format.
 
 #### LLaVA-like
-The format of LLaVA-like datasets are defined [here](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format). 
-Although it's simple, but in real scenarios, there might be some slight variations 
+The format of LLaVA-like datasets are defined [here](https://github.com/haotian-liu/LLaVA/blob/main/docs/Finetune_Custom_Data.md#dataset-format).
+Although it's simple, but in real scenarios, there might be some slight variations
 in some samples.
 
-Here we take the [visual instruction tuning dataset](https://huggingface.co/datasets/liuhaotian/LLaVA-Instruct-150K/blob/main/llava_v1_5_mix665k.json) as an example, 
-and show how these variations influence the dataset format. The table below 
-shows the number of different samples between the original dataset and the 
+Here we take the [visual instruction tuning dataset](https://huggingface.co/datasets/liuhaotian/LLaVA-Instruct-150K/blob/main/llava_v1_5_mix665k.json) as an example,
+and show how these variations influence the dataset format. The table below
+shows the number of different samples between the original dataset and the
 dataset after processing. There are 665,298 samples in the original dataset.
 
 | process                                                                                | # of diff.  |
@@ -124,11 +124,11 @@ dataset after processing. There are 665,298 samples in the original dataset.
 | 3. strip whitespaces before and after values of conversations in the original dataset  | 40,688      |
 | 4. add `'model': ''` fields in the converted dataset                                   | 1           |
 
-It's worth noticing that processes 2-4 won't influence the semantics of sample conversations in the dataset. 
-Thus we think the dataset after conversion can align with the original dataset. 
+It's worth noticing that processes 2-4 won't influence the semantics of sample conversations in the dataset.
+Thus we think the dataset after conversion can align with the original dataset.
 
 Finally, the only 1 sample is different because there are some extra useless fields ("text", "markdown")
-in the conversations, which is shown below. But the "from" and "value" fields are the same between original 
+in the conversations, which is shown below. But the "from" and "value" fields are the same between original
 and converted datasets, so we can regard this sample is aligned with the original one as well.
 
 ```json
@@ -167,7 +167,7 @@ and converted datasets, so we can regard this sample is aligned with the origina
 
 The format of MMC4-like datasets are defined [here](https://github.com/allenai/mmc4#documents). Except `image_info` and `text_list`,
 which are used when converting them to Data-Juicer format, there is an important field `similarity_matrix`. Similarity matrix is
-a matrix of shape `len(image_info) x len(text_list)`, which means it highly depends on the numbers of images and text sentences and their 
+a matrix of shape `len(image_info) x len(text_list)`, which means it highly depends on the numbers of images and text sentences and their
 orders.
 
 However, when processing such datasets with Data-Juicer, images or sentences might be removed from a sample by Filters, and they could be
@@ -192,7 +192,7 @@ The [WavCaps](https://github.com/XinhaoMei/WavCaps#dataset) is composed of four 
         "id": "2219",
         "duration": 14.1424375,
         "audio": "wav_path",
-        "download_link": "http://soundbible.com/grab.php?id=2219&type=wav"}]    
+        "download_link": "http://soundbible.com/grab.php?id=2219&type=wav"}]
 }
 
 # converted dataset
@@ -208,7 +208,7 @@ The [WavCaps](https://github.com/XinhaoMei/WavCaps#dataset) is composed of four 
         "audio": "wav_path",
         "download_link": "http://soundbible.com/grab.php?id=2219&type=wav",
         "category": "",
-        "tags": "" }]    
+        "tags": "" }]
 }
 ```
 
@@ -224,28 +224,28 @@ They all obey the `<question, answer, video_id>` format, where the `video_id` is
 
 #### Youku-mPLUG-like
 
-The Youku-mPLUG dataset contains 4 types of format: pretrain, classification, retrieval, captioning. 
+The Youku-mPLUG dataset contains 4 types of format: pretrain, classification, retrieval, captioning.
 They are slightly different from each other in field name or other attributes, but all of them obey the `<video, caption>` format.
 
 #### InternVid-like
 
 The InternVid dataset contains 4 fields:
-- `YoutubeID`: the Youtube ID of the video used in the sample. 
+- `YoutubeID`: the Youtube ID of the video used in the sample.
 We suppose that users have downloaded these videos already
 and this field is replaced with its storage path.
-- `Start_timestamp`: the start timestamp in string of the video clip for the 
+- `Start_timestamp`: the start timestamp in string of the video clip for the
 corresponding caption.
-- `End_timestamp`: the end timestamp in string of the video clip for the 
+- `End_timestamp`: the end timestamp in string of the video clip for the
 corresponding caption.
 - `Caption`: the corresponding caption for the video clip.
 
-As we can see, the caption in this dataset corresponds to the video clip 
-specified by the start/end timestamps instead of the whole video. So the 
-conversion tool will cut the specified video clip for you if the argument 
+As we can see, the caption in this dataset corresponds to the video clip
+specified by the start/end timestamps instead of the whole video. So the
+conversion tool will cut the specified video clip for you if the argument
 `cut_videos` is set to True. You can cut before conversion by yourself as well.
 
 #### MSR-VTT-like
 MSR-VTT dataset contains multiple fields, here we use 2 fields:
-- `video_id`: the video file name without suffix used in the sample. 
+- `video_id`: the video file name without suffix used in the sample.
 We suppose that users have downloaded these videos already。
 - `caption`: the corresponding caption for the video.
