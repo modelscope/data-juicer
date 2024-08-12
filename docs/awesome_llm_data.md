@@ -4,7 +4,7 @@ Welcome to the "Awesome List" for data-model co-development of Multi-Modal Large
 ![Overview of Our Taxonomy](https://img.alicdn.com/imgextra/i1/O1CN01aN3TVo1mgGZAuSHJ4_!!6000000004983-2-tps-3255-1327.png)
 Soon we will provide a dynamic table of contents to help readers more easily navigate through the materials with features such as search, filter, and sort.
 
-Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. Please feel free to pull requests or open issues to improve this list and add more related resources!
+Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. Please feel free to make pull requests or open issues to [contribute to](#contribution-to-this-survey) this list and add more related resources!
 
 
 
@@ -74,7 +74,7 @@ These tags correspond to the taxonomy in our paper, and each work may be assigne
 ## Paper List
 | Title | Tags | Back Reference (In Paper)|
 |-------|-------|-------|
-|No "Zero-Shot" Without Exponential Data: Pretraining Concept Frequency Determines Multimodal Model Performance|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Evaluator-b4d4fb)|Sec. 1, Sec. 3.1, Sec. 3.1.1, Sec. 3.1.3, Sec. 3.2, Sec. 3.2.4, Sec. 6.2, Sec. 8.2.1, Table 3|
+|No "Zero-Shot" Without Exponential Data: Pretraining Concept Frequency Determines Multimodal Model Performance|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Evaluator-b4d4fb)|Sec. 1, Sec. 3.1, Sec. 3.1.1, Sec. 3.1.3, Sec. 3.2, Sec. 3.2.4, Sec. 6.2, Sec. 8.2.1, Table 2|
 |What Makes for Good Visual Instructions? Synthesizing Complex Visual Reasoning Instructions for Visual Instruction Tuning|![](https://img.shields.io/badge/Model4Data--Synthesis--Creator-b4d4fb)|Sec. 5.1|
 |Med-MMHL: A Multi-Modal Dataset for Detecting Human- and LLM-Generated Misinformation in the Medical Domain|![](https://img.shields.io/badge/Data4Model--Usability--Ethic--Toxicity-d3f0aa)|Sec. 4.3.1|
 |Probing Heterogeneous Pretraining Datasets with Small Curated Datasets|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Condensation-f1db9d)||
@@ -88,7 +88,7 @@ These tags correspond to the taxonomy in our paper, and each work may be assigne
 |The Devil is in the Details: A Deep Dive into the Rabbit Hole of Data Filtering|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Condensation-f1db9d)|Sec. 3.2.1, Sec. 5.3, Sec. 8.3.3|
 |Demystifying CLIP Data|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Mixture-f1db9d)|3.2.2|
 |Learning Transferable Visual Models From Natural Language Supervision|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|Sec. 2.1, Sec. 3.1.1, Sec. 3.2.2|
-|DataComp: In search of the next generation of multimodal datasets|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Condensation-f1db9d)![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Data4Model--Usability--Eval--Generation-d3f0aa) ![](https://img.shields.io/badge/Model4Data--Synthesis--Filter-b4d4fb)|Sec. 1, Sec. 3.1.1, Sec. 3.1.3, Sec. 3.2, Sec. 3.2.1, Sec. 3.2.4, Sec. 4.4.1, Sec. 5.3, Sec. 8.1, Sec. 8.3.3, Table 3|
+|DataComp: In search of the next generation of multimodal datasets|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Condensation-f1db9d)![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Data4Model--Usability--Eval--Generation-d3f0aa) ![](https://img.shields.io/badge/Model4Data--Synthesis--Filter-b4d4fb)|Sec. 1, Sec. 3.1.1, Sec. 3.1.3, Sec. 3.2, Sec. 3.2.1, Sec. 3.2.4, Sec. 4.4.1, Sec. 5.3, Sec. 8.1, Sec. 8.3.3, Table 2|
 |Beyond neural scaling laws: beating power law scaling via data pruning|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Condensation-f1db9d)|Sec. 3.2.1|
 |Flamingo: a visual language model for few-shot learning|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Mixture-f1db9d)|Sec. 3.1.3, Sec. 3.2.2|
 |Quality not quantity: On the interaction between dataset design and robustness of clip|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Condensation-f1db9d) ![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Mixture-f1db9d)|Sec. 3.2.2|
@@ -136,7 +136,7 @@ These tags correspond to the taxonomy in our paper, and each work may be assigne
 |TextHawk: Exploring Efficient Fine-Grained Perception of Multimodal Large Language Models|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|Sec. 3.1.1|
 |The Wolf Within: Covert Injection of Malice into MLLM Societies via an MLLM Operative|![](https://img.shields.io/badge/Data4Model--Usability--Ethic--Toxicity-d3f0aa)|Sec. 4.3.1|
 |BuboGPT: Enabling Visual Grounding in Multi-Modal LLMs|![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|Sec. 3.1.1, Sec. 5.2|
-|MLLM-Bench: Evaluating Multimodal LLMs with Per-sample Criteria|![](https://img.shields.io/badge/Data4Model--Usability--Eval--Understanding-d3f0aa) ![](https://img.shields.io/badge/Model4Data--Synthesis--Evaluator-b4d4fb)|Sec. 4.1.3, Sec. 4.4.2, Sec. 5.4, Sec. 8.2.3, Table 3|
+|MLLM-Bench: Evaluating Multimodal LLMs with Per-sample Criteria|![](https://img.shields.io/badge/Data4Model--Usability--Eval--Understanding-d3f0aa) ![](https://img.shields.io/badge/Model4Data--Synthesis--Evaluator-b4d4fb)|Sec. 4.1.3, Sec. 4.4.2, Sec. 5.4, Sec. 8.2.3, Table 2|
 |MM-SafetyBench: A Benchmark for Safety Evaluation of Multimodal Large Language Models|![](https://img.shields.io/badge/Data4Model--Usability--Eval--Generation-d3f0aa) ![](https://img.shields.io/badge/Data4Model--Usability--Ethic--Toxicity-d3f0aa)| Sec. 4.3.1,  Sec. 4.4.2|
 |Retrieval-augmented Multi-modal Chain-of-Thoughts Reasoning for Large Language Models|![](https://img.shields.io/badge/Data4Model--Usability--Following--ICL-d3f0aa) ![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--MultiHop-d3f0aa) ![](https://img.shields.io/badge/Data4Model--Scaling--Up--Diversity-f1db9d)|Sec. 3.1.3, Sec. 4.1.2, Sec.4.2.2|
 |M3DBench: Let’s Instruct Large Models with Multi-modal 3D Prompts|![](https://img.shields.io/badge/Data4Model--Usability--Eval--Understanding-d3f0aa)|Sec. 4.4.1|
@@ -163,18 +163,18 @@ These tags correspond to the taxonomy in our paper, and each work may be assigne
 |Data Filtering Networks|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Condensation-f1db9d)|Sec. 3.2.1, Sec. 3.2.4, Sec. 8.3.3|
 |T-MARS: Improving Visual Representations by Circumventing Text Feature Learning|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Condensation-f1db9d)|Sec. 3.2.1, Sec. 3.2.4, Sec. 8.3.3|
 |InstructionGPT-4: A 200-Instruction Paradigm for Fine-Tuning MiniGPT-4|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--Condensation-f1db9d)|Sec. 3.2.1|
-|Align and Attend: Multimodal Summarization with Dual Contrastive Losses|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d)|Table 3|
-|MathVerse: Does Your Multi-modal LLM Truly See the Diagrams in Visual Math Problems?|![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--SingleHop-d3f0aa) ![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--MultiHop-d3f0aa) ![](https://img.shields.io/badge/Data4Model--Usability--Eval--Reasoning-d3f0aa)|Table 3|
+|Align and Attend: Multimodal Summarization with Dual Contrastive Losses|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d)|Table 2|
+|MathVerse: Does Your Multi-modal LLM Truly See the Diagrams in Visual Math Problems?|![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--SingleHop-d3f0aa) ![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--MultiHop-d3f0aa) ![](https://img.shields.io/badge/Data4Model--Usability--Eval--Reasoning-d3f0aa)|Table 2|
 |Text-centric Alignment for Multi-Modality Learning|![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)|Sec. 3.2.4|
 |Noisy Correspondence Learning with Meta Similarity Correction|![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d)|Sec. 3.2.4|
 |Grounding-Prompter: Prompting LLM with Multimodal Information for Temporal Sentence Grounding in Long Videos|![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--MultiHop-d3f0aa)|Sec. 4.2.2|
 |Language-Image Models with 3D Understanding|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--SingleHop-d3f0aa) ![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--MultiHop-d3f0aa)|Sec. 4.2.2|
 |Scaling Laws for Generative Mixed-Modal Language Models|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|Sec. 1|
-|BLINK: Multimodal Large Language Models Can See but Not Perceive|![](https://img.shields.io/badge/Data4Model--Usability--Eval--Understanding-d3f0aa)|Sec. 4.4.1, Table 3|
+|BLINK: Multimodal Large Language Models Can See but Not Perceive|![](https://img.shields.io/badge/Data4Model--Usability--Eval--Understanding-d3f0aa)|Sec. 4.4.1, Table 2|
 |Visual Hallucinations of Multi-modal Large Language Models|![](https://img.shields.io/badge/Data4Model--Usability--Eval--Generation-d3f0aa)|Sec. 4.4.2, Sec. 5.3|
 |DDCoT: Duty-Distinct Chain-of-Thought Prompting for Multimodal Reasoning in Language Models|![](https://img.shields.io/badge/Data4Model--Usability--Following--Prompt-d3f0aa) ![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--MultiHop-d3f0aa)|Sec. 4.2.2|
 |EmbodiedGPT: Vision-Language Pre-Training via Embodied Chain of Thought|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--MultiHop-d3f0aa) ![](https://img.shields.io/badge/Model4Data--Synthesis--Creator-b4d4fb)|Sec. 3.1.1, Sec. 4.2.2, Sec. 5.1|
-|Learn to Explain: Multimodal Reasoning via Thought Chains for Science Question Answering|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--MultiHop-d3f0aa)|Sec. 3.1.1, Sec. 4.2.2, Table 3|
+|Learn to Explain: Multimodal Reasoning via Thought Chains for Science Question Answering|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Data4Model--Usability--Reasoning--MultiHop-d3f0aa)|Sec. 3.1.1, Sec. 4.2.2, Table 2|
 |Visual Instruction Tuning|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Model4Data--Synthesis--Creator-b4d4fb) ![](https://img.shields.io/badge/Model4Data--Synthesis--Mapper-b4d4fb)|Sec. 3.1.1|
 |ALLaVA: Harnessing GPT4V-synthesized Data for A Lite Vision-Language Model|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d) ![](https://img.shields.io/badge/Data4Model--Scaling--Effectiveness--CrossModalAlignment-f1db9d) ![](https://img.shields.io/badge/Data4Model--Usability--Following--HumanBehavior-d3f0aa)|Sec. 2.1, Sec. 3.1.1, Sec. 3.2.4, Sec. 4.1, Sec. 4.1.1, Sec. 4.1.3, Sec. 8.3.1, Table 2|
 |Time-LLM: Time Series Forecasting by Reprogramming Large Language Models|![](https://img.shields.io/badge/Data4Model--Usability--Following--Prompt-d3f0aa)|Sec. 4.1.1|
@@ -220,8 +220,12 @@ These tags correspond to the taxonomy in our paper, and each work may be assigne
 |MMICL: Empowering Vision-language Model with Multi-Modal In-Context Learning|![](https://img.shields.io/badge/Data4Model--Usability--Following--ICL-d3f0aa)|Sec 4.1.2|
 |All in an Aggregated Image for In-Image Learning|![](https://img.shields.io/badge/Data4Model--Usability--Following--ICL-d3f0aa)|Sec. 4.1.2|
 |Panda-70m: Captioning 70m videos with multiple cross-modality teachers|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|Table 2|
-|Multimodal C4: An Open, Billion-scale Corpus of Images Interleaved With Text|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|Table 3|
+|Multimodal C4: An Open, Billion-scale Corpus of Images Interleaved With Text|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|Table 2|
+|ChartAssisstant: A Universal Chart Multimodal Language Model via Chart-to-Table Pre-training and Multitask Instruction Tuning|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|Table 2|
 
+# Contribution to This Survey
+Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. Please feel free to make pull requests or open issues to contribute to this list and add more related resources!
+You can add the titles of relevant papers to the table above, and (optionally) provide suggested tags along with the corresponding sections if possible.
 
 # References
 If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2407.08583).
