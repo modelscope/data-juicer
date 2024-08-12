@@ -4,7 +4,7 @@ Welcome to the "Awesome List" for data-model co-development of Multi-Modal Large
 ![Overview of Our Taxonomy](https://img.alicdn.com/imgextra/i1/O1CN01aN3TVo1mgGZAuSHJ4_!!6000000004983-2-tps-3255-1327.png)
 Soon we will provide a dynamic table of contents to help readers more easily navigate through the materials with features such as search, filter, and sort.
 
-Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. Please feel free to pull requests or open issues to improve this list and add more related resources!
+Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. Please feel free to make pull requests or open issues to improve this list and add more related resources!
 
 
 
@@ -222,6 +222,9 @@ These tags correspond to the taxonomy in our paper, and each work may be assigne
 |Panda-70m: Captioning 70m videos with multiple cross-modality teachers|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|Table 2|
 |Multimodal C4: An Open, Billion-scale Corpus of Images Interleaved With Text|![](https://img.shields.io/badge/Data4Model--Scaling--Up--Acquisition-f1db9d)|Table 3|
 
+# Contribution to This Survey
+Due to the rapid development in the field, this repository and our paper are continuously being updated and synchronized with each other. Please feel free to make pull requests or open issues to improve this list and add more related resources!
+You can add the titles of relevant papers to the table above, and provide suggested tags along with the corresponding sections if possible. 
 
 # References
 If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2407.08583).
