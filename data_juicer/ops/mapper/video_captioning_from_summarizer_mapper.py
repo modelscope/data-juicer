@@ -54,6 +54,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
 
     def __init__(self,
                  hf_summarizer: str = None,
+                 trust_remote_code=False,
                  consider_video_caption_from_video: bool = True,
                  consider_video_caption_from_audio: bool = True,
                  consider_video_caption_from_frames: bool = True,
@@ -119,6 +120,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         self.model_key = prepare_model(
             model_type='huggingface',
             pretrained_model_name_or_path=self._hf_summarizer,
+            trust_remote_code=trust_remote_code
         )
 
         # prepare input texts ops

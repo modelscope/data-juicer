@@ -78,6 +78,7 @@ class PhraseGroundingRecallFilter(Filter):
 
     def __init__(self,
                  hf_owlvit='google/owlvit-base-patch32',
+                 trust_remote_code=False,
                  min_recall: ClosedUnitInterval = 0.1,
                  max_recall: ClosedUnitInterval = 1.0,
                  horizontal_flip: bool = False,
@@ -132,7 +133,8 @@ class PhraseGroundingRecallFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_owlvit)
+                                       pretrained_model_name_or_path=hf_owlvit,
+                                       trust_remote_code=trust_remote_code)
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip

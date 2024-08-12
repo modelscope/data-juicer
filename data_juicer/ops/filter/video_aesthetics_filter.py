@@ -37,6 +37,7 @@ class VideoAestheticsFilter(Filter):
 
     def __init__(self,
                  hf_scorer_model='',
+                 trust_remote_code=False,
                  min_score: ClosedUnitInterval = 0.4,
                  max_score: ClosedUnitInterval = 1.0,
                  frame_sampling_method: str = 'uniform',
@@ -105,7 +106,8 @@ class VideoAestheticsFilter(Filter):
 
         self.model_key = prepare_model(
             model_type='simple_aesthetics',
-            pretrained_model_name_or_path=hf_scorer_model)
+            pretrained_model_name_or_path=hf_scorer_model,
+            trust_remote_code=trust_remote_code)
         # the original score predicted by laion-ai's scorer is within [0, 10]
         self.need_normalized_by_ten = ('shunk031/aesthetics-predictor'
                                        in hf_scorer_model)

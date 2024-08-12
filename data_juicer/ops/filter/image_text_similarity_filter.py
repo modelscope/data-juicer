@@ -32,6 +32,7 @@ class ImageTextSimilarityFilter(Filter):
 
     def __init__(self,
                  hf_clip='openai/clip-vit-base-patch32',
+                 trust_remote_code=False,
                  min_score: ClosedUnitInterval = 0.1,
                  max_score: ClosedUnitInterval = 1.0,
                  horizontal_flip: bool = False,
@@ -72,7 +73,8 @@ class ImageTextSimilarityFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_clip)
+                                       pretrained_model_name_or_path=hf_clip,
+                                       trust_remote_code=trust_remote_code)
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip

@@ -38,6 +38,7 @@ class ImageDiffusionMapper(Mapper):
 
     def __init__(self,
                  hf_diffusion: str = 'CompVis/stable-diffusion-v1-4',
+                 trust_remote_code=False,
                  torch_dtype: str = 'fp32',
                  revision: str = 'main',
                  strength: float = 0.8,
@@ -117,7 +118,8 @@ class ImageDiffusionMapper(Mapper):
             pretrained_model_name_or_path=hf_diffusion,
             diffusion_type='image2image',
             torch_dtype=torch_dtype,
-            revision=revision)
+            revision=revision,
+            trust_remote_code=trust_remote_code)
 
     def _real_guidance(self, caption: str, image: Image.Image, rank=None):
 

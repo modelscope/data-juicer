@@ -27,6 +27,7 @@ class ExtractQAMapper(Mapper):
 
     def __init__(self,
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
+                 trust_remote_code=False,
                  pattern: str = None,
                  qa_format: str = 'chatml',
                  *args,
@@ -62,7 +63,8 @@ class ExtractQAMapper(Mapper):
 
         self.qa_format = qa_format
         self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_model)
+                                       pretrained_model_name_or_path=hf_model,
+                                       trust_remote_code=trust_remote_code)
 
     def _extract_qa(self, output):
         """Extract qestion and answer pair from model output response."""
