@@ -1,4 +1,4 @@
-import heapq
+import bisect
 
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
@@ -14,6 +14,8 @@ class RangeSpecifiedFieldSelector(Selector):
 
     def __init__(self,
                  field_key: str = '',
+                 lower_value: float = None,
+                 upper_value: float = None,
                  lower_percentile: ClosedUnitInterval = None,
                  upper_percentile: ClosedUnitInterval = None,
                  lower_rank: PositiveInt = None,
@@ -52,6 +54,8 @@ class RangeSpecifiedFieldSelector(Selector):
         """
         super().__init__(*args, **kwargs)
         self.field_key = field_key
+        self.lower_value = lower_value
+        self.upper_value = upper_value
         self.lower_percentile = lower_percentile
         self.upper_percentile = upper_percentile
         self.lower_rank = lower_rank
@@ -61,21 +65,10 @@ class RangeSpecifiedFieldSelector(Selector):
         if len(dataset) <= 1 or not self.field_key:
             return dataset
 
-        if self.lower_percentile is None and self.lower_rank is None:
+        if self.lower_value is None and self.upper_value is None and \
+            self.lower_percentile is None and self.upper_percentile is None \
+                and self.lower_rank is None and self.upper_rank is None:
             return dataset
-        if self.upper_percentile is None and self.upper_rank is None:
-            return dataset
-
-        lower_bound, upper_bound = 0, len(dataset)
-        if self.lower_percentile is not None:
-            lower_bound = int(self.lower_percentile * len(dataset))
-        if self.lower_rank is not None:
-            lower_bound = max(lower_bound, self.lower_rank)
-        if self.upper_percentile is not None:
-            upper_bound = int(self.upper_percentile * len(dataset))
-        if self.upper_rank is not None:
-            upper_bound = min(upper_bound, self.upper_rank)
-        upper_bound = max(lower_bound, upper_bound)
 
         field_keys = self.field_key.split('.')
         assert field_keys[0] in dataset.features.keys(
@@ -97,13 +90,27 @@ class RangeSpecifiedFieldSelector(Selector):
             return field_value_list
 
         field_value_list = get_field_value_list(dataset, field_keys)
-        select_index = heapq.nsmallest(int(upper_bound), range(len(dataset)),
-                                       field_value_list.__getitem__)
-        sub_dataset = dataset.select(select_index)
+        field_value_list.sort()
 
-        field_value_list = get_field_value_list(sub_dataset, field_keys)
-        select_index = heapq.nlargest(int(upper_bound - lower_bound),
-                                      range(len(sub_dataset)),
-                                      field_value_list.__getitem__)
+        lower_bound, upper_bound = 0, len(dataset) - 1
+        if self.lower_value is not None:
+            lower_bound = bisect.bisect_left(field_value_list,
+                                             self.lower_value)
+        if self.lower_percentile is not None:
+            lower_bound = max(lower_bound,
+                              int(self.lower_percentile * len(dataset)))
+        if self.lower_rank is not None:
+            lower_bound = max(lower_bound, self.lower_rank)
+        if self.upper_value is not None:
+            upper_bound = bisect.bisect_right(field_value_list,
+                                              self.upper_value) - 1
+        if self.upper_percentile is not None:
+            upper_bound = min(upper_bound,
+                              int(self.upper_percentile * len(dataset)))
+        if self.upper_rank is not None:
+            upper_bound = min(upper_bound, self.upper_rank)
+        upper_bound = max(lower_bound, upper_bound)
 
-        return sub_dataset.select(select_index)
+        select_index = list(range(lower_bound, upper_bound + 1))
+
+        return dataset.select(select_index)
