@@ -46,6 +46,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
     def __init__(
         self,
         hf_video_blip='kpyu/video-blip-opt-2.7b-ego4d',
+        trust_remote_code=False,
         caption_num: PositiveInt = 1,
         keep_candidate_mode: str = 'random_any',
         keep_original_sample: bool = True,
@@ -158,6 +159,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
         self.model_key = prepare_model(
             model_type='video_blip',
             pretrained_model_name_or_path=hf_video_blip,
+            trust_remote_code=trust_remote_code
         )
 
     def _process_single_sample(self, ori_sample, rank=None, context=False):

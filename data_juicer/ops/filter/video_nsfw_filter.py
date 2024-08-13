@@ -32,6 +32,7 @@ class VideoNSFWFilter(Filter):
 
     def __init__(self,
                  hf_nsfw_model='Falconsai/nsfw_image_detection',
+                 trust_remote_code=False,
                  score_threshold: ClosedUnitInterval = 0.5,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
@@ -86,7 +87,8 @@ class VideoNSFWFilter(Filter):
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(
             model_type='huggingface',
-            pretrained_model_name_or_path=hf_nsfw_model)
+            pretrained_model_name_or_path=hf_nsfw_model,
+            trust_remote_code=trust_remote_code)
         self.reduce_mode = reduce_mode
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num

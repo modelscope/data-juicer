@@ -28,6 +28,7 @@ class VideoTaggingFromAudioMapper(Mapper):
 
     def __init__(self,
                  hf_ast='MIT/ast-finetuned-audioset-10-10-0.4593',
+                 trust_remote_code=False,
                  *args,
                  **kwargs):
         """
@@ -38,7 +39,8 @@ class VideoTaggingFromAudioMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_ast)
+                                       pretrained_model_name_or_path=hf_ast,
+                                       trust_remote_code=trust_remote_code)
         self._model_sampling_rate = 16000
         self._no_audio_label = 'EMPTY'
 

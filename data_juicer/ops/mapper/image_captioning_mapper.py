@@ -39,6 +39,7 @@ class ImageCaptioningMapper(Mapper):
 
     def __init__(self,
                  hf_img2seq='Salesforce/blip2-opt-2.7b',
+                 trust_remote_code=False,
                  caption_num: PositiveInt = 1,
                  keep_candidate_mode: str = 'random_any',
                  keep_original_sample: bool = True,
@@ -97,7 +98,9 @@ class ImageCaptioningMapper(Mapper):
                 f'["random_any", "similar_one_simhash", "all"].')
 
         self.model_key = prepare_model(
-            model_type='huggingface', pretrained_model_name_or_path=hf_img2seq)
+            model_type='huggingface',
+            pretrained_model_name_or_path=hf_img2seq,
+            trust_remote_code=trust_remote_code)
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode
         self.keep_original_sample = keep_original_sample

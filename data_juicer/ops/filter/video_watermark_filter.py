@@ -35,6 +35,7 @@ class VideoWatermarkFilter(Filter):
 
     def __init__(self,
                  hf_watermark_model='amrul-hzz/watermark_detector',
+                 trust_remote_code=False,
                  prob_threshold: ClosedUnitInterval = 0.8,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
@@ -90,7 +91,8 @@ class VideoWatermarkFilter(Filter):
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(
             model_type='huggingface',
-            pretrained_model_name_or_path=hf_watermark_model)
+            pretrained_model_name_or_path=hf_watermark_model,
+            trust_remote_code=trust_remote_code)
         self.reduce_mode = reduce_mode
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num
