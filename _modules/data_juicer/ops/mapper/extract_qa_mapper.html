@@ -111,6 +111,7 @@
 
 <div class="viewcode-block" id="ExtractQAMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractQAMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;alibaba-pai/pai-qwen1_5-7b-doc2qa&#39;</span><span class="p">,</span>
+                 <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">qa_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;chatml&#39;</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
@@ -146,7 +147,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">qa_format</span> <span class="o">=</span> <span class="n">qa_format</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
-                                       <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_model</span><span class="p">)</span></div>
+                                       <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_model</span><span class="p">,</span>
+                                       <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_extract_qa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract qestion and answer pair from model output response.&quot;&quot;&quot;</span>

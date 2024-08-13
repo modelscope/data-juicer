@@ -115,6 +115,7 @@
 
 <div class="viewcode-block" id="ImageWatermarkFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_watermark_model</span><span class="o">=</span><span class="s1">&#39;amrul-hzz/watermark_detector&#39;</span><span class="p">,</span>
+                 <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">prob_threshold</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
                  <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;any&#39;</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
@@ -142,7 +143,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">any</span> <span class="o">=</span> <span class="p">(</span><span class="n">any_or_all</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
             <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
-            <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_watermark_model</span><span class="p">)</span></div>
+            <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_watermark_model</span><span class="p">,</span>
+            <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ImageWatermarkFilter.compute_stats"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>

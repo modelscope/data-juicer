@@ -138,6 +138,7 @@
 
 <div class="viewcode-block" id="VideoCaptioningFromSummarizerMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoCaptioningFromSummarizerMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_summarizer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">consider_video_caption_from_video</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="n">consider_video_caption_from_audio</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
                  <span class="n">consider_video_caption_from_frames</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -203,7 +204,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
             <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
             <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hf_summarizer</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span>
 
         <span class="c1"># prepare input texts ops</span>
         <span class="k">if</span> <span class="n">vid_cap_from_vid_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

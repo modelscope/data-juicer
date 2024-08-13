@@ -120,6 +120,7 @@
 
 <div class="viewcode-block" id="VideoFramesTextSimilarityFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.VideoFramesTextSimilarityFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_clip</span><span class="o">=</span><span class="s1">&#39;openai/clip-vit-base-patch32&#39;</span><span class="p">,</span>
+                 <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">min_score</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
                  <span class="n">max_score</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
                  <span class="n">frame_sampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;all_keyframes&#39;</span><span class="p">,</span>
@@ -182,7 +183,8 @@
                              <span class="sa">f</span><span class="s1">&#39;Can only be one of [&quot;any&quot;, &quot;all&quot;].&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">any</span> <span class="o">=</span> <span class="p">(</span><span class="n">any_or_all</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
-                                       <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_clip</span><span class="p">)</span>
+                                       <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_clip</span><span class="p">,</span>
+                                       <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reduce_mode</span> <span class="o">=</span> <span class="n">reduce_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">horizontal_flip</span> <span class="o">=</span> <span class="n">horizontal_flip</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vertical_flip</span> <span class="o">=</span> <span class="n">vertical_flip</span>

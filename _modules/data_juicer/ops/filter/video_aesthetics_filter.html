@@ -121,6 +121,7 @@
 
 <div class="viewcode-block" id="VideoAestheticsFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.VideoAestheticsFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_scorer_model</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">min_score</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">0.4</span><span class="p">,</span>
                  <span class="n">max_score</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
                  <span class="n">frame_sampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span>
@@ -189,7 +190,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
             <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;simple_aesthetics&#39;</span><span class="p">,</span>
-            <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_scorer_model</span><span class="p">)</span>
+            <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_scorer_model</span><span class="p">,</span>
+            <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span>
         <span class="c1"># the original score predicted by laion-ai&#39;s scorer is within [0, 10]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">need_normalized_by_ten</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;shunk031/aesthetics-predictor&#39;</span>
                                        <span class="ow">in</span> <span class="n">hf_scorer_model</span><span class="p">)</span>

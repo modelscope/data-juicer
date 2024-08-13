@@ -112,6 +112,7 @@
 
 <div class="viewcode-block" id="VideoTaggingFromAudioMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoTaggingFromAudioMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_ast</span><span class="o">=</span><span class="s1">&#39;MIT/ast-finetuned-audioset-10-10-0.4593&#39;</span><span class="p">,</span>
+                 <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -122,7 +123,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
-                                       <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_ast</span><span class="p">)</span>
+                                       <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_ast</span><span class="p">,</span>
+                                       <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_model_sampling_rate</span> <span class="o">=</span> <span class="mi">16000</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_no_audio_label</span> <span class="o">=</span> <span class="s1">&#39;EMPTY&#39;</span></div>
 

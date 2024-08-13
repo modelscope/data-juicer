@@ -123,6 +123,7 @@
 
 <div class="viewcode-block" id="ImageCaptioningMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageCaptioningMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_img2seq</span><span class="o">=</span><span class="s1">&#39;Salesforce/blip2-opt-2.7b&#39;</span><span class="p">,</span>
+                 <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">caption_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
                  <span class="n">keep_candidate_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;random_any&#39;</span><span class="p">,</span>
                  <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -181,7 +182,9 @@
                 <span class="sa">f</span><span class="s1">&#39;[&quot;random_any&quot;, &quot;similar_one_simhash&quot;, &quot;all&quot;].&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
-            <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span> <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_img2seq</span><span class="p">)</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
+            <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_img2seq</span><span class="p">,</span>
+            <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">caption_num</span> <span class="o">=</span> <span class="n">caption_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_candidate_mode</span> <span class="o">=</span> <span class="n">keep_candidate_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span> <span class="o">=</span> <span class="n">keep_original_sample</span>
