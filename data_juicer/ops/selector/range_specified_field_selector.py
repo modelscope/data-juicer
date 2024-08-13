@@ -90,7 +90,8 @@ class RangeSpecifiedFieldSelector(Selector):
             return field_value_list
 
         field_value_list = get_field_value_list(dataset, field_keys)
-        field_value_list.sort()
+        field_value_list, indices = zip(
+            *sorted(list(zip(field_value_list, range(len(field_value_list))))))
 
         lower_bound, upper_bound = 0, len(dataset) - 1
         if self.lower_value is not None:
@@ -111,6 +112,6 @@ class RangeSpecifiedFieldSelector(Selector):
             upper_bound = min(upper_bound, self.upper_rank)
         upper_bound = max(lower_bound, upper_bound)
 
-        select_index = list(range(lower_bound, upper_bound + 1))
+        select_index = indices[lower_bound:upper_bound + 1]
 
         return dataset.select(select_index)
