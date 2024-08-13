@@ -98,7 +98,9 @@ class ImageCaptioningMapper(Mapper):
                 f'["random_any", "similar_one_simhash", "all"].')
 
         self.model_key = prepare_model(
-            model_type='huggingface', pretrained_model_name_or_path=hf_img2seq, trust_remote_code=trust_remote_code)
+            model_type='huggingface',
+            pretrained_model_name_or_path=hf_img2seq,
+            trust_remote_code=trust_remote_code)
         self.caption_num = caption_num
         self.keep_candidate_mode = keep_candidate_mode
         self.keep_original_sample = keep_original_sample

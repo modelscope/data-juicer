@@ -120,8 +120,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         self.model_key = prepare_model(
             model_type='huggingface',
             pretrained_model_name_or_path=self._hf_summarizer,
-            trust_remote_code=trust_remote_code
-        )
+            trust_remote_code=trust_remote_code)
 
         # prepare input texts ops
         if vid_cap_from_vid_args is None:
