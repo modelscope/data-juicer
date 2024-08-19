@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.format.text_formatter &mdash; data_juicer 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b1f64a84"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+              <div class="version">
+                0.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.format.text_formatter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.format.text_formatter</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Pool</span>
+
+<span class="kn">import</span> <span class="nn">pdfplumber</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">concatenate_datasets</span><span class="p">,</span> <span class="n">load_dataset</span>
+<span class="kn">from</span> <span class="nn">docx</span> <span class="kn">import</span> <span class="n">Document</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.cache_utils</span> <span class="kn">import</span> <span class="n">DATA_JUICER_CACHE_HOME</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.file_utils</span> <span class="kn">import</span> <span class="n">find_files_with_suffix</span>
+
+<span class="kn">from</span> <span class="nn">.formatter</span> <span class="kn">import</span> <span class="n">FORMATTERS</span><span class="p">,</span> <span class="n">LocalFormatter</span><span class="p">,</span> <span class="n">add_suffixes</span><span class="p">,</span> <span class="n">unify_format</span>
+
+
+<span class="k">def</span> <span class="nf">extract_txt_from_docx</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">tgt_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract text from a docx file and save to target path.</span>
+
+<span class="sd">    :param fn: path to input pdf file</span>
+<span class="sd">    :param tgt_path: path to save text file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">Document</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="p">[</span><span class="n">para</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">para</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">paragraphs</span> <span class="k">if</span> <span class="n">para</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+    <span class="n">base_fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.docx&#39;</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tgt_path</span><span class="p">,</span> <span class="n">base_fn</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">extract_txt_from_pdf</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">tgt_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract text from a pdf file and save to target path.</span>
+
+<span class="sd">    :param fn: path to input pdf file</span>
+<span class="sd">    :param tgt_path: path to save text file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">pdfplumber</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">page</span> <span class="ow">in</span> <span class="n">pdf</span><span class="o">.</span><span class="n">pages</span><span class="p">:</span>
+            <span class="c1"># remove tables from each page extracted by pdfplumber</span>
+            <span class="n">tables</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">find_tables</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
+                <span class="n">page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">outside_bbox</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">bbox</span><span class="p">)</span>
+            <span class="c1"># remove page number from the end of each page</span>
+            <span class="n">page_text</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">extract_text</span><span class="p">()</span>
+            <span class="n">page_num</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">page_number</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">page_text</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">page_num</span><span class="p">):</span>
+                <span class="n">page_text</span> <span class="o">=</span> <span class="n">page_text</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">page_num</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">page_text</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">page_text</span><span class="p">)</span>
+        <span class="n">base_fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tgt_path</span><span class="p">,</span> <span class="n">base_fn</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="TextFormatter"><a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.TextFormatter">[docs]</a><span class="nd">@FORMATTERS</span><span class="o">.</span><span class="n">register_module</span><span class="p">()</span>
+<span class="k">class</span> <span class="nc">TextFormatter</span><span class="p">(</span><span class="n">LocalFormatter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The class is used to load and format text-type files.</span>
+
+<span class="sd">    e.g. `[&#39;.txt&#39;, &#39;.pdf&#39;, &#39;.cpp&#39;, &#39;.docx&#39;]`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SUFFIXES</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;.docx&#39;</span><span class="p">,</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;.md&#39;</span><span class="p">,</span> <span class="s1">&#39;.tex&#39;</span><span class="p">,</span> <span class="s1">&#39;.asm&#39;</span><span class="p">,</span> <span class="s1">&#39;.bat&#39;</span><span class="p">,</span> <span class="s1">&#39;.cmd&#39;</span><span class="p">,</span> <span class="s1">&#39;.c&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;.h&#39;</span><span class="p">,</span> <span class="s1">&#39;.cs&#39;</span><span class="p">,</span> <span class="s1">&#39;.cpp&#39;</span><span class="p">,</span> <span class="s1">&#39;.hpp&#39;</span><span class="p">,</span> <span class="s1">&#39;.c++&#39;</span><span class="p">,</span> <span class="s1">&#39;.h++&#39;</span><span class="p">,</span> <span class="s1">&#39;.cc&#39;</span><span class="p">,</span> <span class="s1">&#39;.hh&#39;</span><span class="p">,</span> <span class="s1">&#39;.C&#39;</span><span class="p">,</span> <span class="s1">&#39;.H&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;.cmake&#39;</span><span class="p">,</span> <span class="s1">&#39;.css&#39;</span><span class="p">,</span> <span class="s1">&#39;.dockerfile&#39;</span><span class="p">,</span> <span class="s1">&#39;.f90&#39;</span><span class="p">,</span> <span class="s1">&#39;.f&#39;</span><span class="p">,</span> <span class="s1">&#39;.f03&#39;</span><span class="p">,</span> <span class="s1">&#39;.f08&#39;</span><span class="p">,</span> <span class="s1">&#39;.f77&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;.f95&#39;</span><span class="p">,</span> <span class="s1">&#39;.for&#39;</span><span class="p">,</span> <span class="s1">&#39;.fpp&#39;</span><span class="p">,</span> <span class="s1">&#39;.go&#39;</span><span class="p">,</span> <span class="s1">&#39;.hs&#39;</span><span class="p">,</span> <span class="s1">&#39;.html&#39;</span><span class="p">,</span> <span class="s1">&#39;.java&#39;</span><span class="p">,</span> <span class="s1">&#39;.js&#39;</span><span class="p">,</span> <span class="s1">&#39;.jl&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;.lua&#39;</span><span class="p">,</span> <span class="s1">&#39;.markdown&#39;</span><span class="p">,</span> <span class="s1">&#39;.php&#39;</span><span class="p">,</span> <span class="s1">&#39;.php3&#39;</span><span class="p">,</span> <span class="s1">&#39;.php4&#39;</span><span class="p">,</span> <span class="s1">&#39;.php5&#39;</span><span class="p">,</span> <span class="s1">&#39;.phps&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;.phpt&#39;</span><span class="p">,</span> <span class="s1">&#39;.pl&#39;</span><span class="p">,</span> <span class="s1">&#39;.pm&#39;</span><span class="p">,</span> <span class="s1">&#39;.pod&#39;</span><span class="p">,</span> <span class="s1">&#39;.perl&#39;</span><span class="p">,</span> <span class="s1">&#39;.ps1&#39;</span><span class="p">,</span> <span class="s1">&#39;.psd1&#39;</span><span class="p">,</span> <span class="s1">&#39;.psm1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;.py&#39;</span><span class="p">,</span> <span class="s1">&#39;.rb&#39;</span><span class="p">,</span> <span class="s1">&#39;.rs&#39;</span><span class="p">,</span> <span class="s1">&#39;.sql&#39;</span><span class="p">,</span> <span class="s1">&#39;.scala&#39;</span><span class="p">,</span> <span class="s1">&#39;.sh&#39;</span><span class="p">,</span> <span class="s1">&#39;.bash&#39;</span><span class="p">,</span> <span class="s1">&#39;.command&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;.zsh&#39;</span><span class="p">,</span> <span class="s1">&#39;.ts&#39;</span><span class="p">,</span> <span class="s1">&#39;.tsx&#39;</span><span class="p">,</span> <span class="s1">&#39;.vb&#39;</span><span class="p">,</span> <span class="s1">&#39;Dockerfile&#39;</span><span class="p">,</span> <span class="s1">&#39;Makefile&#39;</span><span class="p">,</span> <span class="s1">&#39;.xml&#39;</span><span class="p">,</span> <span class="s1">&#39;.rst&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;.m&#39;</span><span class="p">,</span> <span class="s1">&#39;.smali&#39;</span>
+    <span class="p">]</span>
+
+<div class="viewcode-block" id="TextFormatter.__init__"><a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.TextFormatter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">dataset_path</span><span class="p">,</span>
+                 <span class="n">suffixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">add_suffix</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param dataset_path: a dataset file or a dataset directory</span>
+<span class="sd">        :param suffixes: files with specified suffixes to be processed</span>
+<span class="sd">        :param add_suffix: Whether to add file suffix to datase meta</span>
+<span class="sd">            info</span>
+<span class="sd">        :param kwargs: extra args</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">dataset_path</span><span class="o">=</span><span class="n">dataset_path</span><span class="p">,</span>
+            <span class="n">suffixes</span><span class="o">=</span><span class="n">suffixes</span> <span class="k">if</span> <span class="n">suffixes</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUFFIXES</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">,</span>
+            <span class="n">add_suffix</span><span class="o">=</span><span class="n">add_suffix</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_path</span> <span class="o">=</span> <span class="n">dataset_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_suffix</span> <span class="o">=</span> <span class="n">add_suffix</span></div>
+
+<div class="viewcode-block" id="TextFormatter.load_dataset"><a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.TextFormatter.load_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_proc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">global_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load a dataset from local text-type files.</span>
+
+<span class="sd">        :param num_proc: number of processes when loading the dataset</span>
+<span class="sd">        :param global_cfg: the global cfg used in consequent processes,</span>
+<span class="sd">        :return: unified_format_dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># extract text to cache directory</span>
+        <span class="n">extracted_dataset_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">DATA_JUICER_CACHE_HOME</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)))</span>
+
+        <span class="k">for</span> <span class="n">file_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">:</span>
+
+            <span class="c1"># extract text from docx or pdf files, and save as txt type</span>
+            <span class="k">if</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s1">&#39;.docx&#39;</span> <span class="ow">or</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">:</span>
+                <span class="n">extracted_filetype_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">extracted_dataset_path</span><span class="p">,</span>
+                                                       <span class="n">file_type</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">extracted_filetype_path</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">extracted_filetype_path</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Extracting text from </span><span class="si">{}</span><span class="s1"> files...&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">file_type</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)))</span>
+
+                <span class="n">extract_func</span> <span class="o">=</span> <span class="n">extract_txt_from_docx</span> \
+                    <span class="k">if</span> <span class="n">file_type</span> <span class="o">==</span> <span class="s1">&#39;.docx&#39;</span> <span class="k">else</span> <span class="n">extract_txt_from_pdf</span>
+                <span class="n">pool</span> <span class="o">=</span> <span class="n">Pool</span><span class="p">(</span><span class="n">num_proc</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">data_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">file_type</span><span class="p">]:</span>
+                    <span class="n">pool</span><span class="o">.</span><span class="n">apply_async</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">extract_func</span><span class="p">,</span>
+                                     <span class="n">args</span><span class="o">=</span><span class="p">(</span>
+                                         <span class="n">data_file</span><span class="p">,</span>
+                                         <span class="n">extracted_filetype_path</span><span class="p">,</span>
+                                     <span class="p">))</span>
+                <span class="n">pool</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">pool</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Extracted text files are stored in directory &#39;</span>
+                            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">extracted_filetype_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+                <span class="c1"># look for extracted txt files</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">file_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">find_files_with_suffix</span><span class="p">(</span>
+                    <span class="n">extracted_filetype_path</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">)[</span><span class="s1">&#39;.txt&#39;</span><span class="p">]</span>
+
+        <span class="c1"># load text dataset, one text file as one sample</span>
+        <span class="n">datasets</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                                <span class="n">data_files</span><span class="o">=</span><span class="p">{</span>
+                                    <span class="n">key</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_files</span>
+                                <span class="p">},</span>
+                                <span class="n">sample_by</span><span class="o">=</span><span class="s1">&#39;document&#39;</span><span class="p">,</span>
+                                <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
+                                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># whether to add file suffix to datase meta info</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_suffix</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Add suffix info into dataset...&#39;</span><span class="p">)</span>
+            <span class="n">datasets</span> <span class="o">=</span> <span class="n">add_suffixes</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">num_proc</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">datasets</span> <span class="o">=</span> <span class="n">concatenate_datasets</span><span class="p">([</span><span class="n">ds</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="k">return</span> <span class="n">unify_format</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span>
+                            <span class="n">text_keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_keys</span><span class="p">,</span>
+                            <span class="n">num_proc</span><span class="o">=</span><span class="n">num_proc</span><span class="p">,</span>
+                            <span class="n">global_cfg</span><span class="o">=</span><span class="n">global_cfg</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

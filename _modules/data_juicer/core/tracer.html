@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.core.tracer &mdash; data_juicer 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b1f64a84"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+              <div class="version">
+                0.2.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.core.tracer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.core.tracer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="Tracer"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Tracer">[docs]</a><span class="k">class</span> <span class="nc">Tracer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The tracer to trace the sample changes before and after an operator</span>
+<span class="sd">    process.</span>
+
+<span class="sd">    The comparison results will be stored in the work directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Tracer.__init__"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Tracer.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">work_dir</span><span class="p">,</span> <span class="n">show_num</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param work_dir: the work directory to store the comparison</span>
+<span class="sd">            results</span>
+<span class="sd">        :param show_num: the maximum number of samples to show in the</span>
+<span class="sd">            comparison result files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;trace&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span> <span class="o">=</span> <span class="n">show_num</span></div>
+
+<div class="viewcode-block" id="Tracer.trace_mapper"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Tracer.trace_mapper">[docs]</a>    <span class="k">def</span> <span class="nf">trace_mapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+                     <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare datasets before and after a Mapper.</span>
+
+<span class="sd">        This will mainly show the different sample pairs due to the</span>
+<span class="sd">        modification by the Mapper</span>
+
+<span class="sd">        :param op_name: the op name of mapper</span>
+<span class="sd">        :param previous_ds: dataset before the mapper process</span>
+<span class="sd">        :param processed_ds: dataset processed by the mapper</span>
+<span class="sd">        :param text_key: which text_key to trace</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">previous_ds</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_ds</span><span class="p">)</span>
+        <span class="n">dif_dict</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Find different samples orderly between previous and processed</span>
+        <span class="c1"># datasets until the total number of found sample pairs is enough.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">previous_ds</span><span class="p">)):</span>
+            <span class="n">previous_sample</span> <span class="o">=</span> <span class="n">previous_ds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">text_key</span><span class="p">]</span>
+            <span class="n">processed_sample</span> <span class="o">=</span> <span class="n">processed_ds</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">text_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">previous_sample</span> <span class="o">!=</span> <span class="n">processed_sample</span><span class="p">:</span>
+                <span class="n">dif_dict</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                    <span class="s1">&#39;original text&#39;</span><span class="p">:</span> <span class="n">previous_sample</span><span class="p">,</span>
+                    <span class="s1">&#39;processed_text&#39;</span><span class="p">:</span> <span class="n">processed_sample</span><span class="p">,</span>
+                <span class="p">})</span>
+                <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">num</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dif_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] are all &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;the same. Thus no comparison results would be &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;generated.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dif_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dif_dict</span><span class="p">)</span><span class="si">}</span><span class="s1"> different samples &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] -- less than &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># export the tracer results.</span>
+        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;mapper-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">.jsonl&#39;</span>
+        <span class="n">dif_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dif_dict</span><span class="p">)</span>
+        <span class="n">dif_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span>
+                       <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">,</span>
+                       <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tracer.trace_batch_mapper"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Tracer.trace_batch_mapper">[docs]</a>    <span class="k">def</span> <span class="nf">trace_batch_mapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+                           <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare datasets before and after a BatchMapper.</span>
+
+<span class="sd">        This will mainly show the new samples augmented by the BatchMapper</span>
+
+<span class="sd">        :param op_name: the op name of mapper</span>
+<span class="sd">        :param previous_ds: dataset before the mapper process</span>
+<span class="sd">        :param processed_ds: dataset processed by the mapper</span>
+<span class="sd">        :param text_key: which text_key to trace</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">previous_ds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">text_key</span><span class="p">]</span> <span class="o">==</span> <span class="n">processed_ds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">text_key</span><span class="p">]</span>
+        <span class="n">aug_dict</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Get the first samples</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">processed_ds</span><span class="p">)):</span>
+            <span class="n">processed_sample</span> <span class="o">=</span> <span class="n">processed_ds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">aug_dict</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">processed_sample</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] are &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;empty. Thus no comparison results would be &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;generated.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are only </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples -- less &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;than expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># export the tracer results.</span>
+        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;mapper-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">.jsonl&#39;</span>
+        <span class="n">dif_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">aug_dict</span><span class="p">)</span>
+        <span class="n">dif_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span>
+                       <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">,</span>
+                       <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tracer.trace_filter"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Tracer.trace_filter">[docs]</a>    <span class="k">def</span> <span class="nf">trace_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">previous_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+                     <span class="n">processed_ds</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare datasets before and after a Filter.</span>
+
+<span class="sd">        This will mainly show the filtered samples by the Filter</span>
+
+<span class="sd">        :param op_name: the op name of filter</span>
+<span class="sd">        :param previous_ds: dataset before the filter process</span>
+<span class="sd">        :param processed_ds: dataset processed by the filter</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">previous_ds</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_ds</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] are all &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;the same. Thus no comparison results would be &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;generated.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># get the number of filtered samples.</span>
+        <span class="n">total_dif_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">previous_ds</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_ds</span><span class="p">)</span>
+        <span class="c1"># index of the current sample in the previous dataset</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">filter_dict</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># number of found filtered samples. It&#39;s the offset bewteen two</span>
+        <span class="c1"># datasets as well.</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">previous_ds</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">-</span> <span class="n">num</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">processed_ds</span><span class="p">)</span> <span class="ow">or</span> \
+                    <span class="n">previous_ds</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">processed_ds</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="n">num</span><span class="p">]:</span>
+                <span class="c1"># 1. If all samples in processed dataset are checked but there</span>
+                <span class="c1"># still some samples left in the previous dataset, all of these</span>
+                <span class="c1"># left samples are filtered.</span>
+                <span class="c1"># 2. If the corresponding samples in previous and processed</span>
+                <span class="c1"># datasets are different, samples in the previous dataset are</span>
+                <span class="c1"># filtered.</span>
+                <span class="n">num</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">filter_dict</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">previous_ds</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">num</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span> <span class="ow">or</span> <span class="n">num</span> <span class="o">&gt;=</span> <span class="n">total_dif_num</span><span class="p">:</span>
+                <span class="c1"># If the total number of found filtered samples is enough or we</span>
+                <span class="c1"># have found all filtered samples, just stop.</span>
+                <span class="k">break</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] are all &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;the same. Thus no comparison results would be &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;generated.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span><span class="si">}</span><span class="s1"> filtered samples &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] -- less than &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># export the tracer results.</span>
+        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;filter-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">.jsonl&#39;</span>
+        <span class="n">filter_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">filter_dict</span><span class="p">)</span>
+        <span class="n">filter_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span>
+                          <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">,</span>
+                          <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Tracer.trace_deduplicator"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Tracer.trace_deduplicator">[docs]</a>    <span class="k">def</span> <span class="nf">trace_deduplicator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dup_pairs</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compare datasets before and after a Deduplicator.</span>
+
+<span class="sd">        This will mainly show the near-duplicate sample pairs extracted</span>
+<span class="sd">        by the Deduplicator. Different from the other two trace methods,</span>
+<span class="sd">        the trace process for deduplicator is embedded into the process</span>
+<span class="sd">        method of deduplicator, but the other two trace methods are</span>
+<span class="sd">        independent of the process method of mapper and filter operators</span>
+
+<span class="sd">        :param op_name: the op name of deduplicator</span>
+<span class="sd">        :param dup_pairs: duplicate sample pairs obtained from</span>
+<span class="sd">            deduplicator</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">dup_pairs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] does not generate dup_pairs &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;correctly, thus no comparison results can be &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;obtained from this op.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Datasets before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] are all &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;the same. Thus no comparison results would be &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;generated.&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">)</span><span class="si">}</span><span class="s1"> filtered samples &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;before and after op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">] -- less than &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;expected </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">show_num</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># reorganize the duplicate pairs</span>
+        <span class="n">dup_dict</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dup_pairs</span><span class="p">:</span>
+            <span class="n">dup_dict</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">&#39;dup1&#39;</span><span class="p">:</span> <span class="n">dup_pairs</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s1">&#39;dup2&#39;</span><span class="p">:</span> <span class="n">dup_pairs</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+            <span class="p">})</span>
+
+        <span class="c1"># export the tracer result.</span>
+        <span class="n">res_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;duplicate-</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">.jsonl&#39;</span>
+        <span class="n">dup_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dup_dict</span><span class="p">)</span>
+        <span class="n">dup_df</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">res_name</span><span class="p">),</span>
+                       <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">,</span>
+                       <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
