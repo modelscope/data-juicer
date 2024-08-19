@@ -126,7 +126,9 @@ class ImageDiffusionMapper(Mapper):
         canvas = image.resize((512, 512), Image.BILINEAR)
         prompt = caption
 
-        diffusion_model = get_model(model_key=self.model_key, rank=rank)
+        diffusion_model = get_model(model_key=self.model_key,
+                                    rank=rank,
+                                    use_cuda=self.use_cuda())
 
         kwargs = dict(image=canvas,
                       prompt=[prompt],

@@ -159,7 +159,9 @@ class VideoAestheticsFilter(Filter):
 
             if len(frame_images) > 0:
                 # compute aesthetics_scores
-                model, processor = get_model(self.model_key, rank=rank)
+                model, processor = get_model(self.model_key,
+                                             rank=rank,
+                                             use_cuda=self.use_cuda())
                 inputs = processor(images=frame_images,
                                    return_tensors='pt').to(model.device)
                 with torch.no_grad():
