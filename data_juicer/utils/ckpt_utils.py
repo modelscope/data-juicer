@@ -84,6 +84,16 @@ class CheckpointManager:
         # 1. same: remove these ops from process list
         # 2. different: cleanup op record, and keep process list unchanged
         recorded_op_num = len(self.op_record)
+        process_op_num = len(self.process_list)
+        if process_op_num < recorded_op_num:
+            logger.warning(
+                f'Current config ops ({process_op_num}) are fewer '
+                f'than checkpoint ops ({recorded_op_num}). Cannot '
+                f'reuse checkpoint; All ops will be processed from the '
+                f'beginning')
+            self.op_record = []
+            return False
+
         prefix_process = self.process_list[:recorded_op_num]
         all_the_same = True
         dif1, dif2 = None, None
