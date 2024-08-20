@@ -87,10 +87,9 @@ class CheckpointManager:
         process_op_num = len(self.process_list)
         if process_op_num < recorded_op_num:
             logger.warning(
-                f'Current config ops ({process_op_num}) are fewer '
-                f'than checkpoint ops ({recorded_op_num}). Cannot '
-                f'reuse checkpoint; All ops will be processed from the '
-                f'beginning')
+                f'Current config ops ({process_op_num}) are fewer than '
+                f'checkpoint ops ({recorded_op_num}). Cannot reuse checkpoint;'
+                f' all ops will be processed from the beginning.')
             self.op_record = []
             return False
 
@@ -113,7 +112,7 @@ class CheckpointManager:
             logger.warning(f'Processed ops of checkpoint are different from '
                            f'current configs: checkpoint-{dif1} vs. config-'
                            f'{dif2}. All ops will be processed from the '
-                           f'beginning')
+                           f'beginning.')
             self.op_record = []
             return False
 
