@@ -51,7 +51,7 @@ class Executor:
         # setup formatter
         logger.info('Setting up data formatter...')
         self.formatter = load_formatter(self.cfg.dataset_path,
-                                        self.cfg.dataset_config,
+                                        self.cfg.generated_dataset_config,
                                         self.cfg.text_keys, self.cfg.suffixes,
                                         self.cfg.add_suffix)
 

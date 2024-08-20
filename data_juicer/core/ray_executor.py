@@ -50,11 +50,11 @@ class RayExecutor:
         # 1. load data
         logger.info('Loading dataset with Ray...')
 
-        if self.cfg.get('dataset_config', None):
-            dataset_config = self.cfg.dataset_config
-            assert isinstance(dataset_config,
-                              dict) and 'type' in dataset_config
-            args = dataset_config.copy()
+        if self.cfg.get('generated_dataset_config', None):
+            generated_dataset_config = self.cfg.generated_dataset_config
+            assert isinstance(generated_dataset_config,
+                              dict) and 'type' in generated_dataset_config
+            args = generated_dataset_config.copy()
             obj_name = args.pop('type')
             from data_juicer.format.formatter import FORMATTERS
             dataset = FORMATTERS.modules[obj_name](**args).load_dataset()

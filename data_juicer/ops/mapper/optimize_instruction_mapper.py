@@ -3,13 +3,23 @@ from typing import Dict
 from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 DEFAULT_SYSTEM_PROMPT = '请优化这个指令，将其修改为一个更详细具体的指令。'
 
 OP_NAME = 'optimize_instruction_mapper'
 
+with AvailabilityChecking(['torch', 'transformers', 'vllm'], OP_NAME):
+    import torch
+    import transformers  # noqa: F401
+    import vllm  # noqa: F401
 
+    # avoid hanging when calling model in multiprocessing
+    torch.set_num_threads(1)
+
+
+# TODO: Extend LLM-based OPs into API-based implementation.
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class OptimizeInstructionMapper(Mapper):
@@ -24,7 +34,7 @@ class OptimizeInstructionMapper(Mapper):
     def __init__(self,
                  hf_model: str = 'alibaba-pai/Qwen2-7B-Instruct-Refine',
                  system_prompt: str = None,
-                 enable_vllm: bool = False,
+                 enable_vllm: bool = True,
                  tensor_parallel_size: int = None,
                  max_model_len: int = None,
                  max_num_seqs: int = 256,

@@ -87,7 +87,7 @@ def init_configs(args=None):
         'default. Accepted format:<w1> dataset1-path <w2> dataset2-path '
         '<w3> dataset3-path ...')
     parser.add_argument(
-        '--dataset_config',
+        '--generated_dataset_config',
         type=Dict,
         default=None,
         help='Configuration used to create a dataset. '

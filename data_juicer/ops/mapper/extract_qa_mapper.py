@@ -5,11 +5,21 @@ from typing import Dict
 from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 OP_NAME = 'extract_qa_mapper'
 
+with AvailabilityChecking(['torch', 'transformers', 'vllm'], OP_NAME):
+    import torch
+    import transformers  # noqa: F401
+    import vllm  # noqa: F401
 
+    # avoid hanging when calling model in multiprocessing
+    torch.set_num_threads(1)
+
+
+# TODO: Extend LLM-based OPs into API-based implementation.
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractQAMapper(Mapper):
@@ -33,7 +43,7 @@ class ExtractQAMapper(Mapper):
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
                  pattern: str = None,
                  qa_format: str = 'chatml',
-                 enable_vllm: bool = False,
+                 enable_vllm: bool = True,
                  tensor_parallel_size: int = None,
                  max_model_len: int = None,
                  max_num_seqs: int = 256,
@@ -74,7 +84,6 @@ class ExtractQAMapper(Mapper):
         """
 
         super().__init__(*args, num_proc=1, **kwargs)
-        self._accelerator = 'cuda'
 
         if pattern is None:
             self.pattern = r'Human: (.*?)\nAssistant: (.*?)(?=\nHuman|$)'

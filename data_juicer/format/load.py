@@ -3,7 +3,7 @@ from .mixture_formatter import MixtureFormatter
 
 
 def load_formatter(dataset_path,
-                   dataset_config=None,
+                   generated_dataset_config=None,
                    text_keys=None,
                    suffixes=[],
                    add_suffix=False,
@@ -13,7 +13,7 @@ def load_formatter(dataset_path,
     weight(default 1.0) according to their formats.
 
     :param dataset_path: path to a dataset file or a dataset directory
-    :param dataset_config: Configuration used to create a dataset.
+    :param generated_dataset_config: Configuration used to create a dataset.
         The dataset will be created from this configuration if provided.
         It must contain the `type` field to specify the dataset name.
     :param text_keys: key names of field that stores sample text.
@@ -23,9 +23,10 @@ def load_formatter(dataset_path,
         info
     :return: a dataset formatter.
     """
-    if dataset_config:
-        assert isinstance(dataset_config, dict) and 'type' in dataset_config
-        args = dataset_config.copy()
+    if generated_dataset_config:
+        assert isinstance(generated_dataset_config,
+                          dict) and 'type' in generated_dataset_config
+        args = generated_dataset_config.copy()
         obj_name = args.pop('type')
         args.update(kwargs)
 
