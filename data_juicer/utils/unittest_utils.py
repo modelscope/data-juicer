@@ -33,9 +33,9 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         max_diff = os.getenv('TEST_MAX_DIFF', 'None')
         cls.maxDiff = None if max_diff == 'None' else int(max_diff)
 
+        import multiprocess
+        cls.original_mp_method = multiprocess.get_start_method()
         if is_cuda_available():
-            import multiprocess
-            cls.original_mp_method = multiprocess.get_start_method()
             multiprocess.set_start_method('spawn', force=True)
 
     @classmethod

@@ -38,7 +38,8 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
   - [✅] Ray多机分布式  
   - [✅] 基于阿里云PAI-DLC和Slurm的多机分布式 
 - [✅] 分布式调度优化（OP-aware、自动化负载均衡）-->  Aliyun PAI-DLC
-- [ ] [WIP] 分布式存储优化  
+- [WIP] 视频相关算子的低精度加速支持, git tags: dj_op, dj_efficiency
+- [WIP] 现有视频相关算子的SOTA模型增强, git tags: dj_op, dj_sota_models
 
 ## 基础算子（视频时空维度）
 - 面向数据质量
@@ -94,22 +95,25 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
   - [✅] **Youku-mPLUG-CN**: 36TB video-caption data：`{<caption, video_id>}`
   - [✅] **InternVid**: 234M data sample:`{<caption, youtube_id, start/end_time>}`
   - [✅] **MSR-VTT**: 10K video-caption data：`{<caption, video_id>}`
-  - [ ] [WIP] ModelScope数据集集成
-  - [ ] VideoInstruct-100K, Panda70M, ......
+  - [✅] ModelScope数据集集成
+  - [✅] VideoInstruct-100K, Panda70M, ......
 - [ ] 大规模高质量DJ-SORA数据集
   - [✅] (Data sandbox) 基于DJ-video算子构建和优化多模态数据菜谱 (算子同期持续完善)
-  - [ ] [WIP] 数据源持续扩充：open-datasets, youku, web， ...
-  - [ ] [WIP] 基于DJ菜谱规模化分析、清洗、生成高质量多模态数据集 (OpenVideo, ...)
-  - [ ] [WIP] 基于DJ菜谱形成大规模3DPatch数仓
+  - [✅] 数据源持续扩充：open-datasets, youku, web， ...
+  - [ ] 基于DJ菜谱规模化分析、清洗、生成高质量多模态数据集
+    -  [WIP] 多场景、高动态 
   - ...
 
 ## DJ-SORA数据验证及模型训练
-  - [ ] [WIP] (DJ-Bench101) 探索及完善多模态数据和模型的协同开发，形成benchmark和insights
-  - [ ] [WIP] 类SORA模型训练pipeline集成
-    - [EasyAnimate](https://github.com/aigc-apps/EasyAnimate)
+  - [✅]  探索及完善多模态数据和模型的协同开发，形成benchmark和insights: [paper](https://arxiv.org/abs/2407.11784)
+  - [] [WIP] 类SORA模型训练pipeline集成
+    - [✅] [EasyAnimate](https://github.com/aigc-apps/EasyAnimate)
+    - [✅] [T2V](https://t2v-turbo.github.io/)
+    - [✅] [V-Bench](https://vchitect.github.io/VBench-project/)
     - ...
   - [✅] (Model-Data sandbox) 在相对小的模型和DJ-SORA数据集上，探索形成低开销、可迁移、有指导性的data-model co-design、配置及检查点
   - [ ] [WIP] 更大规模、更多场景使用DJ-SORA数据训练类SORA模型，提高模型性能
-  - ...
+    - [✅] Data-Juicer-T2v, [V-Bench Top1 model](https://huggingface.co/datajuicer/Data-Juicer-T2V)
+    - ...
 
 

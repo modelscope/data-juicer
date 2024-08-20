@@ -49,7 +49,6 @@ data_probe_algo: 'uniform'                                  # sampling algorithm
 data_probe_ratio: 1.0                                       # the sampling ratio to the original dataset size. It's 1.0 in default. Only used for dataset sampling.
 hpo_config: null                                            # path to a configuration file when using auto-HPO tool.
 
-
 # process schedule: a list of several process operators with their arguments
 process:
   # Mapper ops. Most of these ops need no arguments.
@@ -434,6 +433,9 @@ process:
       min_score: 0.25                                         # the minimum motion score to keep samples
       max_score: 10000.0                                      # the maximum motion score to keep samples
       sampling_fps: 2                                         # the samplig rate of frames_per_second to compute optical flow
+      size: null                                              # resize frames along the smaller edge before computing optical flow, or a sequence like (h, w)
+      max_size: null                                          # maximum allowed for the longer edge of resized frames
+      relative: false                                         # whether to normalize the optical flow magnitude to [0, 1], relative to the frame's diagonal length
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
   - video_nsfw_filter:                                      # filter samples according to the nsfw scores of videos in them
       hf_nsfw_model: Falconsai/nsfw_image_detection           # Huggingface model name for nsfw classification
@@ -521,13 +523,22 @@ process:
       ignore_non_character: false                             # whether to ignore non-alphabet characters, including whitespaces, digits, and punctuations
 
   # Selector ops
-  - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
-      field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
-      top_ratio:                                              # ratio of selected top samples
-      topk:                                                   # number of selected top sample
-      reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
   - frequency_specified_field_selector:                     # selector to select samples based on the sorted frequency of specified field value
       field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
       top_ratio:                                              # ratio of selected top specified field value
       topk:                                                   # number of selected top specified field value
+      reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
+  - random_selector:                                        # selector to random select samples
+      select_ratio:                                           # the ratio to be sampled
+      select_num:                                             # the number to be sampled
+  - range_specified_field_selector:                         # selector to select a range of samples based on the sorted specified field value from smallest to largest.
+      field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
+      lower_percentile:                                       # the lower bound of the percentile to be sampled
+      upper_percentile:                                       # the upper bound of the percentile to be sampled
+      lower_rank:                                             # the lower rank of the percentile to be sampled
+      upper_rank:                                             # the upper rank of the percentile to be sampled
+  - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
+      field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
+      top_ratio:                                              # ratio of selected top samples
+      topk:                                                   # number of selected top sample
       reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order

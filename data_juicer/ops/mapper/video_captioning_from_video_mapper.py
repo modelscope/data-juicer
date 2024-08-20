@@ -1,3 +1,4 @@
+# yapf: disable
 import copy
 import random
 
@@ -8,7 +9,8 @@ from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.mm_utils import (SpecialTokens, extract_key_frames,
+from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
+                                        extract_key_frames,
                                         extract_video_frames_uniformly,
                                         insert_texts_after_placeholders,
                                         load_data_with_context, load_video,
@@ -44,6 +46,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
     def __init__(
         self,
         hf_video_blip='kpyu/video-blip-opt-2.7b-ego4d',
+        trust_remote_code=False,
         caption_num: PositiveInt = 1,
         keep_candidate_mode: str = 'random_any',
         keep_original_sample: bool = True,
@@ -156,6 +159,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
         self.model_key = prepare_model(
             model_type='video_blip',
             pretrained_model_name_or_path=hf_video_blip,
+            trust_remote_code=trust_remote_code
         )
 
     def _process_single_sample(self, ori_sample, rank=None, context=False):
@@ -292,7 +296,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
 
         if not context:
             for vid_key in videos:
-                videos[vid_key].close()
+                close_video(videos[vid_key])
         return generated_samples
 
     def _reduce_captions(self, chunk, generated_text_candidates_single_chunk):

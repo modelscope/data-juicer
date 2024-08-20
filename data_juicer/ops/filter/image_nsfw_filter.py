@@ -28,6 +28,7 @@ class ImageNSFWFilter(Filter):
 
     def __init__(self,
                  hf_nsfw_model='Falconsai/nsfw_image_detection',
+                 trust_remote_code=False,
                  score_threshold: ClosedUnitInterval = 0.5,
                  any_or_all: str = 'any',
                  *args,
@@ -54,7 +55,8 @@ class ImageNSFWFilter(Filter):
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(
             model_type='huggingface',
-            pretrained_model_name_or_path=hf_nsfw_model)
+            pretrained_model_name_or_path=hf_nsfw_model,
+            trust_remote_code=trust_remote_code)
 
     def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already

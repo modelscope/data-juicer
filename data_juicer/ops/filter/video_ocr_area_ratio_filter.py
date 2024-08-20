@@ -6,7 +6,8 @@ from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 from data_juicer import cuda_device_count
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (extract_video_frames_uniformly,
+from data_juicer.utils.mm_utils import (close_video,
+                                        extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 
 from ..base_op import OPERATORS, UNFORKABLE, Filter
@@ -94,6 +95,7 @@ class VideoOcrAreaRatioFilter(Filter):
 
     def get_reader(self, rank):
         if self.use_cuda():
+            rank = 0 if rank is None else rank
             device = f'cuda:{rank % cuda_device_count()}'
             self.reader.detector = self.reader.detector.to(device)
             self.reader.device = device
@@ -170,7 +172,7 @@ class VideoOcrAreaRatioFilter(Filter):
             video_ocr_area_ratios[video_key] = np.mean(frame_ocr_area_ratios)
 
             if not context:
-                container.close()
+                close_video(container)
 
         # get video durations
         sample[Fields.stats][StatsKeys.video_ocr_area_ratio] = [

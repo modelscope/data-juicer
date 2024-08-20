@@ -32,7 +32,7 @@ docker run --gpus all --ipc=host --ulimit memlock=-1 -it --rm -v /dataset:/works
 dokcer 容器成功运行后在容器内运行安装脚本并登录 wandb：
 
 ```shell
-cd /workspace/data-juicer/thirdparty
+cd /workspace/data-juicer/thirdparty/LLM_ecosystems
 ./setup_megatron.sh
 ./setup_helm.sh
 wandb login
@@ -49,7 +49,7 @@ docker commit <container_id> data-juicer-eval
 进入 Megatron-LM 目录并执行数据预处理脚本，该脚本会将 data-juicer 处理好的 jsonline（假设路径为 `/workspace/data/dataset.jsonl`）文件转化为二进制格式，并保存为 `/workspace.data/dataset_text_document.bin` 和 `/workspace.data/dataset_text_document.idx` 两个文件。
 
 ```shell
-cd /workspace/data-juicer/thirdparty/Megatron-LM
+cd /workspace/data-juicer/thirdparty/LLM_ecosystems/Megatron-LM
 python tools/preprocess_data.py              \
        --input /workspace/data/dataset.jsonl \
        --output-prefix dataset \
@@ -65,7 +65,7 @@ python tools/preprocess_data.py              \
 进入 Megatron-LM 目录并执行如下指令
 
 ```shell
-cd /workspace/data-juicer/thirdparty/Megatron-LM
+cd /workspace/data-juicer/thirdparty/LLM_ecosystems/Megatron-LM
 nohup bash /workspace/data-juicer/demos/auto_eval_helm/pretrain_example.sh > train.log 2>&1 &
 ```
 

@@ -1,15 +1,16 @@
+# yapf: disable
 import asyncio
-import os
 
 from jsonargparse import dict_to_namespace
 from loguru import logger
 
 from data_juicer.config import get_init_configs, prepare_side_configs
-from data_juicer.core import Analyzer
-from data_juicer.core import Executor as DjExecutor
-from data_juicer.core.sandbox.factories import (data_evaluator_factory,
-                                                mode_infer_executor_factory,
+from data_juicer.core.sandbox.factories import (data_analyzer_factory,
+                                                data_evaluator_factory,
+                                                data_executor_factory,
+                                                mode_infer_evaluator_factory,
                                                 model_evaluator_factory,
+                                                model_infer_executor_factory,
                                                 model_train_executor_factory)
 from data_juicer.utils.constant import JobRequiredKeys
 from tools.hpo.execute_hpo_3sigma import modify_recipe_k_sigma
@@ -57,7 +58,7 @@ class ProbeViaAnalyzerHook(BaseHook):
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
-        analyzer = Analyzer(self.inited_dj_cfg)
+        analyzer = data_analyzer_factory(self.inited_dj_cfg)
         # probe the data via Analyzer
         logger.info('Begin to analyze data')
         analyzer.run()
@@ -85,8 +86,8 @@ class ProbeViaModelInferHook(BaseHook):
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
-        data_executor = DjExecutor(self.inited_dj_cfg)
-        model_infer_executor = mode_infer_executor_factory(self.other_cfg)
+        data_executor = data_executor_factory(self.inited_dj_cfg)
+        model_infer_executor = mode_infer_evaluator_factory(self.other_cfg)
         # TODO
         # probe the model (calling inference sub-pipeline) based on
         # original data, such that we know what is the "hard" data for
@@ -163,7 +164,7 @@ class ProcessDataHook(BaseHook):
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
-        data_executor = DjExecutor(self.inited_dj_cfg)
+        data_executor = data_executor_factory(self.inited_dj_cfg)
         # basic routine to process data, users can customize this freely
         logger.info('Begin to process the data with given dj recipe')
         data_executor.run()
@@ -189,15 +190,30 @@ class TrainModelHook(BaseHook):
         # users can customize this freely
         logger.info('Begin to train the model with given model config')
         # update training dataset path
-        training_args = {
-            'train_dataset':
-            self.other_cfg.dataset_path,
-            'work_dir':
-            os.path.join(self.other_cfg.work_dir, 'model_trainer_outputs'),
-        }
         asyncio.run(
-            model_trainer.run(model_trainer.model_config['type'],
-                              training_args, **kwargs))
+            model_trainer.run(model_trainer.model_config['type'], **kwargs))
+        return kwargs
+
+
+class InferModelHook(BaseHook):
+
+    def __init__(self, job_cfg, watcher, *args, **kwargs):
+        """
+        Initialize the hook for model training
+
+        :param job_cfg: the job configs
+        :param watcher: for watching the result
+        """
+        super(InferModelHook, self).__init__(job_cfg, watcher, *args, **kwargs)
+
+    def hook(self, **kwargs):
+        self.specify_dj_and_extra_configs()
+        model_infer = model_infer_executor_factory(self.other_cfg,
+                                                   watcher=self.watcher)
+
+        logger.info('Begin to infer the model with given model config')
+        asyncio.run(model_infer.run(model_infer.model_config['type'],
+                                    **kwargs))
         return kwargs
 
 
@@ -219,10 +235,7 @@ class EvaluateDataHook(BaseHook):
         # basic routine to evaluate the given data,
         # users can customize this freely
         logger.info('Begin to evaluate the data with given evaluator config')
-        processed_dataset = self.other_cfg.dataset_path
-        eval_res = data_evaluator.run(eval_type='data',
-                                      eval_obj=processed_dataset,
-                                      **kwargs)
+        eval_res = data_evaluator.run(eval_type='data', **kwargs)
         self.watcher.watch(eval_res, self.meta_name)
         return kwargs
 
@@ -256,6 +269,7 @@ HOOK_MAPPING = {
     'RefineRecipeViaModelFeedbackHook': RefineRecipeViaModelFeedbackHook,
     'ProcessDataHook': ProcessDataHook,
     'TrainModelHook': TrainModelHook,
+    'InferModelHook': InferModelHook,
     'EvaluateDataHook': EvaluateDataHook,
     'EvaluateModelHook': EvaluateModelHook,
 }

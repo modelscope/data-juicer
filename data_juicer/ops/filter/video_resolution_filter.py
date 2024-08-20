@@ -4,7 +4,8 @@ import numpy as np
 from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import load_data_with_context, load_video
+from data_juicer.utils.mm_utils import (close_video, load_data_with_context,
+                                        load_video)
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_VIDEOS
@@ -91,7 +92,7 @@ class VideoResolutionFilter(Filter):
 
         if not context:
             for vid_key in videos:
-                videos[vid_key].close()
+                close_video(videos[vid_key])
 
         return sample
 

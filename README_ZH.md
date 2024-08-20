@@ -23,7 +23,7 @@
 Data-Juicer 是一个一站式**多模态**数据处理系统，旨在为大语言模型 (LLM) 提供更高质量、更丰富、更易“消化”的数据。
 
 
-我们提供了一个基于 JupyterLab 的 [Playground](http://8.130.100.170/)，您可以从浏览器中在线试用 Data-Juicer。 如果Data-Juicer对您的研发有帮助，请引用我们的[工作](#参考文献) 。
+我们提供了一个基于 JupyterLab 的 [Playground](http://8.138.149.181/)，您可以从浏览器中在线试用 Data-Juicer。 如果Data-Juicer对您的研发有帮助，请引用我们的[工作](#参考文献) 。
 
 Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多的功能和数据菜谱。热烈欢迎您加入我们（issues/PRs/[Slack频道](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8275bc8g7ypp) /[钉钉群](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8275bc8g7ypp&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11)/...），一起推进LLM-数据的协同开发和研究！
 
@@ -31,6 +31,8 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 ----
 
 ## 新消息
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-08-09] 我们提出了Img-Diff，它通过*对比数据合成*来增强多模态大型语言模型的性能，在[MMVP benchmark](https://tsb0601.github.io/mmvp_blog/)中比GPT-4V高出12个点。 更多细节请参阅我们的 [论文](https://arxiv.org/abs/2408.04594), 以及从 [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) 和 [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff)下载这份数据集。
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-24] “天池 Better Synth 多模态大模型数据合成赛”——第四届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532251)，了解赛事详情。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png)[2024-07-17] 我们利用Data-Juicer[沙盒实验室套件](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox-ZH.md)，通过数据与模型间的系统性研发工作流，调优数据和模型，在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。相关成果已经整理发表在[论文](http://arxiv.org/abs/2407.11784)中，并且模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png)[2024-07-12] 我们的MLLM-Data精选列表已经演化为一个模型-数据协同开发的角度系统性[综述](https://arxiv.org/abs/2407.08583)。欢迎[浏览](docs/awesome_llm_data.md)或参与贡献!
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-06-01] ModelScope-Sora“数据导演”创意竞速——第三届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532219)，了解赛事详情。
@@ -43,6 +45,8 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 此外，我们的论文也更新到了[第三版](https://arxiv.org/abs/2309.02033) 。
 - [2023-10-13] 我们的第一届以数据为中心的 LLM 竞赛开始了！
   请访问大赛官网，FT-Data Ranker（[1B赛道](https://tianchi.aliyun.com/competition/entrance/532157) 、[7B赛道](https://tianchi.aliyun.com/competition/entrance/532158) ) ，了解更多信息。
+
+<div id="table" align="center"></div>
 
 目录
 ===
@@ -82,7 +86,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 * **数据反馈回路 & 沙盒实验室**：支持一站式数据-模型协同开发，通过[沙盒实验室](docs/Sandbox-ZH.md)快速迭代，基于数据和模型反馈回路、可视化和多维度自动评估等功能，使您更了解和改进您的数据和模型。  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
-* **效率增强**：提供高效并行化的数据处理流水线（Aliyun-PAI\Ray\Slurm\CUDA\算子融合），减少内存占用和CPU开销，提高生产力。  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
+* **面向生产环境**：提供高效并行化的数据处理流水线（Aliyun-PAI\Ray\Slurm\CUDA\算子融合），减少内存占用和CPU开销，支持自动化处理容错。  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 * **全面的数据处理菜谱**：为pre-training、fine-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。 在LLaMA、LLaVA等模型上有效验证。 ![exp_llama](https://img.alicdn.com/imgextra/i2/O1CN019WtUPP1uhebnDlPR8_!!6000000006069-2-tps-2530-1005.png)
 
@@ -190,7 +194,7 @@ pip install py-data-juicer
     ```shell
     docker build -t datajuicer/data-juicer:<version_tag> .
     ```
-  
+
   - `<version_tag>`的格式类似于`v0.2.0`，与发布（Release）的版本号相同。
 
 ### 安装校验
@@ -207,6 +211,9 @@ print(dj.__version__)
 你可以使用包管理器安装 FFmpeg（例如，在 Debian/Ubuntu 上使用 sudo apt install ffmpeg，在 OS X 上使用 brew install ffmpeg），或访问[官方FFmpeg链接](https://ffmpeg.org/download.html)。
 
 随后在终端运行 ffmpeg 命令检查环境是否设置正确。
+
+
+<p align="right"><a href="#table">🔼 back to index</a></p>
 
 ## 快速上手
 
@@ -233,6 +240,19 @@ export DATA_JUICER_CACHE_HOME="/path/to/another/directory"
 export DATA_JUICER_MODELS_CACHE="/path/to/another/directory/models"
 # 资源缓存目录
 export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
+```
+
+#### 灵活的编程接口
+我们提供了各种层次的简单编程接口，以供用户选择：
+```python
+# ... init op & dataset ...
+
+# 链式调用风格，支持单算子或算子列表
+dataset = dataset.process(op)
+dataset = dataset.process([op1, op2])
+# 函数式编程风格，方便快速集成或脚本原型迭代
+dataset = op(dataset)
+dataset = op.run(dataset)
 ```
 
 ### 分布式数据处理
@@ -277,6 +297,9 @@ dj-analyze --config configs/demo/analyzer.yaml
 ```shell
 streamlit run app.py
 ```
+
+
+
 
 ### 构建配置文件
 
@@ -353,6 +376,8 @@ docker exec -it <container_id> bash
 ```
 
 
+<p align="right"><a href="#table">🔼 back to index</a></p>
+
 ## 数据处理菜谱
 
 * [BLOOM 数据处理菜谱](configs/reproduced_bloom/README_ZH.md)
@@ -380,8 +405,6 @@ Data-Juicer 被各种 LLM产品和研究工作使用，包括来自阿里云-通
 Data-Juicer 感谢并参考了社区开源项目：
 [Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Pile](https://huggingface.co/datasets/EleutherAI/pile), [Alpaca-Cot](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT), [Megatron-LM](https://github.com/NVIDIA/Megatron-LM), [DeepSpeed](https://www.deepspeed.ai/), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), [Beam](https://github.com/apache/beam),  [LM-Harness](https://github.com/EleutherAI/lm-evaluation-harness), [HELM](https://github.com/stanford-crfm/helm), ....
 
-
-
 ## 参考文献
 如果您发现我们的工作对您的研发有帮助，请引用以下[论文](https://arxiv.org/abs/2309.02033) 。
 
@@ -393,3 +416,20 @@ Data-Juicer 感谢并参考了社区开源项目：
   year={2024}
 }
 ```
+<details>
+<summary>更多Data-Juicer团队相关论文:
+</summary>>
+
+- [Data-Juicer Sandbox: A Comprehensive Suite for Multimodal Data-Model Co-development](https://arxiv.org/abs/2407.11784)
+
+- [The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective](https://arxiv.org/abs/2407.08583)
+
+- [ImgDiff: Contrastive Data Synthesis for Vision Large Language Models](https://arxiv.org/abs/2408.04594)
+
+- [Data Mixing Made Efficient: A Bivariate Scaling Law for Language Model Pretraining](https://arxiv.org/abs/2402.11505)
+
+</details>
+
+
+
+<p align="right"><a href="#table">🔼 back to index</a></p>

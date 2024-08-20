@@ -2,7 +2,7 @@
 
 算子 (Operator) 是协助数据修改、清理、过滤、去重等基本流程的集合。我们支持广泛的数据来源和文件格式，并支持对自定义数据集的灵活扩展。
 
-这个页面提供了OP的基本描述，用户可以参考[API文档](https://modelscope.github.io/data-juicer/)更细致了解每个OP的具体参数，并且可以查看、运行单元测试，来体验[各OP的用法示例](../tests/ops)以及每个OP作用于内置测试数据样本时的效果。
+这个页面提供了OP的基本描述，用户可以参考[API文档](https://modelscope.github.io/data-juicer/)更细致了解每个OP的具体参数，并且可以查看、运行单元测试 (`tests/ops/...`)，来体验[各OP的用法示例](../tests/ops)以及每个OP作用于内置测试数据样本时的效果。
 
 ## 概览
 
@@ -14,7 +14,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | [ Mapper ]( #mapper )              | 46 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 41 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
-| [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
+| [ Selector ]( #selector )          |  4 | 基于排序选取高质量样本   |
 
 下面列出所有具体算子，每种算子都通过多个标签来注明其主要功能。
 
@@ -160,6 +160,8 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 算子                                  | 场景       | 语言      | 描述                                             |
 |-------------------------------------|----------|---------|------------------------------------------------|
 | frequency_specified_field_selector  | General  | en, zh  | 通过比较指定字段的频率选出前 k 个样本                           |
+| random_selector                     | General  | en, zh  | 随机筛选 k 个样本                            |
+| range_specified_field_selector      | General  | en, zh  | 通过比较指定字段的值选出指定范围的 k 个样本                            |
 | topk_specified_field_selector       | General  | en, zh  | 通过比较指定字段的值选出前 k 个样本                            |
 
 ## 贡献

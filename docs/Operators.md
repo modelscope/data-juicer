@@ -2,7 +2,7 @@
 
 Operators are a collection of basic processes that assist in data modification, cleaning, filtering, deduplication, etc. We support a wide range of data sources and file formats, and allow for flexible extension to custom datasets.
 
-This page offers a basic description of the operators (OPs) in Data-Juicer. Users can refer to the [API documentation](https://modelscope.github.io/data-juicer/) for the specific parameters of each operator. Users can refer to and run the unit tests for [examples of operator-wise usage](../tests/ops) as well as the effects of each operator when applied to built-in test data samples.
+This page offers a basic description of the operators (OPs) in Data-Juicer. Users can refer to the [API documentation](https://modelscope.github.io/data-juicer/) for the specific parameters of each operator. Users can refer to and run the unit tests (`tests/ops/...`) for [examples of operator-wise usage](../tests/ops) as well as the effects of each operator when applied to built-in test data samples.
 
 ## Overview
 
@@ -14,7 +14,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | [ Mapper ]( #mapper )             |   46   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
-| [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
+| [ Selector ]( #selector )         |   4    | Selects top samples based on ranking            |
 
 
 All the specific operators are listed below, each featured with several capability tags.
@@ -163,6 +163,8 @@ All the specific operators are listed below, each featured with several capabili
 | Operator                           | Domain  | Lang   | Description                                                           |
 |------------------------------------|---------|--------|-----------------------------------------------------------------------|
 | frequency_specified_field_selector | General | en, zh | Selects top samples by comparing the frequency of the specified field |
+| random_selector                    | General | en, zh | Selects samples randomly                                              |
+| range_specified_field_selector     | General | en, zh | Selects samples within a specified range by comparing the values of the specified field    |
 | topk_specified_field_selector      | General | en, zh | Selects top samples by comparing the values of the specified field    |
 
 

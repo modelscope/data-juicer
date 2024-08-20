@@ -1,8 +1,8 @@
 # Hyper-parameter Optimization for Data Recipe
 
 ## Auto-HPO based on 3-Sigma principles
-A simple automatic hyper-parameter optimization method for data recipes is to assume that outlier data is harmful to training. 
-We thus can introduce the 3-sigma principle to automatically determine the hyper-parameters and filter the data. 
+A simple automatic hyper-parameter optimization method for data recipes is to assume that outlier data is harmful to training.
+We thus can introduce the 3-sigma principle to automatically determine the hyper-parameters and filter the data.
 
 Specifically, assuming that a certain analysis dimension of the original data obeys a normal distribution and has random errors, we can set the upper and lower bounds of the filtering OP in this dimension to three times the standard deviation based on the statistics produced by the DataJuicer's Analyzer.
 
@@ -11,15 +11,15 @@ $$P(|x-\mu| > 3\sigma) \leq 0.003$$
 To automate this process, we provide the tool which can be used as follows:
 ```shell
 # cd tools/hpo
-# usage 1: do not save the refined recipe 
-python execute_hpo_3sigma.py --config <data-process-cfg-file-path> 
+# usage 1: do not save the refined recipe
+python execute_hpo_3sigma.py --config <data-process-cfg-file-path>
 # usage 2: save the refined recipe at the given path
-python execute_hpo_3sigma.py --config <data-process-cfg-file-path> --path_3sigma_recipe <data-process-cfg-file-after-refined-path> 
+python execute_hpo_3sigma.py --config <data-process-cfg-file-path> --path_3sigma_recipe <data-process-cfg-file-after-refined-path>
 
 # e.g., usage 1
-python execute_hpo_3sigma.py --config configs/process.yaml 
+python execute_hpo_3sigma.py --config configs/process.yaml
 # e.g., usage 2
-python execute_hpo_3sigma.py --config configs/process.yaml --path_3sigma_recipe configs/process_3sigma.yaml 
+python execute_hpo_3sigma.py --config configs/process.yaml --path_3sigma_recipe configs/process_3sigma.yaml
 ```
 
 ## Auto-HPO with WandB
@@ -62,7 +62,7 @@ python execute_hpo_wandb.py --config configs/process.yaml --hpo_config configs/q
 ```
 
 For the configuration for data recipe, i.e., `<data-process-cfg-file-path>`,
-please see more details in our [guidance](https://github.com/alibaba/data-juicer#build-up-config-files). As for the configuration 
+please see more details in our [guidance](https://github.com/alibaba/data-juicer#build-up-config-files). As for the configuration
 for HPO, i.e., `<hpo-cfg-file-path>`, please refer to sweep [guidance](https://docs.wandb.ai/guides/sweeps/define-sweep-configuration).
 
 We provide an illustrative objective "quality_score" in `hpo/objects.py`,

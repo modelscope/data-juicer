@@ -574,12 +574,14 @@ def update_op_process(cfg, parser):
 
         # update op params of cfg.process
         internal_op_para = temp_cfg.get(op_in_process_name)
-
-        cfg.process[i] = {
-            op_in_process_name:
-            None if internal_op_para is None else
-            namespace_to_dict(internal_op_para)
-        }
+        if internal_op_para is not None:
+            num_proc = internal_op_para.get('num_proc')
+            if 'num_proc' in internal_op_para:
+                internal_op_para['num_proc'] = num_proc or cfg.np
+            internal_op_para = namespace_to_dict(internal_op_para)
+        else:
+            internal_op_para = None
+        cfg.process[i] = {op_in_process_name: internal_op_para}
 
     # check the op params via type hint
     temp_parser = copy.deepcopy(parser)

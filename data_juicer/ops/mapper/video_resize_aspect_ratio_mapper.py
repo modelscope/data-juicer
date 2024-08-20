@@ -6,7 +6,7 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.logger_utils import HiddenPrints
-from data_juicer.utils.mm_utils import load_video
+from data_juicer.utils.mm_utils import close_video, load_video
 
 from ..base_op import OPERATORS, Mapper
 
@@ -117,7 +117,7 @@ class VideoResizeAspectRatioMapper(Mapper):
             original_width = video.codec_context.width
             original_height = video.codec_context.height
             original_aspect_ratio = Fraction(original_width, original_height)
-            container.close()
+            close_video(container)
 
             if (original_aspect_ratio >= self.min_ratio
                     and original_aspect_ratio <= self.max_ratio):

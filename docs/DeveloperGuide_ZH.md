@@ -10,7 +10,7 @@
 
 ## 编码规范
 
-我们将编码规范定义在 `.pre-commit-config.yaml` 中。在向仓库贡献代码之前，请使用 `pre-commit` 工具对代码进行规范化。
+我们将编码规范定义在 `.pre-commit-config.yaml` 中。在向仓库贡献代码之前，请使用 `pre-commit` 工具对代码进行自动规范化。
 
 ```shell
 # ===========install pre-commit tool===========
@@ -99,20 +99,22 @@ class StatsKeys(object):
                 return False
     ```
 
-    - 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在构造函数中声明 `self._accelerator = 'cuda'`，并确保 `compute_stats` 和 `process` 方法接受一个额外的位置参数 `rank`。
+    - 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在构造函数中声明 `_accelerator = 'cuda'`，并确保 `compute_stats` 和 `process` 方法接受一个额外的位置参数 `rank`。
 
     ```python
     # ... (same as above)
 
     @OPERATORS.register_module('text_length_filter')
     class TextLengthFilter(Filter):
+   
+        _accelerator = 'cuda'
+   
         def __init__(self,
                     min_len: PositiveInt = 10,
                     max_len: PositiveInt = sys.maxsize,
                     *args,
                     **kwargs):
             # ... (same as above)
-            self._accelerator = 'cuda'
 
         def compute_stats(self, sample, rank=None):
             # ... (same as above)

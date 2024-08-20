@@ -4,7 +4,7 @@ from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (extract_key_frames,
+from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 
@@ -37,6 +37,7 @@ class VideoAestheticsFilter(Filter):
 
     def __init__(self,
                  hf_scorer_model='',
+                 trust_remote_code=False,
                  min_score: ClosedUnitInterval = 0.4,
                  max_score: ClosedUnitInterval = 1.0,
                  frame_sampling_method: str = 'uniform',
@@ -105,7 +106,8 @@ class VideoAestheticsFilter(Filter):
 
         self.model_key = prepare_model(
             model_type='simple_aesthetics',
-            pretrained_model_name_or_path=hf_scorer_model)
+            pretrained_model_name_or_path=hf_scorer_model,
+            trust_remote_code=trust_remote_code)
         # the original score predicted by laion-ai's scorer is within [0, 10]
         self.need_normalized_by_ten = ('shunk031/aesthetics-predictor'
                                        in hf_scorer_model)
@@ -155,23 +157,29 @@ class VideoAestheticsFilter(Filter):
                     sample[Fields.context][sampled_frames_key] = frames
             frame_images = [frame.to_image() for frame in frames]
 
-            # compute aesthetics_scores
-            model, processor = get_model(self.model_key, rank, self.use_cuda())
-            inputs = processor(images=frame_images,
-                               return_tensors='pt').to(model.device)
-            with torch.no_grad():
-                outputs = model(**inputs)
-            if self.need_normalized_by_ten:
-                aesthetics_score = outputs.logits / 10.0
-            else:
-                aesthetics_score = outputs.logits
+            if len(frame_images) > 0:
+                # compute aesthetics_scores
+                model, processor = get_model(self.model_key,
+                                             rank=rank,
+                                             use_cuda=self.use_cuda())
+                inputs = processor(images=frame_images,
+                                   return_tensors='pt').to(model.device)
+                with torch.no_grad():
+                    outputs = model(**inputs)
+                if self.need_normalized_by_ten:
+                    aesthetics_score = outputs.logits / 10.0
+                else:
+                    aesthetics_score = outputs.logits
 
-            if self.reduce_mode == 'avg':
-                aesthetics_score = float(aesthetics_score.mean())
-            elif self.reduce_mode == 'max':
-                aesthetics_score = float(aesthetics_score.max())
+                if self.reduce_mode == 'avg':
+                    aesthetics_score = float(aesthetics_score.mean())
+                elif self.reduce_mode == 'max':
+                    aesthetics_score = float(aesthetics_score.max())
+                else:
+                    aesthetics_score = float(aesthetics_score.min())
             else:
-                aesthetics_score = float(aesthetics_score.min())
+                aesthetics_score = 0.0
+
             aesthetics_scores.append(aesthetics_score)
 
         logger.debug(f'aesthetics_score: {aesthetics_scores}')
@@ -181,7 +189,7 @@ class VideoAestheticsFilter(Filter):
 
         if not context:
             for vid_key in videos:
-                videos[vid_key].close()
+                close_video(videos[vid_key])
 
         return sample
 
