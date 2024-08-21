@@ -73,7 +73,7 @@ class SegmentMapper(Mapper):
                 image = load_image(loaded_image_key)
                 images[loaded_image_key] = image
 
-        model = get_model(self.model_key, rank=rank)
+        model = get_model(self.model_key, rank=rank, use_cuda=True)
         masks = model([image],
                       retina_masks=True,
                       imgsz=self.imgsz,
