@@ -1,8 +1,41 @@
+from data_juicer.core import Analyzer
+from data_juicer.core import Executor as DjExecutor
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  InceptionEvaluator,
                                                  VBenchEvaluator)
-from data_juicer.core.sandbox.model_executors import (ModelscopeInferExecutor,
-                                                      ModelscopeTrainExecutor)
+from data_juicer.core.sandbox.model_executors import (
+    EasyAnimateInferExecutor, EasyAnimateTrainExecutor,
+    ModelscopeInferProbeExecutor, ModelscopeTrainExecutor)
+
+
+class DataExecutorFactory(object):
+    """
+    Factory for Data-Juicer executor.
+    """
+
+    def __call__(self, dj_cfg: dict = None, *args, **kwargs):
+        if dj_cfg is None:
+            return None
+
+        return DjExecutor(dj_cfg)
+
+
+data_executor_factory = DataExecutorFactory()
+
+
+class DataAnalyzerFactory(object):
+    """
+    Factory for Data-Juicer analyzer.
+    """
+
+    def __call__(self, dj_cfg: dict = None, *args, **kwargs):
+        if dj_cfg is None:
+            return None
+
+        return Analyzer(dj_cfg)
+
+
+data_analyzer_factory = DataAnalyzerFactory()
 
 
 class DataEvaluatorFactory(object):
@@ -47,19 +80,19 @@ class ModelEvaluatorFactory(object):
 model_evaluator_factory = ModelEvaluatorFactory()
 
 
-class ModelInferExecutorFactory(object):
+class ModelInferEvaluatorFactory(object):
 
     def __call__(self, model_cfg: dict = None, *args, **kwargs):
         if model_cfg is None:
             return None
 
         if model_cfg.type == 'modelscope':
-            return ModelscopeInferExecutor(model_cfg)
+            return ModelscopeInferProbeExecutor(model_cfg)
 
         # add more model inference here freely
 
 
-mode_infer_executor_factory = ModelInferExecutorFactory()
+mode_infer_evaluator_factory = ModelInferEvaluatorFactory()
 
 
 class ModelTrainExecutorFactory(object):
@@ -70,8 +103,25 @@ class ModelTrainExecutorFactory(object):
 
         if model_cfg.type == 'modelscope':
             return ModelscopeTrainExecutor(model_cfg, **kwargs)
+        elif model_cfg.type == 'easyanimate':
+            return EasyAnimateTrainExecutor(model_cfg, **kwargs)
 
         # add more model trainer here freely
 
 
 model_train_executor_factory = ModelTrainExecutorFactory()
+
+
+class ModelInferExecutorFactory(object):
+
+    def __call__(self, generate_cfg: dict = None, *args, **kwargs):
+        if generate_cfg is None:
+            return None
+
+        if generate_cfg.type == 'easyanimate':
+            return EasyAnimateInferExecutor(generate_cfg, **kwargs)
+
+        # add more data generation here freely
+
+
+model_infer_executor_factory = ModelInferExecutorFactory()

@@ -3,7 +3,8 @@ from collections import defaultdict
 from typing import Dict, Set, Tuple
 
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.mm_utils import load_data_with_context, load_video
+from data_juicer.utils.mm_utils import (close_video, load_data_with_context,
+                                        load_video)
 
 from ..base_op import OPERATORS, Deduplicator
 from ..op_fusion import LOADED_VIDEOS
@@ -36,6 +37,9 @@ class VideoDeduplicator(Deduplicator):
             self.text_dedup_op = DocumentDeduplicator(**kwargs)
 
     def compute_hash(self, sample, context=False):
+        # get hash of text first
+        if self.consider_text:
+            sample = self.text_dedup_op.compute_hash(sample)
         # check if it's computed already
         if HashKeys.videohash in sample:
             return sample
@@ -58,9 +62,10 @@ class VideoDeduplicator(Deduplicator):
                 if packet.stream.type == 'video':
                     md5_hash.update(bytes(packet))
 
+        for key in videos:
+            close_video(videos[key])
+
         sample[HashKeys.videohash] = md5_hash.hexdigest()
-        if self.consider_text:
-            sample = self.text_dedup_op.compute_hash(sample)
         return sample
 
     def process(self, dataset, show_num=0):

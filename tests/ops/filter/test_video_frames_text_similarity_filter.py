@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.video_frames_text_similarity_filter import \
     VideoFramesTextSimilarityFilter

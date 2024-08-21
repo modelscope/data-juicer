@@ -24,8 +24,11 @@ class VideoTaggingFromAudioMapper(Mapper):
     using the Audio Spectrogram Transformer.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_ast='MIT/ast-finetuned-audioset-10-10-0.4593',
+                 trust_remote_code=False,
                  *args,
                  **kwargs):
         """
@@ -36,7 +39,8 @@ class VideoTaggingFromAudioMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_ast)
+                                       pretrained_model_name_or_path=hf_ast,
+                                       trust_remote_code=trust_remote_code)
         self._model_sampling_rate = 16000
         self._no_audio_label = 'EMPTY'
 
@@ -53,7 +57,8 @@ class VideoTaggingFromAudioMapper(Mapper):
         # load video paths
         loaded_video_keys = sample[self.video_key]
 
-        model, feature_extractor = get_model(self.model_key, rank=rank)
+        model, feature_extractor = get_model(self.model_key, rank,
+                                             self.use_cuda())
         video_audio_tags = []
         for video_path in loaded_video_keys:
             # only extract audio data and sr for index 0 for now

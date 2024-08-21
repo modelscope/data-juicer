@@ -1,11 +1,11 @@
 import os
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.mapper.video_resize_aspect_ratio_mapper import \
     VideoResizeAspectRatioMapper
-from data_juicer.utils.mm_utils import load_video
+from data_juicer.utils.mm_utils import close_video, load_video
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
@@ -30,7 +30,7 @@ class VideoResizeAspectRatioMapperTest(DataJuicerTestCaseBase):
                     width = video.streams.video[0].codec_context.width
                     height = video.streams.video[0].codec_context.height
                     sample_list.append((width, height))
-                    video.close()
+                    close_video(video)
                 sizes.append(sample_list)
             return sizes
 

@@ -21,7 +21,7 @@ class OverallAnalysis:
         """
         Initialization method.
 
-        :param dataset: the dataset to be analysed
+        :param dataset: the dataset to be analyzed
         :param output_path: path to store the analysis results.
         """
         self.stats = pd.DataFrame(dataset[Fields.stats])
@@ -29,9 +29,9 @@ class OverallAnalysis:
         if not os.path.exists(self.output_path):
             os.makedirs(self.output_path)
 
-        # default percentiles to analyse
+        # default percentiles to analyze
         self.default_percentiles = [0.25, 0.5, 0.75]
-        # supported dtypes of column to be analysed
+        # supported dtypes of column to be analyzed
         # Notice: there won't be mixed types in a column because the stats is
         # obtained from Dataset, which doesn't allow mixed types.
         # Notice: for now, stats can only be:
@@ -48,7 +48,7 @@ class OverallAnalysis:
         if type(first) not in self.supported_object_types:
             logger.warning(f'There is a column of stats with type '
                            f'[{type(first)}], which is not supported to be '
-                           f'analysed for now.')
+                           f'analyzed for now.')
             return None
         if type(first) is str:
             # describe(include = 'all') can analyze the string type
@@ -58,13 +58,13 @@ class OverallAnalysis:
             col = col.explode().infer_objects()
             return col
 
-    def analyse(self, percentiles=[], num_proc=1, skip_export=False):
+    def analyze(self, percentiles=[], num_proc=1, skip_export=False):
         """
         Apply overall analysis on the whole dataset based on the describe
         method of pandas.
 
-        :param percentiles: percentiles to analyse
-        :param num_proc: number of processes to analyse the dataset
+        :param percentiles: percentiles to analyze
+        :param num_proc: number of processes to analyze the dataset
         :param skip_export: whether export the results to disk
         :return: the overall analysis result.
         """

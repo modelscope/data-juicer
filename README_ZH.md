@@ -1,6 +1,6 @@
-[[English Page]](README.md) | [[文档]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA_ZH.md) 
+[[English Page]](README.md) | [[文档索引]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[DJ-SORA]](docs/DJ_SORA_ZH.md) | [[Awesome List]](docs/awesome_llm_data.md)
 
-# Data-Juicer: 为大语言模型提供更高质量、更丰富、更易“消化”的数据
+# Data-Juicer: 为大模型提供更高质量、更丰富、更易“消化”的数据
 
  <img src="https://img.alicdn.com/imgextra/i3/O1CN017Eq5kf27AlA2NUKef_!!6000000007757-0-tps-1280-720.jpg" width = "640" height = "360" alt="Data-Juicer"/>
 
@@ -22,30 +22,31 @@
 
 Data-Juicer 是一个一站式**多模态**数据处理系统，旨在为大语言模型 (LLM) 提供更高质量、更丰富、更易“消化”的数据。
 
-Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护中，我们将定期强化和新增更多的功能和数据菜谱。热烈欢迎您加入我们，一起推进LLM数据的开发和研究！
 
-我们提供了一个基于 JupyterLab 的 [Playground](http://8.130.100.170/)，您可以从浏览器中在线试用 Data-Juicer。
+我们提供了一个基于 JupyterLab 的 [Playground](http://8.138.149.181/)，您可以从浏览器中在线试用 Data-Juicer。 如果Data-Juicer对您的研发有帮助，请引用我们的[工作](#参考文献) 。
 
-如果Data-Juicer对您的研发有帮助，请引用我们的[工作](#参考文献) 。
+Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多的功能和数据菜谱。热烈欢迎您加入我们（issues/PRs/[Slack频道](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8275bc8g7ypp) /[钉钉群](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8275bc8g7ypp&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11)/...），一起推进LLM-数据的协同开发和研究！
 
-欢迎提issues/PRs，以及加入我们的[Slack频道](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8275bc8g7ypp) 或[钉钉群](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8275bc8g7ypp&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) 进行讨论!
 
 ----
 
 ## 新消息
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-03-07] 我们现在发布了 **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)**! 在这个新版本中，我们支持了更多的 **多模态数据(包括视频)** 相关特性。我们还启动了 **[DJ-SORA](docs/DJ_SORA_ZH.md)** ，为SORA-like大模型构建开放的大规模高质量数据集！
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-02-20] 我们在积极维护一份关于LLM-Data的*精选列表*，欢迎[访问](docs/awesome_llm_data.md)并参与贡献！
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-02-05] 我们的论文被SIGMOD'24 industrial track接收！
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-08-09] 我们提出了Img-Diff，它通过*对比数据合成*来增强多模态大型语言模型的性能，在[MMVP benchmark](https://tsb0601.github.io/mmvp_blog/)中比GPT-4V高出12个点。 更多细节请参阅我们的 [论文](https://arxiv.org/abs/2408.04594), 以及从 [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) 和 [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff)下载这份数据集。
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-24] “天池 Better Synth 多模态大模型数据合成赛”——第四届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532251)，了解赛事详情。
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png)[2024-07-17] 我们利用Data-Juicer[沙盒实验室套件](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox-ZH.md)，通过数据与模型间的系统性研发工作流，调优数据和模型，在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。相关成果已经整理发表在[论文](http://arxiv.org/abs/2407.11784)中，并且模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布。
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png)[2024-07-12] 我们的MLLM-Data精选列表已经演化为一个模型-数据协同开发的角度系统性[综述](https://arxiv.org/abs/2407.08583)。欢迎[浏览](docs/awesome_llm_data.md)或参与贡献!
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-06-01] ModelScope-Sora“数据导演”创意竞速——第三届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532219)，了解赛事详情。
+- [2024-03-07] 我们现在发布了 **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)**! 在这个新版本中，我们支持了更多的 **多模态数据(包括视频)** 相关特性。我们还启动了 **[DJ-SORA](docs/DJ_SORA_ZH.md)** ，为SORA-like大模型构建开放的大规模高质量数据集！
+- [2024-02-20] 我们在积极维护一份关于LLM-Data的*精选列表*，欢迎[访问](docs/awesome_llm_data.md)并参与贡献！
+- [2024-02-05] 我们的论文被SIGMOD'24 industrial track接收！
 - [2024-01-10] 开启“数据混合”新视界——第二届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532174)，了解赛事详情。
-
--[2024-01-05] 现在，我们发布了 **Data-Juicer v0.1.3** 版本！ 
-在这个新版本中，我们支持了**更多Python版本**（3.8-3.10），同时支持了**多模态**数据集的[转换](tools/multimodal/README_ZH.md)和[处理](docs/Operators_ZH.md)（包括文本、图像和音频。更多模态也将会在之后支持）。
+- [2024-01-05] **Data-Juicer v0.1.3** 版本发布了。 
+在这个新版本中，我们支持了**更多Python版本**（3.8-3.10），同时支持了**多模态**数据集的[转换](tools/multimodal/README_ZH.md)和[处理](docs/Operators_ZH.md)（包括文本、图像和音频。更多模态也将会在之后支持）！
 此外，我们的论文也更新到了[第三版](https://arxiv.org/abs/2309.02033) 。
-
 - [2023-10-13] 我们的第一届以数据为中心的 LLM 竞赛开始了！
   请访问大赛官网，FT-Data Ranker（[1B赛道](https://tianchi.aliyun.com/competition/entrance/532157) 、[7B赛道](https://tianchi.aliyun.com/competition/entrance/532158) ) ，了解更多信息。
 
-- [2023-10-8] 我们的论文更新至第二版，并发布了对应的Data-Juicer v0.1.2版本！
+<div id="table" align="center"></div>
 
 目录
 ===
@@ -85,7 +86,7 @@ Data-Juicer（包含[DJ-SORA](docs/DJ_SORA_ZH.md)）正在积极更新和维护�
 
 * **数据反馈回路 & 沙盒实验室**：支持一站式数据-模型协同开发，通过[沙盒实验室](docs/Sandbox-ZH.md)快速迭代，基于数据和模型反馈回路、可视化和多维度自动评估等功能，使您更了解和改进您的数据和模型。  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
-* **效率增强**：提供高效并行化的数据处理流水线（Aliyun-PAI\Ray\Slurm\CUDA\算子融合），减少内存占用和CPU开销，提高生产力。  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
+* **面向生产环境**：提供高效并行化的数据处理流水线（Aliyun-PAI\Ray\Slurm\CUDA\算子融合），减少内存占用和CPU开销，支持自动化处理容错。  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 * **全面的数据处理菜谱**：为pre-training、fine-tuning、中英文等场景提供数十种[预构建的数据处理菜谱](configs/data_juicer_recipes/README_ZH.md)。 在LLaMA、LLaVA等模型上有效验证。 ![exp_llama](https://img.alicdn.com/imgextra/i2/O1CN019WtUPP1uhebnDlPR8_!!6000000006069-2-tps-2530-1005.png)
 
@@ -193,7 +194,7 @@ pip install py-data-juicer
     ```shell
     docker build -t datajuicer/data-juicer:<version_tag> .
     ```
-  
+
   - `<version_tag>`的格式类似于`v0.2.0`，与发布（Release）的版本号相同。
 
 ### 安装校验
@@ -210,6 +211,9 @@ print(dj.__version__)
 你可以使用包管理器安装 FFmpeg（例如，在 Debian/Ubuntu 上使用 sudo apt install ffmpeg，在 OS X 上使用 brew install ffmpeg），或访问[官方FFmpeg链接](https://ffmpeg.org/download.html)。
 
 随后在终端运行 ffmpeg 命令检查环境是否设置正确。
+
+
+<p align="right"><a href="#table">🔼 back to index</a></p>
 
 ## 快速上手
 
@@ -238,6 +242,19 @@ export DATA_JUICER_MODELS_CACHE="/path/to/another/directory/models"
 export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 ```
 
+#### 灵活的编程接口
+我们提供了各种层次的简单编程接口，以供用户选择：
+```python
+# ... init op & dataset ...
+
+# 链式调用风格，支持单算子或算子列表
+dataset = dataset.process(op)
+dataset = dataset.process([op1, op2])
+# 函数式编程风格，方便快速集成或脚本原型迭代
+dataset = op(dataset)
+dataset = op.run(dataset)
+```
+
 ### 分布式数据处理
 
 Data-Juicer 现在基于[RAY](https://www.ray.io/)实现了多机分布式数据处理。
@@ -264,13 +281,13 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 
 ```shell
 # 适用于从源码安装
-python tools/analyze_data.py --config configs/demo/analyser.yaml
+python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # 使用命令行工具
-dj-analyze --config configs/demo/analyser.yaml
+dj-analyze --config configs/demo/analyzer.yaml
 ```
 
-* **注意**：Analyser 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
+* **注意**：Analyzer 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
 
 ### 数据可视化
 
@@ -280,6 +297,9 @@ dj-analyze --config configs/demo/analyser.yaml
 ```shell
 streamlit run app.py
 ```
+
+
+
 
 ### 构建配置文件
 
@@ -356,6 +376,8 @@ docker exec -it <container_id> bash
 ```
 
 
+<p align="right"><a href="#table">🔼 back to index</a></p>
+
 ## 数据处理菜谱
 
 * [BLOOM 数据处理菜谱](configs/reproduced_bloom/README_ZH.md)
@@ -383,16 +405,31 @@ Data-Juicer 被各种 LLM产品和研究工作使用，包括来自阿里云-通
 Data-Juicer 感谢并参考了社区开源项目：
 [Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Pile](https://huggingface.co/datasets/EleutherAI/pile), [Alpaca-Cot](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT), [Megatron-LM](https://github.com/NVIDIA/Megatron-LM), [DeepSpeed](https://www.deepspeed.ai/), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), [Beam](https://github.com/apache/beam),  [LM-Harness](https://github.com/EleutherAI/lm-evaluation-harness), [HELM](https://github.com/stanford-crfm/helm), ....
 
-
-
 ## 参考文献
 如果您发现我们的工作对您的研发有帮助，请引用以下[论文](https://arxiv.org/abs/2309.02033) 。
 
 ```
 @inproceedings{chen2024datajuicer,
-title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
-author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
+  title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
+  author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
   booktitle={International Conference on Management of Data},
   year={2024}
 }
 ```
+<details>
+<summary>更多Data-Juicer团队相关论文:
+</summary>>
+
+- [Data-Juicer Sandbox: A Comprehensive Suite for Multimodal Data-Model Co-development](https://arxiv.org/abs/2407.11784)
+
+- [The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective](https://arxiv.org/abs/2407.08583)
+
+- [ImgDiff: Contrastive Data Synthesis for Vision Large Language Models](https://arxiv.org/abs/2408.04594)
+
+- [Data Mixing Made Efficient: A Bivariate Scaling Law for Language Model Pretraining](https://arxiv.org/abs/2402.11505)
+
+</details>
+
+
+
+<p align="right"><a href="#table">🔼 back to index</a></p>

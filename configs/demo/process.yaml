@@ -12,3 +12,4 @@ export_path: './outputs/demo-process/demo-processed.jsonl'
 process:
   - language_id_score_filter:
       lang: 'zh'
+      min_score: 0.8

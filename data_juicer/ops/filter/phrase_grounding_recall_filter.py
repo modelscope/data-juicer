@@ -74,8 +74,11 @@ class PhraseGroundingRecallFilter(Filter):
     """Filter to keep samples whose locating recalls of phrases extracted
     from text in the images are within a specified range."""
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_owlvit='google/owlvit-base-patch32',
+                 trust_remote_code=False,
                  min_recall: ClosedUnitInterval = 0.1,
                  max_recall: ClosedUnitInterval = 1.0,
                  horizontal_flip: bool = False,
@@ -130,8 +133,8 @@ class PhraseGroundingRecallFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_owlvit)
-        self._accelerator = 'cuda'
+                                       pretrained_model_name_or_path=hf_owlvit,
+                                       trust_remote_code=trust_remote_code)
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
@@ -164,7 +167,7 @@ class PhraseGroundingRecallFilter(Filter):
         text = sample[self.text_key]
         offset = 0
         recalls = []
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         for chunk in text.split(SpecialTokens.eoc):
             count = chunk.count(SpecialTokens.image)

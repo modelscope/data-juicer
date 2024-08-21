@@ -3,7 +3,7 @@ from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (extract_key_frames,
+from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -28,8 +28,11 @@ with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
 class VideoNSFWFilter(Filter):
     """Filter to keep samples whose videos have low nsfw scores."""
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_nsfw_model='Falconsai/nsfw_image_detection',
+                 trust_remote_code=False,
                  score_threshold: ClosedUnitInterval = 0.5,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
@@ -84,8 +87,8 @@ class VideoNSFWFilter(Filter):
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(
             model_type='huggingface',
-            pretrained_model_name_or_path=hf_nsfw_model)
-        self._accelerator = 'cuda'
+            pretrained_model_name_or_path=hf_nsfw_model,
+            trust_remote_code=trust_remote_code)
         self.reduce_mode = reduce_mode
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num
@@ -111,7 +114,7 @@ class VideoNSFWFilter(Filter):
                                                 loaded_video_keys, load_video)
 
         nsfw_scores = []
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         for video_key, video in videos.items():
             sampled_frames_key = video_key + self.sampled_frames_key_suffix
@@ -134,27 +137,33 @@ class VideoNSFWFilter(Filter):
                     sample[Fields.context][sampled_frames_key] = frames
 
             frame_images = [frame.to_image() for frame in frames]
-            inputs = processor(images=frame_images, return_tensors='pt')
-            inputs = inputs.to(model.device)
-            outputs = model(**inputs)
-            logits = outputs.logits
-            cur_scores = [
-                scores[1] for scores in torch.softmax(logits, dim=-1)
-            ]
-            cur_scores = torch.Tensor(cur_scores)
 
-            if self.reduce_mode == 'avg':
-                nsfw_scores.append(cur_scores.mean())
-            elif self.reduce_mode == 'max':
-                nsfw_scores.append(cur_scores.max())
+            if len(frame_images) > 0:
+                inputs = processor(images=frame_images, return_tensors='pt')
+                inputs = inputs.to(model.device)
+                outputs = model(**inputs)
+                logits = outputs.logits
+                cur_scores = [
+                    scores[1] for scores in torch.softmax(logits, dim=-1)
+                ]
+                cur_scores = torch.Tensor(cur_scores)
+
+                if self.reduce_mode == 'avg':
+                    cur_score = cur_scores.mean()
+                elif self.reduce_mode == 'max':
+                    cur_score = cur_scores.max()
+                else:
+                    cur_score = cur_scores.min()
             else:
-                nsfw_scores.append(cur_scores.min())
+                cur_score = 0.0
+
+            nsfw_scores.append(float(cur_score))
 
         sample[Fields.stats][StatsKeys.video_nsfw_score] = nsfw_scores
 
         if not context:
             for vid_key in videos:
-                videos[vid_key].close()
+                close_video(videos[vid_key])
 
         return sample
 

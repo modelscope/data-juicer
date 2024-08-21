@@ -27,8 +27,11 @@ class ImageTextMatchingFilter(Filter):
     """Filter to keep samples those matching score between image and text
     within a specific range."""
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_blip='Salesforce/blip-itm-base-coco',
+                 trust_remote_code=False,
                  min_score: ClosedUnitInterval = 0.003,
                  max_score: ClosedUnitInterval = 1.0,
                  horizontal_flip: bool = False,
@@ -69,8 +72,8 @@ class ImageTextMatchingFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(model_type='huggingface',
-                                       pretrained_model_name_or_path=hf_blip)
-        self._accelerator = 'cuda'
+                                       pretrained_model_name_or_path=hf_blip,
+                                       trust_remote_code=trust_remote_code)
         self.reduce_mode = reduce_mode
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
@@ -95,7 +98,7 @@ class ImageTextMatchingFilter(Filter):
         text = sample[self.text_key]
         offset = 0
         matching_scores = []
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         for chunk in text.split(SpecialTokens.eoc):
             count = chunk.count(SpecialTokens.image)

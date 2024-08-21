@@ -10,7 +10,7 @@
 
 ## 编码规范
 
-我们将编码规范定义在 `.pre-commit-config.yaml` 中。在向仓库贡献代码之前，请使用 `pre-commit` 工具对代码进行规范化。
+我们将编码规范定义在 `.pre-commit-config.yaml` 中。在向仓库贡献代码之前，请使用 `pre-commit` 工具对代码进行自动规范化。
 
 ```shell
 # ===========install pre-commit tool===========
@@ -99,20 +99,22 @@ class StatsKeys(object):
                 return False
     ```
 
-    - 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在构造函数中声明 `self._accelerator = 'cuda'`，并确保 `compute_stats` 和 `process` 方法接受一个额外的位置参数 `rank`。
+    - 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在构造函数中声明 `_accelerator = 'cuda'`，并确保 `compute_stats` 和 `process` 方法接受一个额外的位置参数 `rank`。
 
     ```python
     # ... (same as above)
 
     @OPERATORS.register_module('text_length_filter')
     class TextLengthFilter(Filter):
+   
+        _accelerator = 'cuda'
+   
         def __init__(self,
                     min_len: PositiveInt = 10,
                     max_len: PositiveInt = sys.maxsize,
                     *args,
                     **kwargs):
             # ... (same as above)
-            self._accelerator = 'cuda'
 
         def compute_stats(self, sample, rank=None):
             # ... (same as above)
@@ -121,19 +123,20 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
-    - 如果算子批量处理数据，输入不是一个样本而是一个batch，需要声明`self._batched_op = True`。
+    - 如果算子批量处理数据，输入不是一个样本而是一个batch，需要声明`_batched_op = True`。
     ```python
     # ... (import some other libraries)
     OP_NAME = 'image_diffusion_mapper'
     @OPERATORS.register_module(OP_NAME)
     @LOADED_IMAGES.register_module(OP_NAME)
     class ImageDiffusionMapper(Mapper):
+        _batched_op = True
+
         def __init__(self,
                  # ... (OP parameters)
                  *args,
                  **kwargs):
             super().__init__(*args, **kwargs)
-            self._batched_op = True
 
         def process(self, samples):
             # ... (some codes)
@@ -276,9 +279,9 @@ if __name__ == '__main__':
 
 ### （可选）使新算子可以进行算子融合
 
-- 如果我们的新算子中的部分中间变量的计算过程与已有的算子重复，那么可以将其添加到可融合算子中，以在数据处理时利用算子融合进行加速。（如`word_num_filter`与`word_repetition_filter`都需要对输入文本进行分词）
+- 如果我们的新算子中的部分中间变量的计算过程与已有的算子重复，那么可以将其添加到可融合算子中，以在数据处理时利用算子融合进行加速。（如`words_num_filter`与`word_repetition_filter`都需要对输入文本进行分词）
 - 当算子融合（OP Fusion）功能开启时，这些重复的计算过程和中间变量是可以在算子之间的`context`中共享的，从而可以减少重复计算。
-- 可通过如下步骤使包含共有中间变量的算子可进行算子融合（以`word_num_filter`算子为例）。
+- 可通过如下步骤使包含共有中间变量的算子可进行算子融合（以`words_num_filter`算子为例）。
 
 1. （可选）如果新算子中产生了新的中间变量，需要在`utils/constant.py`中的`InterVars`类中添加新的中间变量名称。通常需要在名称前加上`DEFAULT_PREFIX`前缀。
 
@@ -313,7 +316,7 @@ ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_IMAGES]  # 并添加到注册
 ...
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)  # 将该算子注册到注册组中
-class WordNumFilter(Filter):
+class WordsNumFilter(Filter):
 ...
 ```
 

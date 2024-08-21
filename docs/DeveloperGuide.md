@@ -11,7 +11,7 @@
 ## Coding Style
 
 We define our styles in `.pre-commit-config.yaml`. Before committing,
-please install `pre-commit` tool to check and modify accordingly:
+please install `pre-commit` tool to automatically check and modify accordingly:
 
 ```shell
 # ===========install pre-commit tool===========
@@ -104,20 +104,22 @@ class StatsKeys(object):
                 return False
     ```
 
-    - If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare `self._accelerator = 'cuda'` in the constructor, and ensure that `compute_stats` and `process` methods accept an additional positional argument `rank`.
+    - If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare `_accelerator = 'cuda'` in the constructor, and ensure that `compute_stats` and `process` methods accept an additional positional argument `rank`.
 
     ```python
     # ... (same as above)
 
     @OPERATORS.register_module('text_length_filter')
     class TextLengthFilter(Filter):
+   
+        _accelerator = 'cuda'
+   
         def __init__(self,
                     min_len: PositiveInt = 10,
                     max_len: PositiveInt = sys.maxsize,
                     *args,
                     **kwargs):
             # ... (same as above)
-            self._accelerator = 'cuda'
 
         def compute_stats(self, sample, rank=None):
             # ... (same as above)
@@ -126,19 +128,20 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
-    - If the operator processes data in batches rather than a single sample, it is necessary to declare `self._batched_op = True`.
+    - If the operator processes data in batches rather than a single sample, it is necessary to declare `_batched_op = True`.
     ```python
     # ... (import some other libraries)
     OP_NAME = 'image_diffusion_mapper'
     @OPERATORS.register_module(OP_NAME)
     @LOADED_IMAGES.register_module(OP_NAME)
     class ImageDiffusionMapper(Mapper):
+        _batched_op = True
+
         def __init__(self,
                  # ... (OP parameters)
                  *args,
                  **kwargs):
             super().__init__(*args, **kwargs)
-            self._batched_op = True
 
         def process(self, samples):
             # ... (some codes)
@@ -289,7 +292,7 @@ the corresponding documents, including the following docs:
 ### (Optional) Make your OP fusible
 
 - If the calculation process of some intermediate variables in the new OP is reused in other existing OPs, this new OP can be
-added to the fusible OPs to accelerate the whole data processing with OP fusion technology. (e.g. both the `word_num_filter`
+added to the fusible OPs to accelerate the whole data processing with OP fusion technology. (e.g. both the `words_num_filter`
 and `word_repetition_filter` need to split the input text into words)
 - When opening OP fusion, these reused calculation processes and intermediate variables can be shared in the `context` between
 OPs, thus reducing repeated calculations.
@@ -332,7 +335,7 @@ to this intermediate variable, indicating that the intermediate variable may be 
 ...
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)  # register this new OP into the registry group
-class WordNumFilter(Filter):
+class WordsNumFilter(Filter):
 ...
 ```
 

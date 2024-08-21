@@ -1,6 +1,6 @@
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.deduplicator.document_deduplicator import \
     DocumentDeduplicator

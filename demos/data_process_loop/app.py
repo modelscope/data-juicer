@@ -7,7 +7,7 @@ import yaml
 from loguru import logger
 
 from data_juicer.config import init_configs
-from data_juicer.core import Analyser, Executor
+from data_juicer.core import Analyzer, Executor
 from data_juicer.ops.base_op import OPERATORS
 
 
@@ -93,7 +93,7 @@ def analyze_and_show_res():
     cfg['save_stats_in_one_file'] = True
 
     logger.info('=========Stage 1: analyze original data=========')
-    analyzer = Analyser(cfg)
+    analyzer = Analyzer(cfg)
     analyzed_dataset = analyzer.run()
 
     overall_file = os.path.join(analyzer.analysis_path, 'overall.csv')
@@ -132,7 +132,7 @@ def process_and_show_res():
             cfg_for_processed_data.export_path = os.path.dirname(
                 cfg.export_path) + '_processed/data.jsonl'
 
-            analyzer = Analyser(cfg_for_processed_data)
+            analyzer = Analyzer(cfg_for_processed_data)
             analyzer.analysis_path = os.path.dirname(
                 cfg_for_processed_data.export_path) + '/analysis'
             analyzer.run()

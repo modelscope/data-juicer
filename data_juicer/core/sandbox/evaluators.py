@@ -19,7 +19,7 @@ class BaseEvaluator(object):
     def __init__(self, eval_config: dict):
         self.eval_config = eval_config
 
-    def run(self, eval_type, eval_obj, **kwargs) -> dict:
+    def run(self, eval_type, eval_obj=None, **kwargs) -> dict:
         """
             conduct the evaluation given specified measurement
                 on specified target object;
@@ -30,11 +30,9 @@ class BaseEvaluator(object):
 
 class Gpt3QualityEvaluator(BaseEvaluator):
 
-    def run(self, eval_type, eval_obj, **kwargs):
+    def run(self, eval_type, eval_obj=None, **kwargs):
         if eval_type == 'data':
-            # eval_obj is the path to the dataset to be evaluated
-            assert isinstance(eval_obj, str)
-            input_data_path = eval_obj
+            input_data_path = self.eval_config.dataset_path
             tmp_res_export_path = input_data_path + '.tmp_res.jsonl'
             if os.path.exists(tmp_res_export_path):
                 if os.path.isfile(tmp_res_export_path):
@@ -58,7 +56,7 @@ class Gpt3QualityEvaluator(BaseEvaluator):
 
 class InceptionEvaluator(BaseEvaluator):
 
-    def run(self, eval_type, eval_obj, **kwargs):
+    def run(self, eval_type, eval_obj=None, **kwargs):
         if eval_type == 'data':
             result_dict = calc_metrics(
                 fake_data_path=self.eval_config.fake_data_path,
@@ -83,26 +81,26 @@ class InceptionEvaluator(BaseEvaluator):
 
 class HelmEvaluator(BaseEvaluator):
 
-    def run(self, eval_type, eval_obj, **kwargs):
+    def run(self, eval_type, eval_obj=None, **kwargs):
         raise NotImplementedError("To be refactored from dj's `thirdparty`.")
 
 
 class GptEvaluator(BaseEvaluator):
 
-    def run(self, eval_type, eval_obj, **kwargs):
+    def run(self, eval_type, eval_obj=None, **kwargs):
         raise NotImplementedError('To be refactored from `tools.evaluator`,')
 
 
 class VideoFvdEvaluator(BaseEvaluator):
 
-    def run(self, eval_type, eval_obj, **kwargs):
+    def run(self, eval_type, eval_obj=None, **kwargs):
         raise NotImplementedError(
             'To be refactored from video fvd/isv related tools.')
 
 
 class Gpt4VEvaluator(BaseEvaluator):
 
-    def run(self, eval_type, eval_obj, **kwargs):
+    def run(self, eval_type, eval_obj=None, **kwargs):
         raise NotImplementedError(
             'To be refactored from gpt4v related operators/tools.')
 
@@ -113,7 +111,7 @@ class VBenchEvaluator(BaseEvaluator):
         cur_result = json.load(open(result_path))
         return cur_result[dimension][0]
 
-    def run(self, eval_type, eval_obj, **kwargs):
+    def run(self, eval_type, eval_obj=None, **kwargs):
         if eval_type == 'data':
             prompt_path = self.eval_config.prompt_path
             videos_path = self.eval_config.videos_path
@@ -153,13 +151,13 @@ class VBenchEvaluator(BaseEvaluator):
 
 class LmHarnessEvaluator(BaseEvaluator):
 
-    def run(self, eval_type, eval_obj, **kwargs):
+    def run(self, eval_type, eval_obj=None, **kwargs):
         raise NotImplementedError(
             'To be refactored from, used in data-juicer competition.')
 
 
 class ModelscopeEvaluator(BaseEvaluator):
 
-    def run(self, eval_type, eval_obj, **kwargs):
+    def run(self, eval_type, eval_obj=None, **kwargs):
         raise NotImplementedError(
             'To be implemented from https://github.com/modelscope/eval-scope.')

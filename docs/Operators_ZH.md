@@ -2,7 +2,7 @@
 
 算子 (Operator) 是协助数据修改、清理、过滤、去重等基本流程的集合。我们支持广泛的数据来源和文件格式，并支持对自定义数据集的灵活扩展。
 
-这个页面提供了OP的基本描述，用户可以参考[API文档](https://modelscope.github.io/data-juicer/)更细致了解每个OP的具体参数，并且可以查看、运行单元测试，来体验[各OP的用法示例](../tests/ops)以及每个OP作用于内置测试数据样本时的效果。
+这个页面提供了OP的基本描述，用户可以参考[API文档](https://modelscope.github.io/data-juicer/)更细致了解每个OP的具体参数，并且可以查看、运行单元测试 (`tests/ops/...`)，来体验[各OP的用法示例](../tests/ops)以及每个OP作用于内置测试数据样本时的效果。
 
 ## 概览
 
@@ -14,7 +14,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | [ Mapper ]( #mapper )              | 43 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 41 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
-| [ Selector ]( #selector )          |  2 | 基于排序选取高质量样本   |
+| [ Selector ]( #selector )          |  4 | 基于排序选取高质量样本   |
 
 下面列出所有具体算子，每种算子都通过多个标签来注明其主要功能。
 
@@ -51,7 +51,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 |-----------------------------------------------------|-----------------------|-----------|--------------------------------------------------------|
 | audio_ffmpeg_wrapped_mapper                         | Audio                 | -         | 运行 FFmpeg 语音过滤器的简单封装                         |
 | chinese_convert_mapper                              | General               | zh        | 用于在繁体中文、简体中文和日文汉字之间进行转换（借助 [opencc](https://github.com/BYVoid/OpenCC)）        |
-| clean_copyright_mapper                              | Code                  | en, zh    | 删除代码文件开头的版权声明 (:warning: 必须包含单词 *copyright*)           |
+| clean_copyright_mapper                              | Code                  | en, zh    | 删除代码文件开头的版权声明 (必须包含单词 *copyright*)           |
 | clean_email_mapper                                  | General               | en, zh    | 删除邮箱信息                                                 |
 | clean_html_mapper                                   | General               | en, zh    | 删除 HTML 标签并返回所有节点的纯文本                                  |
 | clean_ip_mapper                                     | General               | en, zh    | 删除 IP 地址                                               |
@@ -61,8 +61,8 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | image_blur_mapper                                   | Image                 |  -        | 对图像进行模糊处理                                              |
 | image_captioning_from_gpt4v_mapper                  | Multimodal            |  -        | 基于gpt-4-vision和图像生成文本                                |
 | image_captioning_mapper                             | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（例如 blip2）和原始样本中的图形生成的。                                             |
-| image_diffusion_mapper                              | Multimodal            |  -        | 用stable diffusion生成图像，对图像进行增强                       ｜
-| image_face_blur_mapper                              | Image                 |  -        | 对图像中的人脸进行模糊处理                                      ｜
+| image_diffusion_mapper                              | Multimodal            |  -        | 用stable diffusion生成图像，对图像进行增强                                                    |
+| image_face_blur_mapper                              | Image                 |  -        | 对图像中的人脸进行模糊处理                                                    |
 | nlpaug_en_mapper                                    | General               | en        | 使用`nlpaug`库对英语文本进行简单增强                                 | 
 | nlpcda_zh_mapper                                    | General               | zh        | 使用`nlpcda`库对中文文本进行简单增强                                 | 
 | punctuation_normalization_mapper                    | General               | en, zh    | 将各种 Unicode 标点符号标准化为其 ASCII 等效项                        |
@@ -81,9 +81,9 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | video_captioning_from_frames_mapper                 | Multimodal         |  -     | 生成样本，其标题是基于一个文字生成图片的模型和原始样本视频中指定帧的图像。不同帧产出的标题会拼接为一条单独的字符串。             |
 | video_captioning_from_summarizer_mapper             | Multimodal         | -      | 通过对多种不同方式生成的文本进行摘要以生成样本的标题（从视频/音频/帧生成标题，从音频/帧生成标签，...）                |
 | video_captioning_from_video_mapper                             | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（video-blip）和原始样本中的视频中指定帧的图像。                                             |
-| video_face_blur_mapper                              | Video                 |  -        | 对视频中的人脸进行模糊处理                                      ｜
+| video_face_blur_mapper                              | Video                 |  -        | 对视频中的人脸进行模糊处理                                                    |
 | video_ffmpeg_wrapped_mapper                         | Video                 | -         | 运行 FFmpeg 视频过滤器的简单封装                         |
-| video_remove_watermark_mapper                       | Video                 | -         | 去除视频中给定区域的水印                                            ｜
+| video_remove_watermark_mapper                       | Video                 | -         | 去除视频中给定区域的水印                                                    |
 | video_resize_aspect_ratio_mapper                    | Video                 | -         | 将视频的宽高比调整到指定范围内                                              |
 | video_resize_resolution_mapper                      | Video                 | -    | 将视频映射到给定的分辨率区间                 |
 | video_split_by_duration_mapper                        | Multimodal            | -         | 根据时长将视频切分为多个片段    |
@@ -127,16 +127,16 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | text_length_filter             | General    | en, zh | 保留总文本长度在指定范围内的样本                            |
 | token_num_filter               | General    | en, zh | 保留token数在指定范围内的样本                           |
 | video_aspect_ratio_filter      | Video      | -      | 保留包含视频的宽高比在指定范围内的样本                     |
-| video_duration_filter          | Video      | -      | 保留包含视频的时长在指定范围内的样本                 ｜
+| video_duration_filter          | Video      | -      | 保留包含视频的时长在指定范围内的样本                       |
 | video_aesthetics_filter        | Video      | -      | 保留指定帧的美学分数在指定范围内的样本|
-| video_frames_text_similarity_filter    | Multimodal | -      | 保留视频中指定帧的图像-文本的特征余弦相似度(基于CLIP模型)在指定范围内的样本 ｜
-| video_motion_score_filter      | Video      | -      | 保留包含视频的运动分数（基于稠密光流）在指定范围内的样本 ｜
-| video_nsfw_filter              | Video      | -      | 保留包含视频的NSFW分数在指定阈值之下的样本｜
-| video_ocr_area_ratio_filter    | Video      | -      | 保留包含视频的特定帧中检测出的文本的面积占比在指定范围内的样本 ｜
-| video_resolution_filter        | Video      | -      | 保留包含视频的分辨率（包括横向分辨率和纵向分辨率）在指定范围内的样本 ｜
-| video_watermark_filter         | Video      | -      | 保留包含视频有水印的概率在指定阈值之下的样本｜
+| video_frames_text_similarity_filter    | Multimodal | -      | 保留视频中指定帧的图像-文本的特征余弦相似度(基于CLIP模型)在指定范围内的样本 |
+| video_motion_score_filter      | Video      | -      | 保留包含视频的运动分数（基于稠密光流）在指定范围内的样本 |
+| video_nsfw_filter              | Video      | -      | 保留包含视频的NSFW分数在指定阈值之下的样本 |
+| video_ocr_area_ratio_filter    | Video      | -      | 保留包含视频的特定帧中检测出的文本的面积占比在指定范围内的样本 |
+| video_resolution_filter        | Video      | -      | 保留包含视频的分辨率（包括横向分辨率和纵向分辨率）在指定范围内的样本    |
+| video_watermark_filter         | Video      | -      | 保留包含视频有水印的概率在指定阈值之下的样本   |
 | video_tagging_from_frames_filter  | Video   | -      | 保留包含具有给定标签视频的样本 |
-| word_num_filter                | General    | en, zh | 保留字数在指定范围内的样本                               |
+| words_num_filter               | General    | en, zh | 保留字数在指定范围内的样本                               |
 | word_repetition_filter         | General    | en, zh | 保留 word-level n-gram 重复比率在指定范围内的样本          |
 
 ## Deduplicator <a name="deduplicator"/>
@@ -157,6 +157,8 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 算子                                  | 场景       | 语言      | 描述                                             |
 |-------------------------------------|----------|---------|------------------------------------------------|
 | frequency_specified_field_selector  | General  | en, zh  | 通过比较指定字段的频率选出前 k 个样本                           |
+| random_selector                     | General  | en, zh  | 随机筛选 k 个样本                            |
+| range_specified_field_selector      | General  | en, zh  | 通过比较指定字段的值选出指定范围的 k 个样本                            |
 | topk_specified_field_selector       | General  | en, zh  | 通过比较指定字段的值选出前 k 个样本                            |
 
 ## 贡献

@@ -3,9 +3,10 @@ import os
 from fractions import Fraction
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.logger_utils import HiddenPrints
-from data_juicer.utils.mm_utils import load_video
+from data_juicer.utils.mm_utils import close_video, load_video
 
 from ..base_op import OPERATORS, Mapper
 
@@ -102,7 +103,11 @@ class VideoResizeAspectRatioMapper(Mapper):
     def process(self, sample):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
+            sample[Fields.source_file] = []
             return sample
+
+        if Fields.source_file not in sample or not sample[Fields.source_file]:
+            sample[Fields.source_file] = sample[self.video_key]
 
         loaded_video_keys = sample[self.video_key]
         for index, video_key in enumerate(loaded_video_keys):
@@ -112,7 +117,7 @@ class VideoResizeAspectRatioMapper(Mapper):
             original_width = video.codec_context.width
             original_height = video.codec_context.height
             original_aspect_ratio = Fraction(original_width, original_height)
-            container.close()
+            close_video(container)
 
             if (original_aspect_ratio >= self.min_ratio
                     and original_aspect_ratio <= self.max_ratio):
@@ -138,6 +143,12 @@ class VideoResizeAspectRatioMapper(Mapper):
                 stream = stream.output(resized_video_key).global_args(*args)
                 stream.run()
             loaded_video_keys[index] = resized_video_key
+
+        # when the file is modified, its source file needs to be updated.
+        for i, value in enumerate(sample[self.video_key]):
+            if sample[Fields.source_file][i] != value:
+                if loaded_video_keys[i] != value:
+                    sample[Fields.source_file][i] = value
 
         sample[self.video_key] = loaded_video_keys
         return sample

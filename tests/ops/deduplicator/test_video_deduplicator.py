@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.deduplicator.video_deduplicator import VideoDeduplicator
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
@@ -32,8 +32,9 @@ class VideoDeduplicatorTest(DataJuicerTestCaseBase):
         os.symlink(video6_path, video7_path)
 
     def _run_video_deduplicator(self, dataset: Dataset, target_list, op):
-        key_list = [op.video_key, op.text_key] \
-            if op.consider_text else [op.video_key]
+        expected_keys = [op.video_key, op.text_key]
+        key_list = [key for key in expected_keys
+                    if len(target_list) > 0 and key in target_list[0]]
 
         dataset = dataset.map(op.compute_hash)
         dataset, _ = op.process(dataset)
@@ -222,6 +223,94 @@ class VideoDeduplicatorTest(DataJuicerTestCaseBase):
         }]
         dataset = Dataset.from_list(ds_list)
         op = VideoDeduplicator()
+        self._run_video_deduplicator(dataset, tgt_list, op)
+
+    def test_no_video(self):
+
+        ds_list = [{
+            'videos': [],
+            'text': '<video> text1'
+        }, {
+            'videos': [self.video2_path],
+            'text': '<video> text2'
+        }, {
+            'videos': [self.video3_path],
+            'text': '<video> text3'
+        }, {
+            'videos': [],
+            'text': '<video> text1'
+        }, {
+            'videos': [self.video5_path],
+            'text': '<video> text5'
+        }, {
+            'videos': [],
+            'text': '<video> text3'
+        }, {
+            'videos': [self.video7_path],
+            'text': '<video> text7'
+        }]
+        tgt_list = [{
+            'videos': [],
+            'text': '<video> text1'
+        }, {
+            'videos': [self.video2_path],
+            'text': '<video> text2'
+        }, {
+            'videos': [self.video3_path],
+            'text': '<video> text3'
+        }, {
+            'videos': [],
+            'text': '<video> text1'
+        }, {
+            'videos': [],
+            'text': '<video> text3'
+        }]
+        dataset = Dataset.from_list(ds_list)
+        op = VideoDeduplicator()
+        self._run_video_deduplicator(dataset, tgt_list, op)
+
+    def test_no_video_consider_text(self):
+
+        ds_list = [{
+            'videos': [],
+            'text': '<video> text1'
+        }, {
+            'videos': [self.video2_path],
+            'text': '<video> text2'
+        }, {
+            'videos': [self.video3_path],
+            'text': '<video> text3'
+        }, {
+            'videos': [],
+            'text': '<video> text1'
+        }, {
+            'videos': [self.video5_path],
+            'text': '<video> text5'
+        }, {
+            'videos': [],
+            'text': '<video> text3'
+        }, {
+            'videos': [self.video7_path],
+            'text': '<video> text3'
+        }]
+        tgt_list = [{
+            'videos': [],
+            'text': '<video> text1'
+        }, {
+            'videos': [self.video2_path],
+            'text': '<video> text2'
+        }, {
+            'videos': [self.video3_path],
+            'text': '<video> text3'
+        }, {
+            'videos': [self.video5_path],
+            'text': '<video> text5'
+        }, {
+            'videos': [],
+            'text': '<video> text3'
+        }]
+        dataset = Dataset.from_list(ds_list)
+        op = VideoDeduplicator(consider_text=True)
         self._run_video_deduplicator(dataset, tgt_list, op)
 
 

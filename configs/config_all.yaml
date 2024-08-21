@@ -40,21 +40,14 @@ executor_type: default                                      # type of executor, 
 ray_address: auto                                           # the address of the Ray cluster.
 
 # only for data analysis
-percentiles: [0.25, 0.5, 0.75]                              # percentiles to analyse the dataset distribution
+percentiles: [0.25, 0.5, 0.75]                              # percentiles to analyze the dataset distribution
 export_original_dataset: false                              # whether to export the original dataset with stats. If you only need the stats of the dataset, setting it to false could speed up the exporting.
 save_stats_in_one_file: false                               # whether to store all stats result into one file
 
 # for sandbox or hpo
-model_infer_config: null                                    # path or dict to model inference configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
-model_train_config: null                                    # path or dict to model training configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
-model_eval_config: null                                     # path or dict to model evaluation configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
-data_eval_config: null                                      # path or dict to data evaluation configuration file when calling model executor in sandbox. Related hooks will be disabled if it's not specified.
 data_probe_algo: 'uniform'                                  # sampling algorithm for dataset. Should be one of ["uniform", "frequency_specified_field_selector", "topk_specified_field_selector"]. It's "uniform" in default. Only used for dataset sampling.
 data_probe_ratio: 1.0                                       # the sampling ratio to the original dataset size. It's 1.0 in default. Only used for dataset sampling.
-path_k_sigma_recipe: null                                   # path to save a configuration file when using k-sigma tool to refine processing recipes
-path_model_feedback_recipe: null                            # path to save a configuration file refined by model feedback
 hpo_config: null                                            # path to a configuration file when using auto-HPO tool.
-
 
 # process schedule: a list of several process operators with their arguments
 process:
@@ -68,6 +61,8 @@ process:
   - clean_links_mapper:                                     # remove web links from text.
   - clean_copyright_mapper:                                 # remove copyright comments.
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
+  - extract_qa_mapper:                                      # mapper to extract question and answer pair from text.
+      hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - image_blur_mapper:                                      # mapper to blur images.
       p: 0.2                                                  # probability of the image being blured
@@ -90,7 +85,7 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated captions in the final datasets and the original captions will be removed. It's True in default.
       prompt: null                                            # a string prompt to guide the generation of blip2 model for all samples globally. It's None in default, which means no prompt provided.
       prompt_key: null                                        # the key name of fields in samples to store prompts for each sample. It's used for set different prompts for different samples. If it's none, use prompt in parameter "prompt". It's None in default.
-      mem_required: '20GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
+      mem_required: '16GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_diffusion_mapper:                                 # generate images by diffusion model
       hf_diffusion: 'CompVis/stable-diffusion-v1-4'           # stable diffusion model name on huggingface to generate image
       torch_dtype: 'fp32'                                     # the floating point type used to load the diffusion model. Can be one of ['fp32', 'fp16', 'bf16']
@@ -101,7 +96,7 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
       caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
-      mem_required: '25GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
+      mem_required: '8GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_face_blur_mapper:                                 # blur faces detected in images
       cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
@@ -336,7 +331,7 @@ process:
       lang: en                                                # compute perplexity in what language
       max_ppl: 1500                                           # the max perplexity score to filter text
   - phrase_grounding_recall_filter:                         # filter samples according to the locating recall of phrases extracted from text in the images.
-      hf_owlvit: openai/clip-vit-base-patch32                 # name of used Hugging Face Owl-ViT
+      hf_owlvit: google/owlvit-base-patch32                   # name of used Hugging Face Owl-ViT
       min_recall: 0.1                                         # the min phrase grounding recall of filter range
       max_recall: 1.0                                         # the max phrase grounding recall of filter range
       horizontal_flip: false                                  # flip image horizontally (left to right).
@@ -413,6 +408,9 @@ process:
       min_score: 0.25                                         # the minimum motion score to keep samples
       max_score: 10000.0                                      # the maximum motion score to keep samples
       sampling_fps: 2                                         # the samplig rate of frames_per_second to compute optical flow
+      size: null                                              # resize frames along the smaller edge before computing optical flow, or a sequence like (h, w)
+      max_size: null                                          # maximum allowed for the longer edge of resized frames
+      relative: false                                         # whether to normalize the optical flow magnitude to [0, 1], relative to the frame's diagonal length
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
   - video_nsfw_filter:                                      # filter samples according to the nsfw scores of videos in them
       hf_nsfw_model: Falconsai/nsfw_image_detection           # Huggingface model name for nsfw classification
@@ -500,13 +498,22 @@ process:
       ignore_non_character: false                             # whether to ignore non-alphabet characters, including whitespaces, digits, and punctuations
 
   # Selector ops
-  - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
-      field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
-      top_ratio:                                              # ratio of selected top samples
-      topk:                                                   # number of selected top sample
-      reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
   - frequency_specified_field_selector:                     # selector to select samples based on the sorted frequency of specified field value
       field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
       top_ratio:                                              # ratio of selected top specified field value
       topk:                                                   # number of selected top specified field value
+      reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
+  - random_selector:                                        # selector to random select samples
+      select_ratio:                                           # the ratio to be sampled
+      select_num:                                             # the number to be sampled
+  - range_specified_field_selector:                         # selector to select a range of samples based on the sorted specified field value from smallest to largest.
+      field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
+      lower_percentile:                                       # the lower bound of the percentile to be sampled
+      upper_percentile:                                       # the upper bound of the percentile to be sampled
+      lower_rank:                                             # the lower rank of the percentile to be sampled
+      upper_rank:                                             # the upper rank of the percentile to be sampled
+  - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
+      field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
+      top_ratio:                                              # ratio of selected top samples
+      topk:                                                   # number of selected top sample
       reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order

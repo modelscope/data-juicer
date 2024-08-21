@@ -1,15 +1,15 @@
 import unittest
 
-from datasets import Dataset
+from data_juicer.core.data import NestedDataset as Dataset
 
-from data_juicer.ops.filter.word_num_filter import WordNumFilter
+from data_juicer.ops.filter.words_num_filter import WordsNumFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class WordNumFilterTest(DataJuicerTestCaseBase):
+class WordsNumFilterTest(DataJuicerTestCaseBase):
 
-    def _run_word_num_filter(self, dataset: Dataset, target_list, op):
+    def _run_words_num_filter(self, dataset: Dataset, target_list, op):
         if Fields.stats not in dataset.features:
             # TODO:
             # this is a temp solution,
@@ -41,8 +41,8 @@ class WordNumFilterTest(DataJuicerTestCaseBase):
             'text': 'a v s e c s f e f g a a a  '
         }]
         dataset = Dataset.from_list(ds_list)
-        op = WordNumFilter(min_num=5, max_num=15)
-        self._run_word_num_filter(dataset, tgt_list, op)
+        op = WordsNumFilter(min_num=5, max_num=15)
+        self._run_words_num_filter(dataset, tgt_list, op)
 
     def test_zh_case(self):
 
@@ -65,11 +65,11 @@ class WordNumFilterTest(DataJuicerTestCaseBase):
             'text': '基于前一步结果，在同一个聚类中找出那些过长文档为假正例，暂不进行滤除'
         }]
         dataset = Dataset.from_list(ds_list)
-        op = WordNumFilter(lang='zh',
+        op = WordsNumFilter(lang='zh',
                            tokenization=True,
                            min_num=10,
                            max_num=25)
-        self._run_word_num_filter(dataset, tgt_list, op)
+        self._run_words_num_filter(dataset, tgt_list, op)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
-[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://modelscope.github.io/data-juicer) | [[*DJ-SORA*]](docs/DJ_SORA.md) 
+[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://modelscope.github.io/data-juicer) |  [[DJ-SORA]](docs/DJ_SORA.md) | [[Awesome List]](docs/awesome_llm_data.md)
 
-# Data-Juicer:  A One-Stop Data Processing System for Large Language Models
+
+# Data-Juicer: A One-Stop Data Processing System for Large Language Models
 
  <img src="https://img.alicdn.com/imgextra/i3/O1CN017Eq5kf27AlA2NUKef_!!6000000007757-0-tps-1280-720.jpg" width = "640" height = "360" alt="Data-Juicer"/>
 
@@ -27,31 +28,32 @@
 Data-Juicer is a one-stop **multimodal** data processing system to make data higher-quality,
 juicier, and more digestible for LLMs.
 
-Data-Juicer (including [DJ-SORA](docs/DJ_SORA.md)) is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets. 
-We welcome you to join us in promoting LLM data development and research!
 
-We provide a [Playground](http://8.130.100.170/) with a managed JupyterLab. [Try Data-Juicer](http://8.130.100.170/) straight away in your browser!
+We provide a [playground](http://8.138.149.181/) with a managed JupyterLab. [Try Data-Juicer](http://8.138.149.181/) straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly cite our [work](#references).
 
-If you find Data-Juicer useful for your research or development, please kindly cite our [work](#references).
-Welcome any issues/PRs and to join our [Slack channel](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw) 
-or [DingDing group](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) for discussion!
+Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets. 
+We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw)  channel, [DingDing](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) group, ...), in promoting data-model co-development along with research and applications of (multimodal) LLMs!
 
 ----
 
 ## News
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)** now! 
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-08-09] We propose Img-Diff, which enhances the performance of multimodal large language models through *contrastive data synthesis*, achieving a score that is 12 points higher than GPT-4V on the [MMVP benchmark](https://tsb0601.github.io/mmvp_blog/). See more details in our [paper](https://arxiv.org/abs/2408.04594), and download the dataset from [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) and [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff).
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-24] "Tianchi Better Synth Data Synthesis Competition for Multimodal Large Models" — Our 4th data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532251) for more information.
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-17] We utilized the Data-Juicer [Sandbox Laboratory Suite](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox.md) to systematically optimize data and models through an co-development workflow between data and models, achieving a new top spot on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard. The related achievements have been compiled and published in a [paper](http://arxiv.org/abs/2407.11784), and the model has been released on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms.
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-12] Our *awesome list of MLLM-Data* has evolved into a systemic [survey](https://arxiv.org/abs/2407.08583) from model-data co-development perspective. Welcome to [explore](docs/awesome_llm_data.md) and contribute!
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-06-01] ModelScope-Sora "Data Directors" creative sprint—Our third data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532219) for more information.
+- [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)** now! 
 In this new version, we support more features for **multimodal data (including video now)**, and introduce **[DJ-SORA](docs/DJ_SORA.md)** to provide open large-scale, high-quality datasets for SORA-like models.
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-02-20] We have actively maintained an *awesome list of LLM-Data*, welcome to [visit](docs/awesome_llm_data.md) and contribute!
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
+- [2024-02-20] We have actively maintained an *awesome list of LLM-Data*, welcome to [visit](docs/awesome_llm_data.md) and contribute!
+- [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
 - [2024-01-10] Discover new horizons in "Data Mixture"—Our second data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532174) for more information.
-- [2024-01-05] We release **Data-Juicer v0.1.3** now! 
+- [2024-01-05] We release **Data-Juicer v0.1.3** now!
 In this new version, we support **more Python versions** (3.8-3.10), and support **multimodal** dataset [converting](tools/multimodal/README.md)/[processing](docs/Operators.md) (Including texts, images, and audios. More modalities will be supported in the future).
 Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
-
 - [2023-10-13] Our first data-centric LLM competition begins! Please
   visit the competition's official websites, FT-Data Ranker ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), for more information.
 
-- [2023-10-8] We update our paper to the 2nd version and release the corresponding version 0.1.2 of Data-Juicer!
+<div id="table" align="center"></div>
 
 Table of Contents
 =================
@@ -93,13 +95,13 @@ Table of Contents
   dedicated [toolkits](#documentation), designed to
   function independently of specific multimodal LLM datasets and processing pipelines.
 
-- **Data-in-the-loop & Sandbox**: Supporting one-stop data-model collaborative development, enabling rapid iteration 
-  through the [sandbox laboratory](docs/Sandbox.md), and providing features such as feedback loops based on data and model, 
+- **Data-in-the-loop & Sandbox**: Supporting one-stop data-model collaborative development, enabling rapid iteration
+  through the [sandbox laboratory](docs/Sandbox.md), and providing features such as feedback loops based on data and model,
   visualization, and multidimensional automatic evaluation, so that you can better understand and improve your data and models.
   ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
-- **Enhanced Efficiency**: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
-  requiring less memory and CPU usage, optimized for maximum productivity.
+- **Towards production environment **: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
+  requiring less memory and CPU usage, optimized with automatic fault-toleration.
   ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
 - **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data
@@ -156,7 +158,7 @@ Table of Contents
 
 ## Installation
 
-### From Source
+### From Source 
 
 - Run the following commands to install the latest basic `data_juicer` version in
   editable mode:
@@ -193,11 +195,11 @@ The dependency options are listed below:
 pip install py-data-juicer
 ```
 
-- **Note**: 
+- **Note**:
   - only the basic APIs in `data_juicer` and two basic tools
     (data [processing](#data-processing) and [analysis](#data-analysis)) are available in this way. If you want customizable
     and complete functions, we recommend you install `data_juicer` [from source](#from-source).
-  - The release versions from pypi have a certain lag compared to the latest version from source. 
+  - The release versions from pypi have a certain lag compared to the latest version from source.
     So if you want to follow the latest functions of `data_juicer`, we recommend you install [from source](#from-source).
 
 ### Using Docker
@@ -214,7 +216,7 @@ pip install py-data-juicer
     ```shell
     docker build -t datajuicer/data-juicer:<version_tag> .
     ```
-  
+
   - The format of `<version_tag>` is like `v0.2.0`, which is the same as release version tag.
 
 ### Installation check
@@ -227,9 +229,13 @@ print(dj.__version__)
 ### For Video-related Operators
 Before using video-related operators, **FFmpeg** should be installed and accessible via the $PATH environment variable.
 
-You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [offical ffmpeg link](https://ffmpeg.org/download.html).
+You can install FFmpeg using package managers(e.g. sudo apt install ffmpeg on Debian/Ubuntu, brew install ffmpeg on OS X) or visit the [official ffmpeg link](https://ffmpeg.org/download.html).
 
 Check if your environment path is set correctly by running the ffmpeg command from the terminal.
+
+
+<p align="right"><a href="#table">🔼 back to index</a></p>
+
 
 ## Quick Start
 
@@ -261,6 +267,20 @@ export DATA_JUICER_MODELS_CACHE="/path/to/another/directory/models"
 export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 ```
 
+#### Flexible Programming Interface
+We provide various simple interfaces for users to choose from as follows. 
+```python
+#... init op & dataset ...
+
+# Chain call style, support single operator or operator list
+dataset = dataset.process(op)
+dataset = dataset.process([op1, op2])
+# Functional programming style for quick integration or script prototype iteration
+dataset = op(dataset)
+dataset = op.run(dataset)
+```
+
+
 ### Distributed Data Processing
 
 We have now implemented multi-machine distributed data processing based on [RAY](https://www.ray.io/). The corresponding demos can be run using the following commands:
@@ -279,17 +299,17 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 
 
 ### Data Analysis
-- Run `analyze_data.py` tool or `dj-analyze` command line tool with your config as the argument to analyse your dataset.
+- Run `analyze_data.py` tool or `dj-analyze` command line tool with your config as the argument to analyze your dataset.
 
 ```shell
 # only for installation from source
-python tools/analyze_data.py --config configs/demo/analyser.yaml
+python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # use command line tool
-dj-analyze --config configs/demo/analyser.yaml
+dj-analyze --config configs/demo/analyzer.yaml
 ```
 
-- **Note:** Analyser only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
+- **Note:** Analyzer only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
 
 ### Data Visualization
 
@@ -378,6 +398,9 @@ docker run -dit \  # run the container in the background
 docker exec -it <container_id> bash
 ```
 
+
+<p align="right"><a href="#table">🔼 back to index</a></p>
+
 ## Data Recipes
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
 - [Recipes for data process in RedPajama](configs/redpajama/README.md)
@@ -391,20 +414,20 @@ docker exec -it <container_id> bash
 Data-Juicer is released under Apache License 2.0.
 
 ## Contributing
-We are in a rapidly developing field and greatly welcome contributions of new 
-features, bug fixes and better documentations. Please refer to 
+We are in a rapidly developing field and greatly welcome contributions of new
+features, bug fixes and better documentations. Please refer to
 [How-to Guide for Developers](docs/DeveloperGuide.md).
 
 If you have any questions, please join our [discussion groups](README.md).
 
 ## Acknowledgement
 Data-Juicer is used across various LLM products and research initiatives,
-including industrial LLMs from Alibaba Cloud's Tongyi, such as Dianjin for 
-financial analysis, and Zhiwen for reading assistant, as well as the Alibaba 
+including industrial LLMs from Alibaba Cloud's Tongyi, such as Dianjin for
+financial analysis, and Zhiwen for reading assistant, as well as the Alibaba
 Cloud's platform for AI (PAI).
 We look forward to more of your experience, suggestions and discussions for collaboration!
 
-Data-Juicer thanks and refers to several community projects, such as 
+Data-Juicer thanks and refers to several community projects, such as
 [Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Pile](https://huggingface.co/datasets/EleutherAI/pile), [Alpaca-Cot](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT), [Megatron-LM](https://github.com/NVIDIA/Megatron-LM), [DeepSpeed](https://www.deepspeed.ai/), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), [Beam](https://github.com/apache/beam),  [LM-Harness](https://github.com/EleutherAI/lm-evaluation-harness), [HELM](https://github.com/stanford-crfm/helm), ....
 
 
@@ -413,9 +436,27 @@ Data-Juicer thanks and refers to several community projects, such as
 If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2309.02033).
 ```
 @inproceedings{chen2024datajuicer,
-title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
-author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
+  title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
+  author={Daoyuan Chen and Yilun Huang and Zhijian Ma and Hesen Chen and Xuchen Pan and Ce Ge and Dawei Gao and Yuexiang Xie and Zhaoyang Liu and Jinyang Gao and Yaliang Li and Bolin Ding and Jingren Zhou},
   booktitle={International Conference on Management of Data},
   year={2024}
 }
 ```
+
+<details>
+<summary> More related papers from Data-Juicer Team:
+</summary>>
+
+- [Data-Juicer Sandbox: A Comprehensive Suite for Multimodal Data-Model Co-development](https://arxiv.org/abs/2407.11784)
+
+- [The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective](https://arxiv.org/abs/2407.08583)
+
+- [ImgDiff: Contrastive Data Synthesis for Vision Large Language Models](https://arxiv.org/abs/2408.04594)
+
+- [Data Mixing Made Efficient: A Bivariate Scaling Law for Language Model Pretraining](https://arxiv.org/abs/2402.11505)
+
+</details>
+
+
+
+<p align="right"><a href="#table">🔼 back to index</a></p>

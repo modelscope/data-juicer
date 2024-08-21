@@ -4,10 +4,13 @@ import os
 import subprocess
 import sys
 
-import multiprocess as mp
 from loguru import logger
+# allow loading truncated images for some too large images.
+from PIL import ImageFile
 
 from data_juicer.utils.availability_utils import _is_package_available
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # For now, only INFO will be shown. Later the severity level will be changed
 # when setup_logger is called to initialize the logger.
@@ -39,50 +42,12 @@ def _cuda_device_count():
         return 0
 
 
-_USE_CUDA = False
-_CUDA_COUNT = _cuda_device_count()
-
-
-def use_cuda():
-    return _USE_CUDA
+_CUDA_DEVICE_COUNT = _cuda_device_count()
 
 
 def cuda_device_count():
-    return _CUDA_COUNT
+    return _CUDA_DEVICE_COUNT
 
 
-def setup_mp():
-    method = os.getenv('MP_START_METHOD', 'auto').lower()
-    if method == 'auto':
-        if _CUDA_COUNT > 0:
-            # forkserver is more lightweight
-            method = ('forkserver' if 'forkserver'
-                      in mp.get_all_start_methods() else 'spawn')
-        else:
-            method = 'fork'
-    try:
-        logger.info(f"Setting multiprocess start method to '{method}'.")
-        mp.set_start_method(method, force=True)
-    except RuntimeError as e:
-        logger.warning(f'Error setting multiprocess start method: {e}')
-
-
-def setup_cuda():
-    global _USE_CUDA
-
-    method = mp.get_start_method()
-    if method != 'fork' and _CUDA_COUNT > 0:
-        _USE_CUDA = True
-    else:
-        _USE_CUDA = False
-    logger.debug(f'_USE_CUDA: {_USE_CUDA} | MP: {method} '
-                 f'({mp.current_process().name})')
-
-
-def initialize():
-    if mp.current_process().name == 'MainProcess':
-        setup_mp()
-    setup_cuda()
-
-
-initialize()
+def is_cuda_available():
+    return _CUDA_DEVICE_COUNT > 0

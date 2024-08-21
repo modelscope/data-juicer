@@ -27,8 +27,11 @@ class ImageWatermarkFilter(Filter):
         probability.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_watermark_model='amrul-hzz/watermark_detector',
+                 trust_remote_code=False,
                  prob_threshold: ClosedUnitInterval = 0.8,
                  any_or_all: str = 'any',
                  *args,
@@ -56,8 +59,8 @@ class ImageWatermarkFilter(Filter):
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(
             model_type='huggingface',
-            pretrained_model_name_or_path=hf_watermark_model)
-        self._accelerator = 'cuda'
+            pretrained_model_name_or_path=hf_watermark_model,
+            trust_remote_code=trust_remote_code)
 
     def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
@@ -75,13 +78,15 @@ class ImageWatermarkFilter(Filter):
         sample, images = load_data_with_context(sample, context,
                                                 loaded_image_keys, load_image)
 
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         images = [images[key] for key in images]
         inputs = processor(images=images, return_tensors='pt').to(model.device)
         outputs = model(**inputs)
         logits = outputs.logits
-        watermark_probs = [probs[1] for probs in torch.softmax(logits, dim=-1)]
+        watermark_probs = [
+            float(probs[1]) for probs in torch.softmax(logits, dim=-1)
+        ]
 
         sample[Fields.stats][StatsKeys.image_watermark_prob] = watermark_probs
 

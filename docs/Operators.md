@@ -2,7 +2,7 @@
 
 Operators are a collection of basic processes that assist in data modification, cleaning, filtering, deduplication, etc. We support a wide range of data sources and file formats, and allow for flexible extension to custom datasets.
 
-This page offers a basic description of the operators (OPs) in Data-Juicer. Users can refer to the [API documentation](https://modelscope.github.io/data-juicer/) for the specific parameters of each operator. Users can refer to and run the unit tests for [examples of operator-wise usage](../tests/ops) as well as the effects of each operator when applied to built-in test data samples.
+This page offers a basic description of the operators (OPs) in Data-Juicer. Users can refer to the [API documentation](https://modelscope.github.io/data-juicer/) for the specific parameters of each operator. Users can refer to and run the unit tests (`tests/ops/...`) for [examples of operator-wise usage](../tests/ops) as well as the effects of each operator when applied to built-in test data samples.
 
 ## Overview
 
@@ -14,7 +14,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | [ Mapper ]( #mapper )             |   43   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
-| [ Selector ]( #selector )         |   2    | Selects top samples based on ranking            |
+| [ Selector ]( #selector )         |   4    | Selects top samples based on ranking            |
 
 
 All the specific operators are listed below, each featured with several capability tags.
@@ -52,7 +52,7 @@ All the specific operators are listed below, each featured with several capabili
 |-----------------------------------------------------|--------------------|--------|---------------------------------------------------------------------------------------------------------------|
 | audio_ffmpeg_wrapped_mapper                         | Audio              | -      | Simple wrapper to run a FFmpeg audio filter                                                                   |
 | chinese_convert_mapper                              | General            | zh     | Converts Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji (by [opencc](https://github.com/BYVoid/OpenCC))                |
-| clean_copyright_mapper                              | Code               | en, zh | Removes copyright notice at the beginning of code files (:warning: must contain the word *copyright*)         |
+| clean_copyright_mapper                              | Code               | en, zh | Removes copyright notice at the beginning of code files (must contain the word *copyright*)         |
 | clean_email_mapper                                  | General            | en, zh | Removes email information                                                                                     |
 | clean_html_mapper                                   | General            | en, zh | Removes HTML tags and returns plain text of all the nodes                                                     |
 | clean_ip_mapper                                     | General            | en, zh | Removes IP addresses                                                                                          |
@@ -125,20 +125,20 @@ All the specific operators are listed below, each featured with several capabili
 | stopwords_filter               | General    | en, zh | Keeps samples with stopword ratio above the specified threshold                                                                                     |
 | suffix_filter                  | General    | en, zh | Keeps samples with specified suffixes                                                                                                               |
 | text_action_filter             | General    | en, zh | Keeps samples containing action verbs in their texts                                                                                                |
-| text_entity_dependency_filter  | General    | en, zh | Keeps samples containing entity nouns related to other tokens in the dependency tree of the texts                                                   |
+| text_entity_dependency_filter  | General    | en, zh | Keeps samples containing dependency edges for an entity in the dependency tree of the texts                                                   |
 | text_length_filter             | General    | en, zh | Keeps samples with total text length within the specified range                                                                                     |
 | token_num_filter               | General    | en, zh | Keeps samples with token count within the specified range                                                                                           |
 | video_aesthetics_filter        | Video      | -      | Keeps samples whose specified frames have aesthetics scores within the specified range     |
 | video_aspect_ratio_filter      | Video      | -      | Keeps samples containing videos with aspect ratios within the specified range                                                                       |
-| video_duration_filter          | Video      | -      | Keep data samples whose videos' durations are within a specified range ｜                                                                            
-| video_frames_text_similarity_filter    | Multimodal | -      | Keep data samples whose similarities between sampled video frame images and text are within a specific range ｜
-| video_motion_score_filter      | Video      | -      | Keep samples with video motion scores within a specific range ｜
+| video_duration_filter          | Video      | -      | Keep data samples whose videos' durations are within a specified range |                                                                            
+| video_frames_text_similarity_filter    | Multimodal | -      | Keep data samples whose similarities between sampled video frame images and text are within a specific range |
+| video_motion_score_filter      | Video      | -      | Keep samples with video motion scores within a specific range |
 | video_nsfw_filter              | Video      | -      | Keeps samples containing videos with NSFW scores below the threshold                                                               |
-| video_ocr_area_ratio_filter    | Video      | -      | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range ｜                                  
+| video_ocr_area_ratio_filter    | Video      | -      | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range |                                  
 | video_resolution_filter        | Video      | -      | Keeps samples containing videos with horizontal and vertical resolutions within the specified range                                                 |
 | video_watermark_filter         | Video      | -      | Keeps samples containing videos with predicted watermark probabilities below the threshold                                                               |
 | video_tagging_from_frames_filter  | Video   | -      | Keep samples containing videos with given tags |
-| word_num_filter                | General    | en, zh | Keeps samples with word count within the specified range                                                                                            |
+| words_num_filter               | General    | en, zh | Keeps samples with word count within the specified range                                                                                            |
 | word_repetition_filter         | General    | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range                                                                    |
 
 
@@ -160,6 +160,8 @@ All the specific operators are listed below, each featured with several capabili
 | Operator                           | Domain  | Lang   | Description                                                           |
 |------------------------------------|---------|--------|-----------------------------------------------------------------------|
 | frequency_specified_field_selector | General | en, zh | Selects top samples by comparing the frequency of the specified field |
+| random_selector                    | General | en, zh | Selects samples randomly                                              |
+| range_specified_field_selector     | General | en, zh | Selects samples within a specified range by comparing the values of the specified field    |
 | topk_specified_field_selector      | General | en, zh | Selects top samples by comparing the values of the specified field    |
 
 

@@ -1,13 +1,14 @@
 import fnmatch
 import os
 from functools import partial
+from pickle import UnpicklingError
 from typing import Optional, Union
 
 import multiprocess as mp
 import wget
 from loguru import logger
 
-from data_juicer import cuda_device_count, use_cuda
+from data_juicer import cuda_device_count, is_cuda_available
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 
@@ -329,7 +330,8 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
 
 
 def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
-                                    return_model=True):
+                                    return_model=True,
+                                    trust_remote_code=False):
     """
     Prepare and load a simple aesthetics model.
 
@@ -343,21 +345,25 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
                                       AestheticsPredictorV2ReLU)
     from transformers import CLIPProcessor
 
-    processor = CLIPProcessor.from_pretrained(pretrained_model_name_or_path)
+    processor = CLIPProcessor.from_pretrained(
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
     if not return_model:
         return processor
     else:
         if 'v1' in pretrained_model_name_or_path:
             model = AestheticsPredictorV1.from_pretrained(
-                pretrained_model_name_or_path)
+                pretrained_model_name_or_path,
+                trust_remote_code=trust_remote_code)
         elif ('v2' in pretrained_model_name_or_path
               and 'linear' in pretrained_model_name_or_path):
             model = AestheticsPredictorV2Linear.from_pretrained(
-                pretrained_model_name_or_path)
+                pretrained_model_name_or_path,
+                trust_remote_code=trust_remote_code)
         elif ('v2' in pretrained_model_name_or_path
               and 'relu' in pretrained_model_name_or_path):
             model = AestheticsPredictorV2ReLU.from_pretrained(
-                pretrained_model_name_or_path)
+                pretrained_model_name_or_path,
+                trust_remote_code=trust_remote_code)
         else:
             raise ValueError(
                 'Not support {}'.format(pretrained_model_name_or_path))
@@ -438,7 +444,8 @@ def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
 def prepare_diffusion_model(pretrained_model_name_or_path,
                             diffusion_type,
                             torch_dtype='fp32',
-                            revision='main'):
+                            revision='main',
+                            trust_remote_code=False):
     """
         Prepare and load an Diffusion model from HuggingFace.
 
@@ -476,7 +483,8 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
             'model. Can only be one of '
             '["fp32", "fp16", "bf16"].')
 
-    if not use_cuda() and (torch_dtype == 'fp16' or torch_dtype == 'bf16'):
+    if not is_cuda_available() and (torch_dtype == 'fp16'
+                                    or torch_dtype == 'bf16'):
         raise ValueError(
             'In cpu mode, only fp32 torch_dtype can be used for diffusion'
             ' model.')
@@ -491,7 +499,8 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
 
     model = pipeline.from_pretrained(pretrained_model_name_or_path,
                                      revision=revision,
-                                     torch_dtype=torch_dtype)
+                                     torch_dtype=torch_dtype,
+                                     trust_remote_code=trust_remote_code)
 
     return model
 
@@ -511,7 +520,8 @@ def prepare_recognizeAnything_model(
         model = ram_plus(pretrained=check_model(pretrained_model_name_or_path),
                          image_size=input_size,
                          vit='swin_l')
-    except:  # noqa: E722
+    except (RuntimeError, UnpicklingError) as e:  # noqa: E722
+        logger.warning(e)
         model = ram_plus(pretrained=check_model(pretrained_model_name_or_path,
                                                 force=True),
                          image_size=input_size,
@@ -561,12 +571,12 @@ def move_to_cuda(model, rank):
 
     for module in model:
         if callable(getattr(module, 'to', None)):
-            logger.info(
+            logger.debug(
                 f'Moving {module.__class__.__name__} to CUDA device {rank}')
             module.to(f'cuda:{rank}')
 
 
-def get_model(model_key=None, rank=None):
+def get_model(model_key=None, rank=None, use_cuda=False):
     if model_key is None:
         return None
 
@@ -576,7 +586,7 @@ def get_model(model_key=None, rank=None):
             f'{model_key} not found in MODEL_ZOO ({mp.current_process().name})'
         )
         MODEL_ZOO[model_key] = model_key()
-    if use_cuda():
+    if use_cuda:
         rank = 0 if rank is None else rank
         rank = rank % cuda_device_count()
         move_to_cuda(MODEL_ZOO[model_key], rank)

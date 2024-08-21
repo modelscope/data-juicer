@@ -3,7 +3,7 @@ from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (extract_key_frames,
+from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -31,8 +31,11 @@ class VideoWatermarkFilter(Filter):
         probability.
     """
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_watermark_model='amrul-hzz/watermark_detector',
+                 trust_remote_code=False,
                  prob_threshold: ClosedUnitInterval = 0.8,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
@@ -88,8 +91,8 @@ class VideoWatermarkFilter(Filter):
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(
             model_type='huggingface',
-            pretrained_model_name_or_path=hf_watermark_model)
-        self._accelerator = 'cuda'
+            pretrained_model_name_or_path=hf_watermark_model,
+            trust_remote_code=trust_remote_code)
         self.reduce_mode = reduce_mode
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num
@@ -115,7 +118,7 @@ class VideoWatermarkFilter(Filter):
                                                 loaded_video_keys, load_video)
 
         watermark_probs = []
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         for video_key, video in videos.items():
             sampled_frames_key = video_key + self.sampled_frames_key_suffix
@@ -137,25 +140,32 @@ class VideoWatermarkFilter(Filter):
                     sample[Fields.context][sampled_frames_key] = frames
 
             frame_images = [frame.to_image() for frame in frames]
-            inputs = processor(images=frame_images, return_tensors='pt')
-            inputs = inputs.to(model.device)
-            outputs = model(**inputs)
-            logits = outputs.logits
-            cur_probs = [probs[1] for probs in torch.softmax(logits, dim=-1)]
-            cur_probs = torch.Tensor(cur_probs)
 
-            if self.reduce_mode == 'avg':
-                watermark_probs.append(cur_probs.mean())
-            elif self.reduce_mode == 'max':
-                watermark_probs.append(cur_probs.max())
+            if len(frame_images) > 0:
+                inputs = processor(images=frame_images, return_tensors='pt')
+                inputs = inputs.to(model.device)
+                outputs = model(**inputs)
+                logits = outputs.logits
+                cur_probs = [
+                    probs[1] for probs in torch.softmax(logits, dim=-1)
+                ]
+                cur_probs = torch.Tensor(cur_probs)
+
+                if self.reduce_mode == 'avg':
+                    cur_prob = cur_probs.mean()
+                elif self.reduce_mode == 'max':
+                    cur_prob = cur_probs.max()
+                else:
+                    cur_prob = cur_probs.min()
             else:
-                watermark_probs.append(cur_probs.min())
+                cur_prob = 0.0
+            watermark_probs.append(float(cur_prob))
 
         sample[Fields.stats][StatsKeys.video_watermark_prob] = watermark_probs
 
         if not context:
             for vid_key in videos:
-                videos[vid_key].close()
+                close_video(videos[vid_key])
 
         return sample
 

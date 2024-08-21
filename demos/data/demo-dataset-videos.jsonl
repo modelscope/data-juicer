@@ -1,0 +1,6 @@
+{"videos":["../../tests/ops/data/video1.mp4"], "text": "<__dj__video> a cartoon"}
+{"videos":["../../tests/ops/data/video1.mp4"], "text": "<__dj__video> 一段卡通"}
+{"videos":["../../tests/ops/data/video2.mp4"], "text": "<__dj__video> a man"}
+{"videos":["../../tests/ops/data/video2.mp4"], "text": "<__dj__video> 一个男人"}
+{"videos":["../../tests/ops/data/video3.mp4"], "text": "<__dj__video> two women"}
+{"videos":["../../tests/ops/data/video3.mp4"], "text": "<__dj__video> 两个女人"}

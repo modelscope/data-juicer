@@ -1,7 +1,7 @@
 import os
 import unittest
 
-from data_juicer.core.data import NestedDataset
+from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.image_captioning_mapper import \
     ImageCaptioningMapper
 from data_juicer.utils.mm_utils import SpecialTokens
@@ -27,7 +27,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         super().tearDownClass(cls.hf_img2seq)
 
     def _run_mapper(self,
-                    dataset: NestedDataset,
+                    dataset: Dataset,
                     op,
                     num_proc=1,
                     caption_num=0):
@@ -48,7 +48,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             'images': [self.img3_path]
         }]
         caption_num = 1
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any')
@@ -69,7 +69,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             }
         ]
         caption_num = 1
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any')
@@ -85,7 +85,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             'images': [self.img3_path]
         }]
         caption_num = 4
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any')
@@ -101,7 +101,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             'images': [self.img3_path]
         }]
         caption_num = 4
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='all')
@@ -118,7 +118,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             'images': [self.img3_path]
         }]
         caption_num = 4
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='similar_one_simhash')
@@ -130,7 +130,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             'images': [self.cat_path]
         }] * 10
         caption_num = 1
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any')
@@ -146,7 +146,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             'images': [self.img3_path]
         }]
         caption_num = 1
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any',
@@ -168,7 +168,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             }
         ]
         caption_num = 1
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any',
@@ -185,7 +185,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             'images': [self.img3_path]
         }]
         caption_num = 4
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any',
@@ -202,7 +202,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             'images': [self.img3_path]
         }]
         caption_num = 4
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='all',
@@ -218,7 +218,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             'images': [self.img3_path]
         }]
         caption_num = 4
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='similar_one_simhash',
@@ -231,7 +231,7 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
             'images': [self.cat_path]
         }] * 10
         caption_num = 1
-        dataset = NestedDataset.from_list(ds_list)
+        dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any',

@@ -4,12 +4,12 @@ from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.mm_utils import (extract_key_frames,
+from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_tagging_from_frames_mapper'
@@ -24,11 +24,14 @@ with AvailabilityChecking(
     torch.set_num_threads(1)
 
 
+@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoTaggingFromFramesMapper(Mapper):
     """Mapper to generate video tags from frames extract by video.
     """
+
+    _accelerator = 'cuda'
 
     def __init__(self,
                  frame_sampling_method: str = 'all_keyframes',
@@ -83,7 +86,7 @@ class VideoTaggingFromFramesMapper(Mapper):
         sample, videos = load_data_with_context(sample, context,
                                                 loaded_video_keys, load_video)
 
-        model = get_model(self.model_key, rank=rank)
+        model = get_model(self.model_key, rank, self.use_cuda())
         video_tags = []
         for _, value in enumerate(loaded_video_keys):
             video = videos[value]
@@ -107,5 +110,10 @@ class VideoTaggingFromFramesMapper(Mapper):
             word_count = Counter(words)
             sorted_word_list = [item for item, _ in word_count.most_common()]
             video_tags.append(sorted_word_list)
+
+        if not context:
+            for vid_key in videos:
+                close_video(videos[vid_key])
+
         sample[Fields.video_frame_tags] = video_tags
         return sample

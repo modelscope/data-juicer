@@ -3,12 +3,14 @@ from typing import List, Union
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
+from data_juicer import cuda_device_count
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (extract_video_frames_uniformly,
+from data_juicer.utils.mm_utils import (close_video,
+                                        extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import OPERATORS, UNFORKABLE, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
 OP_NAME = 'video_ocr_area_ratio_filter'
@@ -29,6 +31,7 @@ def triangle_area(p1, p2, p3):
     return tri_area
 
 
+@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 @INTER_SAMPLED_FRAMES.register_module(OP_NAME)
@@ -36,6 +39,8 @@ class VideoOcrAreaRatioFilter(Filter):
     """Keep data samples whose detected text area ratios for specified frames
     in the video are within a specified range.
     """
+
+    _accelerator = 'cuda'
 
     def __init__(self,
                  min_area_ratio: ClosedUnitInterval = 0,
@@ -75,7 +80,6 @@ class VideoOcrAreaRatioFilter(Filter):
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
-
         # initialize easyocr reader
         if isinstance(languages_to_detect, str):
             languages_to_detect = [languages_to_detect]
@@ -83,12 +87,21 @@ class VideoOcrAreaRatioFilter(Filter):
             lang_list=languages_to_detect,
             recognizer=False,
             verbose=False,
+            gpu=False,
         )
 
         # only uniformly sampling method is supported in this OP
         self.sampled_frames_key_suffix = f'-uniform-{frame_sample_num}'
 
-    def compute_stats(self, sample, context=False):
+    def get_reader(self, rank):
+        if self.use_cuda():
+            rank = 0 if rank is None else rank
+            device = f'cuda:{rank % cuda_device_count()}'
+            self.reader.detector = self.reader.detector.to(device)
+            self.reader.device = device
+        return self.reader
+
+    def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_ocr_area_ratio in sample[Fields.stats]:
             return sample
@@ -104,6 +117,7 @@ class VideoOcrAreaRatioFilter(Filter):
         sample, videos = load_data_with_context(sample, context,
                                                 loaded_video_keys, load_video)
 
+        reader = self.get_reader(rank)
         # compute ocr area ratios
         video_ocr_area_ratios = {}
         for video_key, container in videos.items():
@@ -122,8 +136,7 @@ class VideoOcrAreaRatioFilter(Filter):
             for idx, image in enumerate(images):
                 # return horizontal detected results and free-form detected
                 # results
-                horizontal_list, free_list = self.reader.detect(
-                    np.asarray(image))
+                horizontal_list, free_list = reader.detect(np.asarray(image))
                 total_area = image.width * image.height
                 # rectangles
                 rect_area = 0
@@ -159,7 +172,7 @@ class VideoOcrAreaRatioFilter(Filter):
             video_ocr_area_ratios[video_key] = np.mean(frame_ocr_area_ratios)
 
             if not context:
-                container.close()
+                close_video(container)
 
         # get video durations
         sample[Fields.stats][StatsKeys.video_ocr_area_ratio] = [

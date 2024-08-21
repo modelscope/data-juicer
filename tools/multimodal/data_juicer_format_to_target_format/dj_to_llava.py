@@ -195,7 +195,7 @@ def main(
                         f'dataset. Please check and fix it and '
                         f'retry.')
                 # need to restore questions for samples with only captions
-                ori_convs = ori_ds[id2idx[str(id)]]['conversations']
+                ori_convs = ori_ds[id2idx[str(sid)]]['conversations']
                 conversations.append(ori_convs[0])  # add question
                 conversations.append({
                     'from': ori_convs[1]['from'],

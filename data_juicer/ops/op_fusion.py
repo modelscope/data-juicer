@@ -137,12 +137,12 @@ class FusedFilter(Filter):
         """
         super().__init__()
         self.fused_filters = fused_filters
-        # set _accelerator to 'cuda' if there exists any ops whose _accelerator
+        # set accelerator to 'cuda' if there exists any ops whose accelerator
         # is 'cuda'
         accelerator_methods = set(
-            [op._accelerator for op in self.fused_filters])
+            [op.accelerator for op in self.fused_filters])
         if 'cuda' in accelerator_methods:
-            self._accelerator = 'cuda'
+            self.accelerator = 'cuda'
 
     def compute_stats(self, sample, rank=None):
         import av
@@ -151,7 +151,7 @@ class FusedFilter(Filter):
         sample[Fields.context] = {}
         for op in self.fused_filters:
             # open the context for these fused ops
-            if op._accelerator == 'cuda':
+            if op.accelerator == 'cuda':
                 sample = op.compute_stats(sample, rank=rank, context=True)
             else:
                 sample = op.compute_stats(sample, context=True)
@@ -160,6 +160,7 @@ class FusedFilter(Filter):
         for context_key in sample[Fields.context]:
             if isinstance(sample[Fields.context][context_key],
                           av.container.InputContainer):
+                sample[Fields.context][context_key].streams.video[0].close()
                 sample[Fields.context][context_key].close()
         _ = sample.pop(Fields.context)
         return sample

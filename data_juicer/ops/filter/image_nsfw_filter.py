@@ -24,8 +24,11 @@ with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
 class ImageNSFWFilter(Filter):
     """Filter to keep samples whose images have low nsfw scores."""
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  hf_nsfw_model='Falconsai/nsfw_image_detection',
+                 trust_remote_code=False,
                  score_threshold: ClosedUnitInterval = 0.5,
                  any_or_all: str = 'any',
                  *args,
@@ -52,8 +55,8 @@ class ImageNSFWFilter(Filter):
         self.any = (any_or_all == 'any')
         self.model_key = prepare_model(
             model_type='huggingface',
-            pretrained_model_name_or_path=hf_nsfw_model)
-        self._accelerator = 'cuda'
+            pretrained_model_name_or_path=hf_nsfw_model,
+            trust_remote_code=trust_remote_code)
 
     def compute_stats(self, sample, rank=None, context=False):
         # check if it's computed already
@@ -71,13 +74,15 @@ class ImageNSFWFilter(Filter):
         sample, images = load_data_with_context(sample, context,
                                                 loaded_image_keys, load_image)
 
-        model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         images = [images[key] for key in images]
         inputs = processor(images=images, return_tensors='pt').to(model.device)
         outputs = model(**inputs)
         logits = outputs.logits
-        nsfw_scores = [scores[1] for scores in torch.softmax(logits, dim=-1)]
+        nsfw_scores = [
+            float(scores[1]) for scores in torch.softmax(logits, dim=-1)
+        ]
 
         sample[Fields.stats][StatsKeys.image_nsfw_score] = nsfw_scores
 
