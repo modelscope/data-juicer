@@ -11,7 +11,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 类型                                | 数量 | 描述            |
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
-| [ Mapper ]( #mapper )              | 43 | 对数据样本进行编辑和转换  |
+| [ Mapper ]( #mapper )              | 44 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 41 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  4 | 基于排序选取高质量样本   |
@@ -76,6 +76,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | remove_table_text_mapper                            | General, Financial    | en        | 检测并删除可能的表格内容（:warning: 依赖正则表达式匹配，因此很脆弱）                |
 | remove_words_with_incorrect_<br />substrings_mapper | General               | en, zh    | 删除包含指定子字符串的单词                                          |
 | replace_content_mapper                              | General               | en, zh    | 使用一个指定的替换字符串替换文本中满足特定正则表达式模版的所有内容             |
+| segment_mapper                                      | Image                 | -         | 对图像实施“分割万物”(segment-anything)的语义分割，并返回bounding box数值    |
 | sentence_split_mapper                               | General               | en        | 根据语义拆分和重组句子                                            |
 | video_captioning_from_audio_mapper                         | Multimodal         | -      | 基于 Qwen-Audio 模型根据视频的音频流为视频生成新的标题描述 |
 | video_captioning_from_frames_mapper                 | Multimodal         |  -     | 生成样本，其标题是基于一个文字生成图片的模型和原始样本视频中指定帧的图像。不同帧产出的标题会拼接为一条单独的字符串。             |

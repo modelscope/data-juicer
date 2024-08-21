@@ -150,6 +150,10 @@ process:
       lang: en                                                # sample in which language
       tokenization: false                                     # whether to use model to tokenize documents
       substrings: ['http', 'www', '.com', 'href', '//']       # incorrect substrings to remove
+  - segment_mapper:                                         # perform segment-anything on images and return the bounding box values.
+      imgsz: 1024                                             # image resolution after image resizing
+      conf: 0.05                                              # confidence score threshold
+      iou: 0.5                                                # IoU (Intersection over Union) score threshold
   - sentence_split_mapper:                                  # split text to multiple sentences and join them with '\n'
       lang: 'en'                                              # split text in what language
   - video_captioning_from_audio_mapper:                     # caption a video according to its audio streams based on Qwen-Audio model

@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
-| [ Mapper ]( #mapper )             |   43   | Edits and transforms samples                    |
+| [ Mapper ]( #mapper )             |   44   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   4    | Selects top samples based on ranking            |
@@ -77,6 +77,7 @@ All the specific operators are listed below, each featured with several capabili
 | remove_table_text_mapper                            | General, Financial | en     | Detects and removes possible table contents (:warning: relies on regular expression matching and thus fragile)|
 | remove_words_with_incorrect_<br />substrings_mapper | General            | en, zh | Removes words containing specified substrings                                                                 |
 | replace_content_mapper                              | General            | en, zh | Replace all content in the text that matches a specific regular expression pattern with a designated replacement string                    |
+| segment_mapper                                      | Image              | -      | Perform segment-anything on images and return the bounding box values
 | sentence_split_mapper                               | General            | en     | Splits and reorganizes sentences according to semantics                                                       |
 | video_captioning_from_audio_mapper                  | Multimodal         | -      | Caption a video according to its audio streams based on Qwen-Audio model                                      |
 | video_captioning_from_frames_mapper                 | Multimodal         |  -     | generate samples whose captions are generated based on an image-to-text model and sampled video frames. Captions from different frames will be concatenated to a single string |

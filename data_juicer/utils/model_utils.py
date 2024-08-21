@@ -530,6 +530,12 @@ def prepare_recognizeAnything_model(
     return model
 
 
+def prepare_fastsam_model(pretrained_model_name_or_path):
+    from ultralytics import FastSAM
+
+    return FastSAM(pretrained_model_name_or_path)
+
+
 MODEL_FUNCTION_MAPPING = {
     'fasttext': prepare_fasttext_model,
     'sentencepiece': prepare_sentencepiece_for_lang,
@@ -540,7 +546,8 @@ MODEL_FUNCTION_MAPPING = {
     'spacy': prepare_spacy_model,
     'diffusion': prepare_diffusion_model,
     'video_blip': prepare_video_blip_model,
-    'recognizeAnything': prepare_recognizeAnything_model
+    'recognizeAnything': prepare_recognizeAnything_model,
+    'fastsam': prepare_fastsam_model
 }
 
 
