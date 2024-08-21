@@ -9,7 +9,7 @@ from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
                                         load_image)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_face_blur_mapper'
@@ -19,6 +19,7 @@ with AvailabilityChecking(['opencv-python', 'Pillow'], OP_NAME):
     from PIL import ImageFilter
 
 
+@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageFaceBlurMapper(Mapper):
