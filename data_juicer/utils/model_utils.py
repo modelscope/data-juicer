@@ -551,9 +551,6 @@ def prepare_model(model_type, **model_kwargs):
     global MODEL_ZOO
     model_func = MODEL_FUNCTION_MAPPING[model_type]
     model_key = partial(model_func, **model_kwargs)
-    # always instantiate once for possible caching
-    model_objects = model_key()
-    MODEL_ZOO[model_key] = model_objects
     return model_key
 
 
