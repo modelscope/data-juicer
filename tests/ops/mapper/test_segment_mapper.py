@@ -12,7 +12,7 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 
 
 
-class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
+class SegmentMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
 
