@@ -530,6 +530,22 @@ def prepare_recognizeAnything_model(
     return model
 
 
+def prepare_sdxl_prompt2prompt(pretrained_model_name_or_path,
+                               pipe_func,
+                               torch_dtype='fp32'):
+
+    import torch
+    if torch_dtype == 'fp32':
+        model = pipe_func.from_pretrained(pretrained_model_name_or_path,
+                                          torch_dtype=torch.float32,
+                                          use_safetensors=True)
+    else:
+        model = pipe_func.from_pretrained(pretrained_model_name_or_path,
+                                          torch_dtype=torch.float16,
+                                          use_safetensors=True)
+    return model
+
+
 MODEL_FUNCTION_MAPPING = {
     'fasttext': prepare_fasttext_model,
     'sentencepiece': prepare_sentencepiece_for_lang,
@@ -540,7 +556,8 @@ MODEL_FUNCTION_MAPPING = {
     'spacy': prepare_spacy_model,
     'diffusion': prepare_diffusion_model,
     'video_blip': prepare_video_blip_model,
-    'recognizeAnything': prepare_recognizeAnything_model
+    'recognizeAnything': prepare_recognizeAnything_model,
+    'sdxl-prompt-to-prompt': prepare_sdxl_prompt2prompt
 }
 
 

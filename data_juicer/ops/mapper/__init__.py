@@ -12,8 +12,8 @@ from . import (audio_ffmpeg_wrapped_mapper, chinese_convert_mapper,
                remove_repeat_sentences_mapper, remove_specific_chars_mapper,
                remove_table_text_mapper,
                remove_words_with_incorrect_substrings_mapper,
-               replace_content_mapper, sentence_split_mapper,
-               video_captioning_from_audio_mapper,
+               replace_content_mapper, sdxl_prompt2prompt_mapper,
+               sentence_split_mapper, video_captioning_from_audio_mapper,
                video_captioning_from_frames_mapper,
                video_captioning_from_summarizer_mapper,
                video_captioning_from_video_mapper, video_face_blur_mapper,
@@ -54,6 +54,7 @@ from .remove_table_text_mapper import RemoveTableTextMapper
 from .remove_words_with_incorrect_substrings_mapper import \
     RemoveWordsWithIncorrectSubstringsMapper
 from .replace_content_mapper import ReplaceContentMapper
+from .sdxl_prompt2prompt_mapper import SDXLPrompt2PromptMapper
 from .sentence_split_mapper import SentenceSplitMapper
 from .video_captioning_from_audio_mapper import VideoCaptioningFromAudioMapper
 from .video_captioning_from_frames_mapper import \
@@ -118,6 +119,7 @@ __all__ = [
     'AudioFFmpegWrappedMapper',
     'VideoSplitByDurationMapper',
     'VideoFaceBlurMapper',
+    'SDXLPrompt2PromptMapper'
 ]
 
 # yapf: enable
