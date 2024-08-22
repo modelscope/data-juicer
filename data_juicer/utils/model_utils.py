@@ -569,6 +569,12 @@ def prepare_recognizeAnything_model(
     return model
 
 
+def prepare_opencv_classifier(model_path):
+    import cv2
+    model = cv2.CascadeClassifier(model_path)
+    return model
+
+
 MODEL_FUNCTION_MAPPING = {
     'fasttext': prepare_fasttext_model,
     'sentencepiece': prepare_sentencepiece_for_lang,
@@ -580,7 +586,8 @@ MODEL_FUNCTION_MAPPING = {
     'diffusion': prepare_diffusion_model,
     'video_blip': prepare_video_blip_model,
     'recognizeAnything': prepare_recognizeAnything_model,
-    'vllm': prepare_vllm_model
+    'vllm': prepare_vllm_model,
+    'opencv_classifier': prepare_opencv_classifier,
 }
 
 
@@ -591,9 +598,6 @@ def prepare_model(model_type, **model_kwargs):
     global MODEL_ZOO
     model_func = MODEL_FUNCTION_MAPPING[model_type]
     model_key = partial(model_func, **model_kwargs)
-    # always instantiate once for possible caching
-    model_objects = model_key()
-    MODEL_ZOO[model_key] = model_objects
     return model_key
 
 
