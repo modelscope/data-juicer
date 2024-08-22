@@ -83,7 +83,6 @@
              
   <h1>Source code for data_juicer.core.executor</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
 
 <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
@@ -122,7 +121,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tracer</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -142,17 +140,15 @@
         <span class="c1"># check if there are existing checkpoints first and try to load the</span>
         <span class="c1"># checkpoints. If the checkpoints are loaded successfully, ops that</span>
         <span class="c1"># have been processed will be skipped.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">use_checkpoint</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Preparing checkpoint manager...&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;ckpt&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span> <span class="o">=</span> <span class="n">CheckpointManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_dir</span><span class="p">,</span>
-                                                  <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span><span class="p">,</span>
+                                                  <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">,</span>
                                                   <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">np</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span><span class="o">.</span><span class="n">ckpt_available</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found existed dataset checkpoint.&#39;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span><span class="o">.</span><span class="n">get_left_process_list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span><span class="o">.</span><span class="n">get_left_process_list</span><span class="p">()</span>
 
         <span class="c1"># prepare exporter and check export path suffix</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Preparing exporter...&#39;</span><span class="p">)</span>
@@ -239,15 +235,14 @@
 
         <span class="c1"># 2. extract processes</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Preparing process operators...&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span> <span class="o">=</span> <span class="n">load_ops</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">,</span>
-                                               <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">op_fusion</span><span class="p">)</span>
+        <span class="n">ops</span> <span class="o">=</span> <span class="n">load_ops</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">op_fusion</span><span class="p">)</span>
 
         <span class="c1"># 3. data process</span>
         <span class="c1"># - If tracer is open, trace each op after it&#39;s processed</span>
         <span class="c1"># - If checkpoint is open, clean the cache files after each process</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Processing data...&#39;</span><span class="p">)</span>
         <span class="n">tstart</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="p">,</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span>
                                   <span class="n">exporter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="p">,</span>
                                   <span class="n">checkpointer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span><span class="p">,</span>
                                   <span class="n">tracer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tracer</span><span class="p">)</span>
@@ -256,17 +251,7 @@
 
         <span class="c1"># 4. data export</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Exporting dataset to disk...&#39;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;An error occurred during exporting the processed &#39;</span>
-                         <span class="s1">&#39;dataset.&#39;</span><span class="p">)</span>
-            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">use_checkpoint</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing checkpoint of dataset processed by &#39;</span>
-                            <span class="s1">&#39;last op...&#39;</span><span class="p">)</span>
-                <span class="n">dataset</span><span class="o">.</span><span class="n">cleanup_cache_files</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span><span class="o">.</span><span class="n">save_ckpt</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="c1"># compress the last dataset after exporting</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">use_cache</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">cache_compress</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">data_juicer.utils.compress</span> <span class="kn">import</span> <span class="n">compress</span>

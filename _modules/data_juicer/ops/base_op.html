@@ -241,27 +241,6 @@
                 <span class="n">method</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">dataset</span><span class="p">,</span>
-                 <span class="o">*</span><span class="p">,</span>
-                 <span class="n">exporter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">checkpointer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">tracer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">exporter</span><span class="o">=</span><span class="n">exporter</span><span class="p">,</span> <span class="n">tracer</span><span class="o">=</span><span class="n">tracer</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">checkpointer</span><span class="p">:</span>
-                <span class="n">checkpointer</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">dataset</span>
-        <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;An error occurred during Op [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
-            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">checkpointer</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing checkpoint of dataset processed by &#39;</span>
-                            <span class="s1">&#39;last op...&#39;</span><span class="p">)</span>
-                <span class="n">dataset</span><span class="o">.</span><span class="n">cleanup_cache_files</span><span class="p">()</span>
-                <span class="n">checkpointer</span><span class="o">.</span><span class="n">save_ckpt</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">is_batched_op</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_batched_op</span>

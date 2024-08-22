@@ -115,7 +115,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">()</span> <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">cfg</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ops</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">use_cache</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using cache compression method: &#39;</span>
@@ -163,13 +162,12 @@
 
         <span class="c1"># extract processes</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Preparing process operators...&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span> <span class="o">=</span> <span class="n">load_ops</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">,</span>
-                                              <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">op_fusion</span><span class="p">)</span>
+        <span class="n">ops</span> <span class="o">=</span> <span class="n">load_ops</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">op_fusion</span><span class="p">)</span>
 
         <span class="c1"># 2. stats precompute only for filter ops</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Computing the stats of dataset...&#39;</span><span class="p">)</span>
         <span class="n">stats_collected</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ops</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ops</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">Filter</span><span class="p">):</span>
                 <span class="n">original_process</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">process</span>
                 <span class="n">op</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="kc">None</span>

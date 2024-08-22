@@ -86,6 +86,7 @@
 
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
@@ -258,24 +259,32 @@
         <span class="n">unforkable_operators</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">UNFORKABLE</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
 
         <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span>
-        <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operators</span><span class="p">:</span>
-            <span class="n">mp_context</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;forkserver&#39;</span><span class="p">,</span> <span class="s1">&#39;spawn&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span>
-                <span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()</span> <span class="ow">or</span> <span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">unforkable_operators</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="n">setup_mp</span><span class="p">(</span><span class="n">mp_context</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operators</span><span class="p">:</span>
+                <span class="n">mp_context</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;forkserver&#39;</span><span class="p">,</span> <span class="s1">&#39;spawn&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()</span>
+                    <span class="ow">or</span> <span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">unforkable_operators</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">setup_mp</span><span class="p">(</span><span class="n">mp_context</span><span class="p">)</span>
 
-            <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
-            <span class="c1"># run single op</span>
-            <span class="n">dataset</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span>
-                         <span class="n">exporter</span><span class="o">=</span><span class="n">exporter</span><span class="p">,</span>
-                         <span class="n">checkpointer</span><span class="o">=</span><span class="n">checkpointer</span><span class="p">,</span>
-                         <span class="n">tracer</span><span class="o">=</span><span class="n">tracer</span><span class="p">)</span>
-            <span class="c1"># record processed ops</span>
-            <span class="k">if</span> <span class="n">checkpointer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">checkpointer</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span>
-                                    <span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_process_kwargs</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;OP [</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s1">] Done in </span><span class="si">{</span><span class="n">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">s. &#39;</span>
-                        <span class="sa">f</span><span class="s1">&#39;Left </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+                <span class="c1"># run single op</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">exporter</span><span class="o">=</span><span class="n">exporter</span><span class="p">,</span> <span class="n">tracer</span><span class="o">=</span><span class="n">tracer</span><span class="p">)</span>
+                <span class="c1"># record processed ops</span>
+                <span class="k">if</span> <span class="n">checkpointer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">checkpointer</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_of_cfg</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;OP [</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s1">] Done in </span><span class="si">{</span><span class="n">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">s. &#39;</span>
+                            <span class="sa">f</span><span class="s1">&#39;Left </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;An error occurred during Op [</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">checkpointer</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing checkpoint of dataset processed by &#39;</span>
+                            <span class="s1">&#39;last op...&#39;</span><span class="p">)</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">cleanup_cache_files</span><span class="p">()</span>
+                <span class="n">checkpointer</span><span class="o">.</span><span class="n">save_ckpt</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dataset</span></div>
 
 <div class="viewcode-block" id="NestedDataset.map"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.map">[docs]</a>    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
