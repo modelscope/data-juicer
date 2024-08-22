@@ -133,5 +133,6 @@ class CheckpointManager:
 
         :return: a dataset stored in checkpoint file.
         """
-        ds = Dataset.load_from_disk(self.ckpt_ds_dir)
+        from data_juicer.core.data import NestedDataset
+        ds = NestedDataset(Dataset.load_from_disk(self.ckpt_ds_dir))
         return ds
