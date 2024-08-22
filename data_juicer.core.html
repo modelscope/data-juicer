@@ -205,6 +205,48 @@ can be accessed by nested manner.</p>
 cache files.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.NestedDataset.load_from_disk">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_from_disk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/data.html#NestedDataset.load_from_disk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.NestedDataset.load_from_disk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a dataset that was previously saved using [<cite>save_to_disk</cite>] from a dataset directory, or from a
+filesystem using any implementation of <cite>fsspec.spec.AbstractFileSystem</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_path</strong> (<cite>str</cite>) – Path (e.g. <cite>“dataset/train”</cite>) or remote URI (e.g. <cite>“s3//my-bucket/dataset/train”</cite>)
+of the dataset directory where the dataset will be loaded from.</p></li>
+<li><p><strong>fs</strong> (<cite>fsspec.spec.AbstractFileSystem</cite>, <em>optional</em>) – <p>Instance of the remote filesystem where the dataset will be saved to.</p>
+<p>&lt;Deprecated version=”2.8.0”&gt;</p>
+<p><cite>fs</cite> was deprecated in version 2.8.0 and will be removed in 3.0.0.
+Please use <cite>storage_options</cite> instead, e.g. <cite>storage_options=fs.storage_options</cite></p>
+<p>&lt;/Deprecated&gt;</p>
+</p></li>
+<li><p><strong>keep_in_memory</strong> (<cite>bool</cite>, defaults to <cite>None</cite>) – Whether to copy the dataset in-memory. If <cite>None</cite>, the
+dataset will not be copied in-memory unless explicitly enabled by setting
+<cite>datasets.config.IN_MEMORY_MAX_SIZE</cite> to nonzero. See more details in the
+[improve performance](../cache#improve-performance) section.</p></li>
+<li><p><strong>storage_options</strong> (<cite>dict</cite>, <em>optional</em>) – <p>Key/value pairs to be passed on to the file-system backend, if any.</p>
+<p>&lt;Added version=”2.8.0”/&gt;</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>If <cite>dataset_path</cite> is a path of a dataset directory, the dataset requested.</p></li>
+<li><p>If <cite>dataset_path</cite> is a path of a dataset dict directory, a <cite>datasets.DatasetDict</cite> with each split.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>[<cite>Dataset</cite>] or [<cite>DatasetDict</cite>]</p>
+</dd>
+</dl>
+<p>Example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`py</span>
+<span class="pre">&gt;&gt;&gt;</span> <span class="pre">ds</span> <span class="pre">=</span> <span class="pre">load_from_disk(&quot;path/to/dataset/directory&quot;)</span>
+<span class="pre">`</span></code></p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
