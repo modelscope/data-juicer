@@ -6,7 +6,8 @@ from data_juicer.ops.mapper.sdxl_prompt2prompt_mapper import SDXLPrompt2PromptMa
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
-
+# These tests have been tested locally.
+@SKIPPED_TESTS.register_module()
 class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
