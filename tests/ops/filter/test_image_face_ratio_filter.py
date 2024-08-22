@@ -125,6 +125,8 @@ class ImageFaceRatioFilterTest(DataJuicerTestCaseBase):
         self._run_helper(dataset, tgt_list, op)
 
     def test_filter_multi_process(self):
+        import multiprocess as mp
+        mp.set_start_method('forkserver', force=True)
 
         ds_list = [{
             'images': [self.img1_path]

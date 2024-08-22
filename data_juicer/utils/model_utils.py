@@ -530,6 +530,12 @@ def prepare_recognizeAnything_model(
     return model
 
 
+def prepare_opencv_classifier(model_path):
+    import cv2
+    model = cv2.CascadeClassifier(model_path)
+    return model
+
+
 MODEL_FUNCTION_MAPPING = {
     'fasttext': prepare_fasttext_model,
     'sentencepiece': prepare_sentencepiece_for_lang,
@@ -540,7 +546,8 @@ MODEL_FUNCTION_MAPPING = {
     'spacy': prepare_spacy_model,
     'diffusion': prepare_diffusion_model,
     'video_blip': prepare_video_blip_model,
-    'recognizeAnything': prepare_recognizeAnything_model
+    'recognizeAnything': prepare_recognizeAnything_model,
+    'opencv_classifier': prepare_opencv_classifier,
 }
 
 
