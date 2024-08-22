@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import inspect
+import traceback
 from abc import ABC, abstractmethod
 from functools import wraps
 from time import time
@@ -174,24 +175,32 @@ class NestedDataset(Dataset, DJDataset):
         unforkable_operators = set(UNFORKABLE.modules.keys())
 
         dataset = self
-        for op in operators:
-            mp_context = ['forkserver', 'spawn'] if (
-                op.use_cuda() or op._name in unforkable_operators) else None
-            setup_mp(mp_context)
+        try:
+            for op in operators:
+                mp_context = ['forkserver', 'spawn'] if (
+                    op.use_cuda()
+                    or op._name in unforkable_operators) else None
+                setup_mp(mp_context)
 
-            start = time()
-            # run single op
-            dataset = op(dataset,
-                         exporter=exporter,
-                         checkpointer=checkpointer,
-                         tracer=tracer)
-            # record processed ops
-            if checkpointer is not None:
-                checkpointer.record(op._name,
-                                    list(op._process_kwargs.values())[0])
-            end = time()
-            logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
-                        f'Left {len(dataset)} samples.')
+                start = time()
+                # run single op
+                dataset = op.run(dataset, exporter=exporter, tracer=tracer)
+                # record processed ops
+                if checkpointer is not None:
+                    checkpointer.record(op._of_cfg)
+                end = time()
+                logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
+                            f'Left {len(dataset)} samples.')
+        except:  # noqa: E722
+            logger.error(f'An error occurred during Op [{op._name}].')
+            traceback.print_exc()
+            exit(1)
+        finally:
+            if checkpointer:
+                logger.info('Writing checkpoint of dataset processed by '
+                            'last op...')
+                dataset.cleanup_cache_files()
+                checkpointer.save_ckpt(dataset)
         return dataset
 
     def map(self, *args, **kargs):

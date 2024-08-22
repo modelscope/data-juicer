@@ -32,7 +32,7 @@ def load_ops(process_list, op_fusion=False):
     if op_fusion:
         new_process_list, ops = fuse_operators(new_process_list, ops)
 
-    for process, op in zip(new_process_list, ops):
-        op._process_kwargs = process
+    for op_cfg, op in zip(new_process_list, ops):
+        op._op_cfg = op_cfg
 
-    return new_process_list, ops
+    return ops
