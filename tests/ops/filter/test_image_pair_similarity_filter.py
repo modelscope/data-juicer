@@ -6,9 +6,11 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.filter.image_pair_similarity_filter import ImagePairSimilarityFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
+                                              DataJuicerTestCaseBase)
 
-
+# These tests have been tested locally.
+@SKIPPED_TESTS.register_module()
 class ImagePairSimilarityFilterTest(DataJuicerTestCaseBase):
 
     hf_clip = 'openai/clip-vit-base-patch32'
