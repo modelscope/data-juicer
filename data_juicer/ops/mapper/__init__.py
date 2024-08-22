@@ -4,7 +4,7 @@ from . import (audio_ffmpeg_wrapped_mapper, chinese_convert_mapper,
                clean_ip_mapper, clean_links_mapper, expand_macro_mapper,
                extract_qa_mapper, fix_unicode_mapper, image_blur_mapper,
                image_captioning_from_gpt4v_mapper, image_captioning_mapper,
-               image_diffusion_mapper, image_face_blur_mapper,
+               image_diffusion_mapper, image_face_blur_mapper, mllm_mapper,
                nlpaug_en_mapper, nlpcda_zh_mapper,
                punctuation_normalization_mapper, remove_bibliography_mapper,
                remove_comments_mapper, remove_header_mapper,
@@ -39,6 +39,7 @@ from .image_captioning_from_gpt4v_mapper import ImageCaptioningFromGPT4VMapper
 from .image_captioning_mapper import ImageCaptioningMapper
 from .image_diffusion_mapper import ImageDiffusionMapper
 from .image_face_blur_mapper import ImageFaceBlurMapper
+from .mllm_mapper import MllmMapper
 from .nlpaug_en_mapper import NlpaugEnMapper
 from .nlpcda_zh_mapper import NlpcdaZhMapper
 from .punctuation_normalization_mapper import PunctuationNormalizationMapper
@@ -118,6 +119,7 @@ __all__ = [
     'AudioFFmpegWrappedMapper',
     'VideoSplitByDurationMapper',
     'VideoFaceBlurMapper',
+    'MllmMapper'
 ]
 
 # yapf: enable

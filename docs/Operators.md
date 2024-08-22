@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
-| [ Mapper ]( #mapper )             |   43   | Edits and transforms samples                    |
+| [ Mapper ]( #mapper )             |   44   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   4    | Selects top samples based on ranking            |
@@ -64,6 +64,7 @@ All the specific operators are listed below, each featured with several capabili
 | image_captioning_mapper                             | Multimodal         |  -     | generate samples whose captions are generated based on another model (such as blip2) and the figure within the original sample |
 | image_diffusion_mapper                              | Multimodal         |  -     | Generate and augment images by stable diffusion model                                                         |
 | image_face_blur_mapper                              | Image              |  -     | Blur faces detected in images                                                                                 |
+| mllm_mapper                                         | Multimodal         | en, zh | Use multimodal large language models for image-text question answering tasks                                                              |
 | nlpaug_en_mapper                                    | General            | en     | Simply augments texts in English based on the `nlpaug` library                                                | 
 | nlpcda_zh_mapper                                    | General            | zh     | Simply augments texts in Chinese based on the `nlpcda` library                                                | 
 | punctuation_normalization_mapper                    | General            | en, zh | Normalizes various Unicode punctuations to their ASCII equivalents                                            |
