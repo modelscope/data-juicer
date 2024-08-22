@@ -334,6 +334,10 @@ class NestedDataset(Dataset, DJDataset):
         cleanup_compressed_cache_files(self)
         return super().cleanup_cache_files()
 
+    @staticmethod
+    def load_from_disk(*args, **kargs):
+        return NestedDataset(Dataset.load_from_disk(*args, **kargs))
+
 
 def nested_query(root_obj: Union[NestedDatasetDict, NestedDataset,
                                  NestedQueryDict], key):
