@@ -187,7 +187,7 @@ class NestedDataset(Dataset, DJDataset):
                 dataset = op.run(dataset, exporter=exporter, tracer=tracer)
                 # record processed ops
                 if checkpointer is not None:
-                    checkpointer.record(op._of_cfg)
+                    checkpointer.record(op._op_cfg)
                 end = time()
                 logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
                             f'Left {len(dataset)} samples.')
@@ -196,7 +196,7 @@ class NestedDataset(Dataset, DJDataset):
             traceback.print_exc()
             exit(1)
         finally:
-            if checkpointer:
+            if checkpointer and dataset is not self:
                 logger.info('Writing checkpoint of dataset processed by '
                             'last op...')
                 dataset.cleanup_cache_files()
@@ -333,6 +333,10 @@ class NestedDataset(Dataset, DJDataset):
         cache files."""
         cleanup_compressed_cache_files(self)
         return super().cleanup_cache_files()
+
+    @staticmethod
+    def load_from_disk(*args, **kargs):
+        return NestedDataset(Dataset.load_from_disk(*args, **kargs))
 
 
 def nested_query(root_obj: Union[NestedDatasetDict, NestedDataset,
