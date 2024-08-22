@@ -187,7 +187,7 @@ class NestedDataset(Dataset, DJDataset):
                 dataset = op.run(dataset, exporter=exporter, tracer=tracer)
                 # record processed ops
                 if checkpointer is not None:
-                    checkpointer.record(op._of_cfg)
+                    checkpointer.record(op._op_cfg)
                 end = time()
                 logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
                             f'Left {len(dataset)} samples.')
@@ -227,11 +227,14 @@ class NestedDataset(Dataset, DJDataset):
                 called_func, '__wrapped__'):
             called_func = called_func.__wrapped__
 
-        # Batched is always required for fault tolerance
         if inspect.ismethod(called_func):
-            kargs['batched'] = True
-            kargs['batch_size'] = kargs.pop(
-                'batch_size', 1) if called_func.__self__.is_batched_op() else 1
+            # batched is required for fault-tolerant or batched OP
+            if not called_func.__self__.turbo or \
+                    called_func.__self__.is_batched_op():
+                kargs['batched'] = True
+                kargs['batch_size'] = kargs.pop('batch_size', 1)
+            else:
+                kargs['batched'] = False
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)

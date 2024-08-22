@@ -193,6 +193,12 @@ def init_configs(args=None):
         'will find all suffix files, and select a suitable formatter '
         'with the most files as default.')
     parser.add_argument(
+        '--turbo',
+        type=bool,
+        default=False,
+        help='Enable Turbo mode to maximize processing speed. Stability '
+        'features like fault tolerance will be disabled.')
+    parser.add_argument(
         '--use_cache',
         type=bool,
         default=True,
@@ -463,6 +469,8 @@ def init_setup_from_cfg(cfg):
                     'image_key': cfg.image_key,
                     'audio_key': cfg.audio_key,
                     'video_key': cfg.video_key,
+                    'num_proc': cfg.np,
+                    'turbo': cfg.turbo,
                 }
             else:
                 if 'text_key' not in args or args['text_key'] is None:
@@ -473,6 +481,10 @@ def init_setup_from_cfg(cfg):
                     args['audio_key'] = cfg.audio_key
                 if 'video_key' not in args or args['video_key'] is None:
                     args['video_key'] = cfg.video_key
+                if 'num_proc' not in args or args['num_proc'] is None:
+                    args['num_proc'] = cfg.np
+                if 'turbo' not in args or args['turbo'] is None:
+                    args['turbo'] = cfg.turbo
             op[op_name] = args
 
     return cfg
@@ -567,14 +579,12 @@ def update_op_process(cfg, parser):
 
         # update op params of cfg.process
         internal_op_para = temp_cfg.get(op_in_process_name)
-        if internal_op_para is not None:
-            num_proc = internal_op_para.get('num_proc')
-            if 'num_proc' in internal_op_para:
-                internal_op_para['num_proc'] = num_proc or cfg.np
-            internal_op_para = namespace_to_dict(internal_op_para)
-        else:
-            internal_op_para = None
-        cfg.process[i] = {op_in_process_name: internal_op_para}
+
+        cfg.process[i] = {
+            op_in_process_name:
+            None if internal_op_para is None else
+            namespace_to_dict(internal_op_para)
+        }
 
     # check the op params via type hint
     temp_parser = copy.deepcopy(parser)
