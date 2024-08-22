@@ -9,7 +9,8 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 class OpFusionTest(DataJuicerTestCaseBase):
 
     def _run_op_fusion(self, original_process_list, target_process_list):
-        new_process_list, _ = load_ops(original_process_list, op_fusion=True)
+        ops = load_ops(original_process_list, op_fusion=True)
+        new_process_list = [op._op_cfg for op in ops]
         self.assertEqual(new_process_list, target_process_list)
 
     def test_regular_config(self):

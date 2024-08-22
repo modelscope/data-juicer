@@ -31,7 +31,6 @@ class Analyzer:
         self.cfg = init_configs() if cfg is None else cfg
 
         self.work_dir = self.cfg.work_dir
-        self.ops = None
 
         if self.cfg.use_cache:
             logger.info(f'Using cache compression method: '
@@ -79,13 +78,12 @@ class Analyzer:
 
         # extract processes
         logger.info('Preparing process operators...')
-        self.cfg.process, self.ops = load_ops(self.cfg.process,
-                                              self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
 
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')
         stats_collected = False
-        for op in self.ops:
+        for op in ops:
             if isinstance(op, Filter):
                 original_process = op.process
                 op.process = None
