@@ -21,6 +21,7 @@ class AlphanumericFilter(Filter):
     """Filter to keep samples with alphabet/numeric ratio within a specific
     range."""
 
+    @AUTOINSTALL.check(['transformers'])
     def __init__(self,
                  tokenization: bool = False,
                  min_ratio: float = 0.25,

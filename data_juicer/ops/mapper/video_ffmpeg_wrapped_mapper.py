@@ -19,6 +19,7 @@ class VideoFFmpegWrappedMapper(Mapper):
     """Simple wrapper for FFmpeg video filters.
     """
 
+    @AUTOINSTALL.check(['ffmpeg-python'])
     def __init__(
         self,
         filter_name: Optional[str] = None,

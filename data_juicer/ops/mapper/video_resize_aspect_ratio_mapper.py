@@ -62,6 +62,7 @@ class VideoResizeAspectRatioMapper(Mapper):
 
     STRATEGY = ['decrease', 'increase']
 
+    @AUTOINSTALL.check(['ffmpeg-python'])
     def __init__(
         self,
         min_ratio: str = '9/21',

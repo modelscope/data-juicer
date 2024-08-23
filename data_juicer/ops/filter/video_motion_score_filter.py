@@ -43,6 +43,7 @@ class VideoMotionScoreFilter(Filter):
         'flags': 0
     }
 
+    @AUTOINSTALL.check(['opencv-python'])
     def __init__(self,
                  min_score: float = 0.25,
                  max_score: float = sys.float_info.max,

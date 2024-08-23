@@ -30,6 +30,7 @@ class ImageTextMatchingFilter(Filter):
 
     _accelerator = 'cuda'
 
+    @AUTOINSTALL.check(['torch', 'transformers'])
     def __init__(self,
                  hf_blip='Salesforce/blip-itm-base-coco',
                  trust_remote_code=False,

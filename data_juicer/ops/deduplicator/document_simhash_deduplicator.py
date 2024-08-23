@@ -27,6 +27,7 @@ with AvailabilityChecking(['simhash-pybind'], OP_NAME):
 class DocumentSimhashDeduplicator(Deduplicator):
     """Deduplicator to deduplicate samples at document-level using SimHash."""
 
+    @AUTOINSTALL.check(['simhash-pybind'])
     def __init__(self,
                  tokenization: str = 'space',
                  window_size: PositiveInt = 6,

@@ -105,6 +105,7 @@ class DocumentMinhashDeduplicator(Deduplicator):
     kept in the final dataset.
     """
 
+    @AUTOINSTALL.check(['scipy'])
     def __init__(
         self,
         tokenization: str = 'space',

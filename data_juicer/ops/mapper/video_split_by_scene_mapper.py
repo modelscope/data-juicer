@@ -44,6 +44,7 @@ class VideoSplitBySceneMapper(Mapper):
         ['fade_bias', 'add_final_scene', 'method', 'block_size']
     }
 
+    @AUTOINSTALL.check(['scenedetect[opencv]'])
     def __init__(self,
                  detector: str = 'ContentDetector',
                  threshold: NonNegativeFloat = 27.0,

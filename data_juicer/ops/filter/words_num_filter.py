@@ -24,6 +24,7 @@ class WordsNumFilter(Filter):
     """Filter to keep samples with total words number within a specific
     range."""
 
+    @AUTOINSTALL.check(['sentencepiece'])
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,

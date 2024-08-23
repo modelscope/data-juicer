@@ -26,6 +26,7 @@ class WordRepetitionFilter(Filter):
     """Filter to keep samples with word-level n-gram repetition ratio within a
     specific range."""
 
+    @AUTOINSTALL.check(['sentencepiece'])
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,

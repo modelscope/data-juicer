@@ -21,6 +21,7 @@ class LanguageIDScoreFilter(Filter):
     """Filter to keep samples in a specific language with confidence score
     larger than a specific min value."""
 
+    @AUTOINSTALL.check(['fasttext-wheel'])
     def __init__(self,
                  lang: Union[str, List[str], Tuple[str]] = '',
                  min_score: ClosedUnitInterval = 0.8,

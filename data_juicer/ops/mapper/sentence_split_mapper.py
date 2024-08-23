@@ -15,6 +15,7 @@ with AvailabilityChecking(['nltk'], OP_NAME):
 class SentenceSplitMapper(Mapper):
     """Mapper to split text samples to sentences."""
 
+    @AUTOINSTALL.check(['nltk'])
     def __init__(self, lang: str = 'en', *args, **kwargs):
         """
         Initialization method.

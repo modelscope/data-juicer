@@ -34,6 +34,7 @@ class ImageFaceBlurMapper(Mapper):
         'maxSize': None,
     }
 
+    @AUTOINSTALL.check(['opencv-python', 'Pillow'])
     def __init__(self,
                  cv_classifier='',
                  blur_type: str = 'gaussian',

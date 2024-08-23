@@ -21,6 +21,7 @@ class TextEntityDependencyFilter(Filter):
     and filter them. The text containing no entities will be omitted.
     """
 
+    @AUTOINSTALL.check(['spacy-pkuseg'])
     def __init__(self,
                  lang: str = 'en',
                  min_dependency_num: int = 1,

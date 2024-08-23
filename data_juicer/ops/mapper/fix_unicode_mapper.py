@@ -13,6 +13,7 @@ with AvailabilityChecking(['ftfy'], OP_NAME):
 class FixUnicodeMapper(Mapper):
     """Mapper to fix unicode errors in text samples."""
 
+    @AUTOINSTALL.check(['ftfy'])
     def __init__(self, normalization: str = None, *args, **kwargs):
         """
         Initialization method.

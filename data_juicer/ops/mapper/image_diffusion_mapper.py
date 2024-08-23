@@ -37,6 +37,7 @@ class ImageDiffusionMapper(Mapper):
     _accelerator = 'cuda'
     _batched_op = True
 
+    @AUTOINSTALL.check(['diffusers', 'torch', 'transformers', 'simhash-pybind'])
     def __init__(self,
                  hf_diffusion: str = 'CompVis/stable-diffusion-v1-4',
                  trust_remote_code=False,

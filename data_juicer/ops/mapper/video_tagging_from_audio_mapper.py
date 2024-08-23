@@ -27,6 +27,7 @@ class VideoTaggingFromAudioMapper(Mapper):
 
     _accelerator = 'cuda'
 
+    @AUTOINSTALL.check(['torch', 'transformers', 'torchaudio'])
     def __init__(self,
                  hf_ast='MIT/ast-finetuned-audioset-10-10-0.4593',
                  trust_remote_code=False,

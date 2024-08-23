@@ -27,6 +27,7 @@ class StopWordsFilter(Filter):
     """Filter to keep samples with stopword ratio larger than a specific min
     value."""
 
+    @AUTOINSTALL.check(['sentencepiece'])
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,

@@ -20,6 +20,7 @@ class NlpcdaZhMapper(Mapper):
 
     _batched_op = True
 
+    @AUTOINSTALL.check(['nlpaug'])
     def __init__(self,
                  sequential: bool = False,
                  aug_num: int = 1,

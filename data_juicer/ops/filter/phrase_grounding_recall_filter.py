@@ -77,6 +77,7 @@ class PhraseGroundingRecallFilter(Filter):
 
     _accelerator = 'cuda'
 
+    @AUTOINSTALL.check(['torch', 'transformers', 'nltk'])
     def __init__(self,
                  hf_owlvit='google/owlvit-base-patch32',
                  trust_remote_code=False,

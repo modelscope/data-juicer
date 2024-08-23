@@ -40,6 +40,7 @@ class ImageDeduplicator(Deduplicator):
     of images between documents.
     """
 
+    @AUTOINSTALL.check(['imagededup'])
     def __init__(self,
                  method: str = 'phash',
                  consider_text: bool = False,

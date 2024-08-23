@@ -30,6 +30,7 @@ class ImageWatermarkFilter(Filter):
 
     _accelerator = 'cuda'
 
+    @AUTOINSTALL.check(['torch', 'transformers'])
     def __init__(self,
                  hf_watermark_model='amrul-hzz/watermark_detector',
                  trust_remote_code=False,

@@ -32,6 +32,7 @@ class ImageAestheticsFilter(Filter):
 
     _accelerator = 'cuda'
 
+    @AUTOINSTALL.check(['torch', 'transformers', 'simple-aesthetics-predictor'])
     def __init__(self,
                  hf_scorer_model='',
                  trust_remote_code=False,

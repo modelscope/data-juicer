@@ -27,6 +27,7 @@ class FlaggedWordFilter(Filter):
     """Filter to keep samples with flagged-word ratio less than a specific max
     value."""
 
+    @AUTOINSTALL.check(['sentencepiece'])
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,

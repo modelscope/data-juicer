@@ -31,6 +31,7 @@ class VideoRemoveWatermarkMapper(Mapper):
         Remove the watermarks in videos given regions.
     """
 
+    @AUTOINSTALL.check(['opencv-python'])
     def __init__(self,
                  roi_strings: List[str] = ['0,0,0.1,0.1'],
                  roi_type: str = 'ratio',

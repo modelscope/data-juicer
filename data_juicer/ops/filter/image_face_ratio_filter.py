@@ -34,6 +34,7 @@ class ImageFaceRatioFilter(Filter):
         'maxSize': None,
     }
 
+    @AUTOINSTALL.check(['opencv-python'])
     def __init__(self,
                  cv_classifier='',
                  min_ratio: ClosedUnitInterval = 0.0,

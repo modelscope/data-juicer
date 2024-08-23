@@ -35,6 +35,7 @@ class VideoFramesTextSimilarityFilter(Filter):
 
     _accelerator = 'cuda'
 
+    @AUTOINSTALL.check(['torch', 'transformers'])
     def __init__(self,
                  hf_clip='openai/clip-vit-base-patch32',
                  trust_remote_code=False,

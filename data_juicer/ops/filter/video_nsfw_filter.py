@@ -31,6 +31,7 @@ class VideoNSFWFilter(Filter):
 
     _accelerator = 'cuda'
 
+    @AUTOINSTALL.check(['torch', 'transformers'])
     def __init__(self,
                  hf_nsfw_model='Falconsai/nsfw_image_detection',
                  trust_remote_code=False,

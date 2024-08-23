@@ -19,6 +19,7 @@ class AudioFFmpegWrappedMapper(Mapper):
     """Simple wrapper for FFmpeg audio filters.
     """
 
+    @AUTOINSTALL.check(['ffmpeg-python'])
     def __init__(
         self,
         filter_name: Optional[str] = None,

@@ -43,6 +43,7 @@ class VideoOcrAreaRatioFilter(Filter):
 
     _accelerator = 'cuda'
 
+    @AUTOINSTALL.check(['easyocr'])
     def __init__(self,
                  min_area_ratio: ClosedUnitInterval = 0,
                  max_area_ratio: ClosedUnitInterval = 1.0,

@@ -19,6 +19,7 @@ with AvailabilityChecking(['sentencepiece'], OP_NAME):
 class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
     """Mapper to remove words with incorrect substrings."""
 
+    @AUTOINSTALL.check(['sentencepiece'])
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,

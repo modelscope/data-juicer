@@ -17,6 +17,7 @@ with AvailabilityChecking(['selectolax'], OP_NAME):
 class CleanHtmlMapper(Mapper):
     """Mapper to clean html code in text samples."""
 
+    @AUTOINSTALL.check(['selectolax'])
     def __init__(self, *args, **kwargs):
         """
         Initialization method.

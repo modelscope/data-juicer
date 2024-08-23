@@ -45,6 +45,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
     _accelerator = 'cuda'
     _batched_op = True
 
+    @AUTOINSTALL.check(['torch', 'transformers', 'simhash-pybind'])
     def __init__(
         self,
         hf_img2seq='Salesforce/blip2-opt-2.7b',

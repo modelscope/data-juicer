@@ -37,6 +37,7 @@ class RayImageDeduplicator(RayBasicDeduplicator):
     of images between documents.
     """
 
+    @AUTOINSTALL.check(['imagededup'])
     def __init__(self,
                  redis_host: str = 'localhost',
                  redis_port: PositiveInt = 6380,
