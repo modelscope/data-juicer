@@ -196,7 +196,7 @@ class NestedDataset(Dataset, DJDataset):
             traceback.print_exc()
             exit(1)
         finally:
-            if checkpointer:
+            if checkpointer and dataset is not self:
                 logger.info('Writing checkpoint of dataset processed by '
                             'last op...')
                 dataset.cleanup_cache_files()
@@ -336,6 +336,10 @@ class NestedDataset(Dataset, DJDataset):
         cache files."""
         cleanup_compressed_cache_files(self)
         return super().cleanup_cache_files()
+
+    @staticmethod
+    def load_from_disk(*args, **kargs):
+        return NestedDataset(Dataset.load_from_disk(*args, **kargs))
 
 
 def nested_query(root_obj: Union[NestedDatasetDict, NestedDataset,
