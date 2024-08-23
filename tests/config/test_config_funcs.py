@@ -68,8 +68,8 @@ class ConfigTest(DataJuicerTestCaseBase):
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
-            _, op_from_cfg = load_ops(cfg.process)
-            self.assertTrue(len(op_from_cfg) == 3)
+            ops_from_cfg = load_ops(cfg.process)
+            self.assertTrue(len(ops_from_cfg) == 3)
 
     def test_val_range_check_cmd(self):
         out = StringIO()

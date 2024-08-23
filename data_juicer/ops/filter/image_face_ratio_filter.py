@@ -1,30 +1,40 @@
+import os
+
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.mm_utils import (load_data_with_context, load_image,
-                                        pil_to_opencv)
+from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
+                                        load_image)
+from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import OPERATORS, UNFORKABLE, Filter
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_face_ratio_filter'
 
-with AvailabilityChecking(['dlib'], OP_NAME):
-    import dlib
+with AvailabilityChecking(['opencv-python'], OP_NAME):
+    import cv2
 
 
+@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImageFaceRatioFilter(Filter):
     """Filter to keep samples with face area ratios within a specific range.
     """
 
-    _default_kwargs = {'upsample_num_times': 0}
+    _default_kwargs = {
+        'scaleFactor': 1.1,
+        'minNeighbors': 3,
+        'minSize': None,
+        'maxSize': None,
+    }
 
     def __init__(self,
+                 cv_classifier='',
                  min_ratio: ClosedUnitInterval = 0.0,
                  max_ratio: ClosedUnitInterval = 0.4,
                  any_or_all: str = 'any',
@@ -33,6 +43,8 @@ class ImageFaceRatioFilter(Filter):
         """
         Initialization method.
 
+        :param cv_classifier: OpenCV classifier path for face detection.
+            By default, we will use 'haarcascade_frontalface_alt.xml'.
         :param min_ratio: Min ratio for the largest face area in an image.
         :param max_ratio: Max ratio for the largest face area in an image.
         :param any_or_all: Keep this sample with 'any' or 'all' strategy of
@@ -43,6 +55,10 @@ class ImageFaceRatioFilter(Filter):
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(*args, **kwargs)
+
+        if cv_classifier == '':
+            cv_classifier = os.path.join(cv2.data.haarcascades,
+                                         'haarcascade_frontalface_alt.xml')
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
 
@@ -56,8 +72,8 @@ class ImageFaceRatioFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-        # Initialize face detector
-        self.detector = dlib.get_frontal_face_detector()
+        self.model_key = prepare_model(model_type='opencv_classifier',
+                                       model_path=cv_classifier)
 
     def compute_stats(self, sample, context=False):
         # check if it's computed already
@@ -75,25 +91,20 @@ class ImageFaceRatioFilter(Filter):
         sample, images = load_data_with_context(sample, context,
                                                 loaded_image_keys, load_image)
 
+        model = get_model(self.model_key)
+
         # detect faces
         face_detections = {}
         for key, image in images.items():
-            img = pil_to_opencv(image)
-            dets = self.detector(img, **self.extra_kwargs)
-            face_detections[key] = [[
-                max(det.left(), 0),
-                max(det.top(), 0),
-                min(det.right(), image.width),
-                min(det.bottom(), image.height)
-            ] for det in dets]
+            face_detections[key] = detect_faces(image, model,
+                                                **self.extra_kwargs)
         logger.debug(f'detections: {face_detections}')
 
         # compute face area ratios for each image considering the largest face
         face_area_ratios = {}
         for key, dets in face_detections.items():
             image_area = images[key].width * images[key].height
-            face_area_ratios[key] = max([(x2 - x1) * (y2 - y1)
-                                         for x1, y1, x2, y2 in dets],
+            face_area_ratios[key] = max([w * h for _, _, w, h in dets],
                                         default=0.0) / image_area
         logger.debug(f'ratios: {face_area_ratios}')
 
