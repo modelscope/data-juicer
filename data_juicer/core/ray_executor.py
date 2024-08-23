@@ -34,11 +34,9 @@ class RayExecutor:
 
         self.work_dir = self.cfg.work_dir
 
-        self.ops = None
         # init ray
         logger.info('Initing Ray ...')
         ray.init(self.cfg.ray_address)
-        self.process_list = self.cfg.process
 
     def run(self, load_data_np=None):
         """
@@ -65,13 +63,12 @@ class RayExecutor:
         dataset = RayDataset(dataset, self.cfg.dataset_path, self.cfg)
         # 2. extract processes
         logger.info('Preparing process operators...')
-        self.process_list, self.ops = load_ops(self.cfg.process,
-                                               self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
 
         # 3. data process
         logger.info('Processing data...')
         tstart = time.time()
-        dataset.process(self.ops)
+        dataset.process(ops)
         tend = time.time()
         logger.info(f'All Ops are done in {tend - tstart:.3f}s.')
 

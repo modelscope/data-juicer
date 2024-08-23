@@ -1,5 +1,4 @@
 import os
-import traceback
 from time import time
 
 from loguru import logger
@@ -38,7 +37,6 @@ class Executor:
 
         self.work_dir = self.cfg.work_dir
 
-        self.ops = None
         self.tracer = None
         self.ckpt_manager = None
 
@@ -59,17 +57,15 @@ class Executor:
         # check if there are existing checkpoints first and try to load the
         # checkpoints. If the checkpoints are loaded successfully, ops that
         # have been processed will be skipped.
-        self.process_list = self.cfg.process
         if self.cfg.use_checkpoint:
             logger.info('Preparing checkpoint manager...')
             self.ckpt_dir = os.path.join(self.work_dir, 'ckpt')
             self.ckpt_manager = CheckpointManager(self.ckpt_dir,
-                                                  self.process_list,
+                                                  self.cfg.process,
                                                   self.cfg.np)
             if self.ckpt_manager.ckpt_available:
                 logger.info('Found existed dataset checkpoint.')
-                self.process_list = self.ckpt_manager.get_left_process_list()
-        self.cfg.process = self.process_list
+                self.cfg.process = self.ckpt_manager.get_left_process_list()
 
         # prepare exporter and check export path suffix
         logger.info('Preparing exporter...')
@@ -156,15 +152,14 @@ class Executor:
 
         # 2. extract processes
         logger.info('Preparing process operators...')
-        self.process_list, self.ops = load_ops(self.cfg.process,
-                                               self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
 
         # 3. data process
         # - If tracer is open, trace each op after it's processed
         # - If checkpoint is open, clean the cache files after each process
         logger.info('Processing data...')
         tstart = time()
-        dataset = dataset.process(self.ops,
+        dataset = dataset.process(ops,
                                   exporter=self.exporter,
                                   checkpointer=self.ckpt_manager,
                                   tracer=self.tracer)
@@ -173,17 +168,7 @@ class Executor:
 
         # 4. data export
         logger.info('Exporting dataset to disk...')
-        try:
-            self.exporter.export(dataset)
-        except:  # noqa: E722
-            logger.error('An error occurred during exporting the processed '
-                         'dataset.')
-            traceback.print_exc()
-            if self.cfg.use_checkpoint:
-                logger.info('Writing checkpoint of dataset processed by '
-                            'last op...')
-                dataset.cleanup_cache_files()
-                self.ckpt_manager.save_ckpt(dataset)
+        self.exporter.export(dataset)
         # compress the last dataset after exporting
         if self.cfg.use_cache and self.cfg.cache_compress:
             from data_juicer.utils.compress import compress
