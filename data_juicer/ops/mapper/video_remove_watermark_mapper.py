@@ -15,7 +15,7 @@ from data_juicer.utils.mm_utils import (close_video,
                                         parse_string_to_roi,
                                         process_each_frame)
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_remove_watermark_mapper'

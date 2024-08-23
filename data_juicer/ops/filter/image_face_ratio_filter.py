@@ -11,7 +11,7 @@ from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
                                         load_image)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, UNFORKABLE, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_face_ratio_filter'

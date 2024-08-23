@@ -17,7 +17,7 @@ from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
-from ..base_op import OPERATORS, Deduplicator
+from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
 from ..common.helper_func import UnionFind, split_on_whitespace
 
 OP_NAME = 'document_minhash_deduplicator'

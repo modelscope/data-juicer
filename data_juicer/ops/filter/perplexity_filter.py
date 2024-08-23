@@ -9,7 +9,7 @@ from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 from ..common import get_words_from_document
 from ..op_fusion import INTER_WORDS
 

@@ -12,7 +12,7 @@ from data_juicer.utils.mm_utils import (close_video, detect_faces,
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, UNFORKABLE, Mapper
-from ..op_fusion import LOADED_VIDEOS
+from ..op_fusion import AUTOINSTALL, LOADED_VIDEOS
 
 OP_NAME = 'video_face_blur_mapper'
 

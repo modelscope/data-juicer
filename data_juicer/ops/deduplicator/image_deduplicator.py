@@ -8,7 +8,7 @@ from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
-from ..base_op import OPERATORS, Deduplicator
+from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
 from ..op_fusion import LOADED_IMAGES
 from .document_deduplicator import DocumentDeduplicator
 

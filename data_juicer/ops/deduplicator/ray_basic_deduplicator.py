@@ -4,7 +4,6 @@ from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import Filter
 

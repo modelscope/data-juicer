@@ -11,7 +11,7 @@ from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
 from data_juicer.utils.mm_utils import SpecialTokens
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'video_split_by_scene_mapper'
 

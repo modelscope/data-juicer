@@ -5,7 +5,7 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
 
-from ..base_op import OPERATORS, UNFORKABLE, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
 from ..mapper.video_tagging_from_frames_mapper import \
     VideoTaggingFromFramesMapper
 from ..op_fusion import LOADED_VIDEOS

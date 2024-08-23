@@ -5,7 +5,7 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
-from ..base_op import OPERATORS
+from ..base_op import AUTOINSTALL, OPERATORS
 from ..op_fusion import LOADED_IMAGES
 from .ray_basic_deduplicator import RayBasicDeduplicator
 

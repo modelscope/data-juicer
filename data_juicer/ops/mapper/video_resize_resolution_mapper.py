@@ -11,7 +11,7 @@ from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import close_video, load_video
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, AUTOINSTALL, OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_resize_resolution_mapper'
