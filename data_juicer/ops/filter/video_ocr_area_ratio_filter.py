@@ -6,6 +6,7 @@ from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 from data_juicer import cuda_device_count
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)

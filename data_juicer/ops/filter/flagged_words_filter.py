@@ -6,6 +6,7 @@ from jsonargparse.typing import ClosedUnitInterval, List
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ...utils.asset_utils import ASSET_DIR, load_words_asset

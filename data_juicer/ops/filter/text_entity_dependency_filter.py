@@ -1,12 +1,17 @@
 import numpy as np
 
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 
 OP_NAME = 'text_entity_dependency_filter'
+
+with AvailabilityChecking(['spacy-pkuseg'], OP_NAME):
+    import spacy_pkuseg  # noqa: F401
 
 
 @OPERATORS.register_module(OP_NAME)

@@ -7,6 +7,7 @@ from jsonargparse.typing import PositiveFloat, PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, UNFORKABLE, Filter
 

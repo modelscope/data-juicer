@@ -4,6 +4,8 @@ from typing import Tuple, Union
 
 from loguru import logger
 
+from data_juicer.utils.auto_install_utils import _is_package_installed
+
 UNAVAILABLE_OPERATORS = {}
 CHECK_SYSTEM_INFO_ONCE = True
 
@@ -57,23 +59,7 @@ class AvailabilityChecking:
                               f'`pip install -v -e .[{self.requires_type}]`'
 
     def __enter__(self):
-
-        # only for python3.8 on mac
-        global CHECK_SYSTEM_INFO_ONCE
-        if CHECK_SYSTEM_INFO_ONCE:
-            import os
-            import platform
-            import sys
-            major, minor = sys.version_info[:2]
-            system = platform.system()
-            if major == 3 and minor == 8 and system == 'Darwin':
-                logger.warning(
-                    'The torch.set_num_threads function does not '
-                    'work in python3.8 version on Mac systems. We will set '
-                    'OMP_NUM_THREADS to 1 manually before importing torch')
-
-                os.environ['OMP_NUM_THREADS'] = str(1)
-                CHECK_SYSTEM_INFO_ONCE = False
+        _torch_check_and_set()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is ModuleNotFoundError:
@@ -105,7 +91,7 @@ def _is_package_available(
         return_version: bool = False) -> Union[Tuple[bool, str], bool]:
     # Check we're not importing a "pkg_name" directory somewhere
     # but the actual library by trying to grab the version
-    package_exists = importlib.util.find_spec(pkg_name) is not None
+    package_exists = _is_package_installed(pkg_name)
     package_version = 'N/A'
     if package_exists:
         try:
@@ -118,3 +104,22 @@ def _is_package_available(
         return package_exists, package_version
     else:
         return package_exists
+
+
+def _torch_check_and_set():
+    # only for python3.8 on mac
+    global CHECK_SYSTEM_INFO_ONCE
+    if CHECK_SYSTEM_INFO_ONCE and importlib.util.find_spec('torch') is not None:
+        major, minor = sys.version_info[:2]
+        system = platform.system()
+        if major == 3 and minor == 8 and system == 'Darwin':
+            logger.warning(
+                'The torch.set_num_threads function does not '
+                'work in python3.8 version on Mac systems. We will set '
+                'OMP_NUM_THREADS to 1 manually before importing torch')
+
+            os.environ['OMP_NUM_THREADS'] = str(1)
+            CHECK_SYSTEM_INFO_ONCE = False
+        import torch
+        # avoid hanging when calling clip in multiprocessing
+        torch.set_num_threads(1)
