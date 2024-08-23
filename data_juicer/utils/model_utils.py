@@ -406,7 +406,7 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
     return (model, processor) if return_model else processor
 
 
-def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
+def prepare_spacy_model(lang, name_pattern='{}_core_web_md'):
     """
     Prepare spacy model for specific language.
 
