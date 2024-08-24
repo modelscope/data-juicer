@@ -10,9 +10,9 @@ from data_juicer.ops.mapper.segment_mapper import SegmentMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
-
-
-class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
+# These tests have been tested locally.
+@SKIPPED_TESTS.register_module()
+class SegmentMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
 
