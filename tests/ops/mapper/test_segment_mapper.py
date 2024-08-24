@@ -32,7 +32,7 @@ class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         dataset = dataset.map(op.process, num_proc=1, with_rank=True)
-        print(dataset["bboxes"])
+        print(dataset)
 
     def test_segment_mapper(self):
         self._run_segment_mapper()

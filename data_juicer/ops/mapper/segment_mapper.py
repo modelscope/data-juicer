@@ -28,7 +28,7 @@ class SegmentMapper(Mapper):
     _batched_op = True
 
     def __init__(self,
-                 fastsam_path=None,
+                 fastsam_path='./FastSAM-x.pt',
                  imgsz=1024,
                  conf=0.05,
                  iou=0.5,
@@ -73,7 +73,7 @@ class SegmentMapper(Mapper):
                 image = load_image(loaded_image_key)
                 images[loaded_image_key] = image
 
-        model = get_model(self.model_key, rank=rank, use_cuda=True)
+        model = get_model(self.model_key, rank=rank, use_cuda=self.use_cuda())
         masks = model([image],
                       retina_masks=True,
                       imgsz=self.imgsz,
