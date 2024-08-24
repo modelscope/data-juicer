@@ -14,7 +14,9 @@ class SentenceAugmentationMapperTest(DataJuicerTestCaseBase):
             hf_model='Qwen2-7B-Instruct',
             task_sentence="Please replace one entity in this sentence with another entity, such as an animal, a vehicle, or a piece of furniture. Please only answer with the replaced sentence. ASSISTANT:",
             max_new_tokens=512,
-            sampling_params={'temperature': 0.9, 'top_p': 0.95}
+            temperature=0.9,
+            top_p=0.95,
+            num_beams=1,
         )
 
         samples = [
@@ -28,6 +30,7 @@ class SentenceAugmentationMapperTest(DataJuicerTestCaseBase):
 
     def test_sentence_augmentation_mapper(self):
         self._run_sentence_augmentation_mapper()
+
 
 
 if __name__ == '__main__':
