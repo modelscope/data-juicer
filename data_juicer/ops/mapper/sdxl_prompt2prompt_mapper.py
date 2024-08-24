@@ -72,7 +72,9 @@ class SDXLPrompt2PromptMapper(Mapper):
 
     def process(self, sample, rank=None, context=False):
 
-        model = get_model(model_key=self.model_key, rank=rank, use_cuda=True)
+        model = get_model(model_key=self.model_key,
+                          rank=rank,
+                          use_cuda=self.use_cuda())
 
         seed = 0
         g_cpu = torch.Generator().manual_seed(seed)

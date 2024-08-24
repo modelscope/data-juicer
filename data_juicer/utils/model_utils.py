@@ -543,6 +543,14 @@ def prepare_sdxl_prompt2prompt(pretrained_model_name_or_path,
         model = pipe_func.from_pretrained(pretrained_model_name_or_path,
                                           torch_dtype=torch.float16,
                                           use_safetensors=True)
+
+    return model
+
+
+def prepare_opencv_classifier(model_path):
+    import cv2
+    model = cv2.CascadeClassifier(model_path)
+
     return model
 
 
@@ -557,7 +565,8 @@ MODEL_FUNCTION_MAPPING = {
     'diffusion': prepare_diffusion_model,
     'video_blip': prepare_video_blip_model,
     'recognizeAnything': prepare_recognizeAnything_model,
-    'sdxl-prompt-to-prompt': prepare_sdxl_prompt2prompt
+    'sdxl-prompt-to-prompt': prepare_sdxl_prompt2prompt,
+    'opencv_classifier': prepare_opencv_classifier
 }
 
 
