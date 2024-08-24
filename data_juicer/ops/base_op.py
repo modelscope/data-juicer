@@ -157,27 +157,6 @@ class OP:
                 method = wrap_func_with_nested_access(method)
                 setattr(self, name, method)
 
-    def __call__(self,
-                 dataset,
-                 *,
-                 exporter=None,
-                 checkpointer=None,
-                 tracer=None):
-        try:
-            dataset = self.run(dataset, exporter=exporter, tracer=tracer)
-            if checkpointer:
-                checkpointer.record(self._name, self._process_kwargs)
-            return dataset
-        except:  # noqa: E722
-            logger.error(f'An error occurred during Op [{self._name}].')
-            traceback.print_exc()
-            if checkpointer:
-                logger.info('Writing checkpoint of dataset processed by '
-                            'last op...')
-                dataset.cleanup_cache_files()
-                checkpointer.save_ckpt(dataset)
-            exit(1)
-
     @classmethod
     def is_batched_op(cls):
         return cls._batched_op
