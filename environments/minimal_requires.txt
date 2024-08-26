@@ -4,7 +4,7 @@ pandas==2.0.3
 datasets==2.18.0
 av
 soundfile
-librosa
+librosa>=0.10
 loguru
 tabulate
 tqdm
