@@ -21,8 +21,7 @@ with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class SegmentMapper(Mapper):
-    """Perform segment-anything on images and 
-    return the bounding box values"""
+    """Perform segment-anything on images and return the bounding boxes."""
 
     _accelerator = 'cuda'
     _batched_op = True
