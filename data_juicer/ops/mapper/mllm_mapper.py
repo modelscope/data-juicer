@@ -12,7 +12,7 @@ torch.set_num_threads(1)
 @LOADED_IMAGES.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class MllmMapper(Mapper):
-    """Mapper to optimize instruction.
+    """Mapper to use MLLMs for visual question answering tasks.
     Recommended model list: [
         liuhaotia/llava-v1.6-vicuna-7b
     ]
@@ -67,12 +67,9 @@ class MllmMapper(Mapper):
                 image = load_image(loaded_image_key)
                 images[loaded_image_key] = image
 
-        if torch.cuda.is_available():
-            model, processor = get_model(self.model_key,
-                                         rank=rank,
-                                         use_cuda=True)
-        else:
-            model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(model_key=self.model_key,
+                                     rank=rank,
+                                     use_cuda=self.use_cuda())
 
         conversation = [
             {

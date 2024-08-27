@@ -12,7 +12,7 @@ class MllmMapperTest(DataJuicerTestCaseBase):
 
     def _run_mllm(self, enable_vllm=False):
         op = MllmMapper(
-            hf_model='llava-v1.6-vicuna-7b-hf',
+            hf_model='liuhaotian/llava-v1.6-vicuna-7b',
             temperature=0.9,
             top_p=0.95,
             max_new_tokens=512
