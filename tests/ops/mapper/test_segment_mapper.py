@@ -10,9 +10,9 @@ from data_juicer.ops.mapper.segment_mapper import SegmentMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
-class SegmentMapperTest(DataJuicerTestCaseBase):
+
+
+class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
 
@@ -23,16 +23,19 @@ class SegmentMapperTest(DataJuicerTestCaseBase):
 
         img1_path = './crayon.jpg'
         img2_path = './ipod.jpg'
+        img3_path = './0_19_0_0.jpg'
 
         ds_list = [{
-            'images': [img1_path]
+            'images': [img1_path, img3_path]
         }, {
             'images': [img2_path]
         }]
 
-        dataset = Dataset.from_list(ds_list)
-        dataset = dataset.map(op.process, num_proc=1, with_rank=True)
-        print(dataset)
+
+        for sample in ds_list:
+            result = op.process(sample)
+            print(f'Output results: {result}')
+
 
     def test_segment_mapper(self):
         self._run_segment_mapper()

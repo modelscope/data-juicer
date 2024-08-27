@@ -21,8 +21,7 @@ with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class SegmentMapper(Mapper):
-    """Mapper to generate samples whose captions are generated based on
-    another model and the figure."""
+    """Perform segment-anything on images and return the bounding boxes."""
 
     _accelerator = 'cuda'
     _batched_op = True
@@ -52,12 +51,8 @@ class SegmentMapper(Mapper):
         self.conf = conf
         self.iou = iou
 
-    def _process_single_sample(self, ori_sample, rank=None):
-        """
+    def process(self, ori_sample, rank=None):
 
-        :param ori_sample: a single data sample before applying generation
-        :return: batched results after generation
-        """
         # there is no image in this sample
         if self.image_key not in ori_sample or \
                 not ori_sample[self.image_key]:
@@ -74,50 +69,20 @@ class SegmentMapper(Mapper):
                 images[loaded_image_key] = image
 
         model = get_model(self.model_key, rank=rank, use_cuda=self.use_cuda())
-        masks = model([image],
-                      retina_masks=True,
-                      imgsz=self.imgsz,
-                      conf=self.conf,
-                      iou=self.iou,
-                      verbose=False)[0]
 
-        if len(masks.boxes.xyxy) == 0:
-            return []
+        generated_samples['bboxes'] = []
 
-        generated_samples['bboxes'] = masks.boxes.xyxy
+        for image in images:
+            masks = model([image],
+                          retina_masks=True,
+                          imgsz=self.imgsz,
+                          conf=self.conf,
+                          iou=self.iou,
+                          verbose=False)[0]
+
+            if len(masks.boxes.xyxy) == 0:
+                generated_samples['bboxes'].append([])
+            else:
+                generated_samples['bboxes'].append(masks.boxes.xyxy)
 
         return generated_samples
-
-    def process(self, samples, rank=None):
-        """
-        Note:
-            This is a batched_OP, whose input and output type are
-            both list. Suppose there are $N$ input sample list with batch
-            size as $b$, and denote caption_num as $M$.
-            the number of total samples after generation is $2Nb$
-            for 'random_any' and 'similar_one' mode,
-            and $(1+M)Nb$ for 'all' mode.
-
-        :param samples:
-        :return:
-        """
-        # reconstruct samples from "dict of lists" to "list of dicts"
-        reconstructed_samples = []
-        for i in range(len(samples['images'])):
-            reconstructed_samples.append(
-                {key: samples[key][i]
-                 for key in samples})
-        samples_after_generation = []
-        # do generation for each sample within the batch
-        for ori_sample in reconstructed_samples:
-            generated_samples = self._process_single_sample(ori_sample,
-                                                            rank=rank)
-            if len(generated_samples) != 0:
-                samples_after_generation.append(generated_samples)
-        # reconstruct samples from "list of dicts" to "dict of lists"
-        keys = samples_after_generation[0].keys()
-        res_samples = {}
-        for key in keys:
-            res_samples[key] = [s[key] for s in samples_after_generation]
-
-        return res_samples
