@@ -21,8 +21,8 @@ with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class SegmentMapper(Mapper):
-    """Mapper to generate samples whose captions are generated based on
-    another model and the figure."""
+    """Perform segment-anything on images and 
+    return the bounding box values"""
 
     _accelerator = 'cuda'
     _batched_op = True
