@@ -28,7 +28,7 @@ with AvailabilityChecking(check_list, OP_NAME):
 @LOADED_IMAGES.register_module(OP_NAME)
 class SDXLPrompt2PromptMapper(Mapper):
     """
-        Generate image by diffusion model
+        Generate pairs of similar images by the SDXL model
     """
 
     _accelerator = 'cuda'
