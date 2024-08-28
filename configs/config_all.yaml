@@ -372,6 +372,11 @@ process:
   - text_length_filter:                                     # filter text with length out of specific range
       min_len: 10                                             # the min length of filter range
       max_len: 10000                                          # the max length of filter range
+  - text_pair_similarity_filter:                            # filter samples according to the similarity score between the text pair.
+      hf_clip: 'openai/clip-vit-base-patch32'                 # model name of the CLIP model on huggingface
+      min_score: 0.1                                          # the min similarity score of filter range
+      max_score: 1.0                                          # the max similarity score of filter range
+      any_or_all: "any"                                       # keep this sample when any/all text pairs meet the filter condition
   - token_num_filter:                                       # filter text with total token number out of specific range
       hf_tokenizer: EleutherAI/pythia-6.9b-deduped            # name of used Hugging Face tokenizer
       min_num: 10                                             # the min number of filter range

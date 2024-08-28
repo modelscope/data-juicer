@@ -12,7 +12,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
 | [ Mapper ]( #mapper )              | 43 | 对数据样本进行编辑和转换  |
-| [ Filter ]( #filter )              | 41 | 过滤低质量样本       |
+| [ Filter ]( #filter )              | 42 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  4 | 基于排序选取高质量样本   |
 
@@ -125,6 +125,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | text_action_filter             | General    | en, zh | 保留文本部分包含动作的样本                               |
 | text_entity_dependency_filter  | General    | en, zh | 保留文本部分的依存树中具有非独立实体的样本                       |
 | text_length_filter             | General    | en, zh | 保留总文本长度在指定范围内的样本                            |
+| text_pair_similarity_filter    | General    | en, zh | 保留文本特征余弦相似度(基于CLIP模型)在指定范围内的样本                 |
 | token_num_filter               | General    | en, zh | 保留token数在指定范围内的样本                           |
 | video_aspect_ratio_filter      | Video      | -      | 保留包含视频的宽高比在指定范围内的样本                     |
 | video_duration_filter          | Video      | -      | 保留包含视频的时长在指定范围内的样本                       |

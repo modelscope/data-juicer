@@ -12,7 +12,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   43   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   42   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   4    | Selects top samples based on ranking            |
 
@@ -127,6 +127,7 @@ All the specific operators are listed below, each featured with several capabili
 | text_action_filter             | General    | en, zh | Keeps samples containing action verbs in their texts                                                                                                |
 | text_entity_dependency_filter  | General    | en, zh | Keeps samples containing dependency edges for an entity in the dependency tree of the texts                                                   |
 | text_length_filter             | General    | en, zh | Keeps samples with total text length within the specified range                                                                                     |
+| text_pair_similarity_filter    | General    | en, zh | Keeps text pairs with text feature cosine similarity within the specified range based on a CLIP model                                                    |
 | token_num_filter               | General    | en, zh | Keeps samples with token count within the specified range                                                                                           |
 | video_aesthetics_filter        | Video      | -      | Keeps samples whose specified frames have aesthetics scores within the specified range     |
 | video_aspect_ratio_filter      | Video      | -      | Keeps samples containing videos with aspect ratios within the specified range                                                                       |

@@ -12,13 +12,13 @@ from . import (alphanumeric_filter, audio_duration_filter,
                specified_field_filter, specified_numeric_field_filter,
                stopwords_filter, suffix_filter, text_action_filter,
                text_entity_dependency_filter, text_length_filter,
-               token_num_filter, video_aesthetics_filter,
-               video_aspect_ratio_filter, video_duration_filter,
-               video_frames_text_similarity_filter, video_motion_score_filter,
-               video_nsfw_filter, video_ocr_area_ratio_filter,
-               video_resolution_filter, video_tagging_from_frames_filter,
-               video_watermark_filter, word_repetition_filter,
-               words_num_filter)
+               text_pair_similarity_filter, token_num_filter,
+               video_aesthetics_filter, video_aspect_ratio_filter,
+               video_duration_filter, video_frames_text_similarity_filter,
+               video_motion_score_filter, video_nsfw_filter,
+               video_ocr_area_ratio_filter, video_resolution_filter,
+               video_tagging_from_frames_filter, video_watermark_filter,
+               word_repetition_filter, words_num_filter)
 from .alphanumeric_filter import AlphanumericFilter
 from .audio_duration_filter import AudioDurationFilter
 from .audio_nmf_snr_filter import AudioNMFSNRFilter
@@ -47,6 +47,7 @@ from .suffix_filter import SuffixFilter
 from .text_action_filter import TextActionFilter
 from .text_entity_dependency_filter import TextEntityDependencyFilter
 from .text_length_filter import TextLengthFilter
+from .text_pair_similarity_filter import TextPairSimilarityFilter
 from .token_num_filter import TokenNumFilter
 from .video_aesthetics_filter import VideoAestheticsFilter
 from .video_aspect_ratio_filter import VideoAspectRatioFilter
@@ -104,6 +105,7 @@ __all__ = [
     'FlaggedWordFilter',
     'WordRepetitionFilter',
     'VideoMotionScoreFilter',
+    'TextPairSimilarityFilter'
 ]
 
 # yapf: enable
