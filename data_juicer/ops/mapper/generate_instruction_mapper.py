@@ -108,7 +108,8 @@ class GenerateInstructionMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, num_proc=1, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.num_proc = 1
 
         self.instruct_num = instruct_num
         self.similarity_threshold = similarity_threshold

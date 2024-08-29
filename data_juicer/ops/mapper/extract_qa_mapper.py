@@ -85,7 +85,8 @@ class ExtractQAMapper(Mapper):
             ...
         """
 
-        super().__init__(*args, num_proc=1, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.num_proc = 1
 
         if pattern is None:
             self.pattern = r'Human: (.*?)\nAssistant: (.*?)(?=\nHuman|$)'

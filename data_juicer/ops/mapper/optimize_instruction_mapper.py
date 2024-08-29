@@ -61,7 +61,8 @@ class OptimizeInstructionMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, num_proc=1, **kwargs)
+        super().__init__(*args, **kwargs)
+        self.num_proc = 1
 
         if system_prompt is None:
             system_prompt = DEFAULT_SYSTEM_PROMPT
