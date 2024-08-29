@@ -12,6 +12,8 @@ with AvailabilityChecking(['ftfy'], OP_NAME):
 class FixUnicodeMapper(Mapper):
     """Mapper to fix unicode errors in text samples."""
 
+    _batched_op = True
+
     def __init__(self, normalization: str = None, *args, **kwargs):
         """
         Initialization method.
@@ -33,7 +35,8 @@ class FixUnicodeMapper(Mapper):
                              'supported. Can only be one of '
                              '["NFC", "NFKC", "NFD", "NFKD"]')
 
-    def process(self, sample):
-        sample[self.text_key] = ftfy.fix_text(sample[self.text_key],
-                                              normalization=self.normalization)
-        return sample
+    def process(self, samples):
+        samples[self.text_key] = [
+            ftfy.fix_text(i, normalization=self.normalization) \
+                for i in samples[self.text_key]]
+        return samples
