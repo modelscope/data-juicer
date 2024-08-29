@@ -24,3 +24,4 @@ simple-aesthetics-predictor
 scenedetect[opencv]
 ffmpeg-python
 opencv-python
+vllm
