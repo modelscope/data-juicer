@@ -72,7 +72,7 @@ def check_model(model_name, force=False):
             )
         else:
             logger.info(
-                f'Model [{cached_model_path}] not found . Downloading...')
+                f'Model [{cached_model_path}] not found. Downloading...')
 
         try:
             model_link = os.path.join(MODEL_LINKS, model_name)
@@ -445,7 +445,7 @@ def prepare_vllm_model(pretrained_model_name_or_path,
     return (model, processor) if return_model else processor
 
 
-def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
+def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.7.0'):
     """
     Prepare spacy model for specific language.
 
@@ -458,17 +458,40 @@ def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
     assert lang in ['zh', 'en'], 'Diversity only support zh and en'
     model_name = name_pattern.format(lang)
     logger.info(f'Loading spacy model [{model_name}]...')
-    compressed_model = '{}.zip'.format(model_name)
+    compressed_model = '{}.tar.gz'.format(model_name)
 
     # decompress the compressed model if it's not decompressed
     def decompress_model(compressed_model_path):
-        decompressed_model_path = compressed_model_path.replace('.zip', '')
+        if not compressed_model_path.endswith('.tar.gz'):
+            raise ValueError('Only .tar.gz files are supported')
+
+        decompressed_model_path = compressed_model_path.replace('.tar.gz', '')
         if os.path.exists(decompressed_model_path) \
                 and os.path.isdir(decompressed_model_path):
             return decompressed_model_path
-        import zipfile
-        with zipfile.ZipFile(compressed_model_path) as zf:
-            zf.extractall(DJMC)
+
+        ver_name = os.path.basename(decompressed_model_path)
+        unver_name = ver_name.rsplit('-', maxsplit=1)[0]
+        target_dir_in_archive = f'{ver_name}/{unver_name}/{ver_name}/'
+
+        import tarfile
+        with tarfile.open(compressed_model_path, 'r:gz') as tar:
+            for member in tar.getmembers():
+                if member.name.startswith(target_dir_in_archive):
+                    # relative path without unnecessary directory levels
+                    relative_path = os.path.relpath(
+                        member.name, start=target_dir_in_archive)
+                    target_path = os.path.join(decompressed_model_path,
+                                               relative_path)
+
+                    if member.isfile():
+                        # ensure the directory exists
+                        target_directory = os.path.dirname(target_path)
+                        os.makedirs(target_directory, exist_ok=True)
+                        # for files, extract to the specific location
+                        with tar.extractfile(member) as source:
+                            with open(target_path, 'wb') as target:
+                                target.write(source.read())
         return decompressed_model_path
 
     try:
