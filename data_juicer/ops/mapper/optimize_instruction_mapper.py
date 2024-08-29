@@ -33,6 +33,7 @@ class OptimizeInstructionMapper(Mapper):
 
     def __init__(self,
                  hf_model: str = 'alibaba-pai/Qwen2-7B-Instruct-Refine',
+                 trust_remote_code: bool = False,
                  system_prompt: str = None,
                  enable_vllm: bool = True,
                  tensor_parallel_size: int = None,
@@ -44,6 +45,7 @@ class OptimizeInstructionMapper(Mapper):
         """
         Initialization method.
         :param hf_model: Hugginface model id.
+        :param trust_remote_code: passed to transformers
         :param system_prompt: System prompt for optimize samples.
         :param enable_vllm: Whether to use vllm for inference acceleration.
         :param tensor_parallel_size: It is only valid when enable_vllm is True.
@@ -78,6 +80,7 @@ class OptimizeInstructionMapper(Mapper):
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
+                trust_remote_code=trust_remote_code,
                 tensor_parallel_size=tensor_parallel_size,
                 max_model_len=max_model_len,
                 max_num_seqs=max_num_seqs)
@@ -85,7 +88,8 @@ class OptimizeInstructionMapper(Mapper):
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
-                pretrained_model_name_or_path=hf_model)
+                pretrained_model_name_or_path=hf_model,
+                trust_remote_code=trust_remote_code)
             self.sampling_params = sampling_params
 
     def process(self, sample=None, rank=None):

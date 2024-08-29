@@ -28,7 +28,7 @@ class EmptyFormatter(BaseFormatter):
 
     @property
     def null_value(self):
-        return {}
+        return None
 
     def load_dataset(self, *args, **kwargs):
         data_dict = {}
@@ -36,9 +36,13 @@ class EmptyFormatter(BaseFormatter):
 
         for key in self.feature_keys:
             features.update({key: Value('string')})
-            data_dict.update({key: [self.null_value] * self.length})
+            data_dict.update(
+                {key: [self.null_value for _ in range(self.length)]})
 
         empty_dataset = Dataset.from_dict(data_dict, features=features)
+
+        from data_juicer.core.data import NestedDataset
+        empty_dataset = NestedDataset(empty_dataset)
 
         return empty_dataset
 

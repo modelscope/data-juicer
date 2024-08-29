@@ -41,8 +41,9 @@ class GenerateInstructionMapper(Mapper):
     You should configure an empty dataset in your yaml config file:
     ```
     generated_dataset_config:
-      type: 'EmptyFormatter'
+      type: 'EmptyFormatter'  # use `RayEmptyFormatter` when enable ray
       length: ${The number of generated samples}
+      feature_keys: ${text key}
     ```
     The number of samples generated is determined by
     the length of the empty dataset.
@@ -53,6 +54,7 @@ class GenerateInstructionMapper(Mapper):
                  hf_model,
                  seed_file,
                  instruct_num,
+                 trust_remote_code: bool = False,
                  similarity_threshold: float = 0.7,
                  prompt_template: str = None,
                  qa_pair_template: str = None,
@@ -73,7 +75,7 @@ class GenerateInstructionMapper(Mapper):
         :param instruct_num: The number of instruction samples.
             Randomly select N samples from "seed_file" and
             put them into prompt as instruction samples.
-        :param generate_num: The number of generated samples.
+        :param trust_remote_code: passed to transformers
         :param similarity_threshold: The similarity score threshold
             between the generated samples and the seed samples.
             Range from 0 to 1. Samples with similarity score less than
@@ -140,6 +142,7 @@ class GenerateInstructionMapper(Mapper):
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
+                trust_remote_code=trust_remote_code,
                 tensor_parallel_size=tensor_parallel_size,
                 max_model_len=max_model_len,
                 max_num_seqs=max_num_seqs)
@@ -147,7 +150,8 @@ class GenerateInstructionMapper(Mapper):
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
-                pretrained_model_name_or_path=hf_model)
+                pretrained_model_name_or_path=hf_model,
+                trust_remote_code=trust_remote_code)
             self.sampling_params = sampling_params
 
         self.seed_qa_samples = self.load_seed_qa_samples(seed_file)

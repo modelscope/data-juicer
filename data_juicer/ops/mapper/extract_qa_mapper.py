@@ -54,6 +54,7 @@ class ExtractQAMapper(Mapper):
         """
         Initialization method.
         :param hf_model: Hugginface model id.
+        :param trust_remote_code: passed to transformers
         :param pattern: regular expression pattern to search for within text.
         :param qa_format: Output format of question and answer pair.
         :param enable_vllm: Whether to use vllm for inference acceleration.
@@ -106,6 +107,7 @@ class ExtractQAMapper(Mapper):
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
+                trust_remote_code=trust_remote_code,
                 tensor_parallel_size=tensor_parallel_size,
                 max_model_len=max_model_len,
                 max_num_seqs=max_num_seqs)
@@ -113,7 +115,8 @@ class ExtractQAMapper(Mapper):
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
-                pretrained_model_name_or_path=hf_model)
+                pretrained_model_name_or_path=hf_model,
+                trust_remote_code=trust_remote_code)
             self.sampling_params = sampling_params
 
     def _extract_qa(self, output):
