@@ -406,6 +406,45 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
     return (model, processor) if return_model else processor
 
 
+def prepare_vllm_model(pretrained_model_name_or_path,
+                       return_model=True,
+                       trust_remote_code=False,
+                       tensor_parallel_size=1,
+                       max_model_len=None,
+                       max_num_seqs=256):
+    """
+    Prepare and load a HuggingFace model with the correspoding processor.
+
+    :param pretrained_model_name_or_path: model name or path
+    :param return_model: return model or not
+    :param trust_remote_code: passed to transformers
+    :param tensor_parallel_size: The number of GPUs to use for distributed
+        execution with tensor parallelism.
+    :param max_model_len: Model context length. If unspecified, will
+        be automatically derived from the model config.
+    :param max_num_seqs: Maximum number of sequences to be processed in a
+        single iteration.
+    :return: a tuple (model, input processor) if `return_model` is True;
+        otherwise, only the processor is returned.
+    """
+    from transformers import AutoProcessor
+    from vllm import LLM as vLLM
+
+    processor = AutoProcessor.from_pretrained(
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+
+    if return_model:
+        import torch
+        model = vLLM(model=pretrained_model_name_or_path,
+                     trust_remote_code=trust_remote_code,
+                     dtype=torch.float16,
+                     tensor_parallel_size=tensor_parallel_size,
+                     max_model_len=max_model_len,
+                     max_num_seqs=max_num_seqs)
+
+    return (model, processor) if return_model else processor
+
+
 def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.7.0'):
     """
     Prepare spacy model for specific language.
@@ -570,6 +609,7 @@ MODEL_FUNCTION_MAPPING = {
     'diffusion': prepare_diffusion_model,
     'video_blip': prepare_video_blip_model,
     'recognizeAnything': prepare_recognizeAnything_model,
+    'vllm': prepare_vllm_model,
     'opencv_classifier': prepare_opencv_classifier,
 }
 
