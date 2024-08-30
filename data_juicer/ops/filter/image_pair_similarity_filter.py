@@ -22,7 +22,7 @@ with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
 class ImagePairSimilarityFilter(Filter):
-    """Filter to keep samples those similarities between image and text
+    """Filter to keep image pairs with similarities between images
     within a specific range."""
 
     _accelerator = 'cuda'
