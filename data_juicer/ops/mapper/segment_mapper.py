@@ -3,16 +3,15 @@ import copy
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.ops.op_fusion import LOADED_IMAGES
 from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 OP_NAME = 'segment_mapper'
 
-with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
-                          OP_NAME):
-    import simhash  # noqa: F401
+with AvailabilityChecking(['torch', 'ultralytics'], OP_NAME):
     import torch
-    import transformers  # noqa: F401
+    import ultralytics  # noqa: F401
 
     # avoid hanging when calling model in multiprocessing
     torch.set_num_threads(1)
@@ -27,7 +26,7 @@ class SegmentMapper(Mapper):
     _batched_op = True
 
     def __init__(self,
-                 fastsam_path='./FastSAM-x.pt',
+                 fastsam_path='FastSAM-x.pt',
                  imgsz=1024,
                  conf=0.05,
                  iou=0.5,
@@ -70,7 +69,7 @@ class SegmentMapper(Mapper):
 
         model = get_model(self.model_key, rank=rank, use_cuda=self.use_cuda())
 
-        generated_samples['bboxes'] = []
+        generated_samples[Fields.bbox_tag] = []
 
         for image in images:
             masks = model([image],
@@ -81,8 +80,8 @@ class SegmentMapper(Mapper):
                           verbose=False)[0]
 
             if len(masks.boxes.xyxy) == 0:
-                generated_samples['bboxes'].append([])
+                generated_samples[Fields.bbox_tag].append([])
             else:
-                generated_samples['bboxes'].append(masks.boxes.xyxy)
+                generated_samples[Fields.bbox_tag].append(masks.boxes.xyxy)
 
         return generated_samples

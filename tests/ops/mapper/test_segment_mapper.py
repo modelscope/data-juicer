@@ -20,15 +20,17 @@ class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
         op = SegmentMapper(
             fastsam_path='FastSAM-x.pt',
         )
-
-        img1_path = './crayon.jpg'
-        img2_path = './ipod.jpg'
-        img3_path = './0_19_0_0.jpg'
+        
+        data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
+                             'data')
+        img2_path = os.path.join(data_path, 'img2.jpg')
+        img3_path = os.path.join(data_path, 'img3.jpg')
+        img5_path = os.path.join(data_path, 'img5.jpg')
 
         ds_list = [{
-            'images': [img1_path, img3_path]
+            'images': [img2_path, img3_path]
         }, {
-            'images': [img2_path]
+            'images': [img5_path]
         }]
 
 
