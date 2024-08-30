@@ -37,7 +37,7 @@ class ReplaceContentMapperTest(DataJuicerTestCaseBase):
         op = ReplaceContentMapper(pattern='●■', repl='<SPEC>')
         self._run_helper(op, samples)
 
-    def xxtest_raw_digit_pattern_text(self):
+    def test_raw_digit_pattern_text(self):
 
         samples = [
             {
@@ -48,7 +48,7 @@ class ReplaceContentMapperTest(DataJuicerTestCaseBase):
         op = ReplaceContentMapper(pattern=r'\d+(?:,\d+)*', repl='<DIGIT>')
         self._run_helper(op, samples)
 
-    def xxtest_regular_digit_pattern_text(self):
+    def test_regular_digit_pattern_text(self):
 
         samples = [
             {
