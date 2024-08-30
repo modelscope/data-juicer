@@ -6,15 +6,19 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.filter.image_pair_similarity_filter import ImagePairSimilarityFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
+
 class ImagePairSimilarityFilterTest(DataJuicerTestCaseBase):
 
+    data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
+                             'data')
+    cat_path = os.path.join(data_path, 'cat.jpg')
+    img2_path = os.path.join(data_path, 'img2.jpg')
+    img3_path = os.path.join(data_path, 'img3.jpg')
+    img5_path = os.path.join(data_path, 'img5.jpg')
+    img7_path = os.path.join(data_path, 'img7.jpg')
     hf_clip = 'openai/clip-vit-base-patch32'
-
     
     @classmethod
     def tearDownClass(cls) -> None:
@@ -41,18 +45,21 @@ class ImagePairSimilarityFilterTest(DataJuicerTestCaseBase):
 
         ds_list = [{
             'text': 'image pair 1',
-            'images': ["./0.jpg", "./1.jpg"]
+            'images': [self.cat_path, self.img3_path]
         }, {
             'text': 'image pair 2',
-            'images': ["./crayon.jpg", "./ipod.jpg"]
+            'images': [self.img3_path, self.img7_path]
+        }, {
+            'text': 'image pair 3',
+            'images': [self.img2_path, self.img5_path]
         }]
 
 
         dataset = Dataset.from_list(ds_list)
-        op = ImagePairSimilarityFilter(hf_clip="clip-vit-base-patch32",
+        op = ImagePairSimilarityFilter(hf_clip=self.hf_clip,
                                        any_or_all='any',
                                        min_score=0.85,
-                                       max_score=0.98)
+                                       max_score=1)
         self._run_filter(dataset, op)
 
 

@@ -4,7 +4,7 @@ pandas==2.0.3
 datasets==2.18.0
 av
 soundfile
-librosa
+librosa>=0.10
 loguru
 tabulate
 tqdm
@@ -21,7 +21,7 @@ pdfplumber
 plotly
 python-docx
 streamlit
-spacy==3.5.0
+spacy==3.7.0
 multiprocess==0.70.12
 dill==0.3.4
 psutil

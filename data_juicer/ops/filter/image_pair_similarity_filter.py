@@ -67,10 +67,10 @@ class ImagePairSimilarityFilter(Filter):
             return sample
 
         # there is no image in this sample
-        if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.image_pair_similarity] = np.array(
-                [], dtype=np.float64)
-            return sample
+        if (self.image_key not in sample
+                or not len(sample[self.image_key]) == 2
+                or sample[self.image_key][0] == sample[self.image_key][1]):
+            raise ValueError('Each sample must include two images.')
 
         # load images
         loaded_image_keys = sample[self.image_key]
@@ -93,12 +93,12 @@ class ImagePairSimilarityFilter(Filter):
         similarity = torch.cosine_similarity(image1_batch_feature,
                                              image2_batch_feature,
                                              dim=1)
-        sample[Fields.stats][StatsKeys.image_text_similarity] = similarity
+        sample[Fields.stats][StatsKeys.image_pair_similarity] = similarity
 
         return sample
 
     def process(self, sample, rank=None):
-        similarity = sample[Fields.stats][StatsKeys.image_text_similarity]
+        similarity = sample[Fields.stats][StatsKeys.image_pair_similarity]
         if len(similarity) <= 0:
             return True
 
