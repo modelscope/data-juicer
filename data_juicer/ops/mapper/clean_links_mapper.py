@@ -10,6 +10,8 @@ from ..base_op import OPERATORS, Mapper
 class CleanLinksMapper(Mapper):
     """Mapper to clean links like http/https/ftp in text samples."""
 
+    _batched_op = True
+
     def __init__(self, pattern: str = None, repl: str = '', *args, **kwargs):
         """
         Initialization method.
@@ -38,13 +40,13 @@ class CleanLinksMapper(Mapper):
                 self.pattern = pattern[2:-1]
         self.repl = repl
 
-    def process(self, sample):
+    def process(self, samples):
+        for i, text in enumerate(samples[self.text_key]):
+            if not re.search(self.pattern, text, flags=re.DOTALL):
+                continue
 
-        if not re.search(self.pattern, sample[self.text_key], flags=re.DOTALL):
-            return sample
-
-        sample[self.text_key] = re.sub(pattern=self.pattern,
-                                       repl=self.repl,
-                                       string=sample[self.text_key],
-                                       flags=re.DOTALL)
-        return sample
+            samples[self.text_key][i] = re.sub(pattern=self.pattern,
+                                               repl=self.repl,
+                                               string=text,
+                                               flags=re.DOTALL)
+        return samples

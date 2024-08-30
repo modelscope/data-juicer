@@ -37,7 +37,7 @@ class FixUnicodeMapper(Mapper):
 
     def process(self, samples):
         samples[self.text_key] = [
-            ftfy.fix_text(i, normalization=self.normalization)
-            for i in samples[self.text_key]
+            ftfy.fix_text(text, normalization=self.normalization)
+            for text in samples[self.text_key]
         ]
         return samples
