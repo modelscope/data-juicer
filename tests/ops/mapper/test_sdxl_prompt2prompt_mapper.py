@@ -3,18 +3,15 @@ from PIL import Image
 import unittest
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.sdxl_prompt2prompt_mapper import SDXLPrompt2PromptMapper
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
 class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
 
     def _run_sdxl_prompt2prompt(self, enable_vllm=False):
         op = SDXLPrompt2PromptMapper(
-            hf_diffusion='stable-diffusion-xl-base-1.0',
+            hf_diffusion='stabilityai/stable-diffusion-xl-base-1.0',
             torch_dtype="fp16"
         )
 
