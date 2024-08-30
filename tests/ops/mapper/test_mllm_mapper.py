@@ -1,10 +1,7 @@
 import unittest
 from data_juicer.ops.mapper.mllm_mapper import MllmMapper
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
 class MllmMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
@@ -18,8 +15,13 @@ class MllmMapperTest(DataJuicerTestCaseBase):
             max_new_tokens=512
         )
 
+        data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
+                             'data')
+        img2_path = os.path.join(data_path, 'img2.jpg')
+        img3_path = os.path.join(data_path, 'img3.jpg')
+      
         samples = [
-            {self.text_key: 'Describe this image.', self.image_key: ["./ipod.jpg", "./crayon.jpg"]},
+            {self.text_key: 'Describe this image.', self.image_key: [img2_path, img3_path]},
         ]
 
         for sample in samples:
