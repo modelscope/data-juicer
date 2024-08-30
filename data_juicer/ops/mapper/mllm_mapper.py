@@ -14,13 +14,13 @@ torch.set_num_threads(1)
 class MllmMapper(Mapper):
     """Mapper to use MLLMs for visual question answering tasks.
     Recommended model list: [
-        liuhaotia/llava-v1.6-vicuna-7b
+        liuhaotian/llava-v1.6-vicuna-7b
     ]
     """
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_model: str = 'liuhaotia/llava-v1.6-vicuna-7b',
+                 hf_model: str = 'liuhaotian/llava-v1.6-vicuna-7b',
                  max_new_tokens=256,
                  temperature=0.2,
                  top_p=None,
