@@ -38,14 +38,13 @@ class TextLengthFilter(Filter):
     def compute_stats(self, samples):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
-
         for i, stat in enumerate(samples_stats):
             # check if it's computed already
             if StatsKeys.text_len in stat:
                 continue
             else:
                 samples_stats[i][StatsKeys.text_len] = len(samples_list[i])
-        
+
         return samples
 
     def process(self, samples):
