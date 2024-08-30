@@ -15,6 +15,8 @@ from ..common import (SPECIAL_CHARACTERS, merge_on_whitespace_tab_newline,
 class RemoveLongWordsMapper(Mapper):
     """Mapper to remove long words within a specific range."""
 
+    _batched_op = True
+
     def __init__(self,
                  min_len: PositiveInt = 1,
                  max_len: PositiveInt = sys.maxsize,
@@ -43,11 +45,13 @@ class RemoveLongWordsMapper(Mapper):
         else:
             return False
 
-    def process(self, sample):
-
-        sentences = split_on_newline_tab_whitespace(sample[self.text_key])
-        sentences = [[[
-            word for word in subsentence if self.should_keep_long_word(word)
-        ] for subsentence in sentence] for sentence in sentences]
-        sample[self.text_key] = merge_on_whitespace_tab_newline(sentences)
-        return sample
+    def process(self, samples):
+        for i, text in enumerate(samples[self.text_key]):
+            sentences = split_on_newline_tab_whitespace(text)
+            sentences = [[[
+                word for word in subsentence
+                if self.should_keep_long_word(word)
+            ] for subsentence in sentence] for sentence in sentences]
+            samples[self.text_key][i] = merge_on_whitespace_tab_newline(
+                sentences)
+        return samples

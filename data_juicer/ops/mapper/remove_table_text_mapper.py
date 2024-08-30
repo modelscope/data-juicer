@@ -16,6 +16,8 @@ class RemoveTableTextMapper(Mapper):
     number of tables.
     """
 
+    _batched_op = True
+
     def __init__(self,
                  min_col: from_2_to_20 = 2,
                  max_col: from_2_to_20 = 20,
@@ -34,12 +36,12 @@ class RemoveTableTextMapper(Mapper):
         self.max_col = max_col
         self.pattern = r'(?<=\n)((\S+?)([ |\t](\S+?)){%d}\n+){2,}'
 
-    def process(self, sample):
+    def process(self, samples):
+        for i, text in enumerate(samples[self.text_key]):
+            for i in range(self.min_col - 1, self.max_col):
+                pattern = re.compile(self.pattern % i)
+                text = pattern.sub('', text)
 
-        text = sample[self.text_key]
-        for i in range(self.min_col - 1, self.max_col):
-            pattern = re.compile(self.pattern % i)
-            text = pattern.sub('', text)
+            samples[self.text_key][i] = text
 
-        sample[self.text_key] = text
-        return sample
+        return samples
