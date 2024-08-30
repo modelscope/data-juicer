@@ -1,10 +1,8 @@
 import unittest
 from data_juicer.ops.mapper.sentence_augmentation_mapper import SentenceAugmentationMapper
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
+
 class SentenceAugmentationMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
