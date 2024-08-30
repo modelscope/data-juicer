@@ -20,6 +20,9 @@ class Fields(object):
     video_frame_tags = DEFAULT_PREFIX + 'video_frame_tags__'
     video_audio_tags = DEFAULT_PREFIX + 'video_audio_tags__'
 
+    # text_tags
+    text_tags = DEFAULT_PREFIX + 'text_tags__'
+
     # the name of the original file from which this sample was derived.
     source_file = DEFAULT_PREFIX + 'source_file__'
 
