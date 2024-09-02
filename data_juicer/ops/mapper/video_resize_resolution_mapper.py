@@ -4,7 +4,6 @@ import sys
 
 from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.file_utils import transfer_filename
@@ -16,8 +15,7 @@ from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_resize_resolution_mapper'
 
-with AvailabilityChecking(['ffmpeg-python'], OP_NAME), HiddenPrints():
-    import ffmpeg
+ffmpeg = LazyLoader('ffmpeg', globals(), 'ffmpeg')
 
 
 @OPERATORS.register_module(OP_NAME)

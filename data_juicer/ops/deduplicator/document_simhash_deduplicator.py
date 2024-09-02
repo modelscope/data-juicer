@@ -10,7 +10,6 @@ import regex
 from jsonargparse.typing import PositiveInt
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 
@@ -19,8 +18,7 @@ from ..common.helper_func import split_on_whitespace
 
 OP_NAME = 'document_simhash_deduplicator'
 
-with AvailabilityChecking(['simhash-pybind'], OP_NAME):
-    import simhash
+simhash = LazyLoader('simhash', globals(), 'simhash')
 
 
 @OPERATORS.register_module(OP_NAME)

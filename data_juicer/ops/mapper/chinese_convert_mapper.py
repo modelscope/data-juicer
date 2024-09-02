@@ -1,12 +1,10 @@
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'chinese_convert_mapper'
 
-with AvailabilityChecking(['opencc'], OP_NAME):
-    import opencc  # noqa: F401
+opencc = LazyLoader('opencc', globals(), 'opencc')
 
 OPENCC_CONVERTER = None
 

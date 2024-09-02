@@ -2,7 +2,6 @@ import numpy as np
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 from PIL import ImageOps
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
@@ -17,13 +16,8 @@ from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
 OP_NAME = 'video_frames_text_similarity_filter'
 
-with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
-
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
+torch = LazyLoader('torch', globals(), 'torch')
+transformers = LazyLoader('transformers', globals(), 'transformers')
 
 
 @OPERATORS.register_module(OP_NAME)

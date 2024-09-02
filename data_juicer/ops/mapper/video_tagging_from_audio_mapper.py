@@ -1,6 +1,5 @@
 import librosa
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import extract_audio_from_video
@@ -10,13 +9,7 @@ from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'video_tagging_from_audio_mapper'
 
-with AvailabilityChecking(['torch', 'transformers', 'torchaudio'], OP_NAME):
-    import torch
-    import torchaudio  # noqa: F401
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling recognizeAnything in multiprocessing
-    torch.set_num_threads(1)
+torch = LazyLoader('torch', globals(), 'torch')
 
 
 @OPERATORS.register_module(OP_NAME)

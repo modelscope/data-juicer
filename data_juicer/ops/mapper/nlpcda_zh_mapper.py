@@ -2,7 +2,6 @@ from copy import deepcopy
 
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 
@@ -10,8 +9,7 @@ from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'nlpcda_zh_mapper'
 
-with AvailabilityChecking(['nlpcda'], OP_NAME), HiddenPrints():
-    import nlpcda
+nlpcda = LazyLoader('nlpcda', globals(), 'nlpcda')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -20,7 +18,7 @@ class NlpcdaZhMapper(Mapper):
 
     _batched_op = True
 
-    @AUTOINSTALL.check(['nlpaug'])
+    @AUTOINSTALL.check(['nlpcda'])
     def __init__(self,
                  sequential: bool = False,
                  aug_num: int = 1,

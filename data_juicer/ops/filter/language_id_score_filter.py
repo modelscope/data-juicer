@@ -3,7 +3,6 @@ from typing import List, Tuple, Union
 from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -12,8 +11,7 @@ from ..base_op import AUTOINSTALL, OPERATORS, Filter
 
 OP_NAME = 'language_id_score_filter'
 
-with AvailabilityChecking(['fasttext-wheel'], OP_NAME):
-    import fasttext  # noqa: F401
+fasttext = LazyLoader('fasttext', globals(), 'fasttext')
 
 
 @OPERATORS.register_module(OP_NAME)

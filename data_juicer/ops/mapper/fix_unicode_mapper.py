@@ -1,12 +1,10 @@
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'fix_unicode_mapper'
 
-with AvailabilityChecking(['ftfy'], OP_NAME):
-    import ftfy
+ftfy = LazyLoader('ftfy', globals(), 'ftfy')
 
 
 @OPERATORS.register_module(OP_NAME)

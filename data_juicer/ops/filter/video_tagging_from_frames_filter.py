@@ -1,9 +1,7 @@
 import numpy as np
 from jsonargparse.typing import List, PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
 from ..mapper.video_tagging_from_frames_mapper import \
@@ -11,15 +9,6 @@ from ..mapper.video_tagging_from_frames_mapper import \
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_tagging_from_frames_filter'
-
-with AvailabilityChecking(
-    ['torch', 'git+https://github.com/xinyu1205/recognize-anything.git'],
-        OP_NAME):
-    import ram  # noqa: F401
-    import torch
-
-    # avoid hanging when calling recognizeAnything in multiprocessing
-    torch.set_num_threads(1)
 
 
 @UNFORKABLE.register_module(OP_NAME)

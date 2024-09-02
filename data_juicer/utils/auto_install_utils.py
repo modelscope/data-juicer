@@ -50,7 +50,7 @@ class AutoInstaller(object):
                             pkg = self.version_map[pkg]
                         subprocess.check_call(["pip", "install", pkg])
                         logger.info(f"The {pkg} installed.")
-                        if pkg == torch:
+                        if pkg == 'torch':
                             _torch_check_and_set()
                 return func(*args, **kwargs)
             return inner_wrapper

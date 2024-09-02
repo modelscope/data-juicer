@@ -2,18 +2,13 @@ from copy import deepcopy
 
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'nlpaug_en_mapper'
 
-with AvailabilityChecking(['nlpaug'], OP_NAME):
-    import nlpaug.augmenter.char as nac
-    import nlpaug.augmenter.word as naw
-    import nlpaug.flow as naf
-    from nlpaug.util import Action
+nlpaug = LazyLoader('nlpaug', globals(), 'nlpaug')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -99,6 +94,8 @@ class NlpaugEnMapper(Mapper):
 
         aug_pipeline = []
         # word level
+        naw = nlpaug.augmenter.word
+        Action = nlpaug.util.Action
         if delete_random_word:
             aug_pipeline.append(naw.RandomWordAug(action=Action.DELETE))
         if swap_random_word:
@@ -109,6 +106,7 @@ class NlpaugEnMapper(Mapper):
             aug_pipeline.append(naw.SplitAug())
 
         # char level
+        nac = nlpaug.augmenter.char
         if keyboard_error_char:
             aug_pipeline.append(nac.KeyboardAug())
         if ocr_error_char:
@@ -121,7 +119,7 @@ class NlpaugEnMapper(Mapper):
             aug_pipeline.append(nac.RandomCharAug(action=Action.INSERT))
 
         if self.sequential:
-            self.aug = naf.Sequential(aug_pipeline)
+            self.aug = nlpaug.flow.Sequential(aug_pipeline)
         else:
             self.aug = aug_pipeline
 

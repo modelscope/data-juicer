@@ -2,7 +2,6 @@ import math
 import os
 from fractions import Fraction
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.file_utils import transfer_filename
@@ -13,8 +12,7 @@ from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'video_resize_aspect_ratio_mapper'
 
-with AvailabilityChecking(['ffmpeg-python'], OP_NAME), HiddenPrints():
-    import ffmpeg
+ffmpeg = LazyLoader('ffmpeg', globals(), 'ffmpeg')
 
 
 def rescale(width, height, ori_ratio, min_ratio, max_ratio, strategy):

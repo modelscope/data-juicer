@@ -4,7 +4,6 @@ import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
@@ -16,8 +15,7 @@ from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_face_ratio_filter'
 
-with AvailabilityChecking(['opencv-python'], OP_NAME):
-    import cv2
+cv2 = LazyLoader('cv2', globals(), 'cv2')
 
 
 @UNFORKABLE.register_module(OP_NAME)

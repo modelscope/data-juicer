@@ -2,15 +2,13 @@
 # https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/
 # --------------------------------------------------------
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'clean_html_mapper'
 
-with AvailabilityChecking(['selectolax'], OP_NAME):
-    from selectolax.parser import HTMLParser
+selectolax = LazyLoader('selectolax', globals(), 'selectolax')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -34,7 +32,7 @@ class CleanHtmlMapper(Mapper):
             raw_html = raw_html.replace('</li>', '')
             raw_html = raw_html.replace('<ol>', '\n*')
             raw_html = raw_html.replace('</ol>', '')
-            parser = HTMLParser(raw_html)
+            parser = selectolax.parser.HTMLParser(raw_html)
             return parser.text()
 
         sample[self.text_key] = _clean_html(sample[self.text_key])

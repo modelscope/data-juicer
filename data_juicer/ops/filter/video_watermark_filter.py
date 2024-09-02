@@ -1,7 +1,6 @@
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
@@ -14,13 +13,7 @@ from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
 OP_NAME = 'video_watermark_filter'
 
-with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
-
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling watermark detection in multiprocessing
-    torch.set_num_threads(1)
+torch = LazyLoader('torch', globals(), 'torch')
 
 
 @OPERATORS.register_module(OP_NAME)

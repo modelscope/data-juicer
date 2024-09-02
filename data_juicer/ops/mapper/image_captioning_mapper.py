@@ -5,9 +5,7 @@ import numpy as np
 from jsonargparse.typing import PositiveInt
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (SpecialTokens,
                                         insert_texts_after_placeholders,
                                         load_image, remove_non_special_tokens,
@@ -18,15 +16,6 @@ from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_captioning_mapper'
-
-with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
-                          OP_NAME):
-    import simhash  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling model in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)

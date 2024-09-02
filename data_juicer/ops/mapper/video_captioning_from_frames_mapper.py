@@ -7,9 +7,7 @@ from jsonargparse.typing import PositiveInt
 from loguru import logger
 from PIL import ImageOps
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
                                         extract_key_frames,
                                         extract_video_frames_uniformly,
@@ -23,16 +21,6 @@ from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_captioning_from_frames_mapper'
-
-with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
-                          OP_NAME):
-
-    import simhash  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)

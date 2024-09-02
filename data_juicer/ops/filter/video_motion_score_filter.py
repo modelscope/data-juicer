@@ -5,7 +5,6 @@ from typing import List, Optional, Sequence, Tuple, Union
 import numpy as np
 from jsonargparse.typing import PositiveFloat, PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 
@@ -13,8 +12,7 @@ from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
 
 OP_NAME = 'video_motion_score_filter'
 
-with AvailabilityChecking(['opencv-python'], OP_NAME):
-    import cv2
+cv2 = LazyLoader('cv2', globals(), 'cv2')
 
 
 @contextmanager

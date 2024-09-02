@@ -2,7 +2,6 @@ import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
@@ -14,14 +13,7 @@ from ..op_fusion import LOADED_IMAGES
 OP_NAME = 'image_aesthetics_filter'
 CHECK_PKGs = ['torch', 'transformers', 'simple-aesthetics-predictor']
 
-with AvailabilityChecking(CHECK_PKGs, OP_NAME):
-
-    import aesthetics_predictor  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
+torch = LazyLoader('torch', globals(), 'torch')
 
 
 @OPERATORS.register_module(OP_NAME)

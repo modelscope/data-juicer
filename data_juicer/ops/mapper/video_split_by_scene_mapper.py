@@ -4,7 +4,6 @@ from itertools import chain
 
 from jsonargparse.typing import NonNegativeFloat, NonNegativeInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.file_utils import (add_suffix_to_filename,
@@ -15,9 +14,7 @@ from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'video_split_by_scene_mapper'
 
-with AvailabilityChecking(['scenedetect[opencv]'], OP_NAME):
-    import scenedetect.detectors
-    from scenedetect import detect, split_video_ffmpeg
+scenedetect = LazyLoader('scenedetect', globals(), 'scenedetect')
 
 
 def replace_func(match, scene_counts_iter):
@@ -109,7 +106,7 @@ class VideoSplitBySceneMapper(Mapper):
             # detect scenes
             detector = self.detector_class(self.threshold, self.min_scene_len,
                                            **self.detector_kwargs)
-            scene_list = detect(video_key,
+            scene_list = scenedetect.detect(video_key,
                                 detector,
                                 show_progress=self.show_progress,
                                 start_in_scene=True)
@@ -124,7 +121,7 @@ class VideoSplitBySceneMapper(Mapper):
                     for i in range(len(scene_list))
                 ]
                 # split video into clips
-                split_video_ffmpeg(input_video_path=video_key,
+                scenedetect.split_video_ffmpeg(input_video_path=video_key,
                                    scene_list=scene_list,
                                    output_file_template=output_template,
                                    show_progress=self.show_progress)

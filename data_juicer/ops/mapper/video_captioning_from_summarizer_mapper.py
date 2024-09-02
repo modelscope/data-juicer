@@ -3,44 +3,13 @@ from typing import Dict
 
 from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens, remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 NAME = 'video_captioning_from_summarizer_mapper'
-CHECK_PKGS = [
-    'torch',
-    'transformers',
-    'simhash-pybind',  # by video caption
-    'transformers_stream_generator',
-    'einops',
-    'accelerate',
-    'tiktoken',  # by audio caption
-    'torchaudio',  # by audio tag
-    'git+https://github.com/xinyu1205/recognize-anything.git',  # by frame tag
-]
-
-with AvailabilityChecking(CHECK_PKGS, NAME):
-    # video caption
-    # audio caption
-    import accelerate  # noqa: F401
-    import einops  # noqa: F401
-    # frame tag
-    import ram  # noqa: F401
-    import simhash  # noqa: F401
-    import tiktoken  # noqa: F401
-    import torch
-    # audio tag
-    import torchaudio  # noqa: F401
-    import transformers  # noqa: F401
-    import transformers_stream_generator  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(NAME)

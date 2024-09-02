@@ -2,7 +2,6 @@ import os
 
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.file_utils import transfer_filename
@@ -15,9 +14,8 @@ from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_face_blur_mapper'
 
-with AvailabilityChecking(['opencv-python', 'Pillow'], OP_NAME):
-    import cv2
-    from PIL import ImageFilter
+cv2 = LazyLoader('cv2', globals(), 'cv2')
+PIL = LazyLoader('PIL', globals(), 'PIL')
 
 
 @UNFORKABLE.register_module(OP_NAME)
@@ -66,11 +64,11 @@ class ImageFaceBlurMapper(Mapper):
             raise ValueError('Radius must be >= 0. ')
 
         if blur_type == 'mean':
-            self.blur = ImageFilter.BLUR
+            self.blur = PIL.ImageFilter.BLUR
         elif blur_type == 'box':
-            self.blur = ImageFilter.BoxBlur(radius)
+            self.blur = PIL.ImageFilter.BoxBlur(radius)
         else:
-            self.blur = ImageFilter.GaussianBlur(radius)
+            self.blur = PIL.ImageFilter.GaussianBlur(radius)
 
         self.blur_type = blur_type
         self.radius = radius

@@ -3,9 +3,7 @@ import os
 
 from PIL import Image
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
@@ -15,16 +13,6 @@ from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_diffusion_mapper'
-
-check_list = ['diffusers', 'torch', 'transformers', 'simhash-pybind']
-with AvailabilityChecking(check_list, OP_NAME):
-    import diffusers  # noqa: F401
-    import simhash  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling stable diffusion in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
