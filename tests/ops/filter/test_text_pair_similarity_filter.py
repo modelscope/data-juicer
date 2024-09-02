@@ -11,7 +11,10 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 class TextPairSimilarityFilterTest(DataJuicerTestCaseBase):
 
-    hf_clip = 'openai/clip-vit-base-patch32'
+    hf_clip = "openai/clip-vit-base-patch32"
+
+    text_key = "text"
+    text_key_second = "target_text"
 
     
     @classmethod
@@ -31,21 +34,22 @@ class TextPairSimilarityFilterTest(DataJuicerTestCaseBase):
                               num_proc=num_proc,
                               with_rank=True)
         dataset = dataset.filter(op.process, num_proc=num_proc)
-        dataset = dataset.select_columns(column_names=['text', 'target_text'])
+        dataset = dataset.select_columns(column_names=[self.text_key, 
+            self.text_key_second])
         res_list = dataset.to_list()
         print(res_list)
 
     def test_no_eoc_special_token(self):
 
         ds_list = [{
-            'target_text': 'a lovely cat',
-            'text': 'a lovely cat',
+            self.text_key_second: 'a lovely cat',
+            self.text_key: 'a lovely cat',
         }, {
-            'target_text': 'a lovely cat',
-            'text': 'a cute cat',
+            self.text_key_second: 'a lovely cat',
+            self.text_key: 'a cute cat',
         }, {
-            'target_text': 'a lovely cat',
-            'text': 'a black dog',
+            self.text_key_second: 'a lovely cat',
+            self.text_key: 'a black dog',
         }]
 
 
@@ -53,7 +57,8 @@ class TextPairSimilarityFilterTest(DataJuicerTestCaseBase):
         op = TextPairSimilarityFilter(hf_clip=self.hf_clip,
                                        any_or_all='any',
                                        min_score=0.1,
-                                       max_score=0.85)
+                                       max_score=0.99,
+                                       text_key_second=self.text_key_second)
         self._run_filter(dataset, op)
 
 

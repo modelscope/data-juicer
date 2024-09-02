@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
 
@@ -5,6 +7,9 @@ from data_juicer.ops.base_op import OPERATORS, Filter
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 OP_NAME = 'text_pair_similarity_filter'
 
@@ -29,6 +34,7 @@ class TextPairSimilarityFilter(Filter):
                  trust_remote_code=False,
                  min_score: ClosedUnitInterval = 0.1,
                  max_score: ClosedUnitInterval = 1.0,
+                 text_key_second=None,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -39,6 +45,8 @@ class TextPairSimilarityFilter(Filter):
             the similarity between image and text.
         :param min_score: The min similarity to keep samples.
         :param max_score: The max similarity to keep samples.
+        :param text_key_second: used to store the other sentence
+            in the text pair.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the
@@ -56,7 +64,7 @@ class TextPairSimilarityFilter(Filter):
         self.model_key = prepare_model(model_type='huggingface',
                                        pretrained_model_name_or_path=hf_clip,
                                        trust_remote_code=trust_remote_code)
-        self.new_sample_key = ['target_text']
+        self.text_key_second = text_key_second
 
     def compute_stats(self, sample, rank=None, context=False):
 
@@ -65,13 +73,15 @@ class TextPairSimilarityFilter(Filter):
             return sample
 
         # there is no target text
-        for temp_new_key in self.new_sample_key:
-            if temp_new_key not in sample or len(sample[temp_new_key]) == 0:
-                raise ValueError(
-                    f'Key \'{temp_new_key}\' is not found in sample. ')
+        if self.text_key_second is None:
+            logger.error('This OP (text_pair_similarity_filter) requires \
+                processing multiple fields, and you need to specify \
+                valid `text_key_second`')
 
         # there is no text in this sample
-        if (self.text_key not in sample or len(sample[self.text_key]) == 0):
+        if (self.text_key not in sample or len(sample[self.text_key]) == 0
+                or self.text_key_second not in sample
+                or len(sample[self.text_key_second]) == 0):
             sample[Fields.stats][StatsKeys.text_pair_similarity] = np.array(
                 [], dtype=np.float64)
             return sample
@@ -79,7 +89,7 @@ class TextPairSimilarityFilter(Filter):
         model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         text1 = sample[self.text_key]
-        text2 = sample['target_text']
+        text2 = sample[self.text_key_second]
 
         text_tensors = processor([text1, text2],
                                  padding=True,
