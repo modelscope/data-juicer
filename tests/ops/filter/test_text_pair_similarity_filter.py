@@ -6,8 +6,7 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.filter.text_pair_similarity_filter import TextPairSimilarityFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import SpecialTokens
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
 class TextPairSimilarityFilterTest(DataJuicerTestCaseBase):

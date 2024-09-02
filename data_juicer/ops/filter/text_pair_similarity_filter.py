@@ -56,6 +56,7 @@ class TextPairSimilarityFilter(Filter):
         self.model_key = prepare_model(model_type='huggingface',
                                        pretrained_model_name_or_path=hf_clip,
                                        trust_remote_code=trust_remote_code)
+        self.new_sample_key = ['target_text']
 
     def compute_stats(self, sample, rank=None, context=False):
 
@@ -63,10 +64,14 @@ class TextPairSimilarityFilter(Filter):
         if StatsKeys.text_pair_similarity in sample[Fields.stats]:
             return sample
 
+        # there is no target text
+        for temp_new_key in self.new_sample_key:
+            if temp_new_key not in sample or len(sample[temp_new_key]) == 0:
+                raise ValueError(
+                    f'Key \'{temp_new_key}\' is not found in sample. ')
+
         # there is no text in this sample
-        if (self.text_key not in sample or 'target_text' not in sample
-                or len(sample[self.text_key]) == 0
-                or len(sample['target_text']) == 0):
+        if (self.text_key not in sample or len(sample[self.text_key]) == 0):
             sample[Fields.stats][StatsKeys.text_pair_similarity] = np.array(
                 [], dtype=np.float64)
             return sample
