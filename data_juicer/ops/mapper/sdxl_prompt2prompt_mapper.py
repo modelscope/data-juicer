@@ -63,14 +63,19 @@ class SDXLPrompt2PromptMapper(Mapper):
         self.guidance_scale = guidance_scale
         self.hf_diffusion = hf_diffusion
         self.torch_dtype = torch_dtype
-
         self.model_key = prepare_model(
             model_type='sdxl-prompt-to-prompt',
             pretrained_model_name_or_path=hf_diffusion,
             pipe_func=Prompt2PromptPipeline,
             torch_dtype=torch_dtype)
+        self.new_sample_key = ['caption1', 'caption2']
 
     def process(self, sample, rank=None, context=False):
+
+        for temp_new_key in self.new_sample_key:
+            if temp_new_key not in sample:
+                raise ValueError(
+                    f'Key \'{temp_new_key}\' is not found in sample. ')
 
         model = get_model(model_key=self.model_key,
                           rank=rank,
@@ -88,13 +93,10 @@ class SDXLPrompt2PromptMapper(Mapper):
             },
         }
 
-        sample['output'] = []
+        sample['images'] = []
 
         with torch.no_grad():
-            prompts = [
-                sample[self.text_key]['caption1'],
-                sample[self.text_key]['caption2']
-            ]
+            prompts = [sample['caption1'], sample['caption2']]
             image = model(prompts,
                           cross_attention_kwargs=cross_attention_kwargs,
                           guidance_scale=self.guidance_scale,
@@ -102,7 +104,7 @@ class SDXLPrompt2PromptMapper(Mapper):
                           generator=g_cpu)
 
             for idx, img in enumerate(image['images']):
-                sample['output'].append(img)
+                sample['images'].append(img)
 
         return sample
 

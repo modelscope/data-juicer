@@ -5,6 +5,7 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.sdxl_prompt2prompt_mapper import SDXLPrompt2PromptMapper
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
+
 class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
@@ -16,17 +17,17 @@ class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
         )
 
 
-        ds_list = [{self.text_key: {"caption1": "a chocolate cake",
-                                    "caption2": "a confetti apple cake"}},
-                    {self.text_key: {"caption1": "a chocolate",
-                                    "caption2": "apples"}}]
+        ds_list = [{"caption1": "a chocolate cake",
+                    "caption2": "a confetti apple cake"},
+                    {"caption1": "a chocolate",
+                    "caption2": "bread"}]
 
         dataset = Dataset.from_list(ds_list)
         dataset = dataset.map(op.process, num_proc=2, with_rank=True)
         
         
         for temp_idx, sample in enumerate(dataset):
-            for idx, img in enumerate(sample["output"]):
+            for idx, img in enumerate(sample["images"]):
                 img = Image.open(io.BytesIO(img["bytes"]))
                 img.save(f"./test{str(temp_idx)}_{str(idx)}.jpg") 
 
