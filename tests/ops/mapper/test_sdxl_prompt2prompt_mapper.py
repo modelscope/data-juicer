@@ -10,17 +10,22 @@ class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
 
+    text_key_second = "caption1"
+    text_key_third = "caption2"
+
     def _run_sdxl_prompt2prompt(self, enable_vllm=False):
         op = SDXLPrompt2PromptMapper(
             hf_diffusion='stabilityai/stable-diffusion-xl-base-1.0',
-            torch_dtype="fp16"
+            torch_dtype="fp16",
+            text_key_second=self.text_key_second,
+            text_key_third=self.text_key_third
         )
 
 
-        ds_list = [{"caption1": "a chocolate cake",
-                    "caption2": "a confetti apple cake"},
-                    {"caption1": "a chocolate",
-                    "caption2": "bread"}]
+        ds_list = [{self.text_key_second: "a chocolate cake",
+                    self.text_key_third: "a confetti apple bread"},
+                    {self.text_key_second: "a chocolate",
+                    self.text_key_third: "bread"}]
 
         dataset = Dataset.from_list(ds_list)
         dataset = dataset.map(op.process, num_proc=2, with_rank=True)
@@ -34,7 +39,6 @@ class SDXLPrompt2PromptMapperTest(DataJuicerTestCaseBase):
 
     def test_sdxl_prompt2prompt(self):
         self._run_sdxl_prompt2prompt()
-
 
 
 if __name__ == '__main__':

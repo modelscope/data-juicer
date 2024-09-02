@@ -1,4 +1,5 @@
 import abc
+import logging
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import numpy as np
@@ -14,11 +15,15 @@ from data_juicer.ops.op_fusion import LOADED_IMAGES
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
 OP_NAME = 'sdxl_prompt2prompt_mapper'
 
-check_list = ['diffusers', 'torch', 'transformers', 'simhash-pybind']
+check_list = ['diffusers', 'torch', 'transformers']
 with AvailabilityChecking(check_list, OP_NAME):
     import diffusers  # noqa: F401
+    import transformers  # noqa: F401
 
     # avoid hanging when calling stable diffusion in multiprocessing
     torch.set_num_threads(1)
@@ -40,6 +45,8 @@ class SDXLPrompt2PromptMapper(Mapper):
             torch_dtype: str = 'fp32',
             num_inference_steps: float = 50,
             guidance_scale: float = 7.5,
+            text_key_second=None,
+            text_key_third=None,
             *args,
             **kwargs):
         """
@@ -55,6 +62,10 @@ class SDXLPrompt2PromptMapper(Mapper):
         :param guidance_scale: A higher guidance scale value encourages the
             model to generate images closely linked to the text prompt at the
             expense of lower image quality. Guidance scale is enabled when
+        :param text_key_second: used to store the first caption
+            in the caption pair.
+        :param text_key_third: used to store the second caption
+            in the caption pair.
 
         """
         super().__init__(*args, **kwargs)
@@ -68,14 +79,20 @@ class SDXLPrompt2PromptMapper(Mapper):
             pretrained_model_name_or_path=hf_diffusion,
             pipe_func=Prompt2PromptPipeline,
             torch_dtype=torch_dtype)
-        self.new_sample_key = ['caption1', 'caption2']
+        self.text_key_second = text_key_second
+        self.text_key_third = text_key_third
 
     def process(self, sample, rank=None, context=False):
 
-        for temp_new_key in self.new_sample_key:
-            if temp_new_key not in sample:
-                raise ValueError(
-                    f'Key \'{temp_new_key}\' is not found in sample. ')
+        if self.text_key_second is None:
+            logger.error('This OP (sdxl_prompt2prompt_mapper) requires \
+                processing multiple fields, and you need to specify \
+                valid `text_key_second`')
+
+        if self.text_key_third is None:
+            logger.error('This OP (sdxl_prompt2prompt_mapper) requires \
+                processing multiple fields, and you need to specify \
+                valid `text_key_third`')
 
         model = get_model(model_key=self.model_key,
                           rank=rank,
@@ -96,7 +113,9 @@ class SDXLPrompt2PromptMapper(Mapper):
         sample['images'] = []
 
         with torch.no_grad():
-            prompts = [sample['caption1'], sample['caption2']]
+            prompts = [
+                sample[self.text_key_second], sample[self.text_key_third]
+            ]
             image = model(prompts,
                           cross_attention_kwargs=cross_attention_kwargs,
                           guidance_scale=self.guidance_scale,

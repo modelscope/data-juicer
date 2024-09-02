@@ -183,6 +183,8 @@ process:
       hf_diffusion: 'stabilityai/stable-diffusion-xl-base-1.0' # model name of the SDXL model on huggingface
       num_inference_steps: 50                                 # the larger the value, the better the image generation quality
       guidance_scale: 7.5                                     # a higher guidance scale value encourages the model to generate images closely linked to the text prompt at the expense of lower image quality
+      text_key_second: None                                   # used to store the first caption in the caption pair
+      text_key_third: None                                    # used to store the second caption in the caption pair
   - sentence_split_mapper:                                  # split text to multiple sentences and join them with '\n'
       lang: 'en'                                              # split text in what language
   - video_captioning_from_audio_mapper:                     # caption a video according to its audio streams based on Qwen-Audio model
