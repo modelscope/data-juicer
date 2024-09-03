@@ -27,7 +27,9 @@ class VideoTaggingFromFramesMapper(Mapper):
 
     _accelerator = 'cuda'
 
-    @AUTOINSTALL.check(['torch', 'ram@git+https://github.com/xinyu1205/recognize-anything.git'])
+    @AUTOINSTALL.check([
+        'torch', 'ram@git+https://github.com/xinyu1205/recognize-anything.git'
+    ])
     def __init__(self,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,

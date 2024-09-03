@@ -14,15 +14,11 @@ imagededup = LazyLoader('imagededup', globals(), 'imagededup')
 
 HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
 
+
 def get_hash_method(method_name):
     from imagededup.methods import AHash, DHash, PHash, WHash
 
-    mapping = {
-        'phash': PHash,
-        'dhash': DHash,
-        'whash': WHash,
-        'ahash': AHash
-    }
+    mapping = {'phash': PHash, 'dhash': DHash, 'whash': WHash, 'ahash': AHash}
 
     return mapping[method_name]
 

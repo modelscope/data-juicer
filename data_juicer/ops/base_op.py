@@ -16,8 +16,10 @@ from data_juicer.utils.registry import Registry
 OPERATORS = Registry('Operators')
 UNFORKABLE = Registry('Unforkable')
 current_path = os.path.dirname(os.path.realpath(__file__))
-version_file_path = os.path.join(current_path, '../../environments/science_requires.txt')
+version_file_path = os.path.join(current_path,
+                                 '../../environments/science_requires.txt')
 AUTOINSTALL = AutoInstaller([version_file_path])
+
 
 def convert_list_dict_to_dict_list(samples):
     # reconstruct samples from "list of dicts" to "dict of lists"

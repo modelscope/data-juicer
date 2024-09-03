@@ -594,7 +594,8 @@ def free_models():
     for model_key in MODEL_ZOO:
         try:
             MODEL_ZOO[model_key].to('cpu')
-        except:
+        except Exception:
             pass
     del MODEL_ZOO
+    global MODEL_ZOO
     MODEL_ZOO = {}

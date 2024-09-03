@@ -20,7 +20,10 @@ class VideoCaptioningFromAudioMapper(Mapper):
     _accelerator = 'cuda'
     _batched_op = True
 
-    @AUTOINSTALL.check(['transformers', 'transformers_stream_generator', 'einops', 'accelerate', 'tiktoken'])
+    @AUTOINSTALL.check([
+        'transformers', 'transformers_stream_generator', 'einops',
+        'accelerate', 'tiktoken'
+    ])
     def __init__(self, keep_original_sample: bool = True, *args, **kwargs):
         """
         Initialization method.

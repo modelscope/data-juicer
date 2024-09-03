@@ -4,7 +4,8 @@ from typing import Tuple, Union
 
 from loguru import logger
 
-from data_juicer.utils.auto_install_utils import _is_package_installed, _torch_check_and_set
+from data_juicer.utils.auto_install_utils import (_is_package_installed,
+                                                  _torch_check_and_set)
 
 UNAVAILABLE_OPERATORS = {}
 

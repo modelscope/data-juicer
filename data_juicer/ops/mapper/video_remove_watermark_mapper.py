@@ -5,8 +5,8 @@ import numpy as np
 from jsonargparse.typing import List, PositiveInt
 
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import (close_video,
                                         extract_video_frames_uniformly,
@@ -19,7 +19,8 @@ from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_remove_watermark_mapper'
 
-cv2 = LazyLoader('cv2', globals(), 'cv2')
+with HiddenPrints():
+    cv2 = LazyLoader('cv2', globals(), 'cv2')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -154,8 +155,8 @@ class VideoRemoveWatermarkMapper(Mapper):
             else:
                 scaled_diversity = np.zeros_like(pixel_diversity)
             scaled_diversity = scaled_diversity.astype(np.uint8)
-            _, binary_frame = cv2.threshold(scaled_diversity, 0, 255,
-                                           cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            _, binary_frame = cv2.threshold(
+                scaled_diversity, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
             # the watermark pixels have less diversity
             binary_frame = ~binary_frame
             mask[roi[1]:roi[3],

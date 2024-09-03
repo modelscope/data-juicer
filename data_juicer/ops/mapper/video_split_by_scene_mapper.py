@@ -5,9 +5,9 @@ from itertools import chain
 from jsonargparse.typing import NonNegativeFloat, NonNegativeInt
 
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
@@ -107,9 +107,9 @@ class VideoSplitBySceneMapper(Mapper):
             detector = self.detector_class(self.threshold, self.min_scene_len,
                                            **self.detector_kwargs)
             scene_list = scenedetect.detect(video_key,
-                                detector,
-                                show_progress=self.show_progress,
-                                start_in_scene=True)
+                                            detector,
+                                            show_progress=self.show_progress,
+                                            start_in_scene=True)
             scene_counts[video_key] = len(scene_list)
 
             if len(scene_list) > 1:
@@ -121,10 +121,11 @@ class VideoSplitBySceneMapper(Mapper):
                     for i in range(len(scene_list))
                 ]
                 # split video into clips
-                scenedetect.split_video_ffmpeg(input_video_path=video_key,
-                                   scene_list=scene_list,
-                                   output_file_template=output_template,
-                                   show_progress=self.show_progress)
+                scenedetect.split_video_ffmpeg(
+                    input_video_path=video_key,
+                    scene_list=scene_list,
+                    output_file_template=output_template,
+                    show_progress=self.show_progress)
             else:
                 output_video_keys[video_key] = [video_key]
 

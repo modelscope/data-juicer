@@ -17,6 +17,7 @@ OP_NAME = 'perplexity_filter'
 kenlm = LazyLoader('kenlm', globals(), 'kenlm')
 sentencepiece = LazyLoader('sentencepiece', globals(), 'sentencepiece')
 
+
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
 class PerplexityFilter(Filter):
