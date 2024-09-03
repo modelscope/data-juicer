@@ -15,6 +15,8 @@ class SpecialCharactersFilter(Filter):
     """Filter to keep samples with special-char ratio within a specific
     range."""
 
+    _batched_op = True
+
     def __init__(self,
                  min_ratio: ClosedUnitInterval = 0.0,
                  max_ratio: ClosedUnitInterval = 0.25,
@@ -36,23 +38,36 @@ class SpecialCharactersFilter(Filter):
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
 
-    def compute_stats(self, sample):
-        # check if it's computed already
-        if StatsKeys.special_char_ratio in sample[Fields.stats]:
-            return sample
+    def compute_stats(self, samples):
+        samples_list = samples[self.text_key]
+        samples_stats = samples[Fields.stats]
 
-        # get ratio of special characters
-        sample[Fields.stats][StatsKeys.special_char_ratio] = (
-            len([c
-                 for c in sample[self.text_key] if c in SPECIAL_CHARACTERS]) /
-            len(sample[self.text_key])) if len(
-                sample[self.text_key]) != 0 else 0.0
-        return sample
+        for i, stat in enumerate(samples_stats):
+            # check if it's computed already
+            if StatsKeys.special_char_ratio in stat:
+                continue
+            # get ratio of special characters
+            samples_stats[i][StatsKeys.special_char_ratio] = (
+                len([c for c in samples_list[i] if c in SPECIAL_CHARACTERS]) /
+                len(samples_list[i])) if len(samples_list[i]) != 0 else 0.0
 
-    def process(self, sample):
-        if self.min_ratio <= \
-                sample[Fields.stats][StatsKeys.special_char_ratio] \
-                <= self.max_ratio:
-            return True
+        return samples
+
+    def process(self, samples):
+        if isinstance(samples[Fields.stats], list):
+            bool_results = []
+            for stat in samples[Fields.stats]:
+                if self.min_ratio <= stat[
+                        StatsKeys.special_char_ratio] <= self.max_ratio:
+                    bool_results.append(True)
+                else:
+                    bool_results.append(False)
+            return bool_results
         else:
-            return False
+            # single sample for ray filter
+            if self.min_ratio <= \
+                    samples[Fields.stats][StatsKeys.special_char_ratio] \
+                    <= self.max_ratio:
+                return True
+            else:
+                return False
