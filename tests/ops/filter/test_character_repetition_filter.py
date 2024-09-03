@@ -18,8 +18,8 @@ class CharacterRepetitionFilterTest(DataJuicerTestCaseBase):
             # only add stats when calling filter op
             dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
-        dataset = dataset.map(op.compute_stats)
-        dataset = dataset.filter(op.process)
+        dataset = dataset.map(op.compute_stats, batch_size=op.batch_size, num_proc=1)
+        dataset = dataset.filter(op.process, batch_size=op.batch_size, num_proc=2)
         dataset = dataset.select_columns(column_names=['text'])
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
