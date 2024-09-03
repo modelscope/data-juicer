@@ -44,19 +44,20 @@ class AverageLineLengthFilter(Filter):
         samples_stats = samples[Fields.stats]
         context_key = f'{InterVars.lines}'
 
-        for i, stat in enumerate(samples_stats):
+        for idx, stat in enumerate(samples_stats):
             # check if it's computed already
             if StatsKeys.avg_line_length in stat:
                 continue
 
-            if context and context_key in samples[Fields.context][i]:
-                lines = samples[Fields.context][i][context_key]
+            cur_text = samples_list[idx]
+            if context and context_key in samples[Fields.context][idx]:
+                lines = samples[Fields.context][idx][context_key]
             else:
-                lines = samples_list[i].splitlines()
+                lines = cur_text.splitlines()
                 if context:
-                    samples[Fields.context][i][context_key] = lines
-            samples_stats[i][StatsKeys.avg_line_length] = \
-                len(samples_list[i]) / len(lines) if len(lines) != 0 else 0.0
+                    samples[Fields.context][idx][context_key] = lines
+            samples_stats[idx][StatsKeys.avg_line_length] = \
+                len(cur_text) / len(lines) if len(lines) != 0 else 0.0
         return samples
 
     def process(self, samples):

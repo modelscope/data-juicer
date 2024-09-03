@@ -58,7 +58,7 @@ class ExpandMacroMapper(Mapper):
         return macros
 
     def process(self, samples):
-        for i, text in enumerate(samples[self.text_key]):
+        for idx, text in enumerate(samples[self.text_key]):
             non_arg_macros = self._build_non_arg_macros_dict(text)
 
             # TODO: macros that take arguments are not supported yet
@@ -80,6 +80,6 @@ class ExpandMacroMapper(Mapper):
             for macro_name, macro_value in arg_macros.items():
                 pass
 
-            samples[self.text_key][i] = text
+            samples[self.text_key][idx] = text
 
         return samples

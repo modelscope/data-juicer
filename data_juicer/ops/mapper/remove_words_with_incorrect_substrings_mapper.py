@@ -51,7 +51,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
         return should_keep
 
     def process(self, samples):
-        for i, text in enumerate(samples[self.text_key]):
+        for idx, text in enumerate(samples[self.text_key]):
             if self.tokenization:
                 tokenizer = get_model(self.model_key)
                 sentences = get_words_from_document(
@@ -74,6 +74,6 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
                 ] for subsentence in sentence] for sentence in sentences]
                 text = merge_on_whitespace_tab_newline(sentences)
 
-            samples[self.text_key][i] = text
+            samples[self.text_key][idx] = text
 
         return samples

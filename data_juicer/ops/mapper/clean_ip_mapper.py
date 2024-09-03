@@ -35,11 +35,11 @@ class CleanIpMapper(Mapper):
         self.repl = repl
 
     def process(self, samples):
-        for i, text in enumerate(samples[self.text_key]):
+        for idx, text in enumerate(samples[self.text_key]):
             if not re.search(self.pattern, text, flags=re.DOTALL):
                 continue
-            samples[self.text_key][i] = re.sub(pattern=self.pattern,
-                                               repl=self.repl,
-                                               string=text,
-                                               flags=re.DOTALL)
+            samples[self.text_key][idx] = re.sub(pattern=self.pattern,
+                                                 repl=self.repl,
+                                                 string=text,
+                                                 flags=re.DOTALL)
         return samples

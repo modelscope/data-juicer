@@ -37,11 +37,11 @@ class RemoveTableTextMapper(Mapper):
         self.pattern = r'(?<=\n)((\S+?)([ |\t](\S+?)){%d}\n+){2,}'
 
     def process(self, samples):
-        for i, text in enumerate(samples[self.text_key]):
-            for i in range(self.min_col - 1, self.max_col):
-                pattern = re.compile(self.pattern % i)
+        for idx, text in enumerate(samples[self.text_key]):
+            for idx in range(self.min_col - 1, self.max_col):
+                pattern = re.compile(self.pattern % idx)
                 text = pattern.sub('', text)
 
-            samples[self.text_key][i] = text
+            samples[self.text_key][idx] = text
 
         return samples

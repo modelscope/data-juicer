@@ -42,7 +42,7 @@ class RemoveCommentsMapper(Mapper):
     def process(self, samples):
         # TODO: remove different comments by sample type
 
-        for i, text in enumerate(samples[self.text_key]):
+        for idx, text in enumerate(samples[self.text_key]):
             if self.inline:
                 # remove all in comments within a line
                 text = re.sub(pattern=r'[^\\]%.+$',
@@ -56,6 +56,6 @@ class RemoveCommentsMapper(Mapper):
                               string=text,
                               flags=re.MULTILINE)
 
-            samples[self.text_key][i] = text
+            samples[self.text_key][idx] = text
 
         return samples

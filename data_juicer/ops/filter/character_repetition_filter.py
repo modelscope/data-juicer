@@ -50,9 +50,10 @@ class CharacterRepetitionFilter(Filter):
             if StatsKeys.char_rep_ratio in stat:
                 continue
 
+            cur_text = samples_list[idx]
             char_ngrams = [
-                samples_list[idx][i:i + self.n]
-                for i in range(len(samples_list[idx]) - self.n + 1)
+                cur_text[i:i + self.n]
+                for i in range(len(cur_text) - self.n + 1)
             ]
             freq_char_ngrams = {}
             for char_ngram in char_ngrams:

@@ -42,14 +42,15 @@ class SpecialCharactersFilter(Filter):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
 
-        for i, stat in enumerate(samples_stats):
+        for idx, stat in enumerate(samples_stats):
             # check if it's computed already
             if StatsKeys.special_char_ratio in stat:
                 continue
+            cur_text = samples_list[idx]
             # get ratio of special characters
-            samples_stats[i][StatsKeys.special_char_ratio] = (
-                len([c for c in samples_list[i] if c in SPECIAL_CHARACTERS]) /
-                len(samples_list[i])) if len(samples_list[i]) != 0 else 0.0
+            samples_stats[idx][StatsKeys.special_char_ratio] = (
+                len([c for c in cur_text if c in SPECIAL_CHARACTERS]) /
+                len(cur_text)) if len(cur_text) != 0 else 0.0
 
         return samples
 

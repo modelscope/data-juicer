@@ -53,21 +53,21 @@ class PerplexityFilter(Filter):
         samples_stats = samples[Fields.stats]
         words_key = f'{InterVars.words}-{self.sp_model_key}'
 
-        for i, stat in enumerate(samples_stats):
+        for idx, stat in enumerate(samples_stats):
             # check if it's computed already
             if StatsKeys.perplexity in stat:
                 continue
             # tokenization
-            if context and words_key in samples[Fields.context][i]:
-                words = samples[Fields.context][i][words_key]
+            if context and words_key in samples[Fields.context][idx]:
+                words = samples[Fields.context][idx][words_key]
             else:
                 tokenizer = get_model(self.sp_model_key)
                 words = get_words_from_document(
-                    samples_list[i],
+                    samples_list[idx],
                     token_func=tokenizer.encode_as_pieces
                     if tokenizer else None)
                 if context:
-                    samples[Fields.context][i][words_key] = words
+                    samples[Fields.context][idx][words_key] = words
             text = ' '.join(words)
             # compute perplexity
             logits, length = 0, 0
@@ -76,7 +76,7 @@ class PerplexityFilter(Filter):
                 logits += kenlm_model.score(line)
                 length += (len(line.split()) + 1)
             ppl = (10.0**(-logits / length)) if length != 0 else 0.0
-            samples_stats[i][StatsKeys.perplexity] = round(ppl, 1)
+            samples_stats[idx][StatsKeys.perplexity] = round(ppl, 1)
 
         return samples
 

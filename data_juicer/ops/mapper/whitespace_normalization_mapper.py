@@ -28,12 +28,12 @@ class WhitespaceNormalizationMapper(Mapper):
         super().__init__(*args, **kwargs)
 
     def process(self, samples):
-        for i, text in enumerate(samples[self.text_key]):
+        for idx, text in enumerate(samples[self.text_key]):
             # remove whitespaces before and after the main content
             text = text.strip()
 
             # replace all kinds of whitespaces with ' '
-            samples[self.text_key][i] = ''.join([
+            samples[self.text_key][idx] = ''.join([
                 char if char not in VARIOUS_WHITESPACES else ' '
                 for char in text
             ])

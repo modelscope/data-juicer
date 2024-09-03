@@ -46,7 +46,7 @@ class RemoveRepeatSentencesMapper(Mapper):
                                        ) if ignore_special_character else None
 
     def process(self, samples):
-        for i, text in enumerate(samples[self.text_key]):
+        for idx, text in enumerate(samples[self.text_key]):
             lines = [e for e in text.split('\n')]
             new_lines = []
             hash_set = set([])
@@ -68,6 +68,6 @@ class RemoveRepeatSentencesMapper(Mapper):
                             hash_set.add(copy)
                 new_lines.append(new_sent)
 
-            samples[self.text_key][i] = '\n'.join(new_lines)
+            samples[self.text_key][idx] = '\n'.join(new_lines)
 
         return samples

@@ -60,29 +60,27 @@ class AlphanumericFilter(Filter):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
 
-        for i, stat in enumerate(samples_stats):
+        for idx, stat in enumerate(samples_stats):
+            cur_text = samples_list[idx]
             if self.tokenization:
                 if StatsKeys.alpha_token_ratio in stat:
                     continue
                 alpha_count = sum(
-                    map(lambda char: 1
-                        if char.isalpha() else 0, samples_list[i]))
+                    map(lambda char: 1 if char.isalpha() else 0, cur_text))
                 tokenizer = get_model(self.model_key)
                 token_count = len(
                     get_words_from_document(
-                        samples_list[i],
+                        cur_text,
                         token_func=tokenizer.tokenize if tokenizer else None))
-                samples_stats[i][StatsKeys.alpha_token_ratio] = (
+                samples_stats[idx][StatsKeys.alpha_token_ratio] = (
                     alpha_count / token_count) if token_count != 0 else 0.0
             else:
                 if StatsKeys.alnum_ratio in stat:
                     continue
                 alnum_count = sum(
-                    map(lambda char: 1
-                        if char.isalnum() else 0, samples_list[i]))
-                samples_stats[i][StatsKeys.alnum_ratio] = (
-                    alnum_count /
-                    len(samples_list[i])) if len(samples_list[i]) != 0 else 0.0
+                    map(lambda char: 1 if char.isalnum() else 0, cur_text))
+                samples_stats[idx][StatsKeys.alnum_ratio] = (
+                    alnum_count / len(cur_text)) if len(cur_text) != 0 else 0.0
 
         return samples
 

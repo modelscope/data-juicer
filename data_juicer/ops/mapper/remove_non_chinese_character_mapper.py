@@ -36,12 +36,12 @@ class RemoveNonChineseCharacterlMapper(Mapper):
             self.pattern += u']'
 
     def process(self, samples):
-        for i, text in enumerate(samples[self.text_key]):
+        for idx, text in enumerate(samples[self.text_key]):
             if not re.search(self.pattern, text, flags=re.DOTALL):
                 continue
 
-            samples[self.text_key][i] = re.sub(pattern=self.pattern,
-                                               repl=r'',
-                                               string=text,
-                                               flags=re.DOTALL)
+            samples[self.text_key][idx] = re.sub(pattern=self.pattern,
+                                                 repl=r'',
+                                                 string=text,
+                                                 flags=re.DOTALL)
         return samples

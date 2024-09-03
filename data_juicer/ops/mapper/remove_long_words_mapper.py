@@ -46,12 +46,12 @@ class RemoveLongWordsMapper(Mapper):
             return False
 
     def process(self, samples):
-        for i, text in enumerate(samples[self.text_key]):
+        for idx, text in enumerate(samples[self.text_key]):
             sentences = split_on_newline_tab_whitespace(text)
             sentences = [[[
                 word for word in subsentence
                 if self.should_keep_long_word(word)
             ] for subsentence in sentence] for sentence in sentences]
-            samples[self.text_key][i] = merge_on_whitespace_tab_newline(
+            samples[self.text_key][idx] = merge_on_whitespace_tab_newline(
                 sentences)
         return samples
