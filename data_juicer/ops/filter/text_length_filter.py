@@ -57,7 +57,7 @@ class TextLengthFilter(Filter):
                     bool_res.append(False)
             return bool_res
         else:
-            # for ray filter
+            # single sample for ray filter
             if self.min_len <= samples[Fields.stats][
                     StatsKeys.text_len] <= self.max_len:
                 return True

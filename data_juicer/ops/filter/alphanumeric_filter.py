@@ -20,6 +20,8 @@ class AlphanumericFilter(Filter):
     """Filter to keep samples with alphabet/numeric ratio within a specific
     range."""
 
+    _batched_op = True
+
     def __init__(self,
                  tokenization: bool = False,
                  min_ratio: float = 0.25,
@@ -54,36 +56,51 @@ class AlphanumericFilter(Filter):
                 pretrained_model_name_or_path='EleutherAI/pythia-6.9b-deduped',
                 return_model=False)
 
-    def compute_stats(self, sample):
-        if self.tokenization:
-            if StatsKeys.alpha_token_ratio in sample[Fields.stats]:
-                return sample
-            alpha_count = sum(
-                map(lambda char: 1
-                    if char.isalpha() else 0, sample[self.text_key]))
-            tokenizer = get_model(self.model_key)
-            token_count = len(
-                get_words_from_document(
-                    sample[self.text_key],
-                    token_func=tokenizer.tokenize if tokenizer else None))
-            sample[Fields.stats][StatsKeys.alpha_token_ratio] = (
-                alpha_count / token_count) if token_count != 0 else 0.0
-        else:
-            if StatsKeys.alnum_ratio in sample[Fields.stats]:
-                return sample
-            alnum_count = sum(
-                map(lambda char: 1
-                    if char.isalnum() else 0, sample[self.text_key]))
-            sample[Fields.stats][StatsKeys.alnum_ratio] = (
-                alnum_count / len(sample[self.text_key])) if len(
-                    sample[self.text_key]) != 0 else 0.0
-        return sample
+    def compute_stats(self, samples):
+        samples_list = samples[self.text_key]
+        samples_stats = samples[Fields.stats]
 
-    def process(self, sample):
-        ratio = sample[Fields.stats][
-            StatsKeys.alpha_token_ratio] if self.tokenization else sample[
-                Fields.stats][StatsKeys.alnum_ratio]
-        if self.min_ratio <= ratio <= self.max_ratio:
-            return True
+        for i, stat in enumerate(samples_stats):
+            if self.tokenization:
+                if StatsKeys.alpha_token_ratio in stat:
+                    continue
+                alpha_count = sum(
+                    map(lambda char: 1
+                        if char.isalpha() else 0, samples_list[i]))
+                tokenizer = get_model(self.model_key)
+                token_count = len(
+                    get_words_from_document(
+                        samples_list[i],
+                        token_func=tokenizer.tokenize if tokenizer else None))
+                samples_stats[i][StatsKeys.alpha_token_ratio] = (
+                    alpha_count / token_count) if token_count != 0 else 0.0
+            else:
+                if StatsKeys.alnum_ratio in stat:
+                    continue
+                alnum_count = sum(
+                    map(lambda char: 1
+                        if char.isalnum() else 0, samples_list[i]))
+                samples_stats[i][StatsKeys.alnum_ratio] = (
+                    alnum_count /
+                    len(samples_list[i])) if len(samples_list[i]) != 0 else 0.0
+
+        return samples
+
+    def process(self, samples):
+        ratio_key = StatsKeys.alpha_token_ratio if self.tokenization \
+            else StatsKeys.alnum_ratio
+        if isinstance(samples[Fields.stats], list):
+            bool_res = []
+            for stat in samples[Fields.stats]:
+                if self.min_ratio <= stat[ratio_key] <= self.max_ratio:
+                    bool_res.append(True)
+                else:
+                    bool_res.append(False)
+            return bool_res
         else:
-            return False
+            # single sample for ray filter
+            if self.min_ratio <= samples[
+                    Fields.stats][ratio_key] <= self.max_ratio:
+                return True
+            else:
+                return False
