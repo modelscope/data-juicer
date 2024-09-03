@@ -25,6 +25,8 @@ class PerplexityFilter(Filter):
     """Filter to keep samples with perplexity score less than a specific max
     value."""
 
+    _batched_op = True
+
     def __init__(self,
                  lang: str = 'en',
                  max_ppl: PositiveFloat = 1500,
@@ -46,33 +48,43 @@ class PerplexityFilter(Filter):
                                           lang=lang)
         self.kl_model_key = prepare_model(model_type='kenlm', lang=lang)
 
-    def compute_stats(self, sample, context=False):
-        # check if it's computed already
-        if StatsKeys.perplexity in sample[Fields.stats]:
-            return sample
-
-        # tokenization
+    def compute_stats(self, samples, context=False):
+        samples_list = samples[self.text_key]
+        samples_stats = samples[Fields.stats]
         words_key = f'{InterVars.words}-{self.sp_model_key}'
-        if context and words_key in sample[Fields.context]:
-            words = sample[Fields.context][words_key]
+
+        for i, stat in enumerate(samples_stats):
+            # check if it's computed already
+            if StatsKeys.perplexity in stat:
+                continue
+            # tokenization
+            if context and words_key in samples[Fields.context][i]:
+                words = samples[Fields.context][i][words_key]
+            else:
+                tokenizer = get_model(self.sp_model_key)
+                words = get_words_from_document(
+                    samples_list[i],
+                    token_func=tokenizer.encode_as_pieces
+                    if tokenizer else None)
+                if context:
+                    samples[Fields.context][i][words_key] = words
+            text = ' '.join(words)
+            # compute perplexity
+            logits, length = 0, 0
+            kenlm_model = get_model(self.kl_model_key)
+            for line in text.splitlines():
+                logits += kenlm_model.score(line)
+                length += (len(line.split()) + 1)
+            ppl = (10.0**(-logits / length)) if length != 0 else 0.0
+            samples_stats[i][StatsKeys.perplexity] = round(ppl, 1)
+
+        return samples
+
+    def process(self, samples):
+        if isinstance(samples[Fields.stats], list):
+            return [
+                stat[StatsKeys.perplexity] <= self.max_ppl
+                for stat in samples[Fields.stats]
+            ]
         else:
-            tokenizer = get_model(self.sp_model_key)
-            words = get_words_from_document(
-                sample[self.text_key],
-                token_func=tokenizer.encode_as_pieces if tokenizer else None)
-            if context:
-                sample[Fields.context][words_key] = words
-        text = ' '.join(words)
-        # compute perplexity
-        logits, length = 0, 0
-        kenlm_model = get_model(self.kl_model_key)
-        for line in text.splitlines():
-            logits += kenlm_model.score(line)
-            length += (len(line.split()) + 1)
-        ppl = (10.0**(-logits / length)) if length != 0 else 0.0
-        sample[Fields.stats][StatsKeys.perplexity] = round(ppl, 1)
-
-        return sample
-
-    def process(self, sample):
-        return sample[Fields.stats][StatsKeys.perplexity] <= self.max_ppl
+            return samples[Fields.stats][StatsKeys.perplexity] <= self.max_ppl
