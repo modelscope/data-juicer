@@ -75,7 +75,7 @@ class VideoTaggingFromAudioMapper(Mapper):
                 sr = self._model_sampling_rate
             inputs = feature_extractor(y,
                                        sampling_rate=sr,
-                                       return_tensors='pt')
+                                       return_tensors='pt').to(model.device)
             with torch.no_grad():
                 logits = model(**inputs).logits
             predicted_tag_id = torch.argmax(logits, dim=-1).item()

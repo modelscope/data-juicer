@@ -7,7 +7,7 @@ import pyarrow as pa
 from loguru import logger
 
 from data_juicer import is_cuda_available
-from data_juicer.utils.auto_install_utils import 
+from data_juicer.utils.auto_install_utils import AutoInstaller
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.process_utils import calculate_np
@@ -17,7 +17,7 @@ OPERATORS = Registry('Operators')
 UNFORKABLE = Registry('Unforkable')
 current_path = os.path.dirname(os.path.realpath(__file__))
 version_file_path = os.path.join(current_path, '../../environments/science_requires.txt')
-AUTOINSTALL = AutoInstaller(version_file_path)
+AUTOINSTALL = AutoInstaller([version_file_path])
 
 def convert_list_dict_to_dict_list(samples):
     # reconstruct samples from "list of dicts" to "dict of lists"

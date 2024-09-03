@@ -9,6 +9,9 @@ from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 OP_NAME = 'nlpaug_en_mapper'
 
 nlpaug = LazyLoader('nlpaug', globals(), 'nlpaug')
+nac = LazyLoader('nac', globals(), 'nlpaug.augmenter.char')
+naw = LazyLoader('naw', globals(), 'nlpaug.augmenter.word')
+naf = LazyLoader('naf', globals(), 'nlpaug.flow')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -94,7 +97,6 @@ class NlpaugEnMapper(Mapper):
 
         aug_pipeline = []
         # word level
-        naw = nlpaug.augmenter.word
         Action = nlpaug.util.Action
         if delete_random_word:
             aug_pipeline.append(naw.RandomWordAug(action=Action.DELETE))
@@ -106,7 +108,6 @@ class NlpaugEnMapper(Mapper):
             aug_pipeline.append(naw.SplitAug())
 
         # char level
-        nac = nlpaug.augmenter.char
         if keyboard_error_char:
             aug_pipeline.append(nac.KeyboardAug())
         if ocr_error_char:
@@ -119,7 +120,7 @@ class NlpaugEnMapper(Mapper):
             aug_pipeline.append(nac.RandomCharAug(action=Action.INSERT))
 
         if self.sequential:
-            self.aug = nlpaug.flow.Sequential(aug_pipeline)
+            self.aug = naf.Sequential(aug_pipeline)
         else:
             self.aug = aug_pipeline
 

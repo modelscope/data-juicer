@@ -555,7 +555,6 @@ def prepare_model(model_type, **model_kwargs):
     assert (model_type in MODEL_FUNCTION_MAPPING.keys()
             ), 'model_type must be one of the following: {}'.format(
                 list(MODEL_FUNCTION_MAPPING.keys()))
-    global MODEL_ZOO
     model_func = MODEL_FUNCTION_MAPPING[model_type]
     model_key = partial(model_func, **model_kwargs)
     return model_key
@@ -588,3 +587,14 @@ def get_model(model_key=None, rank=None, use_cuda=False):
         rank = rank % cuda_device_count()
         move_to_cuda(MODEL_ZOO[model_key], rank)
     return MODEL_ZOO[model_key]
+
+
+def free_models():
+    global MODEL_ZOO
+    for model_key in MODEL_ZOO:
+        try:
+            MODEL_ZOO[model_key].to('cpu')
+        except:
+            pass
+    del MODEL_ZOO
+    MODEL_ZOO = {}

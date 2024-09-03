@@ -4,10 +4,9 @@ from typing import Tuple, Union
 
 from loguru import logger
 
-from data_juicer.utils.auto_install_utils import _is_package_installed
+from data_juicer.utils.auto_install_utils import _is_package_installed, _torch_check_and_set
 
 UNAVAILABLE_OPERATORS = {}
-CHECK_SYSTEM_INFO_ONCE = True
 
 
 class UnavailableOperator:
@@ -104,22 +103,3 @@ def _is_package_available(
         return package_exists, package_version
     else:
         return package_exists
-
-
-def _torch_check_and_set():
-    # only for python3.8 on mac
-    global CHECK_SYSTEM_INFO_ONCE
-    if CHECK_SYSTEM_INFO_ONCE and importlib.util.find_spec('torch') is not None:
-        major, minor = sys.version_info[:2]
-        system = platform.system()
-        if major == 3 and minor == 8 and system == 'Darwin':
-            logger.warning(
-                'The torch.set_num_threads function does not '
-                'work in python3.8 version on Mac systems. We will set '
-                'OMP_NUM_THREADS to 1 manually before importing torch')
-
-            os.environ['OMP_NUM_THREADS'] = str(1)
-            CHECK_SYSTEM_INFO_ONCE = False
-        import torch
-        # avoid hanging when calling clip in multiprocessing
-        torch.set_num_threads(1)

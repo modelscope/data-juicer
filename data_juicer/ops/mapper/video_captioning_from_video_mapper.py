@@ -17,8 +17,8 @@ from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
-from ..op_fusion import AUTOINSTALL, LOADED_VIDEOS
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_captioning_from_video_mapper'
 

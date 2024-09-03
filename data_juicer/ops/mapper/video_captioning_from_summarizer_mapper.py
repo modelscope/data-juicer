@@ -30,7 +30,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         'accelerate',
         'tiktoken',  # by audio caption
         'torchaudio',  # by audio tag
-        'git+https://github.com/xinyu1205/recognize-anything.git'])
+        'ram@git+https://github.com/xinyu1205/recognize-anything.git'])
     def __init__(self,
                  hf_summarizer: str = None,
                  trust_remote_code=False,

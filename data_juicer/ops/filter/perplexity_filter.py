@@ -23,7 +23,7 @@ class PerplexityFilter(Filter):
     """Filter to keep samples with perplexity score less than a specific max
     value."""
 
-    @AUTOINSTALL.check(['perplexity_filter'])
+    @AUTOINSTALL.check(['sentencepiece', 'kenlm'])
     def __init__(self,
                  lang: str = 'en',
                  max_ppl: PositiveFloat = 1500,

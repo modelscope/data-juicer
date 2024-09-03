@@ -6,14 +6,36 @@ import platform
 
 from loguru import logger
 
-from data_juicer.utils.availability_utils import _torch_check_and_set
+CHECK_SYSTEM_INFO_ONCE = True
 
 def _is_package_installed(package_name):
+    if '@' in package_name:
+        package_name = package_name.split('@')[0]
     try:
         subprocess.check_output([sys.executable, '-m', 'pip', 'show', package_name], stderr=subprocess.STDOUT)
         return True
     except subprocess.CalledProcessError:
         return False
+
+
+def _torch_check_and_set():
+    # only for python3.8 on mac
+    global CHECK_SYSTEM_INFO_ONCE
+    if CHECK_SYSTEM_INFO_ONCE and importlib.util.find_spec('torch') is not None:
+        major, minor = sys.version_info[:2]
+        system = platform.system()
+        if major == 3 and minor == 8 and system == 'Darwin':
+            logger.warning(
+                'The torch.set_num_threads function does not '
+                'work in python3.8 version on Mac systems. We will set '
+                'OMP_NUM_THREADS to 1 manually before importing torch')
+
+            os.environ['OMP_NUM_THREADS'] = str(1)
+            CHECK_SYSTEM_INFO_ONCE = False
+        import torch
+        # avoid hanging when calling clip in multiprocessing
+        torch.set_num_threads(1)
+
 
 class AutoInstaller(object):
     """
@@ -50,8 +72,8 @@ class AutoInstaller(object):
                             pkg = self.version_map[pkg]
                         subprocess.check_call(["pip", "install", pkg])
                         logger.info(f"The {pkg} installed.")
-                        if pkg == 'torch':
-                            _torch_check_and_set()
+                    if pkg == 'torch':
+                        _torch_check_and_set()
                 return func(*args, **kwargs)
             return inner_wrapper
         return wrapper

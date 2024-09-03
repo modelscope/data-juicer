@@ -20,7 +20,7 @@ class VideoTaggingFromFramesFilter(Filter):
 
     _accelerator = 'cuda'
 
-    @AUTOINSTALL.check(['torch', 'git+https://github.com/xinyu1205/recognize-anything.git'])
+    @AUTOINSTALL.check(['torch', 'ram@git+https://github.com/xinyu1205/recognize-anything.git'])
     def __init__(self,
                  tags: List[str] = ['people'],
                  contain: str = 'any',
