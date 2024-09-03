@@ -79,14 +79,14 @@ class CharacterRepetitionFilter(Filter):
 
     def process(self, samples):
         if isinstance(samples[Fields.stats], list):
-            bool_res = []
+            bool_results = []
             for stat in samples[Fields.stats]:
                 if self.min_ratio <= stat[
                         StatsKeys.char_rep_ratio] <= self.max_ratio:
-                    bool_res.append(True)
+                    bool_results.append(True)
                 else:
-                    bool_res.append(False)
-            return bool_res
+                    bool_results.append(False)
+            return bool_results
         else:
             # single sample for ray filter
             if self.min_ratio <= samples[Fields.stats][
