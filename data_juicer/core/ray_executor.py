@@ -9,7 +9,6 @@ from data_juicer.utils.availability_utils import AvailabilityChecking
 
 with AvailabilityChecking(['ray'], requires_type='dist'):
     import ray
-    import ray.data as rd
 
 
 class RayExecutor:
@@ -57,10 +56,7 @@ class RayExecutor:
             from data_juicer.format.formatter import FORMATTERS
             dataset = FORMATTERS.modules[obj_name](**args).load_dataset()
         else:
-            dataset = rd.read_json(self.cfg.dataset_path)
-
-        # convert all the path in dataset to absolute path
-        dataset = RayDataset(dataset, self.cfg.dataset_path, self.cfg)
+            dataset = RayDataset(self.cfg.dataset_path, self.cfg)
         # 2. extract processes
         logger.info('Preparing process operators...')
         ops = load_ops(self.cfg.process, self.cfg.op_fusion)

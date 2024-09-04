@@ -8,6 +8,7 @@ import zstandard as zstd
 from loguru import logger
 
 DEFAULT_PREFIX = '__dj__'
+DEFAULT_MAX_FILE_SIZE = 128 * 1024 * 1024  # 128 MB
 
 
 class Fields(object):
