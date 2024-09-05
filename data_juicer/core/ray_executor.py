@@ -46,7 +46,7 @@ class RayExecutor:
         """
         # 1. load data
         logger.info('Loading dataset with Ray...')
-
+        tstart = time.time()
         if self.cfg.get('generated_dataset_config', None):
             generated_dataset_config = self.cfg.generated_dataset_config
             assert isinstance(generated_dataset_config,
@@ -63,7 +63,6 @@ class RayExecutor:
 
         # 3. data process
         logger.info('Processing data...')
-        tstart = time.time()
         dataset.process(ops)
 
         # 4. data export

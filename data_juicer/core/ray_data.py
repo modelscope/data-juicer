@@ -122,7 +122,7 @@ def split_jsonl(file_path: str, max_size: int,
 
             # Write the buffered lines to the current output file
             if buffer:
-                with open(output_file_path, 'a', encoding='utf-8') as outfile:
+                with open(output_file_path, 'w', encoding='utf-8') as outfile:
                     outfile.writelines(buffer)
                 buffer = []
                 buffer_size = 0
@@ -197,7 +197,7 @@ def best_file_num(cpu: int, memory: int, file_size: int) -> int:
     Returns:
         int: best number of files in a single batch
     """
-    max_files_by_memory = memory // (2 * file_size)
+    max_files_by_memory = memory // (16 * file_size)
 
     best_num_files = max(1, (max_files_by_memory // cpu)) * cpu
     logger.info(f'Best number of files in a single batch: {best_num_files}')
@@ -250,6 +250,7 @@ class RayDataset(DJDataset):
                                     DEFAULT_MAX_FILE_SIZE, cfg.work_dir)
         cpu = ray.cluster_resources().get('CPU', 0)
         memory = ray.cluster_resources().get('memory', 0) / 1024 / 1024
+        logger.info(f'CPU: {cpu}, Memory: {memory}')
         batch_file_num = best_file_num(cpu, memory, DEFAULT_MAX_FILE_SIZE)
         return RayDataset(datasets=load_splited_json_dataset(
             files, batch_file_num),
