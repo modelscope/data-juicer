@@ -1,3 +1,4 @@
 fire
 jsonlines
 click
+fastapi[standard]

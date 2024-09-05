@@ -2,8 +2,15 @@ import importlib
 import inspect
 import logging
 import os
+import time
+from urllib.parse import parse_qs
 
 from fastapi import FastAPI, HTTPException, Request
+from pydantic import validate_call
+
+from data_juicer.core.exporter import Exporter
+from data_juicer.format.load import load_formatter
+from data_juicer.utils.file_utils import add_suffix_to_filename
 
 logger = logging.getLogger('uvicorn.error')
 app = FastAPI()
@@ -30,19 +37,44 @@ def register_objects_from_init(directory: str):
 
 def register_class(cls, class_name: str, module_path: str):
     """Register class and its methods as endpoints."""
-    for method_name in get_public_methods(cls):
-        api_path = f'/{module_path}/{class_name}/{method_name}'
+
+    def create_class_call(method_name):
 
         async def class_call(request: Request):
             try:
                 init_args = await request.json() if await request.body(
                 ) else {}
+                cls.__init__ = validate_call(
+                    cls.__init__, config=dict(arbitrary_types_allowed=True))
                 instance = cls(**init_args)
-                result = getattr(instance, method_name)(**request.query_params)
+                method = validate_call(getattr(instance, method_name))
+                q_params = parse_qs(request.url.query, keep_blank_values=True)
+                d_params = dict((k, v if len(v) > 1 else v[0])
+                                for k, v in q_params.items())
+                exporter = None
+                if dataset_path := d_params.get('dataset'):
+                    if isinstance(dataset_path, str):
+                        dataset = load_formatter(dataset_path).load_dataset()
+                        d_params['dataset'] = dataset
+                        export_path = add_suffix_to_filename(
+                            dataset_path, f'_{int(time.time())}')
+                        exporter = Exporter(export_path,
+                                            keep_stats_in_res_ds=True,
+                                            keep_hashes_in_res_ds=True,
+                                            export_stats=False)
+                result = method(**d_params)
+                if exporter:
+                    exporter.export(result)
+                    result = export_path
                 return {'status': 'success', 'result': result}
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))
 
+        return class_call
+
+    for method_name in get_public_methods(cls):
+        api_path = f'/{module_path}/{class_name}/{method_name}'
+        class_call = create_class_call(method_name)
         app.add_api_route(api_path, class_call, methods=['POST'])
         logger.debug(f'Registered {api_path}')
 
@@ -53,6 +85,8 @@ def register_function(func, func_name: str, module_path: str):
 
     async def func_call(request: Request):
         try:
+            nonlocal func
+            func = validate_call(func)
             result = func(**request.query_params)
             return {'status': 'success', 'result': result}
         except Exception as e:
