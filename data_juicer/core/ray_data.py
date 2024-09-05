@@ -84,54 +84,60 @@ def get_num_gpus(op, op_proc):
     return 1.0 / proc_per_gpu
 
 
-def split_jsonl(file_path: str, max_size: int, output_dir: str) -> List[str]:
-    """Split a jsonl file into multiple sub files
+def split_jsonl(file_path: str, max_size: int,
+                output_dir: str) -> Generator[str]:
+    """Split a jsonl file into multiple sub files more efficiently.
 
     Args:
         file_path (`str`): path of the original jsonl file
         max_size (`int`): max size of each sub file (in MB)
         output_dir (`str`): directory to save the sub files
 
-    Returns:
-        List[str]: list of sub file paths
+    Yields:
+        str: path of each newly created sub file
     """
     os.makedirs(output_dir, exist_ok=True)
-    sub_file_paths = []
     file_index = 0
     max_byte_size = max_size * 1024**2
     base_file_name = os.path.basename(file_path)
     file_name = os.path.splitext(base_file_name)[0]
     current_size = 0
+    buffer = []
+    buffer_size = 0
+    logger.info(f'Spliting {file_path}.')
+
     with open(file_path, 'r', encoding='utf-8') as infile:
         while True:
-            # Create a new file if we're starting or have reached the max size
-            if current_size >= max_byte_size:
-                file_index += 1
-                current_size = 0
             # Determine the output file name
             output_file_name = f'{file_name}_{file_index}.jsonl'
             output_file_path = os.path.join(output_dir, output_file_name)
-            # Open the output file in append mode
-            with open(output_file_path, 'a', encoding='utf-8') as outfile:
+
+            # Read lines until we reach the max buffer size
+            while current_size + buffer_size < max_byte_size:
                 line = infile.readline()
                 if not line:
                     break
-                # Write the line to the current output file
-                outfile.write(line)
-                # Update the current file size
-                current_size += len(line.encode('utf-8'))
-            # Add the new file path to the list if it's a new file
-            if output_file_path not in sub_file_paths:
-                sub_file_paths.append(output_file_path)
+                buffer.append(line)
+                buffer_size += len(line)
 
-    return sub_file_paths
+            # Write the buffered lines to the current output file
+            if buffer:
+                with open(output_file_path, 'a', encoding='utf-8') as outfile:
+                    outfile.writelines(buffer)
+                buffer = []
+                buffer_size = 0
+                file_index += 1
+                yield output_file_path
+
+            if not line:
+                break
 
 
 def split_jsonl_dataset(
     dataset_paths: Union[str, List[str]],
     max_size: int,
     output_dir: str,
-) -> List[str]:
+) -> Generator[str]:
     """Re-split the jsonl dataset files.
 
     Args:
@@ -139,18 +145,17 @@ def split_jsonl_dataset(
         max_size (`int`): max size of each sub file (in MB)
         output_dir (`str`): directory to save the sub files
 
-    Returns:
-        List[str]: list of sub file paths
+    Yields:
+        str: path of each newly created sub file
     """
     if isinstance(dataset_paths, str):
         dataset_paths = [dataset_paths]
 
-    all_sub_file_paths = []
+    logger.info('Re-splitting dataset files...')
     for path in dataset_paths:
-        sub_file_paths = split_jsonl(path, max_size, output_dir)
-        all_sub_file_paths.extend(sub_file_paths)
-
-    return all_sub_file_paths
+        for sub_file_path in split_jsonl(path, max_size, output_dir):
+            logger.info(f'Splited into {sub_file_path}')
+            yield sub_file_path
 
 
 def get_jsonl_file_names(dataset_dir_path: str) -> List[str]:
@@ -194,19 +199,19 @@ def best_file_num(cpu: int, memory: int, file_size: int) -> int:
     """
     max_files_by_memory = memory // (2 * file_size)
 
-    best_num_files = max(1, (max_files_by_memory // cpu) * cpu)
-
+    best_num_files = max(1, (max_files_by_memory // cpu)) * cpu
+    logger.info(f'Best number of files in a single batch: {best_num_files}')
     return best_num_files
 
 
 def load_splited_json_dataset(
-    file_paths: List[str],
+    file_paths: Generator[str],
     file_num_in_batch: int,
 ) -> Generator[Dataset, None, None]:
     """Load dataset from the splited jsonl files.
 
     Args:
-        file_paths (`List[str]`):
+        file_paths (`Generator[str]`):
             A list of paths to the JSONL files.
         file_num_in_batch (`int`):
             The number of files to be included in each batch.
@@ -214,13 +219,14 @@ def load_splited_json_dataset(
     Yields:
         `Dataset`: A dataset containing data from the specified batch of files.
     """
-    num_batches = (len(file_paths) + file_num_in_batch - 1)
-    for i in range(num_batches):
-        start_idx = i * file_num_in_batch
-        end_idx = min((i + 1) * file_num_in_batch, len(file_paths))
-        batch_file_paths = file_paths[start_idx:end_idx]
-        dataset = rd.read_json(batch_file_paths)
-        yield dataset
+    files = []
+    for file_path in file_paths:
+        files.append(file_path)
+        if len(files) >= file_num_in_batch:
+            yield rd.read_json(files)
+            files.clear()
+    if len(files) > 0:
+        yield rd.read_json(files)
 
 
 class RayDataset(DJDataset):
@@ -245,7 +251,7 @@ class RayDataset(DJDataset):
         cpu = ray.cluster_resources().get('CPU', 0)
         memory = ray.cluster_resources().get('memory', 0) / 1024 / 1024
         batch_file_num = best_file_num(cpu, memory, DEFAULT_MAX_FILE_SIZE)
-        return RayDataset(dataset=load_splited_json_dataset(
+        return RayDataset(datasets=load_splited_json_dataset(
             files, batch_file_num),
                           cfg=cfg)
 
@@ -310,4 +316,4 @@ class RayDataset(DJDataset):
 
     def write_json(self, path: str, force_ascii: bool = False) -> None:
         for dataset in self.datasets:
-            dataset.write_json(path, force_ascii)
+            dataset.write_json(path, force_ascii=force_ascii)
