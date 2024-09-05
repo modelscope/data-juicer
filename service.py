@@ -75,7 +75,10 @@ def register_class(cls, class_name: str, module_path: str):
     for method_name in get_public_methods(cls):
         api_path = f'/{module_path}/{class_name}/{method_name}'
         class_call = create_class_call(method_name)
-        app.add_api_route(api_path, class_call, methods=['POST'])
+        app.add_api_route(api_path,
+                          class_call,
+                          methods=['POST'],
+                          tags=['POST'])
         logger.debug(f'Registered {api_path}')
 
 
@@ -92,16 +95,19 @@ def register_function(func, func_name: str, module_path: str):
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    app.add_api_route(api_path, func_call, methods=['GET'])
+    app.add_api_route(api_path, func_call, methods=['GET'], tags=['GET'])
     logger.debug(f'Registered {api_path}')
 
 
 def get_public_methods(cls):
     """Get public methods of a class."""
+    selected = [
+        'run', 'process', 'compute_stats', 'compute_hash', 'analyze', 'compute'
+    ]
     return [
         name
         for name, _ in inspect.getmembers(cls, predicate=inspect.isfunction)
-        if not name.startswith('_')
+        if not name.startswith('_') and name in selected
     ]
 
 
