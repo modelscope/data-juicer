@@ -12,6 +12,8 @@ CHECK_SYSTEM_INFO_ONCE = True
 def _is_package_installed(package_name):
     if '@' in package_name:
         package_name = package_name.split('@')[0]
+    if '[' in package_name:
+        package_name = package_name.split('[')[0]
     try:
         subprocess.check_output(
             [sys.executable, '-m', 'pip', 'show', package_name],
