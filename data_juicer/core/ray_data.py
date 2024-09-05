@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from typing import Any, Generator, List, Union
 
+import pandas as pd
 import pyarrow as pa
 from loguru import logger
 
@@ -233,6 +234,7 @@ class RayDataset(DJDataset):
             self.datasets = datasets
         if cfg:
             self.num_proc = cfg.np
+        self.output_dataset = []
 
     @classmethod
     def read_jsonl(cls,
@@ -260,7 +262,7 @@ class RayDataset(DJDataset):
         outputs = []
         for dataset in self.datasets:
             # todo: pass dataset path into the function
-            data = preprocess_dataset(dataset, self.cfg)
+            data = preprocess_dataset(dataset, dataset_path=None, cfg=self.cfg)
             if operators is None:
                 return self
             if not isinstance(operators, list):
@@ -268,6 +270,7 @@ class RayDataset(DJDataset):
             for op in operators:
                 data = self._run_single_op(op, data)
             outputs.append(data)
+        self.datasets = outputs
         return self
 
     def _run_single_op(self, op, dataset: Dataset) -> Dataset:
@@ -298,3 +301,13 @@ class RayDataset(DJDataset):
             import traceback
             traceback.print_exc()
             exit(1)
+
+    def to_pandas(self) -> pd.DataFrame:
+        dfs = []
+        for data in self.datasets:
+            dfs.append(data.to_pandas())
+        return pd.concat(dfs, ignore_index=True)
+
+    def write_json(self, path: str, force_ascii: bool = False) -> None:
+        for dataset in self.datasets:
+            dataset.write_json(path, force_ascii)

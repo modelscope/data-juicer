@@ -70,5 +70,5 @@ class RayExecutor:
 
         # 4. data export
         logger.info('Exporting dataset to disk...')
-        dataset.data.write_json(self.cfg.export_path, force_ascii=False)
+        dataset.write_json(self.cfg.export_path, force_ascii=False)
         return dataset

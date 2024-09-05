@@ -83,7 +83,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             dataset = dataset.select_columns(column_names=column_names)
             return dataset.to_list()
         elif current_tag.startswith('ray'):
-            dataset = dataset.data.to_pandas().get(column_names)
+            dataset = dataset.to_pandas().get(column_names)
             if dataset is None:
                 return []
             return dataset.to_dict(orient='records')
