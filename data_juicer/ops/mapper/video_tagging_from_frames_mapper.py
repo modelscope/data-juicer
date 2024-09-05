@@ -9,7 +9,7 @@ from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         load_data_with_context, load_video)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Mapper
+from ..base_op import OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_tagging_from_frames_mapper'
@@ -27,9 +27,6 @@ class VideoTaggingFromFramesMapper(Mapper):
 
     _accelerator = 'cuda'
 
-    @AUTOINSTALL.check([
-        'torch', 'ram@git+https://github.com/xinyu1205/recognize-anything.git'
-    ])
     def __init__(self,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
@@ -54,7 +51,12 @@ class VideoTaggingFromFramesMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=[
+            'torch',
+            'ram@git+https://github.com/xinyu1205/recognize-anything.git'
+        ],
+                         *args,
+                         **kwargs)
         if frame_sampling_method not in ['all_keyframes', 'uniform']:
             raise ValueError(
                 f'Frame sampling method [{frame_sampling_method}] is not '

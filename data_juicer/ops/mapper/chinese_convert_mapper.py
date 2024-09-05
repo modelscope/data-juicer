@@ -1,6 +1,6 @@
 from data_juicer.utils.lazy_loader import LazyLoader
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 
 OP_NAME = 'chinese_convert_mapper'
 
@@ -26,7 +26,6 @@ class ChineseConvertMapper(Mapper):
     """Mapper to convert Chinese between Traditional Chinese, Simplified Chinese
     and Japanese Kanji."""
 
-    @AUTOINSTALL.check(['opencc'])
     def __init__(self, mode: str = 's2t', *args, **kwargs):
         """
         Initialization method.
@@ -72,7 +71,7 @@ class ChineseConvertMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['opencc'], *args, **kwargs)
         mode_list = [
             's2t', 't2s', 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp',
             't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 'jp2t'

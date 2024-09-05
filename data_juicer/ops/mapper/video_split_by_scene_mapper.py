@@ -10,7 +10,7 @@ from data_juicer.utils.file_utils import (add_suffix_to_filename,
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 
 OP_NAME = 'video_split_by_scene_mapper'
 
@@ -41,7 +41,6 @@ class VideoSplitBySceneMapper(Mapper):
         ['fade_bias', 'add_final_scene', 'method', 'block_size']
     }
 
-    @AUTOINSTALL.check(['scenedetect[opencv]'])
     def __init__(self,
                  detector: str = 'ContentDetector',
                  threshold: NonNegativeFloat = 27.0,
@@ -60,7 +59,9 @@ class VideoSplitBySceneMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['scenedetect[opencv]'],
+                         *args,
+                         **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
 
         if detector not in self.avaliable_detectors:

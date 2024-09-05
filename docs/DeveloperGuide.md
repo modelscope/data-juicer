@@ -379,7 +379,6 @@ else:
 
 ```python
 # ... (import some library)
-from ..base_op import AUTOINSTALL
 from data_juicer.utils.lazy_loader import LazyLoader
 
 # lazy import
@@ -387,13 +386,12 @@ kenlm = LazyLoader('kenlm', globals(), 'kenlm')
 sentencepiece = LazyLoader('sentencepiece', globals(), 'sentencepiece')
 
 class PerplexityFilter(Filter):
-    # auto install before init
-    @AUTOINSTALL.check(['sentencepiece', 'kenlm'])
     def __init__(self,
                 # ... (OP parameters)
                 *args,
                 **kwargs):
-        super().__init__(*args, **kwargs)
+        # auto install before init
+        super().__init__(extra_requirements=['sentencepiece', 'kenlm'], *args, **kwargs)
         # ... (some codes)
 
     def process(self, sample):

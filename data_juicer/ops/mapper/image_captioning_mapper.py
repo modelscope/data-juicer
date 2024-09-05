@@ -12,7 +12,7 @@ from data_juicer.utils.mm_utils import (SpecialTokens,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_captioning_mapper'
@@ -27,7 +27,6 @@ class ImageCaptioningMapper(Mapper):
     _accelerator = 'cuda'
     _batched_op = True
 
-    @AUTOINSTALL.check(['torch', 'transformers', 'simhash-pybind'])
     def __init__(self,
                  hf_img2seq='Salesforce/blip2-opt-2.7b',
                  trust_remote_code=False,
@@ -78,7 +77,10 @@ class ImageCaptioningMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(
+            extra_requirements=['torch', 'transformers', 'simhash-pybind'],
+            *args,
+            **kwargs)
 
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'

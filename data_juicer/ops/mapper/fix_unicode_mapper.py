@@ -1,6 +1,6 @@
 from data_juicer.utils.lazy_loader import LazyLoader
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 
 OP_NAME = 'fix_unicode_mapper'
 
@@ -11,7 +11,6 @@ ftfy = LazyLoader('ftfy', globals(), 'ftfy')
 class FixUnicodeMapper(Mapper):
     """Mapper to fix unicode errors in text samples."""
 
-    @AUTOINSTALL.check(['ftfy'])
     def __init__(self, normalization: str = None, *args, **kwargs):
         """
         Initialization method.
@@ -22,7 +21,7 @@ class FixUnicodeMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['ftfy'], *args, **kwargs)
         if normalization and len(normalization) > 0:
             self.normalization = normalization.upper()
         else:

@@ -10,7 +10,7 @@ from data_juicer.utils.mm_utils import (close_video, detect_faces,
                                         process_each_frame)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Mapper
+from ..base_op import OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_face_blur_mapper'
@@ -33,7 +33,6 @@ class VideoFaceBlurMapper(Mapper):
         'maxSize': None,
     }
 
-    @AUTOINSTALL.check(['opencv-python', 'Pillow'])
     def __init__(self,
                  cv_classifier='',
                  blur_type: str = 'gaussian',
@@ -51,7 +50,9 @@ class VideoFaceBlurMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['opencv-python', 'Pillow'],
+                         *args,
+                         **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
 
         if cv_classifier == '':

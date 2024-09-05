@@ -1,6 +1,6 @@
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 from ..common import get_sentences_from_document
 
 OP_NAME = 'sentence_split_mapper'
@@ -10,7 +10,6 @@ OP_NAME = 'sentence_split_mapper'
 class SentenceSplitMapper(Mapper):
     """Mapper to split text samples to sentences."""
 
-    @AUTOINSTALL.check(['nltk'])
     def __init__(self, lang: str = 'en', *args, **kwargs):
         """
         Initialization method.
@@ -19,7 +18,7 @@ class SentenceSplitMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['nltk'], *args, **kwargs)
         self.lang = lang
         self.model_key = prepare_model(model_type='nltk', lang=lang)
 

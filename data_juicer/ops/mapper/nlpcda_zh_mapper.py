@@ -5,7 +5,7 @@ from loguru import logger
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 
 OP_NAME = 'nlpcda_zh_mapper'
 
@@ -18,7 +18,6 @@ class NlpcdaZhMapper(Mapper):
 
     _batched_op = True
 
-    @AUTOINSTALL.check(['nlpcda'])
     def __init__(self,
                  sequential: bool = False,
                  aug_num: int = 1,
@@ -69,7 +68,7 @@ class NlpcdaZhMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['nlpcda'], *args, **kwargs)
 
         self.aug_num = aug_num
         if aug_num >= 10:

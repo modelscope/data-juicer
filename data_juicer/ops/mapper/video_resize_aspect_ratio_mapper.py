@@ -8,7 +8,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import close_video, load_video
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 
 OP_NAME = 'video_resize_aspect_ratio_mapper'
 
@@ -61,7 +61,6 @@ class VideoResizeAspectRatioMapper(Mapper):
 
     STRATEGY = ['decrease', 'increase']
 
-    @AUTOINSTALL.check(['ffmpeg-python'])
     def __init__(
         self,
         min_ratio: str = '9/21',
@@ -88,7 +87,7 @@ class VideoResizeAspectRatioMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['ffmpeg-python'], *args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
 
         strategy = strategy.lower()

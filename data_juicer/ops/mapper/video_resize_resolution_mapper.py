@@ -10,7 +10,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import close_video, load_video
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_resize_resolution_mapper'
@@ -27,7 +27,6 @@ class VideoResizeResolutionMapper(Mapper):
         with deep learning for future works.
     """
 
-    @AUTOINSTALL.check(['ffmpeg-python'])
     def __init__(self,
                  min_width: PositiveInt = 1,
                  max_width: PositiveInt = sys.maxsize,
@@ -59,7 +58,7 @@ class VideoResizeResolutionMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['ffmpeg-python'], *args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
 
         force_original_aspect_ratio = force_original_aspect_ratio.lower()

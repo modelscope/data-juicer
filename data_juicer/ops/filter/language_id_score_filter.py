@@ -7,7 +7,7 @@ from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 
 OP_NAME = 'language_id_score_filter'
 
@@ -19,7 +19,6 @@ class LanguageIDScoreFilter(Filter):
     """Filter to keep samples in a specific language with confidence score
     larger than a specific min value."""
 
-    @AUTOINSTALL.check(['fasttext-wheel'])
     def __init__(self,
                  lang: Union[str, List[str], Tuple[str]] = '',
                  min_score: ClosedUnitInterval = 0.8,
@@ -34,7 +33,9 @@ class LanguageIDScoreFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['fasttext-wheel'],
+                         *args,
+                         **kwargs)
         if not lang:
             # lang is [], '' or None
             self.lang = None

@@ -14,7 +14,7 @@ from data_juicer.utils.mm_utils import (close_video,
                                         parse_string_to_roi,
                                         process_each_frame)
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_remove_watermark_mapper'
@@ -30,7 +30,6 @@ class VideoRemoveWatermarkMapper(Mapper):
         Remove the watermarks in videos given regions.
     """
 
-    @AUTOINSTALL.check(['opencv-python'])
     def __init__(self,
                  roi_strings: List[str] = ['0,0,0.1,0.1'],
                  roi_type: str = 'ratio',
@@ -69,7 +68,7 @@ class VideoRemoveWatermarkMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['opencv-python'], *args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
 
         if roi_type not in ['ratio', 'pixel']:

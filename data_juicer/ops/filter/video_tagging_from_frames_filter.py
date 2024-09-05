@@ -3,7 +3,7 @@ from jsonargparse.typing import List, PositiveInt
 
 from data_juicer.utils.constant import Fields
 
-from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
+from ..base_op import OPERATORS, UNFORKABLE, Filter
 from ..mapper.video_tagging_from_frames_mapper import \
     VideoTaggingFromFramesMapper
 from ..op_fusion import LOADED_VIDEOS
@@ -20,9 +20,6 @@ class VideoTaggingFromFramesFilter(Filter):
 
     _accelerator = 'cuda'
 
-    @AUTOINSTALL.check([
-        'torch', 'ram@git+https://github.com/xinyu1205/recognize-anything.git'
-    ])
     def __init__(self,
                  tags: List[str] = ['people'],
                  contain: str = 'any',
@@ -59,7 +56,12 @@ class VideoTaggingFromFramesFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=[
+            'torch',
+            'ram@git+https://github.com/xinyu1205/recognize-anything.git'
+        ],
+                         *args,
+                         **kwargs)
         if contain not in ['any', 'all']:
             raise ValueError(f'the containing type [{contain}] is not '
                              f'supported. Can only be one of ["any", "all"].')

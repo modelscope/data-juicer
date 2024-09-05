@@ -125,6 +125,8 @@ class OP:
         """
         Base class of operators.
 
+        :param extra_requirements: the extra requirements of the OP,
+            check and auto install here
         :param text_key: the key name of field that stores sample texts
             to be processed.
         :param image_key: the key name of field that stores sample image list
@@ -134,6 +136,10 @@ class OP:
         :param video_key: the key name of field that stores sample video list
             to be processed
         """
+        # check and auto install extra dependencies
+        self.extra_requirements = kwargs.get('extra_requirements', [])
+        AUTOINSTALL.check(self.extra_requirements)
+
         # init data keys
         self.text_key = kwargs.get('text_key', 'text')
         self.image_key = kwargs.get('image_key', 'images')

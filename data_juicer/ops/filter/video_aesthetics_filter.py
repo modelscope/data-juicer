@@ -9,7 +9,7 @@ from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         load_data_with_context, load_video)
 
 from ...utils.model_utils import get_model, prepare_model
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
 OP_NAME = 'video_aesthetics_filter'
@@ -27,8 +27,6 @@ class VideoAestheticsFilter(Filter):
 
     _accelerator = 'cuda'
 
-    @AUTOINSTALL.check(
-        ['torch', 'transformers', 'simple-aesthetics-predictor'])
     def __init__(self,
                  hf_scorer_model='',
                  trust_remote_code=False,
@@ -76,7 +74,11 @@ class VideoAestheticsFilter(Filter):
         :param kwargs: Extra keyword arguments.
         """
 
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=[
+            'torch', 'transformers', 'simple-aesthetics-predictor'
+        ],
+                         *args,
+                         **kwargs)
         if hf_scorer_model == '':
             hf_scorer_model = \
                 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE'

@@ -2,7 +2,7 @@ from jsonargparse.typing import List
 
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       merge_on_whitespace_tab_newline,
                       split_on_newline_tab_whitespace, strip)
@@ -14,7 +14,6 @@ OP_NAME = 'remove_words_with_incorrect_substrings_mapper'
 class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
     """Mapper to remove words with incorrect substrings."""
 
-    @AUTOINSTALL.check(['sentencepiece'])
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,
@@ -32,7 +31,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
         """
         if substrings is None:
             substrings = ['http', 'www', '.com', 'href', '//']
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['sentencepiece'], *args, **kwargs)
         self.tokenization = tokenization
         self.substrings = substrings
         self.lang = lang

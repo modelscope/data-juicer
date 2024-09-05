@@ -7,7 +7,7 @@ from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
-from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
+from ..base_op import OPERATORS, Deduplicator
 from ..op_fusion import LOADED_IMAGES
 from .document_deduplicator import DocumentDeduplicator
 
@@ -34,7 +34,6 @@ class ImageDeduplicator(Deduplicator):
     of images between documents.
     """
 
-    @AUTOINSTALL.check(['imagededup'])
     def __init__(self,
                  method: str = 'phash',
                  consider_text: bool = False,
@@ -49,7 +48,7 @@ class ImageDeduplicator(Deduplicator):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['imagededup'], *args, **kwargs)
         if method not in HASH_METHOD:
             raise ValueError(f'Keep strategy [{method}] is not supported. '
                              f'Can only be one of {HASH_METHOD}.')

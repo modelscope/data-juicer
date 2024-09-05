@@ -70,21 +70,12 @@ class AutoInstaller(object):
         """
         install if the package is not importable.
         """
-
-        def wrapper(func):
-
-            def inner_wrapper(*args, **kwargs):
-                for pkg in check_pkgs:
-                    if not _is_package_installed(pkg):
-                        logger.info(f'Installing {pkg} ...')
-                        if pkg in self.version_map:
-                            pkg = self.version_map[pkg]
-                        subprocess.check_call(['pip', 'install', pkg])
-                        logger.info(f'The {pkg} installed.')
-                    if pkg == 'torch':
-                        _torch_check_and_set()
-                return func(*args, **kwargs)
-
-            return inner_wrapper
-
-        return wrapper
+        for pkg in check_pkgs:
+            if not _is_package_installed(pkg):
+                logger.info(f'Installing {pkg} ...')
+                if pkg in self.version_map:
+                    pkg = self.version_map[pkg]
+                subprocess.check_call(['pip', 'install', pkg])
+                logger.info(f'The {pkg} installed.')
+            if pkg == 'torch':
+                _torch_check_and_set()

@@ -5,7 +5,7 @@ from jsonargparse.typing import PositiveInt
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
 from ..op_fusion import INTER_WORDS
@@ -19,7 +19,6 @@ class WordsNumFilter(Filter):
     """Filter to keep samples with total words number within a specific
     range."""
 
-    @AUTOINSTALL.check(['sentencepiece'])
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,
@@ -41,7 +40,7 @@ class WordsNumFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['sentencepiece'], *args, **kwargs)
         self.min_num = min_num
         self.max_num = max_num
         self.model_key = None

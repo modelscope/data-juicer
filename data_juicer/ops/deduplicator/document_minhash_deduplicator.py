@@ -16,7 +16,7 @@ from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
+from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import UnionFind, split_on_whitespace
 
 OP_NAME = 'document_minhash_deduplicator'
@@ -103,7 +103,6 @@ class DocumentMinhashDeduplicator(Deduplicator):
     kept in the final dataset.
     """
 
-    @AUTOINSTALL.check(['scipy'])
     def __init__(
         self,
         tokenization: str = 'space',
@@ -149,7 +148,7 @@ class DocumentMinhashDeduplicator(Deduplicator):
         :param tokenizer_model: path for the sentencepiece model, used for
             sentencepiece tokenization.
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['scipy'], *args, **kwargs)
         # about minhash computation
         self.tokenization = tokenization
         self.window_size = window_size

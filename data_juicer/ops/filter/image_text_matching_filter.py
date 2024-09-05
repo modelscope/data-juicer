@@ -8,7 +8,7 @@ from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_text_matching_filter'
@@ -25,7 +25,6 @@ class ImageTextMatchingFilter(Filter):
 
     _accelerator = 'cuda'
 
-    @AUTOINSTALL.check(['torch', 'transformers'])
     def __init__(self,
                  hf_blip='Salesforce/blip-itm-base-coco',
                  trust_remote_code=False,
@@ -58,7 +57,9 @@ class ImageTextMatchingFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['torch', 'transformers'],
+                         *args,
+                         **kwargs)
         self.min_score = min_score
         self.max_score = max_score
         if reduce_mode not in ['avg', 'max', 'min']:

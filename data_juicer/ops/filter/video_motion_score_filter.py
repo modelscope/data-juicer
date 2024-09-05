@@ -8,7 +8,7 @@ from jsonargparse.typing import PositiveFloat, PositiveInt
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 
-from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
+from ..base_op import OPERATORS, UNFORKABLE, Filter
 
 OP_NAME = 'video_motion_score_filter'
 
@@ -41,7 +41,6 @@ class VideoMotionScoreFilter(Filter):
         'flags': 0
     }
 
-    @AUTOINSTALL.check(['opencv-python'])
     def __init__(self,
                  min_score: float = 0.25,
                  max_score: float = sys.float_info.max,
@@ -79,7 +78,7 @@ class VideoMotionScoreFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(extra_requirements=['opencv-python'], *args, **kwargs)
         self.min_score = min_score
         self.max_score = max_score
         self.sampling_fps = sampling_fps
