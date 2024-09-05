@@ -230,8 +230,9 @@ class NestedDataset(Dataset, DJDataset):
         # Batched is always required for fault tolerance
         if inspect.ismethod(called_func):
             kargs['batched'] = True
-            kargs['batch_size'] = kargs.pop(
-                'batch_size', 1) if called_func.__self__.is_batched_op() else 1
+            kargs['batch_size'] = kargs.pop('batch_size', 1) if hasattr(
+                called_func.__self__, 'is_batched_op'
+            ) and called_func.__self__.is_batched_op() else 1
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
