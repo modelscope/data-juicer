@@ -4,7 +4,7 @@ from jsonargparse.typing import PositiveInt
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
-from ..base_op import OPERATORS
+from ..base_op import AUTOINSTALL, OPERATORS
 from ..op_fusion import LOADED_IMAGES
 from .ray_basic_deduplicator import RayBasicDeduplicator
 
@@ -44,11 +44,11 @@ class RayImageDeduplicator(RayBasicDeduplicator):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['imagededup'],
-                         redis_host=redis_host,
+        super().__init__(redis_host=redis_host,
                          redis_port=redis_port,
                          *args,
                          **kwargs)
+        AUTOINSTALL.check(['imagededup'])
         if method not in HASH_METHOD:
             raise ValueError(f'Keep strategy [{method}] is not supported. '
                              f'Can only be one of {HASH_METHOD}.')

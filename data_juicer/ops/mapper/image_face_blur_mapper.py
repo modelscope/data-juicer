@@ -9,7 +9,7 @@ from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
                                         load_image)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, UNFORKABLE, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_face_blur_mapper'
@@ -49,9 +49,8 @@ class ImageFaceBlurMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['opencv-python', 'Pillow'],
-                         *args,
-                         **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['opencv-python', 'Pillow'])
         self._init_parameters = self.remove_extra_parameters(locals())
 
         if cv_classifier == '':

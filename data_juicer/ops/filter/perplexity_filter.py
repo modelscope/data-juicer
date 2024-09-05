@@ -8,7 +8,7 @@ from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 from ..common import get_words_from_document
 from ..op_fusion import INTER_WORDS
 
@@ -38,9 +38,8 @@ class PerplexityFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['sentencepiece', 'kenlm'],
-                         *args,
-                         **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['sentencepiece', 'kenlm'])
         self.max_ppl = max_ppl
         self.lang = lang
         self.sp_model_key = prepare_model(model_type='sentencepiece',

@@ -4,7 +4,7 @@
 
 from data_juicer.utils.lazy_loader import LazyLoader
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'clean_html_mapper'
 
@@ -22,7 +22,8 @@ class CleanHtmlMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['selectolax'], *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['selectolax'])
 
     def process(self, sample):
 

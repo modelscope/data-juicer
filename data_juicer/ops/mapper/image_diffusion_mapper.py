@@ -9,7 +9,7 @@ from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_diffusion_mapper'
@@ -88,11 +88,9 @@ class ImageDiffusionMapper(Mapper):
         :param hf_img2seq: model name on huggingface to generate caption if
             caption_key is None.
         """
-        super().__init__(extra_requirements=[
-            'diffusers', 'torch', 'transformers', 'simhash-pybind'
-        ],
-                         *args,
-                         **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(
+            ['diffusers', 'torch', 'transformers', 'simhash-pybind'])
         self._init_parameters = self.remove_extra_parameters(locals())
         self.strength = strength
         self.guidance_scale = guidance_scale

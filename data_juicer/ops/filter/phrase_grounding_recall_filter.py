@@ -12,7 +12,7 @@ from data_juicer.utils.mm_utils import (SpecialTokens, iou,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'phrase_grounding_recall_filter'
@@ -116,9 +116,8 @@ class PhraseGroundingRecallFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['torch', 'transformers', 'nltk'],
-                         *args,
-                         **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['torch', 'transformers', 'nltk'])
         self.min_recall = min_recall
         self.max_recall = max_recall
         if reduce_mode not in ['avg', 'max', 'min']:

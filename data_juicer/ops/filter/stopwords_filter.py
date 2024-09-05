@@ -9,7 +9,7 @@ from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
 from ..op_fusion import INTER_WORDS
@@ -53,7 +53,8 @@ class StopWordsFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['sentencepiece'], *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['sentencepiece'])
         self.lang = lang
         self.min_ratio = min_ratio
         self.use_words_aug = use_words_aug

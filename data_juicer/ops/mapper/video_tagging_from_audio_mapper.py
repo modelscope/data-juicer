@@ -5,7 +5,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'video_tagging_from_audio_mapper'
 
@@ -31,10 +31,8 @@ class VideoTaggingFromAudioMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(
-            extra_requirements=['torch', 'transformers', 'torchaudio'],
-            *args,
-            **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['torch', 'transformers', 'torchaudio'])
         self.model_key = prepare_model(model_type='huggingface',
                                        pretrained_model_name_or_path=hf_ast,
                                        trust_remote_code=trust_remote_code)

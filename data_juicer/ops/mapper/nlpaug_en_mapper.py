@@ -4,7 +4,7 @@ from loguru import logger
 
 from data_juicer.utils.lazy_loader import LazyLoader
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'nlpaug_en_mapper'
 
@@ -84,7 +84,8 @@ class NlpaugEnMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['nlpaug'], *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['nlpaug'])
 
         self.aug_num = aug_num
         if aug_num >= 10:

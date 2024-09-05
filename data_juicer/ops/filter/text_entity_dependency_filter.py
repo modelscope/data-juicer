@@ -4,7 +4,7 @@ from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 
 OP_NAME = 'text_entity_dependency_filter'
 
@@ -34,7 +34,8 @@ class TextEntityDependencyFilter(Filter):
             'any': keep this sample if any objet is dependent. 'all': keep this
             sample only if all images are dependent.
         """
-        super().__init__(extra_requirements=['spacy-pkuseg'], *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['spacy-pkuseg'])
 
         if lang not in ['en', 'zh']:
             raise ValueError(

@@ -13,7 +13,7 @@ from loguru import logger
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 
-from ..base_op import OPERATORS, Deduplicator
+from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
 
 OP_NAME = 'document_simhash_deduplicator'
@@ -55,9 +55,8 @@ class DocumentSimhashDeduplicator(Deduplicator):
             num_blocks
         """
         # about simhash computation
-        super().__init__(extra_requirements=['simhash-pybind'],
-                         *args,
-                         **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['simhash-pybind'])
         self.tokenization = tokenization
         self.window_size = window_size
         self.lowercase = lowercase

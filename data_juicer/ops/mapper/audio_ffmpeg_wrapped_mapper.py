@@ -5,7 +5,7 @@ from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'audio_ffmpeg_wrapped_mapper'
 
@@ -39,7 +39,8 @@ class AudioFFmpegWrappedMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['ffmpeg-python'], *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['ffmpeg-python'])
         self._init_parameters = self.remove_extra_parameters(locals())
 
         self.filter_name = filter_name

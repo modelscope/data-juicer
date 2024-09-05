@@ -6,7 +6,7 @@ from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 from ..common import get_words_from_document
 
 OP_NAME = 'token_num_filter'
@@ -38,7 +38,8 @@ class TokenNumFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['transformers'], *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['transformers'])
         self.min_num = min_num
         self.max_num = max_num
         self.hf_tokenizer = hf_tokenizer

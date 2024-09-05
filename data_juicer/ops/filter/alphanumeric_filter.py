@@ -5,7 +5,7 @@ from jsonargparse.typing import PositiveFloat
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 from ..common import get_words_from_document
 
 OP_NAME = 'alphanumeric_filter'
@@ -38,7 +38,8 @@ class AlphanumericFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['transformers'], *args, **kwargs)
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['transformers'])
         self.tokenization = tokenization
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
