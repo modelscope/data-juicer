@@ -33,7 +33,7 @@ class LanguageIDScoreFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(extra_requirements=['fasttext-wheel'],
+        super().__init__(extra_requirements=['fasttext', 'fasttext-wheel'],
                          *args,
                          **kwargs)
         if not lang:
