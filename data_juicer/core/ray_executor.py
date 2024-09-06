@@ -56,7 +56,9 @@ class RayExecutor:
             from data_juicer.format.formatter import FORMATTERS
             dataset = FORMATTERS.modules[obj_name](**args).load_dataset()
         else:
-            dataset = RayDataset.read_jsonl(self.cfg.dataset_path, self.cfg)
+            dataset = RayDataset.read_jsonl(self.cfg.dataset_path,
+                                            self.cfg,
+                                            resplit=True)
         # 2. extract processes
         logger.info('Preparing process operators...')
         ops = load_ops(self.cfg.process, self.cfg.op_fusion)
