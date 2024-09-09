@@ -72,7 +72,7 @@ def check_model(model_name, force=False):
             )
         else:
             logger.info(
-                f'Model [{cached_model_path}] not found . Downloading...')
+                f'Model [{cached_model_path}] not found. Downloading...')
 
         try:
             model_link = os.path.join(MODEL_LINKS, model_name)
@@ -406,7 +406,46 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
     return (model, processor) if return_model else processor
 
 
-def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
+def prepare_vllm_model(pretrained_model_name_or_path,
+                       return_model=True,
+                       trust_remote_code=False,
+                       tensor_parallel_size=1,
+                       max_model_len=None,
+                       max_num_seqs=256):
+    """
+    Prepare and load a HuggingFace model with the correspoding processor.
+
+    :param pretrained_model_name_or_path: model name or path
+    :param return_model: return model or not
+    :param trust_remote_code: passed to transformers
+    :param tensor_parallel_size: The number of GPUs to use for distributed
+        execution with tensor parallelism.
+    :param max_model_len: Model context length. If unspecified, will
+        be automatically derived from the model config.
+    :param max_num_seqs: Maximum number of sequences to be processed in a
+        single iteration.
+    :return: a tuple (model, input processor) if `return_model` is True;
+        otherwise, only the processor is returned.
+    """
+    from transformers import AutoProcessor
+    from vllm import LLM as vLLM
+
+    processor = AutoProcessor.from_pretrained(
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+
+    if return_model:
+        import torch
+        model = vLLM(model=pretrained_model_name_or_path,
+                     trust_remote_code=trust_remote_code,
+                     dtype=torch.float16,
+                     tensor_parallel_size=tensor_parallel_size,
+                     max_model_len=max_model_len,
+                     max_num_seqs=max_num_seqs)
+
+    return (model, processor) if return_model else processor
+
+
+def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.7.0'):
     """
     Prepare spacy model for specific language.
 
@@ -419,17 +458,40 @@ def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.5.0'):
     assert lang in ['zh', 'en'], 'Diversity only support zh and en'
     model_name = name_pattern.format(lang)
     logger.info(f'Loading spacy model [{model_name}]...')
-    compressed_model = '{}.zip'.format(model_name)
+    compressed_model = '{}.tar.gz'.format(model_name)
 
     # decompress the compressed model if it's not decompressed
     def decompress_model(compressed_model_path):
-        decompressed_model_path = compressed_model_path.replace('.zip', '')
+        if not compressed_model_path.endswith('.tar.gz'):
+            raise ValueError('Only .tar.gz files are supported')
+
+        decompressed_model_path = compressed_model_path.replace('.tar.gz', '')
         if os.path.exists(decompressed_model_path) \
                 and os.path.isdir(decompressed_model_path):
             return decompressed_model_path
-        import zipfile
-        with zipfile.ZipFile(compressed_model_path) as zf:
-            zf.extractall(DJMC)
+
+        ver_name = os.path.basename(decompressed_model_path)
+        unver_name = ver_name.rsplit('-', maxsplit=1)[0]
+        target_dir_in_archive = f'{ver_name}/{unver_name}/{ver_name}/'
+
+        import tarfile
+        with tarfile.open(compressed_model_path, 'r:gz') as tar:
+            for member in tar.getmembers():
+                if member.name.startswith(target_dir_in_archive):
+                    # relative path without unnecessary directory levels
+                    relative_path = os.path.relpath(
+                        member.name, start=target_dir_in_archive)
+                    target_path = os.path.join(decompressed_model_path,
+                                               relative_path)
+
+                    if member.isfile():
+                        # ensure the directory exists
+                        target_directory = os.path.dirname(target_path)
+                        os.makedirs(target_directory, exist_ok=True)
+                        # for files, extract to the specific location
+                        with tar.extractfile(member) as source:
+                            with open(target_path, 'wb') as target:
+                                target.write(source.read())
         return decompressed_model_path
 
     try:
@@ -547,6 +609,7 @@ MODEL_FUNCTION_MAPPING = {
     'diffusion': prepare_diffusion_model,
     'video_blip': prepare_video_blip_model,
     'recognizeAnything': prepare_recognizeAnything_model,
+    'vllm': prepare_vllm_model,
     'opencv_classifier': prepare_opencv_classifier,
 }
 

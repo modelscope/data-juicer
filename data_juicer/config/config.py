@@ -87,6 +87,13 @@ def init_configs(args=None):
         'default. Accepted format:<w1> dataset1-path <w2> dataset2-path '
         '<w3> dataset3-path ...')
     parser.add_argument(
+        '--generated_dataset_config',
+        type=Dict,
+        default=None,
+        help='Configuration used to create a dataset. '
+        'The dataset will be created from this configuration if provided. '
+        'It must contain the `type` field to specify the dataset name.')
+    parser.add_argument(
         '--export_path',
         type=str,
         default='./outputs/hello_world.jsonl',
@@ -377,7 +384,7 @@ def init_setup_from_cfg(cfg):
                  redirect=cfg.executor_type == 'default')
 
     # check and get dataset dir
-    if os.path.exists(cfg.dataset_path):
+    if cfg.get('dataset_path', None) and os.path.exists(cfg.dataset_path):
         cfg.dataset_path = os.path.abspath(cfg.dataset_path)
         if os.path.isdir(cfg.dataset_path):
             cfg.dataset_dir = cfg.dataset_path

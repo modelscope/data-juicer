@@ -48,9 +48,12 @@ class Executor:
 
         # setup formatter
         logger.info('Setting up data formatter...')
-        self.formatter = load_formatter(self.cfg.dataset_path,
-                                        self.cfg.text_keys, self.cfg.suffixes,
-                                        self.cfg.add_suffix)
+        self.formatter = load_formatter(
+            dataset_path=self.cfg.dataset_path,
+            generated_dataset_config=self.cfg.generated_dataset_config,
+            text_keys=self.cfg.text_keys,
+            suffixes=self.cfg.suffixes,
+            add_suffix=self.cfg.add_suffix)
 
         # whether to use checkpoint mechanism. If it's true, Executor will
         # check if there are existing checkpoints first and try to load the

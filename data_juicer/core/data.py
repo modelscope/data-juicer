@@ -229,8 +229,9 @@ class NestedDataset(Dataset, DJDataset):
 
         if inspect.ismethod(called_func):
             # batched is required for fault-tolerant or batched OP
-            if not called_func.__self__.turbo or \
-                    called_func.__self__.is_batched_op():
+            if not called_func.__self__.turbo or hasattr(
+                    called_func.__self__,
+                    'is_batched_op') and called_func.__self__.is_batched_op():
                 kargs['batched'] = True
                 kargs['batch_size'] = kargs.pop('batch_size', 1)
             else:
