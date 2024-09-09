@@ -101,7 +101,7 @@ class VideoTaggingFromFramesMapper(Mapper):
                 frames = extract_video_frames_uniformly(video, self.frame_num)
             else:
                 video_tags.append([])
-                frames = []
+                continue
 
             frame_tensor = torch.stack([
                 self.transform(frame.to_image()) for frame in frames

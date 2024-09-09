@@ -1,4 +1,5 @@
 import librosa
+import numpy as np
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
@@ -58,7 +59,7 @@ class VideoTaggingFromAudioMapper(Mapper):
 
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
-            sample[self.tag_field_name] = []
+            sample[self.tag_field_name] = np.array([], dtype=np.str_)
             return sample
 
         # load video paths
@@ -87,11 +88,11 @@ class VideoTaggingFromAudioMapper(Mapper):
                 sr = self._model_sampling_rate
             inputs = feature_extractor(y,
                                        sampling_rate=sr,
-                                       return_tensors='pt')
+                                       return_tensors='pt').to(model.device)
             with torch.no_grad():
                 logits = model(**inputs).logits
             predicted_tag_id = torch.argmax(logits, dim=-1).item()
             predicted_tag = model.config.id2label[predicted_tag_id]
             video_audio_tags.append(predicted_tag)
-        sample[self.tag_field_name] = video_audio_tags
+        sample[self.tag_field_name] = np.array(video_audio_tags, dtype=np.str_)
         return sample
