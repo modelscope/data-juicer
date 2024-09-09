@@ -2,12 +2,12 @@ import math
 import re
 from itertools import chain
 
+import lazy_loader as lazy
 from jsonargparse.typing import NonNegativeFloat, NonNegativeInt
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
-import lazy_loader as lazy
 from data_juicer.utils.mm_utils import SpecialTokens
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper

@@ -5,13 +5,13 @@
 from collections import defaultdict, deque
 from typing import Dict, Set
 
+import lazy_loader as lazy
 import numpy as np
 import regex
 from jsonargparse.typing import PositiveInt
 from loguru import logger
 
 from data_juicer.utils.constant import HashKeys
-import lazy_loader as lazy
 
 from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace

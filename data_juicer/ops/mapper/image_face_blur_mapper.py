@@ -1,10 +1,10 @@
 import os
 
+import lazy_loader as lazy
 from loguru import logger
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
-import lazy_loader as lazy
 from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
                                         load_image)
 from data_juicer.utils.model_utils import get_model, prepare_model

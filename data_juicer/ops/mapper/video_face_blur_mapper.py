@@ -1,10 +1,10 @@
 import os
 
 import av
+import lazy_loader as lazy
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
-import lazy_loader as lazy
 from data_juicer.utils.mm_utils import (close_video, detect_faces,
                                         load_data_with_context, load_video,
                                         process_each_frame)

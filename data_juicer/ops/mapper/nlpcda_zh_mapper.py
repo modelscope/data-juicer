@@ -1,8 +1,8 @@
 from copy import deepcopy
 
+import lazy_loader as lazy
 from loguru import logger
 
-import lazy_loader as lazy
 from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper

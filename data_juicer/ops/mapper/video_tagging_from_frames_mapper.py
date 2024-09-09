@@ -1,9 +1,9 @@
 from collections import Counter
 
+import lazy_loader as lazy
 from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.constant import Fields
-import lazy_loader as lazy
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)

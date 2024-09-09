@@ -1,9 +1,9 @@
 import sys
 
+import lazy_loader as lazy
 from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
-import lazy_loader as lazy
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import AUTOINSTALL, OPERATORS, Filter

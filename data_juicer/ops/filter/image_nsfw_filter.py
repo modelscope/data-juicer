@@ -1,8 +1,8 @@
+import lazy_loader as lazy
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
 
 from data_juicer.utils.constant import Fields, StatsKeys
-import lazy_loader as lazy
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 

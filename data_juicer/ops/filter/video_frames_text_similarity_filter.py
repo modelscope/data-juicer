@@ -1,9 +1,9 @@
+import lazy_loader as lazy
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 from PIL import ImageOps
 
 from data_juicer.utils.constant import Fields, StatsKeys
-import lazy_loader as lazy
 from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
                                         extract_key_frames,
                                         extract_video_frames_uniformly,

@@ -1,8 +1,7 @@
 from copy import deepcopy
 
-from loguru import logger
-
 import lazy_loader as lazy
+from loguru import logger
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 

@@ -1,10 +1,10 @@
 from collections import defaultdict
 from typing import Dict, Set, Tuple
 
+import lazy_loader as lazy
 import numpy as np
 
 from data_juicer.utils.constant import HashKeys
-import lazy_loader as lazy
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator

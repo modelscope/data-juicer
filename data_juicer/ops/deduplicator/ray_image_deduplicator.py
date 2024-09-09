@@ -1,7 +1,7 @@
+import lazy_loader as lazy
 import numpy as np
 from jsonargparse.typing import PositiveInt
 
-import lazy_loader as lazy
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ..base_op import AUTOINSTALL, OPERATORS

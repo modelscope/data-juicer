@@ -1,7 +1,7 @@
+import lazy_loader as lazy
 import librosa
 
 from data_juicer.utils.constant import Fields
-import lazy_loader as lazy
 from data_juicer.utils.mm_utils import extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 

@@ -2,11 +2,11 @@ import sys
 from contextlib import contextmanager
 from typing import List, Optional, Sequence, Tuple, Union
 
+import lazy_loader as lazy
 import numpy as np
 from jsonargparse.typing import PositiveFloat, PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
-import lazy_loader as lazy
 
 from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
 

@@ -1,8 +1,9 @@
 from typing import Dict, List, Optional
 
+import lazy_loader as lazy
+
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
-import lazy_loader as lazy
 from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper

@@ -2,11 +2,11 @@
 # https://huggingface.co/spaces/huggingface/text-data-filtering
 # --------------------------------------------------------
 
+import lazy_loader as lazy
 from jsonargparse.typing import ClosedUnitInterval, List
 
 from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
-import lazy_loader as lazy
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import AUTOINSTALL, OPERATORS, Filter

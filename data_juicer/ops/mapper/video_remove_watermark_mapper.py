@@ -1,12 +1,12 @@
 import os
 
 import av
+import lazy_loader as lazy
 import numpy as np
 from jsonargparse.typing import List, PositiveInt
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
-import lazy_loader as lazy
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import (close_video,
                                         extract_video_frames_uniformly,
