@@ -1,10 +1,10 @@
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'fix_unicode_mapper'
 
-ftfy = LazyLoader('ftfy', globals(), 'ftfy')
+ftfy = lazy.load('ftfy')
 
 
 @OPERATORS.register_module(OP_NAME)

@@ -1,10 +1,10 @@
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'chinese_convert_mapper'
 
-opencc = LazyLoader('opencc', globals(), 'opencc')
+opencc = lazy.load('opencc')
 
 OPENCC_CONVERTER = None
 

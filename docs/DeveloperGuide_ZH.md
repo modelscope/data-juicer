@@ -357,11 +357,11 @@ else:
 ```python
 # ... (import some library)
 from ..base_op import AUTOINSTALL
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 
 # lazy import
-kenlm = LazyLoader('kenlm', globals(), 'kenlm')
-sentencepiece = LazyLoader('sentencepiece', globals(), 'sentencepiece')
+kenlm = lazy.load('kenlm')
+sentencepiece = lazy.load('sentencepiece')
 
 class PerplexityFilter(Filter):
     def __init__(self,

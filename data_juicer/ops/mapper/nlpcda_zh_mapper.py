@@ -2,14 +2,14 @@ from copy import deepcopy
 
 from loguru import logger
 
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'nlpcda_zh_mapper'
 
-nlpcda = LazyLoader('nlpcda', globals(), 'nlpcda')
+nlpcda = lazy.load('nlpcda')
 
 
 @OPERATORS.register_module(OP_NAME)

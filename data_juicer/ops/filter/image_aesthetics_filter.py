@@ -3,7 +3,7 @@ from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ...utils.model_utils import get_model, prepare_model
@@ -13,7 +13,7 @@ from ..op_fusion import LOADED_IMAGES
 OP_NAME = 'image_aesthetics_filter'
 CHECK_PKGs = ['torch', 'transformers', 'simple-aesthetics-predictor']
 
-torch = LazyLoader('torch', globals(), 'torch')
+torch = lazy.load('torch')
 
 
 @OPERATORS.register_module(OP_NAME)

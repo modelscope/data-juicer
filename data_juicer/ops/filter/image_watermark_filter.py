@@ -2,7 +2,7 @@ import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -11,8 +11,8 @@ from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_watermark_filter'
 
-torch = LazyLoader('torch', globals(), 'torch')
-transformers = LazyLoader('transformers', globals(), 'transformers')
+torch = lazy.load('torch')
+transformers = lazy.load('transformers')
 
 
 @OPERATORS.register_module(OP_NAME)

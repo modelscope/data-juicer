@@ -1,7 +1,7 @@
 import numpy as np
 from jsonargparse.typing import PositiveInt
 
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ..base_op import AUTOINSTALL, OPERATORS
@@ -10,7 +10,7 @@ from .ray_basic_deduplicator import RayBasicDeduplicator
 
 OP_NAME = 'ray_image_deduplicator'
 
-imagededup = LazyLoader('imagededup', globals(), 'imagededup')
+imagededup = lazy.load('imagededup')
 
 HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
 

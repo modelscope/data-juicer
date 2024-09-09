@@ -4,7 +4,7 @@ from loguru import logger
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
                                         load_image)
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -14,8 +14,8 @@ from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_face_blur_mapper'
 
-cv2 = LazyLoader('cv2', globals(), 'cv2')
-PIL = LazyLoader('PIL', globals(), 'PIL')
+cv2 = lazy.load('cv2')
+PIL = lazy.load('PIL')
 
 
 @UNFORKABLE.register_module(OP_NAME)

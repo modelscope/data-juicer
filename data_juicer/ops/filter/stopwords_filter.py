@@ -6,7 +6,7 @@ from jsonargparse.typing import ClosedUnitInterval, List
 
 from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import AUTOINSTALL, OPERATORS, Filter
@@ -16,7 +16,7 @@ from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'stopwords_filter'
 
-sentencepiece = LazyLoader('sentencepiece', globals(), 'sentencepiece')
+sentencepiece = lazy.load('sentencepiece')
 
 
 @OPERATORS.register_module(OP_NAME)

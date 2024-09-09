@@ -5,7 +5,7 @@ from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 
 from data_juicer import cuda_device_count
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.mm_utils import (close_video,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
@@ -15,7 +15,7 @@ from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
 OP_NAME = 'video_ocr_area_ratio_filter'
 
-easyocr = LazyLoader('easyocr', globals(), 'easyocr')
+easyocr = lazy.load('easyocr')
 
 
 def triangle_area(p1, p2, p3):

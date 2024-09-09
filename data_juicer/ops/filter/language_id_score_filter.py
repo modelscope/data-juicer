@@ -4,14 +4,14 @@ from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import AUTOINSTALL, OPERATORS, Filter
 
 OP_NAME = 'language_id_score_filter'
 
-fasttext = LazyLoader('fasttext', globals(), 'fasttext')
+fasttext = lazy.load('fasttext')
 
 
 @OPERATORS.register_module(OP_NAME)

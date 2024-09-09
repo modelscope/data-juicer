@@ -11,14 +11,14 @@ from jsonargparse.typing import PositiveInt
 from loguru import logger
 
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 
 from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
 
 OP_NAME = 'document_simhash_deduplicator'
 
-simhash = LazyLoader('simhash', globals(), 'simhash')
+simhash = lazy.load('simhash')
 
 
 @OPERATORS.register_module(OP_NAME)

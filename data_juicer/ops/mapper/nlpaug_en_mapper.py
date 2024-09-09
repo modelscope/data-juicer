@@ -2,16 +2,16 @@ from copy import deepcopy
 
 from loguru import logger
 
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'nlpaug_en_mapper'
 
-nlpaug = LazyLoader('nlpaug', globals(), 'nlpaug')
-nac = LazyLoader('nac', globals(), 'nlpaug.augmenter.char')
-naw = LazyLoader('naw', globals(), 'nlpaug.augmenter.word')
-naf = LazyLoader('naf', globals(), 'nlpaug.flow')
+nlpaug = lazy.load('nlpaug')
+nac = lazy.load('nlpaug.augmenter.char')
+naw = lazy.load('nlpaug.augmenter.word')
+naf = lazy.load('nlpaug.flow')
 
 
 @OPERATORS.register_module(OP_NAME)

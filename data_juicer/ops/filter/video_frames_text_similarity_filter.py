@@ -3,7 +3,7 @@ from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 from PIL import ImageOps
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
                                         extract_key_frames,
                                         extract_video_frames_uniformly,
@@ -16,8 +16,8 @@ from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
 OP_NAME = 'video_frames_text_similarity_filter'
 
-torch = LazyLoader('torch', globals(), 'torch')
-transformers = LazyLoader('transformers', globals(), 'transformers')
+torch = lazy.load('torch')
+transformers = lazy.load('transformers')
 
 
 @OPERATORS.register_module(OP_NAME)

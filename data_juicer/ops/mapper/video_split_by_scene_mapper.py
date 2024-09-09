@@ -7,14 +7,14 @@ from jsonargparse.typing import NonNegativeFloat, NonNegativeInt
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.mm_utils import SpecialTokens
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'video_split_by_scene_mapper'
 
-scenedetect = LazyLoader('scenedetect', globals(), 'scenedetect')
+scenedetect = lazy.load('scenedetect')
 
 
 def replace_func(match, scene_counts_iter):

@@ -4,7 +4,7 @@ import av
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.mm_utils import (close_video, detect_faces,
                                         load_data_with_context, load_video,
                                         process_each_frame)
@@ -15,8 +15,8 @@ from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_face_blur_mapper'
 
-cv2 = LazyLoader('cv2', globals(), 'cv2')
-PIL = LazyLoader('PIL', globals(), 'PIL')
+cv2 = lazy.load('cv2')
+PIL = lazy.load('PIL')
 
 
 @UNFORKABLE.register_module(OP_NAME)

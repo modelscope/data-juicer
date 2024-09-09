@@ -6,6 +6,7 @@ import hashlib
 import struct
 from collections import defaultdict
 
+import lazy_loader as lazy
 import numpy as np
 import regex
 from jsonargparse.typing import ClosedUnitInterval, PositiveInt
@@ -13,7 +14,6 @@ from loguru import logger
 from tqdm import tqdm
 
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
 from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
@@ -21,7 +21,7 @@ from ..common.helper_func import UnionFind, split_on_whitespace
 
 OP_NAME = 'document_minhash_deduplicator'
 
-integrate = LazyLoader('integrate', globals(), 'scipy.integrate')
+integrate = lazy.load('scipy.integrate')
 
 MERSENNE_PRIME = np.uint64((1 << 61) - 1)
 MAX_HASH = np.uint64((1 << 32) - 1)

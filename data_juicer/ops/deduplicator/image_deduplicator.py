@@ -4,7 +4,7 @@ from typing import Dict, Set, Tuple
 import numpy as np
 
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.lazy_loader import LazyLoader
+import lazy_loader as lazy
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
@@ -13,7 +13,7 @@ from .document_deduplicator import DocumentDeduplicator
 
 OP_NAME = 'image_deduplicator'
 
-imagededup = LazyLoader('imagededup', globals(), 'imagededup')
+imagededup = lazy.load('imagededup')
 
 HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
 
