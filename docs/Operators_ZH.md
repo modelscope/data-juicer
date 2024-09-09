@@ -12,7 +12,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
 | [ Mapper ]( #mapper )              | 46 | 对数据样本进行编辑和转换  |
-| [ Filter ]( #filter )              | 41 | 过滤低质量样本       |
+| [ Filter ]( #filter )              | 42 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  5 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  4 | 基于排序选取高质量样本   |
 
@@ -111,6 +111,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | image_aspect_ratio_filter      | Image      | -      | 保留样本中包含的图片的宽高比在指定范围内的样本                     |
 | image_face_ratio_filter        | Image      | -      | 保留样本中包含的图片的最大脸部区域在指定范围内的样本                  |
 | image_nsfw_filter              | Image      | -      | 保留包含NSFW分数在指定阈值之下的图像的样本 |
+| image_pair_similarity_filter   | Image      | -      | 保留图像特征余弦相似度(基于CLIP模型)在指定范围内的样本                 |
 | image_shape_filter             | Image      | -      | 保留样本中包含的图片的形状（即宽和高）在指定范围内的样本                |
 | image_size_filter              | Image      | -      | 保留样本中包含的图片的大小（bytes）在指定范围内的样本               |
 | image_text_matching_filter     | Multimodal | -      | 保留图像-文本的分类匹配分(基于BLIP模型)在指定范围内的样本            |
