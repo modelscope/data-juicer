@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 
@@ -23,7 +24,7 @@ class NlpaugEnMapper(Mapper):
 
     def __init__(self,
                  sequential: bool = False,
-                 aug_num: int = 1,
+                 aug_num: PositiveInt = 1,
                  keep_original_sample: bool = True,
                  delete_random_word: bool = False,
                  swap_random_word: bool = False,

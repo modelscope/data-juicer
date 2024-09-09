@@ -1,9 +1,10 @@
 import json
 import random
 import re
-from typing import Dict
+from typing import Dict, Optional
 
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -51,18 +52,18 @@ class GenerateInstructionMapper(Mapper):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_model,
-                 seed_file,
-                 instruct_num,
+                 hf_model: str,
+                 seed_file: str,
+                 instruct_num: PositiveInt,
                  trust_remote_code: bool = False,
                  similarity_threshold: float = 0.7,
-                 prompt_template: str = None,
-                 qa_pair_template: str = None,
-                 example_template: str = None,
-                 qa_extraction_pattern: str = None,
+                 prompt_template: Optional[str] = None,
+                 qa_pair_template: Optional[str] = None,
+                 example_template: Optional[str] = None,
+                 qa_extraction_pattern: Optional[str] = None,
                  enable_vllm: bool = True,
-                 tensor_parallel_size: int = None,
-                 max_model_len: int = None,
+                 tensor_parallel_size: Optional[int] = None,
+                 max_model_len: Optional[int] = None,
                  max_num_seqs: int = 256,
                  sampling_params: Dict = {},
                  *args,

@@ -2,7 +2,9 @@
 # https://huggingface.co/spaces/huggingface/text-data-filtering
 # --------------------------------------------------------
 
-from jsonargparse.typing import ClosedUnitInterval, List
+from typing import List
+
+from pydantic import PositiveInt
 
 from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -29,10 +31,10 @@ class StopWordsFilter(Filter):
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,
-                 min_ratio: ClosedUnitInterval = 0.3,
+                 min_ratio: float = 0.3,
                  stopwords_dir: str = ASSET_DIR,
                  use_words_aug: bool = False,
-                 words_aug_group_sizes: List = [2],
+                 words_aug_group_sizes: List[PositiveInt] = [2],
                  words_aug_join_char: str = '',
                  *args,
                  **kwargs):

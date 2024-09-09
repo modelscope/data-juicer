@@ -1,5 +1,5 @@
 import os
-from typing import List, Tuple, Union
+from typing import List, Union
 
 from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 from loguru import logger
@@ -27,7 +27,7 @@ class LocalFormatter(BaseFormatter):
         self,
         dataset_path: str,
         type: str,
-        suffixes: Union[str, List[str], Tuple[str]] = None,
+        suffixes: Union[str, List[str], None] = None,
         text_keys: List[str] = None,
         add_suffix=False,
         **kwargs,
