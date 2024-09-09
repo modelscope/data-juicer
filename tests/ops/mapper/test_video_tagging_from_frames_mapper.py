@@ -71,6 +71,52 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
         op = VideoTaggingFromFramesMapper()
         self._run_video_tagging_from_frames_mapper(op, ds_list, tgt_list)
 
+    def test_specified_tag_field_name(self):
+        tag_field_name = 'my_tags'
+
+        ds_list = [{
+            'text': f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
+            'videos': [self.vid1_path]
+        }, {
+            'text':
+            f'{SpecialTokens.video} 身穿白色上衣的男子，拿着一个东西，拍打自己的胃部。{SpecialTokens.eoc}',
+            'videos': [self.vid2_path]
+        }, {
+            'text':
+            f'{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
+            'videos': [self.vid3_path]
+        }]
+        tgt_list = [{
+            'text':
+            f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
+            'videos': [self.vid1_path],
+            Fields.video_frame_tags: [[
+                'animal', 'ray', 'text', 'writing', 'yellow', 'game',
+                'screenshot', 'cartoon', 'cartoon character', 'person', 'robe',
+                'sky'
+            ]]
+        }, {
+            'text':
+            f'{SpecialTokens.video} 身穿白色上衣的男子，拿着一个东西，拍打自己的胃部。{SpecialTokens.eoc}',
+            'videos': [self.vid2_path],
+            Fields.video_frame_tags: [[
+                'man', 'shirt', 't shirt', 't-shirt', 'wear', 'white', 'boy',
+                'catch', 'hand', 'blind', 'cotton candy', 'ball', 'person'
+            ]]
+        }, {
+            'text':
+            f'{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
+            'videos': [self.vid3_path],
+            tag_field_name: [[
+                'woman', 'table', 'girl', 'sit', 'person', 'laptop',
+                'bookshelf', 'conversation', 'round table', 'computer', 'man',
+                'closet', 'stool', 'computer screen', 'laugh', 'cabinet',
+                'hand', 'selfie', 'stand'
+            ]]
+        }]
+        op = VideoTaggingFromFramesMapper(tag_field_name=tag_field_name)
+        self._run_video_tagging_from_frames_mapper(op, ds_list, tgt_list)
+
     def test_uniform(self):
         ds_list = [{
             'text': f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',

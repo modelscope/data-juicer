@@ -29,9 +29,11 @@ class ImageTaggingMapper(Mapper):
 
     _accelerator = 'cuda'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, tag_field_name=Fields.image_tags, *args, **kwargs):
         """
         Initialization method.
+        :param tag_field_name: the field name to store the tags. It's
+            "__dj__image_tags__" in default.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -42,15 +44,16 @@ class ImageTaggingMapper(Mapper):
             input_size=384)
         from ram import get_transform
         self.transform = get_transform(image_size=384)
+        self.tag_field_name = tag_field_name
 
     def process(self, sample, rank=None, context=False):
         # check if it's generated already
-        if Fields.image_tags in sample:
+        if self.tag_field_name in sample:
             return sample
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.image_tags] = []
+            sample[self.tag_field_name] = []
             return sample
 
         # load images
@@ -63,7 +66,7 @@ class ImageTaggingMapper(Mapper):
         for _, value in enumerate(loaded_image_keys):
             image = images[value]
 
-            image_tensor = torch.unsqueeze(self.transform(image)).to(
+            image_tensor = torch.unsqueeze(self.transform(image), dim=0).to(
                 next(model.parameters()).device)
             with torch.no_grad():
                 tags, _ = model.generate_tag(image_tensor)
@@ -73,5 +76,5 @@ class ImageTaggingMapper(Mapper):
             sorted_word_list = [item for item, _ in word_count.most_common()]
             image_tags.append(sorted_word_list)
 
-        sample[Fields.image_tags] = image_tags
+        sample[self.tag_field_name] = image_tags
         return sample

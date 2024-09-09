@@ -36,6 +36,7 @@ class VideoTaggingFromFramesMapper(Mapper):
     def __init__(self,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
+                 tag_field_name=Fields.video_frame_tags,
                  *args,
                  **kwargs):
         """
@@ -71,14 +72,16 @@ class VideoTaggingFromFramesMapper(Mapper):
         from ram import get_transform
         self.transform = get_transform(image_size=384)
 
+        self.tag_field_name = tag_field_name
+
     def process(self, sample, rank=None, context=False):
         # check if it's generated already
-        if Fields.video_frame_tags in sample:
+        if self.tag_field_name in sample:
             return sample
 
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
-            sample[Fields.video_frame_tags] = []
+            sample[self.tag_field_name] = []
             return sample
 
         # load videos
@@ -115,5 +118,5 @@ class VideoTaggingFromFramesMapper(Mapper):
             for vid_key in videos:
                 close_video(videos[vid_key])
 
-        sample[Fields.video_frame_tags] = video_tags
+        sample[self.tag_field_name] = video_tags
         return sample
