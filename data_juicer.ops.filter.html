@@ -91,6 +91,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.FlaggedWordFilter"><code class="docutils literal notranslate"><span class="pre">FlaggedWordFilter</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.WordRepetitionFilter"><code class="docutils literal notranslate"><span class="pre">WordRepetitionFilter</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.VideoMotionScoreFilter"><code class="docutils literal notranslate"><span class="pre">VideoMotionScoreFilter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.ImagePairSimilarityFilter"><code class="docutils literal notranslate"><span class="pre">ImagePairSimilarityFilter</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
@@ -2820,6 +2821,79 @@ vars in the sample temporarily.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.VideoMotionScoreFilter.process">
 <span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/video_motion_score_filter.html#VideoMotionScoreFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.VideoMotionScoreFilter.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>For sample level, sample –&gt; Boolean.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – sample to decide whether to filter</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true for keeping and false for filtering</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.ImagePairSimilarityFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.filter.</span></span><span class="sig-name descname"><span class="pre">ImagePairSimilarityFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'openai/clip-vit-base-patch32'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trust_remote_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">any_or_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/image_pair_similarity_filter.html#ImagePairSimilarityFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.ImagePairSimilarityFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></p>
+<p>Filter to keep image pairs with similarities between images
+within a specific range.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.ImagePairSimilarityFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'openai/clip-vit-base-patch32'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trust_remote_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">any_or_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/image_pair_similarity_filter.html#ImagePairSimilarityFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.ImagePairSimilarityFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">param hf_clip<span class="colon">:</span></dt>
+<dd class="field-odd"><p>clip model name on huggingface to compute
+the similarity between image and text.</p>
+</dd>
+<dt class="field-even">param min_score<span class="colon">:</span></dt>
+<dd class="field-even"><p>The min similarity to keep samples.</p>
+</dd>
+<dt class="field-odd">param max_score<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The max similarity to keep samples.</p>
+</dd>
+<dt class="field-even">param any_or_all<span class="colon">:</span></dt>
+<dd class="field-even"><p>keep this sample with ‘any’ or ‘all’ strategy of
+all images. ‘any’: keep this sample if any images meet the
+condition. ‘all’: keep this sample only if all images meet the
+condition.</p>
+</dd>
+<dt class="field-odd">param args<span class="colon">:</span></dt>
+<dd class="field-odd"><p>extra args</p>
+</dd>
+<dt class="field-even">param kwargs<span class="colon">:</span></dt>
+<dd class="field-even"><p>extra args</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.ImagePairSimilarityFilter.compute_stats">
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/image_pair_similarity_filter.html#ImagePairSimilarityFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.ImagePairSimilarityFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute stats for the sample which is used as a metric to decide
+whether to filter this sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample</strong> – input sample.</p></li>
+<li><p><strong>context</strong> – whether to store context information of intermediate
+vars in the sample temporarily.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sample with computed stats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.ImagePairSimilarityFilter.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/image_pair_similarity_filter.html#ImagePairSimilarityFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.ImagePairSimilarityFilter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
