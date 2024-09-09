@@ -320,6 +320,11 @@ process:
       score_threshold: 0.5                                    # the nsfw score threshold for samples, range from 0 to 1. Samples with nsfw score less than this threshold will be kept.
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
       mem_required: '1GB'                                     # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
+  - image_pair_similarity_filter:                           # filter samples according to the similarity score between the image pair.
+      hf_clip: 'openai/clip-vit-base-patch32'                 # model name of the CLIP model on huggingface
+      min_score: 0.1                                          # the min similarity score of filter range
+      max_score: 1.0                                          # the max similarity score of filter range
+      any_or_all: "any"                                       # keep this sample when any/all images meet the filter condition
   - image_shape_filter:                                     # filter samples according to the widths and heights of images in them
       min_width: 200                                          # the min width of width filter range
       max_width: 5000                                         # the max width of width filter range

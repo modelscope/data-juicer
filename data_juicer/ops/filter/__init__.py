@@ -4,7 +4,8 @@ from . import (alphanumeric_filter, audio_duration_filter,
                average_line_length_filter, character_repetition_filter,
                flagged_words_filter, image_aesthetics_filter,
                image_aspect_ratio_filter, image_face_ratio_filter,
-               image_nsfw_filter, image_shape_filter, image_size_filter,
+               image_nsfw_filter, image_pair_similarity_filter,
+               image_shape_filter, image_size_filter,
                image_text_matching_filter, image_text_similarity_filter,
                image_watermark_filter, language_id_score_filter,
                maximum_line_length_filter, perplexity_filter,
@@ -30,6 +31,7 @@ from .image_aesthetics_filter import ImageAestheticsFilter
 from .image_aspect_ratio_filter import ImageAspectRatioFilter
 from .image_face_ratio_filter import ImageFaceRatioFilter
 from .image_nsfw_filter import ImageNSFWFilter
+from .image_pair_similarity_filter import ImagePairSimilarityFilter
 from .image_shape_filter import ImageShapeFilter
 from .image_size_filter import ImageSizeFilter
 from .image_text_matching_filter import ImageTextMatchingFilter
@@ -104,6 +106,7 @@ __all__ = [
     'FlaggedWordFilter',
     'WordRepetitionFilter',
     'VideoMotionScoreFilter',
+    'ImagePairSimilarityFilter'
 ]
 
 # yapf: enable

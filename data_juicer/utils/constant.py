@@ -144,6 +144,7 @@ class StatsKeysConstant(object):
     image_aesthetics_scores = 'image_aesthetics_scores'
     image_nsfw_score = 'image_nsfw_score'
     image_watermark_prob = 'image_watermark_prob'
+    image_pair_similarity = 'image_pair_similarity'
 
     # audios
     audio_duration = 'audio_duration'
