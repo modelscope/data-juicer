@@ -35,6 +35,7 @@ class VideoTaggingFromFramesFilter(Filter):
                  contain: str = 'any',
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
+                 tag_field_name=Fields.video_frame_tags,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -59,6 +60,8 @@ class VideoTaggingFromFramesFilter(Filter):
             the first and the last frames will be extracted. If it's larger
             than 2, in addition to the first and the last frames, other frames
             will be extracted uniformly within the video duration.
+        :param tag_field_name: the field name to store the tags. It's
+            "__dj__video_frame_tags__" in default.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all videos. 'any': keep this sample if any videos meet the
             condition. 'all': keep this sample only if all videos meet the
@@ -80,10 +83,12 @@ class VideoTaggingFromFramesFilter(Filter):
         self.tags = set([tag.lower() for tag in tags])
         self.contain_any = (contain == 'any')
         self.any = (any_or_all == 'any')
+        self.tag_field_name = tag_field_name
         self.tagging_producer = VideoTaggingFromFramesMapper(
             frame_sampling_method=frame_sampling_method,
             frame_num=frame_num,
             accelerator=self.accelerator,
+            tag_field_name=self.tag_field_name,
         )
 
     def compute_stats(self, sample, rank=None, context=False):
@@ -93,7 +98,7 @@ class VideoTaggingFromFramesFilter(Filter):
         return sample
 
     def process(self, sample, rank=None):
-        video_tags = sample[Fields.video_frame_tags]
+        video_tags = sample[self.tag_field_name]
         if len(video_tags) <= 0:
             return True
 

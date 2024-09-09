@@ -55,6 +55,8 @@ class VideoTaggingFromFramesMapper(Mapper):
             the first and the last frames will be extracted. If it's larger
             than 2, in addition to the first and the last frames, other frames
             will be extracted uniformly within the video duration.
+        :param tag_field_name: the field name to store the tags. It's
+            "__dj__video_frame_tags__" in default.
         :param args: extra args
         :param kwargs: extra args
         """
