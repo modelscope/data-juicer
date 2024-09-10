@@ -49,6 +49,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'num_proc': 4,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
                     }
                 }, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
@@ -65,6 +66,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
@@ -131,6 +133,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
                     }
                 })
             self.assertDictEqual(
@@ -147,6 +150,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
                     }
                 })
             self.assertDictEqual(
@@ -163,6 +167,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
                     }
                 })
             self.assertDictEqual(
@@ -179,6 +184,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
                     }
                 })
             self.assertDictEqual(
@@ -195,6 +201,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
                     }
                 })
 
