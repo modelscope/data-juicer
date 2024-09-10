@@ -52,9 +52,9 @@ class GenerateInstructionMapper(Mapper):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_model: str,
-                 seed_file: str,
-                 instruct_num: PositiveInt,
+                 hf_model: str = 'Qwen/Qwen-7B-Chat',
+                 seed_file: Optional[str] = None,
+                 instruct_num: PositiveInt = 3,
                  trust_remote_code: bool = False,
                  similarity_threshold: float = 0.7,
                  prompt_template: Optional[str] = None,
