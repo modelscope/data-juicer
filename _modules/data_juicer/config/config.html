@@ -284,6 +284,12 @@
         <span class="s1">&#39;will find all suffix files, and select a suitable formatter &#39;</span>
         <span class="s1">&#39;with the most files as default.&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--turbo&#39;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Enable Turbo mode to maximize processing speed. Stability &#39;</span>
+        <span class="s1">&#39;features like fault tolerance will be disabled.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;--use_cache&#39;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -554,6 +560,8 @@
                     <span class="s1">&#39;image_key&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">image_key</span><span class="p">,</span>
                     <span class="s1">&#39;audio_key&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">audio_key</span><span class="p">,</span>
                     <span class="s1">&#39;video_key&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">video_key</span><span class="p">,</span>
+                    <span class="s1">&#39;num_proc&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">np</span><span class="p">,</span>
+                    <span class="s1">&#39;turbo&#39;</span><span class="p">:</span> <span class="n">cfg</span><span class="o">.</span><span class="n">turbo</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">if</span> <span class="s1">&#39;text_key&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;text_key&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -564,6 +572,10 @@
                     <span class="n">args</span><span class="p">[</span><span class="s1">&#39;audio_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">audio_key</span>
                 <span class="k">if</span> <span class="s1">&#39;video_key&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;video_key&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">args</span><span class="p">[</span><span class="s1">&#39;video_key&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">video_key</span>
+                <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">args</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">np</span>
+                <span class="k">if</span> <span class="s1">&#39;turbo&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;turbo&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">args</span><span class="p">[</span><span class="s1">&#39;turbo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">turbo</span>
             <span class="n">op</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span>
 
     <span class="k">return</span> <span class="n">cfg</span>
@@ -658,14 +670,12 @@
 
         <span class="c1"># update op params of cfg.process</span>
         <span class="n">internal_op_para</span> <span class="o">=</span> <span class="n">temp_cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op_in_process_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">internal_op_para</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">num_proc</span> <span class="o">=</span> <span class="n">internal_op_para</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;num_proc&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">in</span> <span class="n">internal_op_para</span><span class="p">:</span>
-                <span class="n">internal_op_para</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_proc</span> <span class="ow">or</span> <span class="n">cfg</span><span class="o">.</span><span class="n">np</span>
-            <span class="n">internal_op_para</span> <span class="o">=</span> <span class="n">namespace_to_dict</span><span class="p">(</span><span class="n">internal_op_para</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">internal_op_para</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">op_in_process_name</span><span class="p">:</span> <span class="n">internal_op_para</span><span class="p">}</span>
+
+        <span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">op_in_process_name</span><span class="p">:</span>
+            <span class="kc">None</span> <span class="k">if</span> <span class="n">internal_op_para</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span>
+            <span class="n">namespace_to_dict</span><span class="p">(</span><span class="n">internal_op_para</span><span class="p">)</span>
+        <span class="p">}</span>
 
     <span class="c1"># check the op params via type hint</span>
     <span class="n">temp_parser</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
