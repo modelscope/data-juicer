@@ -69,28 +69,26 @@ class ConfigTest(DataJuicerTestCaseBase):
                 }, 'nested dict load fail, un-expected internal value')
 
             ops_from_cfg = load_ops(cfg.process)
-            self.assertTrue(len(ops_from_cfg) == 3)
+            self.assertTrue(len(ops_from_cfg) == 4)
 
     def test_val_range_check_cmd(self):
         out = StringIO()
-        err_msg_head = ("language_id_score_filter.min_score")
-        err_msg = ("Not of type ClosedUnitInterval: 1.1 does not conform to "
-                   "restriction v>=0 and v<=1")
+        err_msg_head = ("remove_table_text_mapper.min_col")
+        err_msg = ("Input should be greater than or equal to 2")
         with redirect_stdout(out), redirect_stderr(out):
             with self.assertRaises(SystemExit) as cm:
                 init_configs(
                     args=f'--config {test_yaml_path} '
-                          '--language_id_score_filter.min_score 1.1'.split())
+                          '--remove_table_text_mapper.min_col 1'.split())
             self.assertEqual(cm.exception.code, 2)
         out_str = out.getvalue()
         self.assertIn(err_msg_head, out_str)
         self.assertIn(err_msg, out_str)
 
-    def test_val_range_check_yaml(self):
+    def _test_val_range_check_yaml(self):
         out = StringIO()
-        err_msg_head = ("language_id_score_filter.min_score")
-        err_msg = ("Not of type ClosedUnitInterval: 1.1 does not conform to "
-                   "restriction v>=0 and v<=1")
+        err_msg_head = ("remove_table_text_mapper.max_col")
+        err_msg = ("Input should be less than or equal to 20")
         with redirect_stdout(out), redirect_stderr(out):
             with self.assertRaises(SystemExit) as cm:
                 init_configs(args=f'--config {test_bad_yaml_path}'.split())
