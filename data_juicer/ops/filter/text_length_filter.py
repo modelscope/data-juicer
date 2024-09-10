@@ -13,8 +13,8 @@ class TextLengthFilter(Filter):
     range."""
 
     def __init__(self,
-                 min_len: PositiveInt = 10,
-                 max_len: PositiveInt = sys.maxsize,
+                 min_len: int = 10,
+                 max_len: int = sys.maxsize,
                  *args,
                  **kwargs):
         """
