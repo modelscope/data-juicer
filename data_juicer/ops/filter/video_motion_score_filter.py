@@ -1,6 +1,6 @@
 import sys
 from contextlib import contextmanager
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 from pydantic import PositiveFloat, PositiveInt
@@ -202,7 +202,7 @@ class VideoMotionScoreFilter(Filter):
 
 def _compute_resized_output_size(
     frame_size: Tuple[int, int],
-    size: List[int],
+    size: Union[Tuple[PositiveInt], Tuple[PositiveInt, PositiveInt]],
     max_size: Optional[int] = None,
 ) -> Tuple[int, int]:
     h, w = frame_size
