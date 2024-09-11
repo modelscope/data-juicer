@@ -218,7 +218,7 @@ def transfer_filename(original_filepath: Union[str, Path], op_name,
 def copy_data(from_dir, to_dir, data_path):
     """
         Copy data from from_dir/data_path to to_dir/data_path.
-        Return Ture if success.
+        Return True if success.
     """
     from_path = os.path.join(from_dir, data_path)
     to_path = os.path.join(to_dir, data_path)
