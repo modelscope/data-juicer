@@ -41,7 +41,7 @@ class ExtractQAMapper(Mapper):
 
     def __init__(self,
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
-                 trust_remote_code=False,
+                 trust_remote_code: bool = False,
                  pattern: str = None,
                  qa_format: str = 'chatml',
                  enable_vllm: bool = True,

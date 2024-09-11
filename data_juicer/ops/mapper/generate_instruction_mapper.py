@@ -51,9 +51,9 @@ class GenerateInstructionMapper(Mapper):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_model,
-                 seed_file,
-                 instruct_num,
+                 hf_model: str = 'Qwen/Qwen-7B-Chat',
+                 seed_file: str = None,
+                 instruct_num: int = 3,
                  trust_remote_code: bool = False,
                  similarity_threshold: float = 0.7,
                  prompt_template: str = None,
@@ -110,6 +110,10 @@ class GenerateInstructionMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self.num_proc = 1
+
+        if not seed_file:
+            raise ValueError('Please provide `seed_file` parameter, a file in chatml format. '\
+                'Reference data: data-juicer/demos/data/demo-dataset-chatml.jsonl ')
 
         self.instruct_num = instruct_num
         self.similarity_threshold = similarity_threshold
