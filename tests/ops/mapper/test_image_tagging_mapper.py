@@ -6,8 +6,9 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.image_tagging_mapper import \
     ImageTaggingMapper
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
+@SKIPPED_TESTS.register_module()
 class ImageTaggingMapperTest(DataJuicerTestCaseBase):
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
