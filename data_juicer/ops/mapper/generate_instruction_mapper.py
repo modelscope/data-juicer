@@ -111,6 +111,10 @@ class GenerateInstructionMapper(Mapper):
         super().__init__(*args, **kwargs)
         self.num_proc = 1
 
+        if not seed_file:
+            raise ValueError('Please provide `seed_file` parameter, a file in chatml format. '\
+                'Reference data: data-juicer/demos/data/demo-dataset-chatml.jsonl ')
+
         self.instruct_num = instruct_num
         self.similarity_threshold = similarity_threshold
         self.similarity_type = 'rouge_l'
