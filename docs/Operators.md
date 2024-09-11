@@ -12,7 +12,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   46   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   41   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   42   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   4    | Selects top samples based on ranking            |
 
@@ -113,6 +113,7 @@ All the specific operators are listed below, each featured with several capabili
 | image_aspect_ratio_filter      | Image      | -      | Keeps samples containing images with aspect ratios within the specified range                                                                       |
 | image_face_ratio_filter        | Image      | -      | Keeps samples containing images with face area ratios within the specified range                                                                    |
 | image_nsfw_filter              | Image      | -      | Keeps samples containing images with NSFW scores below the threshold                                                               |
+| image_pair_similarity_filter   | Image      | -      | Keeps image pairs with image feature cosine similarity within the specified range based on a CLIP model                                                    |
 | image_shape_filter             | Image      | -      | Keeps samples containing images with widths and heights within the specified range                                                                  |
 | image_size_filter              | Image      | -      | Keeps samples containing images whose size in bytes are within the specified range                                                                  |
 | image_text_matching_filter     | Multimodal | -      | Keeps samples with image-text classification matching score within the specified range based on a BLIP model                                        |
