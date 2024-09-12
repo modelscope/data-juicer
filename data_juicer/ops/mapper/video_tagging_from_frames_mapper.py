@@ -1,7 +1,7 @@
 from collections import Counter
 
 import numpy as np
-from jsonargparse.typing import PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
@@ -37,7 +37,7 @@ class VideoTaggingFromFramesMapper(Mapper):
     def __init__(self,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
-                 tag_field_name=Fields.video_frame_tags,
+                 tag_field_name: str = Fields.video_frame_tags,
                  *args,
                  **kwargs):
         """
