@@ -37,7 +37,7 @@ class VideoTaggingFromFramesFilter(Filter):
                  contain: str = 'any',
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
-                 tag_field_name=Fields.video_frame_tags,
+                 tag_field_name: str = Fields.video_frame_tags,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
