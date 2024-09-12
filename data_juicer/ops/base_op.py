@@ -148,6 +148,8 @@ class OP:
         if isinstance(self.mem_required, str):
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 
+        self.turbo = kwargs.get('turbo', False)
+
         # nested wrappers
         from data_juicer.core.data import wrap_func_with_nested_access
         for name in ['process', 'compute_stats', 'compute_hash']:

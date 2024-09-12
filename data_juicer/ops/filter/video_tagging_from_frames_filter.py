@@ -1,5 +1,7 @@
+from typing import List
+
 import numpy as np
-from jsonargparse.typing import List, PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields

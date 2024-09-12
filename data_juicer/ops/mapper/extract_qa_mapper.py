@@ -1,6 +1,6 @@
 import json
 import re
-from typing import Dict
+from typing import Dict, Optional
 
 from loguru import logger
 
@@ -41,12 +41,12 @@ class ExtractQAMapper(Mapper):
 
     def __init__(self,
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
-                 trust_remote_code=False,
-                 pattern: str = None,
+                 trust_remote_code: bool = False,
+                 pattern: Optional[str] = None,
                  qa_format: str = 'chatml',
                  enable_vllm: bool = True,
-                 tensor_parallel_size: int = None,
-                 max_model_len: int = None,
+                 tensor_parallel_size: Optional[int] = None,
+                 max_model_len: Optional[int] = None,
                  max_num_seqs: int = 256,
                  sampling_params: Dict = {},
                  *args,

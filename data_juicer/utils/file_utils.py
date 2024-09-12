@@ -6,7 +6,7 @@ import re
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import AsyncGenerator, List, Tuple, Union
+from typing import AsyncGenerator, List, Union
 
 from datasets.utils.extract import ZstdExtractor as Extractor
 
@@ -46,7 +46,7 @@ async def follow_read(
 
 def find_files_with_suffix(
         path: Union[str, Path],
-        suffixes: Union[str, List[str], Tuple[str]] = None) -> List[str]:
+        suffixes: Union[str, List[str], None] = None) -> List[str]:
     """
     Traverse a path to find all files with the specified suffixes.
 

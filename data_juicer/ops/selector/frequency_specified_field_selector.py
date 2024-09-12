@@ -1,6 +1,8 @@
 import numbers
+from typing import Optional
 
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
+from pydantic import Field, PositiveInt
+from typing_extensions import Annotated
 
 from ..base_op import OPERATORS, Selector
 
@@ -12,8 +14,9 @@ class FrequencySpecifiedFieldSelector(Selector):
 
     def __init__(self,
                  field_key: str = '',
-                 top_ratio: ClosedUnitInterval = None,
-                 topk: PositiveInt = None,
+                 top_ratio: Optional[Annotated[float,
+                                               Field(ge=0, le=1)]] = None,
+                 topk: Optional[PositiveInt] = None,
                  reverse: bool = True,
                  *args,
                  **kwargs):

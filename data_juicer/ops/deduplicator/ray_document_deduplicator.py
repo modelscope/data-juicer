@@ -2,7 +2,7 @@ import hashlib
 import string
 
 import regex as re
-from jsonargparse.typing import PositiveInt
+from pydantic import PositiveInt
 
 from ..base_op import OPERATORS
 from .ray_basic_deduplicator import RayBasicDeduplicator
