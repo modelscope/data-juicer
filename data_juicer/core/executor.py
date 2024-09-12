@@ -33,8 +33,9 @@ class Executor:
 
         :param cfg: optional config dict.
         """
-        from jsonargparse import Namespace
         import json
+
+        from jsonargparse import Namespace
         if type(cfg) == str:
             cfg = json.loads(cfg)
             cfg = Namespace(**cfg)

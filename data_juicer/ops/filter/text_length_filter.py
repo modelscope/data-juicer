@@ -1,7 +1,5 @@
 import sys
 
-from jsonargparse.typing import PositiveInt
-
 from data_juicer.utils.constant import Fields, StatsKeys
 
 from ..base_op import OPERATORS, Filter
