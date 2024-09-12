@@ -83,7 +83,6 @@
              
   <h1>Source code for data_juicer.ops.filter.image_aspect_ratio_filter</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">PositiveFloat</span>
 
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="n">load_data_with_context</span><span class="p">,</span> <span class="n">load_image</span>
@@ -100,8 +99,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ImageAspectRatioFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageAspectRatioFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">min_ratio</span><span class="p">:</span> <span class="n">PositiveFloat</span> <span class="o">=</span> <span class="mf">0.333</span><span class="p">,</span>
-                 <span class="n">max_ratio</span><span class="p">:</span> <span class="n">PositiveFloat</span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">,</span>
+                 <span class="n">min_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.333</span><span class="p">,</span>
+                 <span class="n">max_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">,</span>
                  <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;any&#39;</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>

@@ -84,8 +84,6 @@
   <h1>Source code for data_juicer.ops.filter.alphanumeric_filter</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
 
-<span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">PositiveFloat</span>
-
 <span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
@@ -107,7 +105,7 @@
 <div class="viewcode-block" id="AlphanumericFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.AlphanumericFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">tokenization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="n">min_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
-                 <span class="n">max_ratio</span><span class="p">:</span> <span class="n">PositiveFloat</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
+                 <span class="n">max_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

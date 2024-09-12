@@ -82,7 +82,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.ops.mapper.clean_email_mapper</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">regex</span> <span class="k">as</span> <span class="nn">re</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">regex</span> <span class="k">as</span> <span class="nn">re</span>
 
 <span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 
@@ -91,7 +93,11 @@
 <span class="k">class</span> <span class="nc">CleanEmailMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to clean email in text samples.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CleanEmailMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.CleanEmailMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">repl</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="CleanEmailMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.CleanEmailMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">repl</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 

@@ -83,10 +83,11 @@
              
   <h1>Source code for data_juicer.ops.mapper.video_remove_watermark_mapper</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">av</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">PositiveInt</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
 
 <span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
@@ -117,11 +118,10 @@
 <div class="viewcode-block" id="VideoRemoveWatermarkMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoRemoveWatermarkMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">roi_strings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0,0,0.1,0.1&#39;</span><span class="p">],</span>
                  <span class="n">roi_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ratio&#39;</span><span class="p">,</span>
-                 <span class="n">roi_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">roi_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
                  <span class="n">min_frame_threshold</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>
                  <span class="n">detection_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;pixel_value&#39;</span><span class="p">,</span>
-                 <span class="n">threshold</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

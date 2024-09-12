@@ -82,7 +82,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.ops.filter.suffix_filter</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
 
@@ -93,10 +93,7 @@
 <span class="k">class</span> <span class="nc">SuffixFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with specified suffix.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="SuffixFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.SuffixFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">suffixes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span>
-                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
-                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="SuffixFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.SuffixFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suffixes</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 

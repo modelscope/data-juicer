@@ -84,10 +84,10 @@
   <h1>Source code for data_juicer.ops.filter.video_motion_score_filter</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">PositiveFloat</span><span class="p">,</span> <span class="n">PositiveInt</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveFloat</span><span class="p">,</span> <span class="n">PositiveInt</span>
 
 <span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
@@ -130,8 +130,8 @@
                  <span class="n">min_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
                  <span class="n">max_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">float_info</span><span class="o">.</span><span class="n">max</span><span class="p">,</span>
                  <span class="n">sampling_fps</span><span class="p">:</span> <span class="n">PositiveFloat</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-                 <span class="n">size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span>
-                                      <span class="n">Sequence</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">],</span>
+                             <span class="n">Tuple</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">PositiveInt</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">max_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">relative</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;any&#39;</span><span class="p">,</span>
@@ -174,7 +174,7 @@
                     <span class="sa">f</span><span class="s1">&#39;Size must be an int or a 1 or 2 element tuple/list,&#39;</span>
                     <span class="sa">f</span><span class="s1">&#39;not a </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">size</span><span class="p">)</span><span class="si">}</span><span class="s1"> element tuple/list.&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">size</span> <span class="o">=</span> <span class="p">[</span><span class="n">size</span><span class="p">]</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="o">=</span> <span class="n">max_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">relative</span> <span class="o">=</span> <span class="n">relative</span>
@@ -286,9 +286,9 @@
 
 <span class="k">def</span> <span class="nf">_compute_resized_output_size</span><span class="p">(</span>
     <span class="n">frame_size</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
-    <span class="n">size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+    <span class="n">size</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">,</span> <span class="n">PositiveInt</span><span class="p">]],</span>
     <span class="n">max_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
     <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">frame_size</span>
     <span class="n">short</span><span class="p">,</span> <span class="n">long</span> <span class="o">=</span> <span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span> <span class="k">if</span> <span class="n">w</span> <span class="o">&lt;=</span> <span class="n">h</span> <span class="k">else</span> <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
 

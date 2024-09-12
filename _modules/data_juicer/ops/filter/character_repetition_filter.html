@@ -87,7 +87,7 @@
 <span class="c1"># --------------------------------------------------------</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">ClosedUnitInterval</span><span class="p">,</span> <span class="n">PositiveInt</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
 
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
 
@@ -101,8 +101,8 @@
 
 <div class="viewcode-block" id="CharacterRepetitionFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.CharacterRepetitionFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">rep_len</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-                 <span class="n">min_ratio</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-                 <span class="n">max_ratio</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+                 <span class="n">min_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">max_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

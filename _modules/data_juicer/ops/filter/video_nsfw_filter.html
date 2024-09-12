@@ -83,7 +83,7 @@
              
   <h1>Source code for data_juicer.ops.filter.video_nsfw_filter</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">ClosedUnitInterval</span><span class="p">,</span> <span class="n">PositiveInt</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
 
 <span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
@@ -115,9 +115,9 @@
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
 
 <div class="viewcode-block" id="VideoNSFWFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.VideoNSFWFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">hf_nsfw_model</span><span class="o">=</span><span class="s1">&#39;Falconsai/nsfw_image_detection&#39;</span><span class="p">,</span>
-                 <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">score_threshold</span><span class="p">:</span> <span class="n">ClosedUnitInterval</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+                 <span class="n">hf_nsfw_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Falconsai/nsfw_image_detection&#39;</span><span class="p">,</span>
+                 <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">score_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
                  <span class="n">frame_sampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;all_keyframes&#39;</span><span class="p">,</span>
                  <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
                  <span class="n">reduce_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;avg&#39;</span><span class="p">,</span>
