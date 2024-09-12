@@ -33,6 +33,12 @@ class Executor:
 
         :param cfg: optional config dict.
         """
+        from jsonargparse import Namespace
+        import json
+        if type(cfg) == str:
+            cfg = json.loads(cfg)
+            cfg = Namespace(**cfg)
+
         self.cfg = init_configs() if cfg is None else cfg
 
         self.work_dir = self.cfg.work_dir
@@ -135,7 +141,7 @@ class Executor:
         else:
             raise ValueError(f'Unsupported sample_algo: {sample_algo}')
 
-    def run(self, load_data_np=None):
+    def run(self, load_data_np=None, skip_return=False):
         """
         Running the dataset process pipeline.
 
@@ -175,4 +181,6 @@ class Executor:
         if self.cfg.use_cache and self.cfg.cache_compress:
             from data_juicer.utils.compress import compress
             compress(dataset)
-        return dataset
+
+        if not skip_return:
+            return dataset

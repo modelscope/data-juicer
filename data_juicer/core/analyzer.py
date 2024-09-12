@@ -28,6 +28,12 @@ class Analyzer:
 
         :param cfg: optional config dict.
         """
+        from jsonargparse import Namespace
+        import json
+        if type(cfg) == str:
+            cfg = json.loads(cfg)
+            cfg = Namespace(**cfg)
+
         self.cfg = init_configs() if cfg is None else cfg
 
         self.work_dir = self.cfg.work_dir
@@ -65,7 +71,7 @@ class Analyzer:
         self.overall_single_plot_path = None
         self.analysis_path = os.path.join(self.cfg.work_dir, 'analysis')
 
-    def run(self, load_data_np=None, skip_export=False):
+    def run(self, load_data_np=None, skip_export=False, skip_return=False):
         """
         Running the dataset analysis pipeline.
 
@@ -129,4 +135,5 @@ class Analyzer:
         )
         column_wise_analysis.analyze(skip_export=skip_export)
 
-        return dataset
+        if not skip_return:
+            return dataset
