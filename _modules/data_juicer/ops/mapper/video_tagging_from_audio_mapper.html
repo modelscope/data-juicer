@@ -83,6 +83,7 @@
              
   <h1>Source code for data_juicer.ops.mapper.video_tagging_from_audio_mapper</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">librosa</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
 <span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
@@ -113,11 +114,16 @@
 <div class="viewcode-block" id="VideoTaggingFromAudioMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoTaggingFromAudioMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_ast</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;MIT/ast-finetuned-audioset-10-10-0.4593&#39;</span><span class="p">,</span>
                  <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">tag_field_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Fields</span><span class="o">.</span><span class="n">video_audio_tags</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
+<span class="sd">        :param hf_ast: path to the HF model to tag from audios.</span>
+<span class="sd">        :param trust_remote_code: whether to trust the remote code of HF models</span>
+<span class="sd">        :param tag_field_name: the field name to store the tags. It&#39;s</span>
+<span class="sd">            &quot;__dj__video_audio_tags__&quot; in default.</span>
 <span class="sd">        :param args: extra args</span>
 <span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -126,16 +132,18 @@
                                        <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_ast</span><span class="p">,</span>
                                        <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_model_sampling_rate</span> <span class="o">=</span> <span class="mi">16000</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_no_audio_label</span> <span class="o">=</span> <span class="s1">&#39;EMPTY&#39;</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_no_audio_label</span> <span class="o">=</span> <span class="s1">&#39;EMPTY&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span> <span class="o">=</span> <span class="n">tag_field_name</span></div>
 
 <div class="viewcode-block" id="VideoTaggingFromAudioMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoTaggingFromAudioMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s generated already</span>
-        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">video_audio_tags</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="c1"># there is no video in this sample</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]:</span>
-            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">video_audio_tags</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="c1"># load video paths</span>
@@ -164,13 +172,13 @@
                 <span class="n">sr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_sampling_rate</span>
             <span class="n">inputs</span> <span class="o">=</span> <span class="n">feature_extractor</span><span class="p">(</span><span class="n">y</span><span class="p">,</span>
                                        <span class="n">sampling_rate</span><span class="o">=</span><span class="n">sr</span><span class="p">,</span>
-                                       <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span>
+                                       <span class="n">return_tensors</span><span class="o">=</span><span class="s1">&#39;pt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
             <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
                 <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span><span class="o">.</span><span class="n">logits</span>
             <span class="n">predicted_tag_id</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
             <span class="n">predicted_tag</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">id2label</span><span class="p">[</span><span class="n">predicted_tag_id</span><span class="p">]</span>
             <span class="n">video_audio_tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predicted_tag</span><span class="p">)</span>
-        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">video_audio_tags</span><span class="p">]</span> <span class="o">=</span> <span class="n">video_audio_tags</span>
+        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">video_audio_tags</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span></div></div>
 </pre></div>
 

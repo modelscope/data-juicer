@@ -121,6 +121,7 @@
                  <span class="n">contain</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;any&#39;</span><span class="p">,</span>
                  <span class="n">frame_sampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;all_keyframes&#39;</span><span class="p">,</span>
                  <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                 <span class="n">tag_field_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Fields</span><span class="o">.</span><span class="n">video_frame_tags</span><span class="p">,</span>
                  <span class="n">any_or_all</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;any&#39;</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -145,6 +146,8 @@
 <span class="sd">            the first and the last frames will be extracted. If it&#39;s larger</span>
 <span class="sd">            than 2, in addition to the first and the last frames, other frames</span>
 <span class="sd">            will be extracted uniformly within the video duration.</span>
+<span class="sd">        :param tag_field_name: the field name to store the tags. It&#39;s</span>
+<span class="sd">            &quot;__dj__video_frame_tags__&quot; in default.</span>
 <span class="sd">        :param any_or_all: keep this sample with &#39;any&#39; or &#39;all&#39; strategy of</span>
 <span class="sd">            all videos. &#39;any&#39;: keep this sample if any videos meet the</span>
 <span class="sd">            condition. &#39;all&#39;: keep this sample only if all videos meet the</span>
@@ -166,10 +169,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">tag</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contain_any</span> <span class="o">=</span> <span class="p">(</span><span class="n">contain</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">any</span> <span class="o">=</span> <span class="p">(</span><span class="n">any_or_all</span> <span class="o">==</span> <span class="s1">&#39;any&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span> <span class="o">=</span> <span class="n">tag_field_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tagging_producer</span> <span class="o">=</span> <span class="n">VideoTaggingFromFramesMapper</span><span class="p">(</span>
             <span class="n">frame_sampling_method</span><span class="o">=</span><span class="n">frame_sampling_method</span><span class="p">,</span>
             <span class="n">frame_num</span><span class="o">=</span><span class="n">frame_num</span><span class="p">,</span>
             <span class="n">accelerator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="p">,</span>
+            <span class="n">tag_field_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="VideoTaggingFromFramesFilter.compute_stats"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.VideoTaggingFromFramesFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -179,7 +184,7 @@
         <span class="k">return</span> <span class="n">sample</span></div>
 
 <div class="viewcode-block" id="VideoTaggingFromFramesFilter.process"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.VideoTaggingFromFramesFilter.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">video_tags</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">video_frame_tags</span><span class="p">]</span>
+        <span class="n">video_tags</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">video_tags</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 

@@ -84,6 +84,7 @@
   <h1>Source code for data_juicer.ops.mapper.video_tagging_from_frames_mapper</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
 
 <span class="kn">from</span> <span class="nn">data_juicer.utils.availability_utils</span> <span class="kn">import</span> <span class="n">AvailabilityChecking</span>
@@ -120,6 +121,7 @@
 <div class="viewcode-block" id="VideoTaggingFromFramesMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoTaggingFromFramesMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">frame_sampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;all_keyframes&#39;</span><span class="p">,</span>
                  <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                 <span class="n">tag_field_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Fields</span><span class="o">.</span><span class="n">video_frame_tags</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -138,6 +140,8 @@
 <span class="sd">            the first and the last frames will be extracted. If it&#39;s larger</span>
 <span class="sd">            than 2, in addition to the first and the last frames, other frames</span>
 <span class="sd">            will be extracted uniformly within the video duration.</span>
+<span class="sd">        :param tag_field_name: the field name to store the tags. It&#39;s</span>
+<span class="sd">            &quot;__dj__video_frame_tags__&quot; in default.</span>
 <span class="sd">        :param args: extra args</span>
 <span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -153,16 +157,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">frame_sampling_method</span> <span class="o">=</span> <span class="n">frame_sampling_method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">frame_num</span> <span class="o">=</span> <span class="n">frame_num</span>
         <span class="kn">from</span> <span class="nn">ram</span> <span class="kn">import</span> <span class="n">get_transform</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">get_transform</span><span class="p">(</span><span class="n">image_size</span><span class="o">=</span><span class="mi">384</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">get_transform</span><span class="p">(</span><span class="n">image_size</span><span class="o">=</span><span class="mi">384</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span> <span class="o">=</span> <span class="n">tag_field_name</span></div>
 
 <div class="viewcode-block" id="VideoTaggingFromFramesMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoTaggingFromFramesMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s generated already</span>
-        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">video_frame_tags</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="c1"># there is no video in this sample</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]:</span>
-            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">video_frame_tags</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="c1"># load videos</span>
@@ -182,7 +188,7 @@
                 <span class="n">frames</span> <span class="o">=</span> <span class="n">extract_video_frames_uniformly</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_num</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">video_tags</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
-                <span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">continue</span>
 
             <span class="n">frame_tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">to_image</span><span class="p">())</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">frames</span>
@@ -193,13 +199,13 @@
             <span class="n">words</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">tag</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">)]</span>
             <span class="n">word_count</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
             <span class="n">sorted_word_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">item</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">word_count</span><span class="o">.</span><span class="n">most_common</span><span class="p">()]</span>
-            <span class="n">video_tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sorted_word_list</span><span class="p">)</span>
+            <span class="n">video_tags</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sorted_word_list</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">vid_key</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
                 <span class="n">close_video</span><span class="p">(</span><span class="n">videos</span><span class="p">[</span><span class="n">vid_key</span><span class="p">])</span>
 
-        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">video_frame_tags</span><span class="p">]</span> <span class="o">=</span> <span class="n">video_tags</span>
+        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tag_field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">video_tags</span>
         <span class="k">return</span> <span class="n">sample</span></div></div>
 </pre></div>
 
