@@ -57,6 +57,7 @@ class Monitor:
         'Used mem.',
         'Free mem.',
         'Available mem.',
+        'Mem. util.',
         'GPU free mem.',
         'GPU used mem.',
         'GPU util.',

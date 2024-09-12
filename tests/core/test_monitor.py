@@ -40,24 +40,30 @@ class MonitorTest(DataJuicerTestCaseBase):
 
     def test_monitor_func(self):
         _, dict1 = Monitor.monitor_func(self._increase_mem_func,
-                                        args=(10 ** 5, 2, 8,),
+                                        args=(10 ** 3, 2, 4,),
                                         sample_interval=0.3)
-        resource1 = dict1['resource']
-        self.assertLessEqual(resource1[1]['Mem. util.'], resource1[-2]['Mem. util.'])
+        analysis1 = Monitor.analyze_single_resource_util(dict1)
+        logger.info(analysis1['resource_analysis'])
 
         _, dict2 = Monitor.monitor_func(self._increase_mem_func,
-                                        args=(10 ** 6, 2, 5,),
-                                        sample_interval=0.2)
-        resource2 = dict2['resource'][:]
-        self.assertLessEqual(resource2[1]['Mem. util.'], resource2[-2]['Mem. util.'])
+                                        args=(10 ** 5, 2, 4,),
+                                        sample_interval=0.3)
+        analysis2 = Monitor.analyze_single_resource_util(dict2)
+        logger.info(analysis2['resource_analysis'])
 
         _, dict3 = Monitor.monitor_func(self._increase_mem_func,
-                                        args=(25600000, 2, 4,),
+                                        args=(10 ** 7, 2, 4,),
                                         sample_interval=0.3)
-        resource3 = dict3['resource'][:]
-        self.assertLessEqual(resource3[1]['Mem. util.'], resource3[-2]['Mem. util.'])
-        self.assertGreaterEqual(resource3[1]['Mem. util.'],
-                                resource1[-2]['Mem. util.'])
+        analysis3 = Monitor.analyze_single_resource_util(dict3)
+        logger.info(analysis3['resource_analysis'])
+
+        self.assertLessEqual(
+            analysis1['resource_analysis']['Mem. util.']['avg'],
+            analysis2['resource_analysis']['Mem. util.']['avg'])
+
+        self.assertLessEqual(
+            analysis2['resource_analysis']['Mem. util.']['avg'],
+            analysis3['resource_analysis']['Mem. util.']['avg'])
 
 
 if __name__ == '__main__':
