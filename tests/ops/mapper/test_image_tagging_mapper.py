@@ -17,10 +17,10 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
     img3_path = os.path.join(data_path, 'img3.jpg')
 
     def _run_image_tagging_mapper(self,
-                                              op,
-                                              source_list,
-                                              target_list,
-                                              num_proc=1):
+                                  op,
+                                  source_list,
+                                  target_list,
+                                  num_proc=1):
         dataset = Dataset.from_list(source_list)
         dataset = dataset.map(op.process, num_proc=num_proc)
         res_list = dataset.to_list()
@@ -53,6 +53,25 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
             Fields.image_tags: [[
                 'alley', 'black', 'building', 'catch', 'person', 'pavement',
                 'photo', 'rain', 'road', 'umbrella', 'walk', 'woman']],
+        }]
+        op = ImageTaggingMapper()
+        self._run_image_tagging_mapper(op, ds_list, tgt_list)
+
+    def test_no_images(self):
+        ds_list = [{
+            'images': []
+        }, {
+            'images': [self.img2_path]
+        }]
+        tgt_list = [{
+            'images': [],
+            Fields.image_tags: [[]],
+        }, {
+            'images': [self.img2_path],
+            Fields.image_tags: [[
+                'advertisement', 'back', 'bus', 'car', 'city bus',
+                'city street', 'curb', 'decker bus', 'drive', 'license plate',
+                'road', 'street scene', 'tour bus', 'travel', 'white']],
         }]
         op = ImageTaggingMapper()
         self._run_image_tagging_mapper(op, ds_list, tgt_list)
@@ -125,12 +144,13 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
         }]
         op = ImageTaggingMapper()
         self._run_image_tagging_mapper(op,
-                                                   ds_list,
-                                                   tgt_list,
-                                                   num_proc=2)
+                                       ds_list,
+                                       tgt_list,
+                                       num_proc=2)
         # WARNING: current parallel tests only work in spawn method
         multiprocess.set_start_method(original_method, force=True)
         # WARNING: current parallel tests only work in spawn method
+
 
 if __name__ == '__main__':
     unittest.main()

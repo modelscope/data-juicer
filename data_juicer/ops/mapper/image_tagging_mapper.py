@@ -1,5 +1,7 @@
 from collections import Counter
 
+import numpy as np
+
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
@@ -29,7 +31,10 @@ class ImageTaggingMapper(Mapper):
 
     _accelerator = 'cuda'
 
-    def __init__(self, tag_field_name=Fields.image_tags, *args, **kwargs):
+    def __init__(self,
+                 tag_field_name: str = Fields.image_tags,
+                 *args,
+                 **kwargs):
         """
         Initialization method.
         :param tag_field_name: the field name to store the tags. It's
@@ -53,7 +58,7 @@ class ImageTaggingMapper(Mapper):
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[self.tag_field_name] = []
+            sample[self.tag_field_name] = np.array([[]], dtype=np.str_)
             return sample
 
         # load images
@@ -71,10 +76,10 @@ class ImageTaggingMapper(Mapper):
             with torch.no_grad():
                 tags, _ = model.generate_tag(image_tensor)
 
-            words = [word.strip() for tag in tags for word in tag.split('|')]
+            words = [word.strip() for word in tags[0].split('|')]
             word_count = Counter(words)
             sorted_word_list = [item for item, _ in word_count.most_common()]
-            image_tags.append(sorted_word_list)
+            image_tags.append(np.array(sorted_word_list, dtype=np.str_))
 
         sample[self.tag_field_name] = image_tags
         return sample

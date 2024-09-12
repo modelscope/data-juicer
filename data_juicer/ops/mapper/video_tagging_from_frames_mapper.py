@@ -1,5 +1,6 @@
 from collections import Counter
 
+import numpy as np
 from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -83,7 +84,7 @@ class VideoTaggingFromFramesMapper(Mapper):
 
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
-            sample[self.tag_field_name] = []
+            sample[self.tag_field_name] = np.array([[]], dtype=np.str_)
             return sample
 
         # load videos
@@ -114,7 +115,7 @@ class VideoTaggingFromFramesMapper(Mapper):
             words = [word.strip() for tag in tags for word in tag.split('|')]
             word_count = Counter(words)
             sorted_word_list = [item for item, _ in word_count.most_common()]
-            video_tags.append(sorted_word_list)
+            video_tags.append(np.array(sorted_word_list, dtype=np.str_))
 
         if not context:
             for vid_key in videos:
