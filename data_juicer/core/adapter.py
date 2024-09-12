@@ -1,3 +1,4 @@
+from datasets import concatenate_datasets
 from loguru import logger
 
 from data_juicer.core.monitor import Monitor
@@ -41,7 +42,7 @@ class Adapter:
                 'speed'] = sample_num / resource_util_per_op['time']
             resource_util_list.append(resource_util_per_op)
 
-        return resource_util_list
+        return dataset, resource_util_list
 
     def workloads_adapt(self, dataset, operators):
         """
@@ -50,23 +51,31 @@ class Adapter:
         :param dataset: The dataset that needs to be processed
         :param operators: Operators in the data recipe
         """
-        load_factor = self.probe_small_batches(dataset, operators)
-        dataset_batches = self.batch_split(dataset, self.cfg, load_factor)
-        return dataset_batches
+        res_data_batches = []
+        load_factor = 1.0
+        left_dataset = dataset
+        while left_dataset:
+            data_batch, left_dataset = self.take_batch(left_dataset, self.cfg,
+                                                       load_factor)
+            res_batch, load_factor = self.probe_data_batches(
+                data_batch, operators, load_factor)
+            res_data_batches.append(res_batch)
+        return concatenate_datasets(res_data_batches)
 
-    def probe_small_batches(self, dataset, operators):
+    def probe_data_batches(self, data_batch, operators, load_factor=None):
         """
         Perform small batch pre-execution to probe available resources,
         current load and estimated OP speed, returning load factors and speed
         ranks for each OP.
 
-        :param dataset: The dataset to pre-execute small batches on
+        :param data_batch: The dataset batch to pre-execute on
         :param operators: The OP list to be pre-execution and probe
+        :param load_factor: Load factor for this batch
         :return: A list of probe results for each OP.
         """
-        # get a small batch of dataset in default batch size
-        small_batch = self.batch_split(dataset, self.cfg)
-        resource_util_list = self.execute_and_probe(small_batch, operators)
+        # process and monitor the resource utilization
+        res_batch, resource_util_list = self.execute_and_probe(
+            data_batch, operators)
         # analyze resource utilization
         analysis_res = Monitor.analyze_resource_util_list(resource_util_list)
 
@@ -74,10 +83,10 @@ class Adapter:
         load_factor = 1.0 * analysis_res
         pass
         logger.info(f'Adjust load factor to: {load_factor}')
-        return load_factor
+        return res_batch, load_factor
 
     @staticmethod
-    def batch_split(dataset, config, load_factor=None):
+    def take_batch(dataset, config, load_factor=None):
         """
         Split the dataset into batches based on configuration and load factor.
 
@@ -87,11 +96,17 @@ class Adapter:
         :return: An iterator of batches
         """
         # get initial batch size
-        adjusted_batch_size = config.get('batch_size', 100)
+        batch_size = config.get('batch_size', 100)
         # adapt according to the load factor
         if load_factor:
-            adjusted_batch_size = int(adjusted_batch_size / load_factor)
+            batch_size = int(batch_size / load_factor)
+            pass
         # should be in [1, 1000]
-        adjusted_batch_size = min(max(adjusted_batch_size, 1), 1000)
+        batch_size = min(max(batch_size, 1), 1000)
 
-        return dataset.iter(batch_size=adjusted_batch_size)
+        # check if there are enough samples
+        num_samples = len(dataset)
+        if batch_size >= num_samples:
+            return dataset, None
+        else:
+            return dataset.take(batch_size), dataset.skip(batch_size)
