@@ -70,7 +70,7 @@ class Monitor:
         Detect the resource utilization of all distributed nodes.
         """
         # TODO
-        pass
+        raise NotImplementedError
 
     @staticmethod
     def monitor_current_resources():
@@ -84,31 +84,39 @@ class Monitor:
 
         # CPU
         resource_dict['CPU count'] = get_cpu_count()
-        resource_dict['CPU util.'] = get_cpu_utilization()
+        resource_dict['CPU util.'] = get_cpu_utilization() / 100.0
         resource_dict['Total mem.'] = query_mem_info('total')
         resource_dict['Used mem.'] = query_mem_info('used')
         resource_dict['Free mem.'] = query_mem_info('free')
         resource_dict['Available mem.'] = query_mem_info('available')
+        resource_dict['Mem. util.'] = resource_dict[
+            'Used mem.'] / resource_dict['Total mem.']
 
         # GPU
         resource_dict['GPU total mem.'] = query_cuda_info('memory.total')
         resource_dict['GPU free mem.'] = query_cuda_info('memory.free')
         resource_dict['GPU used mem.'] = query_cuda_info('memory.used')
         resource_dict['GPU util.'] = query_cuda_info('utilization.gpu')
+        if resource_dict['GPU util.']:
+            resource_dict['GPU util.'] = [
+                x / 100.0 for x in resource_dict['GPU util.']
+            ]
 
         return resource_dict
 
-    def analyze_resource_util_list(self, resource_util_list):
+    @staticmethod
+    def analyze_resource_util_list(resource_util_list):
         """
         Analyze the resource utilization for a given resource util list.
         Compute {'max', 'min', 'avg'} of resource metrics for each dict item.
         """
         res_list = []
         for item in resource_util_list:
-            res_list.append(self.analyze_single_resource_util(item))
+            res_list.append(Monitor.analyze_single_resource_util(item))
         return res_list
 
-    def analyze_single_resource_util(self, resource_util_dict):
+    @staticmethod
+    def analyze_single_resource_util(resource_util_dict):
         """
         Analyze the resource utilization for a single resource util dict.
         Compute {'max', 'min', 'avg'} of each resource metrics.
@@ -116,16 +124,21 @@ class Monitor:
         analysis_res = {}
         record_list = {}
         for record in resource_util_dict['resource']:
-            for key in self.DYNAMIC_FIELDS:
+            for key in Monitor.DYNAMIC_FIELDS:
                 if key in record:
-                    record_list.setdefault(key, []).append(record[key])
+                    if record[key] is None:
+                        continue
+                    elif isinstance(record[key], list):
+                        record_list.setdefault(key, []).extend(record[key])
+                    else:
+                        record_list.setdefault(key, []).append(record[key])
 
         # analyze the max, min, and avg
         for key in record_list:
             analysis_res[key] = {
                 'max': max(record_list[key]),
                 'min': min(record_list[key]),
-                'avg': sum(record_list[key]) / len(record_list),
+                'avg': sum(record_list[key]) / len(record_list[key]),
             }
         resource_util_dict['resource_analysis'] = analysis_res
 
