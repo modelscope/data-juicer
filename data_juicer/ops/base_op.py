@@ -148,6 +148,8 @@ class OP:
         if isinstance(self.mem_required, str):
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 
+        self.turbo = kwargs.get('turbo', False)
+
         # nested wrappers
         from data_juicer.core.data import wrap_func_with_nested_access
         for name in ['process', 'compute_stats', 'compute_hash']:
@@ -293,7 +295,7 @@ class Filter(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, *, exporter=None, tracer=None):
+    def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         if Fields.stats not in dataset.features:
             from data_juicer.core.data import add_same_content_to_new_column
             dataset = dataset.map(add_same_content_to_new_column,
@@ -309,12 +311,16 @@ class Filter(OP):
                               desc=self._name + '_compute_stats')
         if self.stats_export_path is not None:
             exporter.export_compute_stats(dataset, self.stats_export_path)
-        new_dataset = dataset.filter(self.process,
-                                     num_proc=self.runtime_np(),
-                                     desc=self._name + '_process')
-        if tracer:
-            tracer.trace_filter(self._name, dataset, new_dataset)
-        return new_dataset
+
+        if reduce:
+            new_dataset = dataset.filter(self.process,
+                                         num_proc=self.runtime_np(),
+                                         desc=self._name + '_process')
+            if tracer:
+                tracer.trace_filter(self._name, dataset, new_dataset)
+            return new_dataset
+        else:
+            return dataset
 
 
 class Deduplicator(OP):
@@ -360,16 +366,19 @@ class Deduplicator(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, *, exporter=None, tracer=None):
+    def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         dataset = dataset.map(self.compute_hash,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
                               desc=self._name + '_compute_hash')
-        show_num = tracer.show_num if tracer else 0
-        new_dataset, dup_pairs = self.process(dataset, show_num)
-        if tracer:
-            tracer.trace_deduplicator(self._name, dup_pairs)
-        return new_dataset
+        if reduce:
+            show_num = tracer.show_num if tracer else 0
+            new_dataset, dup_pairs = self.process(dataset, show_num)
+            if tracer:
+                tracer.trace_deduplicator(self._name, dup_pairs)
+            return new_dataset
+        else:
+            return dataset
 
 
 class Selector(OP):
