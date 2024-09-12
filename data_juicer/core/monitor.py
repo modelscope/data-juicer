@@ -8,6 +8,59 @@ from data_juicer.utils.resource_utils import (get_cpu_count,
 
 
 class Monitor:
+    """
+    Monitor resource utilization and other information during the data
+    processing.
+
+    Resource utilization dict: (for each func)
+    '''python
+    {
+        'time': 10,
+        'resource': [
+            {
+                'timestamp': xxx,
+                'CPU count': xxx,
+                'GPU free mem.': xxx.
+                ...
+            },
+            {
+                'timestamp': xxx,
+                'CPU count': xxx,
+                'GPU free mem.': xxx,
+                ...
+            },
+        ]
+    }
+    '''
+
+    Based on the structure above, the resource utilization analysis result will
+    add several extra fields on the first level:
+    '''python
+    {
+        'time': 10,
+        'resource': [...],
+        'resource_analysis': {
+            'GPU free mem.': {
+                'max': xxx,
+                'min': xxx,
+                'avg': xxx,
+            },
+            ...
+        }
+    }
+    '''
+    Only those fields in DYNAMIC_FIELDS will be analyzed.
+    """
+
+    DYNAMIC_FIELDS = {
+        'CPU util.',
+        'Used mem.',
+        'Free mem.',
+        'Available mem.',
+        'GPU free mem.',
+        'GPU used mem.',
+        'GPU util.',
+    }
 
     def __init__(self):
         pass
@@ -45,6 +98,39 @@ class Monitor:
 
         return resource_dict
 
+    def analyze_resource_util_list(self, resource_util_list):
+        """
+        Analyze the resource utilization for a given resource util list.
+        Compute {'max', 'min', 'avg'} of resource metrics for each dict item.
+        """
+        res_list = []
+        for item in resource_util_list:
+            res_list.append(self.analyze_single_resource_util(item))
+        return res_list
+
+    def analyze_single_resource_util(self, resource_util_dict):
+        """
+        Analyze the resource utilization for a single resource util dict.
+        Compute {'max', 'min', 'avg'} of each resource metrics.
+        """
+        analysis_res = {}
+        record_list = {}
+        for record in resource_util_dict['resource']:
+            for key in self.DYNAMIC_FIELDS:
+                if key in record:
+                    record_list.setdefault(key, []).append(record[key])
+
+        # analyze the max, min, and avg
+        for key in record_list:
+            analysis_res[key] = {
+                'max': max(record_list[key]),
+                'min': min(record_list[key]),
+                'avg': sum(record_list[key]) / len(record_list),
+            }
+        resource_util_dict['resource_analysis'] = analysis_res
+
+        return resource_util_dict
+
     @staticmethod
     def monitor_func(func, args=None, sample_interval=0.5):
         """
@@ -67,8 +153,8 @@ class Monitor:
         else:
             func = partial(func, args)
 
-        # resource utilization list
-        resource_util = {}
+        # resource utilization dict
+        resource_util_dict = {}
 
         # whether in the monitoring mode
         running_flag = False
@@ -80,7 +166,7 @@ class Monitor:
             while running_flag:
                 this_states.append(Monitor.monitor_current_resources())
                 time.sleep(interval)
-            resource_util['resource'] = this_states
+            resource_util_dict['resource'] = this_states
 
         # start monitor
         running_flag = True
@@ -100,6 +186,6 @@ class Monitor:
         monitor_thread.join()
 
         # calculate speed
-        resource_util['time'] = end - start
+        resource_util_dict['time'] = end - start
 
-        return ret, resource_util
+        return ret, resource_util_dict

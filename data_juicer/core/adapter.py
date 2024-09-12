@@ -1,10 +1,13 @@
+from loguru import logger
+
 from data_juicer.core.monitor import Monitor
 
 
 class Adapter:
 
-    def __init__(self):
-        self.current_resources = self.detect_current_resources()
+    def __init__(self, cfg):
+        self.cfg = cfg
+        self.current_resources = Monitor.monitor_current_resources()
 
     @staticmethod
     def execute_and_probe(dataset, operators, sample_interval=0.5):
@@ -25,7 +28,7 @@ class Adapter:
         # number of test samples
         sample_num = len(dataset)
         # resource utilization list
-        resource_util = []
+        resource_util_list = []
         # probe for each OP
         for op in operators:
 
@@ -36,9 +39,20 @@ class Adapter:
             # calculate speed
             resource_util_per_op[
                 'speed'] = sample_num / resource_util_per_op['time']
-            resource_util.append(resource_util_per_op)
+            resource_util_list.append(resource_util_per_op)
 
-        return resource_util
+        return resource_util_list
+
+    def workloads_adapt(self, dataset, operators):
+        """
+        Manage the scheduling and load balancing for the dataset processing.
+
+        :param dataset: The dataset that needs to be processed
+        :param operators: Operators in the data recipe
+        """
+        load_factor = self.probe_small_batches(dataset, operators)
+        dataset_batches = self.batch_split(dataset, self.cfg, load_factor)
+        return dataset_batches
 
     def probe_small_batches(self, dataset, operators):
         """
@@ -50,14 +64,16 @@ class Adapter:
         :param operators: The OP list to be pre-execution and probe
         :return: A list of probe results for each OP.
         """
-        # 假设这个函数执行一小部分数据以检测负载
-        print('Pre-executing small batches to detect system load...')
-        # 这里可以添加具体的逻辑来预执行小批量
-        # 模拟的负载因子（可以根据实际情况计算）
+        # get a small batch of dataset in default batch size
+        small_batch = self.batch_split(dataset, self.cfg)
+        resource_util_list = self.execute_and_probe(small_batch, operators)
+        # analyze resource utilization
+        analysis_res = Monitor.analyze_resource_util_list(resource_util_list)
 
-        # 例如，在负载过高的情况下返回较小的值
-        load_factor = self.available_resources['load']  # 返回当前负载
-        print(f'Detected load factor: {load_factor}')
+        # get a new load_factor according to the analysis result
+        load_factor = 1.0 * analysis_res
+        pass
+        logger.info(f'Adjust load factor to: {load_factor}')
         return load_factor
 
     @staticmethod
