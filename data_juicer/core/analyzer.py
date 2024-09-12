@@ -77,6 +77,7 @@ class Analyzer:
 
         :param load_data_np: number of workers when loading the dataset.
         :param skip_export: whether export the results into disk
+        :param skip_return: skip return for API called.
         :return: analyzed dataset.
         """
         # 1. format data
