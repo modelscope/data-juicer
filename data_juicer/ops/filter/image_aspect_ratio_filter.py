@@ -1,5 +1,4 @@
 import numpy as np
-from jsonargparse.typing import PositiveFloat
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
@@ -16,8 +15,8 @@ class ImageAspectRatioFilter(Filter):
     """
 
     def __init__(self,
-                 min_ratio: PositiveFloat = 0.333,
-                 max_ratio: PositiveFloat = 3.0,
+                 min_ratio: float = 0.333,
+                 max_ratio: float = 3.0,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):

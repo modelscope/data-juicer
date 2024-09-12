@@ -1,7 +1,6 @@
 import os
 
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -34,9 +33,9 @@ class ImageFaceRatioFilter(Filter):
     }
 
     def __init__(self,
-                 cv_classifier='',
-                 min_ratio: ClosedUnitInterval = 0.0,
-                 max_ratio: ClosedUnitInterval = 0.4,
+                 cv_classifier: str = '',
+                 min_ratio: float = 0.0,
+                 max_ratio: float = 0.4,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):

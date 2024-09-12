@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from loguru import logger
 
@@ -34,10 +34,10 @@ class OptimizeInstructionMapper(Mapper):
     def __init__(self,
                  hf_model: str = 'alibaba-pai/Qwen2-7B-Instruct-Refine',
                  trust_remote_code: bool = False,
-                 system_prompt: str = None,
+                 system_prompt: Optional[str] = None,
                  enable_vllm: bool = True,
-                 tensor_parallel_size: int = None,
-                 max_model_len: int = None,
+                 tensor_parallel_size: Optional[int] = None,
+                 max_model_len: Optional[int] = None,
                  max_num_seqs: int = 256,
                  sampling_params: Dict = {},
                  *args,

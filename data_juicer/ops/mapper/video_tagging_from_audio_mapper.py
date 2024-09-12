@@ -27,8 +27,8 @@ class VideoTaggingFromAudioMapper(Mapper):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_ast='MIT/ast-finetuned-audioset-10-10-0.4593',
-                 trust_remote_code=False,
+                 hf_ast: str = 'MIT/ast-finetuned-audioset-10-10-0.4593',
+                 trust_remote_code: bool = False,
                  *args,
                  **kwargs):
         """

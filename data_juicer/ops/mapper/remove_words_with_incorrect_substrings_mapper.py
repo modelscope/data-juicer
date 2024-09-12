@@ -1,4 +1,4 @@
-from jsonargparse.typing import List
+from typing import List, Optional
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -21,7 +21,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,
-                 substrings: List = None,
+                 substrings: Optional[List[str]] = None,
                  *args,
                  **kwargs):
         """

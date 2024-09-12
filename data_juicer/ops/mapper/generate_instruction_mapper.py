@@ -1,9 +1,10 @@
 import json
 import random
 import re
-from typing import Dict
+from typing import Dict, Optional
 
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -52,17 +53,17 @@ class GenerateInstructionMapper(Mapper):
 
     def __init__(self,
                  hf_model: str = 'Qwen/Qwen-7B-Chat',
-                 seed_file: str = None,
-                 instruct_num: int = 3,
+                 seed_file: str = '',
+                 instruct_num: PositiveInt = 3,
                  trust_remote_code: bool = False,
                  similarity_threshold: float = 0.7,
-                 prompt_template: str = None,
-                 qa_pair_template: str = None,
-                 example_template: str = None,
-                 qa_extraction_pattern: str = None,
+                 prompt_template: Optional[str] = None,
+                 qa_pair_template: Optional[str] = None,
+                 example_template: Optional[str] = None,
+                 qa_extraction_pattern: Optional[str] = None,
                  enable_vllm: bool = True,
-                 tensor_parallel_size: int = None,
-                 max_model_len: int = None,
+                 tensor_parallel_size: Optional[int] = None,
+                 max_model_len: Optional[int] = None,
                  max_num_seqs: int = 256,
                  sampling_params: Dict = {},
                  *args,
@@ -112,8 +113,9 @@ class GenerateInstructionMapper(Mapper):
         self.num_proc = 1
 
         if not seed_file:
-            raise ValueError('Please provide `seed_file` parameter, a file in chatml format. '\
-                'Reference data: data-juicer/demos/data/demo-dataset-chatml.jsonl ')
+            raise ValueError(
+                'Please provide `seed_file` in chatml format.'
+                'Example: data-juicer/demos/data/demo-dataset-chatml.jsonl')
 
         self.instruct_num = instruct_num
         self.similarity_threshold = similarity_threshold

@@ -1,5 +1,4 @@
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -31,10 +30,10 @@ class ImageTextSimilarityFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_clip='openai/clip-vit-base-patch32',
-                 trust_remote_code=False,
-                 min_score: ClosedUnitInterval = 0.1,
-                 max_score: ClosedUnitInterval = 1.0,
+                 hf_clip: str = 'openai/clip-vit-base-patch32',
+                 trust_remote_code: bool = False,
+                 min_score: float = 0.1,
+                 max_score: float = 1.0,
                  horizontal_flip: bool = False,
                  vertical_flip: bool = False,
                  any_or_all: str = 'any',
