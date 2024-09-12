@@ -28,8 +28,8 @@ python tools/video_metrics/calc_metrics_for_dataset.py --help
 
 - `fake_data_path`: The path to generated dataset. Only support for `jsonl` format. The video paths are put in the list under `videos` keys.
 - `real_data_path`: The path to ground truth dataset. Only support for `jsonl` format. The video paths are put in the list under `videos` keys. Required when computing FVD, FID, KID, and PR.
-- `fake_mm_dir`: The root diretory to store the fake videos. If it is not none, the paths in jsonl file at fake_data_path are relative paths on it, else are absolute path.
-- `real_mm_dir`: The root diretory to store the real videos. If it is not none, the paths in jsonl file at real_data_path are relative paths on it, else are absolute path.
+- `fake_mm_dir`: The root directory to store the fake videos. If it is not none, the paths in jsonl file at fake_data_path are relative paths on it, else are absolute path.
+- `real_mm_dir`: The root directory to store the real videos. If it is not none, the paths in jsonl file at real_data_path are relative paths on it, else are absolute path.
 - `metric`: The name of metric applied, currently support `fvd2048_16f`, `fvd2048_128f`, `fvd2048_128f_subsample8f`, `kvd2048_16f`, `isv2048_ucf`, `prv2048_3n_16f`, `fid50k`, `kid50k`, `is50k`, `pr50k_3n`.
     - `fvd2048_16f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 16 adjacent frames each time.
     - `fvd2048_128f`: Compute Frechet Video Distance (FVD), sample 2048 times in dataset, 128 adjacent frames each time.
