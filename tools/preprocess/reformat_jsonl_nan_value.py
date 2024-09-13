@@ -14,7 +14,7 @@ from datasets import Dataset
 def check_dict_non_nan(obj):
     """
     Check if all fields in the dict object are non-Nan
-    :papram: a dict object
+    :param: a dict object
     :return: True if all fields in the dict object are non-Nan,
             else False
     """

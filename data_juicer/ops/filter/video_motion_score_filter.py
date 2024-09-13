@@ -1,9 +1,9 @@
 import sys
 from contextlib import contextmanager
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
-from jsonargparse.typing import PositiveFloat, PositiveInt
+from pydantic import PositiveFloat, PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -46,8 +46,8 @@ class VideoMotionScoreFilter(Filter):
                  min_score: float = 0.25,
                  max_score: float = sys.float_info.max,
                  sampling_fps: PositiveFloat = 2,
-                 size: Optional[Union[PositiveInt,
-                                      Sequence[PositiveInt]]] = None,
+                 size: Union[PositiveInt, Tuple[PositiveInt],
+                             Tuple[PositiveInt, PositiveInt], None] = None,
                  max_size: Optional[PositiveInt] = None,
                  relative: bool = False,
                  any_or_all: str = 'any',
@@ -90,7 +90,7 @@ class VideoMotionScoreFilter(Filter):
                     f'Size must be an int or a 1 or 2 element tuple/list,'
                     f'not a {len(size)} element tuple/list.')
         if isinstance(size, int):
-            size = [size]
+            size = (size, )
         self.size = size
         self.max_size = max_size
         self.relative = relative
@@ -202,9 +202,9 @@ class VideoMotionScoreFilter(Filter):
 
 def _compute_resized_output_size(
     frame_size: Tuple[int, int],
-    size: Optional[List[int]],
+    size: Union[Tuple[PositiveInt], Tuple[PositiveInt, PositiveInt]],
     max_size: Optional[int] = None,
-) -> List[int]:
+) -> Tuple[int, int]:
     h, w = frame_size
     short, long = (w, h) if w <= h else (h, w)
 

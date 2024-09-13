@@ -100,7 +100,7 @@ def main(
     target_mmc4_ds_path: str,
     eoc_special_token: str = SpecialTokens.eoc,
     image_special_token: str = SpecialTokens.image,
-    sent_seperator: str = ' ',
+    sent_separator: str = ' ',
     keep_dj_fields: bool = False,
 ):
     """
@@ -121,7 +121,7 @@ def main(
         this special token is not specified. So we simply use the default image
         special token from our Data-Juicer. Default: <__dj__image> (from
         Data-Juicer).
-    :param sent_seperator: seperator to split different sentences. Default: " "
+    :param sent_separator: separator to split different sentences. Default: " "
     :param keep_dj_fields: whether to keep intermediate fields from
         Data-Juicer, such as "images", "text", ... Default: False.
     """
@@ -201,11 +201,11 @@ def main(
                 sentences = []
                 curr_image_idx = 0
                 for text_idx, sent in enumerate(chunks):
-                    # remove possible sentence seperator
-                    if sent.endswith(sent_seperator):
-                        sent = sent[:-len(sent_seperator)].strip()
-                    if sent.startswith(sent_seperator):
-                        sent = sent[len(sent_seperator):].strip()
+                    # remove possible sentence separator
+                    if sent.endswith(sent_separator):
+                        sent = sent[:-len(sent_separator)].strip()
+                    if sent.startswith(sent_separator):
+                        sent = sent[len(sent_separator):].strip()
 
                     # remove possible image_special_token and update
                     # matched_text_index for corresponding image_info
@@ -213,13 +213,13 @@ def main(
                     while sent.startswith(image_special_token):
                         sent = sent[len(image_special_token):].strip()
                         found_image_num += 1
-                        if sent.startswith(sent_seperator):
-                            sent = sent[len(sent_seperator):].strip()
+                        if sent.startswith(sent_separator):
+                            sent = sent[len(sent_separator):].strip()
                     while sent.endswith(image_special_token):
                         sent = sent[:-len(image_special_token)].strip()
                         found_image_num += 1
-                        if sent.endswith(sent_seperator):
-                            sent = sent[:-len(sent_seperator)].strip()
+                        if sent.endswith(sent_separator):
+                            sent = sent[:-len(sent_separator)].strip()
                     sentences.append(sent)
                     if found_image_num > 0:
                         for _ in range(found_image_num):

@@ -262,7 +262,7 @@ class CacheCompressManager:
         """
         return str(filename) + self.compressor_extension
 
-    def _get_cache_diretory(self, ds):
+    def _get_cache_directory(self, ds):
         """
         Get dataset cache directory.
         :param ds: input dataset.
@@ -324,7 +324,7 @@ class CacheCompressManager:
             dataset should be compressed.
         :param num_proc: number of processes to compress cache files.
         """
-        # remove cache files from the list of cahce files to be compressed
+        # remove cache files from the list of cache files to be compressed
         prev_cache_names = [item['filename'] for item in prev_ds.cache_files]
         this_cache_names = [item['filename'] for item in this_ds.cache_files] \
             if this_ds else []
@@ -389,7 +389,7 @@ class CacheCompressManager:
             `cache-` and ends with compression format.
         :param num_proc: number of processes to decompress cache files.
         """
-        cache_directory = self._get_cache_diretory(ds)
+        cache_directory = self._get_cache_directory(ds)
         if cache_directory is None:
             return
 
@@ -448,7 +448,7 @@ class CacheCompressManager:
         which starts with `cache-` and ends with compression format
         :param ds: input dataset.
         """
-        cache_directory = self._get_cache_diretory(ds)
+        cache_directory = self._get_cache_directory(ds)
         if cache_directory is None:
             return
         f_names = self._get_cache_file_names(

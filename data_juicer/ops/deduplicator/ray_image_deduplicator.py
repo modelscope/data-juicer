@@ -1,5 +1,5 @@
 import numpy as np
-from jsonargparse.typing import PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.mm_utils import load_data_with_context, load_image

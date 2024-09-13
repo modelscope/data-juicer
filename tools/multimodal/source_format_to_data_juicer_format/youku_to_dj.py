@@ -69,7 +69,7 @@ def main(
     eoc_special_token: str = SpecialTokens.eoc,
     video_special_token: str = SpecialTokens.video,
     add_eoc_at_last: bool = True,
-    sent_seperator: str = ' ',
+    sent_separator: str = ' ',
     video_special_token_insert_pos: str = 'before',
     subset_type: str = 'classification',
     keep_other_fields: bool = True,
@@ -90,7 +90,7 @@ def main(
         Data-Juicer).
     :param add_eoc_at_last: whether to add an extra eoc_special_token at the
         end of text. Default: False.
-    :param sent_seperator: seperator to split different sentences or tokens.
+    :param sent_separator: separator to split different sentences or tokens.
         Default: " "
     :param video_special_token_insert_pos: the position in the sentence to
         insert the corresponding video special token. Should be one of: [
@@ -149,7 +149,7 @@ def main(
                 # add video special token
                 new_sample, text = convert_text_to_dj(
                     text, row, add_eoc_at_last, eoc_special_token,
-                    keep_other_fields, sent_seperator, video_special_token,
+                    keep_other_fields, sent_separator, video_special_token,
                     video_special_token_insert_pos)
                 # all sentences correspond to the same video
                 new_sample[video_key] = [video]

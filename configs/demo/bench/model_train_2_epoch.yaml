@@ -13,7 +13,7 @@ train:
     # https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/dj-competition/modelscope_sora/models/easyanimate_mm_16x256x256_pretrain.safetensors
     transformer_path: "/PATH/TO/EASYANIMATE_MODEL"
   dataset_path:
-    # The root diretory to videos. Set empty if it is the absolute path in the dataset.
+    # The root directory to videos. Set empty if it is the absolute path in the dataset.
     dataset_name: ""
     # path to the Data-Juicer dataset. Note that the root path is in "thirdparth/easy_animate"
     dataset_meta_name: "../../../outputs/demo-bench/demo-dataset-with-multi-op-stats.jsonl"

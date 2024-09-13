@@ -5,7 +5,7 @@ import shutil
 import tempfile
 import time
 from argparse import ArgumentError, Namespace
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Union
 
 import yaml
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
@@ -194,7 +194,7 @@ def init_configs(args=None):
         'own special token according to your input dataset.')
     parser.add_argument(
         '--suffixes',
-        type=Union[str, List[str], Tuple[str]],
+        type=Union[str, List[str]],
         default=[],
         help='Suffixes of files that will be find and loaded. If not set, we '
         'will find all suffix files, and select a suitable formatter '
