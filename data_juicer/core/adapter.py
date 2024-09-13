@@ -1,14 +1,13 @@
-from datasets import concatenate_datasets
-from loguru import logger
-
 from data_juicer.core.monitor import Monitor
 
 
 class Adapter:
 
+    MAX_BATCH_SIZE = 10000
+
     def __init__(self, cfg):
         self.cfg = cfg
-        self.current_resources = Monitor.monitor_current_resources()
+        self.idle_resources = Monitor.monitor_current_resources()
 
     @staticmethod
     def execute_and_probe(dataset, operators, sample_interval=0.5):
@@ -26,13 +25,12 @@ class Adapter:
         if operators is None or len(operators) == 0:
             return []
 
-        # number of test samples
-        sample_num = len(dataset)
         # resource utilization list
         resource_util_list = []
         # probe for each OP
         for op in operators:
-
+            # number of test samples
+            sample_num = len(dataset)
             # run single op and monitor the resource utilization
             dataset, resource_util_per_op = Monitor.monitor_func(
                 op.run, args=(dataset, ), sample_interval=sample_interval)
@@ -42,7 +40,7 @@ class Adapter:
                 'speed'] = sample_num / resource_util_per_op['time']
             resource_util_list.append(resource_util_per_op)
 
-        return dataset, resource_util_list
+        return resource_util_list
 
     def workloads_adapt(self, dataset, operators):
         """
@@ -51,62 +49,89 @@ class Adapter:
         :param dataset: The dataset that needs to be processed
         :param operators: Operators in the data recipe
         """
-        res_data_batches = []
-        load_factor = 1.0
-        left_dataset = dataset
-        while left_dataset:
-            data_batch, left_dataset = self.take_batch(left_dataset, self.cfg,
-                                                       load_factor)
-            res_batch, load_factor = self.probe_data_batches(
-                data_batch, operators, load_factor)
-            res_data_batches.append(res_batch)
-        return concatenate_datasets(res_data_batches)
+        # TODO: set batch size to 1 for all OPs for probing
+        load_analysis_res, probed_batch_size = self.probe_small_batch(
+            dataset, operators)
 
-    def probe_data_batches(self, data_batch, operators, load_factor=None):
+        # calculate batch size for each OP according to the analysis results
+        bs_per_op = self.batch_size_strategy(load_analysis_res,
+                                             base_bs=probed_batch_size)
+
+        return bs_per_op
+
+    def batch_size_strategy(self, load_analysis_res, base_bs=1, util_th=0.9):
+        """
+        Decide the batch size for each op according to their workload analysis
+        result and expected utilization threshold. We need to guarantee that
+        the resource utilization won't exceed the threshold. Now we only
+        consider the buckets effect, which means the max batch size is decided
+        by the max utilization of all types of resources except GPU util
+        (decided by num_proc).
+        """
+        batch_size_per_op = []
+
+        # compute left utils according to the util_th
+        left_utils = {}
+        for key in self.idle_resources:
+            if 'util.' not in key or 'GPU' in key:
+                continue
+            left_utils[key] = max(0, util_th - self.idle_resources[key])
+
+        for item in load_analysis_res:
+            max_util = 1e-5
+            max_key = min(left_utils.items(), key=lambda it: it[1])[0]
+            analysis_res = item['resource_analysis']
+            for key in analysis_res:
+                if 'util.' not in key or 'GPU' in key:
+                    continue
+                used_util = max(
+                    0, analysis_res[key]['max'] - self.idle_resources[key])
+                if used_util > max_util:
+                    max_util = used_util
+                    max_key = key
+            load_factor = left_utils[max_key] / max_util
+            bs_this_op = min(max(int(base_bs * load_factor), 1),
+                             self.MAX_BATCH_SIZE)
+            batch_size_per_op.append(bs_this_op)
+
+        return batch_size_per_op
+
+    def probe_small_batch(self, dataset, operators):
         """
         Perform small batch pre-execution to probe available resources,
         current load and estimated OP speed, returning load factors and speed
         ranks for each OP.
 
-        :param data_batch: The dataset batch to pre-execute on
+        :param dataset: The dataset to pre-execute small batch on
         :param operators: The OP list to be pre-execution and probe
-        :param load_factor: Load factor for this batch
         :return: A list of probe results for each OP.
         """
+        # take a small batch
+        data_batch = self.take_batch(dataset, self.cfg)
         # process and monitor the resource utilization
-        res_batch, resource_util_list = self.execute_and_probe(
-            data_batch, operators)
+        resource_util_list = self.execute_and_probe(data_batch, operators)
         # analyze resource utilization
         analysis_res = Monitor.analyze_resource_util_list(resource_util_list)
 
-        # get a new load_factor according to the analysis result
-        load_factor = 1.0 * analysis_res
-        pass
-        logger.info(f'Adjust load factor to: {load_factor}')
-        return res_batch, load_factor
+        return analysis_res, len(data_batch)
 
     @staticmethod
-    def take_batch(dataset, config, load_factor=None):
+    def take_batch(dataset, config):
         """
         Split the dataset into batches based on configuration and load factor.
 
         :param dataset: The dataset to be split
         :param config: Configuration settings, including batch size
-        :param load_factor: The detected load factor from pre-execution
         :return: An iterator of batches
         """
         # get initial batch size
-        batch_size = config.get('batch_size', 100)
-        # adapt according to the load factor
-        if load_factor:
-            batch_size = int(batch_size / load_factor)
-            pass
-        # should be in [1, 1000]
-        batch_size = min(max(batch_size, 1), 1000)
+        batch_size = config.get('batch_size', 1000)
+        # should be in [1, 10000]
+        batch_size = min(max(batch_size, 1), Adapter.MAX_BATCH_SIZE)
 
         # check if there are enough samples
         num_samples = len(dataset)
         if batch_size >= num_samples:
-            return dataset, None
+            return dataset
         else:
-            return dataset.take(batch_size), dataset.skip(batch_size)
+            return dataset.take(batch_size)

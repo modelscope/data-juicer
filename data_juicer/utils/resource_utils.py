@@ -3,8 +3,11 @@ import subprocess
 import psutil
 from loguru import logger
 
+NVSMI_REPORT = True
+
 
 def query_cuda_info(query_key):
+    global NVSMI_REPORT
     # get cuda info using "nvidia-smi" command in MB
     try:
         nvidia_smi_output = subprocess.check_output([
@@ -21,7 +24,9 @@ def query_cuda_info(query_key):
                       'GPUs on this machine.'
         else:
             err_msg = str(e)
-        logger.warning(err_msg)
+        if NVSMI_REPORT:
+            logger.warning(err_msg)
+            NVSMI_REPORT = False
         return None
     cuda_info_list = []
     for line in nvidia_smi_output.strip().split('\n'):
