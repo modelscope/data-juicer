@@ -1,7 +1,10 @@
 import os
 from time import time
+from typing import Optional
 
+from jsonargparse import Namespace
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.config import init_configs
 from data_juicer.core.data import Dataset
@@ -27,19 +30,12 @@ class Executor:
     ops in the config file in order and generate a processed dataset.
     """
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: Optional[Namespace] = None):
         """
         Initialization method.
 
-        :param cfg: optional config dict.
+        :param cfg: optional jsonargparse Namespace.
         """
-        import json
-
-        from jsonargparse import Namespace
-        if type(cfg) == str:
-            cfg = json.loads(cfg)
-            cfg = Namespace(**cfg)
-
         self.cfg = init_configs() if cfg is None else cfg
 
         self.work_dir = self.cfg.work_dir
@@ -142,12 +138,11 @@ class Executor:
         else:
             raise ValueError(f'Unsupported sample_algo: {sample_algo}')
 
-    def run(self, load_data_np=None, skip_return=False):
+    def run(self, load_data_np: Optional[PositiveInt] = None):
         """
         Running the dataset process pipeline.
 
         :param load_data_np: number of workers when loading the dataset.
-        :param skip_return: skip return for API called.
         :return: processed dataset.
         """
         # 1. format data
@@ -184,5 +179,4 @@ class Executor:
             from data_juicer.utils.compress import compress
             compress(dataset)
 
-        if not skip_return:
-            return dataset
+        return dataset

@@ -4,12 +4,12 @@ import os
 import shutil
 import tempfile
 import time
-from argparse import ArgumentError, Namespace
-from typing import Dict, List, Union
+from argparse import ArgumentError
+from typing import Dict, List, Optional, Union
 
 import yaml
-from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
-                          namespace_to_dict)
+from jsonargparse import (ActionConfigFile, ArgumentParser, Namespace,
+                          dict_to_namespace, namespace_to_dict)
 from jsonargparse.typehints import ActionTypeHint
 from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
@@ -22,7 +22,7 @@ global_cfg = None
 global_parser = None
 
 
-def init_configs(args=None):
+def init_configs(args: Optional[List[str]] = None):
     """
     initialize the jsonargparse parser and parse configs from one of:
         1. POSIX-style commands line args;
@@ -658,13 +658,13 @@ def display_config(cfg):
     print(table)
 
 
-def export_config(cfg,
-                  path,
-                  format='yaml',
-                  skip_none=True,
-                  skip_check=True,
-                  overwrite=False,
-                  multifile=True):
+def export_config(cfg: Namespace,
+                  path: str,
+                  format: str = 'yaml',
+                  skip_none: bool = True,
+                  skip_check: bool = True,
+                  overwrite: bool = False,
+                  multifile: bool = True):
     """
     Save the config object, some params are from jsonargparse
 
@@ -700,7 +700,7 @@ def export_config(cfg,
     logger.info(f'Saved the configuration in {path}')
 
 
-def merge_config(ori_cfg, new_cfg: Dict):
+def merge_config(ori_cfg: Namespace, new_cfg: Namespace):
     """
     Merge configuration from new_cfg into ori_cfg
 
@@ -758,7 +758,7 @@ def merge_config(ori_cfg, new_cfg: Dict):
         logger.error('Config merge failed')
 
 
-def prepare_side_configs(ori_config):
+def prepare_side_configs(ori_config: Union[str, Namespace, Dict]):
     """
     parse the config if ori_config is a string of a config file path with
         yaml, yml or json format
@@ -790,14 +790,12 @@ def prepare_side_configs(ori_config):
     return config
 
 
-def get_init_configs(cfg):
+def get_init_configs(cfg: Namespace):
     """
     set init configs of datajucer for cfg
     """
     temp_dir = tempfile.gettempdir()
     temp_file = os.path.join(temp_dir, 'job_dj_config.json')
-    if type(cfg) == str:
-        cfg = json.loads(cfg)
     if isinstance(cfg, Namespace):
         cfg = namespace_to_dict(cfg)
     # create an temp config file
