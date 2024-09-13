@@ -1,10 +1,22 @@
-import threading
 import time
 from functools import partial
+from multiprocessing import get_context
 
 from data_juicer.utils.resource_utils import (get_cpu_count,
                                               get_cpu_utilization,
                                               query_cuda_info, query_mem_info)
+
+
+def resource_monitor(mdict, interval):
+    # function to monitor the resource
+    # interval is the sampling interval
+    this_states = []
+    while True:
+        this_states.append(Monitor.monitor_current_resources())
+        time.sleep(interval)
+        if mdict['stop']:
+            break
+    mdict['resource'] = this_states
 
 
 class Monitor:
@@ -170,36 +182,33 @@ class Monitor:
         # resource utilization dict
         resource_util_dict = {}
 
-        # whether in the monitoring mode
-        running_flag = False
-
-        def resource_monitor(interval):
-            # function to monitor the resource
-            # interval is the sampling interval
-            this_states = []
-            while running_flag:
-                this_states.append(Monitor.monitor_current_resources())
-                time.sleep(interval)
-            resource_util_dict['resource'] = this_states
-
         # start monitor
-        running_flag = True
-        monitor_thread = threading.Thread(target=resource_monitor,
-                                          args=(sample_interval, ))
-        monitor_thread.start()
-        # start timer
-        start = time.time()
+        ctx = get_context('fork')
+        with ctx.Manager() as manager:
+            mdict = manager.dict()
+            mdict['stop'] = False
+            monitor_proc = ctx.Process(target=resource_monitor,
+                                       args=(
+                                           mdict,
+                                           sample_interval,
+                                       ))
+            monitor_proc.start()
+            # start timer
+            start = time.time()
 
-        # run single op
-        ret = func()
+            # run single op
+            ret = func()
 
-        # end timer
-        end = time.time()
-        # stop monitor
-        running_flag = False
-        monitor_thread.join()
+            # end timer
+            end = time.time()
 
-        # calculate speed
-        resource_util_dict['time'] = end - start
+            # stop monitor
+            mdict['stop'] = True
+            monitor_proc.join()
+
+            resource_util_dict['resource'] = mdict['resource']
+
+            # calculate speed
+            resource_util_dict['time'] = end - start
 
         return ret, resource_util_dict

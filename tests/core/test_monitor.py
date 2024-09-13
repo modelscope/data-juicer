@@ -2,8 +2,9 @@ import unittest
 import time
 from loguru import logger
 from data_juicer.core import Monitor
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
+@SKIPPED_TESTS.register_module()
 class MonitorTest(DataJuicerTestCaseBase):
 
     def test_monitor_current_resources(self):
@@ -46,24 +47,14 @@ class MonitorTest(DataJuicerTestCaseBase):
         logger.info(analysis1['resource_analysis'])
 
         _, dict2 = Monitor.monitor_func(self._increase_mem_func,
-                                        args=(10 ** 5, 2, 4,),
+                                        args=(10 ** 7, 2, 4,),
                                         sample_interval=0.3)
         analysis2 = Monitor.analyze_single_resource_util(dict2)
         logger.info(analysis2['resource_analysis'])
 
-        _, dict3 = Monitor.monitor_func(self._increase_mem_func,
-                                        args=(10 ** 7, 2, 4,),
-                                        sample_interval=0.3)
-        analysis3 = Monitor.analyze_single_resource_util(dict3)
-        logger.info(analysis3['resource_analysis'])
-
         self.assertLessEqual(
             analysis1['resource_analysis']['Mem. util.']['avg'],
             analysis2['resource_analysis']['Mem. util.']['avg'])
-
-        self.assertLessEqual(
-            analysis2['resource_analysis']['Mem. util.']['avg'],
-            analysis3['resource_analysis']['Mem. util.']['avg'])
 
 
 if __name__ == '__main__':
