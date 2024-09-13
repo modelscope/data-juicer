@@ -1,11 +1,13 @@
 import importlib
 import inspect
+import json
 import logging
 import os
 import time
 from urllib.parse import parse_qs
 
 from fastapi import FastAPI, HTTPException, Request
+from jsonargparse import Namespace
 from pydantic import validate_call
 
 from data_juicer.core.exporter import Exporter
@@ -62,10 +64,19 @@ def register_class(cls, class_name: str, module_path: str):
                                             keep_stats_in_res_ds=True,
                                             keep_hashes_in_res_ds=True,
                                             export_stats=False)
+                # TODO: Traverse method's signature and convert any arguments \
+                #  that should be Namespace but are passed as str
+                if cfg_path := d_params.get('cfg'):
+                    if isinstance(cfg_path, str):
+                        cfg = Namespace(**json.loads(cfg_path))
+                        d_params['cfg'] = cfg
+                skip_return = d_params.pop('skip_return', False)
                 result = method(**d_params)
                 if exporter:
                     exporter.export(result)
                     result = export_path
+                if skip_return:
+                    result = ''
                 return {'status': 'success', 'result': result}
             except Exception as e:
                 raise HTTPException(status_code=500, detail=str(e))

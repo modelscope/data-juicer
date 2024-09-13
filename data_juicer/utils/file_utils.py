@@ -6,7 +6,7 @@ import re
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import AsyncGenerator, List, Tuple, Union
+from typing import AsyncGenerator, List, Union
 
 from datasets.utils.extract import ZstdExtractor as Extractor
 
@@ -46,7 +46,7 @@ async def follow_read(
 
 def find_files_with_suffix(
         path: Union[str, Path],
-        suffixes: Union[str, List[str], Tuple[str]] = None) -> List[str]:
+        suffixes: Union[str, List[str], None] = None) -> List[str]:
     """
     Traverse a path to find all files with the specified suffixes.
 
@@ -218,7 +218,7 @@ def transfer_filename(original_filepath: Union[str, Path], op_name,
 def copy_data(from_dir, to_dir, data_path):
     """
         Copy data from from_dir/data_path to to_dir/data_path.
-        Return Ture if success.
+        Return True if success.
     """
     from_path = os.path.join(from_dir, data_path)
     to_path = os.path.join(to_dir, data_path)

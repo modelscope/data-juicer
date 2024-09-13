@@ -11,7 +11,7 @@ from loguru import logger
 
 
 class Hasher:
-    """Hasher that accepts python objets as inputs."""
+    """Hasher that accepts python objects as inputs."""
 
     dispatch: Dict = {}
 

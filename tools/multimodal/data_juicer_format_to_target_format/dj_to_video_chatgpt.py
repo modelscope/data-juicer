@@ -46,7 +46,7 @@ def main(
     target_video_chatgpt_ds_path: str,
     eoc_special_token: str = SpecialTokens.eoc,
     video_special_token: str = SpecialTokens.video,
-    sent_seperator: str = ' ',
+    sent_separator: str = ' ',
 ):
     """
     Convert a Data-Juicer-format dataset to a Video-ChatGPT-like dataset.
@@ -62,7 +62,7 @@ def main(
         this special token is not specified. So we simply use the default video
         special token from our Data-Juicer. Default: <__dj__video> (from
         Data-Juicer).
-    :param sent_seperator: seperator to split different sentences. Default: " "
+    :param sent_separator: separator to split different sentences. Default: " "
     """
     # ----- Constant settings. Better not to change them. -----
     text_key = 'text'  # default key of field to store the sample text
@@ -103,7 +103,7 @@ def main(
             # add question and answer
             text = s.pop(text_key).strip()
             text = remove_dj_special_tokens(text, eoc_special_token,
-                                            sent_seperator,
+                                            sent_separator,
                                             video_special_token)
             # get the question and answer
             parts = text.split(f'[[{tgt_q_key}]]:')[1]

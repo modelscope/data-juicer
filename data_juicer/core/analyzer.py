@@ -1,6 +1,9 @@
 import os
+from typing import Optional
 
+from jsonargparse import Namespace
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
@@ -22,11 +25,11 @@ class Analyzer:
     dataset better.
     """
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: Optional[Namespace] = None):
         """
         Initialization method.
 
-        :param cfg: optional config dict.
+        :param cfg: optional jsonargparse Namespace dict.
         """
         self.cfg = init_configs() if cfg is None else cfg
 
@@ -65,7 +68,9 @@ class Analyzer:
         self.overall_single_plot_path = None
         self.analysis_path = os.path.join(self.cfg.work_dir, 'analysis')
 
-    def run(self, load_data_np=None, skip_export=False):
+    def run(self,
+            load_data_np: Optional[PositiveInt] = None,
+            skip_export: bool = False):
         """
         Running the dataset analysis pipeline.
 

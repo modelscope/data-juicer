@@ -80,7 +80,7 @@ def main(
     eoc_special_token: str = SpecialTokens.eoc,
     image_special_token: str = '<image>',
     add_eoc_at_last: bool = True,
-    sent_seperator: str = '\n',
+    sent_separator: str = '\n',
     only_keep_caption: bool = False,
 ):
     """
@@ -110,7 +110,7 @@ def main(
         problems that come from this change. Default: <image>.
     :param add_eoc_at_last: whether to add an extra eoc_special_token at the
         end of text. Default: True.
-    :param sent_seperator: seperator to split different sentences. Default: \n.
+    :param sent_separator: separator to split different sentences. Default: \n.
     :param only_keep_caption: only keep the caption in the single-turn dialog
         or not. This argument is mainly for the pretrain-type dataset of LLaVA,
         which only covers a limited number of questions and the corresponding
@@ -236,39 +236,39 @@ def main(
                     if image_broadcast:
                         # broadcast image to each conversation round
                         if image_broadcast_pos == 'before':
-                            sent_human = image_special_token + sent_seperator \
+                            sent_human = image_special_token + sent_separator \
                                          + sent_human
                         elif image_broadcast_pos == 'after':
-                            sent_human += sent_seperator + image_special_token
+                            sent_human += sent_separator + image_special_token
                         elif image_broadcast_pos == 'random':
                             if random.random() < 0.5:
                                 # before
                                 sent_human = image_special_token \
-                                             + sent_seperator + sent_human
+                                             + sent_separator + sent_human
                             else:
                                 # after
-                                sent_human += sent_seperator \
+                                sent_human += sent_separator \
                                               + image_special_token
                         else:
                             # follow the first round conversation
                             if image_token_pos_in_first_round == 'before':
                                 sent_human = image_special_token \
-                                             + sent_seperator + sent_human
+                                             + sent_separator + sent_human
                             else:
-                                sent_human += sent_seperator \
+                                sent_human += sent_separator \
                                               + image_special_token
                         images.append(image)
 
                 # combine these texts together
                 if only_keep_caption:
-                    new_sent = image_special_token + sent_seperator \
+                    new_sent = image_special_token + sent_separator \
                                + sent_robot
                 else:
-                    new_sent = role_human + sent_human + sent_seperator \
+                    new_sent = role_human + sent_human + sent_separator \
                         + role_robot + sent_robot
                 formatted_conversations.append(new_sent)
 
-            join_sep = sent_seperator
+            join_sep = sent_separator
             if split_chunk:
                 # split (human, robot) pairs into several chunks
                 join_sep = f' {eoc_special_token}' + join_sep

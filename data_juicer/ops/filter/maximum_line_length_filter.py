@@ -1,7 +1,5 @@
 import sys
 
-from jsonargparse.typing import PositiveInt
-
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 
 from ..base_op import OPERATORS, Filter
@@ -15,8 +13,8 @@ class MaximumLineLengthFilter(Filter):
     range."""
 
     def __init__(self,
-                 min_len: PositiveInt = 10,
-                 max_len: PositiveInt = sys.maxsize,
+                 min_len: int = 10,
+                 max_len: int = sys.maxsize,
                  *args,
                  **kwargs):
         """

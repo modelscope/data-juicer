@@ -1,7 +1,10 @@
 import os
 from time import time
+from typing import Optional
 
+from jsonargparse import Namespace
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.config import init_configs
 from data_juicer.core.data import Dataset
@@ -27,11 +30,11 @@ class Executor:
     ops in the config file in order and generate a processed dataset.
     """
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: Optional[Namespace] = None):
         """
         Initialization method.
 
-        :param cfg: optional config dict.
+        :param cfg: optional jsonargparse Namespace.
         """
         self.cfg = init_configs() if cfg is None else cfg
 
@@ -135,7 +138,7 @@ class Executor:
         else:
             raise ValueError(f'Unsupported sample_algo: {sample_algo}')
 
-    def run(self, load_data_np=None):
+    def run(self, load_data_np: Optional[PositiveInt] = None):
         """
         Running the dataset process pipeline.
 
@@ -175,4 +178,5 @@ class Executor:
         if self.cfg.use_cache and self.cfg.cache_compress:
             from data_juicer.utils.compress import compress
             compress(dataset)
+
         return dataset
