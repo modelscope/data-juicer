@@ -77,7 +77,8 @@ class AutoInstaller(object):
                 logger.info(f'Installing {pkg} ...')
                 if pkg in self.version_map:
                     pkg = self.version_map[pkg]
-                subprocess.check_call(['pip', 'install', pkg])
+                pip_cmd = [sys.executable, '-m', 'pip', 'install', pkg]
+                subprocess.check_call(pip_cmd)
                 logger.info(f'The {pkg} installed.')
             if pkg == 'torch':
                 _torch_check_and_set()
