@@ -4,8 +4,7 @@ from typing import Tuple, Union
 
 from loguru import logger
 
-from data_juicer.utils.auto_install_utils import (_is_package_installed,
-                                                  _torch_check_and_set)
+from data_juicer.utils.auto_install_utils import _torch_check_and_set
 
 UNAVAILABLE_OPERATORS = {}
 
@@ -91,7 +90,7 @@ def _is_package_available(
         return_version: bool = False) -> Union[Tuple[bool, str], bool]:
     # Check we're not importing a "pkg_name" directory somewhere
     # but the actual library by trying to grab the version
-    package_exists = _is_package_installed(pkg_name)
+    package_exists = importlib.util.find_spec(pkg_name) is not None
     package_version = 'N/A'
     if package_exists:
         try:
