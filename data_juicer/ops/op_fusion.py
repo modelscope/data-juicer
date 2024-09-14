@@ -104,17 +104,14 @@ def fuse_filter_group(original_filter_group):
             # more than 1 ops share the same intermediate var, try to fuse them
             defs, ops = zip(*inter_vars_filter)
             # new definition: new name and a definition list of fused op list
-            fused_filter_def = {
-                'OpFusion:(%s)' % ','.join([
-                    list(process.items())[0][0] for process in defs
-                ]):
-                list(defs)
-            }
+            fused_filter_name = 'OpFusion:(%s)' % ','.join(
+                [list(process.items())[0][0] for process in defs])
+            fused_filter_def = {fused_filter_name: list(defs)}
             logger.info(f'Ops are fused into one op '
                         f'{list(fused_filter_def.keys())[0]}.')
             # use these ops to create a FusedFilter object, and add the fused
             # definition and op into the fused group
-            fused_filter = FusedFilter(ops)
+            fused_filter = FusedFilter(fused_filter_name, ops)
             fused_group_def.append(fused_filter_def)
             fused_group.append(fused_filter)
         else:
@@ -129,13 +126,14 @@ def fuse_filter_group(original_filter_group):
 class FusedFilter(Filter):
     """A fused operator for filters."""
 
-    def __init__(self, fused_filters: List):
+    def __init__(self, name: str, fused_filters: List):
         """
         Initialization method.
 
         :param fused_filters: a list of filters to be fused.
         """
         super().__init__()
+        self._name = name
         self.fused_filters = fused_filters
         # set accelerator to 'cuda' if there exists any ops whose accelerator
         # is 'cuda'
