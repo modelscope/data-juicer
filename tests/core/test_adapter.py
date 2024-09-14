@@ -160,7 +160,7 @@ class AdapterTest(DataJuicerTestCaseBase):
 
         datasets.enable_caching()
 
-    def test_workloads_adapt(self):
+    def test_adapt_workloads(self):
         datasets.disable_caching()
         # basic test
         ds = load_dataset('json', data_files=self.test_file, split='train')
@@ -171,7 +171,7 @@ class AdapterTest(DataJuicerTestCaseBase):
         ]  # use some batched OPs later
 
         adapter = Adapter({'batch_size': 100})
-        adapted_batch_sizes = adapter.workloads_adapt(ds, ops)
+        adapted_batch_sizes = adapter.adapt_workloads(ds, ops)
         self.assertEqual(len(adapted_batch_sizes), len(ops))
         logger.info(adapted_batch_sizes)
 

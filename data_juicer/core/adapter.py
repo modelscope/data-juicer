@@ -1,3 +1,5 @@
+from datasets.config import DEFAULT_MAX_BATCH_SIZE
+
 from data_juicer.core.monitor import Monitor
 
 
@@ -5,7 +7,7 @@ class Adapter:
 
     MAX_BATCH_SIZE = 10000
 
-    def __init__(self, cfg):
+    def __init__(self, cfg: dict):
         self.cfg = cfg
         self.idle_resources = Monitor.monitor_current_resources()
 
@@ -42,7 +44,28 @@ class Adapter:
 
         return resource_util_list
 
-    def workloads_adapt(self, dataset, operators):
+    @staticmethod
+    def take_batch(dataset, config):
+        """
+        Split the dataset into batches based on configuration and load factor.
+
+        :param dataset: The dataset to be split
+        :param config: Configuration settings, including batch size
+        :return: An iterator of batches
+        """
+        # get initial batch size
+        batch_size = config.get('batch_size', DEFAULT_MAX_BATCH_SIZE)
+        # should be in [1, 10000]
+        batch_size = min(max(batch_size, 1), Adapter.MAX_BATCH_SIZE)
+
+        # check if there are enough samples
+        num_samples = len(dataset)
+        if batch_size >= num_samples:
+            return dataset
+        else:
+            return dataset.take(batch_size)
+
+    def adapt_workloads(self, dataset, operators):
         """
         Manage the scheduling and load balancing for the dataset processing.
 
@@ -58,6 +81,25 @@ class Adapter:
                                              base_bs=probed_batch_size)
 
         return bs_per_op
+
+    def probe_small_batch(self, dataset, operators):
+        """
+        Perform small batch pre-execution to probe available resources,
+        current load and estimated OP speed, returning load factors and speed
+        ranks for each OP.
+
+        :param dataset: The dataset to pre-execute small batch on
+        :param operators: The OP list to be pre-execution and probe
+        :return: A list of probe results for each OP.
+        """
+        # take a small batch
+        data_batch = self.take_batch(dataset, self.cfg)
+        # process and monitor the resource utilization
+        resource_util_list = self.execute_and_probe(data_batch, operators)
+        # analyze resource utilization
+        analysis_res = Monitor.analyze_resource_util_list(resource_util_list)
+
+        return analysis_res, len(data_batch)
 
     def batch_size_strategy(self, load_analysis_res, base_bs=1, util_th=0.9):
         """
@@ -95,43 +137,3 @@ class Adapter:
             batch_size_per_op.append(bs_this_op)
 
         return batch_size_per_op
-
-    def probe_small_batch(self, dataset, operators):
-        """
-        Perform small batch pre-execution to probe available resources,
-        current load and estimated OP speed, returning load factors and speed
-        ranks for each OP.
-
-        :param dataset: The dataset to pre-execute small batch on
-        :param operators: The OP list to be pre-execution and probe
-        :return: A list of probe results for each OP.
-        """
-        # take a small batch
-        data_batch = self.take_batch(dataset, self.cfg)
-        # process and monitor the resource utilization
-        resource_util_list = self.execute_and_probe(data_batch, operators)
-        # analyze resource utilization
-        analysis_res = Monitor.analyze_resource_util_list(resource_util_list)
-
-        return analysis_res, len(data_batch)
-
-    @staticmethod
-    def take_batch(dataset, config):
-        """
-        Split the dataset into batches based on configuration and load factor.
-
-        :param dataset: The dataset to be split
-        :param config: Configuration settings, including batch size
-        :return: An iterator of batches
-        """
-        # get initial batch size
-        batch_size = config.get('batch_size', 1000)
-        # should be in [1, 10000]
-        batch_size = min(max(batch_size, 1), Adapter.MAX_BATCH_SIZE)
-
-        # check if there are enough samples
-        num_samples = len(dataset)
-        if batch_size >= num_samples:
-            return dataset
-        else:
-            return dataset.take(batch_size)

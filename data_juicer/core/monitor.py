@@ -89,7 +89,8 @@ class Monitor:
     def monitor_current_resources():
         """
         Detect the resource utilization of the current environment/machine.
-        All data of "util." is in percent. All data of "mem." is in MB.
+        All data of "util." is ratios in the range of [0.0, 1.0]. All data of
+        "mem." is in MB.
         """
         resource_dict = dict()
         # current time
