@@ -1,7 +1,7 @@
 import copy
-from typing import Dict
+from typing import Dict, Optional
 
-from jsonargparse.typing import PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
@@ -54,16 +54,16 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
 
     def __init__(self,
                  hf_summarizer: str = None,
-                 trust_remote_code=False,
+                 trust_remote_code: bool = False,
                  consider_video_caption_from_video: bool = True,
                  consider_video_caption_from_audio: bool = True,
                  consider_video_caption_from_frames: bool = True,
                  consider_video_tags_from_audio: bool = True,
                  consider_video_tags_from_frames: bool = True,
-                 vid_cap_from_vid_args: Dict = None,
-                 vid_cap_from_frm_args: Dict = None,
-                 vid_tag_from_aud_args: Dict = None,
-                 vid_tag_from_frm_args: Dict = None,
+                 vid_cap_from_vid_args: Optional[Dict] = None,
+                 vid_cap_from_frm_args: Optional[Dict] = None,
+                 vid_tag_from_aud_args: Optional[Dict] = None,
+                 vid_tag_from_frm_args: Optional[Dict] = None,
                  keep_tag_num: PositiveInt = 5,
                  keep_original_sample: bool = True,
                  *args,

@@ -2,8 +2,8 @@ import sys
 
 import librosa
 import numpy as np
-from jsonargparse.typing import PositiveInt
 from librosa.decompose import decompose
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import load_audio, load_data_with_context

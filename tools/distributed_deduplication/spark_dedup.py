@@ -1,6 +1,6 @@
 import sys
 import time
-from typing import Union
+from typing import Optional
 
 import fire
 from loguru import logger
@@ -18,11 +18,11 @@ from tools.quality_classifier.qc_utils import (export_result, load_dataset,
 @logger.catch
 def dedup_dataset(dataset_path: str,
                   result_path: str,
-                  tokenizer: Union[str, None] = None,
+                  tokenizer: Optional[str] = None,
                   num_features: int = 1047576,
                   num_hashtables: int = 10,
                   text_key: str = 'text',
-                  master_url: Union[str, None] = None):
+                  master_url: Optional[str] = None):
     """
     Perform fuzzy text deduplication on the given dataset.
     :param dataset_path: the path to the dataset to perform deduplication,

@@ -1,7 +1,6 @@
 import sys
 
 import numpy as np
-from jsonargparse.typing import NonNegativeFloat
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (close_video, load_data_with_context,
@@ -20,8 +19,8 @@ class VideoDurationFilter(Filter):
     """
 
     def __init__(self,
-                 min_duration: NonNegativeFloat = 0,
-                 max_duration: NonNegativeFloat = sys.maxsize,
+                 min_duration: float = 0,
+                 max_duration: float = sys.maxsize,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):

@@ -6,10 +6,11 @@ from . import (audio_ffmpeg_wrapped_mapper, chinese_convert_mapper,
                generate_instruction_mapper, image_blur_mapper,
                image_captioning_from_gpt4v_mapper, image_captioning_mapper,
                image_diffusion_mapper, image_face_blur_mapper,
-               nlpaug_en_mapper, nlpcda_zh_mapper, optimize_instruction_mapper,
-               punctuation_normalization_mapper, remove_bibliography_mapper,
-               remove_comments_mapper, remove_header_mapper,
-               remove_long_words_mapper, remove_non_chinese_character_mapper,
+               image_tagging_mapper, nlpaug_en_mapper, nlpcda_zh_mapper,
+               optimize_instruction_mapper, punctuation_normalization_mapper,
+               remove_bibliography_mapper, remove_comments_mapper,
+               remove_header_mapper, remove_long_words_mapper,
+               remove_non_chinese_character_mapper,
                remove_repeat_sentences_mapper, remove_specific_chars_mapper,
                remove_table_text_mapper,
                remove_words_with_incorrect_substrings_mapper,
@@ -41,6 +42,7 @@ from .image_captioning_from_gpt4v_mapper import ImageCaptioningFromGPT4VMapper
 from .image_captioning_mapper import ImageCaptioningMapper
 from .image_diffusion_mapper import ImageDiffusionMapper
 from .image_face_blur_mapper import ImageFaceBlurMapper
+from .image_tagging_mapper import ImageTaggingMapper
 from .nlpaug_en_mapper import NlpaugEnMapper
 from .nlpcda_zh_mapper import NlpcdaZhMapper
 from .optimize_instruction_mapper import OptimizeInstructionMapper
@@ -123,6 +125,7 @@ __all__ = [
     'AudioFFmpegWrappedMapper',
     'VideoSplitByDurationMapper',
     'VideoFaceBlurMapper',
+    'ImageTaggingMapper',
 ]
 
 # yapf: enable
