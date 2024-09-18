@@ -122,8 +122,11 @@ def fuse_filter_group(original_filter_group, fusion_strategy='greedy'):
                 fused_filter_name: [op._op_cfg for op in ops]
             }
             fused_filter_speed = sum([
-                probe_res['speed'] for probe_res in probe_res_list if probe_res
+                1.0 / probe_res['speed'] for probe_res in probe_res_list
+                if probe_res
             ])
+            if fused_filter_speed > 0:
+                fused_filter_speed = 1.0 / fused_filter_speed
             fused_group.append(fused_filter)
             group_speed.append(fused_filter_speed)
         else:
