@@ -1,3 +1,4 @@
+import json
 import os
 from time import time
 from typing import Optional, Union
@@ -36,9 +37,6 @@ class Executor:
 
         :param cfg: optional jsonargparse Namespace.
         """
-        import json
-
-        from jsonargparse import Namespace
         if type(cfg) == str:
             cfg = json.loads(cfg)
             cfg = Namespace(**cfg)
@@ -147,7 +145,7 @@ class Executor:
 
     def run(self,
             load_data_np: Optional[PositiveInt] = None,
-            skip_return: bool = False):
+            skip_return=False):
         """
         Running the dataset process pipeline.
 

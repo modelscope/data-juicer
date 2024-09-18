@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Optional, Union
 
@@ -31,9 +32,6 @@ class Analyzer:
 
         :param cfg: optional jsonargparse Namespace dict.
         """
-        import json
-
-        from jsonargparse import Namespace
         if type(cfg) == str:
             cfg = json.loads(cfg)
             cfg = Namespace(**cfg)
