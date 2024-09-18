@@ -31,6 +31,11 @@ class Adapter:
         resource_util_list = []
         # probe for each OP
         for op in operators:
+            # set num_proc to 1 for each OP to focus on the influence of batch
+            # size only.
+            old_num_proc = op.num_proc
+            op.num_proc = 1
+
             # number of test samples
             sample_num = len(dataset)
             # run single op and monitor the resource utilization
@@ -41,6 +46,9 @@ class Adapter:
             resource_util_per_op[
                 'speed'] = sample_num / resource_util_per_op['time']
             resource_util_list.append(resource_util_per_op)
+
+            # restore to the original num_proc
+            op.num_proc = old_num_proc
 
         return resource_util_list
 
