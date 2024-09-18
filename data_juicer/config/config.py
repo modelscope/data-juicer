@@ -790,7 +790,7 @@ def prepare_side_configs(ori_config: Union[str, Namespace, Dict]):
     return config
 
 
-def get_init_configs(cfg: Namespace):
+def get_init_configs(cfg):
     """
     set init configs of datajucer for cfg
     """

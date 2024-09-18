@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Union
 
 from jsonargparse import Namespace
 from loguru import logger
@@ -25,7 +25,7 @@ class Analyzer:
     dataset better.
     """
 
-    def __init__(self, cfg: Optional[Namespace] = None):
+    def __init__(self, cfg: Union[str, Namespace] = None):
         """
         Initialization method.
 
@@ -78,7 +78,7 @@ class Analyzer:
     def run(self,
             load_data_np: Optional[PositiveInt] = None,
             skip_export: bool = False,
-            skip_return=False):
+            skip_return: bool = False):
         """
         Running the dataset analysis pipeline.
 

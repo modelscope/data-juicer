@@ -1,6 +1,6 @@
 import os
 from time import time
-from typing import Optional
+from typing import Optional, Union
 
 from jsonargparse import Namespace
 from loguru import logger
@@ -30,7 +30,7 @@ class Executor:
     ops in the config file in order and generate a processed dataset.
     """
 
-    def __init__(self, cfg: Optional[Namespace] = None):
+    def __init__(self, cfg: Union[str, Namespace] = None):
         """
         Initialization method.
 
@@ -147,7 +147,7 @@ class Executor:
 
     def run(self,
             load_data_np: Optional[PositiveInt] = None,
-            skip_return=False):
+            skip_return: bool = False):
         """
         Running the dataset process pipeline.
 
