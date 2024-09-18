@@ -25,74 +25,81 @@ INTER_SAMPLED_FRAMES = Registry(InterVars.sampled_frames)
 # all
 ALL_INTER_VARS = [INTER_LINES, INTER_WORDS, LOADED_IMAGES, LOADED_VIDEOS]
 
+# supported fusion strategies
+FUSION_STRATEGIES = {'greedy', 'probe'}
 
-def fuse_operators(process_list, ops):
+
+def fuse_operators(ops, fusion_strategy='greedy', probe_res=None):
     """
     Fuse the input ops list and return the fused ops list.
 
-    :param process_list: the list of original process definition, including op
-        names and args.
     :param ops: the corresponding list of op objects.
+    :param fusion_strategy: the OP fusion strategy. Should be one of {"greedy",
+        "probe"}. "greedy" means only put the fused OP to the last of OP group.
+        "probe" means reordering the OPs according to the probed processing
+        speed of each OP.
+    :param probe_res: the probed speed for each OP from Monitor.
     :return: a list of fused op objects.
     """
+    if probe_res is None:
+        probe_res = [None for _ in range(len(ops))]
     # detect filter groups and try to fuse them
-    fused_op_def = []
     fused_ops = []
     filter_group = []
     in_group = False
-    for process, op in zip(process_list, ops):
+    for op, op_probe in zip(ops, probe_res):
         if isinstance(op, Filter):
             if not in_group:
                 in_group = True
-            filter_group.append((process, op))
+            filter_group.append((op, op_probe))
         elif in_group:
             # got a filter group, try to fuse them
-            fused_group_def, fused_group = fuse_filter_group(filter_group)
-            fused_op_def.extend(fused_group_def)
+            fused_group = fuse_filter_group(filter_group, fusion_strategy)
             fused_ops.extend(fused_group)
             filter_group = []
             in_group = False
             # and add the current non-filter op into fused_ops
-            fused_op_def.append(process)
             fused_ops.append(op)
         else:  # not a filter and not in a filter group, skip
-            fused_op_def.append(process)
             fused_ops.append(op)
     if in_group and len(filter_group) > 0:
         # the final filter group, try to fuse them
-        fused_group_def, fused_group = fuse_filter_group(filter_group)
-        fused_op_def.extend(fused_group_def)
+        fused_group = fuse_filter_group(filter_group, fusion_strategy)
         fused_ops.extend(fused_group)
-    return fused_op_def, fused_ops
+    return fused_ops
 
 
-def fuse_filter_group(original_filter_group):
+def fuse_filter_group(original_filter_group, fusion_strategy='greedy'):
     """
     Fuse single filter group and return the fused filter group.
 
     :param original_filter_group: the original filter group, including op
         definitions and objects.
+    :param fusion_strategy: the OP fusion strategy. Should be one of {"greedy",
+        "probe"}. "greedy" means only put the fused OP to the last of OP group.
+        "probe" means reordering the OPs according to the probed processing
+        speed of each OP.
     :return: the fused definitions and objects of the input filter group.
     """
-    fused_group_def = []
     fused_group = []
+    group_speed = []
     all_intermediate_vars = ALL_INTER_VARS
     all_fused_filters = {
         inter_vars: []
         for inter_vars in all_intermediate_vars
     }
     # group these filters by their intermediate vars
-    for process, op in original_filter_group:
-        op_name, op_args = list(process.items())[0]
+    for op, probe_res in original_filter_group:
+        op_name = op._name
         for inter_vars in all_intermediate_vars:
             if op_name in inter_vars.modules:
-                all_fused_filters[inter_vars].append((process, op))
+                all_fused_filters[inter_vars].append((op, probe_res))
                 break
         else:
             # first apply other filters to decrease the number of samples, so
             # we add them into the fused_group list directly
-            fused_group_def.append(process)
             fused_group.append(op)
+            group_speed.append(probe_res['speed'] if probe_res else 0)
 
     # try to fuse ops for each type of intermediate vars
     for inter_vars in all_intermediate_vars:
@@ -102,25 +109,41 @@ def fuse_filter_group(original_filter_group):
             pass
         elif len(inter_vars_filter) > 1:
             # more than 1 ops share the same intermediate var, try to fuse them
-            defs, ops = zip(*inter_vars_filter)
+            ops, probe_res_list = zip(*inter_vars_filter)
             # new definition: new name and a definition list of fused op list
             fused_filter_name = 'OpFusion:(%s)' % ','.join(
-                [list(process.items())[0][0] for process in defs])
-            fused_filter_def = {fused_filter_name: list(defs)}
+                [op._name for op in ops])
             logger.info(f'Ops are fused into one op '
-                        f'{list(fused_filter_def.keys())[0]}.')
+                        f'{fused_filter_name}.')
             # use these ops to create a FusedFilter object, and add the fused
             # definition and op into the fused group
             fused_filter = FusedFilter(fused_filter_name, ops)
-            fused_group_def.append(fused_filter_def)
+            fused_filter._op_cfg = {
+                fused_filter_name: [op._op_cfg for op in ops]
+            }
+            fused_filter_speed = sum([
+                probe_res['speed'] for probe_res in probe_res_list if probe_res
+            ])
             fused_group.append(fused_filter)
+            group_speed.append(fused_filter_speed)
         else:
             # only 1 op for this type of intermediate var, add it to the fused
             # group directly without fusion
-            fused_group_def.append(inter_vars_filter[0][0])
-            fused_group.append(inter_vars_filter[0][1])
+            fused_group.append(inter_vars_filter[0][0])
+            probe_res = inter_vars_filter[0][1]
+            group_speed.append(probe_res['speed'] if probe_res else 0)
 
-    return fused_group_def, fused_group
+    # reorder according to the probed speed results in group_speed
+    # 'greedy': all speed data in group_speed will be 0, which will keep the
+    #   current order of fused group
+    # 'probe': OPs in fused group will be reordered according to the speed data
+    #   in group_speed in descending order
+    fused_group = [
+        op for op, _ in sorted(
+            zip(fused_group, group_speed), key=lambda it: it[1], reverse=True)
+    ]
+
+    return fused_group
 
 
 class FusedFilter(Filter):

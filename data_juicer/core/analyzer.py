@@ -6,8 +6,10 @@ from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
 from data_juicer.format import load_formatter
 from data_juicer.ops import Filter, load_ops
+from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils import cache_utils
 
+from .adapter import Adapter
 from .exporter import Exporter
 
 
@@ -78,7 +80,18 @@ class Analyzer:
 
         # extract processes
         logger.info('Preparing process operators...')
-        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process)
+
+        if self.cfg.op_fusion:
+            probe_res = None
+            if self.cfg.fusion_strategy == 'probe':
+                logger.info('Probe the OP speed for OP reordering...')
+                adapter = Adapter(self.cfg)
+                probe_res = adapter.probe_small_batch(dataset, ops)
+
+            logger.info(f'Start OP fusion and reordering with strategy '
+                        f'[{self.cfg.fusion_strategy}]...')
+            ops = fuse_operators(ops, self.cfg.fusion_strategy, probe_res)
 
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')

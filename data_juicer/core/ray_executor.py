@@ -5,6 +5,7 @@ from loguru import logger
 from data_juicer.config import init_configs
 from data_juicer.core.ray_data import RayDataset
 from data_juicer.ops import load_ops
+from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.availability_utils import AvailabilityChecking
 
 with AvailabilityChecking(['ray'], requires_type='dist'):
@@ -63,7 +64,13 @@ class RayExecutor:
         dataset = RayDataset(dataset, self.cfg.dataset_path, self.cfg)
         # 2. extract processes
         logger.info('Preparing process operators...')
-        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process)
+
+        if self.cfg.op_fusion:
+            # TODO: support probe-based OP fusion for Ray mode
+            logger.info(f'Start OP fusion and reordering with strategy '
+                        f'[{self.cfg.fusion_strategy}]...')
+            ops = fuse_operators(ops, self.cfg.fusion_strategy)
 
         # 3. data process
         logger.info('Processing data...')

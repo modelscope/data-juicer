@@ -8,6 +8,7 @@ from data_juicer.core.data import Dataset
 from data_juicer.format.load import load_formatter
 from data_juicer.format.mixture_formatter import MixtureFormatter
 from data_juicer.ops import OPERATORS, load_ops
+from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 
@@ -15,6 +16,7 @@ from ..ops.selector.frequency_specified_field_selector import \
     FrequencySpecifiedFieldSelector
 from ..ops.selector.topk_specified_field_selector import \
     TopkSpecifiedFieldSelector
+from .adapter import Adapter
 from .exporter import Exporter
 from .tracer import Tracer
 
@@ -150,9 +152,20 @@ class Executor:
                 load_data_np = self.cfg.np
             dataset = self.formatter.load_dataset(load_data_np, self.cfg)
 
-        # 2. extract processes
+        # 2. extract processes and optimize their orders
         logger.info('Preparing process operators...')
-        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process)
+
+        if self.cfg.op_fusion:
+            probe_res = None
+            if self.cfg.fusion_strategy == 'probe':
+                logger.info('Probe the OP speed for OP reordering...')
+                adapter = Adapter(self.cfg)
+                probe_res = adapter.probe_small_batch(dataset, ops)
+
+            logger.info(f'Start OP fusion and reordering with strategy '
+                        f'[{self.cfg.fusion_strategy}]...')
+            ops = fuse_operators(ops, self.cfg.fusion_strategy, probe_res)
 
         # 3. data process
         # - If tracer is open, trace each op after it's processed
