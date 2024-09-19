@@ -160,6 +160,7 @@ class Executor:
         logger.info('Processing data...')
         tstart = time()
         dataset = dataset.process(ops,
+                                  work_dir=self.work_dir,
                                   exporter=self.exporter,
                                   checkpointer=self.ckpt_manager,
                                   tracer=self.tracer)
