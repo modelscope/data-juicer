@@ -60,9 +60,11 @@ class AverageLineLengthFilter(Filter):
 
     def process(self, samples):
         if isinstance(samples[Fields.stats], list):
-            return map(
-                lambda stat: self.min_len <= stat[StatsKeys.avg_line_length] <=
-                self.max_len, samples[Fields.stats])
+            return list(
+                map(
+                    lambda stat: self.min_len <= stat[StatsKeys.avg_line_length
+                                                      ] <= self.max_len,
+                    samples[Fields.stats]))
         else:
             # single sample for ray filter
             if self.min_len <= samples[Fields.stats][

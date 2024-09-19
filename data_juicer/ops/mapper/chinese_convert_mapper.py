@@ -87,7 +87,7 @@ class ChineseConvertMapper(Mapper):
     def process(self, samples):
         prepare_converter(self.mode)
 
-        samples[self.text_key] = map(
-            lambda text: OPENCC_CONVERTER.convert(text),
-            samples[self.text_key])
+        samples[self.text_key] = list(
+            map(lambda text: OPENCC_CONVERTER.convert(text),
+                samples[self.text_key]))
         return samples
