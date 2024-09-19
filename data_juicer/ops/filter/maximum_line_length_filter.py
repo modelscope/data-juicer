@@ -61,14 +61,7 @@ class MaximumLineLengthFilter(Filter):
 
     def process(self, samples):
         if isinstance(samples[Fields.stats], list):
-            bool_results = []
-            for stat in samples[Fields.stats]:
-                if self.min_len <= stat[
-                        StatsKeys.max_line_length] <= self.max_len:
-                    bool_results.append(True)
-                else:
-                    bool_results.append(False)
-            return bool_results
+            return map(lambda stat: self.min_len <= stat[StatsKeys.max_line_length] <= self.max_len, samples[Fields.stats])
         else:
             # single sample for ray filter
             if self.min_len <= samples[Fields.stats][

@@ -37,7 +37,5 @@ class CleanHtmlMapper(Mapper):
             parser = HTMLParser(raw_html)
             return parser.text()
 
-        samples[self.text_key] = [
-            _clean_html(text) for text in samples[self.text_key]
-        ]
+        samples[self.text_key] = map(lambda text: _clean_html(text), samples[self.text_key])
         return samples

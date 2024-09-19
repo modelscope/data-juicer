@@ -86,13 +86,7 @@ class AlphanumericFilter(Filter):
         ratio_key = StatsKeys.alpha_token_ratio if self.tokenization \
             else StatsKeys.alnum_ratio
         if isinstance(samples[Fields.stats], list):
-            bool_results = []
-            for stat in samples[Fields.stats]:
-                if self.min_ratio <= stat[ratio_key] <= self.max_ratio:
-                    bool_results.append(True)
-                else:
-                    bool_results.append(False)
-            return bool_results
+            return map(lambda stat: self.min_ratio<=stat[ratio_key]<=self.max_ratio, samples[Fields.stats])
         else:
             # single sample for ray filter
             if self.min_ratio <= samples[

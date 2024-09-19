@@ -116,14 +116,7 @@ class WordRepetitionFilter(Filter):
 
     def process(self, samples):
         if isinstance(samples[Fields.stats], list):
-            bool_results = []
-            for stat in samples[Fields.stats]:
-                if self.min_ratio <= stat[
-                        StatsKeys.word_rep_ratio] <= self.max_ratio:
-                    bool_results.append(True)
-                else:
-                    bool_results.append(False)
-            return bool_results
+            return map(lambda stat: self.min_ratio <= stat[StatsKeys.word_rep_ratio] <= self.max_ratio, samples[Fields.stats])
         else:
             # single sample for ray filter
             if self.min_ratio <= samples[Fields.stats][
