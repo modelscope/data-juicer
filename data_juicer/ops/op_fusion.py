@@ -168,6 +168,9 @@ class FusedFilter(Filter):
         if 'cuda' in accelerator_methods:
             self.accelerator = 'cuda'
 
+        # update num_proc with the min num_proc of all fusible filters
+        self.num_proc = min([op.runtime_np() for op in self.fused_filters])
+
     def compute_stats(self, sample, rank=None):
         import av
 

@@ -161,7 +161,7 @@ class Executor:
             if self.cfg.fusion_strategy == 'probe':
                 logger.info('Probe the OP speed for OP reordering...')
                 adapter = Adapter(self.cfg)
-                probe_res = adapter.probe_small_batch(dataset, ops)
+                probe_res, _ = adapter.probe_small_batch(dataset, ops)
 
             logger.info(f'Start OP fusion and reordering with strategy '
                         f'[{self.cfg.fusion_strategy}]...')
