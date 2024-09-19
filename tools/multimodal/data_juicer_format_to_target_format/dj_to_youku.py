@@ -67,7 +67,7 @@ def main(
     target_youku_ds_path: str,
     eoc_special_token: str = SpecialTokens.eoc,
     video_special_token: str = SpecialTokens.video,
-    sent_seperator: str = ' ',
+    sent_separator: str = ' ',
     subset_type: str = 'classification',
 ):
     """
@@ -84,7 +84,7 @@ def main(
         this special token is not specified. So we simply use the default video
         special token from our Data-Juicer. Default: <__dj__video> (from
         Data-Juicer).
-    :param sent_seperator: seperator to split different sentences. Default: " "
+    :param sent_separator: separator to split different sentences. Default: " "
     :param subset_type: the subset type of the input dataset. Should be one of
         ["pretrain", "classification", "retrieval", "captioning"]. Default:
         "classification".
@@ -165,7 +165,7 @@ def main(
                 # add text, remove extra special tokens
                 text = s[text_key].strip()
                 text = remove_dj_special_tokens(text, eoc_special_token,
-                                                sent_seperator,
+                                                sent_separator,
                                                 video_special_token)
                 new_sample[tgt_text_key] = text
 

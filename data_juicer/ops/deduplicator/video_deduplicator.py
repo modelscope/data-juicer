@@ -85,7 +85,7 @@ class VideoDeduplicator(Deduplicator):
         if show_num > 0:
             # sample duplicate pairs
             if self.consider_text:
-                hash2ids: Dict[Tuple[int], Set[int]] = defaultdict(set)
+                hash2ids: Dict[Tuple[int, int], Set[int]] = defaultdict(set)
                 hashes = zip(dataset[HashKeys.videohash],
                              dataset[HashKeys.hash])
             else:

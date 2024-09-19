@@ -1,6 +1,5 @@
-from typing import List, Tuple, Union
+from typing import List, Union
 
-from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -21,8 +20,8 @@ class LanguageIDScoreFilter(Filter):
     larger than a specific min value."""
 
     def __init__(self,
-                 lang: Union[str, List[str], Tuple[str]] = '',
-                 min_score: ClosedUnitInterval = 0.8,
+                 lang: Union[str, List[str]] = '',
+                 min_score: float = 0.8,
                  *args,
                  **kwargs):
         """

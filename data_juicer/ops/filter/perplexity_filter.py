@@ -2,8 +2,6 @@
 # https://huggingface.co/spaces/huggingface/text-data-filtering
 # --------------------------------------------------------
 
-from jsonargparse.typing import PositiveFloat
-
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -29,7 +27,7 @@ class PerplexityFilter(Filter):
 
     def __init__(self,
                  lang: str = 'en',
-                 max_ppl: PositiveFloat = 1500,
+                 max_ppl: float = 1500,
                  *args,
                  **kwargs):
         """

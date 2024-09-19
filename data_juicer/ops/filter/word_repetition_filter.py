@@ -2,7 +2,7 @@
 # https://huggingface.co/spaces/huggingface/text-data-filtering
 # --------------------------------------------------------
 
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
@@ -31,8 +31,8 @@ class WordRepetitionFilter(Filter):
                  lang: str = 'en',
                  tokenization: bool = False,
                  rep_len: PositiveInt = 10,
-                 min_ratio: ClosedUnitInterval = 0.0,
-                 max_ratio: ClosedUnitInterval = 0.5,
+                 min_ratio: float = 0.0,
+                 max_ratio: float = 0.5,
                  *args,
                  **kwargs):
         """

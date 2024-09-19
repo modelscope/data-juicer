@@ -1,3 +1,5 @@
+from typing import Optional
+
 import regex as re
 
 from ..base_op import OPERATORS, Mapper
@@ -9,7 +11,11 @@ class CleanEmailMapper(Mapper):
 
     _batched_op = True
 
-    def __init__(self, pattern: str = None, repl: str = '', *args, **kwargs):
+    def __init__(self,
+                 pattern: Optional[str] = None,
+                 repl: str = '',
+                 *args,
+                 **kwargs):
         """
         Initialization method.
 

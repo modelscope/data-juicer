@@ -2,7 +2,7 @@ import math
 import re
 from itertools import chain
 
-from jsonargparse.typing import NonNegativeFloat, NonNegativeInt
+from pydantic import NonNegativeFloat, NonNegativeInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields

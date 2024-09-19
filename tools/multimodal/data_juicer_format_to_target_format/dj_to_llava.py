@@ -75,7 +75,7 @@ def main(
     keep_only_first_image: bool = True,
     eoc_special_token: str = SpecialTokens.eoc,
     image_special_token: str = '<image>',
-    sent_seperator: str = '\n',
+    sent_separator: str = '\n',
     restore_questions: bool = False,
     original_llava_ds_path: str = None,
 ):
@@ -95,7 +95,7 @@ def main(
         this token always be "<image>". You can change it to align with your
         own LLaVA-like datasets but should be careful of possible compatibility
         problems that come from this change. Default: <image>.
-    :param sent_seperator: seperator to split different sentences. Default: \n.
+    :param sent_separator: separator to split different sentences. Default: \n.
     :param restore_questions: need to restore human questions if only keep
         caption when converting the LLaVA-like dataset to Data-Juicer-format.
         If it's True, an extra argument original_llava_ds_path is required.
@@ -163,9 +163,9 @@ def main(
             def clean_sentence(sentence, round):
                 sentence = sentence.strip()
 
-                # remove sentence seperator
-                if sentence.endswith(sent_seperator):
-                    sentence = sentence[:-len(sent_seperator)].strip()
+                # remove sentence separator
+                if sentence.endswith(sent_separator):
+                    sentence = sentence[:-len(sent_separator)].strip()
                 # remove possible eoc_special_tokens
                 if sentence.endswith(eoc_special_token):
                     sentence = sentence[:-len(eoc_special_token)].strip()
@@ -174,12 +174,12 @@ def main(
                 if round > 0 and keep_only_first_image:
                     if sentence.startswith(image_special_token):
                         sentence = sentence[len(image_special_token):].strip()
-                        if sentence.startswith(sent_seperator):
-                            sentence = sentence[len(sent_seperator):].strip()
+                        if sentence.startswith(sent_separator):
+                            sentence = sentence[len(sent_separator):].strip()
                     if sentence.endswith(image_special_token):
                         sentence = sentence[:-len(image_special_token)].strip()
-                        if sentence.endswith(sent_seperator):
-                            sentence = sentence[:-len(sent_seperator)].strip()
+                        if sentence.endswith(sent_separator):
+                            sentence = sentence[:-len(sent_separator)].strip()
                 return sentence
 
             conversations = []

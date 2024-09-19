@@ -2,8 +2,6 @@
 # https://huggingface.co/spaces/huggingface/text-data-filtering
 # --------------------------------------------------------
 
-from jsonargparse.typing import ClosedUnitInterval
-
 from data_juicer.utils.constant import Fields, StatsKeys
 
 from ..base_op import OPERATORS, Filter
@@ -18,8 +16,8 @@ class SpecialCharactersFilter(Filter):
     _batched_op = True
 
     def __init__(self,
-                 min_ratio: ClosedUnitInterval = 0.0,
-                 max_ratio: ClosedUnitInterval = 0.25,
+                 min_ratio: float = 0.0,
+                 max_ratio: float = 0.25,
                  *args,
                  **kwargs):
         """

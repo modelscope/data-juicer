@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Union
 
 from data_juicer.utils.constant import Fields
 
@@ -9,10 +9,7 @@ from ..base_op import OPERATORS, Filter
 class SuffixFilter(Filter):
     """Filter to keep samples with specified suffix."""
 
-    def __init__(self,
-                 suffixes: Union[str, List[str], Tuple[str]] = [],
-                 *args,
-                 **kwargs):
+    def __init__(self, suffixes: Union[str, List[str]] = [], *args, **kwargs):
         """
         Initialization method.
 

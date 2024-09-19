@@ -1,10 +1,8 @@
 import regex as re
-from jsonargparse.typing import restricted_number_type
+from pydantic import Field
+from typing_extensions import Annotated
 
 from ..base_op import OPERATORS, Mapper
-
-from_2_to_20 = restricted_number_type('from_2_to_20', int, [('>=', 2),
-                                                            ('<=', 20)])
 
 
 @OPERATORS.register_module('remove_table_text_mapper')
@@ -19,8 +17,8 @@ class RemoveTableTextMapper(Mapper):
     _batched_op = True
 
     def __init__(self,
-                 min_col: from_2_to_20 = 2,
-                 max_col: from_2_to_20 = 20,
+                 min_col: Annotated[int, Field(ge=2, le=20)] = 2,
+                 max_col: Annotated[int, Field(ge=2, le=20)] = 20,
                  *args,
                  **kwargs):
         """

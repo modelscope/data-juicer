@@ -14,7 +14,7 @@ class ReplaceContentMapper(Mapper):
     _batched_op = True
 
     def __init__(self,
-                 pattern: Union[str, List[str]] = None,
+                 pattern: Union[str, List[str], None] = None,
                  repl: Union[str, List[str]] = '',
                  *args,
                  **kwargs):

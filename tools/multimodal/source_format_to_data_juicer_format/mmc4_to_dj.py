@@ -97,7 +97,7 @@ def main(
     image_special_token: str = SpecialTokens.image,
     image_special_token_insert_pos: str = 'before',
     add_eoc_at_last: bool = True,
-    sent_seperator: str = ' ',
+    sent_separator: str = ' ',
     keep_other_fields: bool = True,
 ):
     """
@@ -123,7 +123,7 @@ def main(
         Flamingo format.
     :param add_eoc_at_last: whether to add an extra eoc_special_token at the
         end of text. Default: True.
-    :param sent_seperator: seperator to split different sentences. Default: " "
+    :param sent_separator: separator to split different sentences. Default: " "
     :param keep_other_fields: whether to keep other fields in the original
         datasets. Default: False.
     """
@@ -220,23 +220,23 @@ def main(
                     if image_num_this_sent > 0:
                         # insert several image_special_tokens to specific
                         # position.
-                        image_special_tokens = sent_seperator.join(
+                        image_special_tokens = sent_separator.join(
                             [image_special_token] * image_num_this_sent)
                         if image_special_token_insert_pos == 'before':
-                            sent = image_special_tokens + sent_seperator + sent
+                            sent = image_special_tokens + sent_separator + sent
                         elif image_special_token_insert_pos == 'after':
-                            sent += sent_seperator + image_special_tokens
+                            sent += sent_separator + image_special_tokens
                         else:
                             if random.random() < 0.5:
                                 # before
-                                sent = image_special_tokens + sent_seperator \
+                                sent = image_special_tokens + sent_separator \
                                        + sent
                             else:
                                 # after
-                                sent += sent_seperator + image_special_tokens
+                                sent += sent_separator + image_special_tokens
                     new_sents.append(sent)
 
-                join_sep = f' {eoc_special_token}{sent_seperator}'
+                join_sep = f' {eoc_special_token}{sent_separator}'
                 text = join_sep.join(new_sents)
                 if add_eoc_at_last:
                     text += f' {eoc_special_token}'

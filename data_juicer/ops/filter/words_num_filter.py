@@ -1,7 +1,5 @@
 import sys
 
-from jsonargparse.typing import PositiveInt
-
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -28,8 +26,8 @@ class WordsNumFilter(Filter):
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,
-                 min_num: PositiveInt = 10,
-                 max_num: PositiveInt = sys.maxsize,
+                 min_num: int = 10,
+                 max_num: int = sys.maxsize,
                  *args,
                  **kwargs):
         """

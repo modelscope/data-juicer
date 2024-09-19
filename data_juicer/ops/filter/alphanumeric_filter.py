@@ -1,7 +1,5 @@
 import sys
 
-from jsonargparse.typing import PositiveFloat
-
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -25,7 +23,7 @@ class AlphanumericFilter(Filter):
     def __init__(self,
                  tokenization: bool = False,
                  min_ratio: float = 0.25,
-                 max_ratio: PositiveFloat = sys.maxsize,
+                 max_ratio: float = sys.maxsize,
                  *args,
                  **kwargs):
         """

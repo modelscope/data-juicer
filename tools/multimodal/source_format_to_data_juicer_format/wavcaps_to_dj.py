@@ -115,7 +115,7 @@ def main(
     audio_special_token: str = SpecialTokens.audio,
     add_eoc_at_last: bool = True,
     add_target_field_token: bool = False,
-    sent_seperator: str = '\n',
+    sent_separator: str = '\n',
 ):
     """
     Convert a WavCaps-like dataset to the Data-Juicer format.
@@ -135,7 +135,7 @@ def main(
         end of text. Default: True.
     :param add_target_field_token: whether to add an extra target_field_token
         into text.
-    :param sent_seperator: seperator to split different sentences. Default: \n.
+    :param sent_separator: separator to split different sentences. Default: \n.
     """
     # ----- Constant settings. Better not to change them. -----
     text_key = 'text'  # default key of field to store the sample text
@@ -198,7 +198,7 @@ def main(
                                f'before converting.')
                 continue
             audio = [all_audio_files[audio_name]]
-            text = audio_special_token + sent_seperator
+            text = audio_special_token + sent_separator
             if target_field not in sample.keys():
                 logger.warning(
                     f'{target_field} does not exist in this sample with '

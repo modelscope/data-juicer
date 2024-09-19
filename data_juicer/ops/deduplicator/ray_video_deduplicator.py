@@ -1,6 +1,6 @@
 import hashlib
 
-from jsonargparse.typing import PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.mm_utils import (close_video, load_data_with_context,
                                         load_video)

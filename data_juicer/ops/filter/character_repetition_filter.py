@@ -3,7 +3,7 @@
 # --------------------------------------------------------
 
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 
@@ -19,8 +19,8 @@ class CharacterRepetitionFilter(Filter):
 
     def __init__(self,
                  rep_len: PositiveInt = 10,
-                 min_ratio: ClosedUnitInterval = 0.0,
-                 max_ratio: ClosedUnitInterval = 0.5,
+                 min_ratio: float = 0.0,
+                 max_ratio: float = 0.5,
                  *args,
                  **kwargs):
         """
