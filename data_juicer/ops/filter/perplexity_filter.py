@@ -80,6 +80,7 @@ class PerplexityFilter(Filter):
 
     def process(self, samples):
         if isinstance(samples[Fields.stats], list):
-            return map(lambda stat: stat[StatsKeys.perplexity] <= self.max_ppl, samples[Fields.stats])
+            return map(lambda stat: stat[StatsKeys.perplexity] <= self.max_ppl,
+                       samples[Fields.stats])
         else:
             return samples[Fields.stats][StatsKeys.perplexity] <= self.max_ppl

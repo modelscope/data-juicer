@@ -58,5 +58,8 @@ class PunctuationNormalizationMapper(Mapper):
         }
 
     def process(self, samples):
-        samples[self.text_key] = map(lambda text: ''.join([self.punctuation_unicode.get(c, c) for c in text]), samples[self.text_key])
+        samples[self.text_key] = map(
+            lambda text: ''.join(
+                [self.punctuation_unicode.get(c, c) for c in text]),
+            samples[self.text_key])
         return samples
