@@ -16,6 +16,161 @@ class RangeSpecifiedFieldSelectorTest(DataJuicerTestCaseBase):
         target_list = sorted(target_list, key=lambda x: x['text'])
         self.assertEqual(res_list, target_list)
 
+    def test_value_select(self):
+        ds_list = [{
+            'text': 'Today is Sun',
+            'count': 101,
+            'meta': {
+                'suffix': '.pdf',
+                'key1': {
+                    'key2': {
+                        'count': 34
+                    },
+                    'count': 5
+                }
+            }
+        }, {
+            'text': 'a v s e c s f e f g a a a  ',
+            'count': 16,
+            'meta': {
+                'suffix': '.docx',
+                'key1': {
+                    'key2': {
+                        'count': 243
+                    },
+                    'count': 63
+                }
+            }
+        }, {
+            'text': '中文也是一个字算一个长度',
+            'count': 162,
+            'meta': {
+                'suffix': '.txt',
+                'key1': {
+                    'key2': {
+                        'count': None
+                    },
+                    'count': 23
+                }
+            }
+        }, {
+            'text': '，。、„”“«»１」「《》´∶：？！',
+            'count': None,
+            'meta': {
+                'suffix': '.html',
+                'key1': {
+                    'key2': {
+                        'count': 18
+                    },
+                    'count': 48
+                }
+            }
+        }, {
+            'text': '他的英文名字叫Harry Potter',
+            'count': 88,
+            'meta': {
+                'suffix': '.pdf',
+                'key1': {
+                    'key2': {
+                        'count': 551
+                    },
+                    'count': 78
+                }
+            }
+        }, {
+            'text': '这是一个测试',
+            'count': None,
+            'meta': {
+                'suffix': '.py',
+                'key1': {
+                    'key2': {
+                        'count': 89
+                    },
+                    'count': 3
+                }
+            }
+        }, {
+            'text': '我出生于2023年12月15日',
+            'count': None,
+            'meta': {
+                'suffix': '.java',
+                'key1': {
+                    'key2': {
+                        'count': 354.32
+                    },
+                    'count': 67
+                }
+            }
+        }, {
+            'text': 'emoji表情测试下😊，😸31231\n',
+            'count': 2,
+            'meta': {
+                'suffix': '.html',
+                'key1': {
+                    'key2': {
+                        'count': 354.32
+                    },
+                    'count': 32
+                }
+            }
+        }, {
+            'text': 'a=1\nb\nc=1+2+3+5\nd=6',
+            'count': 178,
+            'meta': {
+                'suffix': '.pdf',
+                'key1': {
+                    'key2': {
+                        'count': 33
+                    },
+                    'count': 33
+                }
+            }
+        }, {
+            'text': '使用片段分词器对每个页面进行分词，使用语言',
+            'count': 666,
+            'meta': {
+                'suffix': '.xml',
+                'key1': {
+                    'key2': {
+                        'count': 18
+                    },
+                    'count': 48
+                }
+            }
+        }]
+        tgt_list = [{
+            'text': 'a v s e c s f e f g a a a  ',
+            'count': 16,
+            'meta': {
+                'suffix': '.docx',
+                'key1': {
+                    'key2': {
+                        'count': 243
+                    },
+                    'count': 63
+                }
+            }
+        }, {
+            'text': '我出生于2023年12月15日',
+            'count': None,
+            'meta': {
+                'suffix': '.java',
+                'key1': {
+                    'key2': {
+                        'count': 354.32
+                    },
+                    'count': 67
+                }
+            }
+        }]
+        dataset = Dataset.from_list(ds_list)
+        op = RangeSpecifiedFieldSelector(field_key='meta.key1.count',
+                                        lower_value=243,
+                                        upper_percentile=354.32,
+                                        lower_rank=5,
+                                        upper_rank=10)
+        self._run_range_selector(dataset, tgt_list, op)
+
     def test_percentile_select(self):
         ds_list = [{
             'text': 'Today is Sun',
