@@ -148,6 +148,8 @@ class OP:
         if isinstance(self.mem_required, str):
             self.mem_required = size_to_bytes(self.mem_required) / 1024**3
 
+        self.turbo = kwargs.get('turbo', False)
+
         # nested wrappers
         from data_juicer.core.data import wrap_func_with_nested_access
         for name in ['process', 'compute_stats', 'compute_hash']:
@@ -156,27 +158,6 @@ class OP:
                 setattr(self, f'_{name}', method)
                 method = wrap_func_with_nested_access(method)
                 setattr(self, name, method)
-
-    def __call__(self,
-                 dataset,
-                 *,
-                 exporter=None,
-                 checkpointer=None,
-                 tracer=None):
-        try:
-            dataset = self.run(dataset, exporter=exporter, tracer=tracer)
-            if checkpointer:
-                checkpointer.record(self._name, self._process_kwargs)
-            return dataset
-        except:  # noqa: E722
-            logger.error(f'An error occurred during Op [{self._name}].')
-            traceback.print_exc()
-            if checkpointer:
-                logger.info('Writing checkpoint of dataset processed by '
-                            'last op...')
-                dataset.cleanup_cache_files()
-                checkpointer.save_ckpt(dataset)
-            exit(1)
 
     @classmethod
     def is_batched_op(cls):
@@ -328,7 +309,7 @@ class Filter(OP):
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
                               desc=self._name + '_compute_stats')
-        if self.stats_export_path is not None:
+        if exporter and self.stats_export_path is not None:
             exporter.export_compute_stats(dataset, self.stats_export_path)
         new_dataset = dataset.filter(self.process,
                                      num_proc=self.runtime_np(),

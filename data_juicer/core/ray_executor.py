@@ -34,11 +34,9 @@ class RayExecutor:
 
         self.work_dir = self.cfg.work_dir
 
-        self.ops = None
         # init ray
         logger.info('Initing Ray ...')
         ray.init(self.cfg.ray_address)
-        self.process_list = self.cfg.process
 
     def run(self, load_data_np=None):
         """
@@ -49,19 +47,28 @@ class RayExecutor:
         """
         # 1. load data
         logger.info('Loading dataset with Ray...')
-        dataset = rd.read_json(self.cfg.dataset_path)
+
+        if self.cfg.get('generated_dataset_config', None):
+            generated_dataset_config = self.cfg.generated_dataset_config
+            assert isinstance(generated_dataset_config,
+                              dict) and 'type' in generated_dataset_config
+            args = generated_dataset_config.copy()
+            obj_name = args.pop('type')
+            from data_juicer.format.formatter import FORMATTERS
+            dataset = FORMATTERS.modules[obj_name](**args).load_dataset()
+        else:
+            dataset = rd.read_json(self.cfg.dataset_path)
 
         # convert all the path in dataset to absolute path
         dataset = RayDataset(dataset, self.cfg.dataset_path, self.cfg)
         # 2. extract processes
         logger.info('Preparing process operators...')
-        self.process_list, self.ops = load_ops(self.cfg.process,
-                                               self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
 
         # 3. data process
         logger.info('Processing data...')
         tstart = time.time()
-        dataset.process(self.ops)
+        dataset.process(ops)
         tend = time.time()
         logger.info(f'All Ops are done in {tend - tstart:.3f}s.')
 

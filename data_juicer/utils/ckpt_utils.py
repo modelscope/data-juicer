@@ -1,7 +1,6 @@
 import json
 import os
 
-from datasets import Dataset
 from loguru import logger
 
 
@@ -58,10 +57,10 @@ class CheckpointManager:
             os.makedirs(self.ckpt_dir, exist_ok=True)
             return False
 
-    def record(self, op_name, op_args):
+    def record(self, op_cfg: dict):
         """Save op name and args to op record, which is used to compare with
         the process list from config to decide if a checkpoint is available."""
-        self.op_record.append({op_name: op_args})
+        self.op_record.append(op_cfg)
 
     def check_ops_to_skip(self):
         """
@@ -84,6 +83,15 @@ class CheckpointManager:
         # 1. same: remove these ops from process list
         # 2. different: cleanup op record, and keep process list unchanged
         recorded_op_num = len(self.op_record)
+        process_op_num = len(self.process_list)
+        if process_op_num < recorded_op_num:
+            logger.warning(
+                f'Current config ops ({process_op_num}) are fewer than '
+                f'checkpoint ops ({recorded_op_num}). Cannot reuse checkpoint;'
+                f' all ops will be processed from the beginning.')
+            self.op_record = []
+            return False
+
         prefix_process = self.process_list[:recorded_op_num]
         all_the_same = True
         dif1, dif2 = None, None
@@ -103,7 +111,7 @@ class CheckpointManager:
             logger.warning(f'Processed ops of checkpoint are different from '
                            f'current configs: checkpoint-{dif1} vs. config-'
                            f'{dif2}. All ops will be processed from the '
-                           f'beginning')
+                           f'beginning.')
             self.op_record = []
             return False
 
@@ -124,5 +132,6 @@ class CheckpointManager:
 
         :return: a dataset stored in checkpoint file.
         """
-        ds = Dataset.load_from_disk(self.ckpt_ds_dir)
+        from data_juicer.core.data import NestedDataset
+        ds = NestedDataset.load_from_disk(self.ckpt_ds_dir)
         return ds

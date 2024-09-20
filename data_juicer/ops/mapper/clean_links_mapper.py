@@ -1,6 +1,8 @@
 # Some code here has been modified from:
 # https://github.com/kallewesterling/CleanText/
 # --------------------------------------------------------
+from typing import Optional
+
 import regex as re
 
 from ..base_op import OPERATORS, Mapper
@@ -10,7 +12,11 @@ from ..base_op import OPERATORS, Mapper
 class CleanLinksMapper(Mapper):
     """Mapper to clean links like http/https/ftp in text samples."""
 
-    def __init__(self, pattern: str = None, repl: str = '', *args, **kwargs):
+    def __init__(self,
+                 pattern: Optional[str] = None,
+                 repl: str = '',
+                 *args,
+                 **kwargs):
         """
         Initialization method.
 

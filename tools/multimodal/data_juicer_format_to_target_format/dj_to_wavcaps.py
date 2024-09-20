@@ -84,7 +84,7 @@ def main(
     audio_special_token: str = SpecialTokens.audio,
     remove_eoc_at_last: bool = True,
     remove_target_field_token: bool = False,
-    sent_seperator: str = '\n',
+    sent_separator: str = '\n',
 ):
     """
     Convert a Data-Juicer-format dataset to a WavCaps-like dataset.
@@ -103,7 +103,7 @@ def main(
         the end of text. Default: True.
     :param remove_target_field_token: whether to remove the extra
         target_field_token at text.
-    :param sent_seperator: seperator to split different sentences. Default: \n.
+    :param sent_separator: separator to split different sentences. Default: \n.
     """
     # ----- Constant settings. Better not to change them. -----
     from_format = '[[%s]]: '  # default handle method for the text label
@@ -147,7 +147,7 @@ def main(
             del sample[Fields.meta]['num_captions_per_audio']
 
             sample[Fields.meta][target_field] = sample['text'].replace(
-                audio_special_token + sent_seperator, '')
+                audio_special_token + sent_separator, '')
             if remove_eoc_at_last:
                 sample[Fields.meta][target_field] = sample[
                     Fields.meta][target_field].replace(eoc_special_token, '')

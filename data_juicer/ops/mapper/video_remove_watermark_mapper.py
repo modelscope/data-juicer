@@ -1,8 +1,9 @@
 import os
+from typing import List, Optional
 
 import av
 import numpy as np
-from jsonargparse.typing import List, PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
@@ -33,11 +34,10 @@ class VideoRemoveWatermarkMapper(Mapper):
     def __init__(self,
                  roi_strings: List[str] = ['0,0,0.1,0.1'],
                  roi_type: str = 'ratio',
-                 roi_key: str = None,
+                 roi_key: Optional[str] = None,
                  frame_num: PositiveInt = 10,
                  min_frame_threshold: PositiveInt = 7,
                  detection_method: str = 'pixel_value',
-                 threshold: int = None,
                  *args,
                  **kwargs):
         """

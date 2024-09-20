@@ -12,7 +12,7 @@ class ReplaceContentMapper(Mapper):
     replacement string."""
 
     def __init__(self,
-                 pattern: Union[str, List[str]] = None,
+                 pattern: Union[str, List[str], None] = None,
                  repl: Union[str, List[str]] = '',
                  *args,
                  **kwargs):

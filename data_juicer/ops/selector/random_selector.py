@@ -1,4 +1,7 @@
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
+from typing import Optional
+
+from pydantic import Field, PositiveInt
+from typing_extensions import Annotated
 
 from data_juicer.format.mixture_formatter import MixtureFormatter
 
@@ -10,7 +13,8 @@ class RandomSelector(Selector):
     """Selector to random select samples. """
 
     def __init__(self,
-                 select_ratio: ClosedUnitInterval = None,
+                 select_ratio: Optional[Annotated[float,
+                                                  Field(ge=0, le=1)]] = None,
                  select_num: PositiveInt = None,
                  *args,
                  **kwargs):

@@ -1,5 +1,4 @@
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -30,9 +29,15 @@ class ImageWatermarkFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
+<<<<<<< HEAD
                  hf_watermark_model='amrul-hzz/watermark_detector',
                  trust_remote_code=False,
                  prob_threshold: ClosedUnitInterval = 0.8,
+=======
+                 hf_watermark_model: str = 'amrul-hzz/watermark_detector',
+                 trust_remote_code: bool = False,
+                 prob_threshold: float = 0.8,
+>>>>>>> main
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):

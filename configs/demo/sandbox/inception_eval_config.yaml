@@ -4,9 +4,9 @@ type: video_inception_evaluator
 fake_data_path: /path/to/the/generated/dj_format_dataset
 # The path to ground truth dataset. Only support for `jsonl` format. The video paths are put in the list under `videos` keys. Required when computing FVD, FID, KID, and PR.
 real_data_path: /path/to/the/groundtruth/dj_format_dataset
-# The root diretory to store the generated videos. If it is not none, the paths in jsonl file at fake_data_path are relative paths on it, else are absolute path.
+# The root directory to store the generated videos. If it is not none, the paths in jsonl file at fake_data_path are relative paths on it, else are absolute path.
 fake_mm_dir: null
-# The root diretory to store the real videos. If it is not none, the paths in jsonl file at real_data_path are relative paths on it, else are absolute path.
+# The root directory to store the real videos. If it is not none, the paths in jsonl file at real_data_path are relative paths on it, else are absolute path.
 real_mm_dir: null
 # Path to the corresponding detection model. Download the model from web if it is None.
 detector_path: null

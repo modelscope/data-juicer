@@ -1,4 +1,5 @@
 import librosa
+import numpy as np
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
@@ -27,13 +28,23 @@ class VideoTaggingFromAudioMapper(Mapper):
     _accelerator = 'cuda'
 
     def __init__(self,
+<<<<<<< HEAD
                  hf_ast='MIT/ast-finetuned-audioset-10-10-0.4593',
                  trust_remote_code=False,
+=======
+                 hf_ast: str = 'MIT/ast-finetuned-audioset-10-10-0.4593',
+                 trust_remote_code: bool = False,
+                 tag_field_name: str = Fields.video_audio_tags,
+>>>>>>> main
                  *args,
                  **kwargs):
         """
         Initialization method.
 
+        :param hf_ast: path to the HF model to tag from audios.
+        :param trust_remote_code: whether to trust the remote code of HF models
+        :param tag_field_name: the field name to store the tags. It's
+            "__dj__video_audio_tags__" in default.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -44,14 +55,16 @@ class VideoTaggingFromAudioMapper(Mapper):
         self._model_sampling_rate = 16000
         self._no_audio_label = 'EMPTY'
 
+        self.tag_field_name = tag_field_name
+
     def process(self, sample, rank=None):
         # check if it's generated already
-        if Fields.video_audio_tags in sample:
+        if self.tag_field_name in sample:
             return sample
 
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
-            sample[Fields.video_audio_tags] = []
+            sample[self.tag_field_name] = np.array([], dtype=np.str_)
             return sample
 
         # load video paths
@@ -80,11 +93,11 @@ class VideoTaggingFromAudioMapper(Mapper):
                 sr = self._model_sampling_rate
             inputs = feature_extractor(y,
                                        sampling_rate=sr,
-                                       return_tensors='pt')
+                                       return_tensors='pt').to(model.device)
             with torch.no_grad():
                 logits = model(**inputs).logits
             predicted_tag_id = torch.argmax(logits, dim=-1).item()
             predicted_tag = model.config.id2label[predicted_tag_id]
             video_audio_tags.append(predicted_tag)
-        sample[Fields.video_audio_tags] = video_audio_tags
+        sample[self.tag_field_name] = np.array(video_audio_tags, dtype=np.str_)
         return sample

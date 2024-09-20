@@ -3,12 +3,13 @@ import datetime
 import os
 import re
 import shutil
-from typing import List, Union
+from typing import List, Optional, Union
 
 import av
 import numpy as np
 from datasets import Audio, Image
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 from data_juicer.utils.file_utils import add_suffix_to_filename
@@ -127,6 +128,22 @@ def pil_to_opencv(pil_image):
     return opencv_image
 
 
+def detect_faces(image, detector, **extra_kwargs):
+    import cv2
+
+    img = pil_to_opencv(image)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    dets = detector.detectMultiScale(gray, **extra_kwargs)
+    rectified_dets = []
+    for (x, y, w, h) in dets:
+        x = max(x, 0)
+        y = max(y, 0)
+        w = min(w, image.width - x)
+        h = min(h, image.height - y)
+        rectified_dets.append([x, y, w, h])
+    return rectified_dets
+
+
 def get_file_size(path):
     import os
     return os.path.getsize(path)
@@ -179,7 +196,7 @@ def load_video(path, mode='r'):
 
 
 def get_video_duration(input_video: Union[str, av.container.InputContainer],
-                       video_stream_index=0):
+                       video_stream_index: int = 0):
     """
     Get the video's duration from the container
 
@@ -206,7 +223,7 @@ def get_video_duration(input_video: Union[str, av.container.InputContainer],
 
 def get_decoded_frames_from_video(
         input_video: Union[str, av.container.InputContainer],
-        video_stream_index=0):
+        video_stream_index: int = 0):
     """
     Get the video's frames from the container
 
@@ -231,7 +248,7 @@ def cut_video_by_seconds(
     input_video: Union[str, av.container.InputContainer],
     output_video: str,
     start_seconds: float,
-    end_seconds: float = None,
+    end_seconds: Optional[float] = None,
 ):
     """
     Cut a video into several segments by times in second.
@@ -450,7 +467,7 @@ def get_key_frame_seconds(input_video: Union[str,
 
 def extract_video_frames_uniformly(
     input_video: Union[str, av.container.InputContainer],
-    frame_num: int,
+    frame_num: PositiveInt,
 ):
     """
     Extract a number of video frames uniformly within the video duration.
@@ -565,10 +582,10 @@ def extract_video_frames_uniformly(
 
 def extract_audio_from_video(
     input_video: Union[str, av.container.InputContainer],
-    output_audio: str = None,
+    output_audio: Optional[str] = None,
     start_seconds: int = 0,
-    end_seconds: int = None,
-    stream_indexes: Union[int, List[int]] = None,
+    end_seconds: Optional[int] = None,
+    stream_indexes: Union[int, List[int], None] = None,
 ):
     """
     Extract audio data for the given video.
@@ -788,7 +805,7 @@ def parse_string_to_roi(roi_string, roi_type='pixel'):
     return None
 
 
-def close_video(container):
+def close_video(container: av.container.InputContainer):
     """
     Close the video stream and container to avoid memory leak.
 

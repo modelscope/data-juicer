@@ -1,7 +1,6 @@
 from typing import List
 
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 from PIL import ImageOps
 
@@ -77,17 +76,24 @@ class PhraseGroundingRecallFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
+<<<<<<< HEAD
                  hf_owlvit='google/owlvit-base-patch32',
                  trust_remote_code=False,
                  min_recall: ClosedUnitInterval = 0.1,
                  max_recall: ClosedUnitInterval = 1.0,
+=======
+                 hf_owlvit: str = 'google/owlvit-base-patch32',
+                 trust_remote_code: bool = False,
+                 min_recall: float = 0.1,
+                 max_recall: float = 1.0,
+>>>>>>> main
                  horizontal_flip: bool = False,
                  vertical_flip: bool = False,
                  any_or_all: str = 'any',
                  reduce_mode: str = 'avg',
-                 iou_thr: ClosedUnitInterval = 0.5,
-                 large_area_ratio_thr: ClosedUnitInterval = 0.95,
-                 conf_thr: ClosedUnitInterval = 0.0,
+                 iou_thr: float = 0.5,
+                 large_area_ratio_thr: float = 0.95,
+                 conf_thr: float = 0.0,
                  *args,
                  **kwargs):
         """

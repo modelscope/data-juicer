@@ -1,12 +1,27 @@
 import json
-import logging
 import re
+from typing import Dict, Optional
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
+from loguru import logger
+
+from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
 
+OP_NAME = 'extract_qa_mapper'
 
-@OPERATORS.register_module('extract_qa_mapper')
+with AvailabilityChecking(['torch', 'transformers', 'vllm'], OP_NAME):
+    import torch
+    import transformers  # noqa: F401
+    import vllm  # noqa: F401
+
+    # avoid hanging when calling model in multiprocessing
+    torch.set_num_threads(1)
+
+
+# TODO: Extend LLM-based OPs into API-based implementation.
+@UNFORKABLE.register_module(OP_NAME)
+@OPERATORS.register_module(OP_NAME)
 class ExtractQAMapper(Mapper):
     """
     Mapper to extract question and answer pair from text samples.
@@ -23,20 +38,41 @@ class ExtractQAMapper(Mapper):
     """
 
     _accelerator = 'cuda'
-    _batched_op = True
 
     def __init__(self,
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
+<<<<<<< HEAD
                  trust_remote_code=False,
                  pattern: str = None,
+=======
+                 trust_remote_code: bool = False,
+                 pattern: Optional[str] = None,
+>>>>>>> main
                  qa_format: str = 'chatml',
+                 enable_vllm: bool = True,
+                 tensor_parallel_size: Optional[int] = None,
+                 max_model_len: Optional[int] = None,
+                 max_num_seqs: int = 256,
+                 sampling_params: Dict = {},
                  *args,
                  **kwargs):
         """
         Initialization method.
         :param hf_model: Hugginface model id.
+        :param trust_remote_code: passed to transformers
         :param pattern: regular expression pattern to search for within text.
         :param qa_format: Output format of question and answer pair.
+        :param enable_vllm: Whether to use vllm for inference acceleration.
+        :param tensor_parallel_size: It is only valid when enable_vllm is True.
+            The number of GPUs to use for distributed execution with tensor
+            parallelism.
+        :param max_model_len: It is only valid when enable_vllm is True.
+            Model context length. If unspecified, will be automatically
+            derived from the model config.
+        :param max_num_seqs: It is only valid when enable_vllm is True.
+            Maximum number of sequences to be processed in a single iteration.
+        :param sampling_params: Sampling parameters for text generation.
+            e.g {'temperature': 0.9, 'top_p': 0.95}
         :param args: extra args
         :param kwargs: extra args
 
@@ -55,6 +91,7 @@ class ExtractQAMapper(Mapper):
         """
 
         super().__init__(*args, **kwargs)
+        self.num_proc = 1
 
         if pattern is None:
             self.pattern = r'Human: (.*?)\nAssistant: (.*?)(?=\nHuman|$)'
@@ -62,9 +99,37 @@ class ExtractQAMapper(Mapper):
             self.pattern = pattern
 
         self.qa_format = qa_format
+<<<<<<< HEAD
         self.model_key = prepare_model(model_type='huggingface',
                                        pretrained_model_name_or_path=hf_model,
                                        trust_remote_code=trust_remote_code)
+=======
+        self.enable_vllm = enable_vllm
+
+        if enable_vllm:
+            import torch
+            from vllm import SamplingParams
+
+            assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
+            if not tensor_parallel_size:
+                tensor_parallel_size = torch.cuda.device_count()
+                logger.info(f'Set tensor_parallel_size to \
+                    {tensor_parallel_size} for vllm.')
+            self.model_key = prepare_model(
+                model_type='vllm',
+                pretrained_model_name_or_path=hf_model,
+                trust_remote_code=trust_remote_code,
+                tensor_parallel_size=tensor_parallel_size,
+                max_model_len=max_model_len,
+                max_num_seqs=max_num_seqs)
+            self.sampling_params = SamplingParams(**sampling_params)
+        else:
+            self.model_key = prepare_model(
+                model_type='huggingface',
+                pretrained_model_name_or_path=hf_model,
+                trust_remote_code=trust_remote_code)
+            self.sampling_params = sampling_params
+>>>>>>> main
 
     def _extract_qa(self, output):
         """Extract qestion and answer pair from model output response."""
@@ -82,14 +147,21 @@ class ExtractQAMapper(Mapper):
     def process(self, sample, rank=None):
         model, processor = get_model(self.model_key, rank, self.use_cuda())
 
-        inputs = processor(sample[self.text_key],
-                           return_tensors='pt').to(model.device)
-        response = model.generate(**inputs)
-        output = processor.decode(response.cpu()[0], skip_special_tokens=True)
+        if self.enable_vllm:
+            response = model.generate([sample[self.text_key]],
+                                      self.sampling_params)
+            output = response[0].outputs[0].text
+        else:
+            inputs = processor(sample[self.text_key],
+                               return_tensors='pt').to(model.device)
+            response = model.generate(**inputs, **self.sampling_params)
+            output = processor.decode(response.cpu()[0],
+                                      skip_special_tokens=True)
+
         qa_list = self._extract_qa(output)
 
         if not len(qa_list):
-            logging.info(
+            logger.info(
                 'No question and answer data was extracted from this sample!')
 
         dialogue_data = []

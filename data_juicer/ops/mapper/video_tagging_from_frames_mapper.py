@@ -1,6 +1,7 @@
 from collections import Counter
 
-from jsonargparse.typing import PositiveInt
+import numpy as np
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
@@ -36,6 +37,7 @@ class VideoTaggingFromFramesMapper(Mapper):
     def __init__(self,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
+                 tag_field_name: str = Fields.video_frame_tags,
                  *args,
                  **kwargs):
         """
@@ -54,6 +56,8 @@ class VideoTaggingFromFramesMapper(Mapper):
             the first and the last frames will be extracted. If it's larger
             than 2, in addition to the first and the last frames, other frames
             will be extracted uniformly within the video duration.
+        :param tag_field_name: the field name to store the tags. It's
+            "__dj__video_frame_tags__" in default.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -71,14 +75,16 @@ class VideoTaggingFromFramesMapper(Mapper):
         from ram import get_transform
         self.transform = get_transform(image_size=384)
 
+        self.tag_field_name = tag_field_name
+
     def process(self, sample, rank=None, context=False):
         # check if it's generated already
-        if Fields.video_frame_tags in sample:
+        if self.tag_field_name in sample:
             return sample
 
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
-            sample[Fields.video_frame_tags] = []
+            sample[self.tag_field_name] = np.array([[]], dtype=np.str_)
             return sample
 
         # load videos
@@ -98,7 +104,7 @@ class VideoTaggingFromFramesMapper(Mapper):
                 frames = extract_video_frames_uniformly(video, self.frame_num)
             else:
                 video_tags.append([])
-                frames = []
+                continue
 
             frame_tensor = torch.stack([
                 self.transform(frame.to_image()) for frame in frames
@@ -109,11 +115,11 @@ class VideoTaggingFromFramesMapper(Mapper):
             words = [word.strip() for tag in tags for word in tag.split('|')]
             word_count = Counter(words)
             sorted_word_list = [item for item, _ in word_count.most_common()]
-            video_tags.append(sorted_word_list)
+            video_tags.append(np.array(sorted_word_list, dtype=np.str_))
 
         if not context:
             for vid_key in videos:
                 close_video(videos[vid_key])
 
-        sample[Fields.video_frame_tags] = video_tags
+        sample[self.tag_field_name] = video_tags
         return sample

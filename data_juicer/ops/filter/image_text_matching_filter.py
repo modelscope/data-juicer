@@ -1,5 +1,4 @@
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 from PIL import ImageOps
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
@@ -30,10 +29,17 @@ class ImageTextMatchingFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
+<<<<<<< HEAD
                  hf_blip='Salesforce/blip-itm-base-coco',
                  trust_remote_code=False,
                  min_score: ClosedUnitInterval = 0.003,
                  max_score: ClosedUnitInterval = 1.0,
+=======
+                 hf_blip: str = 'Salesforce/blip-itm-base-coco',
+                 trust_remote_code: bool = False,
+                 min_score: float = 0.003,
+                 max_score: float = 1.0,
+>>>>>>> main
                  horizontal_flip: bool = False,
                  vertical_flip: bool = False,
                  any_or_all: str = 'any',

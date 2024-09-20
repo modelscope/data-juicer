@@ -1,5 +1,5 @@
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -31,9 +31,15 @@ class VideoNSFWFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
+<<<<<<< HEAD
                  hf_nsfw_model='Falconsai/nsfw_image_detection',
                  trust_remote_code=False,
                  score_threshold: ClosedUnitInterval = 0.5,
+=======
+                 hf_nsfw_model: str = 'Falconsai/nsfw_image_detection',
+                 trust_remote_code: bool = False,
+                 score_threshold: float = 0.5,
+>>>>>>> main
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
                  reduce_mode: str = 'avg',

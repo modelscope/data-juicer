@@ -1,6 +1,6 @@
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -36,10 +36,17 @@ class VideoAestheticsFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
+<<<<<<< HEAD
                  hf_scorer_model='',
                  trust_remote_code=False,
                  min_score: ClosedUnitInterval = 0.4,
                  max_score: ClosedUnitInterval = 1.0,
+=======
+                 hf_scorer_model: str = '',
+                 trust_remote_code: bool = False,
+                 min_score: float = 0.4,
+                 max_score: float = 1.0,
+>>>>>>> main
                  frame_sampling_method: str = 'uniform',
                  frame_num: PositiveInt = 3,
                  any_or_all: str = 'any',
@@ -159,7 +166,9 @@ class VideoAestheticsFilter(Filter):
 
             if len(frame_images) > 0:
                 # compute aesthetics_scores
-                model, processor = get_model(self.model_key, rank=rank)
+                model, processor = get_model(self.model_key,
+                                             rank=rank,
+                                             use_cuda=self.use_cuda())
                 inputs = processor(images=frame_images,
                                    return_tensors='pt').to(model.device)
                 with torch.no_grad():

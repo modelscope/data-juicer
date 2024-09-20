@@ -1,7 +1,10 @@
 import copy
 import os
+from typing import Optional
 
 from PIL import Image
+from pydantic import Field, PositiveInt
+from typing_extensions import Annotated
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
@@ -38,15 +41,19 @@ class ImageDiffusionMapper(Mapper):
 
     def __init__(self,
                  hf_diffusion: str = 'CompVis/stable-diffusion-v1-4',
+<<<<<<< HEAD
                  trust_remote_code=False,
+=======
+                 trust_remote_code: bool = False,
+>>>>>>> main
                  torch_dtype: str = 'fp32',
                  revision: str = 'main',
-                 strength: float = 0.8,
+                 strength: Annotated[float, Field(ge=0, le=1)] = 0.8,
                  guidance_scale: float = 7.5,
-                 aug_num: int = 1,
+                 aug_num: PositiveInt = 1,
                  keep_original_sample: bool = True,
-                 caption_key: str = None,
-                 hf_img2seq='Salesforce/blip2-opt-2.7b',
+                 caption_key: Optional[str] = None,
+                 hf_img2seq: str = 'Salesforce/blip2-opt-2.7b',
                  *args,
                  **kwargs):
         """
@@ -126,7 +133,9 @@ class ImageDiffusionMapper(Mapper):
         canvas = image.resize((512, 512), Image.BILINEAR)
         prompt = caption
 
-        diffusion_model = get_model(model_key=self.model_key, rank=rank)
+        diffusion_model = get_model(model_key=self.model_key,
+                                    rank=rank,
+                                    use_cuda=self.use_cuda())
 
         kwargs = dict(image=canvas,
                       prompt=[prompt],

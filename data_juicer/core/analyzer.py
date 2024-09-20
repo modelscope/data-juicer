@@ -31,7 +31,6 @@ class Analyzer:
         self.cfg = init_configs() if cfg is None else cfg
 
         self.work_dir = self.cfg.work_dir
-        self.ops = None
 
         if self.cfg.use_cache:
             logger.info(f'Using cache compression method: '
@@ -40,9 +39,12 @@ class Analyzer:
 
         # setup formatter
         logger.info('Setting up data formatter...')
-        self.formatter = load_formatter(self.cfg.dataset_path,
-                                        self.cfg.text_keys, self.cfg.suffixes,
-                                        self.cfg.add_suffix)
+        self.formatter = load_formatter(
+            dataset_path=self.cfg.dataset_path,
+            generated_dataset_config=self.cfg.generated_dataset_config,
+            text_keys=self.cfg.text_keys,
+            suffixes=self.cfg.suffixes,
+            add_suffix=self.cfg.add_suffix)
 
         # prepare exporter and check export path suffix
         # NOTICE: no need to export dataset texts for analyzer
@@ -79,17 +81,16 @@ class Analyzer:
 
         # extract processes
         logger.info('Preparing process operators...')
-        self.cfg.process, self.ops = load_ops(self.cfg.process,
-                                              self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
 
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')
         stats_collected = False
-        for op in self.ops:
+        for op in ops:
             if isinstance(op, Filter):
                 original_process = op.process
                 op.process = None
-                dataset = dataset.process(op)
+                dataset = dataset.process(op, work_dir=self.work_dir)
                 op.process = original_process
                 stats_collected = True
         if not stats_collected:
