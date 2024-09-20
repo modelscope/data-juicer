@@ -1,5 +1,5 @@
 from itertools import chain, repeat
-from typing import List, Tuple, Union
+from typing import List, Union
 
 import numpy as np
 from datasets import Dataset, concatenate_datasets
@@ -15,7 +15,7 @@ class MixtureFormatter(BaseFormatter):
 
     def __init__(self,
                  dataset_path: str,
-                 suffixes: Union[str, List[str], Tuple[str]] = None,
+                 suffixes: Union[str, List[str], None] = None,
                  text_keys=None,
                  add_suffix=False,
                  max_samples=None,

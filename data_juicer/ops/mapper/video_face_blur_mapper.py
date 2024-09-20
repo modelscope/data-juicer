@@ -35,7 +35,7 @@ class VideoFaceBlurMapper(Mapper):
     }
 
     def __init__(self,
-                 cv_classifier='',
+                 cv_classifier: str = '',
                  blur_type: str = 'gaussian',
                  radius: float = 2,
                  *args,

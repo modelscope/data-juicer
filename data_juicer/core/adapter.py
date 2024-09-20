@@ -98,7 +98,8 @@ class Adapter:
 
         :param dataset: The dataset to pre-execute small batch on
         :param operators: The OP list to be pre-execution and probe
-        :return: A list of probe results for each OP.
+        :return: A list of probe results for each OP and the length of data
+            batch to probe.
         """
         # take a small batch
         data_batch = self.take_batch(dataset, self.cfg)

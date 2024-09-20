@@ -4,8 +4,6 @@
 
 import sys
 
-from jsonargparse.typing import PositiveInt
-
 from ..base_op import OPERATORS, Mapper
 from ..common import (SPECIAL_CHARACTERS, merge_on_whitespace_tab_newline,
                       split_on_newline_tab_whitespace, strip)
@@ -16,8 +14,8 @@ class RemoveLongWordsMapper(Mapper):
     """Mapper to remove long words within a specific range."""
 
     def __init__(self,
-                 min_len: PositiveInt = 1,
-                 max_len: PositiveInt = sys.maxsize,
+                 min_len: int = 1,
+                 max_len: int = sys.maxsize,
                  *args,
                  **kwargs):
         """

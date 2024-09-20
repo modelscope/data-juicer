@@ -41,9 +41,12 @@ class Analyzer:
 
         # setup formatter
         logger.info('Setting up data formatter...')
-        self.formatter = load_formatter(self.cfg.dataset_path,
-                                        self.cfg.text_keys, self.cfg.suffixes,
-                                        self.cfg.add_suffix)
+        self.formatter = load_formatter(
+            dataset_path=self.cfg.dataset_path,
+            generated_dataset_config=self.cfg.generated_dataset_config,
+            text_keys=self.cfg.text_keys,
+            suffixes=self.cfg.suffixes,
+            add_suffix=self.cfg.add_suffix)
 
         # prepare exporter and check export path suffix
         # NOTICE: no need to export dataset texts for analyzer
@@ -100,7 +103,7 @@ class Analyzer:
             if isinstance(op, Filter):
                 original_process = op.process
                 op.process = None
-                dataset = dataset.process(op)
+                dataset = dataset.process(op, work_dir=self.work_dir)
                 op.process = original_process
                 stats_collected = True
         if not stats_collected:

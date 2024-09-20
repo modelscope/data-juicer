@@ -1,5 +1,4 @@
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 
 from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -27,9 +26,9 @@ class ImageNSFWFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_nsfw_model='Falconsai/nsfw_image_detection',
-                 trust_remote_code=False,
-                 score_threshold: ClosedUnitInterval = 0.5,
+                 hf_nsfw_model: str = 'Falconsai/nsfw_image_detection',
+                 trust_remote_code: bool = False,
+                 score_threshold: float = 0.5,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):

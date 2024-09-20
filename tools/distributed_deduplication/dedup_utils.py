@@ -2,14 +2,14 @@
 # https://github.com/bigcode-project/bigcode-dataset/blob/main/near_deduplication/minhash_deduplication_spark.py
 # --------------------------------------------------------
 
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple
 
 from loguru import logger
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 
 
-def init_spark(master_url: Union[str, None] = None,
+def init_spark(master_url: Optional[str] = None,
                spark_executor_memory=None,
                spark_driver_memory=None,
                spark_executor_memoryOverhead=None):
