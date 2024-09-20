@@ -33,6 +33,8 @@ class RangeSpecifiedFieldSelector(Selector):
     def __init__(
             self,
             field_key: str = '',
+            lower_value: float = None,
+                 upper_value: float = None,
             lower_percentile: Optional[Annotated[float,
                                                  Field(ge=0, le=1)]] = None,
             upper_percentile: Optional[Annotated[float,
