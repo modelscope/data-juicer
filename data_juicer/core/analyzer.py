@@ -90,7 +90,7 @@ class Analyzer:
             if isinstance(op, Filter):
                 original_process = op.process
                 op.process = None
-                dataset = dataset.process(op)
+                dataset = dataset.process(op, work_dir=self.work_dir)
                 op.process = original_process
                 stats_collected = True
         if not stats_collected:
