@@ -120,4 +120,3 @@ class RangeSpecifiedFieldSelector(Selector):
         select_index = indices[lower_bound:upper_bound + 1]
 
         return dataset.select(select_index)
-
