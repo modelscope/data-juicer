@@ -18,6 +18,8 @@ with AvailabilityChecking(['sentencepiece'], OP_NAME):
 class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
     """Mapper to remove words with incorrect substrings."""
 
+    _batched_op = True
+
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,
@@ -48,25 +50,30 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
         should_keep = all([(i_substr not in word) for i_substr in substrings])
         return should_keep
 
-    def process(self, sample):
-        if self.tokenization:
-            tokenizer = get_model(self.model_key)
-            sentences = get_words_from_document(
-                sample[self.text_key],
-                token_func=tokenizer.encode_as_pieces if tokenizer else None)
-            words = [
-                word.replace('▁', '') for word in sentences
-                if self.should_keep_word_with_incorrect_substrings(
-                    word.replace('▁', ''), self.substrings)
-            ]
-            if len(words) != len(sentences):
-                sample[self.text_key] = ''.join(words)
-        else:
-            sentences = split_on_newline_tab_whitespace(sample[self.text_key])
-            sentences = [[[
-                word for word in subsentence
-                if self.should_keep_word_with_incorrect_substrings(
-                    word, self.substrings)
-            ] for subsentence in sentence] for sentence in sentences]
-            sample[self.text_key] = merge_on_whitespace_tab_newline(sentences)
-        return sample
+    def process(self, samples):
+        for idx, text in enumerate(samples[self.text_key]):
+            if self.tokenization:
+                tokenizer = get_model(self.model_key)
+                sentences = get_words_from_document(
+                    text,
+                    token_func=tokenizer.encode_as_pieces
+                    if tokenizer else None)
+                words = [
+                    word.replace('▁', '') for word in sentences
+                    if self.should_keep_word_with_incorrect_substrings(
+                        word.replace('▁', ''), self.substrings)
+                ]
+                if len(words) != len(sentences):
+                    text = ''.join(words)
+            else:
+                sentences = split_on_newline_tab_whitespace(text)
+                sentences = [[[
+                    word for word in subsentence
+                    if self.should_keep_word_with_incorrect_substrings(
+                        word, self.substrings)
+                ] for subsentence in sentence] for sentence in sentences]
+                text = merge_on_whitespace_tab_newline(sentences)
+
+            samples[self.text_key][idx] = text
+
+        return samples

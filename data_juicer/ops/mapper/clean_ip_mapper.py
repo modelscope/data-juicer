@@ -9,6 +9,8 @@ from ..base_op import OPERATORS, Mapper
 class CleanIpMapper(Mapper):
     """Mapper to clean ipv4 and ipv6 address in text samples."""
 
+    _batched_op = True
+
     def __init__(self,
                  pattern: Optional[str] = None,
                  repl: str = '',
@@ -38,13 +40,12 @@ class CleanIpMapper(Mapper):
                 self.pattern = pattern[2:-1]
         self.repl = repl
 
-    def process(self, sample):
-
-        if not re.search(self.pattern, sample[self.text_key], flags=re.DOTALL):
-            return sample
-
-        sample[self.text_key] = re.sub(pattern=self.pattern,
-                                       repl=self.repl,
-                                       string=sample[self.text_key],
-                                       flags=re.DOTALL)
-        return sample
+    def process(self, samples):
+        for idx, text in enumerate(samples[self.text_key]):
+            if not re.search(self.pattern, text, flags=re.DOTALL):
+                continue
+            samples[self.text_key][idx] = re.sub(pattern=self.pattern,
+                                                 repl=self.repl,
+                                                 string=text,
+                                                 flags=re.DOTALL)
+        return samples
