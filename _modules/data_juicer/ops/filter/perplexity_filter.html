@@ -107,6 +107,8 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with perplexity score less than a specific max</span>
 <span class="sd">    value.&quot;&quot;&quot;</span>
 
+    <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
+
 <div class="viewcode-block" id="PerplexityFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.PerplexityFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
                  <span class="n">max_ppl</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1500</span><span class="p">,</span>
@@ -128,36 +130,45 @@
                                           <span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kl_model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;kenlm&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="n">lang</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PerplexityFilter.compute_stats"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.PerplexityFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="c1"># check if it&#39;s computed already</span>
-        <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">perplexity</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="n">sample</span>
-
-        <span class="c1"># tokenization</span>
+<div class="viewcode-block" id="PerplexityFilter.compute_stats"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.PerplexityFilter.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">samples_list</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
+        <span class="n">samples_stats</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]</span>
         <span class="n">words_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">InterVars</span><span class="o">.</span><span class="n">words</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sp_model_key</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="k">if</span> <span class="n">context</span> <span class="ow">and</span> <span class="n">words_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">]:</span>
-            <span class="n">words</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">words_key</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">samples_stats</span><span class="p">):</span>
+            <span class="c1"># check if it&#39;s computed already</span>
+            <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">perplexity</span> <span class="ow">in</span> <span class="n">stat</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># tokenization</span>
+            <span class="k">if</span> <span class="n">context</span> <span class="ow">and</span> <span class="n">words_key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">idx</span><span class="p">]:</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">idx</span><span class="p">][</span><span class="n">words_key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sp_model_key</span><span class="p">)</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="n">get_words_from_document</span><span class="p">(</span>
+                    <span class="n">samples_list</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                    <span class="n">token_func</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode_as_pieces</span>
+                    <span class="k">if</span> <span class="n">tokenizer</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
+                    <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">idx</span><span class="p">][</span><span class="n">words_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">words</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+            <span class="c1"># compute perplexity</span>
+            <span class="n">logits</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+            <span class="n">kenlm_model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kl_model_key</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+                <span class="n">logits</span> <span class="o">+=</span> <span class="n">kenlm_model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="n">length</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">ppl</span> <span class="o">=</span> <span class="p">(</span><span class="mf">10.0</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">logits</span> <span class="o">/</span> <span class="n">length</span><span class="p">))</span> <span class="k">if</span> <span class="n">length</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="n">samples_stats</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">perplexity</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">ppl</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">samples</span></div>
+
+<div class="viewcode-block" id="PerplexityFilter.process"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.PerplexityFilter.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">stat</span><span class="p">:</span> <span class="n">stat</span><span class="p">[</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">perplexity</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ppl</span><span class="p">,</span>
+                    <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sp_model_key</span><span class="p">)</span>
-            <span class="n">words</span> <span class="o">=</span> <span class="n">get_words_from_document</span><span class="p">(</span>
-                <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">],</span>
-                <span class="n">token_func</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode_as_pieces</span> <span class="k">if</span> <span class="n">tokenizer</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
-                <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span><span class="n">words_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">words</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
-        <span class="c1"># compute perplexity</span>
-        <span class="n">logits</span><span class="p">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
-        <span class="n">kenlm_model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kl_model_key</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
-            <span class="n">logits</span> <span class="o">+=</span> <span class="n">kenlm_model</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-            <span class="n">length</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">ppl</span> <span class="o">=</span> <span class="p">(</span><span class="mf">10.0</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="n">logits</span> <span class="o">/</span> <span class="n">length</span><span class="p">))</span> <span class="k">if</span> <span class="n">length</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
-        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">perplexity</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">ppl</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">sample</span></div>
-
-<div class="viewcode-block" id="PerplexityFilter.process"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.PerplexityFilter.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">perplexity</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ppl</span></div></div>
+            <span class="k">return</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">perplexity</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ppl</span></div></div>
 </pre></div>
 
            </div>

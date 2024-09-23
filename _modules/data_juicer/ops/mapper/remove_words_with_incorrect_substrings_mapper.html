@@ -102,6 +102,8 @@
 <span class="k">class</span> <span class="nc">RemoveWordsWithIncorrectSubstringsMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to remove words with incorrect substrings.&quot;&quot;&quot;</span>
 
+    <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
+
 <div class="viewcode-block" id="RemoveWordsWithIncorrectSubstringsMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveWordsWithIncorrectSubstringsMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">lang</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
                  <span class="n">tokenization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -132,28 +134,33 @@
         <span class="n">should_keep</span> <span class="o">=</span> <span class="nb">all</span><span class="p">([(</span><span class="n">i_substr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">word</span><span class="p">)</span> <span class="k">for</span> <span class="n">i_substr</span> <span class="ow">in</span> <span class="n">substrings</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">should_keep</span></div>
 
-<div class="viewcode-block" id="RemoveWordsWithIncorrectSubstringsMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveWordsWithIncorrectSubstringsMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span><span class="p">:</span>
-            <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">)</span>
-            <span class="n">sentences</span> <span class="o">=</span> <span class="n">get_words_from_document</span><span class="p">(</span>
-                <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">],</span>
-                <span class="n">token_func</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode_as_pieces</span> <span class="k">if</span> <span class="n">tokenizer</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">words</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">word</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;▁&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentences</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_keep_word_with_incorrect_substrings</span><span class="p">(</span>
-                    <span class="n">word</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;▁&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">substrings</span><span class="p">)</span>
-            <span class="p">]</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">):</span>
-                <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">sentences</span> <span class="o">=</span> <span class="n">split_on_newline_tab_whitespace</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])</span>
-            <span class="n">sentences</span> <span class="o">=</span> <span class="p">[[[</span>
-                <span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">subsentence</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_keep_word_with_incorrect_substrings</span><span class="p">(</span>
-                    <span class="n">word</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">substrings</span><span class="p">)</span>
-            <span class="p">]</span> <span class="k">for</span> <span class="n">subsentence</span> <span class="ow">in</span> <span class="n">sentence</span><span class="p">]</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
-            <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">merge_on_whitespace_tab_newline</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">sample</span></div></div>
+<div class="viewcode-block" id="RemoveWordsWithIncorrectSubstringsMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.RemoveWordsWithIncorrectSubstringsMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">text</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span><span class="p">:</span>
+                <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">)</span>
+                <span class="n">sentences</span> <span class="o">=</span> <span class="n">get_words_from_document</span><span class="p">(</span>
+                    <span class="n">text</span><span class="p">,</span>
+                    <span class="n">token_func</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode_as_pieces</span>
+                    <span class="k">if</span> <span class="n">tokenizer</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">words</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">word</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;▁&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">sentences</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_keep_word_with_incorrect_substrings</span><span class="p">(</span>
+                        <span class="n">word</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;▁&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">substrings</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">):</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sentences</span> <span class="o">=</span> <span class="n">split_on_newline_tab_whitespace</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+                <span class="n">sentences</span> <span class="o">=</span> <span class="p">[[[</span>
+                    <span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">subsentence</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">should_keep_word_with_incorrect_substrings</span><span class="p">(</span>
+                        <span class="n">word</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">substrings</span><span class="p">)</span>
+                <span class="p">]</span> <span class="k">for</span> <span class="n">subsentence</span> <span class="ow">in</span> <span class="n">sentence</span><span class="p">]</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">merge_on_whitespace_tab_newline</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
+
+            <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span>
+
+        <span class="k">return</span> <span class="n">samples</span></div></div>
 </pre></div>
 
            </div>

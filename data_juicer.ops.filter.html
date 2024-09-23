@@ -484,7 +484,7 @@ parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.TextLengthFilter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/text_length_filter.html#TextLengthFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.TextLengthFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/text_length_filter.html#TextLengthFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.TextLengthFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -503,7 +503,7 @@ vars in the sample temporarily.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.TextLengthFilter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/text_length_filter.html#TextLengthFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.TextLengthFilter.process" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/text_length_filter.html#TextLengthFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.TextLengthFilter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -757,7 +757,7 @@ will be filtered if their perplexity exceeds this parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.PerplexityFilter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/perplexity_filter.html#PerplexityFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.PerplexityFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/perplexity_filter.html#PerplexityFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.PerplexityFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -776,7 +776,7 @@ vars in the sample temporarily.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.PerplexityFilter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/perplexity_filter.html#PerplexityFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.PerplexityFilter.process" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/perplexity_filter.html#PerplexityFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.PerplexityFilter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -899,7 +899,7 @@ parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.MaximumLineLengthFilter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/maximum_line_length_filter.html#MaximumLineLengthFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.MaximumLineLengthFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/maximum_line_length_filter.html#MaximumLineLengthFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.MaximumLineLengthFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -918,7 +918,7 @@ vars in the sample temporarily.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.MaximumLineLengthFilter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/maximum_line_length_filter.html#MaximumLineLengthFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.MaximumLineLengthFilter.process" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/maximum_line_length_filter.html#MaximumLineLengthFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.MaximumLineLengthFilter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -960,7 +960,7 @@ parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.AverageLineLengthFilter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/average_line_length_filter.html#AverageLineLengthFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.AverageLineLengthFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/average_line_length_filter.html#AverageLineLengthFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.AverageLineLengthFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -979,7 +979,7 @@ vars in the sample temporarily.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.AverageLineLengthFilter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/average_line_length_filter.html#AverageLineLengthFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.AverageLineLengthFilter.process" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/average_line_length_filter.html#AverageLineLengthFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.AverageLineLengthFilter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1288,7 +1288,7 @@ exceeds this parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.AlphanumericFilter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/alphanumeric_filter.html#AlphanumericFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.AlphanumericFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/alphanumeric_filter.html#AlphanumericFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.AlphanumericFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -1307,7 +1307,7 @@ vars in the sample temporarily.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.AlphanumericFilter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/alphanumeric_filter.html#AlphanumericFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.AlphanumericFilter.process" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/alphanumeric_filter.html#AlphanumericFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.AlphanumericFilter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1608,7 +1608,7 @@ exceeds this parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.CharacterRepetitionFilter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/character_repetition_filter.html#CharacterRepetitionFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.CharacterRepetitionFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/character_repetition_filter.html#CharacterRepetitionFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.CharacterRepetitionFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -1627,7 +1627,7 @@ vars in the sample temporarily.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.CharacterRepetitionFilter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/character_repetition_filter.html#CharacterRepetitionFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.CharacterRepetitionFilter.process" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/character_repetition_filter.html#CharacterRepetitionFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.CharacterRepetitionFilter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2005,7 +2005,7 @@ parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.SpecialCharactersFilter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/special_characters_filter.html#SpecialCharactersFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.SpecialCharactersFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/special_characters_filter.html#SpecialCharactersFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.SpecialCharactersFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -2024,7 +2024,7 @@ vars in the sample temporarily.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.SpecialCharactersFilter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/special_characters_filter.html#SpecialCharactersFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.SpecialCharactersFilter.process" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/special_characters_filter.html#SpecialCharactersFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.SpecialCharactersFilter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2534,7 +2534,7 @@ parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.WordsNumFilter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/words_num_filter.html#WordsNumFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.WordsNumFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/words_num_filter.html#WordsNumFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.WordsNumFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -2553,7 +2553,7 @@ vars in the sample temporarily.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.WordsNumFilter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/words_num_filter.html#WordsNumFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.WordsNumFilter.process" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/words_num_filter.html#WordsNumFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.WordsNumFilter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2728,7 +2728,7 @@ exceeds this parameter.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.WordRepetitionFilter.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/word_repetition_filter.html#WordRepetitionFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.WordRepetitionFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/word_repetition_filter.html#WordRepetitionFilter.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.WordRepetitionFilter.compute_stats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -2747,7 +2747,7 @@ vars in the sample temporarily.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.filter.WordRepetitionFilter.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/word_repetition_filter.html#WordRepetitionFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.WordRepetitionFilter.process" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/word_repetition_filter.html#WordRepetitionFilter.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.WordRepetitionFilter.process" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
