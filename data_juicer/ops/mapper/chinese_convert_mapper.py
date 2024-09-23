@@ -27,6 +27,8 @@ class ChineseConvertMapper(Mapper):
     """Mapper to convert Chinese between Traditional Chinese, Simplified Chinese
     and Japanese Kanji."""
 
+    _batched_op = True
+
     def __init__(self, mode: str = 's2t', *args, **kwargs):
         """
         Initialization method.
@@ -82,8 +84,10 @@ class ChineseConvertMapper(Mapper):
         self.mode = mode
         prepare_converter(self.mode)
 
-    def process(self, sample):
+    def process(self, samples):
         prepare_converter(self.mode)
 
-        sample[self.text_key] = OPENCC_CONVERTER.convert(sample[self.text_key])
-        return sample
+        samples[self.text_key] = list(
+            map(lambda text: OPENCC_CONVERTER.convert(text),
+                samples[self.text_key]))
+        return samples
