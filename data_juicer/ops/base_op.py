@@ -242,6 +242,7 @@ class Mapper(OP):
             self.process,
             num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
+            batched=self.is_batched_op(),
             batch_size=self.batch_size,
             desc=self._name + '_process',
         )
@@ -306,17 +307,18 @@ class Filter(OP):
                                       'initial_value': {}
                                   },
                                   num_proc=self.runtime_np(),
-                                  batch_size=self.batch_size,
                                   desc='Adding new column for stats')
         dataset = dataset.map(self.compute_stats,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
+                              batched=self.is_batched_op(),
                               batch_size=self.batch_size,
                               desc=self._name + '_compute_stats')
         if exporter and self.stats_export_path is not None:
             exporter.export_compute_stats(dataset, self.stats_export_path)
         new_dataset = dataset.filter(self.process,
                                      num_proc=self.runtime_np(),
+                                     batched=self.is_batched_op(),
                                      batch_size=self.batch_size,
                                      desc=self._name + '_process')
         if tracer:
