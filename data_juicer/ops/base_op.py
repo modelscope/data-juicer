@@ -133,7 +133,7 @@ class OP:
         self.image_key = kwargs.get('image_key', 'images')
         self.audio_key = kwargs.get('audio_key', 'audios')
         self.video_key = kwargs.get('video_key', 'videos')
-        self.batch_size = kwargs.get('batch_size', 1)
+        self.batch_size = kwargs.get('batch_size', 1000)
 
         # whether the model can be accelerated using cuda
         _accelerator = kwargs.get('accelerator', None)
@@ -204,6 +204,12 @@ class OP:
         related_parameters.update(extra_param_dict)
         return related_parameters
 
+    def run(self, dataset):
+        from data_juicer.core.data import NestedDataset
+        if not isinstance(dataset, NestedDataset):
+            dataset = NestedDataset(dataset)
+        return dataset
+
 
 class Mapper(OP):
 
@@ -238,6 +244,7 @@ class Mapper(OP):
         raise NotImplementedError
 
     def run(self, dataset, *, exporter=None, tracer=None):
+        dataset = super(Mapper, self).run(dataset)
         new_dataset = dataset.map(
             self.process,
             num_proc=self.runtime_np(),
@@ -298,6 +305,7 @@ class Filter(OP):
         raise NotImplementedError
 
     def run(self, dataset, *, exporter=None, tracer=None):
+        dataset = super(Filter, self).run(dataset)
         if Fields.stats not in dataset.features:
             from data_juicer.core.data import add_same_content_to_new_column
             dataset = dataset.map(add_same_content_to_new_column,
@@ -368,6 +376,7 @@ class Deduplicator(OP):
         raise NotImplementedError
 
     def run(self, dataset, *, exporter=None, tracer=None):
+        dataset = super(Deduplicator, self).run(dataset)
         dataset = dataset.map(self.compute_hash,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
@@ -406,6 +415,7 @@ class Selector(OP):
         raise NotImplementedError
 
     def run(self, dataset, *, exporter=None, tracer=None):
+        dataset = super(Selector, self).run(dataset)
         new_dataset = self.process(dataset)
         if tracer:
             tracer.trace_filter(self._name, dataset, new_dataset)

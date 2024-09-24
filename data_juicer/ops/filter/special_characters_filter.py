@@ -54,11 +54,10 @@ class SpecialCharactersFilter(Filter):
 
     def process(self, samples):
         if isinstance(samples[Fields.stats], list):
-            return list(
-                map(
-                    lambda stat: self.min_ratio <= stat[
-                        StatsKeys.special_char_ratio] <= self.max_ratio,
-                    samples[Fields.stats]))
+            return map(
+                lambda stat: self.min_ratio <= stat[
+                    StatsKeys.special_char_ratio] <= self.max_ratio,
+                samples[Fields.stats])
         else:
             # single sample for ray filter
             if self.min_ratio <= \
