@@ -1,3 +1,4 @@
+from datasets import concatenate_datasets
 from datasets.config import DEFAULT_MAX_BATCH_SIZE
 
 from data_juicer.core.monitor import Monitor
@@ -27,28 +28,38 @@ class Adapter:
         if operators is None or len(operators) == 0:
             return []
 
+        # number of test samples
+        sample_num = len(dataset)
+
         # resource utilization list
         resource_util_list = []
         # probe for each OP
         for op in operators:
-            # set num_proc to 1 for each OP to focus on the influence of batch
-            # size only.
-            old_num_proc = op.num_proc
-            op.num_proc = 1
+            # expand the test dataset according to the runtime number of
+            # processes to ensure enough data for a batch and probe the true
+            # resource utilization for each OP
+            expanded_dataset = concatenate_datasets([dataset] *
+                                                    op.runtime_np())
 
-            # number of test samples
-            sample_num = len(dataset)
+            # set the test batch size and save the old one
+            if op.is_batched_op():
+                old_batch_size = op.batch_size
+                op.batch_size = sample_num
+
             # run single op and monitor the resource utilization
-            dataset, resource_util_per_op = Monitor.monitor_func(
-                op.run, args=(dataset, ), sample_interval=sample_interval)
+            _, resource_util_per_op = Monitor.monitor_func(
+                op.run,
+                args=(expanded_dataset, ),
+                sample_interval=sample_interval)
 
             # calculate speed
             resource_util_per_op[
                 'speed'] = sample_num / resource_util_per_op['time']
             resource_util_list.append(resource_util_per_op)
 
-            # restore to the original num_proc
-            op.num_proc = old_num_proc
+            # # restore the batch size
+            if op.is_batched_op():
+                op.batch_size = old_batch_size
 
         return resource_util_list
 

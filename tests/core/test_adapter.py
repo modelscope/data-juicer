@@ -177,6 +177,23 @@ class AdapterTest(DataJuicerTestCaseBase):
 
         datasets.enable_caching()
 
+    def test_adapt_workloads_multiprocessing(self):
+        datasets.disable_caching()
+        # basic test
+        ds = load_dataset('json', data_files=self.test_file, split='train')
+        ops = [
+            FixUnicodeMapper(num_proc=4),
+            PerplexityFilter(num_proc=4),
+            DocumentDeduplicator(num_proc=4),
+        ]  # use some batched OPs later
+
+        adapter = Adapter({'batch_size': 100})
+        adapted_batch_sizes = adapter.adapt_workloads(ds, ops)
+        self.assertEqual(len(adapted_batch_sizes), len(ops))
+        logger.info(adapted_batch_sizes)
+
+        datasets.enable_caching()
+
 
 if __name__ == '__main__':
     unittest.main()
