@@ -1,6 +1,6 @@
 import lazy_loader as lazy
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
@@ -28,9 +28,9 @@ class VideoWatermarkFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_watermark_model='amrul-hzz/watermark_detector',
-                 trust_remote_code=False,
-                 prob_threshold: ClosedUnitInterval = 0.8,
+                 hf_watermark_model: str = 'amrul-hzz/watermark_detector',
+                 trust_remote_code: bool = False,
+                 prob_threshold: float = 0.8,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
                  reduce_mode: str = 'avg',

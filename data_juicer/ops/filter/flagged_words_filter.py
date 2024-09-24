@@ -2,7 +2,9 @@
 # https://huggingface.co/spaces/huggingface/text-data-filtering
 # --------------------------------------------------------
 
-from jsonargparse.typing import ClosedUnitInterval, List
+from typing import List
+
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -25,10 +27,10 @@ class FlaggedWordFilter(Filter):
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,
-                 max_ratio: ClosedUnitInterval = 0.045,
+                 max_ratio: float = 0.045,
                  flagged_words_dir: str = ASSET_DIR,
                  use_words_aug: bool = False,
-                 words_aug_group_sizes: List = [2],
+                 words_aug_group_sizes: List[PositiveInt] = [2],
                  words_aug_join_char: str = '',
                  *args,
                  **kwargs):

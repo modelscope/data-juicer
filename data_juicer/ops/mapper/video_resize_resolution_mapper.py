@@ -3,7 +3,7 @@ import os
 import sys
 
 import lazy_loader as lazy
-from jsonargparse.typing import PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
@@ -28,10 +28,10 @@ class VideoResizeResolutionMapper(Mapper):
     """
 
     def __init__(self,
-                 min_width: PositiveInt = 1,
-                 max_width: PositiveInt = sys.maxsize,
-                 min_height: PositiveInt = 1,
-                 max_height: PositiveInt = sys.maxsize,
+                 min_width: int = 1,
+                 max_width: int = sys.maxsize,
+                 min_height: int = 1,
+                 max_height: int = sys.maxsize,
                  force_original_aspect_ratio: str = 'disable',
                  force_divisible_by: PositiveInt = 2,
                  *args,

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import copy
 import inspect
+import json
+import os
+import traceback
 from abc import ABC, abstractmethod
 from functools import wraps
 from time import time
@@ -11,6 +14,7 @@ from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
+from data_juicer.core.monitor import Monitor
 from data_juicer.ops import UNFORKABLE
 from data_juicer.utils import cache_utils
 from data_juicer.utils.compress import (CompressionOff,
@@ -163,6 +167,7 @@ class NestedDataset(Dataset, DJDataset):
     def process(self,
                 operators,
                 *,
+                work_dir=None,
                 exporter=None,
                 checkpointer=None,
                 tracer=None):
@@ -173,25 +178,46 @@ class NestedDataset(Dataset, DJDataset):
             operators = [operators]
         unforkable_operators = set(UNFORKABLE.modules.keys())
 
-        dataset = self
-        for op in operators:
-            mp_context = ['forkserver', 'spawn'] if (
-                op.use_cuda() or op._name in unforkable_operators) else None
-            setup_mp(mp_context)
+        # resource utilization monitor
+        resource_util_list = []
 
-            start = time()
-            # run single op
-            dataset = op(dataset,
-                         exporter=exporter,
-                         checkpointer=checkpointer,
-                         tracer=tracer)
-            # record processed ops
-            if checkpointer is not None:
-                checkpointer.record(op._name,
-                                    list(op._process_kwargs.values())[0])
-            end = time()
-            logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
-                        f'Left {len(dataset)} samples.')
+        dataset = self
+        try:
+            for op in operators:
+                mp_context = ['forkserver', 'spawn'] if (
+                    op.use_cuda()
+                    or op._name in unforkable_operators) else None
+                setup_mp(mp_context)
+
+                start = time()
+                # run single op
+                run_args = {
+                    'dataset': dataset,
+                    'exporter': exporter,
+                    'tracer': tracer,
+                }
+                dataset, resource_util_per_op = Monitor.monitor_func(
+                    op.run, args=run_args)
+                # record processed ops
+                if checkpointer is not None:
+                    checkpointer.record(op._op_cfg)
+                resource_util_list.append(resource_util_per_op)
+                end = time()
+                logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
+                            f'Left {len(dataset)} samples.')
+        except:  # noqa: E722
+            logger.error(f'An error occurred during Op [{op._name}].')
+            traceback.print_exc()
+            exit(1)
+        finally:
+            if checkpointer and dataset is not self:
+                logger.info('Writing checkpoint of dataset processed by '
+                            'last op...')
+                dataset.cleanup_cache_files()
+                checkpointer.save_ckpt(dataset)
+            if work_dir:
+                with open(os.path.join(work_dir, 'monitor.json'), 'w') as out:
+                    json.dump(resource_util_list, out)
         return dataset
 
     def map(self, *args, **kargs):
@@ -218,11 +244,17 @@ class NestedDataset(Dataset, DJDataset):
                 called_func, '__wrapped__'):
             called_func = called_func.__wrapped__
 
-        # Batched is always required for fault tolerance
         if inspect.ismethod(called_func):
-            kargs['batched'] = True
-            kargs['batch_size'] = kargs.pop(
-                'batch_size', 1) if called_func.__self__.is_batched_op() else 1
+            # batched is required for fault-tolerant or batched OP
+            if not called_func.__self__.turbo or hasattr(
+                    called_func.__self__,
+                    'is_batched_op') and called_func.__self__.is_batched_op():
+                kargs['batched'] = True
+                kargs['batch_size'] = kargs.pop('batch_size', 1) if hasattr(
+                    called_func.__self__, 'is_batched_op'
+                ) and called_func.__self__.is_batched_op() else 1
+            else:
+                kargs['batched'] = False
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
@@ -253,12 +285,25 @@ class NestedDataset(Dataset, DJDataset):
                 args[0] = lambda x: nested_obj_factory(x)
             else:
                 args[0] = wrap_func_with_nested_access(args[0])
+            called_func = args[0]
         else:
             if 'function' not in kargs or kargs['function'] is None:
                 kargs['function'] = lambda x: nested_obj_factory(x)
             else:
                 kargs['function'] = wrap_func_with_nested_access(
                     kargs['function'])
+            called_func = kargs['function']
+
+        # For wrapped function, try to get its unwrapped (bound) method
+        while not inspect.ismethod(called_func) and hasattr(
+                called_func, '__wrapped__'):
+            called_func = called_func.__wrapped__
+
+        # Batched is always required for fault tolerance
+        if inspect.ismethod(
+                called_func) and called_func.__self__.is_batched_op():
+            kargs['batched'] = True
+            kargs['batch_size'] = kargs.pop('batch_size', 1)
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
@@ -324,6 +369,10 @@ class NestedDataset(Dataset, DJDataset):
         cache files."""
         cleanup_compressed_cache_files(self)
         return super().cleanup_cache_files()
+
+    @staticmethod
+    def load_from_disk(*args, **kargs):
+        return NestedDataset(Dataset.load_from_disk(*args, **kargs))
 
 
 def nested_query(root_obj: Union[NestedDatasetDict, NestedDataset,

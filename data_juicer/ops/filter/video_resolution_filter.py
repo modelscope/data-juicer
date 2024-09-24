@@ -1,7 +1,6 @@
 import sys
 
 import numpy as np
-from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (close_video, load_data_with_context,
@@ -20,10 +19,10 @@ class VideoResolutionFilter(Filter):
     """
 
     def __init__(self,
-                 min_width: PositiveInt = 1,
-                 max_width: PositiveInt = sys.maxsize,
-                 min_height: PositiveInt = 1,
-                 max_height: PositiveInt = sys.maxsize,
+                 min_width: int = 1,
+                 max_width: int = sys.maxsize,
+                 min_height: int = 1,
+                 max_height: int = sys.maxsize,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):

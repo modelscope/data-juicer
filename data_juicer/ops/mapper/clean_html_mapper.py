@@ -15,6 +15,8 @@ selectolax = lazy.load('selectolax')
 class CleanHtmlMapper(Mapper):
     """Mapper to clean html code in text samples."""
 
+    _batched_op = True
+
     def __init__(self, *args, **kwargs):
         """
         Initialization method.
@@ -25,7 +27,7 @@ class CleanHtmlMapper(Mapper):
         super().__init__(*args, **kwargs)
         AUTOINSTALL.check(['selectolax'])
 
-    def process(self, sample):
+    def process(self, samples):
 
         def _clean_html(raw_html):
             raw_html = raw_html.replace('<li>', '\n*')
@@ -35,5 +37,6 @@ class CleanHtmlMapper(Mapper):
             parser = selectolax.parser.HTMLParser(raw_html)
             return parser.text()
 
-        sample[self.text_key] = _clean_html(sample[self.text_key])
-        return sample
+        samples[self.text_key] = list(
+            map(lambda text: _clean_html(text), samples[self.text_key]))
+        return samples

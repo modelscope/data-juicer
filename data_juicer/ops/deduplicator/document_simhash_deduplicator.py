@@ -3,13 +3,13 @@
 # --------------------------------------------------------
 
 from collections import defaultdict, deque
-from typing import Dict, Set
+from typing import Dict, Optional, Set
 
 import lazy_loader as lazy
 import numpy as np
 import regex
-from jsonargparse.typing import PositiveInt
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import HashKeys
 
@@ -29,7 +29,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
                  tokenization: str = 'space',
                  window_size: PositiveInt = 6,
                  lowercase: bool = True,
-                 ignore_pattern: str = None,
+                 ignore_pattern: Optional[str] = None,
                  num_blocks: PositiveInt = 6,
                  hamming_distance: PositiveInt = 4,
                  *args,

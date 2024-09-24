@@ -2,7 +2,7 @@ from typing import List, Union
 
 import lazy_loader as lazy
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer import cuda_device_count
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -42,8 +42,8 @@ class VideoOcrAreaRatioFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 min_area_ratio: ClosedUnitInterval = 0,
-                 max_area_ratio: ClosedUnitInterval = 1.0,
+                 min_area_ratio: float = 0,
+                 max_area_ratio: float = 1.0,
                  frame_sample_num: PositiveInt = 3,
                  languages_to_detect: Union[str, List[str]] = ['ch_sim', 'en'],
                  any_or_all: str = 'any',

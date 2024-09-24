@@ -10,6 +10,8 @@ OP_NAME = 'sentence_split_mapper'
 class SentenceSplitMapper(Mapper):
     """Mapper to split text samples to sentences."""
 
+    _batched_op = True
+
     def __init__(self, lang: str = 'en', *args, **kwargs):
         """
         Initialization method.
@@ -23,10 +25,14 @@ class SentenceSplitMapper(Mapper):
         self.lang = lang
         self.model_key = prepare_model(model_type='nltk', lang=lang)
 
-    def process(self, sample):
+    def process(self, samples):
 
         nltk_model = get_model(self.model_key)
-        sample[self.text_key] = get_sentences_from_document(
-            sample[self.text_key],
-            model_func=nltk_model.tokenize if nltk_model else None)
-        return sample
+
+        samples[self.text_key] = [
+            get_sentences_from_document(
+                text, model_func=nltk_model.tokenize if nltk_model else None)
+            for text in samples[self.text_key]
+        ]
+
+        return samples

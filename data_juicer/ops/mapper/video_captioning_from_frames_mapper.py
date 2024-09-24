@@ -1,11 +1,12 @@
 # yapf: disable
 import copy
 import random
+from typing import Optional
 
 import numpy as np
-from jsonargparse.typing import PositiveInt
 from loguru import logger
 from PIL import ImageOps
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
@@ -35,13 +36,13 @@ class VideoCaptioningFromFramesMapper(Mapper):
 
     def __init__(
         self,
-        hf_img2seq='Salesforce/blip2-opt-2.7b',
-        trust_remote_code=False,
+        hf_img2seq: str = 'Salesforce/blip2-opt-2.7b',
+        trust_remote_code: bool = False,
         caption_num: PositiveInt = 1,
         keep_candidate_mode: str = 'random_any',
         keep_original_sample: bool = True,
-        prompt: str = None,
-        prompt_key: str = None,
+        prompt: Optional[str] = None,
+        prompt_key: Optional[str] = None,
         frame_sampling_method: str = 'all_keyframes',
         frame_num: PositiveInt = 3,
         horizontal_flip: bool = False,

@@ -1,6 +1,6 @@
 import lazy_loader as lazy
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
@@ -26,9 +26,9 @@ class VideoNSFWFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_nsfw_model='Falconsai/nsfw_image_detection',
-                 trust_remote_code=False,
-                 score_threshold: ClosedUnitInterval = 0.5,
+                 hf_nsfw_model: str = 'Falconsai/nsfw_image_detection',
+                 trust_remote_code: bool = False,
+                 score_threshold: float = 0.5,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
                  reduce_mode: str = 'avg',

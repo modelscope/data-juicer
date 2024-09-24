@@ -1,7 +1,6 @@
 import sys
 
 import lazy_loader as lazy
-from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -21,8 +20,8 @@ class TokenNumFilter(Filter):
 
     def __init__(self,
                  hf_tokenizer: str = 'EleutherAI/pythia-6.9b-deduped',
-                 min_num: PositiveInt = 10,
-                 max_num: PositiveInt = sys.maxsize,
+                 min_num: int = 10,
+                 max_num: int = sys.maxsize,
                  *args,
                  **kwargs):
         """

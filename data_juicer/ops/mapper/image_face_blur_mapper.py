@@ -2,6 +2,7 @@ import os
 
 import lazy_loader as lazy
 from loguru import logger
+from pydantic import NonNegativeFloat
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
@@ -33,9 +34,9 @@ class ImageFaceBlurMapper(Mapper):
     }
 
     def __init__(self,
-                 cv_classifier='',
+                 cv_classifier: str = '',
                  blur_type: str = 'gaussian',
-                 radius: float = 2,
+                 radius: NonNegativeFloat = 2,
                  *args,
                  **kwargs):
         """

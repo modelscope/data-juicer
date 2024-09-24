@@ -1,6 +1,5 @@
 import lazy_loader as lazy
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -25,10 +24,10 @@ class ImageAestheticsFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_scorer_model='',
-                 trust_remote_code=False,
-                 min_score: ClosedUnitInterval = 0.5,
-                 max_score: ClosedUnitInterval = 1.0,
+                 hf_scorer_model: str = '',
+                 trust_remote_code: bool = False,
+                 min_score: float = 0.5,
+                 max_score: float = 1.0,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):

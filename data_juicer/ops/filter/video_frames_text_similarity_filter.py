@@ -1,7 +1,7 @@
 import lazy_loader as lazy
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 from PIL import ImageOps
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
@@ -32,8 +32,8 @@ class VideoFramesTextSimilarityFilter(Filter):
     def __init__(self,
                  hf_clip='openai/clip-vit-base-patch32',
                  trust_remote_code=False,
-                 min_score: ClosedUnitInterval = 0.1,
-                 max_score: ClosedUnitInterval = 1.0,
+                 min_score: float = 0.1,
+                 max_score: float = 1.0,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
                  horizontal_flip: bool = False,

@@ -3,7 +3,7 @@ import re
 from itertools import chain
 
 import lazy_loader as lazy
-from jsonargparse.typing import NonNegativeFloat, NonNegativeInt
+from pydantic import NonNegativeFloat, NonNegativeInt
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (add_suffix_to_filename,

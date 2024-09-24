@@ -2,6 +2,7 @@ from copy import deepcopy
 
 import lazy_loader as lazy
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.utils.logger_utils import HiddenPrints
 
@@ -20,7 +21,7 @@ class NlpcdaZhMapper(Mapper):
 
     def __init__(self,
                  sequential: bool = False,
-                 aug_num: int = 1,
+                 aug_num: PositiveInt = 1,
                  keep_original_sample: bool = True,
                  replace_similar_word: bool = False,
                  replace_homophone_char: bool = False,

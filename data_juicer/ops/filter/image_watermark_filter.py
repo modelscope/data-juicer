@@ -1,6 +1,5 @@
 import lazy_loader as lazy
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
@@ -26,9 +25,9 @@ class ImageWatermarkFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_watermark_model='amrul-hzz/watermark_detector',
-                 trust_remote_code=False,
-                 prob_threshold: ClosedUnitInterval = 0.8,
+                 hf_watermark_model: str = 'amrul-hzz/watermark_detector',
+                 trust_remote_code: bool = False,
+                 prob_threshold: float = 0.8,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):

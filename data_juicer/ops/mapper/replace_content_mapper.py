@@ -11,8 +11,10 @@ class ReplaceContentMapper(Mapper):
     a specific regular expression pattern with a designated
     replacement string."""
 
+    _batched_op = True
+
     def __init__(self,
-                 pattern: Union[str, List[str]] = None,
+                 pattern: Union[str, List[str], None] = None,
                  repl: Union[str, List[str]] = '',
                  *args,
                  **kwargs):
@@ -42,21 +44,23 @@ class ReplaceContentMapper(Mapper):
             pattern = pattern[2:-1]
         return re.compile(pattern, flags=re.DOTALL)
 
-    def process(self, sample):
+    def process(self, samples):
         if self.pattern is None:
-            return sample
+            return samples
 
-        for i, pattern in enumerate(self.compiled_patterns):
-            if isinstance(self.repl, list) and i < len(self.repl):
-                replacement = self.repl[i]
-            elif isinstance(self.repl, list) and i >= len(self.repl):
-                raise ValueError(f"pattern length: {len(self.pattern)} '"
-                                 f'must be equal to '
-                                 f'repl length: {len(self.repl)}')
-            else:
-                replacement = self.repl
+        for idx, text in enumerate(samples[self.text_key]):
+            for i, pattern in enumerate(self.compiled_patterns):
+                if isinstance(self.repl, list) and i < len(self.repl):
+                    replacement = self.repl[i]
+                elif isinstance(self.repl, list) and i >= len(self.repl):
+                    raise ValueError(f"pattern length: {len(self.pattern)} '"
+                                     f'must be equal to '
+                                     f'repl length: {len(self.repl)}')
+                else:
+                    replacement = self.repl
 
-            sample[self.text_key] = pattern.sub(replacement,
-                                                sample[self.text_key])
+                text = pattern.sub(replacement, text)
 
-        return sample
+            samples[self.text_key][idx] = text
+
+        return samples
