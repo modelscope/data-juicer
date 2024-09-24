@@ -1,7 +1,17 @@
 # User Guide
 ## Applications and Achievements
-Leveraging the Data-Juicer Sandbox Laboratory Suite, we systematically fine-tuned data and models through a dedicated research and development workflow between data and models. For more detailed information, please refer to our [paper](http://arxiv.org/abs/2407.11784). In our work, we have secured a new leading position on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard. The model is now publicly available on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms, and the training [dataset](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip) has also been available.
-![top-1_in_vbench](https://img.alicdn.com/imgextra/i3/O1CN01Ssg83y1EPbDgTzexn_!!6000000000344-2-tps-2966-1832.png)
+Leveraging the Data-Juicer Sandbox Laboratory Suite, we systematically fine-tuned data and models through a dedicated research and development workflow between data and models. For more detailed information, please refer to our [paper](http://arxiv.org/abs/2407.11784). In our work, we have secured a new leading position on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard.
+![top-1_in_vbench](https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png)
+
+The model is now publicly available on the ModelScope and HuggingFace platforms, and the training dataset has also been available.
+
+| Open-source model or dataset | Link | Description |
+| ------------ | --- | --- |
+| Data-Juicer (T2V, 147k) |  [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) <br> [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) | Corresponding to Data-Juicer (T2V-Turbo) model in VBench leaderboard |
+| Data-Juicer (DJ, 228k) | [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) <br> [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) | Corresponding to Data-Juicer (2024-09-23, T2V-Turbo) model in VBench leaderboard |
+| data_juicer_t2v_optimal_data_pool | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-optimal-data-pool)  <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/data-juicer-t2v-optimal-data-pool) | The training dataset of Data-Juicer (T2V, 147k) |
+| data_juicer_t2v_evolution_data_pool | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool_s2.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-evolution-data-pool) | The training dataset of Data-Juicer (2024-09-23, T2V-Turbo) |
+
 To reproduce the paper's experiments, please refer to the sandbox usage guide below, the experimental process in the following figure, the [initial dataset](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip), and the configuration file demos for the process: [1_single_op_pipline.yaml](../configs/demo/bench/1_single_op_pipline.yaml), [2_multi_op_pipline.yaml](../configs/demo/bench/2_multi_op_pipline.yaml), [3_duplicate_pipline.yaml](../configs/demo/bench/3_duplicate_pipline.yaml).
 ![bench_bottom_up](https://img.alicdn.com/imgextra/i3/O1CN01ZwtQuG1sdPnbYYVhH_!!6000000005789-2-tps-7838-3861.png)
 

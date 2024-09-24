@@ -50,7 +50,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 }, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
@@ -68,7 +68,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
@@ -134,7 +134,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -152,7 +152,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -170,7 +170,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -188,7 +188,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -206,7 +206,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 })
 
