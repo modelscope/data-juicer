@@ -120,11 +120,10 @@
                              <span class="s1">&#39;[&quot;NFC&quot;, &quot;NFKC&quot;, &quot;NFD&quot;, &quot;NFKD&quot;]&#39;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FixUnicodeMapper.process"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.FixUnicodeMapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
-        <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="nb">map</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">text</span><span class="p">:</span> <span class="n">ftfy</span><span class="o">.</span><span class="n">fix_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span>
-                                           <span class="n">normalization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">normalization</span><span class="p">),</span>
-                <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]))</span>
+        <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ftfy</span><span class="o">.</span><span class="n">fix_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">normalization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">normalization</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
+        <span class="p">]</span>
         <span class="k">return</span> <span class="n">samples</span></div></div>
 </pre></div>
 
