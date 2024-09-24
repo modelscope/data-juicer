@@ -250,9 +250,7 @@ class NestedDataset(Dataset, DJDataset):
                     called_func.__self__,
                     'is_batched_op') and called_func.__self__.is_batched_op():
                 kargs['batched'] = True
-                kargs['batch_size'] = kargs.pop('batch_size', 1) if hasattr(
-                    called_func.__self__, 'is_batched_op'
-                ) and called_func.__self__.is_batched_op() else 1
+                kargs['batch_size'] = kargs.pop('batch_size', 1)
             else:
                 kargs['batched'] = False
 

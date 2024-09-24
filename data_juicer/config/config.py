@@ -287,6 +287,12 @@ def init_configs(args=None):
         'OPs and fused OPs according to their probed speed (fast to '
         'slow). It\'s "greedy" in default.')
     parser.add_argument(
+        '--adaptive_batch_size',
+        type=bool,
+        default=False,
+        help='Whether to use adaptive batch sizes for each OP according to '
+        'the probed results. It\'s False in default.')
+    parser.add_argument(
         '--process',
         type=List[Dict],
         default=[],

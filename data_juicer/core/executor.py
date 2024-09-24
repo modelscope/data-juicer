@@ -42,6 +42,8 @@ class Executor:
         self.tracer = None
         self.ckpt_manager = None
 
+        self.adapter = Adapter(self.cfg)
+
         # only enable it when using cache
         if self.cfg.use_cache:
             logger.info(f'Using cache compression method: '
@@ -158,16 +160,27 @@ class Executor:
         logger.info('Preparing process operators...')
         ops = load_ops(self.cfg.process)
 
+        # OP fusion
         if self.cfg.op_fusion:
             probe_res = None
             if self.cfg.fusion_strategy == 'probe':
                 logger.info('Probe the OP speed for OP reordering...')
-                adapter = Adapter(self.cfg)
-                probe_res, _ = adapter.probe_small_batch(dataset, ops)
+                probe_res, _ = self.adapter.probe_small_batch(dataset, ops)
 
             logger.info(f'Start OP fusion and reordering with strategy '
                         f'[{self.cfg.fusion_strategy}]...')
             ops = fuse_operators(ops, self.cfg.fusion_strategy, probe_res)
+
+        # adaptive batch size
+        if self.cfg.adaptive_batch_size:
+            # calculate the adaptive batch size
+            bs_per_op = self.adapter.adapt_workloads(dataset, ops)
+            assert len(bs_per_op) == len(ops)
+            # update the adaptive batch size
+            logger.info(f'Adapt batch sizes for each OP to {bs_per_op}')
+            for i, op in enumerate(ops):
+                if op.is_batched_op():
+                    op.batch_size = bs_per_op[i]
 
         # 3. data process
         # - If tracer is open, trace each op after it's processed

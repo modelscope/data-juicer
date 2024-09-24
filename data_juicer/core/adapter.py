@@ -107,17 +107,30 @@ class Adapter:
         current load and estimated OP speed, returning load factors and speed
         ranks for each OP.
 
+        Notice: the probe should be run with cache enabled.
+
         :param dataset: The dataset to pre-execute small batch on
         :param operators: The OP list to be pre-execution and probe
         :return: A list of probe results for each OP and the length of data
             batch to probe.
         """
+        # record the cache state and enable the cache
+        from datasets import (disable_caching, enable_caching,
+                              is_caching_enabled)
+        previous_state = is_caching_enabled()
+        if not previous_state:
+            enable_caching()
+
         # take a small batch
         data_batch = self.take_batch(dataset, self.cfg)
         # process and monitor the resource utilization
         resource_util_list = self.execute_and_probe(data_batch, operators)
         # analyze resource utilization
         analysis_res = Monitor.analyze_resource_util_list(resource_util_list)
+
+        # if the cache is disabled before, disable it again
+        if not previous_state:
+            disable_caching()
 
         return analysis_res, len(data_batch)
 
