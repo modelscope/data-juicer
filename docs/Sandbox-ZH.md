@@ -1,7 +1,17 @@
 # 用户指南
 ## 应用和成果
-我们利用Data-Juicer沙盒实验室套件，通过数据与模型间的系统性研发工作流，调优数据和模型，相关工作请参考[论文](http://arxiv.org/abs/2407.11784)。在本工作中，我们在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。模型已在[ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V)和[HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V)平台发布，训练模型的[数据集](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip)也已开源。
-![top-1_in_vbench](https://img.alicdn.com/imgextra/i3/O1CN01Ssg83y1EPbDgTzexn_!!6000000000344-2-tps-2966-1832.png)
+我们利用Data-Juicer沙盒实验室套件，通过数据与模型间的系统性研发工作流，调优数据和模型，相关工作请参考[论文](http://arxiv.org/abs/2407.11784)。在本工作中，我们在[VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard)文生视频排行榜取得了新的榜首。
+![top-1_in_vbench](https://img.alicdn.com/imgextra/i1/O1CN01I9wHW91UNnX9wtCWu_!!6000000002506-2-tps-1275-668.png)
+
+模型已在ModelScope和HuggingFace平台发布，训练模型的数据集也已开源。
+
+| 开源模型或数据集 | 链接 | 说明 |
+| ------------ | --- | --- |
+| Data-Juicer (T2V, 147k) |  [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) <br> [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) | 对应榜单中 Data-Juicer (T2V-Turbo) 模型 |
+| Data-Juicer (DJ, 228k) | [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) <br> [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) | 对应榜单中 Data-Juicer (2024-09-23, T2V-Turbo) 模型 |
+| data_juicer_t2v_optimal_data_pool | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-optimal-data-pool)  <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/data-juicer-t2v-optimal-data-pool) | Data-Juicer (T2V, 147k) 的训练集 |
+| data_juicer_t2v_evolution_data_pool | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool_s2.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-evolution-data-pool) | Data-Juicer (2024-09-23, T2V-Turbo) 的训练集 |
+
 复现论文实验请参考下面的sandbox使用指南，下图的实验流程，[初始数据集](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip)，以及该流程的工作流的配置文件demo：[1_single_op_pipline.yaml](../configs/demo/bench/1_single_op_pipline.yaml)、[2_multi_op_pipline.yaml](../configs/demo/bench/2_multi_op_pipline.yaml)、[3_duplicate_pipline.yaml](../configs/demo/bench/3_duplicate_pipline.yaml)。
 ![bench_bottom_up](https://img.alicdn.com/imgextra/i3/O1CN01ZwtQuG1sdPnbYYVhH_!!6000000005789-2-tps-7838-3861.png)
 
