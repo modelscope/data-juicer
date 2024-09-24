@@ -28,6 +28,7 @@ class ImageTextSimilarityFilter(Filter):
     within a specific range."""
 
     _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(self,
                  hf_clip: str = 'openai/clip-vit-base-patch32',
@@ -78,80 +79,95 @@ class ImageTextSimilarityFilter(Filter):
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
 
-    def compute_stats(self, sample, rank=None, context=False):
-        # check if it's computed already
-        if StatsKeys.image_text_similarity in sample[Fields.stats]:
-            return sample
+    def compute_stats(self, samples, rank=None, context=False):
+        text_list = samples[self.text_key]
+        image_list = samples[self.image_key]
+        samples_stat = samples[Fields.stats]
 
-        # there is no image in this sample
-        if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.image_text_similarity] = np.array(
-                [], dtype=np.float64)
-            return sample
-
-        # load images
-        loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context,
-                                                loaded_image_keys, load_image)
-
-        text = sample[self.text_key]
-        offset = 0
-        similarity = []
         model, processor = get_model(self.model_key, rank, self.use_cuda())
 
-        for chunk in text.split(SpecialTokens.eoc):
-            count = chunk.count(SpecialTokens.image)
-
-            # no image or no text
-            if count == 0 or len(chunk) == 0:
+        for i, stat in enumerate(samples_stat):
+            # check if it's computed already
+            if StatsKeys.image_text_similarity in stat:
                 continue
-            else:
-                text_chunk = remove_special_tokens(chunk)
-                image_chunk = []
-                for image_key in loaded_image_keys[offset:offset + count]:
-                    image = images[image_key]
-                    if self.horizontal_flip:
-                        image = ImageOps.mirror(image)
-                    if self.vertical_flip:
-                        image = ImageOps.flip(image)
-                    image_chunk.append(image)
 
-                inputs = processor(text=text_chunk,
-                                   images=image_chunk,
-                                   return_tensors='pt',
-                                   truncation=True,
-                                   max_length=model.config.text_config.
-                                   max_position_embeddings,
-                                   padding=True).to(model.device)
+            # there is no image in this samples
+            loaded_image_keys = image_list[i]
+            if not loaded_image_keys:
+                stat[StatsKeys.image_text_similarity] = np.array(
+                    [], dtype=np.float64)
+                return samples
 
-                outputs = model(**inputs)
-                chunk_logits = outputs.logits_per_text / 100.0
+            # load images
+            samples, images = load_data_with_context(samples, context,
+                                                     loaded_image_keys,
+                                                     load_image)
 
-                if self.reduce_mode == 'avg':
-                    chunk_similarity = chunk_logits.mean()
-                elif self.reduce_mode == 'max':
-                    chunk_similarity = chunk_logits.max()
+            text = text_list[i]
+            offset = 0
+            similarity = []
+
+            for chunk in text.split(SpecialTokens.eoc):
+                count = chunk.count(SpecialTokens.image)
+
+                # no image or no text
+                if count == 0 or len(chunk) == 0:
+                    continue
                 else:
-                    chunk_similarity = chunk_logits.min()
+                    text_chunk = remove_special_tokens(chunk)
+                    image_chunk = []
+                    for image_key in loaded_image_keys[offset:offset + count]:
+                        image = images[image_key]
+                        if self.horizontal_flip:
+                            image = ImageOps.mirror(image)
+                        if self.vertical_flip:
+                            image = ImageOps.flip(image)
+                        image_chunk.append(image)
 
-                similarity.append(float(chunk_similarity))
-            offset += count
-        sample[Fields.stats][StatsKeys.image_text_similarity] = similarity
+                    inputs = processor(text=text_chunk,
+                                       images=image_chunk,
+                                       return_tensors='pt',
+                                       truncation=True,
+                                       max_length=model.config.text_config.
+                                       max_position_embeddings,
+                                       padding=True).to(model.device)
 
-        return sample
+                    outputs = model(**inputs)
+                    chunk_logits = outputs.logits_per_text / 100.0
 
-    def process(self, sample, rank=None):
-        similarity = sample[Fields.stats][StatsKeys.image_text_similarity]
-        if len(similarity) <= 0:
-            return True
+                    if self.reduce_mode == 'avg':
+                        chunk_similarity = chunk_logits.mean()
+                    elif self.reduce_mode == 'max':
+                        chunk_similarity = chunk_logits.max()
+                    else:
+                        chunk_similarity = chunk_logits.min()
 
-        keep_bools = np.array([
-            self.min_score <= sim_value <= self.max_score
-            for sim_value in similarity
-        ])
+                    similarity.append(float(chunk_similarity))
+                offset += count
+            stat[StatsKeys.image_text_similarity] = similarity
 
-        # different strategies
-        if self.any:
-            return keep_bools.any()
+        return samples
+
+    def process(self, samples, rank=None):
+
+        def process_single(values):
+            if len(values) <= 0:
+                return True
+
+            keep_bools = np.array([
+                self.min_score <= value <= self.max_score for value in values
+            ])
+
+            # different strategies
+            if self.any:
+                return keep_bools.any()
+            else:
+                return keep_bools.all()
+
+        if isinstance(samples[Fields.stats], list):
+            return map(
+                lambda stat: process_single(stat[
+                    StatsKeys.image_text_similarity]), samples[Fields.stats])
         else:
-            return keep_bools.all()
+            return process_single(
+                samples[Fields.stats][StatsKeys.image_text_similarity])
