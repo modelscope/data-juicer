@@ -2,6 +2,8 @@ from datasets import concatenate_datasets
 from datasets.config import DEFAULT_MAX_BATCH_SIZE
 
 from data_juicer.core.monitor import Monitor
+from data_juicer.ops import UNFORKABLE
+from data_juicer.utils.process_utils import setup_mp
 
 
 class Adapter:
@@ -34,7 +36,12 @@ class Adapter:
         # resource utilization list
         resource_util_list = []
         # probe for each OP
+        unforkable_operators = set(UNFORKABLE.modules.keys())
         for op in operators:
+            # select suitable mp method for each OP
+            mp_context = ['forkserver', 'spawn'] if (
+                op.use_cuda() or op._name in unforkable_operators) else None
+            setup_mp(mp_context)
             # expand the test dataset according to the runtime number of
             # processes to ensure enough data for a batch and probe the true
             # resource utilization for each OP
