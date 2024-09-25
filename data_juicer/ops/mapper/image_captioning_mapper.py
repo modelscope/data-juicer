@@ -6,7 +6,6 @@ import numpy as np
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.mm_utils import (SpecialTokens,
                                         insert_texts_after_placeholders,
@@ -14,19 +13,10 @@ from data_juicer.utils.mm_utils import (SpecialTokens,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_captioning_mapper'
-
-with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
-                          OP_NAME):
-    import simhash  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling model in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -89,6 +79,7 @@ class ImageCaptioningMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['torch', 'transformers', 'simhash-pybind'])
 
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'

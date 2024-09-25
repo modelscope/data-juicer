@@ -352,6 +352,31 @@ else:
 ...
 ```
 
+5. 随着算子数量的增加，Data-Juicer的依赖也不断增多。为了防止Data-Juicer的依赖越来越重，我们为算子额外增加的依赖提供了一套lazy import加上使用时安装依赖的策略。如下样例：
+
+```python
+# ... (import some library)
+from ..base_op import AUTOINSTALL
+import lazy_loader as lazy
+
+# lazy import
+kenlm = lazy.load('kenlm')
+sentencepiece = lazy.load('sentencepiece')
+
+class PerplexityFilter(Filter):
+    def __init__(self,
+                # ... (OP parameters)
+                *args,
+                **kwargs):
+        # auto install before init
+        super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['sentencepiece', 'kenlm'])
+        # ... (some codes)
+
+    def process(self, sample):
+        # ... (some codes)
+```
+
 - 至此，该算子已经能够在算子融合功能开启后，自动地与其他算子进行融合并共享共有的中间变量，减少重复计算，加快整体的数据处理速度
 
 ## 构建自己的配置

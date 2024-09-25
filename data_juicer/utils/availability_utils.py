@@ -4,8 +4,9 @@ from typing import Tuple, Union
 
 from loguru import logger
 
+from data_juicer.utils.auto_install_utils import _torch_check_and_set
+
 UNAVAILABLE_OPERATORS = {}
-CHECK_SYSTEM_INFO_ONCE = True
 
 
 class UnavailableOperator:
@@ -57,23 +58,7 @@ class AvailabilityChecking:
                               f'`pip install -v -e .[{self.requires_type}]`'
 
     def __enter__(self):
-
-        # only for python3.8 on mac
-        global CHECK_SYSTEM_INFO_ONCE
-        if CHECK_SYSTEM_INFO_ONCE:
-            import os
-            import platform
-            import sys
-            major, minor = sys.version_info[:2]
-            system = platform.system()
-            if major == 3 and minor == 8 and system == 'Darwin':
-                logger.warning(
-                    'The torch.set_num_threads function does not '
-                    'work in python3.8 version on Mac systems. We will set '
-                    'OMP_NUM_THREADS to 1 manually before importing torch')
-
-                os.environ['OMP_NUM_THREADS'] = str(1)
-                CHECK_SYSTEM_INFO_ONCE = False
+        _torch_check_and_set()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is ModuleNotFoundError:

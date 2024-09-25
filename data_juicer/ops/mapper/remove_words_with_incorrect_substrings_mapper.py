@@ -1,17 +1,13 @@
 from typing import List, Optional
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       merge_on_whitespace_tab_newline,
                       split_on_newline_tab_whitespace, strip)
 
 OP_NAME = 'remove_words_with_incorrect_substrings_mapper'
-
-with AvailabilityChecking(['sentencepiece'], OP_NAME):
-    import sentencepiece  # noqa: F401
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -38,6 +34,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
         if substrings is None:
             substrings = ['http', 'www', '.com', 'href', '//']
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['sentencepiece'])
         self.tokenization = tokenization
         self.substrings = substrings
         self.lang = lang

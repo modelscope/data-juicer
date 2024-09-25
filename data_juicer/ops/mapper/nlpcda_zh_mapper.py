@@ -1,17 +1,16 @@
 from copy import deepcopy
 
+import lazy_loader as lazy
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.logger_utils import HiddenPrints
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'nlpcda_zh_mapper'
 
-with AvailabilityChecking(['nlpcda'], OP_NAME), HiddenPrints():
-    import nlpcda
+nlpcda = lazy.load('nlpcda')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -71,6 +70,7 @@ class NlpcdaZhMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['nlpcda'])
 
         self.aug_num = aug_num
         if aug_num >= 10:

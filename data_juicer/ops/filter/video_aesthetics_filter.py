@@ -1,28 +1,20 @@
+import lazy_loader as lazy
 import numpy as np
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 
 from ...utils.model_utils import get_model, prepare_model
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
 OP_NAME = 'video_aesthetics_filter'
-CHECK_PKGS = ['torch', 'transformers', 'simple-aesthetics-predictor']
 
-with AvailabilityChecking(CHECK_PKGS, OP_NAME):
-
-    import aesthetics_predictor  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
+torch = lazy.load('torch')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -83,6 +75,8 @@ class VideoAestheticsFilter(Filter):
         """
 
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(
+            ['torch', 'transformers', 'simple-aesthetics-predictor'])
         if hf_scorer_model == '':
             hf_scorer_model = \
                 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE'

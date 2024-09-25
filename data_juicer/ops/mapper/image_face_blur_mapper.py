@@ -1,23 +1,22 @@
 import os
 
+import lazy_loader as lazy
 from loguru import logger
 from pydantic import NonNegativeFloat
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
                                         load_image)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, UNFORKABLE, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_face_blur_mapper'
 
-with AvailabilityChecking(['opencv-python', 'Pillow'], OP_NAME):
-    import cv2
-    from PIL import ImageFilter
+cv2 = lazy.load('cv2')
+PIL = lazy.load('PIL')
 
 
 @UNFORKABLE.register_module(OP_NAME)
@@ -52,6 +51,7 @@ class ImageFaceBlurMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['opencv-python', 'Pillow'])
         self._init_parameters = self.remove_extra_parameters(locals())
 
         if cv_classifier == '':
@@ -65,11 +65,11 @@ class ImageFaceBlurMapper(Mapper):
             raise ValueError('Radius must be >= 0. ')
 
         if blur_type == 'mean':
-            self.blur = ImageFilter.BLUR
+            self.blur = PIL.ImageFilter.BLUR
         elif blur_type == 'box':
-            self.blur = ImageFilter.BoxBlur(radius)
+            self.blur = PIL.ImageFilter.BoxBlur(radius)
         else:
-            self.blur = ImageFilter.GaussianBlur(radius)
+            self.blur = PIL.ImageFilter.GaussianBlur(radius)
 
         self.blur_type = blur_type
         self.radius = radius

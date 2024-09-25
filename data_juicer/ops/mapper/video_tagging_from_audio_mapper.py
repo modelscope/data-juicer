@@ -1,22 +1,16 @@
+import lazy_loader as lazy
 import librosa
 import numpy as np
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'video_tagging_from_audio_mapper'
 
-with AvailabilityChecking(['torch', 'transformers', 'torchaudio'], OP_NAME):
-    import torch
-    import torchaudio  # noqa: F401
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling recognizeAnything in multiprocessing
-    torch.set_num_threads(1)
+torch = lazy.load('torch')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -44,6 +38,7 @@ class VideoTaggingFromAudioMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['torch', 'transformers', 'torchaudio'])
         self.model_key = prepare_model(model_type='huggingface',
                                        pretrained_model_name_or_path=hf_ast,
                                        trust_remote_code=trust_remote_code)
