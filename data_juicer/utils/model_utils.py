@@ -59,8 +59,7 @@ def check_model(model_name, force=False):
     if os.path.exists(model_name):
         return model_name
 
-    if not os.path.exists(DJMC):
-        os.makedirs(DJMC)
+    os.makedirs(DJMC, exist_ok=True)
 
     # check if the specified model exists. If it does not exist, download it
     cached_model_path = os.path.join(DJMC, model_name)
@@ -73,21 +72,23 @@ def check_model(model_name, force=False):
         else:
             logger.info(
                 f'Model [{cached_model_path}] not found. Downloading...')
+    elif os.path.exists(cached_model_path):
+        return cached_model_path
 
+    try:
+        model_link = os.path.join(MODEL_LINKS, model_name)
+        wget.download(model_link, cached_model_path, bar=None)
+    except:  # noqa: E722
         try:
-            model_link = os.path.join(MODEL_LINKS, model_name)
-            wget.download(model_link, cached_model_path, bar=None)
+            backup_model_link = os.path.join(
+                get_backup_model_link(model_name), model_name)
+            wget.download(backup_model_link, cached_model_path, bar=None)
         except:  # noqa: E722
-            try:
-                backup_model_link = os.path.join(
-                    get_backup_model_link(model_name), model_name)
-                wget.download(backup_model_link, cached_model_path, bar=None)
-            except:  # noqa: E722
-                logger.error(
-                    f'Downloading model [{model_name}] error. '
-                    f'Please retry later or download it into {DJMC} '
-                    f'manually from {model_link} or {backup_model_link} ')
-                exit(1)
+            logger.error(
+                f'Downloading model [{model_name}] error. '
+                f'Please retry later or download it into {DJMC} '
+                f'manually from {model_link} or {backup_model_link} ')
+            exit(1)
     return cached_model_path
 
 
