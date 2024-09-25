@@ -66,14 +66,16 @@ def execute_analyzer(dj_config: dict):
         dj_config: configs of data-juicer
     """
     logger.chat(Msg(name='system', content='Analyzing data...', role='system'))
+    url_path = '/data_juicer/core/Analyzer/run'
     try:
-        res = call_data_juicer_api('/data_juicer/core/Analyzer/run',
-                                   {'skip_return': True},
+        res = call_data_juicer_api(url_path,
+                                   params={'skip_return': True},
                                    json={'cfg': jdumps(dj_config)})
+        print(res)
         assert res['status'] == 'success'
         return dj_config['export_path']
     except Exception as e:
-        error_msg = f'An unexpected error occurred in Data-Juicer: {e}'
+        error_msg = f'An unexpected error occurred in calling {url_path}:\n{e}'
         raise RuntimeError(error_msg)
 
 
@@ -123,14 +125,16 @@ def execute_config(dj_config: Dict):
     """
     logger.chat(Msg(name='system', content='Processing data...',
                     role='system'))
+    url_path = '/data_juicer/core/Executor/run'
     try:
-        res = call_data_juicer_api('/data_juicer/core/Executor/run',
+        res = call_data_juicer_api(url_path,
                                    params={'skip_return': True},
                                    json={'cfg': jdumps(dj_config)})
+        print(res)
         assert res['status'] == 'success'
         return dj_config['export_path']
     except Exception as e:
-        error_msg = f'An unexpected error occurred in Data-Juicer: {e}'
+        error_msg = f'An unexpected error occurred in calling {url_path}:\n{e}'
         raise RuntimeError(error_msg)
 
 
@@ -139,7 +143,8 @@ def setup_service_toolkit(module_name, service_toolkit=None):
         service_toolkit = ServiceToolkit()
     module = importlib.import_module(module_name)
     for name in dir(module):
-        obj = getattr(module, name)
-        if callable(obj):
-            service_toolkit.add(obj)
+        if name.startswith('execute_'):
+            obj = getattr(module, name)
+            if callable(obj):
+                service_toolkit.add(obj)
     return service_toolkit

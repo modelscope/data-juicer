@@ -63,9 +63,7 @@ def execute_image_face_blur_mapper(dataset_path: str) -> ServiceResponse:
             The input dataset path.
     """
     try:
-        dj_config = init_config(dataset_path,
-                                'image_face_blur_mapper',
-                                keep_original_sample=False)
+        dj_config = init_config(dataset_path, 'image_face_blur_mapper')
         result_path = execute_config(dj_config)
         return ServiceResponse(ServiceExecStatus.SUCCESS,
                                f'Mapped dataset path: {result_path}')
@@ -103,9 +101,7 @@ def execute_video_face_blur_mapper(dataset_path: str) -> ServiceResponse:
             The input dataset path.
     """
     try:
-        dj_config = init_config(dataset_path,
-                                'video_face_blur_mapper',
-                                keep_original_sample=False)
+        dj_config = init_config(dataset_path, 'video_face_blur_mapper')
         result_path = execute_config(dj_config)
         return ServiceResponse(ServiceExecStatus.SUCCESS,
                                f'Mapped dataset path: {result_path}')

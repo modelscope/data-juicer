@@ -57,7 +57,7 @@ def register_class(module, cls):
                 init_args = await request.json() if await request.body(
                 ) else {}
                 # create an instance
-                instance = cls(**init_args)
+                instance = cls(**_setup_cfg(init_args))
                 # wrap called method
                 method = validate_call(getattr(instance, method_name))
                 result = _invoke(method, request)
@@ -111,7 +111,7 @@ def _invoke(callable, request):
     d_params = dict(
         (k, v if len(v) > 1 else v[0]) for k, v in q_params.items())
     # pre-processing
-    _setup_cfg(d_params)
+    d_params = _setup_cfg(d_params)
     exporter = _setup_dataset(d_params)
     skip_return = d_params.pop('skip_return', False)
     # invoke callable
@@ -133,6 +133,7 @@ def _setup_cfg(params: Dict):
         if isinstance(cfg_str, str):
             cfg = Namespace(**json.loads(cfg_str))
             params['cfg'] = cfg
+    return params
 
 
 def _setup_dataset(params: Dict):
