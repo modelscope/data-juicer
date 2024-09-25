@@ -357,7 +357,7 @@ def update_ds_cache_dir_and_related_vars(new_ds_cache_path):
         config.DEFAULT_EXTRACTED_DATASETS_PATH)
 
 
-def init_setup_from_cfg(cfg):
+def init_setup_from_cfg(cfg: Namespace):
     """
     Do some extra setup tasks after parsing config file or command line.
 
@@ -628,7 +628,7 @@ def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
     return arg_list
 
 
-def config_backup(cfg):
+def config_backup(cfg: Namespace):
     cfg_path = cfg.config[0].absolute
     work_dir = cfg.work_dir
     target_path = os.path.join(work_dir, os.path.basename(cfg_path))
@@ -638,7 +638,7 @@ def config_backup(cfg):
         shutil.copyfile(cfg_path, target_path)
 
 
-def display_config(cfg):
+def display_config(cfg: Namespace):
     import pprint
 
     from tabulate import tabulate
@@ -790,14 +790,12 @@ def prepare_side_configs(ori_config: Union[str, Namespace, Dict]):
     return config
 
 
-def get_init_configs(cfg):
+def get_init_configs(cfg: Union[Namespace, Dict]):
     """
     set init configs of datajucer for cfg
     """
     temp_dir = tempfile.gettempdir()
     temp_file = os.path.join(temp_dir, 'job_dj_config.json')
-    if type(cfg) == str:
-        cfg = json.loads(cfg)
     if isinstance(cfg, Namespace):
         cfg = namespace_to_dict(cfg)
     # create an temp config file

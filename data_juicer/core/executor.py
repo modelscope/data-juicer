@@ -1,7 +1,6 @@
-import json
 import os
 from time import time
-from typing import Optional, Union
+from typing import Optional
 
 from jsonargparse import Namespace
 from loguru import logger
@@ -31,16 +30,12 @@ class Executor:
     ops in the config file in order and generate a processed dataset.
     """
 
-    def __init__(self, cfg: Union[str, Namespace] = None):
+    def __init__(self, cfg: Optional[Namespace] = None):
         """
         Initialization method.
 
         :param cfg: optional jsonargparse Namespace.
         """
-        if type(cfg) == str:
-            cfg = json.loads(cfg)
-            cfg = Namespace(**cfg)
-
         self.cfg = init_configs() if cfg is None else cfg
 
         self.work_dir = self.cfg.work_dir
