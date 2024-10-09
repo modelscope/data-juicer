@@ -70,12 +70,14 @@ class Analyzer:
 
     def run(self,
             load_data_np: Optional[PositiveInt] = None,
-            skip_export: bool = False):
+            skip_export: bool = False,
+            skip_return: bool = False):
         """
         Running the dataset analysis pipeline.
 
         :param load_data_np: number of workers when loading the dataset.
         :param skip_export: whether export the results into disk
+        :param skip_return: skip return for API called.
         :return: analyzed dataset.
         """
         # 1. format data
@@ -134,4 +136,5 @@ class Analyzer:
         )
         column_wise_analysis.analyze(skip_export=skip_export)
 
-        return dataset
+        if not skip_return:
+            return dataset

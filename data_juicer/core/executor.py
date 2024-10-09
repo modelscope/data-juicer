@@ -138,11 +138,14 @@ class Executor:
         else:
             raise ValueError(f'Unsupported sample_algo: {sample_algo}')
 
-    def run(self, load_data_np: Optional[PositiveInt] = None):
+    def run(self,
+            load_data_np: Optional[PositiveInt] = None,
+            skip_return=False):
         """
         Running the dataset process pipeline.
 
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_return: skip return for API called.
         :return: processed dataset.
         """
         # 1. format data
@@ -179,4 +182,5 @@ class Executor:
             from data_juicer.utils.compress import compress
             compress(dataset)
 
-        return dataset
+        if not skip_return:
+            return dataset
