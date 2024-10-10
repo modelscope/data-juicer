@@ -4,22 +4,21 @@
 
 from typing import List
 
+import lazy_loader as lazy
 from pydantic import PositiveInt
 
 from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
 from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'stopwords_filter'
 
-with AvailabilityChecking(['sentencepiece'], OP_NAME):
-    import sentencepiece  # noqa: F401
+sentencepiece = lazy.load('sentencepiece')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -57,6 +56,7 @@ class StopWordsFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['sentencepiece'])
         self.lang = lang
         self.min_ratio = min_ratio
         self.use_words_aug = use_words_aug

@@ -2,18 +2,17 @@ import sys
 from contextlib import contextmanager
 from typing import Optional, Tuple, Union
 
+import lazy_loader as lazy
 import numpy as np
 from pydantic import PositiveFloat, PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 
-from ..base_op import OPERATORS, UNFORKABLE, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
 
 OP_NAME = 'video_motion_score_filter'
 
-with AvailabilityChecking(['opencv-python'], OP_NAME):
-    import cv2
+cv2 = lazy.load('cv2')
 
 
 @contextmanager
@@ -80,6 +79,7 @@ class VideoMotionScoreFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['opencv-python'])
         self.min_score = min_score
         self.max_score = max_score
         self.sampling_fps = sampling_fps

@@ -7,6 +7,7 @@ import struct
 from collections import defaultdict
 from typing import Optional
 
+import lazy_loader as lazy
 import numpy as np
 import regex
 from loguru import logger
@@ -14,17 +15,15 @@ from pydantic import Field, PositiveInt
 from tqdm import tqdm
 from typing_extensions import Annotated
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
-from ..base_op import OPERATORS, Deduplicator
+from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
 from ..common.helper_func import UnionFind, split_on_whitespace
 
 OP_NAME = 'document_minhash_deduplicator'
 
-with AvailabilityChecking(['scipy'], OP_NAME):
-    from scipy.integrate import quad as integrate
+integrate = lazy.load('scipy.integrate')
 
 MERSENNE_PRIME = np.uint64((1 << 61) - 1)
 MAX_HASH = np.uint64((1 << 32) - 1)
@@ -70,7 +69,7 @@ def optimal_param(
         def proba(s):
             return 1 - (1 - s**float(rows))**float(band)
 
-        a, _ = integrate(proba, 0.0, th)
+        a, _ = integrate.quad(proba, 0.0, th)
         return a
 
     def false_negative_probability(th: float, band: int, rows: int):
@@ -79,7 +78,7 @@ def optimal_param(
         def proba(s):
             return 1 - (1 - (1 - s**float(rows))**float(band))
 
-        a, _ = integrate(proba, th, 1.0)
+        a, _ = integrate.quad(proba, th, 1.0)
         return a
 
     # object: minimize the weighted FP and FN ratio
@@ -152,6 +151,7 @@ class DocumentMinhashDeduplicator(Deduplicator):
             sentencepiece tokenization.
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['scipy'])
         # about minhash computation
         self.tokenization = tokenization
         self.window_size = window_size

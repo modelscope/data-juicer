@@ -8,6 +8,7 @@ import ray.data as rd
 from data_juicer import is_cuda_available
 from data_juicer.core.data import DJDataset, NestedDataset
 from data_juicer.core.ray_data import RayDataset
+from data_juicer.utils.model_utils import free_models
 from data_juicer.utils.registry import Registry
 
 SKIPPED_TESTS = Registry('SkippedTests')
@@ -58,6 +59,10 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             if os.path.exists(transformers.TRANSFORMERS_CACHE):
                 print('CLEAN all TRANSFORMERS_CACHE')
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
+
+    @classmethod
+    def tearDown(cls) -> None:
+        free_models()
 
     def generate_dataset(self, data) -> DJDataset:
         """Generate dataset for a specific executor.

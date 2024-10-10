@@ -3,24 +3,12 @@ import os
 
 import regex as re
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.mm_utils import SpecialTokens, extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 NAME = 'video_captioning_from_audio_mapper'
-CHECK_PKGS = [
-    'transformers', 'transformers_stream_generator', 'einops', 'accelerate',
-    'tiktoken'
-]
-
-with AvailabilityChecking(CHECK_PKGS, NAME):
-    import accelerate  # noqa: F401
-    import einops  # noqa: F401
-    import tiktoken  # noqa: F401
-    import transformers  # noqa: F401
-    import transformers_stream_generator  # noqa: F401
 
 
 @OPERATORS.register_module(NAME)
@@ -44,6 +32,10 @@ class VideoCaptioningFromAudioMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check([
+            'transformers', 'transformers_stream_generator', 'einops',
+            'accelerate', 'tiktoken'
+        ])
 
         self.keep_original_sample = keep_original_sample
         self.extra_args = kwargs

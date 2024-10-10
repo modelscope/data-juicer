@@ -1,11 +1,10 @@
-from data_juicer.utils.availability_utils import AvailabilityChecking
+import lazy_loader as lazy
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'chinese_convert_mapper'
 
-with AvailabilityChecking(['opencc'], OP_NAME):
-    import opencc  # noqa: F401
+opencc = lazy.load('opencc')
 
 OPENCC_CONVERTER = None
 
@@ -75,6 +74,7 @@ class ChineseConvertMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['opencc'])
         mode_list = [
             's2t', 't2s', 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp',
             't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 'jp2t'

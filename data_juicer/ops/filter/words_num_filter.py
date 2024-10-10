@@ -1,18 +1,14 @@
 import sys
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
 from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'words_num_filter'
-
-with AvailabilityChecking(['sentencepiece'], OP_NAME):
-    import sentencepiece  # noqa: F401
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -45,6 +41,7 @@ class WordsNumFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['sentencepiece'])
         self.min_num = min_num
         self.max_num = max_num
         self.model_key = None

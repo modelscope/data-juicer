@@ -1,17 +1,16 @@
 from typing import List, Union
 
+import lazy_loader as lazy
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, Filter
 
 OP_NAME = 'language_id_score_filter'
 
-with AvailabilityChecking(['fasttext-wheel'], OP_NAME):
-    import fasttext  # noqa: F401
+fasttext = lazy.load('fasttext')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -34,6 +33,7 @@ class LanguageIDScoreFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['fasttext', 'fasttext-wheel'])
         if not lang:
             # lang is [], '' or None
             self.lang = None

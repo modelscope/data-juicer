@@ -1,22 +1,21 @@
 from typing import List, Union
 
+import lazy_loader as lazy
 import numpy as np
 from pydantic import PositiveInt
 
 from data_juicer import cuda_device_count
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (close_video,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 
-from ..base_op import OPERATORS, UNFORKABLE, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
 OP_NAME = 'video_ocr_area_ratio_filter'
 
-with AvailabilityChecking(['easyocr'], OP_NAME):
-    import easyocr
+easyocr = lazy.load('easyocr')
 
 
 def triangle_area(p1, p2, p3):
@@ -73,6 +72,7 @@ class VideoOcrAreaRatioFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['easyocr'])
         self.min_area_ratio = min_area_ratio
         self.max_area_ratio = max_area_ratio
         self.frame_sample_num = frame_sample_num

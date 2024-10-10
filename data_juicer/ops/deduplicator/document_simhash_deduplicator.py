@@ -5,21 +5,20 @@
 from collections import defaultdict, deque
 from typing import Dict, Optional, Set
 
+import lazy_loader as lazy
 import numpy as np
 import regex
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
 
-from ..base_op import OPERATORS, Deduplicator
+from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
 
 OP_NAME = 'document_simhash_deduplicator'
 
-with AvailabilityChecking(['simhash-pybind'], OP_NAME):
-    import simhash
+simhash = lazy.load('simhash')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -57,6 +56,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
         """
         # about simhash computation
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['simhash-pybind'])
         self.tokenization = tokenization
         self.window_size = window_size
         self.lowercase = lowercase

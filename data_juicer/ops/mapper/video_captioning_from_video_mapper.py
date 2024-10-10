@@ -8,7 +8,6 @@ from loguru import logger
 from PIL import ImageOps
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
                                         extract_key_frames,
@@ -19,20 +18,10 @@ from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_captioning_from_video_mapper'
-
-with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
-                          OP_NAME):
-
-    import simhash  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -117,6 +106,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['torch', 'transformers', 'simhash-pybind'])
 
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'

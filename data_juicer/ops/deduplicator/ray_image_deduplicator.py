@@ -1,31 +1,26 @@
+import lazy_loader as lazy
 import numpy as np
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
-from ..base_op import OPERATORS
+from ..base_op import AUTOINSTALL, OPERATORS
 from ..op_fusion import LOADED_IMAGES
 from .ray_basic_deduplicator import RayBasicDeduplicator
 
 OP_NAME = 'ray_image_deduplicator'
 
-with AvailabilityChecking(['imagededup'], OP_NAME):
-    import imagededup  # noqa: F401
+imagededup = lazy.load('imagededup')
 
-    HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
+HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
 
-    def get_hash_method(method_name):
-        from imagededup.methods import AHash, DHash, PHash, WHash
 
-        mapping = {
-            'phash': PHash,
-            'dhash': DHash,
-            'whash': WHash,
-            'ahash': AHash
-        }
+def get_hash_method(method_name):
+    from imagededup.methods import AHash, DHash, PHash, WHash
 
-        return mapping[method_name]
+    mapping = {'phash': PHash, 'dhash': DHash, 'whash': WHash, 'ahash': AHash}
+
+    return mapping[method_name]
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -53,6 +48,7 @@ class RayImageDeduplicator(RayBasicDeduplicator):
                          redis_port=redis_port,
                          *args,
                          **kwargs)
+        AUTOINSTALL.check(['imagededup'])
         if method not in HASH_METHOD:
             raise ValueError(f'Keep strategy [{method}] is not supported. '
                              f'Can only be one of {HASH_METHOD}.')

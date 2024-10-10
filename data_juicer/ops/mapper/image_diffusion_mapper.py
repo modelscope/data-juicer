@@ -6,27 +6,16 @@ from PIL import Image
 from pydantic import Field, PositiveInt
 from typing_extensions import Annotated
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
 from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_diffusion_mapper'
-
-check_list = ['diffusers', 'torch', 'transformers', 'simhash-pybind']
-with AvailabilityChecking(check_list, OP_NAME):
-    import diffusers  # noqa: F401
-    import simhash  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling stable diffusion in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -103,6 +92,8 @@ class ImageDiffusionMapper(Mapper):
             caption_key is None.
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(
+            ['diffusers', 'torch', 'transformers', 'simhash-pybind'])
         self._init_parameters = self.remove_extra_parameters(locals())
         self.strength = strength
         self.guidance_scale = guidance_scale
