@@ -1,8 +1,7 @@
 import sys
 
-import lazy_loader as lazy
-
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import AUTOINSTALL, OPERATORS, Filter
@@ -10,7 +9,7 @@ from ..common import get_words_from_document
 
 OP_NAME = 'token_num_filter'
 
-transformers = lazy.load('transformers')
+transformers = LazyLoader('transformers', 'transformers')
 
 
 @OPERATORS.register_module(OP_NAME)

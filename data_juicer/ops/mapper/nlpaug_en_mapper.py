@@ -1,17 +1,18 @@
 from copy import deepcopy
 
-import lazy_loader as lazy
 from loguru import logger
 from pydantic import PositiveInt
+
+from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'nlpaug_en_mapper'
 
-nlpaug = lazy.load('nlpaug')
-nac = lazy.load('nlpaug.augmenter.char')
-naw = lazy.load('nlpaug.augmenter.word')
-naf = lazy.load('nlpaug.flow')
+nlpaug = LazyLoader('nlpaug', 'nlpaug')
+nac = LazyLoader('nac', 'nlpaug.augmenter.char')
+naw = LazyLoader('naw', 'nlpaug.augmenter.word')
+naf = LazyLoader('naf', 'nlpaug.flow')
 
 
 @OPERATORS.register_module(OP_NAME)

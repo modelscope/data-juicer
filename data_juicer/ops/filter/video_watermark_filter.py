@@ -1,8 +1,8 @@
-import lazy_loader as lazy
 import numpy as np
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
@@ -13,7 +13,7 @@ from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
 OP_NAME = 'video_watermark_filter'
 
-torch = lazy.load('torch')
+torch = LazyLoader('torch', 'torch')
 
 
 @OPERATORS.register_module(OP_NAME)

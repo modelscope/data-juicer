@@ -1,7 +1,7 @@
-import lazy_loader as lazy
 import numpy as np
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -10,8 +10,8 @@ from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_watermark_filter'
 
-torch = lazy.load('torch')
-transformers = lazy.load('transformers')
+torch = LazyLoader('torch', 'torch')
+transformers = LazyLoader('transformers', 'transformers')
 
 
 @OPERATORS.register_module(OP_NAME)

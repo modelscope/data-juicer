@@ -2,9 +2,8 @@
 # https://huggingface.co/spaces/huggingface/text-data-filtering
 # --------------------------------------------------------
 
-import lazy_loader as lazy
-
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import AUTOINSTALL, OPERATORS, Filter
@@ -13,8 +12,8 @@ from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'perplexity_filter'
 
-kenlm = lazy.load('kenlm')
-sentencepiece = lazy.load('sentencepiece')
+kenlm = LazyLoader('kenlm', 'kenlm')
+sentencepiece = LazyLoader('sentencepiece', 'sentencepiece')
 
 
 @OPERATORS.register_module(OP_NAME)

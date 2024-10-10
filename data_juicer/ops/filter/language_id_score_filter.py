@@ -1,16 +1,16 @@
 from typing import List, Union
 
-import lazy_loader as lazy
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import AUTOINSTALL, OPERATORS, Filter
 
 OP_NAME = 'language_id_score_filter'
 
-fasttext = lazy.load('fasttext')
+fasttext = LazyLoader('fasttext', 'fasttext')
 
 
 @OPERATORS.register_module(OP_NAME)

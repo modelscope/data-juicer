@@ -1,10 +1,10 @@
 from collections import Counter
 
-import lazy_loader as lazy
 import numpy as np
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
@@ -15,8 +15,8 @@ from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_tagging_from_frames_mapper'
 
-ram = lazy.load('ram')
-torch = lazy.load('torch')
+ram = LazyLoader('ram', 'ram')
+torch = LazyLoader('torch', 'torch')
 
 
 @UNFORKABLE.register_module(OP_NAME)
