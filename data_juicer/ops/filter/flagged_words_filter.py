@@ -28,6 +28,8 @@ class FlaggedWordFilter(Filter):
     """Filter to keep samples with flagged-word ratio less than a specific max
     value."""
 
+    _batched_op = True
+
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,
@@ -76,53 +78,61 @@ class FlaggedWordFilter(Filter):
             self.model_key = prepare_model(model_type='sentencepiece',
                                            lang=lang)
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats(self, samples, context=False):
         # check if it's computed already
-        if StatsKeys.flagged_words_ratio in sample[Fields.stats]:
-            return sample
-
-        # try to get words from context
+        samples_list = samples[self.text_key]
+        samples_stats = samples[Fields.stats]
         words_key = f'{InterVars.words}-{self.model_key}'
-        if context and words_key in sample[Fields.context]:
-            words = sample[Fields.context][words_key]
+        tokenizer = get_model(self.model_key)
+        for idx, stat in enumerate(samples_stats):
+            if StatsKeys.flagged_words_ratio in stat:
+                continue
+            if context and words_key in samples[Fields.context][idx]:
+                words = samples[Fields.context][idx][words_key]
+            else:
+                words = get_words_from_document(
+                    samples_list[idx],
+                    token_func=tokenizer.encode_as_pieces
+                    if tokenizer else None)
+                if context:
+                    samples[Fields.context][idx][words_key] = words
+            # try to get refined words from context
+            refined_words_key = f'{InterVars.refined_words}' \
+                                '-True-SPECIAL_CHARS-' \
+                                f'{self.use_words_aug}-' \
+                                f'{self.words_aug_group_sizes}-' \
+                                f'{self.words_aug_join_char}'
+            if context and refined_words_key in samples[Fields.context][idx]:
+                words = samples[Fields.context][idx][refined_words_key]
+            else:
+                words = words_refinement(
+                    words,
+                    lower_case=True,
+                    strip_chars=SPECIAL_CHARACTERS,
+                    use_words_aug=self.use_words_aug,
+                    words_aug_group_sizes=self.words_aug_group_sizes,
+                    words_aug_join_char=self.words_aug_join_char)
+                if context:
+                    samples[Fields.context][idx][refined_words_key] = words
+
+            flagged_words_ratio = (len([
+                word for word in words if word in self.FLAGGED_WORDS[self.lang]
+            ]) / len(words)) if len(words) != 0 else 0.0
+
+            if flagged_words_ratio > 1.0:
+                flagged_words_ratio = 1.0
+
+            samples_stats[idx][
+                StatsKeys.flagged_words_ratio] = flagged_words_ratio
+
+        return samples
+
+    def process(self, samples):
+        if isinstance(samples[Fields.stats], list):
+            return list(
+                map(
+                    lambda stat: stat[StatsKeys.flagged_words_ratio] <= self.
+                    max_ratio, samples[Fields.stats]))
         else:
-            tokenizer = get_model(self.model_key)
-            words = get_words_from_document(
-                sample[self.text_key],
-                token_func=tokenizer.encode_as_pieces if tokenizer else None)
-            if context:
-                sample[Fields.context][words_key] = words
-
-        # try to get refined words from context
-        refined_words_key = f'{InterVars.refined_words}-True-SPECIAL_CHARS-' \
-                            f'{self.use_words_aug}-' \
-                            f'{self.words_aug_group_sizes}-' \
-                            f'{self.words_aug_join_char}'
-        if context and refined_words_key in sample[Fields.context]:
-            words = sample[Fields.context][refined_words_key]
-        else:
-            words = words_refinement(
-                words,
-                lower_case=True,
-                strip_chars=SPECIAL_CHARACTERS,
-                use_words_aug=self.use_words_aug,
-                words_aug_group_sizes=self.words_aug_group_sizes,
-                words_aug_join_char=self.words_aug_join_char)
-            if context:
-                sample[Fields.context][refined_words_key] = words
-
-        flagged_words_ratio = (len(
-            [word
-             for word in words if word in self.FLAGGED_WORDS[self.lang]]) /
-                               len(words)) if len(words) != 0 else 0.0
-
-        if flagged_words_ratio > 1.0:
-            flagged_words_ratio = 1.0
-
-        sample[Fields.stats][
-            StatsKeys.flagged_words_ratio] = flagged_words_ratio
-        return sample
-
-    def process(self, sample):
-        return sample[Fields.stats][
-            StatsKeys.flagged_words_ratio] <= self.max_ratio
+            return samples[Fields.stats][
+                StatsKeys.flagged_words_ratio] <= self.max_ratio
