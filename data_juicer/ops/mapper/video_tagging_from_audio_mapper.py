@@ -1,8 +1,8 @@
-import lazy_loader as lazy
 import librosa
 import numpy as np
 
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -10,7 +10,7 @@ from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'video_tagging_from_audio_mapper'
 
-torch = lazy.load('torch')
+torch = LazyLoader('torch', 'torch')
 
 
 @OPERATORS.register_module(OP_NAME)

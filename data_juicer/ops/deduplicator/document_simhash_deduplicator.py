@@ -5,20 +5,20 @@
 from collections import defaultdict, deque
 from typing import Dict, Optional, Set
 
-import lazy_loader as lazy
 import numpy as np
 import regex
 from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
 
 OP_NAME = 'document_simhash_deduplicator'
 
-simhash = lazy.load('simhash')
+simhash = LazyLoader('simhash', 'simhash')
 
 
 @OPERATORS.register_module(OP_NAME)

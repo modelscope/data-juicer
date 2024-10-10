@@ -2,19 +2,19 @@ import math
 import re
 from itertools import chain
 
-import lazy_loader as lazy
 from pydantic import NonNegativeFloat, NonNegativeInt
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'video_split_by_scene_mapper'
 
-scenedetect = lazy.load('scenedetect')
+scenedetect = LazyLoader('scenedetect', 'scenedetect')
 
 
 def replace_func(match, scene_counts_iter):

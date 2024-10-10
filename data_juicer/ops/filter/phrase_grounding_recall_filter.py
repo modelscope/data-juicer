@@ -1,11 +1,11 @@
 from typing import List
 
-import lazy_loader as lazy
 import numpy as np
 from loguru import logger
 from PIL import ImageOps
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (SpecialTokens, iou,
                                         load_data_with_context, load_image,
                                         remove_special_tokens)
@@ -16,9 +16,9 @@ from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'phrase_grounding_recall_filter'
 
-torch = lazy.load('torch')
-transformers = lazy.load('transformers')
-nltk = lazy.load('nltk')
+torch = LazyLoader('torch', 'torch')
+transformers = LazyLoader('transformers', 'transformers')
+nltk = LazyLoader('nltk', 'nltk')
 
 
 # NER algorithm adapted from GLIP starts

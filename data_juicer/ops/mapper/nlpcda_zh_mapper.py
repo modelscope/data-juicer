@@ -1,16 +1,16 @@
 from copy import deepcopy
 
-import lazy_loader as lazy
 from loguru import logger
 from pydantic import PositiveInt
 
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 
 OP_NAME = 'nlpcda_zh_mapper'
 
-nlpcda = lazy.load('nlpcda')
+nlpcda = LazyLoader('nlpcda', 'nlpcda')
 
 
 @OPERATORS.register_module(OP_NAME)

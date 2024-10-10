@@ -1,9 +1,8 @@
 from typing import Dict, List, Optional
 
-import lazy_loader as lazy
-
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import AUTOINSTALL, OPERATORS, Mapper
@@ -11,7 +10,7 @@ from ..base_op import AUTOINSTALL, OPERATORS, Mapper
 OP_NAME = 'video_ffmpeg_wrapped_mapper'
 
 with HiddenPrints():
-    ffmpeg = lazy.load('ffmpeg')
+    ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
 
 
 @OPERATORS.register_module(OP_NAME)

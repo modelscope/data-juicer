@@ -4,11 +4,11 @@
 
 from typing import List
 
-import lazy_loader as lazy
 from pydantic import PositiveInt
 
 from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import AUTOINSTALL, OPERATORS, Filter
@@ -18,7 +18,7 @@ from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'stopwords_filter'
 
-sentencepiece = lazy.load('sentencepiece')
+sentencepiece = LazyLoader('sentencepiece', 'sentencepiece')
 
 
 @OPERATORS.register_module(OP_NAME)

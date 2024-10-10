@@ -1,7 +1,7 @@
-import lazy_loader as lazy
 import numpy as np
 from pydantic import PositiveInt
 
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ..base_op import AUTOINSTALL, OPERATORS
@@ -10,7 +10,7 @@ from .ray_basic_deduplicator import RayBasicDeduplicator
 
 OP_NAME = 'ray_image_deduplicator'
 
-imagededup = lazy.load('imagededup')
+imagededup = LazyLoader('imagededup', 'imagededup')
 
 HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
 

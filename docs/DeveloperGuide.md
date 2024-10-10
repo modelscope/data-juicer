@@ -380,11 +380,11 @@ else:
 ```python
 # ... (import some library)
 from ..base_op import AUTOINSTALL
-import lazy_loader as lazy
+from data_juicer.utils.lazy_loader import LazyLoader
 
 # lazy import
-kenlm = lazy.load('kenlm')
-sentencepiece = lazy.load('sentencepiece')
+kenlm = LazyLoader('kenlm', 'kenlm')
+sp = LazyLoader('sp', 'sentencepiece')
 
 class PerplexityFilter(Filter):
     def __init__(self,

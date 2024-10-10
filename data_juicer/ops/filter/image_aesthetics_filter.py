@@ -1,8 +1,8 @@
-import lazy_loader as lazy
 import numpy as np
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ...utils.model_utils import get_model, prepare_model
@@ -12,7 +12,7 @@ from ..op_fusion import LOADED_IMAGES
 OP_NAME = 'image_aesthetics_filter'
 CHECK_PKGs = ['torch', 'transformers', 'simple-aesthetics-predictor']
 
-torch = lazy.load('torch')
+torch = LazyLoader('torch', 'torch')
 
 
 @OPERATORS.register_module(OP_NAME)

@@ -2,12 +2,12 @@ import os
 from typing import List, Optional
 
 import av
-import lazy_loader as lazy
 import numpy as np
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import (close_video,
                                         extract_video_frames_uniformly,
@@ -21,7 +21,7 @@ from ..op_fusion import LOADED_VIDEOS
 OP_NAME = 'video_remove_watermark_mapper'
 
 with HiddenPrints():
-    cv2 = lazy.load('cv2')
+    cv2 = LazyLoader('cv2', 'cv2')
 
 
 @OPERATORS.register_module(OP_NAME)
