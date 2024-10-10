@@ -15,9 +15,12 @@ with AvailabilityChecking(['ray'], requires_type='dist'):
     from ray.data import Dataset
 
 
-def is_valid_path(item, dataset_dir):
-    full_path = os.path.abspath(os.path.join(dataset_dir, item))
-    return os.path.exists(full_path)
+def get_abs_path(path, dataset_dir):
+    full_path = os.path.abspath(os.path.join(dataset_dir, path))
+    if os.path.exists(full_path):
+        return full_path
+    else:
+        return path
 
 
 def convert_to_absolute_paths(samples, dataset_dir, path_keys):
@@ -26,16 +29,10 @@ def convert_to_absolute_paths(samples, dataset_dir, path_keys):
         for idx in range(len(samples[key])):
             paths = samples[key][idx]
             if isinstance(paths, str):
-                samples[key][idx] = os.path.abspath(
-                    os.path.join(dataset_dir, paths)) if is_valid_path(
-                        paths, dataset_dir) else paths
-                logger.error(samples[key][idx])
+                samples[key][idx] = get_abs_path(paths, dataset_dir)
             elif isinstance(paths, list):
                 samples[key][idx] = [
-                    os.path.abspath(os.path.join(dataset_dir, item))
-                    if isinstance(item, str)
-                    and is_valid_path(item, dataset_dir) else item
-                    for item in paths
+                    get_abs_path(item, dataset_dir) for item in paths
                 ]
     return pa.Table.from_pydict(samples)
 
@@ -66,7 +63,6 @@ def preprocess_dataset(dataset: Dataset, dataset_path, cfg) -> Dataset:
     if dataset_path:
         dataset = set_dataset_to_absolute_path(dataset, dataset_path, cfg)
     if Fields.stats not in columns:
-        logger.info(f'columns {columns}')
 
         def process_batch_arrow(table: pa.Table) -> pa.Table:
             new_column_data = [{} for _ in range(len(table))]
