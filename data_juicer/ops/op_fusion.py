@@ -152,6 +152,8 @@ def fuse_filter_group(original_filter_group, fusion_strategy='greedy'):
 class FusedFilter(Filter):
     """A fused operator for filters."""
 
+    _batched_op = True
+
     def __init__(self, name: str, fused_filters: List):
         """
         Initialization method.
@@ -171,30 +173,28 @@ class FusedFilter(Filter):
         # update num_proc with the min num_proc of all fusible filters
         self.num_proc = min([op.runtime_np() for op in self.fused_filters])
 
-    def compute_stats(self, sample, rank=None):
+    def compute_stats(self, samples, rank=None):
         import av
 
         # context for the intermediate vars
-        sample[Fields.context] = {}
+        samples[Fields.context] = {}
         for op in self.fused_filters:
             # open the context for these fused ops
-            if op.accelerator == 'cuda':
-                sample = op.compute_stats(sample, rank=rank, context=True)
-            else:
-                sample = op.compute_stats(sample, context=True)
+            rank = rank if op.accelerator == 'cuda' else None
+            samples = op.compute_stats(samples, rank=rank, context=True)
         # clean up the contexts after processing
         # check if there are containers that need to be closed
-        for context_key in sample[Fields.context]:
-            if isinstance(sample[Fields.context][context_key],
+        for context_key in samples[Fields.context]:
+            if isinstance(samples[Fields.context][context_key],
                           av.container.InputContainer):
-                sample[Fields.context][context_key].streams.video[0].close()
-                sample[Fields.context][context_key].close()
-        _ = sample.pop(Fields.context)
-        return sample
+                samples[Fields.context][context_key].streams.video[0].close()
+                samples[Fields.context][context_key].close()
+        _ = samples.pop(Fields.context)
+        return samples
 
-    def process(self, sample):
+    def process(self, samples):
         # Only return True when all filters return True
         for op in self.fused_filters:
-            if not op.process(sample):
+            if not op.process(samples):
                 return False
         return True

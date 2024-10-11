@@ -68,8 +68,8 @@ class WordRepetitionFilter(Filter):
             if StatsKeys.word_rep_ratio in stat:
                 continue
             # try to get words from context
-            if context and words_key in samples[Fields.context][idx]:
-                words = samples[Fields.context][idx][words_key]
+            if context and words_key in samples[Fields.context]:
+                words = samples[Fields.context][words_key]
             else:
                 tokenizer = get_model(self.model_key)
                 words = get_words_from_document(
@@ -77,19 +77,19 @@ class WordRepetitionFilter(Filter):
                     token_func=tokenizer.encode_as_pieces
                     if tokenizer else None)
                 if context:
-                    samples[Fields.context][idx][words_key] = words
+                    samples[Fields.context][words_key] = words
 
             # try to get refined words from context
             refined_words_key = f'{InterVars.refined_words}-' \
                                 f'True-SPECIAL_CHARS-False-[2]-'
-            if context and refined_words_key in samples[Fields.context][idx]:
-                words = samples[Fields.context][idx][refined_words_key]
+            if context and refined_words_key in samples[Fields.context]:
+                words = samples[Fields.context][refined_words_key]
             else:
                 words = words_refinement(words,
                                          lower_case=True,
                                          strip_chars=SPECIAL_CHARACTERS)
                 if context:
-                    samples[Fields.context][idx][refined_words_key] = words
+                    samples[Fields.context][refined_words_key] = words
             word_ngrams = [
                 ' '.join(words[i:i + self.n])
                 for i in range(len(words) - self.n + 1)
