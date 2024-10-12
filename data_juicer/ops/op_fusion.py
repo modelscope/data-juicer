@@ -1,5 +1,6 @@
 from typing import List
 
+import numpy as np
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, InterVars
@@ -199,7 +200,6 @@ class FusedFilter(Filter):
 
     def process(self, samples):
         # Only return True when all filters return True
-        for op in self.fused_filters:
-            if not op.process(samples):
-                return False
-        return True
+        return np.logical_and(
+            *[np.array(op.process(samples))
+              for op in self.fused_filters]).tolist()
