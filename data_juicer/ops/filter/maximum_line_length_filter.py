@@ -40,9 +40,9 @@ class MaximumLineLengthFilter(Filter):
     def compute_stats(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
-        context_key = f'{InterVars.lines}'
 
         for idx, stat in enumerate(samples_stats):
+            context_key = f'{InterVars.lines}-{idx}'
             # check if it's computed already
             if StatsKeys.max_line_length in stat:
                 continue

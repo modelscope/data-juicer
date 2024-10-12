@@ -183,8 +183,10 @@ class FusedFilter(Filter):
         samples[Fields.context] = {}
         for op in self.fused_filters:
             # open the context for these fused ops
-            rank = rank if op.accelerator == 'cuda' else None
-            samples = op.compute_stats(samples, rank=rank, context=True)
+            if op.accelerator == 'cuda':
+                samples = op.compute_stats(samples, rank=rank, context=True)
+            else:
+                samples = op.compute_stats(samples, context=True)
         # clean up the contexts after processing
         # check if there are containers that need to be closed
         for context_key in samples[Fields.context]:

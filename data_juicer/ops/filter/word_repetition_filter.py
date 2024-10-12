@@ -61,9 +61,9 @@ class WordRepetitionFilter(Filter):
     def compute_stats(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
-        words_key = f'{InterVars.words}-{self.model_key}'
 
         for idx, stat in enumerate(samples_stats):
+            words_key = f'{InterVars.words}-{self.model_key}-{idx}'
             # check if it's computed already
             if StatsKeys.word_rep_ratio in stat:
                 continue
