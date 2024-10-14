@@ -51,39 +51,28 @@ class WordsNumFilter(Filter):
             self.model_key = prepare_model(model_type='sentencepiece',
                                            lang=lang)
 
-    def compute_stats(self, samples, context=False):
-        samples_list = samples[self.text_key]
-        samples_stats = samples[Fields.stats]
+    def compute_stats(self, sample, context=False):
+        # check if it's computed already
+        if StatsKeys.num_words in sample[Fields.stats]:
+            return sample
+
         words_key = f'{InterVars.words}-{self.model_key}'
-
-        for idx, stat in enumerate(samples_stats):
-            # check if it's computed already
-            if StatsKeys.num_words in stat:
-                continue
-            if context and words_key in samples[Fields.context][idx]:
-                words = samples[Fields.context][idx][words_key]
-            else:
-                tokenizer = get_model(self.model_key)
-                words = get_words_from_document(
-                    samples_list[idx],
-                    token_func=tokenizer.encode_as_pieces
-                    if tokenizer else None)
-                if context:
-                    samples[Fields.context][idx][words_key] = words
-            words = words_refinement(words, strip_chars=SPECIAL_CHARACTERS)
-            samples_stats[idx][StatsKeys.num_words] = len(words)
-
-        return samples
-
-    def process(self, samples):
-        if isinstance(samples[Fields.stats], list):
-            return map(
-                lambda stat: self.min_num <= stat[StatsKeys.num_words] <= self.
-                max_num, samples[Fields.stats])
+        if context and words_key in sample[Fields.context]:
+            words = sample[Fields.context][words_key]
         else:
-            # single sample for ray filter
-            if self.min_num <= samples[Fields.stats][
-                    StatsKeys.num_words] <= self.max_num:
-                return True
-            else:
-                return False
+            tokenizer = get_model(self.model_key)
+            words = get_words_from_document(
+                sample[self.text_key],
+                token_func=tokenizer.encode_as_pieces if tokenizer else None)
+            if context:
+                sample[Fields.context][words_key] = words
+        words = words_refinement(words, strip_chars=SPECIAL_CHARACTERS)
+        sample[Fields.stats][StatsKeys.num_words] = len(words)
+        return sample
+
+    def process(self, sample):
+        if self.min_num <= sample[Fields.stats][
+                StatsKeys.num_words] <= self.max_num:
+            return True
+        else:
+            return False
