@@ -284,15 +284,19 @@ class Filter(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.compute_stats = catch_map_batches_exception(
-                self.compute_stats)
+            self.compute_stats_branch = catch_map_batches_exception(
+                self.compute_stats_batched)
+            self.process_branch = catch_map_batches_exception(
+                self.process_batched)
         else:
-            self.compute_stats = catch_map_single_exception(self.compute_stats)
+            self.compute_stats_branch = catch_map_single_exception(
+                self.compute_stats)
+            self.process_branch = catch_map_single_exception(self.process)
 
     def compute_stats_batched(self, samples, **kwargs):
         keys = samples.keys()
         samples_stats = samples[Fields.stats]
-        for i, stat in enumerate(samples_stats):
+        for i, _ in enumerate(samples_stats):
             this_sample = {key: samples[key][i] for key in keys}
             res_sample = self.compute_stats(this_sample, **kwargs)
             samples[Fields.stats][i] = res_sample[Fields.stats]
@@ -336,14 +340,14 @@ class Filter(OP):
                                   num_proc=self.runtime_np(),
                                   batch_size=self.batch_size,
                                   desc='Adding new column for stats')
-        dataset = dataset.map(self.compute_stats_batched,
+        dataset = dataset.map(self.compute_stats_branch,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
                               batch_size=self.batch_size,
                               desc=self._name + '_compute_stats')
         if exporter and self.stats_export_path is not None:
             exporter.export_compute_stats(dataset, self.stats_export_path)
-        new_dataset = dataset.filter(self.process_batched,
+        new_dataset = dataset.filter(self.process_branch,
                                      num_proc=self.runtime_np(),
                                      batch_size=self.batch_size,
                                      desc=self._name + '_process')
