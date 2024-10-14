@@ -81,7 +81,7 @@ class WordRepetitionFilter(Filter):
 
             # try to get refined words from context
             refined_words_key = f'{InterVars.refined_words}-' \
-                                f'True-SPECIAL_CHARS-False-[2]-'
+                                f'True-SPECIAL_CHARS-False-[2]-{idx}'
             if context and refined_words_key in samples[Fields.context]:
                 words = samples[Fields.context][refined_words_key]
             else:

@@ -200,6 +200,11 @@ class FusedFilter(Filter):
 
     def process(self, samples):
         # Only return True when all filters return True
-        return np.logical_and(
-            *[np.array(op.process(samples))
-              for op in self.fused_filters]).tolist()
+        res = None
+        for op in self.fused_filters:
+            this_res = np.array(list(op.process(samples)))
+            if res is not None:
+                res = np.logical_and(res, this_res)
+            else:
+                res = this_res
+        return res
