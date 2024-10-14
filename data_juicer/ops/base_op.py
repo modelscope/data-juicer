@@ -300,6 +300,8 @@ class Filter(OP):
             this_sample = {key: samples[key][i] for key in keys}
             res_sample = self.compute_stats(this_sample, **kwargs)
             samples[Fields.stats][i] = res_sample[Fields.stats]
+            if 'context' in kwargs and kwargs['context']:
+                samples[Fields.context][i] = res_sample[Fields.context]
 
         return samples
 
