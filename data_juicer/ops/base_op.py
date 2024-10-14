@@ -236,9 +236,21 @@ class Mapper(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.process = catch_map_batches_exception(self.process)
+            self.process_branch = catch_map_batches_exception(
+                self.process_batched)
         else:
-            self.process = catch_map_single_exception(self.process)
+            self.process_branch = catch_map_single_exception(self.process)
+
+    def process_batched(self, samples):
+        keys = samples.keys()
+        first_key = list(keys)[0]
+        for i in range(len(samples[first_key])):
+            this_sample = {key: samples[key][i] for key in keys}
+            res_sample = self.process(this_sample)
+            for key in keys:
+                samples[key][i] = res_sample[key]
+
+        return samples
 
     def process(self, sample):
         """
@@ -252,7 +264,7 @@ class Mapper(OP):
     def run(self, dataset, *, exporter=None, tracer=None):
         dataset = super(Mapper, self).run(dataset)
         new_dataset = dataset.map(
-            self.process,
+            self.process_branch,
             num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
             batch_size=self.batch_size,
@@ -296,7 +308,7 @@ class Filter(OP):
     def compute_stats_batched(self, samples, **kwargs):
         keys = samples.keys()
         samples_stats = samples[Fields.stats]
-        for i, _ in enumerate(samples_stats):
+        for i in range(len(samples_stats)):
             this_sample = {key: samples[key][i] for key in keys}
             res_sample = self.compute_stats(this_sample, **kwargs)
             samples[Fields.stats][i] = res_sample[Fields.stats]
