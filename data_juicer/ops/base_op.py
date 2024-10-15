@@ -241,12 +241,12 @@ class Mapper(OP):
         else:
             self.process_branch = catch_map_single_exception(self.process)
 
-    def process_batched(self, samples):
+    def process_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
         first_key = list(keys)[0]
         for i in range(len(samples[first_key])):
             this_sample = {key: samples[key][i] for key in keys}
-            res_sample = self.process(this_sample)
+            res_sample = self.process(this_sample, *args, **kwargs)
             for key in keys:
                 samples[key][i] = res_sample[key]
 
@@ -305,12 +305,12 @@ class Filter(OP):
                 self.compute_stats)
             self.process_branch = catch_map_single_exception(self.process)
 
-    def compute_stats_batched(self, samples, **kwargs):
+    def compute_stats_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
         samples_stats = samples[Fields.stats]
         for i in range(len(samples_stats)):
             this_sample = {key: samples[key][i] for key in keys}
-            res_sample = self.compute_stats(this_sample, **kwargs)
+            res_sample = self.compute_stats(this_sample, *args, **kwargs)
             samples[Fields.stats][i] = res_sample[Fields.stats]
             if 'context' in kwargs and kwargs['context']:
                 samples[Fields.context][i] = res_sample[Fields.context]
