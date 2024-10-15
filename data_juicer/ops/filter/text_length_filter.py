@@ -33,17 +33,27 @@ class TextLengthFilter(Filter):
         self.min_len = min_len
         self.max_len = max_len
 
-    def compute_stats(self, sample):
-        # check if it's computed already
-        if StatsKeys.text_len in sample[Fields.stats]:
-            return sample
+    def compute_stats_batched(self, samples):
+        samples_list = samples[self.text_key]
+        samples_stats = samples[Fields.stats]
+        for i, stat in enumerate(samples_stats):
+            # check if it's computed already
+            if StatsKeys.text_len in stat:
+                continue
+            else:
+                samples_stats[i][StatsKeys.text_len] = len(samples_list[i])
 
-        sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
-        return sample
+        return samples
 
-    def process(self, sample):
-        if self.min_len <= sample[Fields.stats][
-                StatsKeys.text_len] <= self.max_len:
-            return True
+    def process_batched(self, samples):
+        if isinstance(samples[Fields.stats], list):
+            return map(
+                lambda stat: self.min_len <= stat[StatsKeys.text_len] <= self.
+                max_len, samples[Fields.stats])
         else:
-            return False
+            # single sample for ray filter
+            if self.min_len <= samples[Fields.stats][
+                    StatsKeys.text_len] <= self.max_len:
+                return True
+            else:
+                return False
