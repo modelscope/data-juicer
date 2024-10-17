@@ -112,7 +112,7 @@ class VideoAestheticsFilter(Filter):
             ('' if frame_sampling_method == 'all_keyframes'
              else f'-{frame_num}')
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_frames_aesthetics_score in sample[Fields.stats]:
             return sample
@@ -187,7 +187,7 @@ class VideoAestheticsFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         aesthetics_scores = (
             sample)[Fields.stats][StatsKeys.video_frames_aesthetics_score]
         if len(aesthetics_scores) <= 0:

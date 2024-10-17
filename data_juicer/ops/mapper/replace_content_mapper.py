@@ -44,7 +44,7 @@ class ReplaceContentMapper(Mapper):
             pattern = pattern[2:-1]
         return re.compile(pattern, flags=re.DOTALL)
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if self.pattern is None:
             return samples
 

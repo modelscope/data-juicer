@@ -96,7 +96,7 @@ class VideoWatermarkFilter(Filter):
             ('' if frame_sampling_method == 'all_keyframes'
              else f'-{frame_num}')
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_watermark_prob in sample[Fields.stats]:
             return sample
@@ -164,7 +164,7 @@ class VideoWatermarkFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         itm_probs = sample[Fields.stats][StatsKeys.video_watermark_prob]
         if len(itm_probs) <= 0:
             return True

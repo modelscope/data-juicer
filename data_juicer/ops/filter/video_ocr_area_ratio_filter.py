@@ -101,7 +101,7 @@ class VideoOcrAreaRatioFilter(Filter):
             self.reader.device = device
         return self.reader
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_ocr_area_ratio in sample[Fields.stats]:
             return sample
@@ -182,7 +182,7 @@ class VideoOcrAreaRatioFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         video_ocr_area_ratios = sample[Fields.stats][
             StatsKeys.video_ocr_area_ratio]
         keep_bools = np.array([

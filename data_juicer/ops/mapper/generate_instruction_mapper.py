@@ -246,7 +246,7 @@ class GenerateInstructionMapper(Mapper):
                 max_score = rouge_l_score
         return max_score
 
-    def process(self, sample=None, rank=None):
+    def process_single(self, sample=None, rank=None):
         model, processor = get_model(self.model_key, rank=rank)
 
         random_qa_samples = random.sample(self.seed_qa_samples,

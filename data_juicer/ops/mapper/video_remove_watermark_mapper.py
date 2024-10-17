@@ -202,7 +202,7 @@ class VideoRemoveWatermarkMapper(Mapper):
         new_np_frame = cv2.inpaint(np_frame, watermark_mask, 3, cv2.INPAINT_NS)
         return av.VideoFrame.from_ndarray(new_np_frame, format='bgr24')
 
-    def process(self, sample, context=False):
+    def process_single(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

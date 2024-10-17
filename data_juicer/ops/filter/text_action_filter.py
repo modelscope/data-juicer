@@ -40,7 +40,7 @@ class TextActionFilter(Filter):
         self.action_tags = ['VV', 'VB', 'VBP', 'VBZ', 'VBD', 'VBG', 'VBN']
         self.min_action_num = min_action_num
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.num_action in sample[Fields.stats]:
             return sample
@@ -59,7 +59,7 @@ class TextActionFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         num_action = sample[Fields.stats][StatsKeys.num_action]
         if self.min_action_num <= num_action:
             return True

@@ -50,7 +50,7 @@ class VideoFFmpegWrappedMapper(Mapper):
         self.capture_stderr = capture_stderr
         self.overwrite_output = overwrite_output
 
-    def process(self, sample):
+    def process_single(self, sample):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

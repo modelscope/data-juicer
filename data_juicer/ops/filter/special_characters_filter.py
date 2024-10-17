@@ -36,7 +36,7 @@ class SpecialCharactersFilter(Filter):
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
 
-    def compute_stats(self, samples):
+    def compute_stats_batched(self, samples):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
 
@@ -52,7 +52,7 @@ class SpecialCharactersFilter(Filter):
 
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
             return map(
                 lambda stat: self.min_ratio <= stat[

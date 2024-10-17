@@ -50,7 +50,7 @@ class AudioFFmpegWrappedMapper(Mapper):
         self.capture_stderr = capture_stderr
         self.overwrite_output = overwrite_output
 
-    def process(self, sample):
+    def process_single(self, sample):
         # there is no audio in this sample
         if self.audio_key not in sample or not sample[self.audio_key]:
             sample[Fields.source_file] = []

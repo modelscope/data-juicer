@@ -268,7 +268,7 @@ class ImageCaptioningMapper(Mapper):
                 generated_text_candidates_single_chunk[max_index])
         return new_generated_text_per_chunk
 
-    def process(self, samples, rank=None):
+    def process_batched(self, samples, rank=None):
         """
         Note:
             This is a batched_OP, whose input and output type are

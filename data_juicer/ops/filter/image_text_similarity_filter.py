@@ -74,7 +74,7 @@ class ImageTextSimilarityFilter(Filter):
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_text_similarity in sample[Fields.stats]:
             return sample
@@ -136,7 +136,7 @@ class ImageTextSimilarityFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         similarity = sample[Fields.stats][StatsKeys.image_text_similarity]
         if len(similarity) <= 0:
             return True

@@ -57,7 +57,7 @@ class ExpandMacroMapper(Mapper):
                 macros[macro_name] = macro_val
         return macros
 
-    def process(self, samples):
+    def process_batched(self, samples):
         for idx, text in enumerate(samples[self.text_key]):
             non_arg_macros = self._build_non_arg_macros_dict(text)
 

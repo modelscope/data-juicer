@@ -47,7 +47,7 @@ class TokenNumFilter(Filter):
             pretrained_model_name_or_path=hf_tokenizer,
             return_model=False)
 
-    def compute_stats(self, sample):
+    def compute_stats_single(self, sample):
         # check if it's computed already
         if StatsKeys.num_token in sample[Fields.stats]:
             return sample
@@ -59,7 +59,7 @@ class TokenNumFilter(Filter):
         sample[Fields.stats][StatsKeys.num_token] = len(tokens)
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         if self.min_num <= sample[Fields.stats][
                 StatsKeys.num_token] <= self.max_num:
             return True

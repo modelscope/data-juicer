@@ -236,23 +236,23 @@ class Mapper(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.process_branch = catch_map_batches_exception(
-                self.process_batched)
+            self.process = catch_map_batches_exception(self.process_batched)
         else:
-            self.process_branch = catch_map_single_exception(self.process)
+            self.process = catch_map_single_exception(self.process_single)
 
     def process_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
-        first_key = list(keys)[0]
-        for i in range(len(samples[first_key])):
+        first_key = next(iter(keys))
+        num_samples = len(samples[first_key])
+        for i in range(num_samples):
             this_sample = {key: samples[key][i] for key in keys}
-            res_sample = self.process(this_sample, *args, **kwargs)
+            res_sample = self.process_single(this_sample, *args, **kwargs)
             for key in keys:
                 samples[key][i] = res_sample[key]
 
         return samples
 
-    def process(self, sample):
+    def process_single(self, sample):
         """
         For sample level, sample --> sample
 
@@ -264,7 +264,7 @@ class Mapper(OP):
     def run(self, dataset, *, exporter=None, tracer=None):
         dataset = super(Mapper, self).run(dataset)
         new_dataset = dataset.map(
-            self.process_branch,
+            self.process,
             num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
             batch_size=self.batch_size,
@@ -296,21 +296,21 @@ class Filter(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.compute_stats_branch = catch_map_batches_exception(
+            self.compute_stats = catch_map_batches_exception(
                 self.compute_stats_batched)
-            self.process_branch = catch_map_batches_exception(
-                self.process_batched)
+            self.process = catch_map_batches_exception(self.process_batched)
         else:
-            self.compute_stats_branch = catch_map_single_exception(
-                self.compute_stats)
-            self.process_branch = catch_map_single_exception(self.process)
+            self.compute_stats = catch_map_single_exception(
+                self.compute_stats_single)
+            self.process = catch_map_single_exception(self.process_single)
 
     def compute_stats_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
-        samples_stats = samples[Fields.stats]
-        for i in range(len(samples_stats)):
+        num_samples = len(samples[Fields.stats])
+        for i in range(num_samples):
             this_sample = {key: samples[key][i] for key in keys}
-            res_sample = self.compute_stats(this_sample, *args, **kwargs)
+            res_sample = self.compute_stats_single(this_sample, *args,
+                                                   **kwargs)
             samples[Fields.stats][i] = res_sample[Fields.stats]
             if 'context' in kwargs and kwargs['context']:
                 samples[Fields.context][i] = res_sample[Fields.context]
@@ -318,10 +318,10 @@ class Filter(OP):
         return samples
 
     def process_batched(self, samples):
-        return map(lambda stat: self.process({Fields.stats: stat}),
+        return map(lambda stat: self.process_single({Fields.stats: stat}),
                    samples[Fields.stats])
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         """
         Compute stats for the sample which is used as a metric to decide
         whether to filter this sample.
@@ -333,7 +333,7 @@ class Filter(OP):
         """
         raise NotImplementedError
 
-    def process(self, sample):
+    def process_single(self, sample):
         """
         For sample level, sample --> Boolean.
 
@@ -354,14 +354,14 @@ class Filter(OP):
                                   num_proc=self.runtime_np(),
                                   batch_size=self.batch_size,
                                   desc='Adding new column for stats')
-        dataset = dataset.map(self.compute_stats_branch,
+        dataset = dataset.map(self.compute_stats,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
                               batch_size=self.batch_size,
                               desc=self._name + '_compute_stats')
         if exporter and self.stats_export_path is not None:
             exporter.export_compute_stats(dataset, self.stats_export_path)
-        new_dataset = dataset.filter(self.process_branch,
+        new_dataset = dataset.filter(self.process,
                                      num_proc=self.runtime_np(),
                                      batch_size=self.batch_size,
                                      desc=self._name + '_process')
