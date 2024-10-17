@@ -1,12 +1,22 @@
-import importlib
 import os
-import platform
 import subprocess
 import sys
 
 from loguru import logger
 
-CHECK_SYSTEM_INFO_ONCE = True
+from data_juicer.utils.auto_install_mapping import MODULE_TO_PKGS
+from data_juicer.utils.availability_utils import _torch_check_and_set
+
+
+def _is_module_installed(module_name):
+    if module_name in MODULE_TO_PKGS:
+        pkgs = MODULE_TO_PKGS[module_name]
+    else:
+        pkgs = [module_name]
+    for pkg in pkgs:
+        if not _is_package_installed(pkg):
+            return False
+    return True
 
 
 def _is_package_installed(package_name):
@@ -16,32 +26,11 @@ def _is_package_installed(package_name):
         package_name = package_name.split('[')[0]
     try:
         subprocess.check_output(
-            [sys.executable, '-m', 'pip', 'show', package_name],
+            [sys.executable, '-m', 'pip', 'show', '-q', package_name],
             stderr=subprocess.STDOUT)
         return True
     except subprocess.CalledProcessError:
         return False
-
-
-def _torch_check_and_set():
-    # only for python3.8 on mac
-    global CHECK_SYSTEM_INFO_ONCE
-    if CHECK_SYSTEM_INFO_ONCE and importlib.util.find_spec(
-            'torch') is not None:
-        major, minor = sys.version_info[:2]
-        system = platform.system()
-        if major == 3 and minor == 8 and system == 'Darwin':
-            logger.warning(
-                'The torch.set_num_threads function does not '
-                'work in python3.8 version on Mac systems. We will set '
-                'OMP_NUM_THREADS to 1 manually before importing torch')
-
-            os.environ['OMP_NUM_THREADS'] = str(1)
-            CHECK_SYSTEM_INFO_ONCE = False
-        import torch
-
-        # avoid hanging when calling clip in multiprocessing
-        torch.set_num_threads(1)
 
 
 class AutoInstaller(object):
@@ -68,17 +57,38 @@ class AutoInstaller(object):
                 '=', ' ').split(' ')[0]
             self.version_map[clean_req] = req
 
-    def check(self, check_pkgs):
+    def check(self, check_pkgs, param=None):
         """
-        install if the package is not importable.
+        install if the package is not installed.
         """
         for pkg in check_pkgs:
             if not _is_package_installed(pkg):
-                logger.info(f'Installing {pkg} ...')
+                logger.warning(f'Installing {pkg} ...')
                 if pkg in self.version_map:
                     pkg = self.version_map[pkg]
-                pip_cmd = [sys.executable, '-m', 'pip', 'install', pkg]
+                # not install the dependency of this pkg
+                if param is None:
+                    pip_cmd = [sys.executable, '-m', 'pip', 'install', pkg]
+                else:
+                    pip_cmd = [
+                        sys.executable, '-m', 'pip', 'install', param, pkg
+                    ]
                 subprocess.check_call(pip_cmd)
                 logger.info(f'The {pkg} installed.')
             if pkg == 'torch':
                 _torch_check_and_set()
+
+    def install(self, module):
+        """
+        install package for given module.
+        """
+        if module in MODULE_TO_PKGS:
+            pkgs = MODULE_TO_PKGS[module]
+        else:
+            pkgs = [module]
+        for pkg in pkgs:
+            if pkg in self.version_map:
+                pkg = self.version_map[pkg]
+            pip_cmd = [sys.executable, '-m', 'pip', 'install', pkg]
+            subprocess.check_call(pip_cmd)
+            logger.info(f'The {pkg} installed.')

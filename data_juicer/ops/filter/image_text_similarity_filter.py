@@ -2,18 +2,14 @@ import numpy as np
 from PIL import ImageOps
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_text_similarity_filter'
-
-torch = LazyLoader('torch', 'torch')
-transformers = LazyLoader('transformers', 'transformers')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -57,7 +53,6 @@ class ImageTextSimilarityFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['torch', 'transformers'])
         self.min_score = min_score
         self.max_score = max_score
         if reduce_mode not in ['avg', 'max', 'min']:

@@ -2,24 +2,18 @@ from collections import Counter
 
 import numpy as np
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_IMAGES
 
+torch = LazyLoader('torch', 'torch')
+ram = LazyLoader('ram', 'ram')
+
 OP_NAME = 'image_tagging_mapper'
-
-with AvailabilityChecking(
-    ['torch', 'git+https://github.com/xinyu1205/recognize-anything.git'],
-        OP_NAME):
-    import ram  # noqa: F401
-    import torch
-
-    # avoid hanging when calling recognizeAnything in multiprocessing
-    torch.set_num_threads(1)
 
 
 @UNFORKABLE.register_module(OP_NAME)
@@ -47,8 +41,7 @@ class ImageTaggingMapper(Mapper):
             model_type='recognizeAnything',
             pretrained_model_name_or_path='ram_plus_swin_large_14m.pth',
             input_size=384)
-        from ram import get_transform
-        self.transform = get_transform(image_size=384)
+        self.transform = ram.get_transform(image_size=384)
         self.tag_field_name = tag_field_name
 
     def process(self, sample, rank=None, context=False):

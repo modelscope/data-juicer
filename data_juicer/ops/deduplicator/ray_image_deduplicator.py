@@ -4,21 +4,25 @@ from pydantic import PositiveInt
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
-from ..base_op import AUTOINSTALL, OPERATORS
+from ..base_op import OPERATORS
 from ..op_fusion import LOADED_IMAGES
 from .ray_basic_deduplicator import RayBasicDeduplicator
 
-OP_NAME = 'ray_image_deduplicator'
+imgdedup_methods = LazyLoader('imgdedup_methods', 'imagededup.methods')
 
-imagededup = LazyLoader('imagededup', 'imagededup')
+OP_NAME = 'ray_image_deduplicator'
 
 HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
 
 
 def get_hash_method(method_name):
-    from imagededup.methods import AHash, DHash, PHash, WHash
 
-    mapping = {'phash': PHash, 'dhash': DHash, 'whash': WHash, 'ahash': AHash}
+    mapping = {
+        'phash': imgdedup_methods.PHash,
+        'dhash': imgdedup_methods.DHash,
+        'whash': imgdedup_methods.WHash,
+        'ahash': imgdedup_methods.AHash
+    }
 
     return mapping[method_name]
 
@@ -48,7 +52,6 @@ class RayImageDeduplicator(RayBasicDeduplicator):
                          redis_port=redis_port,
                          *args,
                          **kwargs)
-        AUTOINSTALL.check(['imagededup'])
         if method not in HASH_METHOD:
             raise ValueError(f'Keep strategy [{method}] is not supported. '
                              f'Can only be one of {HASH_METHOD}.')

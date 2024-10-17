@@ -6,13 +6,12 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ...utils.model_utils import get_model, prepare_model
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-OP_NAME = 'image_aesthetics_filter'
-CHECK_PKGs = ['torch', 'transformers', 'simple-aesthetics-predictor']
-
 torch = LazyLoader('torch', 'torch')
+
+OP_NAME = 'image_aesthetics_filter'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -49,8 +48,6 @@ class ImageAestheticsFilter(Filter):
         """
 
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(
-            ['torch', 'transformers', 'simple-aesthetics-predictor'])
         if hf_scorer_model == '':
             hf_scorer_model = \
                 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE'

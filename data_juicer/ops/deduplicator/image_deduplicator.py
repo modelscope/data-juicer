@@ -7,21 +7,25 @@ from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
-from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
+from ..base_op import OPERATORS, Deduplicator
 from ..op_fusion import LOADED_IMAGES
 from .document_deduplicator import DocumentDeduplicator
 
-OP_NAME = 'image_deduplicator'
+imgdedup_methods = LazyLoader('imgdedup_methods', 'imagededup.methods')
 
-imagededup = LazyLoader('imagededup', 'imagededup')
+OP_NAME = 'image_deduplicator'
 
 HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
 
 
 def get_hash_method(method_name):
-    from imagededup.methods import AHash, DHash, PHash, WHash
 
-    mapping = {'phash': PHash, 'dhash': DHash, 'whash': WHash, 'ahash': AHash}
+    mapping = {
+        'phash': imgdedup_methods.PHash,
+        'dhash': imgdedup_methods.DHash,
+        'whash': imgdedup_methods.WHash,
+        'ahash': imgdedup_methods.AHash
+    }
 
     return mapping[method_name]
 
@@ -49,7 +53,6 @@ class ImageDeduplicator(Deduplicator):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['imagededup'])
         if method not in HASH_METHOD:
             raise ValueError(f'Keep strategy [{method}] is not supported. '
                              f'Can only be one of {HASH_METHOD}.')

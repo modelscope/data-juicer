@@ -8,12 +8,12 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import close_video, load_video
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
-
-OP_NAME = 'video_resize_aspect_ratio_mapper'
+from ..base_op import OPERATORS, Mapper
 
 with HiddenPrints():
     ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
+
+OP_NAME = 'video_resize_aspect_ratio_mapper'
 
 
 def rescale(width, height, ori_ratio, min_ratio, max_ratio, strategy):
@@ -88,7 +88,6 @@ class VideoResizeAspectRatioMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['ffmpeg-python'])
         self._init_parameters = self.remove_extra_parameters(locals())
 
         strategy = strategy.lower()

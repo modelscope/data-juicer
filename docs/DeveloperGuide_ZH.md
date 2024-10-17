@@ -352,12 +352,11 @@ else:
 ...
 ```
 
-5. 随着算子数量的增加，Data-Juicer的依赖也不断增多。为了防止Data-Juicer的依赖越来越重，我们为算子额外增加的依赖提供了一套lazy import加上使用时安装依赖的策略。如下样例：
+5. 随着算子数量的增加，Data-Juicer的依赖也不断增多。为了防止Data-Juicer的依赖越来越重，我们为算子额外增加的依赖提供了一套延迟加载加上使用时安装依赖的策略。`LazyLoader`会检查加载的module对应的package有没有都安装，没有的话会动态自动安装。`AUTOINSTALL`用于安装额外的补丁。如下样例：
 
 ```python
 # ... (import some library)
-from ..base_op import AUTOINSTALL
-from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.lazy_loader import LazyLoader, AUTOINSTALL
 
 # lazy import
 kenlm = LazyLoader('kenlm', 'kenlm')
@@ -370,7 +369,7 @@ class PerplexityFilter(Filter):
                 **kwargs):
         # auto install before init
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['sentencepiece', 'kenlm'])
+        AUTOINSTALL.check(['fasttext-wheel'])
         # ... (some codes)
 
     def process(self, sample):

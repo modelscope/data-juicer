@@ -5,14 +5,14 @@ from pydantic import PositiveInt
 
 from data_juicer.utils.lazy_loader import LazyLoader
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
-
-OP_NAME = 'nlpaug_en_mapper'
+from ..base_op import OPERATORS, Mapper
 
 nlpaug = LazyLoader('nlpaug', 'nlpaug')
 nac = LazyLoader('nac', 'nlpaug.augmenter.char')
 naw = LazyLoader('naw', 'nlpaug.augmenter.word')
 naf = LazyLoader('naf', 'nlpaug.flow')
+
+OP_NAME = 'nlpaug_en_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -86,7 +86,6 @@ class NlpaugEnMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['nlpaug'])
 
         self.aug_num = aug_num
         if aug_num >= 10:

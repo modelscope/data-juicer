@@ -3,10 +3,11 @@ import os
 
 import regex as re
 
+from data_juicer.utils.lazy_loader import AUTOINSTALL
 from data_juicer.utils.mm_utils import SpecialTokens, extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 
 NAME = 'video_captioning_from_audio_mapper'
 

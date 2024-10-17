@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       merge_on_whitespace_tab_newline,
                       split_on_newline_tab_whitespace, strip)
@@ -34,7 +34,6 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
         if substrings is None:
             substrings = ['http', 'www', '.com', 'href', '//']
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['sentencepiece'])
         self.tokenization = tokenization
         self.substrings = substrings
         self.lang = lang
