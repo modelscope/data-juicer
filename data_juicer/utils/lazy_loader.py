@@ -1,4 +1,3 @@
-# Code copied from https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/util/lazy_loader.py # noqa: E501
 """A LazyLoader class."""
 
 import importlib
