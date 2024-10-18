@@ -141,6 +141,7 @@ class StatsKeysConstant(object):
     image_sizes = 'image_sizes'
     face_ratios = 'face_ratios'
     face_detections = 'face_detections'
+    face_counts = 'face_counts'
     image_aesthetics_scores = 'image_aesthetics_scores'
     image_nsfw_score = 'image_nsfw_score'
     image_watermark_prob = 'image_watermark_prob'
