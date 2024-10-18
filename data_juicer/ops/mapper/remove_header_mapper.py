@@ -36,7 +36,7 @@ class RemoveHeaderMapper(Mapper):
 
         self.drop_no_head = drop_no_head
 
-    def process(self, samples):
+    def process_batched(self, samples):
         for idx, text in enumerate(samples[self.text_key]):
             if not re.search(self.pattern, text, flags=re.DOTALL):
                 if self.drop_no_head:

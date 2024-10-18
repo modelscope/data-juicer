@@ -207,7 +207,7 @@ class ImageDiffusionMapper(Mapper):
 
         return generated_samples
 
-    def process(self, samples, rank=None, context=False):
+    def process_batched(self, samples, rank=None, context=False):
         """
             Note:
                 This is a batched_OP, whose the input and output type are

@@ -85,7 +85,7 @@ class VideoResizeResolutionMapper(Mapper):
         self.force_original_aspect_ratio = force_original_aspect_ratio
         self.force_divisible_by = force_divisible_by
 
-    def process(self, sample, context=False):
+    def process_single(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

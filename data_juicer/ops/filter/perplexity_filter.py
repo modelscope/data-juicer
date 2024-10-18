@@ -47,7 +47,7 @@ class PerplexityFilter(Filter):
                                           lang=lang)
         self.kl_model_key = prepare_model(model_type='kenlm', lang=lang)
 
-    def compute_stats(self, samples, context=False):
+    def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
 
@@ -79,7 +79,7 @@ class PerplexityFilter(Filter):
 
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
             return map(lambda stat: stat[StatsKeys.perplexity] <= self.max_ppl,
                        samples[Fields.stats])

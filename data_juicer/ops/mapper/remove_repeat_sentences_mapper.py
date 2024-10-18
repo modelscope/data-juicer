@@ -45,7 +45,7 @@ class RemoveRepeatSentencesMapper(Mapper):
         self.remove_regex = re.compile(r'[^a-zA-Z0-9\u4e00-\u9fa5\n\t ]'
                                        ) if ignore_special_character else None
 
-    def process(self, samples):
+    def process_batched(self, samples):
         for idx, text in enumerate(samples[self.text_key]):
             lines = [e for e in text.split('\n')]
             new_lines = []

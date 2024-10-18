@@ -142,7 +142,7 @@ class PhraseGroundingRecallFilter(Filter):
         for nltk_data_pkg in requires_nltk_data:
             nltk.download(nltk_data_pkg)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.phrase_grounding_recall in sample[Fields.stats]:
             return sample
@@ -256,7 +256,7 @@ class PhraseGroundingRecallFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         recalls = sample[Fields.stats][StatsKeys.phrase_grounding_recall]
         if len(recalls) <= 0:
             return True

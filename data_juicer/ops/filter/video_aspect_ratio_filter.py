@@ -45,7 +45,7 @@ class VideoAspectRatioFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.video_aspect_ratios in sample[Fields.stats]:
             return sample
@@ -76,7 +76,7 @@ class VideoAspectRatioFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         video_aspect_ratios = sample[Fields.stats][
             StatsKeys.video_aspect_ratios]
 

@@ -84,7 +84,7 @@ class ChineseConvertMapper(Mapper):
         self.mode = mode
         prepare_converter(self.mode)
 
-    def process(self, samples):
+    def process_batched(self, samples):
         prepare_converter(self.mode)
 
         samples[self.text_key] = [

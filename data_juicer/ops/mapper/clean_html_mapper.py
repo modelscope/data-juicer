@@ -27,7 +27,7 @@ class CleanHtmlMapper(Mapper):
         super().__init__(*args, **kwargs)
         AUTOINSTALL.check(['selectolax'])
 
-    def process(self, samples):
+    def process_batched(self, samples):
 
         def _clean_html(raw_html):
             raw_html = raw_html.replace('<li>', '\n*')

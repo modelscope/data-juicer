@@ -124,7 +124,7 @@ class NlpaugEnMapper(Mapper):
         else:
             self.aug = aug_pipeline
 
-    def process(self, samples):
+    def process_batched(self, samples):
         # no augmentation methods are opened
         if len(self.aug) == 0:
             if self.keep_original_sample:

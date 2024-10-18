@@ -47,6 +47,7 @@ class StatsKeys(object):
 
 2. 在 `data_juicer/ops/filter/` 目录下创建一个新的算子文件 `text_length_filter.py`，内容如下：
     - 因为它是一个 Filter 算子，所以需要继承 `base_op.py` 中的 `Filter` 基类，并用 `OPERATORS` 修饰以实现自动注册。
+    - 为了方便实现，我们可以以单样本处理的方式实现两个核心方法 `compute_stats_single` 和 `process_single`，它们的输入输出均为单个样本的字典结构。如果你比较熟悉 Data-Juicer 中的batch化处理，你也可以通过覆写 `compute_stats_batched` 和 `process_batched` 方法直接实现它们的batch化版本，它的处理会比单样本版本稍快一些。它们的输入和输出则是按列存储的字典结构，其中包括多个样本。
 
     ```python
     import sys
@@ -84,7 +85,7 @@ class StatsKeys(object):
             self.min_len = min_len
             self.max_len = max_len
 
-        def compute_stats(self, sample):
+        def compute_stats_single(self, sample):
             # check if it's computed already
             if StatsKeys.text_len in sample[Fields.stats]:
                 return sample
@@ -92,14 +93,14 @@ class StatsKeys(object):
             sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
             return sample
 
-        def process(self, sample):
+        def process_single(self, sample):
             if self.min_len <= sample[Fields.stats][StatsKeys.text_len] <= self.max_len:
                 return True
             else:
                 return False
     ```
 
-    - 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在构造函数中声明 `_accelerator = 'cuda'`，并确保 `compute_stats` 和 `process` 方法接受一个额外的位置参数 `rank`。
+    - 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在构造函数中声明 `_accelerator = 'cuda'`，并确保 `compute_stats_single/batched` 和 `process_single/batched` 方法接受一个额外的位置参数 `rank`。
 
     ```python
     # ... (same as above)
@@ -116,14 +117,15 @@ class StatsKeys(object):
                     **kwargs):
             # ... (same as above)
 
-        def compute_stats(self, sample, rank=None):
+        def compute_stats_single(self, sample, rank=None):
             # ... (same as above)
 
-        def process(self, sample, rank=None):
+        def process_single(self, sample, rank=None):
             # ... (same as above)
     ```
 
-    - 如果算子批量处理数据，输入不是一个样本而是一个batch，需要声明`_batched_op = True`。
+    - 如果算子批量处理数据，输入不是一个样本而是一个batch，或者你想在单样本实现上直接激活batch化处理，需要声明`_batched_op = True`。
+      - 对于单样本实现中原来的 `compute_stats_single` 和 `process_single` 方法，你可以保持它们不变，Data-Juicer 会调用默认的batch化处理版本，它们会自动拆分单个样本以调用单样本版本的两个方法来支持batch化处理。你也可以自行实现更高效的batch化的版本。
     ```python
     # ... (import some other libraries)
     OP_NAME = 'image_diffusion_mapper'
@@ -138,7 +140,7 @@ class StatsKeys(object):
                  **kwargs):
             super().__init__(*args, **kwargs)
 
-        def process(self, samples):
+        def process_batched(self, samples):
             # ... (some codes)
     ```
 
@@ -156,7 +158,7 @@ class StatsKeys(object):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
 
-        def process(self, sample):
+        def process_single(self, sample):
             # ... (some codes)
             # captions[index] is the prompt for diffusion model
             related_parameters = self.add_parameters(
@@ -179,7 +181,7 @@ class StatsKeys(object):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
 
-        def process(self, sample):
+        def process_single(self, sample):
             # ... (some codes)
             split_video_path = transfer_filename(
                         original_video_path, OP_NAME, **self._init_parameters)
@@ -373,7 +375,7 @@ class PerplexityFilter(Filter):
         AUTOINSTALL.check(['sentencepiece', 'kenlm'])
         # ... (some codes)
 
-    def process(self, sample):
+    def process_single(self, sample):
         # ... (some codes)
 ```
 

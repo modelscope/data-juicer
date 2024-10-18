@@ -133,7 +133,7 @@ class ExtractQAMapper(Mapper):
 
         return qa_list
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         model, processor = get_model(self.model_key, rank, self.use_cuda())
 
         if self.enable_vllm:

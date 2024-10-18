@@ -33,10 +33,10 @@ class SpecifiedFieldFilter(Filter):
         self.field_key = field_key
         self.target_value = target_value
 
-    def compute_stats(self, sample):
+    def compute_stats_single(self, sample):
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         if not (self.field_key and self.target_value):
             return True
 

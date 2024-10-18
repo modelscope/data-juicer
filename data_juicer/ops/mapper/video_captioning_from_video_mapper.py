@@ -331,7 +331,7 @@ class VideoCaptioningFromVideoMapper(Mapper):
                 generated_text_candidates_single_chunk[max_index])
         return generated_text_per_chunk
 
-    def process(self, samples, rank=None, context=False):
+    def process_batched(self, samples, rank=None, context=False):
         """
         :param samples:
         :return:

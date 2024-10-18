@@ -93,7 +93,7 @@ class OptimizeInstructionMapper(Mapper):
                 trust_remote_code=trust_remote_code)
             self.sampling_params = sampling_params
 
-    def process(self, sample=None, rank=None):
+    def process_single(self, sample=None, rank=None):
         model, processor = get_model(self.model_key, rank=rank)
 
         messages = [{
