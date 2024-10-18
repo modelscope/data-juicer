@@ -176,8 +176,8 @@ it is implemented as Filter sub-class.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.RayBasicDeduplicator.compute_stats">
-<span class="sig-name descname"><span class="pre">compute_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/ray_basic_deduplicator.html#RayBasicDeduplicator.compute_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.RayBasicDeduplicator.compute_stats" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.RayBasicDeduplicator.compute_stats_single">
+<span class="sig-name descname"><span class="pre">compute_stats_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/ray_basic_deduplicator.html#RayBasicDeduplicator.compute_stats_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.RayBasicDeduplicator.compute_stats_single" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute stats for the sample which is used as a metric to decide
 whether to filter this sample.</p>
 <dl class="field-list simple">
@@ -195,8 +195,8 @@ vars in the sample temporarily.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.RayBasicDeduplicator.process">
-<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/ray_basic_deduplicator.html#RayBasicDeduplicator.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.RayBasicDeduplicator.process" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="data_juicer.ops.deduplicator.RayBasicDeduplicator.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/deduplicator/ray_basic_deduplicator.html#RayBasicDeduplicator.process_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.deduplicator.RayBasicDeduplicator.process_single" title="Permalink to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; Boolean.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
