@@ -546,13 +546,18 @@ def extract_video_frames_uniformly(
             container.seek(0)
             search_idx = 0
             curr_pts = second_group[search_idx] / time_base
+            find_all = False
             for frame in container.decode(input_video_stream):
                 if frame.pts >= curr_pts:
                     extracted_frames.append(frame)
                     search_idx += 1
                     if search_idx >= len(second_group):
+                        find_all = True
                         break
                     curr_pts = second_group[search_idx] / time_base
+            if not find_all and frame is not None:
+                # add the last frame
+                extracted_frames.append(frame)
         else:
             # search from a key frame
             container.seek(int(key_frame_second * 1e6))
