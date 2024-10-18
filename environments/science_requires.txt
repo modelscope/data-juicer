@@ -26,4 +26,3 @@ scenedetect[opencv]
 ffmpeg-python
 opencv-python
 vllm
-ram@git+https://github.com/xinyu1205/recognize-anything.git
