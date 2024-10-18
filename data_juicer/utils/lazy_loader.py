@@ -38,8 +38,6 @@ class LazyLoader(types.ModuleType):
         super(LazyLoader, self).__init__(name)
 
     def _load(self):
-        if self.__name__ == 'torch':
-            _torch_check_and_set()
         # Auto install if necessary
         module_name = self.__name__.split('.')[0]
         if not _is_module_installed(module_name):
@@ -47,6 +45,9 @@ class LazyLoader(types.ModuleType):
                 f"Module '{module_name}' not installed or fully installed.")
             logger.warning(f"Auto installing '{module_name}' ...")
             AUTOINSTALL.install(module_name)
+        # check for torch
+        if self.__name__ == 'torch':
+            _torch_check_and_set()
         # Import the target module and insert it into the parent's namespace
         module = importlib.import_module(self.__name__)
 
