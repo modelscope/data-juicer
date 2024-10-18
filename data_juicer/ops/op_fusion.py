@@ -177,7 +177,7 @@ class FusedFilter(Filter):
         # update num_proc with the min num_proc of all fusible filters
         self.num_proc = min([op.runtime_np() for op in self.fused_filters])
 
-    def compute_stats(self, samples, rank=None):
+    def compute_stats_batched(self, samples, rank=None):
         import av
 
         # context for the intermediate vars
@@ -185,9 +185,11 @@ class FusedFilter(Filter):
         for op in self.fused_filters:
             # open the context for these fused ops
             if op.accelerator == 'cuda':
-                samples = op.compute_stats(samples, rank=rank, context=True)
+                samples = op.compute_stats_batched(samples,
+                                                   rank=rank,
+                                                   context=True)
             else:
-                samples = op.compute_stats(samples, context=True)
+                samples = op.compute_stats_batched(samples, context=True)
         # clean up the contexts after processing
         # check if there are containers that need to be closed
         for context_key in samples[Fields.context]:
@@ -198,11 +200,11 @@ class FusedFilter(Filter):
         _ = samples.pop(Fields.context)
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         # Only return True when all filters return True
         res = None
         for op in self.fused_filters:
-            this_res = np.array(list(op.process(samples)))
+            this_res = np.array(list(op.process_batched(samples)))
             if res is not None:
                 res = np.logical_and(res, this_res)
             else:
