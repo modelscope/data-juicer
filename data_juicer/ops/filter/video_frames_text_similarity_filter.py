@@ -107,7 +107,7 @@ class VideoFramesTextSimilarityFilter(Filter):
             ('' if frame_sampling_method == 'all_keyframes'
              else f'-{frame_num}')
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_frames_text_similarity in sample[Fields.stats]:
             return sample
@@ -201,7 +201,7 @@ class VideoFramesTextSimilarityFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         similarity = sample[Fields.stats][
             StatsKeys.video_frames_text_similarity]
         if len(similarity) <= 0:

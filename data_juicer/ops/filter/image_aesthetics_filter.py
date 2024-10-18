@@ -70,7 +70,7 @@ class ImageAestheticsFilter(Filter):
         self.need_normalized_by_ten = ('shunk031/aesthetics-predictor'
                                        in hf_scorer_model)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_aesthetics_scores in sample[Fields.stats]:
             return sample
@@ -107,7 +107,7 @@ class ImageAestheticsFilter(Filter):
             aesthetics_scores
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         aesthetics_scores = (
             sample)[Fields.stats][StatsKeys.image_aesthetics_scores]
         if len(aesthetics_scores) <= 0:

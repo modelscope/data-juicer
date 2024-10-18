@@ -25,7 +25,7 @@ class SentenceSplitMapper(Mapper):
         self.lang = lang
         self.model_key = prepare_model(model_type='nltk', lang=lang)
 
-    def process(self, samples):
+    def process_batched(self, samples):
 
         nltk_model = get_model(self.model_key)
 

@@ -51,7 +51,8 @@ class StatsKeys(object):
 ```
 
 2. Create a new OP file `text_length_filter.py` in the corresponding `data_juicer/ops/filter/` directory as follows.
-   - Because it's a Filter OP, so the new OP needs to inherit from the basic `Filter` class in the `base_op.py`, and be decorated with `OPERATORS` to register itself automatically.
+   - It's a Filter OP, so the new OP needs to inherit from the basic `Filter` class in the `base_op.py`, and be decorated with `OPERATORS` to register itself automatically.
+   - For convenience, we can implement the core functions `compute_stats_single` and `process_single` in a single-sample way, whose input and output are a single sample dictionary. If you are very familiar with batched processing in Data-Juicer, you can also implement the batched version directly by overwriting the `compute_stats_batched` and `process_batched` functions, which will be slightly faster than single-sample version. Their input and output are a column-wise dict with multiple samples.
 
     ```python
     import sys
@@ -89,7 +90,7 @@ class StatsKeys(object):
             self.min_len = min_len
             self.max_len = max_len
 
-        def compute_stats(self, sample):
+        def compute_stats_single(self, sample):
             # check if it's computed already
             if StatsKeys.text_len in sample[Fields.stats]:
                 return sample
@@ -97,14 +98,14 @@ class StatsKeys(object):
             sample[Fields.stats][StatsKeys.text_len] = len(sample[self.text_key])
             return sample
 
-        def process(self, sample):
+        def process_single(self, sample):
             if self.min_len <= sample[Fields.stats][StatsKeys.text_len] <= self.max_len:
                 return True
             else:
                 return False
     ```
 
-    - If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare `_accelerator = 'cuda'` in the constructor, and ensure that `compute_stats` and `process` methods accept an additional positional argument `rank`.
+    - If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare `_accelerator = 'cuda'` in the constructor, and ensure that `compute_stats_single/batched` and `process_single/batched` methods accept an additional positional argument `rank`.
 
     ```python
     # ... (same as above)
@@ -121,14 +122,15 @@ class StatsKeys(object):
                     **kwargs):
             # ... (same as above)
 
-        def compute_stats(self, sample, rank=None):
+        def compute_stats_single(self, sample, rank=None):
             # ... (same as above)
 
-        def process(self, sample, rank=None):
+        def process_single(self, sample, rank=None):
             # ... (same as above)
     ```
 
-    - If the operator processes data in batches rather than a single sample, it is necessary to declare `_batched_op = True`.
+    - If the operator processes data in batches rather than a single sample, or you want to enable batched processing, it is necessary to declare `_batched_op = True`.
+      - For the original `compute_stats_single` and `process_single` functions, you can keep it still and Data-Juicer will call the default batched version to call the single version to support batched processing. Or you can implement your batched version in a more efficient way.
     ```python
     # ... (import some other libraries)
     OP_NAME = 'image_diffusion_mapper'
@@ -143,7 +145,7 @@ class StatsKeys(object):
                  **kwargs):
             super().__init__(*args, **kwargs)
 
-        def process(self, samples):
+        def process_batched(self, samples):
             # ... (some codes)
     ```
 
@@ -162,7 +164,7 @@ class StatsKeys(object):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
 
-        def process(self, sample):
+        def process_single(self, sample):
             # ... (some codes)
             # captions[index] is the prompt for diffusion model
             related_parameters = self.add_parameters(
@@ -186,7 +188,7 @@ class StatsKeys(object):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
 
-        def process(self, sample):
+        def process_single(self, sample):
             # ... (some codes)
             split_video_path = transfer_filename(
                         original_video_path, OP_NAME, **self._init_parameters)
@@ -396,7 +398,7 @@ class PerplexityFilter(Filter):
         AUTOINSTALL.check(['sentencepiece', 'kenlm'])
         # ... (some codes)
 
-    def process(self, sample):
+    def process_single(self, sample):
         # ... (some codes)
 ```
 

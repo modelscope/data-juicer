@@ -75,7 +75,7 @@ class ImageFaceCountFilter(Filter):
         self.model_key = prepare_model(model_type='opencv_classifier',
                                        model_path=cv_classifier)
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.face_ratios in sample[Fields.stats]:
             return sample
@@ -109,7 +109,7 @@ class ImageFaceCountFilter(Filter):
         ]
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         face_counts = sample[Fields.stats][StatsKeys.face_counts]
         if len(face_counts) <= 0:
             return True

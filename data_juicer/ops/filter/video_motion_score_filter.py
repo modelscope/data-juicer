@@ -105,7 +105,7 @@ class VideoMotionScoreFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.video_motion_score in sample[Fields.stats]:
             return sample
@@ -182,7 +182,7 @@ class VideoMotionScoreFilter(Filter):
         ]
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         video_motion_scores = sample[Fields.stats][
             StatsKeys.video_motion_score]
 
