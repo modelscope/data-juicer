@@ -240,6 +240,16 @@ class Mapper(OP):
         else:
             self.process = catch_map_single_exception(self.process_single)
 
+    # set the process method is not allowed to be overridden
+    def __init_subclass__(cls, **kwargs):
+        not_allowed_list = ['process']
+        for method_name in not_allowed_list:
+            if method_name in cls.__dict__:
+                raise TypeError(
+                    f'Method {method_name} cannot be overridden by subclass '
+                    f'{cls.__name__}. Please implement {method_name}_single '
+                    f'or {method_name}_batched.')
+
     def process_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
         first_key = next(iter(keys))
@@ -303,6 +313,16 @@ class Filter(OP):
             self.compute_stats = catch_map_single_exception(
                 self.compute_stats_single)
             self.process = catch_map_single_exception(self.process_single)
+
+    # set the process method is not allowed to be overridden
+    def __init_subclass__(cls, **kwargs):
+        not_allowed_list = ['compute_stats', 'process']
+        for method_name in not_allowed_list:
+            if method_name in cls.__dict__:
+                raise TypeError(
+                    f'Method {method_name} cannot be overridden by subclass '
+                    f'{cls.__name__}. Please implement {method_name}_single '
+                    f'or {method_name}_batched.')
 
     def compute_stats_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
