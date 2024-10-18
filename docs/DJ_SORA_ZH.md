@@ -113,5 +113,5 @@ DJ-SORA将基于Data-Juicer(包含上百个专用的视频、图像、音频、�
     - ...
   - [✅] (Model-Data sandbox) 在相对小的模型和DJ-SORA数据集上，探索形成低开销、可迁移、有指导性的data-model co-design、配置及检查点
   - [ ] [WIP] 更大规模、更多场景使用DJ-SORA数据训练类SORA模型，提高模型性能
-    - [✅] Data-Juicer-T2v, [V-Bench Top1 model](https://huggingface.co/datajuicer/Data-Juicer-T2V-v2)。详情请参考[这里](./Sandbox-ZH.md)。
+    - [✅] Data-Juicer-T2V, [V-Bench Top1 model](https://huggingface.co/datajuicer/Data-Juicer-T2V-v2)。详情请参考[这里](./Sandbox-ZH.md)。
     - ...
