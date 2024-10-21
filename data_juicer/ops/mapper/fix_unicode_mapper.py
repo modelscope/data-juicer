@@ -34,7 +34,7 @@ class FixUnicodeMapper(Mapper):
                              'supported. Can only be one of '
                              '["NFC", "NFKC", "NFD", "NFKD"]')
 
-    def process(self, samples):
+    def process_batched(self, samples):
         samples[self.text_key] = [
             ftfy.fix_text(text, normalization=self.normalization)
             for text in samples[self.text_key]

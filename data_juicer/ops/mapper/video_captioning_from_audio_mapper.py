@@ -116,7 +116,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
         captioned_sample[self.video_key] = left_video_keys
         return [captioned_sample]
 
-    def process(self, samples, rank=None):
+    def process_batched(self, samples, rank=None):
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []
         for i in range(len(samples[self.text_key])):

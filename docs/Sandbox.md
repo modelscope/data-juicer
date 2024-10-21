@@ -12,8 +12,18 @@ The model is now publicly available on the ModelScope and HuggingFace platforms,
 | data_juicer_t2v_optimal_data_pool | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-optimal-data-pool)  <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/data-juicer-t2v-optimal-data-pool) | The training dataset of Data-Juicer (T2V, 147k) |
 | data_juicer_t2v_evolution_data_pool | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool_s2.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-evolution-data-pool) | The training dataset of Data-Juicer (2024-09-23, T2V-Turbo) |
 
+Following is the case study for Data-Juicer (DJ, 228k) outputs.
+  | Prompt | Generated Video |
+  | --- | --- |
+  | A beautiful coastal beach in spring, waves lapping on sand, zoom out | [![Case 0](https://img.alicdn.com/imgextra/i1/O1CN01KuJeOE1Ylqnk9zYkc_!!6000000003100-2-tps-2048-320.png)](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case0.mp4) |
+  | a boat accelerating to gain speed | [![Case 1](https://img.alicdn.com/imgextra/i2/O1CN01i1iMFE1TKlIUlqE8d_!!6000000002364-2-tps-2048-320.png)](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case1.mp4) |
+  | A boat sailing leisurely along the Seine River with the Eiffel Tower in background by Hokusai, in the style of Ukiyo | [![Case 2](https://img.alicdn.com/imgextra/i2/O1CN01u2cjJE1RBwRFeCFuo_!!6000000002074-2-tps-2048-320.png)](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case2.mp4) |
+  | a bottle on the left of a wine glass, front view | [![Case 3](https://img.alicdn.com/imgextra/i4/O1CN01vdMm6Q1xWc1CoJZW6_!!6000000006451-2-tps-2048-320.png)](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case3.mp4) |
+  | A corgi's head depicted as an explosion of a nebula | [![Case 4](https://img.alicdn.com/imgextra/i2/O1CN014oPB8Q1IrJg0AbUUg_!!6000000000946-2-tps-2048-320.png)](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case4.mp4) |
+  | A graceful ballerina doing a pirouette on a dimly lit stage, with soft spotlight highlighting her movements. | [![Case 5](https://img.alicdn.com/imgextra/i4/O1CN01yNlsVu1ymvkJgkvY8_!!6000000006622-2-tps-2048-320.png)](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case5.mp4) |
+
 To reproduce the paper's experiments, please refer to the sandbox usage guide below, the experimental process in the following figure, the [initial dataset](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip), and the configuration file demos for the process: [1_single_op_pipline.yaml](../configs/demo/bench/1_single_op_pipline.yaml), [2_multi_op_pipline.yaml](../configs/demo/bench/2_multi_op_pipline.yaml), [3_duplicate_pipline.yaml](../configs/demo/bench/3_duplicate_pipline.yaml).
-![bench_bottom_up](https://img.alicdn.com/imgextra/i3/O1CN01ZwtQuG1sdPnbYYVhH_!!6000000005789-2-tps-7838-3861.png)
+![bench_bottom_up](https://img.alicdn.com/imgextra/i2/O1CN01xvu2fo1HU80biR6Q5_!!6000000000760-2-tps-7756-3693.png)
 
 ## What is DJ-Sandbox?
 In Data-Juicer, the data sandbox laboratory provides users with the best practices for continuously producing data recipes. It features low overhead, portability, and guidance. In the sandbox, users can quickly experiment, iterate, and refine data recipes based on small-scale datasets and models, before scaling up to produce high-quality data to serve large-scale models.
@@ -133,6 +143,18 @@ Except for DataExecutor and DataAnalyzer, the rest of the components can be spec
 
 The currently supported component factories and the components supported within each factory are as follows:
 
+- DataExecutorFactory
+
+| Component | Function | Desc. of Method `run` | Reference Materials |
+| --- | --- | --- | --- |
+| `DJExecutor` | The data process module of Data-Juicer | - | - |
+
+- DataAnalyzerFactory
+
+| Component | Function | Desc. of Method `run` | Reference Materials |
+| --- | --- | --- | --- |
+| `DJAnalyzer` | The data analysis module of Data-Juicer | - | - |
+
 - DataEvaluatorFactory
 
 | Component | Function | Desc. of Method `run` | Reference Materials |
@@ -166,14 +188,14 @@ The currently supported component factories and the components supported within 
 Please refer to `data_juicer/core/sandbox/factories.py` for detailed definitions.
 # Developer Guide
 As mentioned in the previous section, developers can develop customized configurable components and add them to the corresponding factory classes, then route to appropriate instantiation methods using the `type` parameter. Once the components are implemented, developers can encapsulate them as hooks and register the hooks into the job list. After the job list is orchestrated in the pipeline, when the sandbox pipeline is executed, each job in the job list will be executed in sequence at each step. Each of these parts - components, component factory, hooks, job lists, and the registration and execution orchestration of the pipeline - can be customized by the developer. The relationship among these parts is illustrated in the diagram below.
-![sandbox-pipeline](https://img.alicdn.com/imgextra/i2/O1CN01B3zR0t29noFoHGsyq_!!6000000008113-2-tps-3878-2212.png)
+![sandbox-pipeline](https://img.alicdn.com/imgextra/i3/O1CN01ERmGre1uz3luKOn4n_!!6000000006107-2-tps-4655-1918.png)
 
 ## The Internal Implementation of Components
 Currently, components are mainly divided into two major categories:
 
 - **Executor**: Since the data executor is already handled by the Data-Juicer's Executor, the executor here specifically refers to the model executor, including model training, inference, evaluation, etc. The code is located in `data_juicer/core/sandbox/model_executors.py`.
 - **Evaluator**: Used for evaluating the quality and performance of datasets or models. The code is located in `data_juicer/core/sandbox/evaluators.py`.
-- **Hook**: Used to mount tasks onto the pipeline. The code is located in `data_juicer/core/sandbox/hooks.py`.
+
 ### Executor
 The core function of the model executor is to train, infer, or evaluate the model specified in the configuration file with the specified dataset. The model executor needs to inherit from `BaseModelExecutor` and implement several core methods:
 

@@ -29,7 +29,7 @@ class RemoveBibliographyMapper(Mapper):
         self.pattern += r'\\bibliography\{.*\}'
         self.pattern += r').*$'
 
-    def process(self, samples):
+    def process_batched(self, samples):
         samples[self.text_key] = [
             re.sub(pattern=self.pattern,
                    repl=r'',

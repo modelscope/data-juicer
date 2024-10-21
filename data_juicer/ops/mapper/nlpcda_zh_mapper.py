@@ -129,7 +129,7 @@ class NlpcdaZhMapper(Mapper):
                 self.aug_pipeline.append(
                     nlpcda.EquivalentChar(create_num=create_num))
 
-    def process(self, samples):
+    def process_batched(self, samples):
         # no augmentation methods are opened
         if len(self.aug_pipeline) == 0:
             if self.keep_original_sample:

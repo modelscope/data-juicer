@@ -1,27 +1,27 @@
 import os
 
+import lazy_loader as lazy
 import numpy as np
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
                                         load_image)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, UNFORKABLE, Filter
+from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
 from ..op_fusion import LOADED_IMAGES
 
-cv2 = LazyLoader('cv2', 'cv2')
+OP_NAME = 'image_face_count_filter'
 
-OP_NAME = 'image_face_ratio_filter'
+cv2 = lazy.load('cv2')
 
 
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
-class ImageFaceRatioFilter(Filter):
-    """Filter to keep samples with face area ratios within a specific range.
+class ImageFaceCountFilter(Filter):
+    """Filter to keep samples with the number of faces within a specific range.
     """
 
     _default_kwargs = {
@@ -33,8 +33,8 @@ class ImageFaceRatioFilter(Filter):
 
     def __init__(self,
                  cv_classifier: str = '',
-                 min_ratio: float = 0.0,
-                 max_ratio: float = 0.4,
+                 min_face_count: int = 1,
+                 max_face_count: int = 1,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -43,8 +43,8 @@ class ImageFaceRatioFilter(Filter):
 
         :param cv_classifier: OpenCV classifier path for face detection.
             By default, we will use 'haarcascade_frontalface_alt.xml'.
-        :param min_ratio: Min ratio for the largest face area in an image.
-        :param max_ratio: Max ratio for the largest face area in an image.
+        :param min_face_count: Minimum number of faces required for samples.
+        :param max_face_count: Maximum number of faces required for samples.
         :param any_or_all: Keep this sample with 'any' or 'all' strategy of
             all images. 'any': keep this sample if any images meet the
             condition. 'all': keep this sample only if all images meet the
@@ -53,12 +53,14 @@ class ImageFaceRatioFilter(Filter):
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check(['opencv-python'])
 
         if cv_classifier == '':
             cv_classifier = os.path.join(cv2.data.haarcascades,
                                          'haarcascade_frontalface_alt.xml')
-        self.min_ratio = min_ratio
-        self.max_ratio = max_ratio
+
+        self.min_face_count = min_face_count
+        self.max_face_count = max_face_count
 
         self.extra_kwargs = self._default_kwargs
         for key in kwargs:
@@ -80,7 +82,7 @@ class ImageFaceRatioFilter(Filter):
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.face_ratios] = np.array(
+            sample[Fields.stats][StatsKeys.face_counts] = np.array(
                 [], dtype=np.float64)
             return sample
 
@@ -91,34 +93,30 @@ class ImageFaceRatioFilter(Filter):
 
         model = get_model(self.model_key)
 
-        # detect faces
-        face_detections = {}
-        for key, image in images.items():
-            face_detections[key] = detect_faces(image, model,
-                                                **self.extra_kwargs)
-        logger.debug(f'detections: {face_detections}')
+        # count the number of detected faces in each image
+        face_counts = {}
+        try:
+            for key, image in images.items():
+                dets = detect_faces(image, model, **self.extra_kwargs)
+                face_counts[key] = len(dets)
+            print(f'face counts: {face_counts}')
+            logger.debug(f'face counts: {face_counts}')
+        except Exception as e:
+            logger.exception(e)
 
-        # compute face area ratios for each image considering the largest face
-        face_area_ratios = {}
-        for key, dets in face_detections.items():
-            image_area = images[key].width * images[key].height
-            face_area_ratios[key] = max([w * h for _, _, w, h in dets],
-                                        default=0.0) / image_area
-        logger.debug(f'ratios: {face_area_ratios}')
-
-        sample[Fields.stats][StatsKeys.face_ratios] = [
-            face_area_ratios[key] for key in loaded_image_keys
+        sample[Fields.stats][StatsKeys.face_counts] = [
+            face_counts[key] for key in loaded_image_keys
         ]
         return sample
 
     def process_single(self, sample):
-        face_ratios = sample[Fields.stats][StatsKeys.face_ratios]
-        if len(face_ratios) <= 0:
+        face_counts = sample[Fields.stats][StatsKeys.face_counts]
+        if len(face_counts) <= 0:
             return True
 
         keep_bools = np.array([
-            self.min_ratio <= face_ratio <= self.max_ratio
-            for face_ratio in face_ratios
+            self.min_face_count <= face_count <= self.max_face_count
+            for face_count in face_counts
         ])
 
         # different strategies

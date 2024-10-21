@@ -100,7 +100,7 @@ class VideoResizeAspectRatioMapper(Mapper):
         self.max_ratio = Fraction(str(max_ratio).replace(':', '/'))
         self.strategy = strategy
 
-    def process(self, sample):
+    def process_single(self, sample):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

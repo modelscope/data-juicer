@@ -37,7 +37,7 @@ class AverageLineLengthFilter(Filter):
         self.min_len = min_len
         self.max_len = max_len
 
-    def compute_stats(self, samples, context=False):
+    def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
         context_key = f'{InterVars.lines}'
@@ -58,7 +58,7 @@ class AverageLineLengthFilter(Filter):
                 len(cur_text) / len(lines) if len(lines) != 0 else 0.0
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
             return map(
                 lambda stat: self.min_len <= stat[StatsKeys.avg_line_length] <=

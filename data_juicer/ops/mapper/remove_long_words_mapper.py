@@ -43,7 +43,7 @@ class RemoveLongWordsMapper(Mapper):
         else:
             return False
 
-    def process(self, samples):
+    def process_batched(self, samples):
         for idx, text in enumerate(samples[self.text_key]):
             sentences = split_on_newline_tab_whitespace(text)
             sentences = [[[

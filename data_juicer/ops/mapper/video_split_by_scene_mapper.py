@@ -80,7 +80,7 @@ class VideoSplitBySceneMapper(Mapper):
             for key in avaliable_kwargs if key in kwargs
         }
 
-    def process(self, sample, context=False):
+    def process_single(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

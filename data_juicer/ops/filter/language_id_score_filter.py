@@ -45,7 +45,7 @@ class LanguageIDScoreFilter(Filter):
         self.min_score = min_score
         self.model_key = prepare_model(model_type='fasttext')
 
-    def compute_stats(self, sample):
+    def compute_stats_single(self, sample):
         # check if it's computed already
         if StatsKeys.lang in sample[
                 Fields.stats] and StatsKeys.lang_score in sample[Fields.stats]:
@@ -66,7 +66,7 @@ class LanguageIDScoreFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         if self.lang:
             return sample[Fields.stats][StatsKeys.lang] in self.lang \
                    and sample[Fields.stats][StatsKeys.lang_score] >= \

@@ -42,7 +42,7 @@ class RayBasicDeduplicator(Filter):
         """Calculate hash value for the sample."""
         raise NotImplementedError
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # init redis client
         r = redis.StrictRedis(host=self.redis_host, port=self.redis_port, db=0)
         # compute hash
@@ -51,5 +51,5 @@ class RayBasicDeduplicator(Filter):
         sample[HashKeys.is_duplicate] = r.setnx(md5_value, 1)
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         return sample[HashKeys.is_duplicate]

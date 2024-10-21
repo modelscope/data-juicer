@@ -52,7 +52,7 @@ class ImageNSFWFilter(Filter):
             pretrained_model_name_or_path=hf_nsfw_model,
             trust_remote_code=trust_remote_code)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_nsfw_score in sample[Fields.stats]:
             return sample
@@ -82,7 +82,7 @@ class ImageNSFWFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         itm_scores = sample[Fields.stats][StatsKeys.image_nsfw_score]
         if len(itm_scores) <= 0:
             return True

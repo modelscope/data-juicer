@@ -83,13 +83,13 @@ class VideoTaggingFromFramesFilter(Filter):
             tag_field_name=self.tag_field_name,
         )
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
 
         sample = self.tagging_producer.process(sample, rank, context)
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         video_tags = sample[self.tag_field_name]
         if len(video_tags) <= 0:
             return True

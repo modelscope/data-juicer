@@ -50,7 +50,7 @@ class AlphanumericFilter(Filter):
                 pretrained_model_name_or_path='EleutherAI/pythia-6.9b-deduped',
                 return_model=False)
 
-    def compute_stats(self, samples):
+    def compute_stats_batched(self, samples):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
 
@@ -78,7 +78,7 @@ class AlphanumericFilter(Filter):
 
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         ratio_key = StatsKeys.alpha_token_ratio if self.tokenization \
             else StatsKeys.alnum_ratio
         if isinstance(samples[Fields.stats], list):

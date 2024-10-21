@@ -30,7 +30,7 @@ class RemoveSpecificCharsMapper(Mapper):
         else:
             self.pattern = None
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if self.pattern is None:
             return samples
 

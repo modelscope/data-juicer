@@ -70,7 +70,7 @@ class StopWordsFilter(Filter):
             self.model_key = prepare_model(model_type='sentencepiece',
                                            lang=lang)
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.stopwords_ratio in sample[Fields.stats]:
             return sample
@@ -117,6 +117,6 @@ class StopWordsFilter(Filter):
         sample[Fields.stats][StatsKeys.stopwords_ratio] = stopwords_ratio
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         return sample[Fields.stats][
             StatsKeys.stopwords_ratio] >= self.min_ratio

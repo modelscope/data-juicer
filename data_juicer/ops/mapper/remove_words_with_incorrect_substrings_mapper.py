@@ -46,7 +46,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
         should_keep = all([(i_substr not in word) for i_substr in substrings])
         return should_keep
 
-    def process(self, samples):
+    def process_batched(self, samples):
         for idx, text in enumerate(samples[self.text_key]):
             if self.tokenization:
                 tokenizer = get_model(self.model_key)

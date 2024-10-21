@@ -57,7 +57,7 @@ class WordRepetitionFilter(Filter):
             self.model_key = prepare_model(model_type='sentencepiece',
                                            lang=lang)
 
-    def compute_stats(self, samples, context=False):
+    def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
         words_key = f'{InterVars.words}-{self.model_key}'
@@ -110,7 +110,7 @@ class WordRepetitionFilter(Filter):
 
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
             return map(
                 lambda stat: self.min_ratio <= stat[StatsKeys.word_rep_ratio]

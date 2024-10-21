@@ -27,7 +27,7 @@ class WhitespaceNormalizationMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
 
-    def process(self, samples):
+    def process_batched(self, samples):
         for idx, text in enumerate(samples[self.text_key]):
             # remove whitespaces before and after the main content
             text = text.strip()

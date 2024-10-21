@@ -53,7 +53,7 @@ class TextEntityDependencyFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.num_dependency_edges in sample[Fields.stats]:
             return sample
@@ -88,7 +88,7 @@ class TextEntityDependencyFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         num_dependency_edges = sample[Fields.stats][
             StatsKeys.num_dependency_edges]
         keep_bools = np.array([

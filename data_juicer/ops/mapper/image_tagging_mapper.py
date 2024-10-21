@@ -44,7 +44,7 @@ class ImageTaggingMapper(Mapper):
         self.transform = ram.get_transform(image_size=384)
         self.tag_field_name = tag_field_name
 
-    def process(self, sample, rank=None, context=False):
+    def process_single(self, sample, rank=None, context=False):
         # check if it's generated already
         if self.tag_field_name in sample:
             return sample

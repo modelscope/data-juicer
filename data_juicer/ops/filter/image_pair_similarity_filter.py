@@ -54,7 +54,7 @@ class ImagePairSimilarityFilter(Filter):
                                        pretrained_model_name_or_path=hf_clip,
                                        trust_remote_code=trust_remote_code)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
 
         # check if it's computed already
         if StatsKeys.image_pair_similarity in sample[Fields.stats]:
@@ -91,7 +91,7 @@ class ImagePairSimilarityFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         similarity = sample[Fields.stats][StatsKeys.image_pair_similarity]
         if len(similarity) <= 0:
             return True

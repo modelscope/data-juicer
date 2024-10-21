@@ -39,7 +39,7 @@ class RemoveCommentsMapper(Mapper):
         self.inline = inline
         self.multiline = multiline
 
-    def process(self, samples):
+    def process_batched(self, samples):
         # TODO: remove different comments by sample type
 
         for idx, text in enumerate(samples[self.text_key]):
