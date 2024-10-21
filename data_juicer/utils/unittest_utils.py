@@ -3,13 +3,16 @@ import shutil
 import unittest
 
 import numpy
-import ray.data as rd
 
 from data_juicer import is_cuda_available
 from data_juicer.core.data import DJDataset, NestedDataset
 from data_juicer.core.ray_data import RayDataset
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import free_models
 from data_juicer.utils.registry import Registry
+
+rd = LazyLoader('rd', 'ray.data')
+transformers = LazyLoader('transformers', 'transformers')
 
 SKIPPED_TESTS = Registry('SkippedTests')
 
@@ -45,7 +48,6 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         multiprocess.set_start_method(cls.original_mp_method, force=True)
 
         # clean the huggingface model cache files
-        import transformers
         if hf_model_name:
             # given the hf model name, remove this model only
             model_dir = os.path.join(

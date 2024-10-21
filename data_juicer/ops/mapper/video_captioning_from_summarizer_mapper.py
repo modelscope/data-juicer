@@ -4,10 +4,11 @@ from typing import Dict, Optional
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.lazy_loader import AUTOINSTALL
 from data_juicer.utils.mm_utils import SpecialTokens, remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 
 NAME = 'video_captioning_from_summarizer_mapper'
 
@@ -84,13 +85,11 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         AUTOINSTALL.check([
             'torch',
             'transformers',
-            'simhash-pybind',  # by video caption
             'transformers_stream_generator',
             'einops',
             'accelerate',
             'tiktoken',  # by audio caption
             'torchaudio',  # by audio tag
-            'ram@git+https://github.com/xinyu1205/recognize-anything.git'
         ])
 
         self.keep_original_sample = keep_original_sample

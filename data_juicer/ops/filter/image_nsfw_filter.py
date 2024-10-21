@@ -1,17 +1,16 @@
-import lazy_loader as lazy
 import numpy as np
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-OP_NAME = 'image_nsfw_filter'
+torch = LazyLoader('torch', 'torch')
 
-torch = lazy.load('torch')
-transformers = lazy.load('transformers')
+OP_NAME = 'image_nsfw_filter'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -43,7 +42,6 @@ class ImageNSFWFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['torch', 'transformers'])
         self.score_threshold = score_threshold
         if any_or_all not in ['any', 'all']:
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '

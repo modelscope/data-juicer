@@ -3,20 +3,14 @@ from jsonargparse.typing import ClosedUnitInterval
 
 from data_juicer.ops.base_op import OPERATORS, Filter
 from data_juicer.ops.op_fusion import LOADED_IMAGES
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
+torch = LazyLoader('torch', 'torch')
+
 OP_NAME = 'image_pair_similarity_filter'
-
-with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
-
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)

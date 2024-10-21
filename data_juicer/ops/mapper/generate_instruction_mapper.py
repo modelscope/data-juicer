@@ -6,10 +6,13 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, UNFORKABLE, Mapper
+
+torch = LazyLoader('torch', 'torch')
+vllm = LazyLoader('vllm', 'vllm')
 
 DEFAULT_PROMPT_TEMPLATE = """
 请你仔细观察多个示例数据的输入和输出，按照你的理解，总结出相应规矩，然后写出一个新的【问题】和【回答】。注意，新生成的【问题】和【回答】需要满足如下要求：
@@ -24,14 +27,6 @@ EXAMPLE_TEMPLATE = '\n如下是一条示例数据：\n\n{qa_pairs}'
 QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}\n'
 
 OP_NAME = 'generate_instruction_mapper'
-
-with AvailabilityChecking(['torch', 'transformers', 'vllm'], OP_NAME):
-    import torch
-    import transformers  # noqa: F401
-    import vllm  # noqa: F401
-
-    # avoid hanging when calling model in multiprocessing
-    torch.set_num_threads(1)
 
 
 # TODO: Extend LLM-based OPs into API-based implementation.
@@ -138,8 +133,6 @@ class GenerateInstructionMapper(Mapper):
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
-            import torch
-            from vllm import SamplingParams
 
             assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
             if not tensor_parallel_size:
@@ -153,7 +146,7 @@ class GenerateInstructionMapper(Mapper):
                 tensor_parallel_size=tensor_parallel_size,
                 max_model_len=max_model_len,
                 max_num_seqs=max_num_seqs)
-            self.sampling_params = SamplingParams(**sampling_params)
+            self.sampling_params = vllm.SamplingParams(**sampling_params)
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',

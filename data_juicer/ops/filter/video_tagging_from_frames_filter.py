@@ -5,7 +5,7 @@ from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields
 
-from ..base_op import AUTOINSTALL, OPERATORS, UNFORKABLE, Filter
+from ..base_op import OPERATORS, UNFORKABLE, Filter
 from ..mapper.video_tagging_from_frames_mapper import \
     VideoTaggingFromFramesMapper
 from ..op_fusion import LOADED_VIDEOS
@@ -62,10 +62,6 @@ class VideoTaggingFromFramesFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check([
-            'torch',
-            'ram@git+https://github.com/xinyu1205/recognize-anything.git'
-        ])
         if contain not in ['any', 'all']:
             raise ValueError(f'the containing type [{contain}] is not '
                              f'supported. Can only be one of ["any", "all"].')

@@ -1,10 +1,10 @@
 from itertools import chain
 
-import torch
-from torch.distributions import Categorical
-from transformers import AutoTokenizer
-
 from data_juicer.format import load_formatter
+from data_juicer.utils.lazy_loader import LazyLoader
+
+torch = LazyLoader('torch', 'torch')
+transformers = LazyLoader('transformers', 'transformers')
 
 
 class TextTokenDistCollector(object):
@@ -18,11 +18,14 @@ class TextTokenDistCollector(object):
 
         :param tokenizer: tokenizer name on huggingface
         """
-        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer,
-                                                       trust_remote_code=True)
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(
+            tokenizer, trust_remote_code=True)
         self.vocab_size = len(self.tokenizer)
 
-    def collect(self, data_path, text_key, num_proc=1) -> 'Categorical':
+    def collect(self,
+                data_path,
+                text_key,
+                num_proc=1) -> 'torch.distributions.Categorical':
         """
         Tokenize and collect tokens distribution of input dataset
         :param data_path: path to input dataset.
@@ -63,5 +66,5 @@ class TextTokenDistCollector(object):
             list(chain.from_iterable(dataset['input_ids'])))
         indices, counts = token_ids.unique(return_counts=True)
         token_count.scatter_(0, indices, counts.to(token_count.dtype))
-        dist = Categorical(token_count)
+        dist = torch.distributions.Categorical(token_count)
         return dist

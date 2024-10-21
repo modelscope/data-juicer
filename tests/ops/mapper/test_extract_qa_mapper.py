@@ -13,6 +13,7 @@ class ExtractQAMapperTest(DataJuicerTestCaseBase):
     def _run_extract_qa(self, samples, enable_vllm=False, sampling_params={}, **kwargs):
         op = ExtractQAMapper(
             hf_model='alibaba-pai/pai-qwen1_5-7b-doc2qa',
+            trust_remote_code=True,
             qa_format='chatml',
             enable_vllm=enable_vllm,
             sampling_params=sampling_params,

@@ -53,7 +53,9 @@ def gather_test_cases(test_dir, pattern, tag):
     print(f'These tests will be skipped due to some reasons: '
           f'{SKIPPED_TESTS.modules}')
     for suite_discovered in discover:
+        print('suite_discovered', suite_discovered)
         for test_suite in suite_discovered:
+            print('test_suite', test_suite)
             for test_case in test_suite:
                 if type(test_case) in SKIPPED_TESTS.modules.values():
                     continue
