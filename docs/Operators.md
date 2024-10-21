@@ -12,7 +12,7 @@ The operators in Data-Juicer are categorized into 5 types.
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   7    | Discovers, loads, and canonicalizes source data |
 | [ Mapper ]( #mapper )             |   47   | Edits and transforms samples                    |
-| [ Filter ]( #filter )             |   42   | Filters out low-quality samples                 |
+| [ Filter ]( #filter )             |   43   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   5    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   4    | Selects top samples based on ranking            |
 
@@ -101,50 +101,51 @@ All the specific operators are listed below, each featured with several capabili
 
 ## Filter <a name="filter"/>
 
-| Operator                       | Domain     | Lang   | Description                                                                                                                                         |
-|--------------------------------|------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| alphanumeric_filter            | General    | en, zh | Keeps samples with alphanumeric ratio within the specified range                                                                                    |
-| audio_duration_filter          | Audio      | -      | Keep data samples whose audios' durations are within a specified range                                                                              |
-| audio_nmf_snr_filter           | Audio      | -      | Keep data samples whose audios' Signal-to-Noise Ratios (SNRs, computed based on Non-Negative Matrix Factorization, NMF) are within a specified range|
-| audio_size_filter              | Audio      | -      | Keep data samples whose audios' sizes are within a specified range                                                                                  |
-| average_line_length_filter     | Code       | en, zh | Keeps samples with average line length within the specified range                                                                                   |
-| character_repetition_filter    | General    | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range                                                                    |
-| flagged_words_filter           | General    | en, zh | Keeps samples with flagged-word ratio below the specified threshold                                                                                 |
-| image_aesthetics_filter        | Image      | -      | Keeps samples containing images whose aesthetics scores are within the specified range                                                              |
-| image_aspect_ratio_filter      | Image      | -      | Keeps samples containing images with aspect ratios within the specified range                                                                       |
-| image_face_ratio_filter        | Image      | -      | Keeps samples containing images with face area ratios within the specified range                                                                    |
-| image_nsfw_filter              | Image      | -      | Keeps samples containing images with NSFW scores below the threshold                                                               |
-| image_pair_similarity_filter   | Image      | -      | Keeps image pairs with image feature cosine similarity within the specified range based on a CLIP model                                                    |
-| image_shape_filter             | Image      | -      | Keeps samples containing images with widths and heights within the specified range                                                                  |
-| image_size_filter              | Image      | -      | Keeps samples containing images whose size in bytes are within the specified range                                                                  |
-| image_text_matching_filter     | Multimodal | -      | Keeps samples with image-text classification matching score within the specified range based on a BLIP model                                        |
-| image_text_similarity_filter   | Multimodal | -      | Keeps samples with image-text feature cosine similarity within the specified range based on a CLIP model                                            |
-| image_watermark_filter         | Image      | -      | Keeps samples containing images with predicted watermark probabilities below the threshold                                                               |
-| language_id_score_filter       | General    | en, zh | Keeps samples of the specified language, judged by a predicted confidence score                                                                     |
-| maximum_line_length_filter     | Code       | en, zh | Keeps samples with maximum line length within the specified range                                                                                   |
-| perplexity_filter              | General    | en, zh | Keeps samples with perplexity score below the specified threshold                                                                                   |
-| phrase_grounding_recall_filter | Multimodal | -      | Keeps samples whose locating recalls of phrases extracted from text in the images are within a specified range                                      |
-| special_characters_filter      | General    | en, zh | Keeps samples with special-char ratio within the specified range                                                                                    |
-| specified_field_filter         | General    | en, zh | Filters samples based on field, with value lies in the specified targets                                                                            |
-| specified_numeric_field_filter | General    | en, zh | Filters samples based on field, with value lies in the specified range (for numeric types)                                                          |
-| stopwords_filter               | General    | en, zh | Keeps samples with stopword ratio above the specified threshold                                                                                     |
-| suffix_filter                  | General    | en, zh | Keeps samples with specified suffixes                                                                                                               |
-| text_action_filter             | General    | en, zh | Keeps samples containing action verbs in their texts                                                                                                |
-| text_entity_dependency_filter  | General    | en, zh | Keeps samples containing dependency edges for an entity in the dependency tree of the texts                                                   |
-| text_length_filter             | General    | en, zh | Keeps samples with total text length within the specified range                                                                                     |
-| token_num_filter               | General    | en, zh | Keeps samples with token count within the specified range                                                                                           |
-| video_aesthetics_filter        | Video      | -      | Keeps samples whose specified frames have aesthetics scores within the specified range     |
-| video_aspect_ratio_filter      | Video      | -      | Keeps samples containing videos with aspect ratios within the specified range                                                                       |
-| video_duration_filter          | Video      | -      | Keep data samples whose videos' durations are within a specified range |                                                                            
-| video_frames_text_similarity_filter    | Multimodal | -      | Keep data samples whose similarities between sampled video frame images and text are within a specific range |
-| video_motion_score_filter      | Video      | -      | Keep samples with video motion scores within a specific range |
-| video_nsfw_filter              | Video      | -      | Keeps samples containing videos with NSFW scores below the threshold                                                               |
-| video_ocr_area_ratio_filter    | Video      | -      | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range |                                  
-| video_resolution_filter        | Video      | -      | Keeps samples containing videos with horizontal and vertical resolutions within the specified range                                                 |
-| video_watermark_filter         | Video      | -      | Keeps samples containing videos with predicted watermark probabilities below the threshold                                                               |
-| video_tagging_from_frames_filter  | Video   | -      | Keep samples containing videos with given tags |
-| words_num_filter               | General    | en, zh | Keeps samples with word count within the specified range                                                                                            |
-| word_repetition_filter         | General    | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range                                                                    |
+| Operator                            | Domain     | Lang   | Description                                                                                                                                          |
+|-------------------------------------|------------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| alphanumeric_filter                 | General    | en, zh | Keeps samples with alphanumeric ratio within the specified range                                                                                     |
+| audio_duration_filter               | Audio      | -      | Keep data samples whose audios' durations are within a specified range                                                                               |
+| audio_nmf_snr_filter                | Audio      | -      | Keep data samples whose audios' Signal-to-Noise Ratios (SNRs, computed based on Non-Negative Matrix Factorization, NMF) are within a specified range |
+| audio_size_filter                   | Audio      | -      | Keep data samples whose audios' sizes are within a specified range                                                                                   |
+| average_line_length_filter          | Code       | en, zh | Keeps samples with average line length within the specified range                                                                                    |
+| character_repetition_filter         | General    | en, zh | Keeps samples with char-level n-gram repetition ratio within the specified range                                                                     |
+| flagged_words_filter                | General    | en, zh | Keeps samples with flagged-word ratio below the specified threshold                                                                                  |
+| image_aesthetics_filter             | Image      | -      | Keeps samples containing images whose aesthetics scores are within the specified range                                                               |
+| image_aspect_ratio_filter           | Image      | -      | Keeps samples containing images with aspect ratios within the specified range                                                                        |
+| image_face_count_filter             | Image      | -      | Keeps samples containing images with face counts within the specified range                                                                          |
+| image_face_ratio_filter             | Image      | -      | Keeps samples containing images with face area ratios within the specified range                                                                     |
+| image_nsfw_filter                   | Image      | -      | Keeps samples containing images with NSFW scores below the threshold                                                                                 |
+| image_pair_similarity_filter        | Image      | -      | Keeps image pairs with image feature cosine similarity within the specified range based on a CLIP model                                              |
+| image_shape_filter                  | Image      | -      | Keeps samples containing images with widths and heights within the specified range                                                                   |
+| image_size_filter                   | Image      | -      | Keeps samples containing images whose size in bytes are within the specified range                                                                   |
+| image_text_matching_filter          | Multimodal | -      | Keeps samples with image-text classification matching score within the specified range based on a BLIP model                                         |
+| image_text_similarity_filter        | Multimodal | -      | Keeps samples with image-text feature cosine similarity within the specified range based on a CLIP model                                             |
+| image_watermark_filter              | Image      | -      | Keeps samples containing images with predicted watermark probabilities below the threshold                                                           |
+| language_id_score_filter            | General    | en, zh | Keeps samples of the specified language, judged by a predicted confidence score                                                                      |
+| maximum_line_length_filter          | Code       | en, zh | Keeps samples with maximum line length within the specified range                                                                                    |
+| perplexity_filter                   | General    | en, zh | Keeps samples with perplexity score below the specified threshold                                                                                    |
+| phrase_grounding_recall_filter      | Multimodal | -      | Keeps samples whose locating recalls of phrases extracted from text in the images are within a specified range                                       |
+| special_characters_filter           | General    | en, zh | Keeps samples with special-char ratio within the specified range                                                                                     |
+| specified_field_filter              | General    | en, zh | Filters samples based on field, with value lies in the specified targets                                                                             |
+| specified_numeric_field_filter      | General    | en, zh | Filters samples based on field, with value lies in the specified range (for numeric types)                                                           |
+| stopwords_filter                    | General    | en, zh | Keeps samples with stopword ratio above the specified threshold                                                                                      |
+| suffix_filter                       | General    | en, zh | Keeps samples with specified suffixes                                                                                                                |
+| text_action_filter                  | General    | en, zh | Keeps samples containing action verbs in their texts                                                                                                 |
+| text_entity_dependency_filter       | General    | en, zh | Keeps samples containing dependency edges for an entity in the dependency tree of the texts                                                          |
+| text_length_filter                  | General    | en, zh | Keeps samples with total text length within the specified range                                                                                      |
+| token_num_filter                    | General    | en, zh | Keeps samples with token count within the specified range                                                                                            |
+| video_aesthetics_filter             | Video      | -      | Keeps samples whose specified frames have aesthetics scores within the specified range                                                               |
+| video_aspect_ratio_filter           | Video      | -      | Keeps samples containing videos with aspect ratios within the specified range                                                                        |
+| video_duration_filter               | Video      | -      | Keep data samples whose videos' durations are within a specified range                                                                               |                                                                            
+| video_frames_text_similarity_filter | Multimodal | -      | Keep data samples whose similarities between sampled video frame images and text are within a specific range                                         |
+| video_motion_score_filter           | Video      | -      | Keep samples with video motion scores within a specific range                                                                                        |
+| video_nsfw_filter                   | Video      | -      | Keeps samples containing videos with NSFW scores below the threshold                                                                                 |
+| video_ocr_area_ratio_filter         | Video      | -      | Keep data samples whose detected text area ratios for specified frames in the video are within a specified range                                     |                                  
+| video_resolution_filter             | Video      | -      | Keeps samples containing videos with horizontal and vertical resolutions within the specified range                                                  |
+| video_watermark_filter              | Video      | -      | Keeps samples containing videos with predicted watermark probabilities below the threshold                                                           |
+| video_tagging_from_frames_filter    | Video   | -      | Keep samples containing videos with given tags                                                                                                       |
+| words_num_filter                    | General    | en, zh | Keeps samples with word count within the specified range                                                                                             |
+| word_repetition_filter              | General    | en, zh | Keeps samples with word-level n-gram repetition ratio within the specified range                                                                     |
 
 
 ## Deduplicator <a name="deduplicator"/>
