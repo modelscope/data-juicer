@@ -1,4 +1,3 @@
-import json
 import re
 from typing import Dict, Optional
 
@@ -38,12 +37,12 @@ class ExtractQAMapper(Mapper):
     """
 
     _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(self,
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
                  trust_remote_code: bool = False,
                  pattern: Optional[str] = None,
-                 qa_format: str = 'chatml',
                  enable_vllm: bool = True,
                  tensor_parallel_size: Optional[int] = None,
                  max_model_len: Optional[int] = None,
@@ -56,7 +55,6 @@ class ExtractQAMapper(Mapper):
         :param hf_model: Hugginface model id.
         :param trust_remote_code: passed to transformers
         :param pattern: regular expression pattern to search for within text.
-        :param qa_format: Output format of question and answer pair.
         :param enable_vllm: Whether to use vllm for inference acceleration.
         :param tensor_parallel_size: It is only valid when enable_vllm is True.
             The number of GPUs to use for distributed execution with tensor
@@ -93,7 +91,6 @@ class ExtractQAMapper(Mapper):
         else:
             self.pattern = pattern
 
-        self.qa_format = qa_format
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
@@ -133,41 +130,39 @@ class ExtractQAMapper(Mapper):
 
         return qa_list
 
-    def process_single(self, sample, rank=None):
+    def process_batched(self, samples, rank=None):
         model, processor = get_model(self.model_key, rank, self.use_cuda())
 
-        if self.enable_vllm:
-            response = model.generate([sample[self.text_key]],
-                                      self.sampling_params)
-            output = response[0].outputs[0].text
-        else:
-            inputs = processor(sample[self.text_key],
-                               return_tensors='pt').to(model.device)
-            response = model.generate(**inputs, **self.sampling_params)
-            output = processor.decode(response.cpu()[0],
-                                      skip_special_tokens=True)
+        keys = samples.keys()
+        first_key = next(iter(keys))
+        num_samples = len(samples[first_key])
+        out_samples = {
+            key: []
+            for key in keys | {self.query_key, self.response_key}
+        }
+        for i in range(num_samples):
+            sample = {key: samples[key][i] for key in keys}
+            if self.enable_vllm:
+                response = model.generate([sample[self.text_key]],
+                                          self.sampling_params)
+                output = response[0].outputs[0].text
+            else:
+                inputs = processor(sample[self.text_key],
+                                   return_tensors='pt').to(model.device)
+                response = model.generate(**inputs, **self.sampling_params)
+                output = processor.decode(response.cpu()[0],
+                                          skip_special_tokens=True)
 
-        qa_list = self._extract_qa(output)
+            qa_list = self._extract_qa(output)
 
-        if not len(qa_list):
-            logger.info(
-                'No question and answer data was extracted from this sample!')
+            if len(qa_list) > 0:
+                for q, a in qa_list:
+                    for k, v in sample.items():
+                        out_samples[k].append(v)
+                    out_samples[self.query_key].append(q)
+                    out_samples[self.response_key].append(a)
+            else:
+                logger.info(
+                    'No question and answer was extracted from this sample!')
 
-        dialogue_data = []
-        if self.qa_format == 'chatml':
-            for qa in qa_list:
-                dialogue_data.append({
-                    'messages': [{
-                        'role': 'user',
-                        'content': qa[0]
-                    }, {
-                        'role': 'assistant',
-                        'content': qa[1]
-                    }]
-                })
-        else:
-            raise ValueError(f'Not support {self.qa_format}!')
-
-        sample[self.text_key] = json.dumps(dialogue_data, ensure_ascii=False)
-
-        return sample
+        return out_samples

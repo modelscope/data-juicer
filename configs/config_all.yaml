@@ -64,7 +64,6 @@ process:
   - extract_qa_mapper:                                      # mapper to extract question and answer pair from text.
       hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'           # model name on huggingface to extract question and answer pair.
       pattern: null                                           # regular expression pattern to search for within text.
-      qa_format: 'chatml'                                     # Output format of question and answer pair.
       enable_vllm: true                                       # Whether to use vllm for inference acceleration.
       tensor_parallel_size: null                              # It is only valid when enable_vllm is True. The number of GPUs to use for distributed execution with tensor parallelism.
       max_model_len: null                                     # It is only valid when enable_vllm is True. Model context length. If unspecified, will be automatically derived from the model config.

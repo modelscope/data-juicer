@@ -139,6 +139,11 @@ class OP:
         self.image_key = kwargs.get('image_key', 'images')
         self.audio_key = kwargs.get('audio_key', 'audios')
         self.video_key = kwargs.get('video_key', 'videos')
+
+        self.query_key = kwargs.get('query_key', 'query')
+        self.response_key = kwargs.get('response_key', 'response')
+        self.history_key = kwargs.get('history_key', 'history')
+
         self.batch_size = kwargs.get('batch_size', 1000)
 
         # whether the model can be accelerated using cuda

@@ -101,7 +101,7 @@ class OptimizeInstructionMapper(Mapper):
             'content': self.system_prompt
         }, {
             'role': 'user',
-            'content': sample[self.text_key]
+            'content': sample[self.query_key]
         }]
         input_prompt = processor.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True)
@@ -118,6 +118,6 @@ class OptimizeInstructionMapper(Mapper):
             output = processor.decode(response.cpu()[0],
                                       skip_special_tokens=True)
 
-        sample[self.text_key] = output
+        sample[self.query_key] = output
 
         return sample
