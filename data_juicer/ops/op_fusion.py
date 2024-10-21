@@ -181,7 +181,8 @@ class FusedFilter(Filter):
         import av
 
         # context for the intermediate vars
-        samples[Fields.context] = {}
+        num_samples = len(samples[Fields.stats])
+        samples[Fields.context] = [{}] * num_samples
         for op in self.fused_filters:
             # open the context for these fused ops
             if op.accelerator == 'cuda':
@@ -192,11 +193,11 @@ class FusedFilter(Filter):
                 samples = op.compute_stats_batched(samples, context=True)
         # clean up the contexts after processing
         # check if there are containers that need to be closed
-        for context_key in samples[Fields.context]:
-            if isinstance(samples[Fields.context][context_key],
-                          av.container.InputContainer):
-                samples[Fields.context][context_key].streams.video[0].close()
-                samples[Fields.context][context_key].close()
+        for ctx in samples[Fields.context]:
+            for context_key in ctx:
+                if isinstance(ctx[context_key], av.container.InputContainer):
+                    ctx[context_key].streams.video[0].close()
+                    ctx[context_key].close()
         _ = samples.pop(Fields.context)
         return samples
 
