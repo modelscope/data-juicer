@@ -1,4 +1,5 @@
 import unittest
+from loguru import logger
 from data_juicer.ops.mapper.optimize_instruction_mapper import OptimizeInstructionMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
@@ -7,8 +8,7 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class OptimizeInstructionMapperTest(DataJuicerTestCaseBase):
-
-    text_key = 'text'
+    query_key = 'query'
 
     def _run_optimize_instruction(self, enable_vllm=False):
         op = OptimizeInstructionMapper(
@@ -17,13 +17,13 @@ class OptimizeInstructionMapperTest(DataJuicerTestCaseBase):
         )
 
         samples = [
-            {self.text_key: '鱼香肉丝怎么做？'}
+            {self.query_key: '鱼香肉丝怎么做？'}
         ]
 
         for sample in samples:
             result = op.process(sample)
-            print(f'Output results: {result}')
-            self.assertIn(self.text_key, result)
+            logger.info(f'Output results: {result}')
+            self.assertIn(self.query_key, result)
         
     def test_optimize_instruction(self):
         self._run_optimize_instruction()

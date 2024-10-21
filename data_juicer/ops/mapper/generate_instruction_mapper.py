@@ -217,11 +217,12 @@ class GenerateInstructionMapper(Mapper):
         return qa_pairs
 
     def parse_response(self, response_str):
+        logger.debug(response_str)
         pattern = self.qa_extraction_pattern
         matches = re.findall(pattern, response_str, re.DOTALL)
         response_str = ''
         out_qa_pairs = []
-        for i, match in enumerate(matches):
+        for match in matches:
             question, answer = match
             question = question.strip()
             answer = answer.strip()
@@ -264,11 +265,14 @@ class GenerateInstructionMapper(Mapper):
             output_ids = output_ids[:, inputs.data['input_ids'].shape[1]:]
             response_str = processor.decode(output_ids.cpu()[0],
                                             skip_special_tokens=True)
-        message_list = []
         out_qa_pairs, response_str = self.parse_response(response_str)
 
         if not response_str:
-            return {self.text_key: json.dumps({'messages': message_list})}
+            return {
+                self.query_key: '',
+                self.response_key: '',
+                self.history_key: []
+            }
 
         if self.similarity_type == 'rouge_l':
             sim_score = self.max_rouge_l_score(response_str,
@@ -278,13 +282,15 @@ class GenerateInstructionMapper(Mapper):
                 f'Not support similarity type "{self.similarity_type}"!')
 
         if sim_score <= self.similarity_threshold:
-            for question, answer in out_qa_pairs:
-                message_list.append({'role': 'user', 'content': question})
-                message_list.append({'role': 'assistant', 'content': answer})
+            query, response = out_qa_pairs[-1]
+            history = out_qa_pairs[:-1]
         else:
+            query = response = ''
+            history = []
             logger.info('Filter this generated sample due to similarity.')
 
         return {
-            self.text_key:
-            json.dumps({'messages': message_list}, ensure_ascii=False)
+            self.query_key: query,
+            self.response_key: response,
+            self.history_key: history
         }
