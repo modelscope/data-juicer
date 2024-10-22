@@ -6,11 +6,10 @@ from data_juicer.config import init_configs
 from data_juicer.core.ray_data import RayDataset
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.lazy_loader import LazyLoader
 
-with AvailabilityChecking(['ray'], requires_type='dist'):
-    import ray
-    import ray.data as rd
+ray = LazyLoader('ray', 'ray')
+rd = LazyLoader('rd', 'ray.data')
 
 
 class RayExecutor:
