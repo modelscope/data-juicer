@@ -15,7 +15,6 @@ class ExtractQAMapperTest(DataJuicerTestCaseBase):
         op = ExtractQAMapper(
             hf_model='alibaba-pai/pai-qwen1_5-7b-doc2qa',
             trust_remote_code=True,
-            qa_format='chatml',
             enable_vllm=enable_vllm,
             sampling_params=sampling_params,
             **kwargs)
