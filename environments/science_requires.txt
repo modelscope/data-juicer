@@ -1,6 +1,6 @@
 torch>=1.11.0
 torchaudio
-easyocr
+easyocr==1.7.1
 fasttext
 fasttext-wheel
 kenlm
@@ -26,3 +26,4 @@ scenedetect[opencv]
 ffmpeg-python
 opencv-python
 vllm
+rouge

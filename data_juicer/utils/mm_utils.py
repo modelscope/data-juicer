@@ -13,6 +13,9 @@ from pydantic import PositiveInt
 
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 from data_juicer.utils.file_utils import add_suffix_to_filename
+from data_juicer.utils.lazy_loader import LazyLoader
+
+cv2 = LazyLoader('cv2', 'cv2')
 
 # suppress most warnings from av
 av.logging.set_level(av.logging.PANIC)
@@ -129,8 +132,6 @@ def pil_to_opencv(pil_image):
 
 
 def detect_faces(image, detector, **extra_kwargs):
-    import cv2
-
     img = pil_to_opencv(image)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     dets = detector.detectMultiScale(gray, **extra_kwargs)

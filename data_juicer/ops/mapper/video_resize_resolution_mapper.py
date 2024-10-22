@@ -2,21 +2,21 @@ import math
 import os
 import sys
 
-import lazy_loader as lazy
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import close_video, load_video
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
-OP_NAME = 'video_resize_resolution_mapper'
-
 with HiddenPrints():
-    ffmpeg = lazy.load('ffmpeg')
+    ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
+
+OP_NAME = 'video_resize_resolution_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -59,7 +59,6 @@ class VideoResizeResolutionMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['ffmpeg-python'])
         self._init_parameters = self.remove_extra_parameters(locals())
 
         force_original_aspect_ratio = force_original_aspect_ratio.lower()
