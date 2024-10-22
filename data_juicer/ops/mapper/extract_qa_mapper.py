@@ -39,8 +39,8 @@ class ExtractQAMapper(Mapper):
                  trust_remote_code: bool = False,
                  pattern: Optional[str] = None,
                  qa_format: str = 'chatml',
-                 enable_vllm: bool = True,
-                 tensor_parallel_size: Optional[int] = None,
+                 enable_vllm: bool = False,
+                 tensor_parallel_size: Optional[int] = 1,
                  max_model_len: Optional[int] = None,
                  max_num_seqs: int = 256,
                  sampling_params: Dict = {},
@@ -81,7 +81,6 @@ class ExtractQAMapper(Mapper):
         """
 
         super().__init__(*args, **kwargs)
-        self.num_proc = 1
 
         if pattern is None:
             self.pattern = r'Human: (.*?)\nAssistant: (.*?)(?=\nHuman|$)'
@@ -92,12 +91,6 @@ class ExtractQAMapper(Mapper):
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
-
-            assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
-            if not tensor_parallel_size:
-                tensor_parallel_size = torch.cuda.device_count()
-                logger.info(f'Set tensor_parallel_size to \
-                    {tensor_parallel_size} for vllm.')
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
@@ -110,7 +103,8 @@ class ExtractQAMapper(Mapper):
             self.model_key = prepare_model(
                 model_type='huggingface',
                 pretrained_model_name_or_path=hf_model,
-                trust_remote_code=trust_remote_code)
+                trust_remote_code=trust_remote_code,
+                return_pipe=True)
             self.sampling_params = sampling_params
 
     def _extract_qa(self, output):
@@ -129,16 +123,17 @@ class ExtractQAMapper(Mapper):
     def process_single(self, sample, rank=None):
         model, processor = get_model(self.model_key, rank, self.use_cuda())
 
+        messages = [{'role': 'user', 'content': sample[self.text_key]}]
+
         if self.enable_vllm:
-            response = model.generate([sample[self.text_key]],
-                                      self.sampling_params)
+            response = model.chat(messages, self.sampling_params)
             output = response[0].outputs[0].text
         else:
-            inputs = processor(sample[self.text_key],
-                               return_tensors='pt').to(model.device)
-            response = model.generate(**inputs, **self.sampling_params)
-            output = processor.decode(response.cpu()[0],
-                                      skip_special_tokens=True)
+            # model is pipe
+            response = model(messages,
+                             return_full_text=False,
+                             **self.sampling_params)
+            output = response[0]['generated_text']
 
         qa_list = self._extract_qa(output)
 
