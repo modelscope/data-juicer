@@ -33,7 +33,7 @@ class LanguageIDScoreFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['fasttext', 'fasttext-wheel'])
+        AUTOINSTALL.check(['fasttext-wheel'])
         if not lang:
             # lang is [], '' or None
             self.lang = None
