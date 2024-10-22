@@ -2,13 +2,13 @@
 # https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/
 # --------------------------------------------------------
 
-import lazy_loader as lazy
+from data_juicer.utils.lazy_loader import LazyLoader
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
+
+selectolax = LazyLoader('selectolax', 'selectolax')
 
 OP_NAME = 'clean_html_mapper'
-
-selectolax = lazy.load('selectolax')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -25,7 +25,6 @@ class CleanHtmlMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['selectolax'])
 
     def process_batched(self, samples):
 
