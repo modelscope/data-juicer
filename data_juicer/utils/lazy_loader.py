@@ -40,7 +40,7 @@ class LazyLoader(types.ModuleType):
     def _load(self):
         # Auto install if necessary
         module_name = self.__name__.split('.')[0]
-        if not _is_module_installed(module_name):
+        if self.auto_install and not _is_module_installed(module_name):
             logger.warning(
                 f"Module '{module_name}' not installed or fully installed.")
             logger.warning(f"Auto installing '{module_name}' ...")

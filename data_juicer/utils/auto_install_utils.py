@@ -60,6 +60,10 @@ class AutoInstaller(object):
     def check(self, check_pkgs, param=None):
         """
         install if the package is not installed.
+
+        :param check_pkgs: packages to be check, install them if they are
+            not installed
+        :param param: install param for pip if necessary
         """
         for pkg in check_pkgs:
             if not _is_package_installed(pkg):
@@ -81,6 +85,8 @@ class AutoInstaller(object):
     def install(self, module):
         """
         install package for given module.
+
+        :param module: module to be installed
         """
         if module in MODULE_TO_PKGS:
             pkgs = MODULE_TO_PKGS[module]

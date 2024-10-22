@@ -13,6 +13,7 @@ from ..base_op import OPERATORS, UNFORKABLE, Mapper
 
 torch = LazyLoader('torch', 'torch')
 vllm = LazyLoader('vllm', 'vllm')
+rouge = LazyLoader('rouge', 'rouge')
 
 DEFAULT_PROMPT_TEMPLATE = """
 请你仔细观察多个示例数据的输入和输出，按照你的理解，总结出相应规矩，然后写出一个新的【问题】和【回答】。注意，新生成的【问题】和【回答】需要满足如下要求：
@@ -228,12 +229,11 @@ class GenerateInstructionMapper(Mapper):
         return out_qa_pairs, response_str
 
     def max_rouge_l_score(self, reference, candidates):
-        from rouge import Rouge
 
-        rouge = Rouge()
+        r = rouge.Rouge()
         max_score = 0.0
         for candidate in candidates:
-            scores = rouge.get_scores(candidate, reference)
+            scores = r.get_scores(candidate, reference)
             rouge_l_score = scores[0]['rouge-l']['f']
             if rouge_l_score > max_score:
                 max_score = rouge_l_score

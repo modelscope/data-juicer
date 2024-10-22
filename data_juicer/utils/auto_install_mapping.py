@@ -99,5 +99,6 @@ PKG_TO_OPS = {
         'extract_qa_mapper', 'generate_instruction_mapper',
         'optimize_instruction_mapper'
     ],
+    'rouge': ['generate_instruction_mapper'],
     'ram': ['image_tagging_mapper', 'video_tagging_from_frames_mapper']
 }

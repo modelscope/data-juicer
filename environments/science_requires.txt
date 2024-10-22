@@ -26,3 +26,4 @@ scenedetect[opencv]
 ffmpeg-python
 opencv-python
 vllm
+rouge
