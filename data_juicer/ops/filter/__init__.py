@@ -1,6 +1,4 @@
 # yapf: disable
-from image_face_count_filter import ImageFaceCountFilter
-
 from . import (alphanumeric_filter, audio_duration_filter,
                audio_nmf_snr_filter, audio_size_filter,
                average_line_length_filter, character_repetition_filter,
@@ -31,6 +29,7 @@ from .character_repetition_filter import CharacterRepetitionFilter
 from .flagged_words_filter import FlaggedWordFilter
 from .image_aesthetics_filter import ImageAestheticsFilter
 from .image_aspect_ratio_filter import ImageAspectRatioFilter
+from .image_face_count_filter import ImageFaceCountFilter
 from .image_face_ratio_filter import ImageFaceRatioFilter
 from .image_nsfw_filter import ImageNSFWFilter
 from .image_pair_similarity_filter import ImagePairSimilarityFilter
