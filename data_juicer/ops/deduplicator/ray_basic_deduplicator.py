@@ -1,19 +1,11 @@
-from typing import Any
-
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import Filter
 
-with AvailabilityChecking(['redis'],
-                          op_name='ray_xxx_deduplicator',
-                          requires_type='dist'):
-    try:
-        import redis
-    except Exception:
-        redis = Any
+redis = LazyLoader('redis', 'redis')
 
 
 class RayBasicDeduplicator(Filter):

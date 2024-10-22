@@ -16,6 +16,7 @@ class GenerateInstructionMapperTest(DataJuicerTestCaseBase):
             hf_model='Qwen/Qwen-7B-Chat',
             seed_file='demos/data/demo-dataset-chatml.jsonl',
             instruct_num=2,
+            trust_remote_code=True,
             enable_vllm=enable_vllm
         )
 

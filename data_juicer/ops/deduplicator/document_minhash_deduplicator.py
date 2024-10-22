@@ -7,7 +7,6 @@ import struct
 from collections import defaultdict
 from typing import Optional
 
-import lazy_loader as lazy
 import numpy as np
 import regex
 from loguru import logger
@@ -16,14 +15,15 @@ from tqdm import tqdm
 from typing_extensions import Annotated
 
 from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Deduplicator
+from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import UnionFind, split_on_whitespace
 
-OP_NAME = 'document_minhash_deduplicator'
+integrate = LazyLoader('integrate', 'scipy.integrate')
 
-integrate = lazy.load('scipy.integrate')
+OP_NAME = 'document_minhash_deduplicator'
 
 MERSENNE_PRIME = np.uint64((1 << 61) - 1)
 MAX_HASH = np.uint64((1 << 32) - 1)
@@ -151,7 +151,6 @@ class DocumentMinhashDeduplicator(Deduplicator):
             sentencepiece tokenization.
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['scipy'])
         # about minhash computation
         self.tokenization = tokenization
         self.window_size = window_size
