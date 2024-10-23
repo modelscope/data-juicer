@@ -82,6 +82,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.ImageSizeFilter"><code class="docutils literal notranslate"><span class="pre">ImageSizeFilter</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.VideoWatermarkFilter"><code class="docutils literal notranslate"><span class="pre">VideoWatermarkFilter</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.WordsNumFilter"><code class="docutils literal notranslate"><span class="pre">WordsNumFilter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.ImageFaceCountFilter"><code class="docutils literal notranslate"><span class="pre">ImageFaceCountFilter</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.ImageFaceRatioFilter"><code class="docutils literal notranslate"><span class="pre">ImageFaceRatioFilter</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.FlaggedWordFilter"><code class="docutils literal notranslate"><span class="pre">FlaggedWordFilter</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.filter.WordRepetitionFilter"><code class="docutils literal notranslate"><span class="pre">WordRepetitionFilter</span></code></a></li>
@@ -2375,6 +2376,68 @@ parameter.</p></li>
 <dt class="sig sig-object py" id="data_juicer.ops.filter.WordsNumFilter.process_batched">
 <span class="sig-name descname"><span class="pre">process_batched</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/words_num_filter.html#WordsNumFilter.process_batched"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.WordsNumFilter.process_batched" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.ImageFaceCountFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.filter.</span></span><span class="sig-name descname"><span class="pre">ImageFaceCountFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_classifier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_face_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_face_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">any_or_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/image_face_count_filter.html#ImageFaceCountFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.ImageFaceCountFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Filter" title="data_juicer.ops.base_op.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Filter</span></code></a></p>
+<p>Filter to keep samples with the number of faces within a specific range.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.ImageFaceCountFilter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cv_classifier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_face_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_face_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">any_or_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/image_face_count_filter.html#ImageFaceCountFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.ImageFaceCountFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cv_classifier</strong> – OpenCV classifier path for face detection.
+By default, we will use ‘haarcascade_frontalface_alt.xml’.</p></li>
+<li><p><strong>min_face_count</strong> – Minimum number of faces required for samples.</p></li>
+<li><p><strong>max_face_count</strong> – Maximum number of faces required for samples.</p></li>
+<li><p><strong>any_or_all</strong> – Keep this sample with ‘any’ or ‘all’ strategy of
+all images. ‘any’: keep this sample if any images meet the
+condition. ‘all’: keep this sample only if all images meet the
+condition.</p></li>
+<li><p><strong>args</strong> – Extra positional arguments.</p></li>
+<li><p><strong>kwargs</strong> – Extra keyword arguments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.ImageFaceCountFilter.compute_stats_single">
+<span class="sig-name descname"><span class="pre">compute_stats_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/image_face_count_filter.html#ImageFaceCountFilter.compute_stats_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.ImageFaceCountFilter.compute_stats_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute stats for the sample which is used as a metric to decide
+whether to filter this sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sample</strong> – input sample.</p></li>
+<li><p><strong>context</strong> – whether to store context information of intermediate
+vars in the sample temporarily.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sample with computed stats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.filter.ImageFaceCountFilter.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/image_face_count_filter.html#ImageFaceCountFilter.process_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.ImageFaceCountFilter.process_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>For sample level, sample –&gt; Boolean.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – sample to decide whether to filter</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true for keeping and false for filtering</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
