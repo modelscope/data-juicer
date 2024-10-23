@@ -1,3 +1,4 @@
 [run]
 omit =
-    config-3.py
+    /workspace/config.py
+    /workspace/config-3.py
