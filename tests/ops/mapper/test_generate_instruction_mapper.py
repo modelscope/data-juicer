@@ -28,6 +28,10 @@ class GenerateInstructionMapperTest(DataJuicerTestCaseBase):
 
         for row in dataset:
             logger.info(row)
+            # Note: If switching models causes this assert to fail, it may not be a code issue; 
+            # the model might just have limited capabilities.
+            self.assertNotEqual(row[op.query_key], '')
+            self.assertNotEqual(row[op.response_key], '')
 
     def test_generate_instruction(self):
         self._run_generate_instruction()

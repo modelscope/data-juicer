@@ -22,6 +22,10 @@ class ExtractQAMapperTest(DataJuicerTestCaseBase):
         dataset = dataset.map(op.process, batch_size=2)
         for row in dataset:
             logger.info(row)
+            # Note: If switching models causes this assert to fail, it may not be a code issue; 
+            # the model might just have limited capabilities.
+            self.assertNotEqual(row[op.query_key], '')
+            self.assertNotEqual(row[op.response_key], '')
 
     def test_extract_qa(self):
         samples = [

@@ -23,7 +23,9 @@ class OptimizeInstructionMapperTest(DataJuicerTestCaseBase):
         for sample in samples:
             result = op.process(sample)
             logger.info(f'Output results: {result}')
-            self.assertIn(self.query_key, result)
+            # Note: If switching models causes this assert to fail, it may not be a code issue; 
+            # the model might just have limited capabilities.
+            self.assertNotEqual(sample[op.query_key], '')
         
     def test_optimize_instruction(self):
         self._run_optimize_instruction()
