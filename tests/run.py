@@ -10,6 +10,7 @@ import argparse
 import os
 import sys
 import unittest
+import coverage
 
 from loguru import logger
 
@@ -66,12 +67,20 @@ def gather_test_cases(test_dir, pattern, tag):
 
 
 def main():
+    cov = coverage.Coverage()
+    cov.start()
+
     runner = unittest.TextTestRunner()
     test_suite = gather_test_cases(os.path.abspath(args.test_dir),
                                    args.pattern, args.tag)
     res = runner.run(test_suite)
+
+    cov.stop()
+
     if not res.wasSuccessful():
         exit(1)
+
+    cov.report()
 
 
 if __name__ == '__main__':
