@@ -10,15 +10,15 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 torch = LazyLoader('torch', 'torch')
 vllm = LazyLoader('vllm', 'vllm')
 
-OP_NAME = 'extract_qa_mapper'
+OP_NAME = 'generate_qa_from_text_mapper'
 
 
 # TODO: Extend LLM-based OPs into API-based implementation.
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
-class ExtractQAMapper(Mapper):
+class GenerateQAFromTextMapper(Mapper):
     """
-    Mapper to extract question and answer pair from text samples.
+    Mapper to generate question and answer pairs from text.
     Recommended model list: [
         'alibaba-pai/pai-llama3-8b-doc2qa',
         'alibaba-pai/pai-baichuan2-7b-doc2qa',
@@ -117,7 +117,7 @@ class ExtractQAMapper(Mapper):
         pat = re.compile(self.pattern, re.DOTALL)
         qa_pairs = pat.findall(output)
 
-        for _, qa in enumerate(qa_pairs, 1):
+        for qa in qa_pairs:
             user, assistant = qa
             qa_list.append((user.strip(), assistant.strip()))
 

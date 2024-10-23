@@ -1,17 +1,17 @@
 import unittest
 from loguru import logger
-from data_juicer.ops.mapper.optimize_instruction_mapper import OptimizeInstructionMapper
+from data_juicer.ops.mapper.optimize_query_mapper import OptimizeQueryMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
 # Skip tests for this OP in the GitHub actions due to disk space limitation.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
-class OptimizeInstructionMapperTest(DataJuicerTestCaseBase):
+class OptimizeQueryMapperTest(DataJuicerTestCaseBase):
     query_key = 'query'
 
     def _run_optimize_instruction(self, enable_vllm=False):
-        op = OptimizeInstructionMapper(
+        op = OptimizeQueryMapper(
             hf_model='alibaba-pai/Qwen2-7B-Instruct-Refine',
             enable_vllm=enable_vllm
         )

@@ -64,49 +64,23 @@ from .video_watermark_filter import VideoWatermarkFilter
 from .word_repetition_filter import WordRepetitionFilter
 from .words_num_filter import WordsNumFilter
 
-__all__ = [
-    'ImageTextSimilarityFilter',
-    'VideoAspectRatioFilter',
-    'ImageTextMatchingFilter',
-    'ImageNSFWFilter',
-    'TokenNumFilter',
-    'TextLengthFilter',
-    'SpecifiedNumericFieldFilter',
-    'AudioNMFSNRFilter',
-    'VideoAestheticsFilter',
-    'PerplexityFilter',
-    'PhraseGroundingRecallFilter',
-    'MaximumLineLengthFilter',
-    'AverageLineLengthFilter',
-    'SpecifiedFieldFilter',
-    'VideoTaggingFromFramesFilter',
-    'TextEntityDependencyFilter',
-    'VideoResolutionFilter',
-    'AlphanumericFilter',
-    'ImageWatermarkFilter',
-    'ImageAestheticsFilter',
-    'AudioSizeFilter',
-    'StopWordsFilter',
-    'CharacterRepetitionFilter',
-    'ImageShapeFilter',
-    'VideoDurationFilter',
-    'TextActionFilter',
-    'VideoOcrAreaRatioFilter',
-    'VideoNSFWFilter',
-    'SpecialCharactersFilter',
-    'VideoFramesTextSimilarityFilter',
-    'ImageAspectRatioFilter',
-    'AudioDurationFilter',
-    'LanguageIDScoreFilter',
-    'SuffixFilter',
-    'ImageSizeFilter',
-    'VideoWatermarkFilter',
-    'WordsNumFilter',
-    'ImageFaceRatioFilter',
-    'FlaggedWordFilter',
-    'WordRepetitionFilter',
-    'VideoMotionScoreFilter',
-    'ImagePairSimilarityFilter'
-]
-
 # yapf: enable
+
+__all__ = [
+    'ImageTextSimilarityFilter', 'VideoAspectRatioFilter',
+    'ImageTextMatchingFilter', 'ImageNSFWFilter', 'TokenNumFilter',
+    'TextLengthFilter', 'SpecifiedNumericFieldFilter', 'AudioNMFSNRFilter',
+    'VideoAestheticsFilter', 'PerplexityFilter', 'PhraseGroundingRecallFilter',
+    'MaximumLineLengthFilter', 'AverageLineLengthFilter',
+    'SpecifiedFieldFilter', 'VideoTaggingFromFramesFilter',
+    'TextEntityDependencyFilter', 'VideoResolutionFilter',
+    'AlphanumericFilter', 'ImageWatermarkFilter', 'ImageAestheticsFilter',
+    'AudioSizeFilter', 'StopWordsFilter', 'CharacterRepetitionFilter',
+    'ImageShapeFilter', 'VideoDurationFilter', 'TextActionFilter',
+    'VideoOcrAreaRatioFilter', 'VideoNSFWFilter', 'SpecialCharactersFilter',
+    'VideoFramesTextSimilarityFilter', 'ImageAspectRatioFilter',
+    'AudioDurationFilter', 'LanguageIDScoreFilter', 'SuffixFilter',
+    'ImageSizeFilter', 'VideoWatermarkFilter', 'WordsNumFilter',
+    'ImageFaceRatioFilter', 'FlaggedWordFilter', 'WordRepetitionFilter',
+    'VideoMotionScoreFilter', 'ImagePairSimilarityFilter'
+]

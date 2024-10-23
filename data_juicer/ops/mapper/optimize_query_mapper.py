@@ -11,14 +11,14 @@ vllm = LazyLoader('vllm', 'vllm')
 
 DEFAULT_SYSTEM_PROMPT = '请优化这个指令，将其修改为一个更详细具体的指令。'
 
-OP_NAME = 'optimize_instruction_mapper'
+OP_NAME = 'optimize_query_mapper'
 
 
 # TODO: Extend LLM-based OPs into API-based implementation.
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
-class OptimizeInstructionMapper(Mapper):
-    """Mapper to optimize instruction.
+class OptimizeQueryMapper(Mapper):
+    """Mapper to optimize instruction query.
     Recommended model list: [
         alibaba-pai/Qwen2-1.5B-Instruct-Refine
         alibaba-pai/Qwen2-7B-Instruct-Refine

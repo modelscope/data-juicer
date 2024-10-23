@@ -27,14 +27,15 @@ QA_EXTRACTION_PATTERN = r'【问题】\s*(.*?)\s*【回答】\s*(.*?)\s*(?=【�
 EXAMPLE_TEMPLATE = '\n如下是一条示例数据：\n\n{qa_pairs}'
 QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}\n'
 
-OP_NAME = 'generate_instruction_mapper'
+OP_NAME = 'generate_qa_from_examples_mapper'
 
 
 # TODO: Extend LLM-based OPs into API-based implementation.
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
-class GenerateInstructionMapper(Mapper):
-    """Mapper to generate new instruction text data.
+class GenerateQAFromExamplesMapper(Mapper):
+    """
+    Mapper to generate question and answer pairs from examples.
     You should configure an empty dataset in your yaml config file:
     ```
     generated_dataset_config:

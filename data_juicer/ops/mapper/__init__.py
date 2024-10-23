@@ -2,12 +2,12 @@
 from . import (audio_ffmpeg_wrapped_mapper, chinese_convert_mapper,
                clean_copyright_mapper, clean_email_mapper, clean_html_mapper,
                clean_ip_mapper, clean_links_mapper, expand_macro_mapper,
-               extract_qa_mapper, fix_unicode_mapper,
-               generate_instruction_mapper, image_blur_mapper,
+               fix_unicode_mapper, generate_qa_from_examples_mapper,
+               generate_qa_from_text_mapper, image_blur_mapper,
                image_captioning_from_gpt4v_mapper, image_captioning_mapper,
                image_diffusion_mapper, image_face_blur_mapper,
                image_tagging_mapper, nlpaug_en_mapper, nlpcda_zh_mapper,
-               optimize_instruction_mapper, punctuation_normalization_mapper,
+               optimize_query_mapper, punctuation_normalization_mapper,
                remove_bibliography_mapper, remove_comments_mapper,
                remove_header_mapper, remove_long_words_mapper,
                remove_non_chinese_character_mapper,
@@ -34,9 +34,9 @@ from .clean_html_mapper import CleanHtmlMapper
 from .clean_ip_mapper import CleanIpMapper
 from .clean_links_mapper import CleanLinksMapper
 from .expand_macro_mapper import ExpandMacroMapper
-from .extract_qa_mapper import ExtractQAMapper
 from .fix_unicode_mapper import FixUnicodeMapper
-from .generate_instruction_mapper import GenerateInstructionMapper
+from .generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
+from .generate_qa_from_text_mapper import GenerateQAFromTextMapper
 from .image_blur_mapper import ImageBlurMapper
 from .image_captioning_from_gpt4v_mapper import ImageCaptioningFromGPT4VMapper
 from .image_captioning_mapper import ImageCaptioningMapper
@@ -45,7 +45,7 @@ from .image_face_blur_mapper import ImageFaceBlurMapper
 from .image_tagging_mapper import ImageTaggingMapper
 from .nlpaug_en_mapper import NlpaugEnMapper
 from .nlpcda_zh_mapper import NlpcdaZhMapper
-from .optimize_instruction_mapper import OptimizeInstructionMapper
+from .optimize_query_mapper import OptimizeQueryMapper
 from .punctuation_normalization_mapper import PunctuationNormalizationMapper
 from .remove_bibliography_mapper import RemoveBibliographyMapper
 from .remove_comments_mapper import RemoveCommentsMapper
@@ -78,6 +78,8 @@ from .video_tagging_from_audio_mapper import VideoTaggingFromAudioMapper
 from .video_tagging_from_frames_mapper import VideoTaggingFromFramesMapper
 from .whitespace_normalization_mapper import WhitespaceNormalizationMapper
 
+# yapf: enable
+
 __all__ = [
     'VideoCaptioningFromAudioMapper',
     'VideoTaggingFromAudioMapper',
@@ -97,7 +99,7 @@ __all__ = [
     'VideoFFmpegWrappedMapper',
     'ChineseConvertMapper',
     'NlpcdaZhMapper',
-    'OptimizeInstructionMapper',
+    'OptimizeQueryMapper',
     'ImageBlurMapper',
     'CleanCopyrightMapper',
     'RemoveNonChineseCharacterlMapper',
@@ -109,12 +111,12 @@ __all__ = [
     'VideoTaggingFromFramesMapper',
     'RemoveCommentsMapper',
     'ExpandMacroMapper',
-    'ExtractQAMapper',
+    'GenerateQAFromExamplesMapper',
+    'GenerateQAFromTextMapper',
     'ImageCaptioningMapper',
     'RemoveWordsWithIncorrectSubstringsMapper',
     'VideoCaptioningFromVideoMapper',
     'VideoCaptioningFromSummarizerMapper',
-    'GenerateInstructionMapper',
     'FixUnicodeMapper',
     'NlpaugEnMapper',
     'VideoCaptioningFromFramesMapper',
@@ -127,5 +129,3 @@ __all__ = [
     'VideoFaceBlurMapper',
     'ImageTaggingMapper',
 ]
-
-# yapf: enable

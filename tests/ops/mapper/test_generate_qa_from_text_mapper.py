@@ -1,18 +1,18 @@
 import unittest
 from loguru import logger
 from data_juicer.core.data import NestedDataset as Dataset
-from data_juicer.ops.mapper.extract_qa_mapper import ExtractQAMapper
+from data_juicer.ops.mapper.generate_qa_from_text_mapper import GenerateQAFromTextMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
 # Skip tests for this OP in the GitHub actions due to disk space limitation.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
-class ExtractQAMapperTest(DataJuicerTestCaseBase):
+class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
     text_key = 'text'
 
     def _run_extract_qa(self, samples, enable_vllm=False, sampling_params={}, **kwargs):
-        op = ExtractQAMapper(
+        op = GenerateQAFromTextMapper(
             hf_model='alibaba-pai/pai-qwen1_5-7b-doc2qa',
             trust_remote_code=True,
             enable_vllm=enable_vllm,

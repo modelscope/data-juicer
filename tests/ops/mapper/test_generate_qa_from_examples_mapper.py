@@ -1,19 +1,19 @@
 import unittest
 import json
 from loguru import logger
-from data_juicer.ops.mapper.generate_instruction_mapper import GenerateInstructionMapper
+from data_juicer.ops.mapper.generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
 # Skip tests for this OP in the GitHub actions due to disk space limitation.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
-class GenerateInstructionMapperTest(DataJuicerTestCaseBase):
+class GenerateQAFromExamplesMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'
 
     def _run_generate_instruction(self, enable_vllm=False):
-        op = GenerateInstructionMapper(
+        op = GenerateQAFromExamplesMapper(
             hf_model='Qwen/Qwen-7B-Chat',
             seed_file='demos/data/demo-dataset-chatml.jsonl',
             instruct_num=2,
