@@ -1,9 +1,5 @@
 from data_juicer.ops.base_op import OPERATORS, UNFORKABLE
-from data_juicer.ops.mapper import OptimizeQAMapper
-from data_juicer.utils.lazy_loader import LazyLoader
-
-torch = LazyLoader('torch', 'torch')
-vllm = LazyLoader('vllm', 'vllm')
+from data_juicer.ops.mapper.optimize_qa_mapper import OptimizeQAMapper
 
 OP_NAME = 'optimize_response_mapper'
 
