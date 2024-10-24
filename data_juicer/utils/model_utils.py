@@ -594,9 +594,12 @@ class APIModel:
 
     def __init__(self,
                  *,
+                 api_model,
                  api_url=None,
                  api_key=None,
-                 response_path='choices.0.message.content'):
+                 response_path=None):
+        self.api_model = api_model
+
         if api_url is None:
             api_url = os.getenv('DJ_API_URL')
             if api_url is None:
@@ -609,13 +612,16 @@ class APIModel:
             api_key = os.getenv('DJ_API_KEY') or os.getenv('OPENAI_API_KEY')
         self.api_key = api_key
 
+        if response_path is None:
+            response_path = 'choices.0.message.content'
+        self.response_path = response_path
+
         self.headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.api_key}'
         }
-        self.response_path = response_path
 
-    def __call__(self, *, messages, model, **kwargs):
+    def __call__(self, *, messages, **kwargs):
         """Sends messages to the configured API model and returns the parsed response.
 
         :param messages: The messages to send to the API.
@@ -625,7 +631,7 @@ class APIModel:
         :return: The parsed response from the API, or None if an error occurs.
         """
         payload = {
-            'model': model,
+            'model': self.model,
             'messages': messages,
             **kwargs,
         }
@@ -656,10 +662,7 @@ class APIModel:
         return data
 
 
-def prepare_api_model(*,
-                      api_url=None,
-                      api_key=None,
-                      response_path='choices.0.message.content'):
+def prepare_api_model(*, api_url=None, api_key=None, response_path=None):
     """Creates a callable API model for interacting with the OpenAI-compatible API.
 
     This callable object supports custom result parsing and is suitable for use
