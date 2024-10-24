@@ -7,5 +7,5 @@ omit =
     # avoid measuring third-party dist packages
     */dist-packages/*
 
-    # avoid measuring entrance of unittest
-    tests/run.py
+    # avoid measuring code of unittest
+    tests/*
