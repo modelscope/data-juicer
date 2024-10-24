@@ -1,7 +1,5 @@
 from typing import Dict, Optional
 
-from loguru import logger
-
 from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -30,8 +28,8 @@ class OptimizeInstructionMapper(Mapper):
                  hf_model: str = 'alibaba-pai/Qwen2-7B-Instruct-Refine',
                  trust_remote_code: bool = False,
                  system_prompt: Optional[str] = None,
-                 enable_vllm: bool = True,
-                 tensor_parallel_size: Optional[int] = None,
+                 enable_vllm: bool = False,
+                 tensor_parallel_size: Optional[int] = 1,
                  max_model_len: Optional[int] = None,
                  max_num_seqs: int = 256,
                  sampling_params: Dict = {},
@@ -57,7 +55,6 @@ class OptimizeInstructionMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.num_proc = 1
 
         if system_prompt is None:
             system_prompt = DEFAULT_SYSTEM_PROMPT
@@ -65,11 +62,6 @@ class OptimizeInstructionMapper(Mapper):
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
-            assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
-            if not tensor_parallel_size:
-                tensor_parallel_size = torch.cuda.device_count()
-                logger.info(f'Set tensor_parallel_size to \
-                    {tensor_parallel_size} for vllm.')
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
@@ -82,7 +74,8 @@ class OptimizeInstructionMapper(Mapper):
             self.model_key = prepare_model(
                 model_type='huggingface',
                 pretrained_model_name_or_path=hf_model,
-                trust_remote_code=trust_remote_code)
+                trust_remote_code=trust_remote_code,
+                return_pipe=True)
             self.sampling_params = sampling_params
 
     def process_single(self, sample=None, rank=None):
@@ -95,20 +88,17 @@ class OptimizeInstructionMapper(Mapper):
             'role': 'user',
             'content': sample[self.text_key]
         }]
-        input_prompt = processor.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True)
 
         if self.enable_vllm:
-            response = model.generate([input_prompt], self.sampling_params)
+            response = model.chat(messages, self.sampling_params)
             output = response[0].outputs[0].text
         else:
-            inputs = processor(input_prompt,
-                               return_tensors='pt').to(model.device)
-            response = model.generate(**inputs,
-                                      eos_token_id=processor.eos_token_id,
-                                      **self.sampling_params)
-            output = processor.decode(response.cpu()[0],
-                                      skip_special_tokens=True)
+            # model is pipe
+            response = model(messages,
+                             return_full_text=False,
+                             eos_token_id=processor.eos_token_id,
+                             **self.sampling_params)
+            output = response[0]['generated_text']
 
         sample[self.text_key] = output
 

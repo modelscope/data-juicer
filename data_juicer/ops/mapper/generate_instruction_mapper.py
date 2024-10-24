@@ -15,13 +15,12 @@ torch = LazyLoader('torch', 'torch')
 vllm = LazyLoader('vllm', 'vllm')
 rouge = LazyLoader('rouge', 'rouge')
 
-DEFAULT_PROMPT_TEMPLATE = """
+DEFAULT_SYSTEM_PROMPT = """
 请你仔细观察多个示例数据的输入和输出，按照你的理解，总结出相应规矩，然后写出一个新的【问题】和【回答】。注意，新生成的【问题】和【回答】需要满足如下要求：
 1. 生成的【问题】和【回答】不能与输入的【问题】和【回答】一致，但是需要保持格式相同。
 2. 生成的【问题】不一定要局限于输入【问题】的话题或领域，生成的【回答】需要正确回答生成的【问题】。
 3. 提供的【问题】和【回答】可能是多轮对话，生成的【问题】和【回答】也可以是多轮，但是需要保持格式相同。
 4. 生成的【问题】和【回答】必须成对出现，而且【问题】需要在【回答】之前。
-{augmented_data}
 """
 QA_EXTRACTION_PATTERN = r'【问题】\s*(.*?)\s*【回答】\s*(.*?)\s*(?=【问题】|$)'
 EXAMPLE_TEMPLATE = '\n如下是一条示例数据：\n\n{qa_pairs}'
@@ -53,12 +52,12 @@ class GenerateInstructionMapper(Mapper):
                  instruct_num: PositiveInt = 3,
                  trust_remote_code: bool = False,
                  similarity_threshold: float = 0.7,
-                 prompt_template: Optional[str] = None,
+                 system_prompt: Optional[str] = None,
                  qa_pair_template: Optional[str] = None,
                  example_template: Optional[str] = None,
                  qa_extraction_pattern: Optional[str] = None,
-                 enable_vllm: bool = True,
-                 tensor_parallel_size: Optional[int] = None,
+                 enable_vllm: bool = False,
+                 tensor_parallel_size: Optional[int] = 1,
                  max_model_len: Optional[int] = None,
                  max_num_seqs: int = 256,
                  sampling_params: Dict = {},
@@ -77,9 +76,7 @@ class GenerateInstructionMapper(Mapper):
             between the generated samples and the seed samples.
             Range from 0 to 1. Samples with similarity score less than
             this threshold will be kept.
-        :param prompt_template: Prompt template for generate samples.
-            Please make sure the template contains "{augmented_data}",
-            which corresponds to the augmented samples.
+        :param system_prompt: System prompt for generate samples.
         :param qa_pair_template: Prompt template for generate question
             and answer pair description. Please make sure the template
             contains two "{}" to format question and answer.
@@ -106,7 +103,6 @@ class GenerateInstructionMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.num_proc = 1
 
         if not seed_file:
             raise ValueError(
@@ -117,8 +113,8 @@ class GenerateInstructionMapper(Mapper):
         self.similarity_threshold = similarity_threshold
         self.similarity_type = 'rouge_l'
 
-        if prompt_template is None:
-            prompt_template = DEFAULT_PROMPT_TEMPLATE
+        if system_prompt is None:
+            system_prompt = DEFAULT_SYSTEM_PROMPT
         if qa_pair_template is None:
             qa_pair_template = QA_PAIR_TEMPLATE
         if example_template is None:
@@ -126,7 +122,7 @@ class GenerateInstructionMapper(Mapper):
         if qa_extraction_pattern is None:
             qa_extraction_pattern = QA_EXTRACTION_PATTERN
 
-        self.prompt_template = prompt_template
+        self.system_prompt = system_prompt
         self.qa_pair_template = qa_pair_template
         self.example_template = example_template
         self.qa_extraction_pattern = qa_extraction_pattern
@@ -134,12 +130,6 @@ class GenerateInstructionMapper(Mapper):
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
-
-            assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
-            if not tensor_parallel_size:
-                tensor_parallel_size = torch.cuda.device_count()
-                logger.info(f'Set tensor_parallel_size to \
-                    {tensor_parallel_size} for vllm.')
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
@@ -152,7 +142,8 @@ class GenerateInstructionMapper(Mapper):
             self.model_key = prepare_model(
                 model_type='huggingface',
                 pretrained_model_name_or_path=hf_model,
-                trust_remote_code=trust_remote_code)
+                trust_remote_code=trust_remote_code,
+                return_pipe=True)
             self.sampling_params = sampling_params
 
         self.seed_qa_samples = self.load_seed_qa_samples(seed_file)
@@ -178,7 +169,7 @@ class GenerateInstructionMapper(Mapper):
 
         return qa_samples
 
-    def build_prompt(self, qa_samples, prompt_template):
+    def build_user_prompt(self, qa_samples):
 
         def format_qa_pairs(qa_pairs):
             return ''.join([
@@ -191,9 +182,8 @@ class GenerateInstructionMapper(Mapper):
             for qa_pairs in qa_samples
         ]
 
-        body = ''.join(body_fragments)
-
-        return prompt_template.format(augmented_data=body)
+        user_prompt = ''.join(body_fragments)
+        return user_prompt
 
     def parse_chatml_str(self, input_str):
         user_input = None
@@ -244,21 +234,28 @@ class GenerateInstructionMapper(Mapper):
 
         random_qa_samples = random.sample(self.seed_qa_samples,
                                           self.instruct_num)
-        input_prompt = self.build_prompt(random_qa_samples,
-                                         self.prompt_template)
+        user_prompt = self.build_prompt(random_qa_samples)
+
+        messages = [{
+            'role': 'system',
+            'content': self.system_prompt
+        }, {
+            'role': 'user',
+            'content': user_prompt
+        }]
+
         if self.enable_vllm:
-            response = model.generate([input_prompt], self.sampling_params)
-            response_str = response[0].outputs[0].text
+            response = model.chat(messages, self.sampling_params)
+            output = response[0].outputs[0].text
         else:
-            inputs = processor(input_prompt,
-                               return_tensors='pt').to(model.device)
-            output_ids = model.generate(**inputs, **self.sampling_params)
-            # remove the input prompt from the output
-            output_ids = output_ids[:, inputs.data['input_ids'].shape[1]:]
-            response_str = processor.decode(output_ids.cpu()[0],
-                                            skip_special_tokens=True)
+            # model is pipe
+            response = model(messages,
+                             return_full_text=False,
+                             **self.sampling_params)
+            output = response[0]['generated_text']
+
         message_list = []
-        out_qa_pairs, response_str = self.parse_response(response_str)
+        out_qa_pairs, response_str = self.parse_response(output)
 
         if not response_str:
             return {self.text_key: json.dumps({'messages': message_list})}

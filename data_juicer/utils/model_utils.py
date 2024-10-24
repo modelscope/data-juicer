@@ -370,14 +370,17 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
 
 
 def prepare_huggingface_model(pretrained_model_name_or_path,
+                              trust_remote_code=False,
                               return_model=True,
-                              trust_remote_code=False):
+                              return_pipe=False,
+                              pipe_task='text-generation'):
     """
     Prepare and load a HuggingFace model with the correspoding processor.
 
     :param pretrained_model_name_or_path: model name or path
-    :param return_model: return model or not
     :param trust_remote_code: passed to transformers
+    :param return_model: return model or not
+    :param return_pipe: wrap model to pipeline or not
     :return: a tuple (model, input processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
@@ -402,12 +405,24 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
         model = model_class.from_pretrained(
             pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
 
+        if return_pipe:
+            if isinstance(processor, transformers.PreTrainedTokenizerBase):
+                pipe_param = {'tokenizer': processor}
+            elif isinstance(processor, transformers.SequenceFeatureExtractor):
+                pipe_param = {'feature_extractor': processor}
+            elif isinstance(processor, transformers.BaseImageProcessor):
+                pipe_param = {'image_processor': processor}
+            pipe = transformers.pipeline(task=pipe_task,
+                                         model=model,
+                                         **pipe_param)
+            model = pipe
+
     return (model, processor) if return_model else processor
 
 
 def prepare_vllm_model(pretrained_model_name_or_path,
-                       return_model=True,
                        trust_remote_code=False,
+                       return_model=True,
                        tensor_parallel_size=1,
                        max_model_len=None,
                        max_num_seqs=256):
@@ -415,8 +430,8 @@ def prepare_vllm_model(pretrained_model_name_or_path,
     Prepare and load a HuggingFace model with the correspoding processor.
 
     :param pretrained_model_name_or_path: model name or path
-    :param return_model: return model or not
     :param trust_remote_code: passed to transformers
+    :param return_model: return model or not
     :param tensor_parallel_size: The number of GPUs to use for distributed
         execution with tensor parallelism.
     :param max_model_len: Model context length. If unspecified, will
@@ -616,16 +631,17 @@ def prepare_model(model_type, **model_kwargs):
     return model_key
 
 
-def move_to_cuda(model, rank):
-    # Assuming model can be either a single module or a tuple of modules
-    if not isinstance(model, tuple):
-        model = (model, )
+def move_to_cuda(objs, rank):
+    if not isinstance(objs, (tuple, list)):
+        objs = (objs, )
 
-    for module in model:
-        if callable(getattr(module, 'to', None)):
+    for obj in objs:
+        if isinstance(obj, transformers.Pipeline):
+            obj = obj.model
+        if callable(getattr(obj, 'to', None)):
             logger.debug(
-                f'Moving {module.__class__.__name__} to CUDA device {rank}')
-            module.to(f'cuda:{rank}')
+                f'Moving {obj.__class__.__name__} to CUDA device {rank}')
+            obj.to(f'cuda:{rank}')
 
 
 def get_model(model_key=None, rank=None, use_cuda=False):
