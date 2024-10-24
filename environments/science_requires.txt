@@ -1,7 +1,6 @@
 torch>=1.11.0
 torchaudio
 easyocr==1.7.1
-fasttext
 fasttext-wheel
 kenlm
 sentencepiece

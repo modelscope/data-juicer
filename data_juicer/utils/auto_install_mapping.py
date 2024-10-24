@@ -2,7 +2,7 @@
 MODULE_TO_PKGS = {
     'aesthetics_predictor': ['simple-aesthetics-predictor'],
     'cv2': ['opencv-python'],
-    'fasttext': ['fasttext', 'fasttext-wheel'],
+    'fasttext': ['fasttext-wheel'],
     'ffmpeg': ['ffmpeg-python'],
     'PIL': ['Pillow'],
     'ram': ['ram@git+https://github.com/xinyu1205/recognize-anything.git'],
@@ -31,7 +31,6 @@ PKG_TO_OPS = {
         'video_tagging_from_audio_mapper'
     ],
     'easyocr': ['video_ocr_area_ratio_filter'],
-    'fasttext': ['language_id_score_filter'],
     'fasttext-wheel': ['language_id_score_filter'],
     'kenlm': ['perplexity_filter'],
     'sentencepiece': [

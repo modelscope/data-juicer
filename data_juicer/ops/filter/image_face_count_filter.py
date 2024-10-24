@@ -98,7 +98,6 @@ class ImageFaceCountFilter(Filter):
             for key, image in images.items():
                 dets = detect_faces(image, model, **self.extra_kwargs)
                 face_counts[key] = len(dets)
-            print(f'face counts: {face_counts}')
             logger.debug(f'face counts: {face_counts}')
         except Exception as e:
             logger.exception(e)
