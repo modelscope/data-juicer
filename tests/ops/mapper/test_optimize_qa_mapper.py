@@ -1,17 +1,17 @@
 import unittest
 from loguru import logger
-from data_juicer.ops.mapper.optimize_query_mapper import OptimizeQueryMapper
+from data_juicer.ops.mapper.optimize_qa_mapper import OptimizeQAMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
 # Skip tests for this OP in the GitHub actions due to disk space limitation.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
-class OptimizeQueryMapperTest(DataJuicerTestCaseBase):
+class OptimizeQAMapperTest(DataJuicerTestCaseBase):
+    query_key = 'query'
 
     def _run_op(self, enable_vllm=False):
-        op = OptimizeQueryMapper(
-            hf_model='alibaba-pai/Qwen2-7B-Instruct-Refine',
+        op = OptimizeQAMapper(
             enable_vllm=enable_vllm
         )
 
@@ -26,6 +26,7 @@ class OptimizeQueryMapperTest(DataJuicerTestCaseBase):
             # Note: If switching models causes this assert to fail, it may not be a code issue; 
             # the model might just have limited capabilities.
             self.assertNotEqual(result['query'], '')
+            self.assertNotEqual(result['response'], '')
         
     def test(self):
         self._run_op()
