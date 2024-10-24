@@ -631,16 +631,17 @@ def prepare_model(model_type, **model_kwargs):
     return model_key
 
 
-def move_to_cuda(model, rank):
-    # Assuming model can be either a single module or a tuple of modules
-    if not isinstance(model, tuple):
-        model = (model, )
+def move_to_cuda(objs, rank):
+    if not isinstance(objs, (tuple, list)):
+        objs = (objs, )
 
-    for module in model:
-        if callable(getattr(module, 'to', None)):
+    for obj in objs:
+        if isinstance(obj, transformers.Pipeline):
+            obj = obj.model
+        if callable(getattr(obj, 'to', None)):
             logger.debug(
-                f'Moving {module.__class__.__name__} to CUDA device {rank}')
-            module.to(f'cuda:{rank}')
+                f'Moving {obj.__class__.__name__} to CUDA device {rank}')
+            obj.to(f'cuda:{rank}')
 
 
 def get_model(model_key=None, rank=None, use_cuda=False):
