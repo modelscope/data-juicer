@@ -21,7 +21,8 @@ PKG_TO_OPS = {
         'video_watermark_filter', 'generate_qa_from_text_mapper',
         'generate_qa_from_examples_mapper', 'image_captioning_mapper',
         'image_diffusion_mapper', 'image_tagging_mapper',
-        'optimize_query_mapper', 'video_captioning_from_frames_mapper',
+        'optimize_query_mapper', 'optimize_response_mapper',
+        'optimize_qa_mapper', 'video_captioning_from_frames_mapper',
         'video_captioning_from_summarizer_mapper',
         'video_captioning_from_video_mapper',
         'video_tagging_from_audio_mapper', 'video_tagging_from_frames_mapper'
@@ -58,7 +59,8 @@ PKG_TO_OPS = {
         'video_frames_text_similarity_filter', 'video_nsfw_filter',
         'generate_qa_from_text_mapper', 'generate_qa_from_examples_mapper',
         'image_captioning_mapper', 'image_diffusion_mapper',
-        'optimize_query_mapper', 'video_captioning_from_audio_mapper',
+        'optimize_query_mapper', 'optimize_response_mapper',
+        'optimize_qa_mapper', 'video_captioning_from_audio_mapper',
         'video_captioning_from_frames_mapper',
         'video_captioning_from_summarizer_mapper',
         'video_captioning_from_video_mapper', 'video_tagging_from_audio_mapper'
@@ -96,8 +98,11 @@ PKG_TO_OPS = {
         'video_remove_watermark_mapper'
     ],
     'vllm': [
-        'generate_qa_from_text_mapper', 'generate_qa_from_examples_mapper',
-        'optimize_query_mapper'
+        'generate_qa_from_text_mapper',
+        'generate_qa_from_examples_mapper',
+        'optimize_query_mapper',
+        'optimize_response_mapper',
+        'optimize_qa_mapper',
     ],
     'rouge': ['generate_qa_from_examples_mapper'],
     'ram': ['image_tagging_mapper', 'video_tagging_from_frames_mapper']
