@@ -182,7 +182,7 @@ class FusedFilter(Filter):
 
         # context for the intermediate vars
         num_samples = len(samples[Fields.stats])
-        samples[Fields.context] = [{}] * num_samples
+        samples[Fields.context] = [{} for _ in range(num_samples)]
         for op in self.fused_filters:
             # open the context for these fused ops
             if op.accelerator == 'cuda':
