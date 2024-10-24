@@ -40,20 +40,20 @@ class AverageLineLengthFilter(Filter):
     def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
+        context_key = f'{InterVars.lines}'
 
         for idx, stat in enumerate(samples_stats):
-            context_key = f'{InterVars.lines}-{idx}'
             # check if it's computed already
             if StatsKeys.avg_line_length in stat:
                 continue
 
             cur_text = samples_list[idx]
-            if context and context_key in samples[Fields.context]:
-                lines = samples[Fields.context][context_key]
+            if context and context_key in samples[Fields.context][idx]:
+                lines = samples[Fields.context][idx][context_key]
             else:
                 lines = cur_text.splitlines()
                 if context:
-                    samples[Fields.context][context_key] = lines
+                    samples[Fields.context][idx][context_key] = lines
             samples_stats[idx][StatsKeys.avg_line_length] = \
                 len(cur_text) / len(lines) if len(lines) != 0 else 0.0
         return samples

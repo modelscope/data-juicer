@@ -44,15 +44,15 @@ class PerplexityFilter(Filter):
     def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
+        words_key = f'{InterVars.words}-{self.sp_model_key}'
 
         for idx, stat in enumerate(samples_stats):
-            words_key = f'{InterVars.words}-{self.sp_model_key}-{idx}'
             # check if it's computed already
             if StatsKeys.perplexity in stat:
                 continue
             # tokenization
-            if context and words_key in samples[Fields.context]:
-                words = samples[Fields.context][words_key]
+            if context and words_key in samples[Fields.context][idx]:
+                words = samples[Fields.context][idx][words_key]
             else:
                 tokenizer = get_model(self.sp_model_key)
                 words = get_words_from_document(
@@ -60,7 +60,7 @@ class PerplexityFilter(Filter):
                     token_func=tokenizer.encode_as_pieces
                     if tokenizer else None)
                 if context:
-                    samples[Fields.context][words_key] = words
+                    samples[Fields.context][idx][words_key] = words
             text = ' '.join(words)
             # compute perplexity
             logits, length = 0, 0
