@@ -63,7 +63,6 @@ class WordRepetitionFilter(Filter):
         words_key = f'{InterVars.words}-{self.model_key}'
 
         for idx, stat in enumerate(samples_stats):
-            words_key = f'{InterVars.words}-{self.model_key}-{idx}'
             # check if it's computed already
             if StatsKeys.word_rep_ratio in stat:
                 continue
