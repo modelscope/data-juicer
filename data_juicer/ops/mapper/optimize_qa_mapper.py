@@ -28,8 +28,8 @@ class OptimizeQAMapper(Mapper):
                              '优化后的问题\n'
                              '【回答】\n'
                              '优化后的回答')
-    DEFAULT_INPUT_TEMPLATE = '以下是原始问答对：\n\n{qa_pair}'
-    DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}\n'
+    DEFAULT_INPUT_TEMPLATE = '以下是原始问答对：\n{qa_pair}'
+    DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}'
     DEFAULT_OUTPUT_PATTERN = r'【问题】\s*(.*?)\s*【回答】\s*(.*)'
 
     _accelerator = 'cuda'
@@ -105,7 +105,7 @@ class OptimizeQAMapper(Mapper):
     def build_input(self, sample):
         qa_pair = self.qa_pair_template.format(sample[self.query_key],
                                                sample[self.response_key])
-        input_prompt = self.input_template.format(qa_pair)
+        input_prompt = self.input_template.format(qa_pair=qa_pair)
         return input_prompt
 
     def parse_output(self, raw_output):
