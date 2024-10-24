@@ -1,33 +1,31 @@
 import unittest
-import json
-from data_juicer.ops.mapper.extract_qa_mapper import ExtractQAMapper
+from loguru import logger
+from data_juicer.core.data import NestedDataset as Dataset
+from data_juicer.ops.mapper.generate_qa_from_text_mapper import GenerateQAFromTextMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
 # Skip tests for this OP in the GitHub actions due to disk space limitation.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
-class ExtractQAMapperTest(DataJuicerTestCaseBase):
+class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
     text_key = 'text'
 
     def _run_extract_qa(self, samples, enable_vllm=False, sampling_params={}, **kwargs):
-        op = ExtractQAMapper(
+        op = GenerateQAFromTextMapper(
             hf_model='alibaba-pai/pai-qwen1_5-7b-doc2qa',
             trust_remote_code=True,
-            qa_format='chatml',
             enable_vllm=enable_vllm,
             sampling_params=sampling_params,
-            **kwargs
-            )
-        for sample in samples:
-            result = op.process(sample)
-            out_text = json.loads(result[self.text_key])
-            print(f'Output sample: {out_text}')
-
-            # test one output qa sample
-            qa_sample = out_text[0]
-            self.assertIn('role', qa_sample['messages'][0])
-            self.assertIn('content', qa_sample['messages'][0])
+            **kwargs)
+        dataset = Dataset.from_list(samples)
+        dataset = dataset.map(op.process, batch_size=2)
+        for row in dataset:
+            logger.info(row)
+            # Note: If switching models causes this assert to fail, it may not be a code issue; 
+            # the model might just have limited capabilities.
+            self.assertNotEqual(row[op.query_key], '')
+            self.assertNotEqual(row[op.response_key], '')
 
     def test_extract_qa(self):
         samples = [

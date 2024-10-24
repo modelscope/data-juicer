@@ -27,14 +27,15 @@ QA_EXTRACTION_PATTERN = r'【问题】\s*(.*?)\s*【回答】\s*(.*?)\s*(?=【�
 EXAMPLE_TEMPLATE = '\n如下是一条示例数据：\n\n{qa_pairs}'
 QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}\n'
 
-OP_NAME = 'generate_instruction_mapper'
+OP_NAME = 'generate_qa_from_examples_mapper'
 
 
 # TODO: Extend LLM-based OPs into API-based implementation.
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
-class GenerateInstructionMapper(Mapper):
-    """Mapper to generate new instruction text data.
+class GenerateQAFromExamplesMapper(Mapper):
+    """
+    Mapper to generate question and answer pairs from examples.
     You should configure an empty dataset in your yaml config file:
     ```
     generated_dataset_config:
@@ -48,7 +49,7 @@ class GenerateInstructionMapper(Mapper):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_model: str = 'Qwen/Qwen-7B-Chat',
+                 hf_model: str = 'Qwen/Qwen2.5-7B-Instruct',
                  seed_file: str = '',
                  instruct_num: PositiveInt = 3,
                  trust_remote_code: bool = False,
@@ -211,11 +212,12 @@ class GenerateInstructionMapper(Mapper):
         return qa_pairs
 
     def parse_response(self, response_str):
+        logger.debug(response_str)
         pattern = self.qa_extraction_pattern
         matches = re.findall(pattern, response_str, re.DOTALL)
         response_str = ''
         out_qa_pairs = []
-        for i, match in enumerate(matches):
+        for match in matches:
             question, answer = match
             question = question.strip()
             answer = answer.strip()
@@ -257,11 +259,14 @@ class GenerateInstructionMapper(Mapper):
             output_ids = output_ids[:, inputs.data['input_ids'].shape[1]:]
             response_str = processor.decode(output_ids.cpu()[0],
                                             skip_special_tokens=True)
-        message_list = []
         out_qa_pairs, response_str = self.parse_response(response_str)
 
         if not response_str:
-            return {self.text_key: json.dumps({'messages': message_list})}
+            return {
+                self.query_key: '',
+                self.response_key: '',
+                self.history_key: []
+            }
 
         if self.similarity_type == 'rouge_l':
             sim_score = self.max_rouge_l_score(response_str,
@@ -271,13 +276,15 @@ class GenerateInstructionMapper(Mapper):
                 f'Not support similarity type "{self.similarity_type}"!')
 
         if sim_score <= self.similarity_threshold:
-            for question, answer in out_qa_pairs:
-                message_list.append({'role': 'user', 'content': question})
-                message_list.append({'role': 'assistant', 'content': answer})
+            query, response = out_qa_pairs[-1]
+            history = out_qa_pairs[:-1]
         else:
+            query = response = ''
+            history = []
             logger.info('Filter this generated sample due to similarity.')
 
         return {
-            self.text_key:
-            json.dumps({'messages': message_list}, ensure_ascii=False)
+            self.query_key: query,
+            self.response_key: response,
+            self.history_key: history
         }
