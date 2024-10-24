@@ -36,7 +36,7 @@ class OptimizeQAMapper(Mapper):
 
     def __init__(self,
                  *,
-                 hf_model: str = 'Qwen/Qwen-7B-Chat',
+                 hf_model: str = 'Qwen/Qwen2.5-7B-Instruct',
                  trust_remote_code: bool = False,
                  system_prompt: Optional[str] = None,
                  input_template: Optional[str] = None,
@@ -103,9 +103,9 @@ class OptimizeQAMapper(Mapper):
             self.sampling_params = sampling_params
 
     def build_input(self, sample):
-        qa_pair = self.qa_pair_pattern.format(sample[self.query_key],
-                                              sample[self.response_key])
-        input_prompt = self.input_pattern.format(qa_pair)
+        qa_pair = self.qa_pair_template.format(sample[self.query_key],
+                                               sample[self.response_key])
+        input_prompt = self.input_template.format(qa_pair)
         return input_prompt
 
     def parse_output(self, raw_output):

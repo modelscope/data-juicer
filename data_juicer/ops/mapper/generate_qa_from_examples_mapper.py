@@ -49,7 +49,7 @@ class GenerateQAFromExamplesMapper(Mapper):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_model: str = 'Qwen/Qwen-7B-Chat',
+                 hf_model: str = 'Qwen/Qwen2.5-7B-Instruct',
                  seed_file: str = '',
                  instruct_num: PositiveInt = 3,
                  trust_remote_code: bool = False,
