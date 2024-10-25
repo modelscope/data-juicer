@@ -109,7 +109,7 @@ Table of Contents
   visualization, and multidimensional automatic evaluation, so that you can better understand and improve your data and models.
   ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
-- **Towards production environment **: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
+- **Towards production environment**: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
   requiring less memory and CPU usage, optimized with automatic fault-toleration.
   ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
