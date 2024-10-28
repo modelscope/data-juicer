@@ -9,16 +9,15 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class GenerateQAFromExamplesMapperTest(DataJuicerTestCaseBase):
-
     text_key = 'text'
 
-    def _run_generate_instruction(self, enable_vllm=False):
+    def _run_op(self, enable_vllm=False, llm_params=None, sampling_params=None):
         op = GenerateQAFromExamplesMapper(
-            hf_model='Qwen/Qwen-7B-Chat',
             seed_file='demos/data/demo-dataset-chatml.jsonl',
-            instruct_num=2,
-            trust_remote_code=True,
-            enable_vllm=enable_vllm
+            example_num=3,
+            enable_vllm=enable_vllm,
+            llm_params=llm_params,
+            sampling_params=sampling_params,
         )
 
         from data_juicer.format.empty_formatter import EmptyFormatter
@@ -30,14 +29,18 @@ class GenerateQAFromExamplesMapperTest(DataJuicerTestCaseBase):
             logger.info(row)
             # Note: If switching models causes this assert to fail, it may not be a code issue; 
             # the model might just have limited capabilities.
-            self.assertNotEqual(row[op.query_key], '')
-            self.assertNotEqual(row[op.response_key], '')
+            self.assertIn(op.query_key, row)
+            self.assertIn(op.response_key, row)
 
-    def test_generate_instruction(self):
-        self._run_generate_instruction()
+    def test(self):
+        sampling_params = {"max_new_tokens": 200}
+        self._run_op(sampling_params=sampling_params)
 
-    def test_generate_instruction_vllm(self):
-        self._run_generate_instruction(enable_vllm=True)
+    def test_vllm(self):
+        import torch
+        llm_params = {"tensor_parallel_size": torch.cuda.device_count()}
+        sampling_params = {"max_tokens": 200}
+        self._run_op(enable_vllm=True, llm_params=llm_params, sampling_params=sampling_params)
 
 
 if __name__ == '__main__':

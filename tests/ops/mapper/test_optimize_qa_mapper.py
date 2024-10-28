@@ -10,9 +10,11 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 class OptimizeQAMapperTest(DataJuicerTestCaseBase):
     query_key = 'query'
 
-    def _run_op(self, enable_vllm=False):
+    def _run_op(self, enable_vllm=False, llm_params=None, sampling_params=None):
         op = OptimizeQAMapper(
-            enable_vllm=enable_vllm
+            enable_vllm=enable_vllm,
+            llm_params=llm_params,
+            sampling_params=sampling_params,
         )
 
         samples = [{
@@ -23,16 +25,20 @@ class OptimizeQAMapperTest(DataJuicerTestCaseBase):
         for sample in samples:
             result = op.process(sample)
             logger.info(f'Output results: {result}')
-            # Note: If switching models causes this assert to fail, it may not be a code issue; 
+            # Note: If switching models causes this assert to fail, it may not be a code issue;
             # the model might just have limited capabilities.
             self.assertNotEqual(result['query'], '')
             self.assertNotEqual(result['response'], '')
-        
+
     def test(self):
-        self._run_op()
+        sampling_params = {"max_new_tokens": 200}
+        self._run_op(sampling_params=sampling_params)
 
     def test_vllm(self):
-        self._run_op(enable_vllm=True)
+        import torch
+        llm_params = {"tensor_parallel_size": torch.cuda.device_count()}
+        sampling_params = {"max_tokens": 200}
+        self._run_op(enable_vllm=True, llm_params=llm_params, sampling_params=sampling_params)
 
 
 if __name__ == '__main__':

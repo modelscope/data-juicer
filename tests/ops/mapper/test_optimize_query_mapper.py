@@ -9,10 +9,12 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 @SKIPPED_TESTS.register_module()
 class OptimizeQueryMapperTest(DataJuicerTestCaseBase):
 
-    def _run_op(self, enable_vllm=False):
+    def _run_op(self, enable_vllm=False, llm_params=None, sampling_params=None):
         op = OptimizeQueryMapper(
             hf_model='alibaba-pai/Qwen2-7B-Instruct-Refine',
-            enable_vllm=enable_vllm
+            enable_vllm=enable_vllm,
+            llm_params=llm_params,
+            sampling_params=sampling_params
         )
 
         samples = [{
@@ -28,10 +30,14 @@ class OptimizeQueryMapperTest(DataJuicerTestCaseBase):
             self.assertNotEqual(result['query'], '')
         
     def test(self):
-        self._run_op()
+        sampling_params = {"max_new_tokens": 200}
+        self._run_op(sampling_params=sampling_params)
 
     def test_vllm(self):
-        self._run_op(enable_vllm=True)
+        import torch
+        llm_params = {"tensor_parallel_size": torch.cuda.device_count()}
+        sampling_params = {"max_tokens": 200}
+        self._run_op(enable_vllm=True, llm_params=llm_params, sampling_params=sampling_params)
 
 
 if __name__ == '__main__':
