@@ -14,7 +14,7 @@ import coverage
 
 from loguru import logger
 
-from data_juicer.utils.unittest_utils import SKIPPED_TESTS
+from data_juicer.utils.unittest_utils import SKIPPED_TESTS, set_clear_model_flag
 
 file_dir = os.path.join(os.path.dirname(__file__), '..')
 sys.path.append(file_dir)
@@ -27,8 +27,16 @@ parser.add_argument('--pattern', default='test_*.py', help='test file pattern')
 parser.add_argument('--test_dir',
                     default='tests',
                     help='directory to be tested')
+parser.add_argument('--clear_model',
+                    default=False,
+                    type=bool,
+                    help='whether to clear the downloaded models for tests. '
+                         'It\'s False in default.')
 args = parser.parse_args()
 
+set_clear_model_flag(args.clear_model)
+
+exit()
 
 class TaggedTestLoader(unittest.TestLoader):
     def __init__(self, tag="standalone"):

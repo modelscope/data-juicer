@@ -16,6 +16,8 @@ transformers = LazyLoader('transformers', 'transformers')
 
 SKIPPED_TESTS = Registry('SkippedTests')
 
+CLEAR_MODEL = False
+
 
 def TEST_TAG(*tags):
     """Tags for test case.
@@ -27,6 +29,15 @@ def TEST_TAG(*tags):
         return func
 
     return decorator
+
+
+def set_clear_model_flag(flag):
+    global CLEAR_MODEL
+    CLEAR_MODEL = flag
+    if CLEAR_MODEL:
+        print('CLEAR DOWNLOADED MODELS AFTER UNITTESTS.')
+    else:
+        print('KEEP DOWNLOADED MODELS AFTER UNITTESTS.')
 
 
 class DataJuicerTestCaseBase(unittest.TestCase):
@@ -48,7 +59,9 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         multiprocess.set_start_method(cls.original_mp_method, force=True)
 
         # clean the huggingface model cache files
-        if hf_model_name:
+        if not CLEAR_MODEL:
+            pass
+        elif hf_model_name:
             # given the hf model name, remove this model only
             model_dir = os.path.join(
                 transformers.TRANSFORMERS_CACHE,
