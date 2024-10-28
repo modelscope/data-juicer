@@ -4,9 +4,6 @@ from data_juicer.ops.mapper.generate_instruction_mapper import GenerateInstructi
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
-# Skip tests for this OP in the GitHub actions due to disk space limitation.
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
 class GenerateInstructionMapperTest(DataJuicerTestCaseBase):
 
     text_key = 'text'

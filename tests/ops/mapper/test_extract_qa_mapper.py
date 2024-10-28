@@ -4,9 +4,6 @@ from data_juicer.ops.mapper.extract_qa_mapper import ExtractQAMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
-# Skip tests for this OP in the GitHub actions due to disk space limitation.
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
 class ExtractQAMapperTest(DataJuicerTestCaseBase):
     text_key = 'text'
 
