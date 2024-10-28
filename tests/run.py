@@ -36,8 +36,6 @@ args = parser.parse_args()
 
 set_clear_model_flag(args.clear_model)
 
-exit()
-
 class TaggedTestLoader(unittest.TestLoader):
     def __init__(self, tag="standalone"):
         super().__init__()
