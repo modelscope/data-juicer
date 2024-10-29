@@ -48,7 +48,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
-                                   keep_candidate_mode='random_any')
+                                   keep_candidate_mode='random_any',
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, caption_num=len(dataset) * 2)
 
     def test_eoc_special_token(self):
@@ -69,7 +70,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
-                                   keep_candidate_mode='random_any')
+                                   keep_candidate_mode='random_any',
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, caption_num=len(dataset) * 2)
 
     def test_multi_candidate_keep_random_any(self):
@@ -85,7 +87,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
-                                   keep_candidate_mode='random_any')
+                                   keep_candidate_mode='random_any',
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, caption_num=len(dataset) * 2)
 
     def test_multi_candidate_keep_all(self):
@@ -101,7 +104,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
-                                   keep_candidate_mode='all')
+                                   keep_candidate_mode='all',
+                                   mem_required='16GB')
         self._run_mapper(dataset,
                          op,
                          caption_num=(1 + caption_num) * len(dataset))
@@ -118,7 +122,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
-                                   keep_candidate_mode='similar_one_simhash')
+                                   keep_candidate_mode='similar_one_simhash',
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, caption_num=len(dataset) * 2)
 
     def test_multi_process(self):
@@ -130,7 +135,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(ds_list)
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
-                                   keep_candidate_mode='random_any')
+                                   keep_candidate_mode='random_any',
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, num_proc=4, caption_num=len(dataset) * 2)
 
     def test_no_eoc_special_token_remove_original_sample(self):
@@ -147,7 +153,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any',
-                                   keep_original_sample=False)
+                                   keep_original_sample=False,
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, caption_num=len(dataset))
 
     def test_eoc_special_token_remove_original_sample(self):
@@ -169,7 +176,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any',
-                                   keep_original_sample=False)
+                                   keep_original_sample=False,
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, caption_num=len(dataset))
 
     def test_multi_candidate_keep_random_any_remove_original_sample(self):
@@ -186,7 +194,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any',
-                                   keep_original_sample=False)
+                                   keep_original_sample=False,
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, caption_num=len(dataset))
 
     def test_multi_candidate_keep_all_remove_original_sample(self):
@@ -203,7 +212,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='all',
-                                   keep_original_sample=False)
+                                   keep_original_sample=False,
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, caption_num=caption_num * len(dataset))
 
     def test_multi_candidate_keep_similar_one_remove_original_sample(self):
@@ -219,7 +229,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='similar_one_simhash',
-                                   keep_original_sample=False)
+                                   keep_original_sample=False,
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, caption_num=len(dataset))
 
     def test_multi_process_remove_original_sample(self):
@@ -232,7 +243,8 @@ class ImageCaptioningMapperTest(DataJuicerTestCaseBase):
         op = ImageCaptioningMapper(hf_img2seq=self.hf_img2seq,
                                    caption_num=caption_num,
                                    keep_candidate_mode='random_any',
-                                   keep_original_sample=False)
+                                   keep_original_sample=False,
+                                   mem_required='16GB')
         self._run_mapper(dataset, op, num_proc=4, caption_num=len(dataset))
 
 
