@@ -9,7 +9,7 @@ OP_NAME = 'calibrate_query_mapper'
 @OPERATORS.register_module(OP_NAME)
 class CalibrateQueryMapper(CalibrateQAMapper):
     """
-    Mapper to calibrate only query in question-answer pairs.
+    Mapper to calibrate query in question-answer pairs.
     """
 
     DEFAULT_SYSTEM_PROMPT = '请根据提供的【参考信息】对问答对中的【问题】进行校准，\

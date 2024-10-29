@@ -9,7 +9,7 @@ OP_NAME = 'calibrate_response_mapper'
 @OPERATORS.register_module(OP_NAME)
 class CalibrateResponseMapper(CalibrateQAMapper):
     """
-    Mapper to calibrate only response in question-answer pairs.
+    Mapper to calibrate response in question-answer pairs.
     """
 
     DEFAULT_SYSTEM_PROMPT = '请根据提供的【参考信息】对问答对中的【回答】进行校准，\

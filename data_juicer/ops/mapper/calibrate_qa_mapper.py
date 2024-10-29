@@ -28,8 +28,8 @@ class CalibrateQAMapper(Mapper):
     DEFAULT_OUTPUT_PATTERN = r'【问题】\s*(.*?)\s*【回答】\s*(.*)'
 
     def __init__(self,
-                 *,
                  api_model: str,
+                 *,
                  api_url: Optional[str] = None,
                  api_key: Optional[str] = None,
                  response_path: Optional[str] = None,
@@ -38,7 +38,7 @@ class CalibrateQAMapper(Mapper):
                  reference_template: Optional[str] = None,
                  qa_pair_template: Optional[str] = None,
                  output_pattern: Optional[str] = None,
-                 api_params: Dict = {},
+                 api_params: Optional[Dict] = None,
                  **kwargs):
         """
         Initialization method.
@@ -47,11 +47,12 @@ class CalibrateQAMapper(Mapper):
         :param api_url: API URL. Defaults to DJ_API_URL environment variable.
         :param api_key: API key. Defaults to DJ_API_KEY environment variable.
         :param response_path: Path to extract content from the API response.
+            Defaults to 'choices.0.message.content'.
         :param system_prompt: System prompt for the calibration task.
         :param input_template: Template for building the model input.
         :param reference_template: Template for formatting the reference text.
         :param qa_pair_template: Template for formatting question-answer pairs.
-        :param output_pattern: Pattern for parsing model output.
+        :param output_pattern: Regular expression for parsing model output.
         :param api_params: Extra API parameters.
         :param kwargs: Extra keyword arguments.
         """
@@ -65,7 +66,7 @@ class CalibrateQAMapper(Mapper):
             self.DEFAULT_QA_PAIR_TEMPLATE
         self.output_pattern = output_pattern or self.DEFAULT_OUTPUT_PATTERN
 
-        self.api_params = api_params
+        self.api_params = api_params or {}
         self.model_key = prepare_model(model_type='api',
                                        api_model=api_model,
                                        api_url=api_url,
