@@ -13,7 +13,7 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 @SKIPPED_TESTS.register_module()
 class CalibrateResponseMapperTest(DataJuicerTestCaseBase):
 
-    def _run_op(self, api_model, response_path):
+    def _run_op(self, api_model, response_path=None):
 
         op = CalibrateResponseMapper(api_model=api_model,
                                      response_path=response_path)
@@ -69,7 +69,10 @@ class CalibrateResponseMapperTest(DataJuicerTestCaseBase):
             self.assertNotEqual(result['response'], '')
 
     def test(self):
-        self._run_op('gpt-4o', 'data.response.choices.0.message.content')
+        # before runing this test, set below environment variables:
+        # export DJ_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+        # export DJ_API_KEY=your_key
+        self._run_op('qwen2.5-72b-instruct')
 
 
 if __name__ == '__main__':
