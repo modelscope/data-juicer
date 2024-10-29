@@ -13,7 +13,7 @@ class CalibrateQueryMapper(CalibrateQAMapper):
     """
 
     DEFAULT_SYSTEM_PROMPT = '请根据提供的【参考信息】对问答对中的【问题】进行校准，\
-        使其更加详细、准确，且仍可以由原答案回答。只输出优化后的问题，不要输出多余内容。'
+        使其更加详细、准确，且仍可以由原答案回答。只输出校准后的问题，不要输出多余内容。'
 
     def parse_output(self, raw_output):
         return raw_output.strip(), None

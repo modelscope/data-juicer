@@ -19,9 +19,9 @@ class CalibrateQAMapper(Mapper):
     DEFAULT_SYSTEM_PROMPT = ('请根据提供的【参考信息】对【问题】和【回答】进行校准，使其更加详细、准确。\n'
                              '按照以下格式输出：\n'
                              '【问题】\n'
-                             '优化后的问题\n'
+                             '校准后的问题\n'
                              '【回答】\n'
-                             '优化后的回答')
+                             '校准后的回答')
     DEFAULT_INPUT_TEMPLATE = '{reference}\n{qa_pair}'
     DEFAULT_REFERENCE_TEMPLATE = '【参考信息】\n{}'
     DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}'
