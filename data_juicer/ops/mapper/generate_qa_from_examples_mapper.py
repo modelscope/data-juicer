@@ -68,27 +68,27 @@ class GenerateQAFromExamplesMapper(Mapper):
         """
         Initialization method.
 
-        :param hf_model: Hugginface model id.
-        :param seed_file: Seed file path, chatml format.
-        :param example_num: The number of QA example.
+        :param hf_model: Hugginface model ID.
+        :param seed_file: Path to the seed file in chatml format.
+        :param example_num: The number of selected examples.
             Randomly select N examples from "seed_file" and
-            put them into prompt as instruction samples.
+            put them into prompt as QA examples.
         :param similarity_threshold: The similarity score threshold
-            between the generated samples and the seed samples.
+            between the generated samples and the seed examples.
             Range from 0 to 1. Samples with similarity score less than
             this threshold will be kept.
-        :param system_prompt: System prompt for the generation task.
-        :param input_template: Template for building the input for the model.
-            Please make sure the template contains "{examples}", which
-            will be filled by `example_num` formatted `example_template`.
+        :param system_prompt: System prompt for guiding the generation task.
+        :param input_template: Template for building the input prompt. It must
+            include "{examples}", which will be replaced by `example_num`
+            formatted examples defined by `example_template`.
         :param example_template: Template for formatting each QA example.
-        :param qa_pair_template: Template for formatting one-round QA pair
-            within each QA example. Please make sure the template contains
-            two "{}" to format question and answer.
-        :param output_pattern: Regular expression pattern for parsing
-            question and answer from model response.
+        :param qa_pair_template: Template for formatting a single QA pair
+            within each example. Must include two placeholders "{}" for the
+            question and answer.
+        :param output_pattern: Regular expression pattern to extract questions
+            and answers from model response.
         :param enable_vllm: Whether to use vllm for inference acceleration.
-        :param llm_params: LLM initialization parameters.
+        :param llm_params: Parameters for initializing the model.
         :param sampling_params: Sampling parameters for text generation.
             e.g {'temperature': 0.9, 'top_p': 0.95}
         :param kwargs: Extra keyword arguments.

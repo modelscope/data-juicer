@@ -45,12 +45,12 @@ class GenerateQAFromTextMapper(Mapper):
         """
         Initialization method.
 
-        :param hf_model: Hugginface model id.
-        :param output_pattern: Regular expression pattern for parsing
-            question and answer from model response.
+        :param hf_model: Hugginface model ID.
+        :param output_pattern: Regular expression pattern to extract
+            questions and answers from model response.
         :param enable_vllm: Whether to use vllm for inference acceleration.
-        :param llm_params: LLM initialization parameters.
-        :param sampling_params: Sampling parameters for text generation.
+        :param llm_params: Parameters for initializing the model.
+        :param sampling_params: Sampling parameters for text generation,
             e.g {'temperature': 0.9, 'top_p': 0.95}
         :param kwargs: Extra keyword arguments.
 
