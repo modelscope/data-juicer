@@ -8,6 +8,9 @@ from data_juicer.ops.mapper.image_tagging_mapper import \
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
+# Skip tests for this OP in the GitHub actions due to OOM on the current runner
+# These tests have been tested locally.
+@SKIPPED_TESTS.register_module()
 class ImageTaggingMapperTest(DataJuicerTestCaseBase):
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
