@@ -28,7 +28,7 @@ class CalibrateQAMapper(Mapper):
     DEFAULT_OUTPUT_PATTERN = r'【问题】\s*(.*?)\s*【回答】\s*(.*)'
 
     def __init__(self,
-                 api_model: str,
+                 api_model: str = 'gpt-4o',
                  *,
                  api_url: Optional[str] = None,
                  api_key: Optional[str] = None,
