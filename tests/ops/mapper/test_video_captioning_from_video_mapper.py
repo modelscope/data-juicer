@@ -9,6 +9,9 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
 
+# Skip tests for this OP in the GitHub actions due to OOM on the current runner
+# These tests have been tested locally.
+@SKIPPED_TESTS.register_module()
 class VideoCaptioningFromVideoMapperTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
