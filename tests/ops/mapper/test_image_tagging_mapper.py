@@ -22,7 +22,7 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
                                   target_list,
                                   num_proc=1):
         dataset = Dataset.from_list(source_list)
-        dataset = dataset.map(op.process, num_proc=num_proc)
+        dataset = dataset.map(op.process, num_proc=num_proc, with_rank=True)
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
 
