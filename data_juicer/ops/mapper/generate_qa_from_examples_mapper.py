@@ -241,7 +241,7 @@ class GenerateQAFromExamplesMapper(Mapper):
             sample.update({
                 self.query_key: '',
                 self.response_key: '',
-                self.history_key: []
+                self.history_key: self.empty_history()
             })
             return sample
 
@@ -255,9 +255,11 @@ class GenerateQAFromExamplesMapper(Mapper):
         if sim_score <= self.similarity_threshold:
             query, response = output_qa_pairs[-1]
             history = output_qa_pairs[:-1]
+            if len(history) == 0:
+                history = self.empty_history()
         else:
             query = response = ''
-            history = []
+            history = self.empty_history()
             logger.info('Filter this generated sample due to similarity.')
 
         sample.update({

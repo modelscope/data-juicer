@@ -2,6 +2,7 @@ import copy
 import traceback
 from functools import wraps
 
+import numpy as np
 import pyarrow as pa
 from loguru import logger
 
@@ -214,6 +215,9 @@ class OP:
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
         return dataset
+
+    def empty_history(self):
+        return np.empty((0, 0), dtype=str)
 
 
 class Mapper(OP):
