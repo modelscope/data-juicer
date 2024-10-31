@@ -82,20 +82,19 @@ def check_model(model_name, force=False):
         if os.path.exists(cached_model_path):
             os.remove(cached_model_path)
             logger.info(
-                f'Model [{cached_model_path}] invalid, force to downloading...'
-            )
+                f'Model [{cached_model_path}] is invalid. Forcing download...')
         else:
             logger.info(
-                f'Model [{cached_model_path}] not found. Downloading...')
+                f'Model [{cached_model_path}] is not found. Downloading...')
 
         try:
             model_link = os.path.join(MODEL_LINKS, model_name)
-            wget.download(model_link, cached_model_path, bar=None)
+            wget.download(model_link, cached_model_path)
         except:  # noqa: E722
             try:
                 backup_model_link = os.path.join(
                     get_backup_model_link(model_name), model_name)
-                wget.download(backup_model_link, cached_model_path, bar=None)
+                wget.download(backup_model_link, cached_model_path)
             except:  # noqa: E722
                 logger.error(
                     f'Downloading model [{model_name}] error. '
@@ -245,7 +244,7 @@ def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin', **model_params):
     :param lang: language to render model name
     :return: model instance.
     """
-    model_params.pop('device')
+    model_params.pop('device', None)
 
     model_name = name_pattern.format(lang)
 
@@ -266,7 +265,7 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle', **model_params):
     :param lang: language to render model name
     :return: model instance.
     """
-    model_params.pop('device')
+    model_params.pop('device', None)
 
     nltk_to_punkt = {
         'en': 'english',
@@ -316,7 +315,7 @@ def prepare_recognizeAnything_model(
             pretrained_model_name_or_path, force=True),
                              image_size=input_size,
                              vit='swin_l')
-    device = model_params.pop('device') or 'cpu'
+    device = model_params.pop('device', 'cpu')
     model.to(device).eval()
     return model
 
