@@ -17,21 +17,26 @@ class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
 
     def _run_op(self,
                 enable_vllm=False,
-                llm_params=None,
-                sampling_params=None):
+                model_params=None,
+                sampling_params=None,
+                num_proc=1):
+
         op = GenerateQAFromTextMapper(enable_vllm=enable_vllm,
-                                      llm_params=llm_params,
+                                      model_params=model_params,
                                       sampling_params=sampling_params)
 
         samples = [{
             self.text_key:
             '蒙古国的首都是乌兰巴托（Ulaanbaatar）\n冰岛的首都是雷克雅未克（Reykjavik）\n'
+        }, {
+            self.text_key:
+            '四大名著是指《水浒传》《三国演义》《西游记》《红楼梦》四部长篇小说，作者分别是施耐庵、罗贯中、吴承恩、曹雪芹。'
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process)
+        results = dataset.map(op.process, num_proc=num_proc, with_rank=True)
 
-        for row in dataset:
+        for row in results:
             logger.info(row)
             self.assertIn(op.query_key, row)
             self.assertIn(op.response_key, row)
@@ -40,20 +45,19 @@ class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
         sampling_params = {'max_new_tokens': 200}
         self._run_op(sampling_params=sampling_params)
 
+    def test_multi_process(self):
+        sampling_params = {'max_new_tokens': 200}
+        self._run_op(sampling_params=sampling_params, num_proc=2)
+
     def test_vllm(self):
-        import torch
-        llm_params = {
-            'tensor_parallel_size': torch.cuda.device_count(),
-            'max_model_len': 1024,
-            'max_num_seqs': 16
-        }
+        model_params = {'max_model_len': 1024, 'max_num_seqs': 16}
         sampling_params = {
             'temperature': 0.9,
             'top_p': 0.95,
             'max_tokens': 200
         }
         self._run_op(enable_vllm=True,
-                     llm_params=llm_params,
+                     model_params=model_params,
                      sampling_params=sampling_params)
 
 

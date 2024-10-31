@@ -46,7 +46,7 @@ class GenerateQAFromExamplesMapper(Mapper):
     DEFAULT_INPUT_TEMPLATE = '{examples}'
     DEFAULT_EXAMPLE_TEMPLATE = '\n如下是一条示例数据：\n{qa_pairs}'
     DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}\n'
-    DEFAULT_OUTPUT_PATTERN = r'【问题】\s*(.*?)\s*【回答】\s*(.*?)\s*(?=【问题】|$)'
+    DEFAULT_OUTPUT_PATTERN = r'【问题】(.*?)【回答】(.*?)(?=【问题】|$)'
 
     _accelerator = 'cuda'
 
@@ -62,7 +62,7 @@ class GenerateQAFromExamplesMapper(Mapper):
                  qa_pair_template: Optional[str] = None,
                  output_pattern: Optional[str] = None,
                  enable_vllm: bool = False,
-                 llm_params: Optional[Dict] = None,
+                 model_params: Optional[Dict] = None,
                  sampling_params: Optional[Dict] = None,
                  **kwargs):
         """
@@ -88,13 +88,12 @@ class GenerateQAFromExamplesMapper(Mapper):
         :param output_pattern: Regular expression pattern to extract questions
             and answers from model response.
         :param enable_vllm: Whether to use vllm for inference acceleration.
-        :param llm_params: Parameters for initializing the model.
+        :param model_params: Parameters for initializing the model.
         :param sampling_params: Sampling parameters for text generation.
             e.g {'temperature': 0.9, 'top_p': 0.95}
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(**kwargs)
-        self.num_proc = 1
 
         if not seed_file:
             raise ValueError(
@@ -114,24 +113,29 @@ class GenerateQAFromExamplesMapper(Mapper):
         self.output_pattern = output_pattern or self.DEFAULT_OUTPUT_PATTERN
 
         self.enable_vllm = enable_vllm
-        llm_params = llm_params or {}
+        model_params = model_params or {}
         sampling_params = sampling_params or {}
 
         if enable_vllm:
             assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
-            if llm_params.get('tensor_parallel_size', 1) > 1:
-                self.num_proc = 1
+            # cannot initialize vllm replicas on different GPUs
+            self.num_proc = 1
+            if model_params.get('tensor_parallel_size') is None:
+                tensor_parallel_size = torch.cuda.device_count()
+                logger.info(f'Set tensor_parallel_size to \
+                    {tensor_parallel_size} for vllm.')
+                model_params['tensor_parallel_size'] = tensor_parallel_size
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
-                **llm_params)
+                **model_params)
             self.sampling_params = vllm.SamplingParams(**sampling_params)
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
                 pretrained_model_name_or_path=hf_model,
                 return_pipe=True,
-                **llm_params)
+                **model_params)
             self.sampling_params = sampling_params
 
         self.seed_qa_samples = self._load_seed_qa_samples()
@@ -198,17 +202,15 @@ class GenerateQAFromExamplesMapper(Mapper):
 
     def parse_output(self, raw_output):
         logger.debug(raw_output)
-        matches = re.findall(self.output_pattern, raw_output, re.DOTALL)
         output_qa_pairs = []
+        matches = re.findall(self.output_pattern, raw_output, re.DOTALL)
         for match in matches:
             question, answer = match
-            question = question.strip()
-            answer = answer.strip()
-            output_qa_pairs.append((question, answer))
+            output_qa_pairs.append((question.strip(), answer.strip()))
         return output_qa_pairs
 
     def process_single(self, sample=None, rank=None):
-        model, processor = get_model(self.model_key, rank, self.use_cuda())
+        model, _ = get_model(self.model_key, rank, self.use_cuda())
 
         random_qa_samples = random.sample(self.seed_qa_samples,
                                           self.example_num)

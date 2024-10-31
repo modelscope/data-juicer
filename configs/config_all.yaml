@@ -73,13 +73,13 @@ process:
       qa_pair_template: null                                  # Template for formatting a single QA pair within each example.
       output_pattern: null                                    # Regular expression pattern to extract questions and answers from model response.
       enable_vllm: false                                      # Whether to use vllm for inference acceleration.
-      llm_params: null                                        # Parameters for initializing the model.
+      model_params: null                                      # Parameters for initializing the model.
       sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
   - generate_qa_from_text_mapper:                           # mapper to generate question and answer pairs from text.
       hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'           # Model name on huggingface to generate question and answer pairs.
       output_pattern: null                                    # Regular expression pattern to extract questions and answers from model response.
       enable_vllm: false                                      # Whether to use vllm for inference acceleration.
-      llm_params: null                                        # Parameters for initializing the model.
+      model_params: null                                      # Parameters for initializing the model.
       sampling_params: null                                   # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
   - image_blur_mapper:                                      # mapper to blur images.
       p: 0.2                                                  # probability of the image being blured
@@ -149,7 +149,7 @@ process:
       qa_pair_template: null                                  # Template for formatting the question and answer pair.
       output_pattern: null                                    # Regular expression pattern to extract question and answer from model response.
       enable_vllm: false                                      # whether to use vllm for inference acceleration.
-      llm_params: null                                        # Parameters for initializing the model.
+      model_params: null                                      # Parameters for initializing the model.
       sampling_params: null                                   # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
   - optimize_query_mapper:                                  # optimize query in question-answer pairs.
   - optimize_response_mapper:                               # optimize response in question-answer pairs.

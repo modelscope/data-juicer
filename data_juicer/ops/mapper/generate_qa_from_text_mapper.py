@@ -39,7 +39,7 @@ class GenerateQAFromTextMapper(Mapper):
                  *,
                  output_pattern: Optional[str] = None,
                  enable_vllm: bool = False,
-                 llm_params: Optional[Dict] = None,
+                 model_params: Optional[Dict] = None,
                  sampling_params: Optional[Dict] = None,
                  **kwargs):
         """
@@ -49,7 +49,7 @@ class GenerateQAFromTextMapper(Mapper):
         :param output_pattern: Regular expression pattern to extract
             questions and answers from model response.
         :param enable_vllm: Whether to use vllm for inference acceleration.
-        :param llm_params: Parameters for initializing the model.
+        :param model_params: Parameters for initializing the model.
         :param sampling_params: Sampling parameters for text generation,
             e.g {'temperature': 0.9, 'top_p': 0.95}
         :param kwargs: Extra keyword arguments.
@@ -71,46 +71,47 @@ class GenerateQAFromTextMapper(Mapper):
         super().__init__(**kwargs)
 
         if output_pattern is None:
-            self.output_pattern = r'Human: (.*?)\nAssistant: (.*?)(?=\nHuman|$)'  # noqa: E501
+            self.output_pattern = r'Human:(.*?)Assistant:(.*?)(?=Human|$)'  # noqa: E501
         else:
             self.output_pattern = output_pattern
 
         self.enable_vllm = enable_vllm
-        llm_params = llm_params or {}
+        model_params = model_params or {}
         sampling_params = sampling_params or {}
 
         if enable_vllm:
             assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
-            if llm_params.get('tensor_parallel_size', 1) > 1:
-                self.num_proc = 1
+            # cannot initialize vllm replicas on different GPUs
+            self.num_proc = 1
+            if model_params.get('tensor_parallel_size') is None:
+                tensor_parallel_size = torch.cuda.device_count()
+                logger.info(f'Set tensor_parallel_size to \
+                    {tensor_parallel_size} for vllm.')
+                model_params['tensor_parallel_size'] = tensor_parallel_size
             self.model_key = prepare_model(
                 model_type='vllm',
                 pretrained_model_name_or_path=hf_model,
-                **llm_params)
+                **model_params)
             self.sampling_params = vllm.SamplingParams(**sampling_params)
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
                 pretrained_model_name_or_path=hf_model,
                 return_pipe=True,
-                **llm_params)
+                **model_params)
             self.sampling_params = sampling_params
 
     def parse_output(self, raw_output):
-        """Extract qestion and answer pair from model output response."""
+        logger.debug(raw_output)
         qa_list = []
-
-        pat = re.compile(self.output_pattern, re.DOTALL)
-        qa_pairs = pat.findall(raw_output)
-
-        for qa in qa_pairs:
-            user, assistant = qa
+        matches = re.findall(self.output_pattern, raw_output, re.DOTALL)
+        for match in matches:
+            user, assistant = match
             qa_list.append((user.strip(), assistant.strip()))
-
         return qa_list
 
     def process_batched(self, samples, rank=None):
-        model, processor = get_model(self.model_key, rank, self.use_cuda())
+        model, _ = get_model(self.model_key, rank, self.use_cuda())
 
         input_keys = samples.keys()
         num_samples = len(samples[next(iter(input_keys))])

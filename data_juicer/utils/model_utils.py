@@ -166,7 +166,7 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
     return model
 
 
-def prepare_fasttext_model(model_name='lid.176.bin'):
+def prepare_fasttext_model(model_name='lid.176.bin', **model_params):
     """
     Prepare and load a fasttext model.
 
@@ -186,26 +186,29 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
                               return_model=True,
                               return_pipe=False,
                               pipe_task='text-generation',
-                              **llm_params):
+                              **model_params):
     """
     Prepare and load a HuggingFace model with the correspoding processor.
 
     :param pretrained_model_name_or_path: model name or path
     :param return_model: return model or not
     :param return_pipe: whether to wrap model into pipeline
-    :param llm_params: LLM initialization parameters.
+    :param model_params: model initialization parameters.
     :return: a tuple of (model, input processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
     # require torch for transformer model
     AUTOINSTALL.check(['torch'])
 
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
+
     processor = transformers.AutoProcessor.from_pretrained(
-        pretrained_model_name_or_path, **llm_params)
+        pretrained_model_name_or_path, **model_params)
 
     if return_model:
         config = transformers.AutoConfig.from_pretrained(
-            pretrained_model_name_or_path, **llm_params)
+            pretrained_model_name_or_path, **model_params)
         if hasattr(config, 'auto_map'):
             class_name = next(
                 (k for k in config.auto_map if k.startswith('AutoModel')),
@@ -216,26 +219,25 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
 
         model_class = getattr(transformers, class_name)
         model = model_class.from_pretrained(pretrained_model_name_or_path,
-                                            **llm_params)
+                                            **model_params)
 
         if return_pipe:
             if isinstance(processor, transformers.PreTrainedTokenizerBase):
-                pipe_param = {'tokenizer': processor}
+                pipe_params = {'tokenizer': processor}
             elif isinstance(processor, transformers.SequenceFeatureExtractor):
-                pipe_param = {'feature_extractor': processor}
+                pipe_params = {'feature_extractor': processor}
             elif isinstance(processor, transformers.BaseImageProcessor):
-                pipe_param = {'image_processor': processor}
+                pipe_params = {'image_processor': processor}
             pipe = transformers.pipeline(task=pipe_task,
                                          model=model,
                                          config=config,
-                                         device='cpu',
-                                         **pipe_param)
+                                         **pipe_params)
             model = pipe
 
     return (model, processor) if return_model else processor
 
 
-def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin'):
+def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin', **model_params):
     """
     Prepare and load a kenlm model.
 
@@ -243,17 +245,20 @@ def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin'):
     :param lang: language to render model name
     :return: model instance.
     """
+    model_params.pop('device')
+
     model_name = name_pattern.format(lang)
 
     logger.info('Loading kenlm language model...')
     try:
-        kenlm_model = kenlm.Model(check_model(model_name))
+        kenlm_model = kenlm.Model(check_model(model_name), **model_params)
     except:  # noqa: E722
-        kenlm_model = kenlm.Model(check_model(model_name, force=True))
+        kenlm_model = kenlm.Model(check_model(model_name, force=True),
+                                  **model_params)
     return kenlm_model
 
 
-def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
+def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle', **model_params):
     """
     Prepare and load a nltk punkt model.
 
@@ -261,6 +266,8 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
     :param lang: language to render model name
     :return: model instance.
     """
+    model_params.pop('device')
+
     nltk_to_punkt = {
         'en': 'english',
         'fr': 'french',
@@ -274,20 +281,22 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
 
     logger.info('Loading nltk punkt split model...')
     try:
-        nltk_model = nltk.data.load(check_model(model_name))
+        nltk_model = nltk.data.load(check_model(model_name), **model_params)
     except:  # noqa: E722
-        nltk_model = nltk.data.load(check_model(model_name, force=True))
+        nltk_model = nltk.data.load(check_model(model_name, force=True),
+                                    **model_params)
     return nltk_model
 
 
-def prepare_opencv_classifier(model_path):
+def prepare_opencv_classifier(model_path, **model_params):
     model = cv2.CascadeClassifier(model_path)
     return model
 
 
 def prepare_recognizeAnything_model(
         pretrained_model_name_or_path='ram_plus_swin_large_14m.pth',
-        input_size=384):
+        input_size=384,
+        **model_params):
     """
     Prepare and load recognizeAnything model.
 
@@ -295,6 +304,7 @@ def prepare_recognizeAnything_model(
     :param input_size: the input size of the model.
     """
     logger.info('Loading recognizeAnything model...')
+
     try:
         model = ram.ram_plus(
             pretrained=check_model(pretrained_model_name_or_path),
@@ -306,11 +316,12 @@ def prepare_recognizeAnything_model(
             pretrained_model_name_or_path, force=True),
                              image_size=input_size,
                              vit='swin_l')
-    model.eval()
+    device = model_params.pop('device') or 'cpu'
+    model.to(device).eval()
     return model
 
 
-def prepare_sentencepiece_model(model_path):
+def prepare_sentencepiece_model(model_path, **model_params):
     """
     Prepare and load a sentencepiece model.
 
@@ -326,7 +337,9 @@ def prepare_sentencepiece_model(model_path):
     return sentencepiece_model
 
 
-def prepare_sentencepiece_for_lang(lang, name_pattern='{}.sp.model'):
+def prepare_sentencepiece_for_lang(lang,
+                                   name_pattern='{}.sp.model',
+                                   **model_params):
     """
     Prepare and load a sentencepiece model for specific langauge.
 
@@ -340,8 +353,9 @@ def prepare_sentencepiece_for_lang(lang, name_pattern='{}.sp.model'):
 
 
 def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
+                                    *,
                                     return_model=True,
-                                    trust_remote_code=False):
+                                    **model_params):
     """
     Prepare and load a simple aesthetics model.
 
@@ -350,32 +364,34 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
     :return: a tuple (model, input processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
+
     processor = transformers.CLIPProcessor.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+        pretrained_model_name_or_path, **model_params)
     if not return_model:
         return processor
     else:
         if 'v1' in pretrained_model_name_or_path:
             model = aes_pre.AestheticsPredictorV1.from_pretrained(
-                pretrained_model_name_or_path,
-                trust_remote_code=trust_remote_code)
+                pretrained_model_name_or_path, **model_params)
         elif ('v2' in pretrained_model_name_or_path
               and 'linear' in pretrained_model_name_or_path):
             model = aes_pre.AestheticsPredictorV2Linear.from_pretrained(
-                pretrained_model_name_or_path,
-                trust_remote_code=trust_remote_code)
+                pretrained_model_name_or_path, **model_params)
         elif ('v2' in pretrained_model_name_or_path
               and 'relu' in pretrained_model_name_or_path):
             model = aes_pre.AestheticsPredictorV2ReLU.from_pretrained(
-                pretrained_model_name_or_path,
-                trust_remote_code=trust_remote_code)
+                pretrained_model_name_or_path, **model_params)
         else:
             raise ValueError(
                 'Not support {}'.format(pretrained_model_name_or_path))
         return (model, processor)
 
 
-def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.7.0'):
+def prepare_spacy_model(lang,
+                        name_pattern='{}_core_web_md-3.7.0',
+                        **model_params):
     """
     Prepare spacy model for specific language.
 
@@ -434,8 +450,9 @@ def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.7.0'):
 
 
 def prepare_video_blip_model(pretrained_model_name_or_path,
+                             *,
                              return_model=True,
-                             trust_remote_code=False):
+                             **model_params):
     """
     Prepare and load a video-clip model with the correspoding processor.
 
@@ -445,6 +462,8 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
     :return: a tuple (model, input processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
 
     class VideoBlipVisionModel(transformers.Blip2VisionModel):
         """A simple, augmented version of Blip2VisionModel to handle
@@ -564,25 +583,28 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
             self.post_init()
 
     processor = transformers.AutoProcessor.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+        pretrained_model_name_or_path, **model_params)
     if return_model:
         model_class = VideoBlipForConditionalGeneration
-        model = model_class.from_pretrained(
-            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+        model = model_class.from_pretrained(pretrained_model_name_or_path,
+                                            **model_params)
     return (model, processor) if return_model else processor
 
 
-def prepare_vllm_model(pretrained_model_name_or_path, **llm_params):
+def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     """
     Prepare and load a HuggingFace model with the correspoding processor.
 
     :param pretrained_model_name_or_path: model name or path
-    :param llm_params: LLM initialization parameters.
+    :param model_params: LLM initialization parameters.
     :return: a tuple of (model, tokenizer)
     """
     os.environ['VLLM_WORKER_MULTIPROC_METHOD'] = 'spawn'
 
-    model = vllm.LLM(model=pretrained_model_name_or_path, **llm_params)
+    if model_params.get('device', '').startswith('cuda:'):
+        model_params['device'] = 'cuda'
+
+    model = vllm.LLM(model=pretrained_model_name_or_path, **model_params)
     tokenizer = model.get_tokenizer()
 
     return (model, tokenizer)
@@ -603,6 +625,10 @@ MODEL_FUNCTION_MAPPING = {
     'vllm': prepare_vllm_model,
 }
 
+_MODELS_WITHOUT_FILE_LOCK = {
+    'kenlm', 'nltk', 'recognizeAnything', 'sentencepiece', 'spacy'
+}
+
 
 def prepare_model(model_type, **model_kwargs):
     assert (model_type in MODEL_FUNCTION_MAPPING.keys()
@@ -610,29 +636,10 @@ def prepare_model(model_type, **model_kwargs):
                 list(MODEL_FUNCTION_MAPPING.keys()))
     model_func = MODEL_FUNCTION_MAPPING[model_type]
     model_key = partial(model_func, **model_kwargs)
-    if model_type != 'vllm':
-        # instantiate once for possible caching
+    if model_type in _MODELS_WITHOUT_FILE_LOCK:
+        # initialize once in the main process to safely download model files
         model_key()
     return model_key
-
-
-def move_to_cuda(objs, rank):
-    # Assuming model can be either a single module or a tuple of modules
-    if not isinstance(objs, tuple):
-        objs = (objs, )
-
-    for idx, obj in enumerate(objs):
-        if isinstance(obj, transformers.Pipeline):
-            obj = obj.model
-        if callable(getattr(obj, 'to', None)):
-            logger.debug(
-                f'Moving {obj.__class__.__name__} to CUDA device {rank}')
-            obj.to(f'cuda:{rank}')
-            if hasattr(obj, 'device'):
-                try:
-                    objs[idx].device = obj.device
-                except:  # noqa: E722
-                    pass
 
 
 def get_model(model_key=None, rank=None, use_cuda=False):
@@ -644,11 +651,13 @@ def get_model(model_key=None, rank=None, use_cuda=False):
         logger.debug(
             f'{model_key} not found in MODEL_ZOO ({mp.current_process().name})'
         )
-        MODEL_ZOO[model_key] = model_key()
-    if use_cuda:
-        rank = 0 if rank is None else rank
-        rank = rank % cuda_device_count()
-        move_to_cuda(MODEL_ZOO[model_key], rank)
+        if use_cuda:
+            rank = rank if rank is not None else 0
+            rank = rank % cuda_device_count()
+            device = f'cuda:{rank}'
+        else:
+            device = 'cpu'
+        MODEL_ZOO[model_key] = model_key(device=device)
     return MODEL_ZOO[model_key]
 
 
