@@ -53,6 +53,18 @@ hpo_config: null                                            # path to a configur
 process:
   # Mapper ops. Most of these ops need no arguments.
   - audio_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg audio filters
+  - calibrate_qa_mapper:                                    # calibrate question-answer pairs based on reference text.
+      api_url:                                                # API URL. Defaults to DJ_API_URL environment variable.
+      api_key:                                                # API key. Defaults to DJ_API_KEY environment variable.
+      response_path:                                          # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt:                                          # System prompt for the calibration task.
+      input_template:                                         # Template for building the model input.
+      reference_template:                                     # Template for formatting the reference text.
+      qa_pair_template:                                       # Template for formatting question-answer pairs.
+      output_pattern:                                         # Regular expression for parsing model output.
+      api_params:                                             # Extra parameters passed to the API call.
+  - calibrate_query_mapper:                                 # calibrate query in question-answer pairs based on reference text.
+  - calibrate_response_mapper:                              # calibrate response in question-answer pairs based on reference text.
   - chinese_convert_mapper:                                 # convert Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji.
       mode: 's2t'                                             # choose the mode to convert Chinese: ['s2t', 't2s', 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp', 't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 'jp2t']
   - clean_email_mapper:                                     # remove emails from text.

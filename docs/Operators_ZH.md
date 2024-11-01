@@ -11,7 +11,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | 类型                                | 数量 | 描述            |
 |------------------------------------|:--:|---------------|
 | [ Formatter ]( #formatter )        |  7 | 发现、加载、规范化原始数据 |
-| [ Mapper ]( #mapper )              | 47 | 对数据样本进行编辑和转换  |
+| [ Mapper ]( #mapper )              | 50 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 43 | 过滤低质量样本       |
 | [ Deduplicator ]( #deduplicator )  |  8 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  4 | 基于排序选取高质量样本   |
@@ -47,9 +47,12 @@ Data-Juicer 中的算子分为以下 5 种类型。
 
 ## Mapper <a name="mapper"/>
 
-| 算子                                                 | 场景                    | 语言        | 描述                                                                     |
+| 算子                                                | 场景                  | 语言       | 描述                                                                     |
 |----------------------------------------------------|-----------------------|-----------|------------------------------------------------------------------------|
 | audio_ffmpeg_wrapped_mapper                        | Audio                 | -         | 运行 FFmpeg 语音过滤器的简单封装                                                   |
+| calibrate_qa_mapper                                | General               | en, zh    | 根据参考文本校准问答对                                                     |
+| calibrate_query_mapper                             | General               | en, zh    | 根据参考文本校准问答对中的问题                                               |
+| calibrate_response_mapper                          | General               | en, zh    | 根据参考文本校准问答对中的回答                                               |
 | chinese_convert_mapper                             | General               | zh        | 用于在繁体中文、简体中文和日文汉字之间进行转换（借助 [opencc](https://github.com/BYVoid/OpenCC)） |
 | clean_copyright_mapper                             | Code                  | en, zh    | 删除代码文件开头的版权声明 (必须包含单词 *copyright*)                                     |
 | clean_email_mapper                                 | General               | en, zh    | 删除邮箱信息                                                                 |
@@ -62,10 +65,10 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | generate_instruction_mapper                        | General               | en, zh    | 指令扩充，根据种子数据，生成新的样本。                                                    |
 | image_blur_mapper                                  | Image                 |  -        | 对图像进行模糊处理                                                              |
 | image_captioning_from_gpt4v_mapper                 | Multimodal            |  -        | 基于gpt-4-vision和图像生成文本                                                  |
-| image_captioning_mapper                            | Multimodal            |  -    | 生成样本，其标题是根据另一个辅助模型（例如 blip2）和原始样本中的图形生成的。                              |
+| image_captioning_mapper                            | Multimodal            |  -        | 生成样本，其标题是根据另一个辅助模型（例如 blip2）和原始样本中的图形生成的。                              |
 | image_diffusion_mapper                             | Multimodal            |  -        | 用stable diffusion生成图像，对图像进行增强                                          |
 | image_face_blur_mapper                             | Image                 |  -        | 对图像中的人脸进行模糊处理                                                          |
-| image_tagging_mapper                    | Multimodal         | -      | 从输入图片中生成图片标签                                                           |
+| image_tagging_mapper                               | Multimodal            | -         | 从输入图片中生成图片标签                                                           |
 | nlpaug_en_mapper                                   | General               | en        | 使用`nlpaug`库对英语文本进行简单增强                                                 | 
 | nlpcda_zh_mapper                                   | General               | zh        | 使用`nlpcda`库对中文文本进行简单增强                                                 | 
 | optimize_instruction_mapper                        | General               | en, zh    | 指令优化，优化prompt。                                                         |

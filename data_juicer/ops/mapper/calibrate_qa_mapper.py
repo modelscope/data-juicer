@@ -12,7 +12,7 @@ OP_NAME = 'calibrate_qa_mapper'
 @OPERATORS.register_module(OP_NAME)
 class CalibrateQAMapper(Mapper):
     """
-    Mapper to calibrate question-answer pairs.
+    Mapper to calibrate question-answer pairs based on reference text.
     """
 
     # avoid leading whitespace
@@ -53,7 +53,7 @@ class CalibrateQAMapper(Mapper):
         :param reference_template: Template for formatting the reference text.
         :param qa_pair_template: Template for formatting question-answer pairs.
         :param output_pattern: Regular expression for parsing model output.
-        :param api_params: Extra API parameters.
+        :param api_params: Extra parameters passed to the API call.
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(**kwargs)
