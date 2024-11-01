@@ -8,7 +8,7 @@ import multiprocess as mp
 import wget
 from loguru import logger
 
-from data_juicer import cuda_device_count, is_cuda_available
+from data_juicer import cuda_device_count
 from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
@@ -104,11 +104,8 @@ def check_model(model_name, force=False):
     return cached_model_path
 
 
-def prepare_diffusion_model(pretrained_model_name_or_path,
-                            diffusion_type,
-                            torch_dtype='fp32',
-                            revision='main',
-                            trust_remote_code=False):
+def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
+                            **model_params):
     """
         Prepare and load an Diffusion model from HuggingFace.
 
@@ -116,14 +113,12 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
             or local path to the model
         :param diffusion_type: the use of the diffusion model. It can be
             'image2image', 'text2image', 'inpainting'
-        :param torch_dtype: the floating point to load the diffusion
-            model. Can be one of ['fp32', 'fp16', 'bf16']
-        :param revision: The specific model version to use. It can be a
-            branch name, a tag name, a commit id, or any identifier allowed
-            by Git.
         :return: a Diffusion model.
     """
     AUTOINSTALL.check(['torch', 'transformers'])
+
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
 
     diffusion_type_to_pipeline = {
         'image2image': diffusers.AutoPipelineForImage2Image,
@@ -137,30 +132,9 @@ def prepare_diffusion_model(pretrained_model_name_or_path,
             'model. Can only be one of '
             '["image2image", "text2image", "inpainting"].')
 
-    if torch_dtype not in ['fp32', 'fp16', 'bf16']:
-        raise ValueError(
-            f'Not support {torch_dtype} torch_dtype for diffusion '
-            'model. Can only be one of '
-            '["fp32", "fp16", "bf16"].')
-
-    if not is_cuda_available() and (torch_dtype == 'fp16'
-                                    or torch_dtype == 'bf16'):
-        raise ValueError(
-            'In cpu mode, only fp32 torch_dtype can be used for diffusion'
-            ' model.')
-
     pipeline = diffusion_type_to_pipeline[diffusion_type]
-    if torch_dtype == 'bf16':
-        torch_dtype = torch.bfloat16
-    elif torch_dtype == 'fp16':
-        torch_dtype = torch.float16
-    else:
-        torch_dtype = torch.float32
-
     model = pipeline.from_pretrained(pretrained_model_name_or_path,
-                                     revision=revision,
-                                     torch_dtype=torch_dtype,
-                                     trust_remote_code=trust_remote_code)
+                                     **model_params)
 
     return model
 
