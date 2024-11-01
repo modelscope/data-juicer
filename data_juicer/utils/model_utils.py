@@ -612,7 +612,8 @@ def prepare_model(model_type, **model_kwargs):
     model_func = MODEL_FUNCTION_MAPPING[model_type]
     model_key = partial(model_func, **model_kwargs)
     # always instantiate once for possible caching
-    model_key()
+    if model_type != 'vllm':
+        model_key()
     return model_key
 
 

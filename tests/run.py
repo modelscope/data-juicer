@@ -10,10 +10,11 @@ import argparse
 import os
 import sys
 import unittest
+import coverage
 
 from loguru import logger
 
-from data_juicer.utils.unittest_utils import SKIPPED_TESTS
+from data_juicer.utils.unittest_utils import SKIPPED_TESTS, set_clear_model_flag
 
 file_dir = os.path.join(os.path.dirname(__file__), '..')
 sys.path.append(file_dir)
@@ -26,8 +27,14 @@ parser.add_argument('--pattern', default='test_*.py', help='test file pattern')
 parser.add_argument('--test_dir',
                     default='tests',
                     help='directory to be tested')
+parser.add_argument('--clear_model',
+                    default=False,
+                    type=bool,
+                    help='whether to clear the downloaded models for tests. '
+                         'It\'s False in default.')
 args = parser.parse_args()
 
+set_clear_model_flag(args.clear_model)
 
 class TaggedTestLoader(unittest.TestLoader):
     def __init__(self, tag="standalone"):
@@ -66,12 +73,20 @@ def gather_test_cases(test_dir, pattern, tag):
 
 
 def main():
+    cov = coverage.Coverage()
+    cov.start()
+
     runner = unittest.TextTestRunner()
     test_suite = gather_test_cases(os.path.abspath(args.test_dir),
                                    args.pattern, args.tag)
     res = runner.run(test_suite)
+
+    cov.stop()
+
     if not res.wasSuccessful():
         exit(1)
+
+    cov.report()
 
 
 if __name__ == '__main__':
