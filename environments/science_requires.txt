@@ -1,6 +1,6 @@
 torch>=1.11.0
 torchaudio
-easyocr
+easyocr==1.7.1
 fasttext-wheel
 kenlm
 sentencepiece
@@ -24,4 +24,5 @@ simple-aesthetics-predictor
 scenedetect[opencv]
 ffmpeg-python
 opencv-python
-vllm
+vllm>=0.1.3
+rouge

@@ -16,6 +16,8 @@ class WhitespaceNormalizationMapper(Mapper):
     https://en.wikipedia.org/wiki/Whitespace_character
     """
 
+    _batched_op = True
+
     def __init__(self, *args, **kwargs):
         """
         Initialization method.
@@ -25,13 +27,15 @@ class WhitespaceNormalizationMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
 
-    def process(self, sample):
-        # remove whitespaces before and after the main content
-        text = sample[self.text_key].strip()
+    def process_batched(self, samples):
+        for idx, text in enumerate(samples[self.text_key]):
+            # remove whitespaces before and after the main content
+            text = text.strip()
 
-        # replace all kinds of whitespaces with ' '
-        sample[self.text_key] = ''.join([
-            char if char not in VARIOUS_WHITESPACES else ' ' for char in text
-        ])
+            # replace all kinds of whitespaces with ' '
+            samples[self.text_key][idx] = ''.join([
+                char if char not in VARIOUS_WHITESPACES else ' '
+                for char in text
+            ])
 
-        return sample
+        return samples

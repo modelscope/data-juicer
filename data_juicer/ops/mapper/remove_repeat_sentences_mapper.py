@@ -15,6 +15,8 @@ def split_sentence(text):
 class RemoveRepeatSentencesMapper(Mapper):
     """Mapper to remove repeat sentences in text samples."""
 
+    _batched_op = True
+
     def __init__(self,
                  lowercase: bool = False,
                  ignore_special_character: bool = True,
@@ -43,28 +45,29 @@ class RemoveRepeatSentencesMapper(Mapper):
         self.remove_regex = re.compile(r'[^a-zA-Z0-9\u4e00-\u9fa5\n\t ]'
                                        ) if ignore_special_character else None
 
-    def process(self, sample):
+    def process_batched(self, samples):
+        for idx, text in enumerate(samples[self.text_key]):
+            lines = [e for e in text.split('\n')]
+            new_lines = []
+            hash_set = set([])
+            for line in lines:
+                new_sent = ''
+                if line:
+                    sentences = split_sentence(line)
+                    for sentence in sentences:
+                        copy = sentence.strip()
+                        if self.lowercase:
+                            copy = copy.lower()
+                        if self.remove_regex:
+                            copy = self.remove_regex.sub('', copy)
 
-        lines = [e for e in sample[self.text_key].split('\n')]
-        new_lines = []
-        hash_set = set([])
-        for line in lines:
-            new_sent = ''
-            if line:
-                sentences = split_sentence(line)
-                for sentence in sentences:
-                    copy = sentence.strip()
-                    if self.lowercase:
-                        copy = copy.lower()
-                    if self.remove_regex:
-                        copy = self.remove_regex.sub('', copy)
+                        if len(copy) < self.min_repeat_sentence_length:
+                            new_sent += sentence
+                        elif copy not in hash_set:
+                            new_sent += sentence
+                            hash_set.add(copy)
+                new_lines.append(new_sent)
 
-                    if len(copy) < self.min_repeat_sentence_length:
-                        new_sent += sentence
-                    elif copy not in hash_set:
-                        new_sent += sentence
-                        hash_set.add(copy)
-            new_lines.append(new_sent)
+            samples[self.text_key][idx] = '\n'.join(new_lines)
 
-        sample[self.text_key] = '\n'.join(new_lines)
-        return sample
+        return samples

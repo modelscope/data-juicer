@@ -144,7 +144,7 @@ class FusedFilter(Filter):
         if 'cuda' in accelerator_methods:
             self.accelerator = 'cuda'
 
-    def compute_stats(self, sample, rank=None):
+    def compute_stats_single(self, sample, rank=None):
         import av
 
         # context for the intermediate vars
@@ -165,7 +165,7 @@ class FusedFilter(Filter):
         _ = sample.pop(Fields.context)
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         # Only return True when all filters return True
         for op in self.fused_filters:
             if not op.process(sample):

@@ -12,6 +12,8 @@ class ExpandMacroMapper(Mapper):
     """Mapper to expand macro definitions in the document body of Latex
     samples."""
 
+    _batched_op = True
+
     def __init__(self, *args, **kwargs):
         """
         Initialization method.
@@ -55,26 +57,29 @@ class ExpandMacroMapper(Mapper):
                 macros[macro_name] = macro_val
         return macros
 
-    def process(self, sample):
-        non_arg_macros = self._build_non_arg_macros_dict(sample[self.text_key])
+    def process_batched(self, samples):
+        for idx, text in enumerate(samples[self.text_key]):
+            non_arg_macros = self._build_non_arg_macros_dict(text)
 
-        # TODO: macros that take arguments are not supported yet
-        arg_macros = {}
+            # TODO: macros that take arguments are not supported yet
+            arg_macros = {}
 
-        # inline-expand all non-arg macros
-        for macro_name, macro_value in non_arg_macros.items():
-            sample[self.text_key] = re.sub(
-                # make pattern grouped to make sure that the macro is not part
-                # of a longer alphanumeric word
-                pattern=r'(' + macro_name + r')' + r'([^a-zA-Z0-9])',
-                # replace the macro with its value and add back the character
-                # that was matched after the macro
-                repl=macro_value + r'\2',
-                string=sample[self.text_key])
+            # inline-expand all non-arg macros
+            for macro_name, macro_value in non_arg_macros.items():
+                text = re.sub(
+                    # make pattern grouped to make sure that the macro
+                    # is not part of a longer alphanumeric word
+                    pattern=r'(' + macro_name + r')' + r'([^a-zA-Z0-9])',
+                    # replace the macro with its value and add back the
+                    # character that was matched after the macro
+                    repl=macro_value + r'\2',
+                    string=text)
 
-        # inline-expand all macros that use args
-        # TODO: inline-expand macros with args
-        for macro_name, macro_value in arg_macros.items():
-            pass
+            # inline-expand all macros that use args
+            # TODO: inline-expand macros with args
+            for macro_name, macro_value in arg_macros.items():
+                pass
 
-        return sample
+            samples[self.text_key][idx] = text
+
+        return samples

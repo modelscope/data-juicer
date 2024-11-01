@@ -1,31 +1,30 @@
 import numpy as np
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ..base_op import OPERATORS
 from ..op_fusion import LOADED_IMAGES
 from .ray_basic_deduplicator import RayBasicDeduplicator
 
+imgdedup_methods = LazyLoader('imgdedup_methods', 'imagededup.methods')
+
 OP_NAME = 'ray_image_deduplicator'
 
-with AvailabilityChecking(['imagededup'], OP_NAME):
-    import imagededup  # noqa: F401
+HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
 
-    HASH_METHOD = {'phash', 'dhash', 'whash', 'ahash'}
 
-    def get_hash_method(method_name):
-        from imagededup.methods import AHash, DHash, PHash, WHash
+def get_hash_method(method_name):
 
-        mapping = {
-            'phash': PHash,
-            'dhash': DHash,
-            'whash': WHash,
-            'ahash': AHash
-        }
+    mapping = {
+        'phash': imgdedup_methods.PHash,
+        'dhash': imgdedup_methods.DHash,
+        'whash': imgdedup_methods.WHash,
+        'ahash': imgdedup_methods.AHash
+    }
 
-        return mapping[method_name]
+    return mapping[method_name]
 
 
 @OPERATORS.register_module(OP_NAME)

@@ -7,6 +7,8 @@ from ..base_op import OPERATORS, Mapper
 class RemoveNonChineseCharacterlMapper(Mapper):
     """Mapper to remove non chinese Character in text samples."""
 
+    _batched_op = True
+
     def __init__(self,
                  keep_alphabet: bool = True,
                  keep_number: bool = True,
@@ -33,13 +35,13 @@ class RemoveNonChineseCharacterlMapper(Mapper):
         else:
             self.pattern += u']'
 
-    def process(self, sample):
+    def process_batched(self, samples):
+        for idx, text in enumerate(samples[self.text_key]):
+            if not re.search(self.pattern, text, flags=re.DOTALL):
+                continue
 
-        if not re.search(self.pattern, sample[self.text_key], flags=re.DOTALL):
-            return sample
-
-        sample[self.text_key] = re.sub(pattern=self.pattern,
-                                       repl=r'',
-                                       string=sample[self.text_key],
-                                       flags=re.DOTALL)
-        return sample
+            samples[self.text_key][idx] = re.sub(pattern=self.pattern,
+                                                 repl=r'',
+                                                 string=text,
+                                                 flags=re.DOTALL)
+        return samples

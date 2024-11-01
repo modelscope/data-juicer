@@ -3,20 +3,15 @@ from typing import Dict, Optional
 from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
+
+torch = LazyLoader('torch', 'torch')
+vllm = LazyLoader('vllm', 'vllm')
 
 DEFAULT_SYSTEM_PROMPT = '请优化这个指令，将其修改为一个更详细具体的指令。'
 
 OP_NAME = 'optimize_instruction_mapper'
-
-with AvailabilityChecking(['torch', 'transformers', 'vllm'], OP_NAME):
-    import torch
-    import transformers  # noqa: F401
-    import vllm  # noqa: F401
-
-    # avoid hanging when calling model in multiprocessing
-    torch.set_num_threads(1)
 
 
 # TODO: Extend LLM-based OPs into API-based implementation.
@@ -70,9 +65,6 @@ class OptimizeInstructionMapper(Mapper):
         self.enable_vllm = enable_vllm
 
         if enable_vllm:
-            import torch
-            from vllm import SamplingParams
-
             assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
             if not tensor_parallel_size:
                 tensor_parallel_size = torch.cuda.device_count()
@@ -85,7 +77,7 @@ class OptimizeInstructionMapper(Mapper):
                 tensor_parallel_size=tensor_parallel_size,
                 max_model_len=max_model_len,
                 max_num_seqs=max_num_seqs)
-            self.sampling_params = SamplingParams(**sampling_params)
+            self.sampling_params = vllm.SamplingParams(**sampling_params)
         else:
             self.model_key = prepare_model(
                 model_type='huggingface',
@@ -93,7 +85,7 @@ class OptimizeInstructionMapper(Mapper):
                 trust_remote_code=trust_remote_code)
             self.sampling_params = sampling_params
 
-    def process(self, sample=None, rank=None):
+    def process_single(self, sample=None, rank=None):
         model, processor = get_model(self.model_key, rank=rank)
 
         messages = [{

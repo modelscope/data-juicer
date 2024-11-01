@@ -13,6 +13,9 @@ from pydantic import PositiveInt
 
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 from data_juicer.utils.file_utils import add_suffix_to_filename
+from data_juicer.utils.lazy_loader import LazyLoader
+
+cv2 = LazyLoader('cv2', 'cv2')
 
 # suppress most warnings from av
 av.logging.set_level(av.logging.PANIC)
@@ -129,8 +132,6 @@ def pil_to_opencv(pil_image):
 
 
 def detect_faces(image, detector, **extra_kwargs):
-    import cv2
-
     img = pil_to_opencv(image)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     dets = detector.detectMultiScale(gray, **extra_kwargs)
@@ -546,13 +547,18 @@ def extract_video_frames_uniformly(
             container.seek(0)
             search_idx = 0
             curr_pts = second_group[search_idx] / time_base
+            find_all = False
             for frame in container.decode(input_video_stream):
                 if frame.pts >= curr_pts:
                     extracted_frames.append(frame)
                     search_idx += 1
                     if search_idx >= len(second_group):
+                        find_all = True
                         break
                     curr_pts = second_group[search_idx] / time_base
+            if not find_all and frame is not None:
+                # add the last frame
+                extracted_frames.append(frame)
         else:
             # search from a key frame
             container.seek(int(key_frame_second * 1e6))

@@ -3,15 +3,14 @@ from copy import deepcopy
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import OPERATORS, Mapper
 
-OP_NAME = 'nlpcda_zh_mapper'
+nlpcda = LazyLoader('nlpcda', 'nlpcda')
 
-with AvailabilityChecking(['nlpcda'], OP_NAME), HiddenPrints():
-    import nlpcda
+OP_NAME = 'nlpcda_zh_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -130,7 +129,7 @@ class NlpcdaZhMapper(Mapper):
                 self.aug_pipeline.append(
                     nlpcda.EquivalentChar(create_num=create_num))
 
-    def process(self, samples):
+    def process_batched(self, samples):
         # no augmentation methods are opened
         if len(self.aug_pipeline) == 0:
             if self.keep_original_sample:

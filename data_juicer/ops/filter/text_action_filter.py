@@ -1,4 +1,5 @@
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import AUTOINSTALL
 from data_juicer.utils.mm_utils import remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -28,6 +29,8 @@ class TextActionFilter(Filter):
             parameter.
         """
         super().__init__(*args, **kwargs)
+        # '--no-deps' do not update numpy
+        AUTOINSTALL.check(['spacy-pkuseg'], '--no-deps')
 
         if lang not in ['en', 'zh']:
             raise ValueError(
@@ -39,7 +42,7 @@ class TextActionFilter(Filter):
         self.action_tags = ['VV', 'VB', 'VBP', 'VBZ', 'VBD', 'VBG', 'VBN']
         self.min_action_num = min_action_num
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.num_action in sample[Fields.stats]:
             return sample
@@ -58,7 +61,7 @@ class TextActionFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         num_action = sample[Fields.stats][StatsKeys.num_action]
         if self.min_action_num <= num_action:
             return True

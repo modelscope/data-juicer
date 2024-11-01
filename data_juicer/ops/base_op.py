@@ -133,6 +133,7 @@ class OP:
         self.image_key = kwargs.get('image_key', 'images')
         self.audio_key = kwargs.get('audio_key', 'audios')
         self.video_key = kwargs.get('video_key', 'videos')
+        self.batch_size = kwargs.get('batch_size', 1000)
 
         # whether the model can be accelerated using cuda
         _accelerator = kwargs.get('accelerator', None)
@@ -203,6 +204,12 @@ class OP:
         related_parameters.update(extra_param_dict)
         return related_parameters
 
+    def run(self, dataset):
+        from data_juicer.core.data import NestedDataset
+        if not isinstance(dataset, NestedDataset):
+            dataset = NestedDataset(dataset)
+        return dataset
+
 
 class Mapper(OP):
 
@@ -223,11 +230,33 @@ class Mapper(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.process = catch_map_batches_exception(self.process)
+            self.process = catch_map_batches_exception(self.process_batched)
         else:
-            self.process = catch_map_single_exception(self.process)
+            self.process = catch_map_single_exception(self.process_single)
 
-    def process(self, sample):
+    # set the process method is not allowed to be overridden
+    def __init_subclass__(cls, **kwargs):
+        not_allowed_list = ['process']
+        for method_name in not_allowed_list:
+            if method_name in cls.__dict__:
+                raise TypeError(
+                    f'Method {method_name} cannot be overridden by subclass '
+                    f'{cls.__name__}. Please implement {method_name}_single '
+                    f'or {method_name}_batched.')
+
+    def process_batched(self, samples, *args, **kwargs):
+        keys = samples.keys()
+        first_key = next(iter(keys))
+        num_samples = len(samples[first_key])
+        for i in range(num_samples):
+            this_sample = {key: samples[key][i] for key in keys}
+            res_sample = self.process_single(this_sample, *args, **kwargs)
+            for key in keys:
+                samples[key][i] = res_sample[key]
+
+        return samples
+
+    def process_single(self, sample):
         """
         For sample level, sample --> sample
 
@@ -237,10 +266,12 @@ class Mapper(OP):
         raise NotImplementedError
 
     def run(self, dataset, *, exporter=None, tracer=None):
+        dataset = super(Mapper, self).run(dataset)
         new_dataset = dataset.map(
             self.process,
             num_proc=self.runtime_np(),
             with_rank=self.use_cuda(),
+            batch_size=self.batch_size,
             desc=self._name + '_process',
         )
         if tracer:
@@ -270,11 +301,41 @@ class Filter(OP):
         # runtime wrappers
         if self.is_batched_op():
             self.compute_stats = catch_map_batches_exception(
-                self.compute_stats)
+                self.compute_stats_batched)
+            self.process = catch_map_batches_exception(self.process_batched)
         else:
-            self.compute_stats = catch_map_single_exception(self.compute_stats)
+            self.compute_stats = catch_map_single_exception(
+                self.compute_stats_single)
+            self.process = catch_map_single_exception(self.process_single)
 
-    def compute_stats(self, sample, context=False):
+    # set the process method is not allowed to be overridden
+    def __init_subclass__(cls, **kwargs):
+        not_allowed_list = ['compute_stats', 'process']
+        for method_name in not_allowed_list:
+            if method_name in cls.__dict__:
+                raise TypeError(
+                    f'Method {method_name} cannot be overridden by subclass '
+                    f'{cls.__name__}. Please implement {method_name}_single '
+                    f'or {method_name}_batched.')
+
+    def compute_stats_batched(self, samples, *args, **kwargs):
+        keys = samples.keys()
+        num_samples = len(samples[Fields.stats])
+        for i in range(num_samples):
+            this_sample = {key: samples[key][i] for key in keys}
+            res_sample = self.compute_stats_single(this_sample, *args,
+                                                   **kwargs)
+            samples[Fields.stats][i] = res_sample[Fields.stats]
+            if 'context' in kwargs and kwargs['context']:
+                samples[Fields.context][i] = res_sample[Fields.context]
+
+        return samples
+
+    def process_batched(self, samples):
+        return map(lambda stat: self.process_single({Fields.stats: stat}),
+                   samples[Fields.stats])
+
+    def compute_stats_single(self, sample, context=False):
         """
         Compute stats for the sample which is used as a metric to decide
         whether to filter this sample.
@@ -286,7 +347,7 @@ class Filter(OP):
         """
         raise NotImplementedError
 
-    def process(self, sample):
+    def process_single(self, sample):
         """
         For sample level, sample --> Boolean.
 
@@ -296,6 +357,7 @@ class Filter(OP):
         raise NotImplementedError
 
     def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
+        dataset = super(Filter, self).run(dataset)
         if Fields.stats not in dataset.features:
             from data_juicer.core.data import add_same_content_to_new_column
             dataset = dataset.map(add_same_content_to_new_column,
@@ -304,17 +366,19 @@ class Filter(OP):
                                       'initial_value': {}
                                   },
                                   num_proc=self.runtime_np(),
+                                  batch_size=self.batch_size,
                                   desc='Adding new column for stats')
         dataset = dataset.map(self.compute_stats,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
+                              batch_size=self.batch_size,
                               desc=self._name + '_compute_stats')
-        if self.stats_export_path is not None:
+        if exporter and self.stats_export_path is not None:
             exporter.export_compute_stats(dataset, self.stats_export_path)
-
         if reduce:
             new_dataset = dataset.filter(self.process,
                                          num_proc=self.runtime_np(),
+                                         batch_size=self.batch_size,
                                          desc=self._name + '_process')
             if tracer:
                 tracer.trace_filter(self._name, dataset, new_dataset)
@@ -367,6 +431,7 @@ class Deduplicator(OP):
         raise NotImplementedError
 
     def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
+        dataset = super(Deduplicator, self).run(dataset)
         dataset = dataset.map(self.compute_hash,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
@@ -408,6 +473,7 @@ class Selector(OP):
         raise NotImplementedError
 
     def run(self, dataset, *, exporter=None, tracer=None):
+        dataset = super(Selector, self).run(dataset)
         new_dataset = self.process(dataset)
         if tracer:
             tracer.trace_filter(self._name, dataset, new_dataset)

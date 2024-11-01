@@ -9,6 +9,8 @@ from ..base_op import OPERATORS, Mapper
 class RemoveSpecificCharsMapper(Mapper):
     """Mapper to clean specific chars in text samples."""
 
+    _batched_op = True
+
     def __init__(self,
                  chars_to_remove: Union[str, List[str]] = '◆●■►▼▲▴∆▻▷❖♡□',
                  *args,
@@ -28,13 +30,14 @@ class RemoveSpecificCharsMapper(Mapper):
         else:
             self.pattern = None
 
-    def process(self, sample):
-
+    def process_batched(self, samples):
         if self.pattern is None:
-            return sample
+            return samples
 
-        sample[self.text_key] = re.sub(pattern=self.pattern,
-                                       repl=r'',
-                                       string=sample[self.text_key],
-                                       flags=re.DOTALL)
-        return sample
+        samples[self.text_key] = [
+            re.sub(pattern=self.pattern,
+                   repl=r'',
+                   string=text,
+                   flags=re.DOTALL) for text in samples[self.text_key]
+        ]
+        return samples

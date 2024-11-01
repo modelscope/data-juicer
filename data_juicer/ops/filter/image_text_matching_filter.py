@@ -1,7 +1,6 @@
 import numpy as np
 from PIL import ImageOps
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
@@ -11,13 +10,6 @@ from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_text_matching_filter'
-
-with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling blip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -77,7 +69,7 @@ class ImageTextMatchingFilter(Filter):
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_text_matching_score in sample[Fields.stats]:
             return sample
@@ -142,7 +134,7 @@ class ImageTextMatchingFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         itm_scores = sample[Fields.stats][StatsKeys.image_text_matching_score]
         if len(itm_scores) <= 0:
             return True

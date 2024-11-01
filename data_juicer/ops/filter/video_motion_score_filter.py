@@ -5,15 +5,14 @@ from typing import Optional, Tuple, Union
 import numpy as np
 from pydantic import PositiveFloat, PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, UNFORKABLE, Filter
 
-OP_NAME = 'video_motion_score_filter'
+cv2 = LazyLoader('cv2', 'cv2')
 
-with AvailabilityChecking(['opencv-python'], OP_NAME):
-    import cv2
+OP_NAME = 'video_motion_score_filter'
 
 
 @contextmanager
@@ -105,7 +104,7 @@ class VideoMotionScoreFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.video_motion_score in sample[Fields.stats]:
             return sample
@@ -182,7 +181,7 @@ class VideoMotionScoreFilter(Filter):
         ]
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         video_motion_scores = sample[Fields.stats][
             StatsKeys.video_motion_score]
 

@@ -41,7 +41,8 @@
 | 数据子集                    |      完善前的样本数目       | 完善后的样本数目 | 样本保留率 | 配置链接                          | 数据链接                                                                                                                                                                                                                                                                                 | 来源            |
 |---------------------------|:---------------------------:|:--------------:|:----------:|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
 | LLaVA pretrain (LCS-558k) |          558,128          |   500,380    |   89.65%   | [llava-pretrain-refine.yaml](llava-pretrain-refine.yaml) | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/LLaVA-1.5/public/llava-pretrain-refine-result.json) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/llava-pretrain-refined-by-data-juicer/summary)  <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/llava-pretrain-refined-by-data-juicer)                                        | [LLaVA-1.5](https://github.com/haotian-liu/LLaVA) |
-| Data-Juicer-T2V |          1,217,346          |   147,176    |   12.09%   | [2_multi_op_pipline.yaml](../demo/bench/2_multi_op_pipline.yaml) | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-optimal-data-pool)  <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/data-juicer-t2v-optimal-data-pool)                                        | [InternVid (606k)](https://github.com/OpenGVLab/InternVideo/tree/main/Data/InternVid) <br> [Panda-70M (605k)](https://github.com/snap-research/Panda-70M) <br> [MSR-VTT (6k)](https://www.microsoft.com/en-us/research/publication/msr-vtt-a-large-video-description-dataset-for-bridging-video-and-language/) |
+| Data-Juicer (T2V, 147k) |          1,217,346          |   147,176    |   12.09%   | [data-juicer-sandbox-optimal.yaml](data-juicer-sandbox-optimal.yaml) | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-optimal-data-pool)  <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/data-juicer-t2v-optimal-data-pool)                                        | [InternVid (606k)](https://github.com/OpenGVLab/InternVideo/tree/main/Data/InternVid) <br> [Panda-70M (605k)](https://github.com/snap-research/Panda-70M) <br> [MSR-VTT (6k)](https://www.microsoft.com/en-us/research/publication/msr-vtt-a-large-video-description-dataset-for-bridging-video-and-language/) |
+| Data-Juicer (DJ, 228k) |          3,408,553          |   227,867    |   8.15%   | [data-juicer-sandbox-self-evolution.yaml](data-juicer-sandbox-self-evolution.yaml) | [Aliyun](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_optimal_data_pool_s2.zip) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/data-juicer-t2v-evolution-data-pool)                                        | [InternVid (606k)](https://github.com/OpenGVLab/InternVideo/tree/main/Data/InternVid) <br> [Panda-70M (2,599k)](https://github.com/snap-research/Panda-70M) <br> [Pexels (198k)](https://github.com/cj-mills/pexels-dataset) <br> [MSR-VTT (6k)](https://www.microsoft.com/en-us/research/publication/msr-vtt-a-large-video-description-dataset-for-bridging-video-and-language/) |
 
 ### 评测结果
 - LLaVA pretrain (LCS-558k): 使用**完善后的预训练数据集**预训练并使用原始的指令数据集微调后的模型在12个评测集上有10个超过了基线模型LLaVA-1.5-13B。
@@ -50,6 +51,20 @@
 |---------------------------------|-------| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | LLaVA-1.5-13B <br> (基线)         | **80.0**  | 63.3 | 53.6 | 71.6 | **61.3** | 85.9 | 1531.3 | 67.7 | 63.6 | 61.6 | 72.5 | 36.1 |
 | LLaVA-1.5-13B <br> (完善后的预训练数据集) | 79.94 | **63.5** | **54.09** | **74.20** | 60.82 | **86.67** | **1565.53** | **68.2** | **63.9** | **61.8** | **75.9** | **37.4** |
+
+- Data-Juicer (T2V, 147k) 和 Data-Juicer (DJ, 228k): 使用**完善后的数据集**在 [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) 全面超过基线模型 [T2V-Turbo](https://github.com/Ji4chenLi/t2v-turbo)。这里 T2V-Turbo 是 Data-Juicer (T2V, 147k) 的teacher模型，Data-Juicer (T2V, 147k) 是 Data-Juicer (DJ, 228k) 的teacher模型，详情请参考[沙盒实验室](../../docs/Sandbox-ZH.md)。
+
+| model                         | Total Score | Quality Score | Semantic Score | subject consistency | background consistency | temporal flickering | motion smoothness | dynamic degree | aesthetic quality |
+|-------------------------------|-------| --- | --- | --- | --- | --- | --- | --- | --- |
+| T2V-Turbo               | 81.01 | 82.57 | 74.76 | 96.28 | 97.02 | 97.48 | 97.34 | 49.17 | 63.04 |
+| Data-Juicer (T2V, 147k) | 82.10 | 83.14 | 77.93 | 97.32 | 99.03 | 96.60 | 96.51 | **51.67** | **68.92** |
+| Data-Juicer (DJ, 228k)  | **82.53** | **83.38** | **79.13** | **97.92** | **99.27** | **98.14** | **97.77** | 38.89 | 67.39 |
+
+| model                         | imaging quality | object class | multiple objects | human action | color | spatial relationship | scene | appearance style | temporal style | overall consistency |
+|-------------------------------| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| T2V-Turbo               | **72.49** | 93.96 | 54.65 | 95.20 | 89.90 | 38.67 | 55.58 | 24.42 | 25.51 | 28.16 |
+| Data-Juicer (T2V, 147k) | 70.42 | 95.85 | 61.63 | **95.60** | 94.06 | 46.95 | **57.57** | 24.42 | 26.34 | 28.90 |
+| Data-Juicer (DJ, 228k)  | 70.41 | **96.44** | **64.51** | 95.40 | **95.51** | **47.17** | 57.30 | **25.55** | **26.82** | **29.25** |
 
 ## 视频数据集
 

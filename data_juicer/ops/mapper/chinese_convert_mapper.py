@@ -1,11 +1,10 @@
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-OP_NAME = 'chinese_convert_mapper'
+opencc = LazyLoader('opencc', 'opencc')
 
-with AvailabilityChecking(['opencc'], OP_NAME):
-    import opencc  # noqa: F401
+OP_NAME = 'chinese_convert_mapper'
 
 OPENCC_CONVERTER = None
 
@@ -26,6 +25,8 @@ def prepare_converter(mode):
 class ChineseConvertMapper(Mapper):
     """Mapper to convert Chinese between Traditional Chinese, Simplified Chinese
     and Japanese Kanji."""
+
+    _batched_op = True
 
     def __init__(self, mode: str = 's2t', *args, **kwargs):
         """
@@ -82,8 +83,10 @@ class ChineseConvertMapper(Mapper):
         self.mode = mode
         prepare_converter(self.mode)
 
-    def process(self, sample):
+    def process_batched(self, samples):
         prepare_converter(self.mode)
 
-        sample[self.text_key] = OPENCC_CONVERTER.convert(sample[self.text_key])
-        return sample
+        samples[self.text_key] = [
+            OPENCC_CONVERTER.convert(text) for text in samples[self.text_key]
+        ]
+        return samples

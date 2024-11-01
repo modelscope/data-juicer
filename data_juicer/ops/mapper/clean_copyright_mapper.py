@@ -12,6 +12,8 @@ class CleanCopyrightMapper(Mapper):
     """Mapper to clean copyright comments at the beginning of the text
     samples."""
 
+    _batched_op = True
+
     def __init__(self, *args, **kwargs):
         """
         Initialization method.
@@ -23,21 +25,19 @@ class CleanCopyrightMapper(Mapper):
         self.pat = re.compile('/\\*[^*]*\\*+(?:[^/*][^*]*\\*+)*/')
         self.cpat = re.compile('copyright', re.IGNORECASE)
 
-    def process(self, sample):
-
-        r = self.pat.search(sample[self.text_key])
+    def _process_single_sample(self, sample):
+        r = self.pat.search(sample)
         if r:
             # found one, now see if it contains "copyright", if so strip it
             span = r.span()
-            sub = sample[self.text_key][span[0]:span[1]]
+            sub = sample[span[0]:span[1]]
             if self.cpat.search(sub):
                 # cut it
-                sample[self.text_key] = sample[
-                    self.text_key][:span[0]] + sample[self.text_key][span[1]:]
+                sample = sample[:span[0]] + sample[span[1]:]
 
             return sample
 
-        lines = sample[self.text_key].split('\n')
+        lines = sample.split('\n')
         skip = 0
 
         # Greedy replace any file that begins with comment block, most
@@ -51,5 +51,12 @@ class CleanCopyrightMapper(Mapper):
 
         if skip:
             # we skipped, consume it
-            sample[self.text_key] = '\n'.join(lines[skip:])
+            sample = '\n'.join(lines[skip:])
         return sample
+
+    def process_batched(self, samples):
+        samples[self.text_key] = [
+            self._process_single_sample(text)
+            for text in samples[self.text_key]
+        ]
+        return samples

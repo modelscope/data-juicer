@@ -16,8 +16,8 @@ class WordsNumFilterTest(DataJuicerTestCaseBase):
             # only add stats when calling filter op
             dataset = dataset.add_column(name=Fields.stats,
                                          column=[{}] * dataset.num_rows)
-        dataset = dataset.map(op.compute_stats)
-        dataset = dataset.filter(op.process)
+        dataset = dataset.map(op.compute_stats, batch_size=op.batch_size)
+        dataset = dataset.filter(op.process, batch_size=op.batch_size)
         dataset = dataset.select_columns(column_names=['text'])
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
@@ -41,7 +41,7 @@ class WordsNumFilterTest(DataJuicerTestCaseBase):
             'text': 'a v s e c s f e f g a a a  '
         }]
         dataset = Dataset.from_list(ds_list)
-        op = WordsNumFilter(min_num=5, max_num=15)
+        op = WordsNumFilter(min_num=5, max_num=15, batch_size=2)
         self._run_words_num_filter(dataset, tgt_list, op)
 
     def test_zh_case(self):
@@ -68,7 +68,8 @@ class WordsNumFilterTest(DataJuicerTestCaseBase):
         op = WordsNumFilter(lang='zh',
                            tokenization=True,
                            min_num=10,
-                           max_num=25)
+                           max_num=25,
+                           batch_size=1)
         self._run_words_num_filter(dataset, tgt_list, op)
 
 

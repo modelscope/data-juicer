@@ -6,12 +6,11 @@ from loguru import logger
 from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
 from data_juicer.ops import Filter, Mapper
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.process_utils import calculate_np
 
-with AvailabilityChecking(['ray'], requires_type='dist'):
-    from ray.data import Dataset
+rd = LazyLoader('rd', 'ray.data')
 
 
 def is_valid_path(item, dataset_dir):
@@ -54,7 +53,7 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     return dataset
 
 
-def preprocess_dataset(dataset: Dataset, dataset_path, cfg) -> Dataset:
+def preprocess_dataset(dataset: rd.Dataset, dataset_path, cfg) -> rd.Dataset:
     if dataset_path:
         dataset = set_dataset_to_absolute_path(dataset, dataset_path, cfg)
     columns = dataset.columns()
@@ -81,7 +80,7 @@ def get_num_gpus(op, op_proc):
 class RayDataset(DJDataset):
 
     def __init__(self,
-                 dataset: Dataset,
+                 dataset: rd.Dataset,
                  dataset_path: str = None,
                  cfg=None) -> None:
         self.data = preprocess_dataset(dataset, dataset_path, cfg)
@@ -108,14 +107,16 @@ class RayDataset(DJDataset):
                                self.num_proc, op.use_cuda())
         num_gpus = get_num_gpus(op, op_proc)
         try:
+            batch_size = getattr(op, 'batch_size',
+                                 1) if op.is_batched_op() else 1
             if isinstance(op, Mapper):
                 self.data = self.data.map_batches(op.process,
-                                                  batch_size=1,
+                                                  batch_size=batch_size,
                                                   batch_format='pyarrow',
                                                   num_gpus=num_gpus)
             elif isinstance(op, Filter):
                 self.data = self.data.map_batches(op.compute_stats,
-                                                  batch_size=1,
+                                                  batch_size=batch_size,
                                                   batch_format='pyarrow',
                                                   num_gpus=num_gpus)
                 if op.stats_export_path is not None:

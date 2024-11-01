@@ -1,11 +1,12 @@
 import os
 
 from loguru import logger
+from PIL import ImageFilter
 from pydantic import NonNegativeFloat
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
                                         load_image)
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -13,11 +14,9 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_IMAGES
 
-OP_NAME = 'image_face_blur_mapper'
+cv2 = LazyLoader('cv2', 'cv2')
 
-with AvailabilityChecking(['opencv-python', 'Pillow'], OP_NAME):
-    import cv2
-    from PIL import ImageFilter
+OP_NAME = 'image_face_blur_mapper'
 
 
 @UNFORKABLE.register_module(OP_NAME)
@@ -82,7 +81,7 @@ class ImageFaceBlurMapper(Mapper):
         self.model_key = prepare_model(model_type='opencv_classifier',
                                        model_path=cv_classifier)
 
-    def process(self, sample, context=False):
+    def process_single(self, sample, context=False):
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
             sample[Fields.source_file] = []

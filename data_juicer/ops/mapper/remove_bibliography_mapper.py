@@ -12,6 +12,8 @@ class RemoveBibliographyMapper(Mapper):
     """Mapper to remove bibliography at the end of documents in Latex
     samples."""
 
+    _batched_op = True
+
     def __init__(self, *args, **kwargs):
         """
         Initialization method.
@@ -27,9 +29,12 @@ class RemoveBibliographyMapper(Mapper):
         self.pattern += r'\\bibliography\{.*\}'
         self.pattern += r').*$'
 
-    def process(self, sample):
-        sample[self.text_key] = re.sub(pattern=self.pattern,
-                                       repl=r'',
-                                       string=sample[self.text_key],
-                                       flags=re.DOTALL)
-        return sample
+    def process_batched(self, samples):
+        samples[self.text_key] = [
+            re.sub(pattern=self.pattern,
+                   repl=r'',
+                   string=text,
+                   flags=re.DOTALL) for text in samples[self.text_key]
+        ]
+
+        return samples

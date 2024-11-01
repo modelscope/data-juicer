@@ -1,6 +1,7 @@
 import numpy as np
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import AUTOINSTALL
 from data_juicer.utils.mm_utils import remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -35,6 +36,8 @@ class TextEntityDependencyFilter(Filter):
             sample only if all images are dependent.
         """
         super().__init__(*args, **kwargs)
+        # '--no-deps' do not update numpy
+        AUTOINSTALL.check(['spacy-pkuseg'], '--no-deps')
 
         if lang not in ['en', 'zh']:
             raise ValueError(
@@ -50,7 +53,7 @@ class TextEntityDependencyFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.num_dependency_edges in sample[Fields.stats]:
             return sample
@@ -85,7 +88,7 @@ class TextEntityDependencyFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         num_dependency_edges = sample[Fields.stats][
             StatsKeys.num_dependency_edges]
         keep_bools = np.array([
