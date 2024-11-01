@@ -65,7 +65,7 @@ process:
   - generate_qa_from_examples_mapper:                       # mapper to generate question and answer pairs from examples.
       hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # Model name on huggingface to generate question and answer pairs.
       seed_file: 'demos/data/demo-dataset-chatml.jsonl'       # Path to the seed file in chatml format.
-      instruct_num: 3                                         # The number of randomly selected seed examples.
+      example_num: 3                                          # The number of randomly selected seed examples.
       similarity_threshold: 0.7                               # the similarity score threshold between the generated samples and the seed examples. Range from 0 to 1. Samples with similarity score less than this threshold will be kept.
       system_prompt: null                                     # System prompt for guiding the generation task.
       input_template: null                                    # Template for building the input prompt.

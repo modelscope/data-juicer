@@ -43,8 +43,8 @@ class GenerateQAFromExamplesMapper(Mapper):
         '3. 提供的【问题】和【回答】可能是多轮对话，生成的【问题】和【回答】也可以是多轮，但是需要保持格式相同。\n'
         '4. 生成的【问题】和【回答】必须成对出现，而且【问题】需要在【回答】之前。\n')
 
-    DEFAULT_INPUT_TEMPLATE = '{examples}'
-    DEFAULT_EXAMPLE_TEMPLATE = '\n如下是一条示例数据：\n{qa_pairs}'
+    DEFAULT_INPUT_TEMPLATE = '{}'
+    DEFAULT_EXAMPLE_TEMPLATE = '\n如下是一条示例数据：\n{}'
     DEFAULT_QA_PAIR_TEMPLATE = '【问题】\n{}\n【回答】\n{}\n'
     DEFAULT_OUTPUT_PATTERN = r'【问题】(.*?)【回答】(.*?)(?=【问题】|$)'
 
@@ -79,11 +79,13 @@ class GenerateQAFromExamplesMapper(Mapper):
             this threshold will be kept.
         :param system_prompt: System prompt for guiding the generation task.
         :param input_template: Template for building the input prompt. It must
-            include "{examples}", which will be replaced by `example_num`
-            formatted examples defined by `example_template`.
-        :param example_template: Template for formatting each QA example.
+            include one placeholder '{}', which will be replaced by
+            `example_num` formatted examples defined by `example_template`.
+        :param example_template: Template for formatting one QA example. It
+            must include one placeholder '{}', which will be replaced by one
+            formatted qa_pair.
         :param qa_pair_template: Template for formatting a single QA pair
-            within each example. Must include two placeholders "{}" for the
+            within each example. Must include two placeholders '{}' for the
             question and answer.
         :param output_pattern: Regular expression pattern to extract questions
             and answers from model response.
@@ -141,9 +143,6 @@ class GenerateQAFromExamplesMapper(Mapper):
         self.seed_qa_samples = self._load_seed_qa_samples()
         if len(self.seed_qa_samples) == 0:
             raise ValueError('No QA data was parsed from the seed file!')
-        self.seed_qa_str = [
-            self._sample_to_str(sample) for sample in self.seed_qa_samples
-        ]
 
     def _load_seed_qa_samples(self):
         """Load QA pairs from chatml format file."""
@@ -160,11 +159,13 @@ class GenerateQAFromExamplesMapper(Mapper):
     def _sample_to_str(self, qa_sample):
         return '\n'.join(['\n'.join(qa_pair) for qa_pair in qa_sample]) + '\n'
 
-    def _max_rouge_l_score(self, hypothesis):
+    def _max_rouge_l_score(self, hypothesis, references):
         r = rouge.Rouge()
         max_score = 0.0
-        for reference in self.seed_qa_str:
-            scores = r.get_scores(hypothesis, reference)
+        hyp_str = self._sample_to_str(hypothesis)
+        for reference in references:
+            ref_str = self._sample_to_str(reference)
+            scores = r.get_scores(hyp_str, ref_str)
             rouge_l_score = scores[0]['rouge-l']['f']
             if rouge_l_score > max_score:
                 max_score = rouge_l_score
@@ -246,8 +247,8 @@ class GenerateQAFromExamplesMapper(Mapper):
             return sample
 
         if self.similarity_type == 'rouge_l':
-            output_qa_str = self._sample_to_str(output_qa_pairs)
-            sim_score = self._max_rouge_l_score(output_qa_str)
+            sim_score = self._max_rouge_l_score(output_qa_pairs,
+                                                random_qa_samples)
         else:
             raise ValueError(
                 f'Not support similarity type "{self.similarity_type}"!')
