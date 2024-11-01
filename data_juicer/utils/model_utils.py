@@ -160,7 +160,7 @@ class APIModel:
             return self.nested_access(result, self.response_path)
         except Exception as e:
             logger.exception(e)
-            return None
+            return ''
 
     @staticmethod
     def nested_access(data, path):
