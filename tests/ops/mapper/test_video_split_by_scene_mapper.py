@@ -8,7 +8,6 @@ from data_juicer.ops.mapper.video_split_by_scene_mapper import \
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
-@SKIPPED_TESTS.register_module()
 class VideoSplitBySceneMapperTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
