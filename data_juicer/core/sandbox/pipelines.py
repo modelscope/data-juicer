@@ -1,10 +1,11 @@
+import os
 from typing import List
 
-import wandb
 import yaml
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import namespace_to_dict
 
+import wandb
 from data_juicer.config import merge_config
 from data_juicer.core.sandbox.hooks import register_hook
 
@@ -25,6 +26,8 @@ class SandBoxWatcher:
         experiment_name = sandbox_cfg.experiment_name
         hpo_config = sandbox_cfg.hpo_config
         self.sandbox_cfg = sandbox_cfg
+        if not os.path.exists(self.sandbox_cfg.work_dir):
+            os.makedirs(self.sandbox_cfg.work_dir, exist_ok=True)
 
         self.wandb_run = wandb.init(project=project_name, name=experiment_name)
         if (hpo_config is not None and 'metric' in hpo_config
