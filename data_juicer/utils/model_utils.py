@@ -177,11 +177,13 @@ class APIModel:
         return data
 
 
-def prepare_api_model(*,
-                      api_model,
+def prepare_api_model(api_model,
+                      *,
                       api_url=None,
                       api_key=None,
-                      response_path=None):
+                      response_path=None,
+                      return_processor=False,
+                      processor_name=None):
     """Creates a callable API model for interacting with OpenAI-compatible API.
 
     This callable object supports custom result parsing and is suitable for use
@@ -192,14 +194,54 @@ def prepare_api_model(*,
     :param api_key: The API key for authorization. If not provided, it will
         fallback to the environment variables DJ_API_KEY or OPENAI_API_KEY.
     :param response_path: The path to extract content from the API response.
-        Defaults to 'choices.0.message.content'.
-    :return: A callable API model object that can be used to send messages and
-        receive responses.
+        Defaults to 'choices.0.message.content'.  This can be customized
+        based on the API's response structure.
+    :param return_processor: A boolean flag indicating whether to return a
+        processor along with the model. The processor is used for tasks like
+        tokenization or encoding. Defaults to False.
+    :param processor_name: The name of a specific processor from Hugging Face
+        to be used. This is only necessary if a custom processor is required.
+    :return: A tuple containing the callable API model object and optionally a
+        processor if `return_processor` is True.
     """
-    return APIModel(api_model=api_model,
-                    api_url=api_url,
-                    api_key=api_key,
-                    response_path=response_path)
+    model = APIModel(api_model=api_model,
+                     api_url=api_url,
+                     api_key=api_key,
+                     response_path=response_path)
+    if not return_processor:
+        return model
+
+    def get_processor():
+        try:
+            import tiktoken
+            return tiktoken.encoding_for_model(api_model)
+        except Exception:
+            pass
+
+        try:
+            import dashscope
+            return dashscope.get_tokenizer(api_model)
+        except Exception:
+            pass
+
+        try:
+            return transformers.AutoProcessor.from_pretrained(
+                api_model, trust_remote_code=True)
+        except Exception:
+            raise ValueError(
+                'Failed to initialize the processor. Please check the following:\n'  # noqa: E501
+                "- For OpenAI models: Install 'tiktoken' via `pip install tiktoken`.\n"  # noqa: E501
+                "- For DashScope models: Install 'dashscope' via `pip install dashscope`.\n"  # noqa: E501
+                "- For custom models: Provide a valid Hugging Face name in 'processor_name'.\n"  # noqa: E501
+                'If the issue persists, verify the passed `api_model` parameter.'  # noqa: E501
+            )
+
+    if processor_name is not None:
+        processor = transformers.AutoProcessor.from_pretrained(
+            processor_name, trust_remote_code=True)
+    else:
+        processor = get_processor()
+    return (model, processor)
 
 
 def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
