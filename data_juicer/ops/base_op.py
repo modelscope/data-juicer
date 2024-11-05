@@ -2,6 +2,7 @@ import copy
 import traceback
 from functools import wraps
 
+import numpy as np
 import pyarrow as pa
 from loguru import logger
 
@@ -133,6 +134,11 @@ class OP:
         self.image_key = kwargs.get('image_key', 'images')
         self.audio_key = kwargs.get('audio_key', 'audios')
         self.video_key = kwargs.get('video_key', 'videos')
+
+        self.query_key = kwargs.get('query_key', 'query')
+        self.response_key = kwargs.get('response_key', 'response')
+        self.history_key = kwargs.get('history_key', 'history')
+
         self.batch_size = kwargs.get('batch_size', 1000)
 
         # whether the model can be accelerated using cuda
@@ -209,6 +215,9 @@ class OP:
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
         return dataset
+
+    def empty_history(self):
+        return np.empty((0, 0), dtype=str)
 
 
 class Mapper(OP):
