@@ -54,16 +54,16 @@ process:
   # Mapper ops. Most of these ops need no arguments.
   - audio_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg audio filters
   - calibrate_qa_mapper:                                    # calibrate question-answer pairs based on reference text.
-      api_model:                                              # API model name.
-      api_url:                                                # API URL. Defaults to DJ_API_URL environment variable.
-      api_key:                                                # API key. Defaults to DJ_API_KEY environment variable.
-      response_path:                                          # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
-      system_prompt:                                          # System prompt for the calibration task.
-      input_template:                                         # Template for building the model input.
-      reference_template:                                     # Template for formatting the reference text.
-      qa_pair_template:                                       # Template for formatting question-answer pairs.
-      output_pattern:                                         # Regular expression for parsing model output.
-      api_params:                                             # Extra parameters passed to the API call.
+      api_model: 'gpt-4o'                                     # API model name.
+      api_url: null                                           # API URL. Defaults to DJ_API_URL environment variable.
+      api_key: null                                           # API key. Defaults to DJ_API_KEY environment variable.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the calibration task.
+      input_template: null                                    # Template for building the model input.
+      reference_template: null                                # Template for formatting the reference text.
+      qa_pair_template: null                                  # Template for formatting question-answer pairs.
+      output_pattern: null                                    # Regular expression for parsing model output.
+      api_params: null                                        # Extra parameters in dict passed to the API call.
   - calibrate_query_mapper:                                 # calibrate query in question-answer pairs based on reference text.
   - calibrate_response_mapper:                              # calibrate response in question-answer pairs based on reference text.
   - chinese_convert_mapper:                                 # convert Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji.
@@ -74,30 +74,26 @@ process:
   - clean_links_mapper:                                     # remove web links from text.
   - clean_copyright_mapper:                                 # remove copyright comments.
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
-  - extract_qa_mapper:                                      # mapper to extract question and answer pair from text.
-      hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'           # model name on huggingface to extract question and answer pair.
-      pattern: null                                           # regular expression pattern to search for within text.
-      qa_format: 'chatml'                                     # Output format of question and answer pair.
-      enable_vllm: true                                       # Whether to use vllm for inference acceleration.
-      tensor_parallel_size: null                              # It is only valid when enable_vllm is True. The number of GPUs to use for distributed execution with tensor parallelism.
-      max_model_len: null                                     # It is only valid when enable_vllm is True. Model context length. If unspecified, will be automatically derived from the model config.
-      max_num_seqs: 256                                       # It is only valid when enable_vllm is True. Maximum number of sequences to be processed in a single iteration.
-      sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
   - fix_unicode_mapper:                                     # fix unicode errors in text.
-  - generate_instruction_mapper:                            # generate new instruction text data.
-      hf_model: 'Qwen/Qwen-7B-Chat'                           # model name on huggingface to generate instruction.
-      seed_file: 'demos/data/demo-dataset-chatml.jsonl'       # Seed file as instruction samples to generate new instructions, chatml format.
-      instruct_num: 3                                         # the number of generated samples.
-      similarity_threshold: 0.7                               # the similarity score threshold between the generated samples and the seed samples.Range from 0 to 1. Samples with similarity score less than this threshold will be kept.
-      prompt_template: null                                   # Prompt template for generate samples. Please make sure the template contains "{augmented_data}", which corresponds to the augmented samples.
-      qa_pair_template: null                                  # Prompt template for generate question and answer pair description. Please make sure the template contains two "{}" to format question and answer. Default: '【问题】\n{}\n【回答】\n{}\n'.
-      example_template: null                                  # Prompt template for generate examples. Please make sure the template contains "{qa_pairs}", which corresponds to the question and answer pair description generated by param `qa_pair_template`.
-      qa_extraction_pattern: null                             # Regular expression pattern for parsing question and answer from model response.
-      enable_vllm: true                                       # Whether to use vllm for inference acceleration.
-      tensor_parallel_size: null                              # It is only valid when enable_vllm is True. The number of GPUs to use for distributed execution with tensor parallelism.
-      max_model_len: null                                     # It is only valid when enable_vllm is True. Model context length. If unspecified, will be automatically derived from the model config.
-      max_num_seqs: 256                                       # It is only valid when enable_vllm is True. Maximum number of sequences to be processed in a single iteration.
+  - generate_qa_from_examples_mapper:                       # mapper to generate question and answer pairs from examples.
+      hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # Model name on huggingface to generate question and answer pairs.
+      seed_file: 'demos/data/demo-dataset-chatml.jsonl'       # Path to the seed file in chatml format.
+      example_num: 3                                          # The number of randomly selected seed examples.
+      similarity_threshold: 0.7                               # the similarity score threshold between the generated samples and the seed examples. Range from 0 to 1. Samples with similarity score less than this threshold will be kept.
+      system_prompt: null                                     # System prompt for guiding the generation task.
+      input_template: null                                    # Template for building the input prompt.
+      example_template: null                                  # Template for formatting each QA example.
+      qa_pair_template: null                                  # Template for formatting a single QA pair within each example.
+      output_pattern: null                                    # Regular expression pattern to extract questions and answers from model response.
+      enable_vllm: false                                      # Whether to use vllm for inference acceleration.
+      model_params: null                                      # Parameters for initializing the model.
       sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - generate_qa_from_text_mapper:                           # mapper to generate question and answer pairs from text.
+      hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'           # Model name on huggingface to generate question and answer pairs.
+      output_pattern: null                                    # Regular expression pattern to extract questions and answers from model response.
+      enable_vllm: false                                      # Whether to use vllm for inference acceleration.
+      model_params: null                                      # Parameters for initializing the model.
+      sampling_params: null                                   # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
   - image_blur_mapper:                                      # mapper to blur images.
       p: 0.2                                                  # probability of the image being blured
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
@@ -159,13 +155,17 @@ process:
       delete_random_char: false                               # whether to open the augmentation method of deleting random characters from the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的数据增强"
       swap_random_char: false                                 # whether to open the augmentation method of swapping random contiguous characters in the original texts. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有5种不同的数据强增方法"
       replace_equivalent_num: false                           # whether to open the augmentation method of replacing random numbers with their equivalent representations in the original texts. **Notice**: Only for numbers for now. e.g. "这里一共有5种不同的数据增强方法" --> "这里一共有伍种不同的数据增强方法"
-  - optimize_instruction_mapper:                            # optimize instruction.
-      hf_model: 'alibaba-pai/Qwen2-7B-Instruct-Refine'        # model name on huggingface to optimize instruction
-      enable_vllm: true                                       # whether to use vllm for inference acceleration.
-      tensor_parallel_size: null                              # It is only valid when enable_vllm is True. The number of GPUs to use for distributed execution with tensor parallelism.
-      max_model_len: null                                     # It is only valid when enable_vllm is True. Model context length. If unspecified, will be automatically derived from the model config.
-      max_num_seqs: 256                                       # It is only valid when enable_vllm is True. Maximum number of sequences to be processed in a single iteration.
-      sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - optimize_qa_mapper:                                     # optimize question-answer pairs.
+      hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # model name on huggingface.
+      system_prompt: null                                     # System prompt for guiding the optimization task.
+      input_template: null                                    # Template for building the input for the model.
+      qa_pair_template: null                                  # Template for formatting the question and answer pair.
+      output_pattern: null                                    # Regular expression pattern to extract question and answer from model response.
+      enable_vllm: false                                      # whether to use vllm for inference acceleration.
+      model_params: null                                      # Parameters for initializing the model.
+      sampling_params: null                                   # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - optimize_query_mapper:                                  # optimize query in question-answer pairs.
+  - optimize_response_mapper:                               # optimize response in question-answer pairs.
   - punctuation_normalization_mapper:                       # normalize unicode punctuations to English punctuations.
   - remove_bibliography_mapper:                             # remove bibliography from Latex text.
   - remove_comments_mapper:                                 # remove comments from Latex text, code, etc.

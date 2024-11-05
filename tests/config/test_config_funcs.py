@@ -237,8 +237,8 @@ class ConfigTest(DataJuicerTestCaseBase):
         from data_juicer.ops.base_op import OPERATORS
 
         base_class_params = {
-            'text_key', 'image_key', 'audio_key', 'video_key', 'accelerator',
-            'num_proc', 'cpu_required', 'mem_required',
+            'text_key', 'image_key', 'audio_key', 'video_key', 'query_key', 'response_key', 'history_key',
+            'accelerator', 'turbo', 'batch_size', 'num_proc', 'cpu_required', 'mem_required',
         }
 
         parser = ArgumentParser(default_env=True, default_config_files=None)

@@ -246,15 +246,22 @@ class NestedDataset(Dataset, DJDataset):
 
         if inspect.ismethod(called_func):
             # batched is required for fault-tolerant or batched OP
-            if not called_func.__self__.turbo or hasattr(
+            if callable(getattr(
                     called_func.__self__,
-                    'is_batched_op') and called_func.__self__.is_batched_op():
+                    'is_batched_op')) and called_func.__self__.is_batched_op(
+                    ) or not called_func.__self__.get('turbo', False):
                 kargs['batched'] = True
                 kargs['batch_size'] = kargs.pop('batch_size', 1) if hasattr(
                     called_func.__self__, 'is_batched_op'
                 ) and called_func.__self__.is_batched_op() else 1
             else:
                 kargs['batched'] = False
+
+            # rank is required for cuda model loading
+            if callable(
+                    getattr(called_func.__self__,
+                            'use_cuda')) and called_func.__self__.use_cuda():
+                kargs['with_rank'] = True
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
@@ -300,10 +307,12 @@ class NestedDataset(Dataset, DJDataset):
             called_func = called_func.__wrapped__
 
         # Batched is always required for fault tolerance
-        if inspect.ismethod(
-                called_func) and called_func.__self__.is_batched_op():
-            kargs['batched'] = True
-            kargs['batch_size'] = kargs.pop('batch_size', 1)
+        if inspect.ismethod(called_func):
+            if callable(getattr(
+                    called_func.__self__,
+                    'is_batched_op')) and called_func.__self__.is_batched_op():
+                kargs['batched'] = True
+                kargs['batch_size'] = kargs.pop('batch_size', 1)
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
