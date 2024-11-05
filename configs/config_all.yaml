@@ -63,7 +63,8 @@ process:
       reference_template: null                                # Template for formatting the reference text.
       qa_pair_template: null                                  # Template for formatting question-answer pairs.
       output_pattern: null                                    # Regular expression for parsing model output.
-      api_params: null                                        # Extra parameters in dict passed to the API call.
+      model_params: null                                      # Parameters for initializing the model.
+      sampling_params: null                                   # Extra parameters passed to the API call.
   - calibrate_query_mapper:                                 # calibrate query in question-answer pairs based on reference text.
   - calibrate_response_mapper:                              # calibrate response in question-answer pairs based on reference text.
   - chinese_convert_mapper:                                 # convert Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji.

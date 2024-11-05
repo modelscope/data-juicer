@@ -183,7 +183,8 @@ def prepare_api_model(api_model,
                       api_key=None,
                       response_path=None,
                       return_processor=False,
-                      processor_name=None):
+                      processor_name=None,
+                      **model_params):
     """Creates a callable API model for interacting with OpenAI-compatible API.
 
     This callable object supports custom result parsing and is suitable for use
@@ -201,9 +202,12 @@ def prepare_api_model(api_model,
         tokenization or encoding. Defaults to False.
     :param processor_name: The name of a specific processor from Hugging Face
         to be used. This is only necessary if a custom processor is required.
+    :param model_params: Extra parameters to be passed to the processor.
     :return: A tuple containing the callable API model object and optionally a
         processor if `return_processor` is True.
     """
+    model_params = model_params or {}
+
     model = APIModel(api_model=api_model,
                      api_url=api_url,
                      api_key=api_key,
@@ -225,7 +229,8 @@ def prepare_api_model(api_model,
             pass
 
         try:
-            return transformers.AutoProcessor.from_pretrained(api_model)
+            return transformers.AutoProcessor.from_pretrained(
+                api_model, **model_params)
         except Exception:
             raise ValueError(
                 'Failed to initialize the processor. Please check the following:\n'  # noqa: E501
@@ -235,7 +240,8 @@ def prepare_api_model(api_model,
                 'If the issue persists, check the provided `api_model`.')
 
     if processor_name is not None:
-        processor = transformers.AutoProcessor.from_pretrained(processor_name)
+        processor = transformers.AutoProcessor.from_pretrained(
+            processor_name, **model_params)
     else:
         processor = get_processor()
     return (model, processor)

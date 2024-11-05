@@ -38,7 +38,8 @@ class CalibrateQAMapper(Mapper):
                  reference_template: Optional[str] = None,
                  qa_pair_template: Optional[str] = None,
                  output_pattern: Optional[str] = None,
-                 api_params: Optional[Dict] = None,
+                 model_params: Optional[Dict] = None,
+                 sampling_params: Optional[Dict] = None,
                  **kwargs):
         """
         Initialization method.
@@ -53,7 +54,8 @@ class CalibrateQAMapper(Mapper):
         :param reference_template: Template for formatting the reference text.
         :param qa_pair_template: Template for formatting question-answer pairs.
         :param output_pattern: Regular expression for parsing model output.
-        :param api_params: Extra parameters passed to the API call.
+        :param model_params: Parameters for initializing the model.
+        :param sampling_params: Extra parameters passed to the API call.
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(**kwargs)
@@ -66,12 +68,14 @@ class CalibrateQAMapper(Mapper):
             self.DEFAULT_QA_PAIR_TEMPLATE
         self.output_pattern = output_pattern or self.DEFAULT_OUTPUT_PATTERN
 
-        self.api_params = api_params or {}
+        self.model_params = model_params or {}
+        self.sampling_params = sampling_params or {}
         self.model_key = prepare_model(model_type='api',
                                        api_model=api_model,
                                        api_url=api_url,
                                        api_key=api_key,
-                                       response_path=response_path)
+                                       response_path=response_path,
+                                       **model_params)
 
     def build_input(self, sample):
         reference = self.reference_template.format(sample[self.text_key])
@@ -98,7 +102,7 @@ class CalibrateQAMapper(Mapper):
             'role': 'user',
             'content': self.build_input(sample)
         }]
-        output = client(messages, **self.api_params)
+        output = client(messages, **self.sampling_params)
 
         parsed_q, parsed_a = self.parse_output(output)
         if parsed_q:
