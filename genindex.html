@@ -271,11 +271,11 @@
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExpandMacroMapper.__init__">(data_juicer.ops.mapper.ExpandMacroMapper method)</a>
 </li>
-        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractQAMapper.__init__">(data_juicer.ops.mapper.ExtractQAMapper method)</a>
-</li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.FixUnicodeMapper.__init__">(data_juicer.ops.mapper.FixUnicodeMapper method)</a>
 </li>
-        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateInstructionMapper.__init__">(data_juicer.ops.mapper.GenerateInstructionMapper method)</a>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.__init__">(data_juicer.ops.mapper.GenerateQAFromExamplesMapper method)</a>
+</li>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromTextMapper.__init__">(data_juicer.ops.mapper.GenerateQAFromTextMapper method)</a>
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageBlurMapper.__init__">(data_juicer.ops.mapper.ImageBlurMapper method)</a>
 </li>
@@ -293,7 +293,7 @@
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.NlpcdaZhMapper.__init__">(data_juicer.ops.mapper.NlpcdaZhMapper method)</a>
 </li>
-        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeInstructionMapper.__init__">(data_juicer.ops.mapper.OptimizeInstructionMapper method)</a>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQAMapper.__init__">(data_juicer.ops.mapper.OptimizeQAMapper method)</a>
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.PunctuationNormalizationMapper.__init__">(data_juicer.ops.mapper.PunctuationNormalizationMapper method)</a>
 </li>
@@ -412,8 +412,12 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateInstructionMapper.build_prompt">build_prompt() (data_juicer.ops.mapper.GenerateInstructionMapper method)</a>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.build_input">build_input() (data_juicer.ops.mapper.GenerateQAFromExamplesMapper method)</a>
+
+      <ul>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQAMapper.build_input">(data_juicer.ops.mapper.OptimizeQAMapper method)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -635,8 +639,6 @@
         <li><a href="data_juicer.ops.filter.html#module-data_juicer.ops.filter">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     data_juicer.ops.mapper
 
@@ -651,6 +653,8 @@
         <li><a href="data_juicer.ops.selector.html#module-data_juicer.ops.selector">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     data_juicer.tools
 
@@ -667,6 +671,36 @@
       </ul></li>
       <li><a href="data_juicer.ops.html#data_juicer.ops.Deduplicator">Deduplicator (class in data_juicer.ops)</a>
 </li>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.DEFAULT_EXAMPLE_TEMPLATE">DEFAULT_EXAMPLE_TEMPLATE (data_juicer.ops.mapper.GenerateQAFromExamplesMapper attribute)</a>
+</li>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.DEFAULT_INPUT_TEMPLATE">DEFAULT_INPUT_TEMPLATE (data_juicer.ops.mapper.GenerateQAFromExamplesMapper attribute)</a>
+
+      <ul>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQAMapper.DEFAULT_INPUT_TEMPLATE">(data_juicer.ops.mapper.OptimizeQAMapper attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.DEFAULT_OUTPUT_PATTERN">DEFAULT_OUTPUT_PATTERN (data_juicer.ops.mapper.GenerateQAFromExamplesMapper attribute)</a>
+
+      <ul>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQAMapper.DEFAULT_OUTPUT_PATTERN">(data_juicer.ops.mapper.OptimizeQAMapper attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.DEFAULT_QA_PAIR_TEMPLATE">DEFAULT_QA_PAIR_TEMPLATE (data_juicer.ops.mapper.GenerateQAFromExamplesMapper attribute)</a>
+
+      <ul>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQAMapper.DEFAULT_QA_PAIR_TEMPLATE">(data_juicer.ops.mapper.OptimizeQAMapper attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.DEFAULT_SYSTEM_PROMPT">DEFAULT_SYSTEM_PROMPT (data_juicer.ops.mapper.GenerateQAFromExamplesMapper attribute)</a>
+
+      <ul>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQAMapper.DEFAULT_SYSTEM_PROMPT">(data_juicer.ops.mapper.OptimizeQAMapper attribute)</a>
+</li>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQueryMapper.DEFAULT_SYSTEM_PROMPT">(data_juicer.ops.mapper.OptimizeQueryMapper attribute)</a>
+</li>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeResponseMapper.DEFAULT_SYSTEM_PROMPT">(data_juicer.ops.mapper.OptimizeResponseMapper attribute)</a>
+</li>
+      </ul></li>
       <li><a href="data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis">DiversityAnalysis (class in data_juicer.analysis)</a>
 </li>
       <li><a href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentDeduplicator">DocumentDeduplicator (class in data_juicer.ops.deduplicator)</a>
@@ -695,10 +729,10 @@
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.Executor">Executor (class in data_juicer.core)</a>
 </li>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExpandMacroMapper">ExpandMacroMapper (class in data_juicer.ops.mapper)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExpandMacroMapper">ExpandMacroMapper (class in data_juicer.ops.mapper)</a>
+</li>
       <li><a href="data_juicer.core.html#data_juicer.core.Exporter.export">export() (data_juicer.core.Exporter method)</a>
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.Exporter.export_compute_stats">export_compute_stats() (data_juicer.core.Exporter method)</a>
@@ -706,8 +740,6 @@
       <li><a href="data_juicer.config.html#data_juicer.config.export_config">export_config() (in module data_juicer.config)</a>
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.Exporter">Exporter (class in data_juicer.core)</a>
-</li>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractQAMapper">ExtractQAMapper (class in data_juicer.ops.mapper)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -735,14 +767,16 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateInstructionMapper">GenerateInstructionMapper (class in data_juicer.ops.mapper)</a>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper">GenerateQAFromExamplesMapper (class in data_juicer.ops.mapper)</a>
+</li>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromTextMapper">GenerateQAFromTextMapper (class in data_juicer.ops.mapper)</a>
 </li>
       <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.VideoOcrAreaRatioFilter.get_reader">get_reader() (data_juicer.ops.filter.VideoOcrAreaRatioFilter method)</a>
 </li>
-      <li><a href="data_juicer.ops.common.html#data_juicer.ops.common.get_sentences_from_document">get_sentences_from_document() (in module data_juicer.ops.common)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.ops.common.html#data_juicer.ops.common.get_sentences_from_document">get_sentences_from_document() (in module data_juicer.ops.common)</a>
+</li>
       <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitByKeyFrameMapper.get_split_key_frame">get_split_key_frame() (data_juicer.ops.mapper.VideoSplitByKeyFrameMapper method)</a>
 </li>
       <li><a href="data_juicer.ops.common.html#data_juicer.ops.common.get_words_from_document">get_words_from_document() (in module data_juicer.ops.common)</a>
@@ -843,8 +877,6 @@
 </li>
       <li><a href="data_juicer.ops.html#data_juicer.ops.load_ops">load_ops() (in module data_juicer.ops)</a>
 </li>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateInstructionMapper.load_seed_qa_samples">load_seed_qa_samples() (data_juicer.ops.mapper.GenerateInstructionMapper method)</a>
-</li>
       <li><a href="data_juicer.format.html#data_juicer.format.LocalFormatter">LocalFormatter (class in data_juicer.format)</a>
 </li>
   </ul></td>
@@ -858,8 +890,6 @@
       <li><a href="data_juicer.ops.html#data_juicer.ops.Mapper">Mapper (class in data_juicer.ops)</a>
 </li>
       <li><a href="data_juicer.core.html#data_juicer.core.Adapter.MAX_BATCH_SIZE">MAX_BATCH_SIZE (data_juicer.core.Adapter attribute)</a>
-</li>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateInstructionMapper.max_rouge_l_score">max_rouge_l_score() (data_juicer.ops.mapper.GenerateInstructionMapper method)</a>
 </li>
       <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.MaximumLineLengthFilter">MaximumLineLengthFilter (class in data_juicer.ops.filter)</a>
 </li>
@@ -938,10 +968,14 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeInstructionMapper">OptimizeInstructionMapper (class in data_juicer.ops.mapper)</a>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQAMapper">OptimizeQAMapper (class in data_juicer.ops.mapper)</a>
+</li>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQueryMapper">OptimizeQueryMapper (class in data_juicer.ops.mapper)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeResponseMapper">OptimizeResponseMapper (class in data_juicer.ops.mapper)</a>
+</li>
       <li><a href="data_juicer.analysis.html#data_juicer.analysis.OverallAnalysis">OverallAnalysis (class in data_juicer.analysis)</a>
 </li>
   </ul></td>
@@ -952,10 +986,18 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_juicer.format.html#data_juicer.format.ParquetFormatter">ParquetFormatter (class in data_juicer.format)</a>
 </li>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateInstructionMapper.parse_chatml_str">parse_chatml_str() (data_juicer.ops.mapper.GenerateInstructionMapper method)</a>
+      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.parse_output">parse_output() (data_juicer.ops.mapper.GenerateQAFromExamplesMapper method)</a>
+
+      <ul>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromTextMapper.parse_output">(data_juicer.ops.mapper.GenerateQAFromTextMapper method)</a>
 </li>
-      <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateInstructionMapper.parse_response">parse_response() (data_juicer.ops.mapper.GenerateInstructionMapper method)</a>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQAMapper.parse_output">(data_juicer.ops.mapper.OptimizeQAMapper method)</a>
 </li>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQueryMapper.parse_output">(data_juicer.ops.mapper.OptimizeQueryMapper method)</a>
+</li>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeResponseMapper.parse_output">(data_juicer.ops.mapper.OptimizeResponseMapper method)</a>
+</li>
+      </ul></li>
       <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.PerplexityFilter">PerplexityFilter (class in data_juicer.ops.filter)</a>
 </li>
       <li><a href="data_juicer.ops.filter.html#data_juicer.ops.filter.PhraseGroundingRecallFilter">PhraseGroundingRecallFilter (class in data_juicer.ops.filter)</a>
@@ -1026,6 +1068,8 @@
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExpandMacroMapper.process_batched">(data_juicer.ops.mapper.ExpandMacroMapper method)</a>
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.FixUnicodeMapper.process_batched">(data_juicer.ops.mapper.FixUnicodeMapper method)</a>
+</li>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromTextMapper.process_batched">(data_juicer.ops.mapper.GenerateQAFromTextMapper method)</a>
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageCaptioningFromGPT4VMapper.process_batched">(data_juicer.ops.mapper.ImageCaptioningFromGPT4VMapper method)</a>
 </li>
@@ -1155,9 +1199,7 @@
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.AudioFFmpegWrappedMapper.process_single">(data_juicer.ops.mapper.AudioFFmpegWrappedMapper method)</a>
 </li>
-        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractQAMapper.process_single">(data_juicer.ops.mapper.ExtractQAMapper method)</a>
-</li>
-        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateInstructionMapper.process_single">(data_juicer.ops.mapper.GenerateInstructionMapper method)</a>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.process_single">(data_juicer.ops.mapper.GenerateQAFromExamplesMapper method)</a>
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageBlurMapper.process_single">(data_juicer.ops.mapper.ImageBlurMapper method)</a>
 </li>
@@ -1165,7 +1207,7 @@
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageTaggingMapper.process_single">(data_juicer.ops.mapper.ImageTaggingMapper method)</a>
 </li>
-        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeInstructionMapper.process_single">(data_juicer.ops.mapper.OptimizeInstructionMapper method)</a>
+        <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.OptimizeQAMapper.process_single">(data_juicer.ops.mapper.OptimizeQAMapper method)</a>
 </li>
         <li><a href="data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoFaceBlurMapper.process_single">(data_juicer.ops.mapper.VideoFaceBlurMapper method)</a>
 </li>

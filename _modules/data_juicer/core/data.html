@@ -325,15 +325,22 @@
 
         <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">called_func</span><span class="p">):</span>
             <span class="c1"># batched is required for fault-tolerant or batched OP</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">turbo</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span>
+            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span>
                     <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span>
-                    <span class="s1">&#39;is_batched_op&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
+                    <span class="s1">&#39;is_batched_op&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">(</span>
+                    <span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">turbo</span><span class="p">:</span>
                 <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batched&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span>
                     <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span> <span class="s1">&#39;is_batched_op&#39;</span>
                 <span class="p">)</span> <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">()</span> <span class="k">else</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batched&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># rank is required for cuda model loading</span>
+            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span>
+                            <span class="s1">&#39;use_cuda&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">():</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;with_rank&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="s1">&#39;new_fingerprint&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">new_fingerprint</span> <span class="o">=</span> <span class="n">generate_fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
@@ -379,10 +386,12 @@
             <span class="n">called_func</span> <span class="o">=</span> <span class="n">called_func</span><span class="o">.</span><span class="n">__wrapped__</span>
 
         <span class="c1"># Batched is always required for fault tolerance</span>
-        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span>
-                <span class="n">called_func</span><span class="p">)</span> <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
-            <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batched&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">called_func</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span>
+                    <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span>
+                    <span class="s1">&#39;is_batched_op&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batched&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s1">&#39;new_fingerprint&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">new_fingerprint</span> <span class="o">=</span> <span class="n">generate_fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
