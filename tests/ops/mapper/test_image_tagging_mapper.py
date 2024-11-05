@@ -8,6 +8,8 @@ from data_juicer.ops.mapper.image_tagging_mapper import \
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
+# Skip tests for this OP in the GitHub actions due to OOM on the current runner
+# These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class ImageTaggingMapperTest(DataJuicerTestCaseBase):
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
@@ -22,7 +24,7 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
                                   target_list,
                                   num_proc=1):
         dataset = Dataset.from_list(source_list)
-        dataset = dataset.map(op.process, num_proc=num_proc)
+        dataset = dataset.map(op.process, num_proc=num_proc, with_rank=True)
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
 

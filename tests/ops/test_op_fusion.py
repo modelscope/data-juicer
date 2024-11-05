@@ -5,7 +5,6 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
 
-@SKIPPED_TESTS.register_module()
 class OpFusionTest(DataJuicerTestCaseBase):
 
     def _run_op_fusion(self, original_process_list, target_process_list):

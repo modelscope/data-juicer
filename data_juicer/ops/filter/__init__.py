@@ -44,21 +44,20 @@ from .word_repetition_filter import WordRepetitionFilter
 from .words_num_filter import WordsNumFilter
 
 __all__ = [
-    'ImageTextSimilarityFilter', 'VideoAspectRatioFilter',
-    'ImageTextMatchingFilter', 'ImageNSFWFilter', 'TokenNumFilter',
-    'TextLengthFilter', 'SpecifiedNumericFieldFilter', 'AudioNMFSNRFilter',
-    'VideoAestheticsFilter', 'PerplexityFilter', 'PhraseGroundingRecallFilter',
-    'MaximumLineLengthFilter', 'AverageLineLengthFilter',
-    'SpecifiedFieldFilter', 'VideoTaggingFromFramesFilter',
-    'TextEntityDependencyFilter', 'VideoResolutionFilter',
-    'AlphanumericFilter', 'ImageWatermarkFilter', 'ImageAestheticsFilter',
-    'AudioSizeFilter', 'StopWordsFilter', 'CharacterRepetitionFilter',
-    'ImageShapeFilter', 'VideoDurationFilter', 'TextActionFilter',
-    'VideoOcrAreaRatioFilter', 'VideoNSFWFilter', 'SpecialCharactersFilter',
-    'VideoFramesTextSimilarityFilter', 'ImageAspectRatioFilter',
-    'AudioDurationFilter', 'LanguageIDScoreFilter', 'SuffixFilter',
-    'ImageSizeFilter', 'VideoWatermarkFilter', 'WordsNumFilter',
-    'ImageFaceCountFilter', 'ImageFaceRatioFilter', 'FlaggedWordFilter',
-    'WordRepetitionFilter', 'VideoMotionScoreFilter',
-    'ImagePairSimilarityFilter'
+    'AlphanumericFilter', 'AudioDurationFilter', 'AudioNMFSNRFilter',
+    'AudioSizeFilter', 'AverageLineLengthFilter', 'CharacterRepetitionFilter',
+    'FlaggedWordFilter', 'ImageAestheticsFilter', 'ImageAspectRatioFilter',
+    'ImageFaceCountFilter', 'ImageFaceRatioFilter', 'ImageNSFWFilter',
+    'ImagePairSimilarityFilter', 'ImageShapeFilter', 'ImageSizeFilter',
+    'ImageTextMatchingFilter', 'ImageTextSimilarityFilter',
+    'ImageWatermarkFilter', 'LanguageIDScoreFilter', 'MaximumLineLengthFilter',
+    'PerplexityFilter', 'PhraseGroundingRecallFilter',
+    'SpecialCharactersFilter', 'SpecifiedFieldFilter',
+    'SpecifiedNumericFieldFilter', 'StopWordsFilter', 'SuffixFilter',
+    'TextActionFilter', 'TextEntityDependencyFilter', 'TextLengthFilter',
+    'TokenNumFilter', 'VideoAestheticsFilter', 'VideoAspectRatioFilter',
+    'VideoDurationFilter', 'VideoFramesTextSimilarityFilter',
+    'VideoMotionScoreFilter', 'VideoNSFWFilter', 'VideoOcrAreaRatioFilter',
+    'VideoResolutionFilter', 'VideoTaggingFromFramesFilter',
+    'VideoWatermarkFilter', 'WordRepetitionFilter', 'WordsNumFilter'
 ]
