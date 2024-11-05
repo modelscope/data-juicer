@@ -225,20 +225,17 @@ def prepare_api_model(api_model,
             pass
 
         try:
-            return transformers.AutoProcessor.from_pretrained(
-                api_model, trust_remote_code=True)
+            return transformers.AutoProcessor.from_pretrained(api_model)
         except Exception:
             raise ValueError(
                 'Failed to initialize the processor. Please check the following:\n'  # noqa: E501
                 "- For OpenAI models: Install 'tiktoken' via `pip install tiktoken`.\n"  # noqa: E501
-                "- For DashScope models: Install 'dashscope' via `pip install dashscope`.\n"  # noqa: E501
-                "- For custom models: Provide a valid Hugging Face name in 'processor_name'.\n"  # noqa: E501
-                'If the issue persists, verify the passed `api_model` parameter.'  # noqa: E501
-            )
+                "- For DashScope models: Install both 'dashscope' and 'tiktoken' via `pip install dashscope tiktoken`.\n"  # noqa: E501
+                "- For custom models: Provide a valid Hugging Face name via the 'processor_name' parameter.\n"  # noqa: E501
+                'If the issue persists, check the provided `api_model`.')
 
     if processor_name is not None:
-        processor = transformers.AutoProcessor.from_pretrained(
-            processor_name, trust_remote_code=True)
+        processor = transformers.AutoProcessor.from_pretrained(processor_name)
     else:
         processor = get_processor()
     return (model, processor)
