@@ -249,7 +249,7 @@ class NestedDataset(Dataset, DJDataset):
             if callable(getattr(
                     called_func.__self__,
                     'is_batched_op')) and called_func.__self__.is_batched_op(
-                    ) or not called_func.__self__.get('turbo', False):
+                    ) or not getattr(called_func.__self__, 'turbo', False):
                 kargs['batched'] = True
                 kargs['batch_size'] = kargs.pop('batch_size', 1) if hasattr(
                     called_func.__self__, 'is_batched_op'
