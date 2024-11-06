@@ -3,7 +3,7 @@ from data_juicer.ops.mapper.optimize_instruction_mapper import OptimizeInstructi
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
-# Skip tests for this OP in the GitHub actions due to disk space limitation.
+# Skip tests for this OP in the GitHub actions due to unknown DistNetworkError.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class OptimizeInstructionMapperTest(DataJuicerTestCaseBase):

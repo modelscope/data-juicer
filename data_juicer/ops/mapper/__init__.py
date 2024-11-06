@@ -6,6 +6,7 @@ from .clean_html_mapper import CleanHtmlMapper
 from .clean_ip_mapper import CleanIpMapper
 from .clean_links_mapper import CleanLinksMapper
 from .expand_macro_mapper import ExpandMacroMapper
+from .extract_event_mapper import ExtractEventMapper
 from .extract_qa_mapper import ExtractQAMapper
 from .fix_unicode_mapper import FixUnicodeMapper
 from .generate_instruction_mapper import GenerateInstructionMapper
@@ -32,6 +33,7 @@ from .remove_words_with_incorrect_substrings_mapper import \
     RemoveWordsWithIncorrectSubstringsMapper
 from .replace_content_mapper import ReplaceContentMapper
 from .sentence_split_mapper import SentenceSplitMapper
+from .text_chunk_mapper import TextChunkMapper
 from .video_captioning_from_audio_mapper import VideoCaptioningFromAudioMapper
 from .video_captioning_from_frames_mapper import \
     VideoCaptioningFromFramesMapper
@@ -98,4 +100,6 @@ __all__ = [
     'VideoSplitByDurationMapper',
     'VideoFaceBlurMapper',
     'ImageTaggingMapper',
+    'TextChunkMapper',
+    'ExtractEventMapper',
 ]
