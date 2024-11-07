@@ -823,32 +823,22 @@ within a specific range.</p>
 <dt class="sig sig-object py" id="data_juicer.ops.filter.ImagePairSimilarityFilter.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hf_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'openai/clip-vit-base-patch32'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trust_remote_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ClosedUnitInterval</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">any_or_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'any'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/filter/image_pair_similarity_filter.html#ImagePairSimilarityFilter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.filter.ImagePairSimilarityFilter.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialization method.</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">param hf_clip<span class="colon">:</span></dt>
-<dd class="field-odd"><p>clip model name on huggingface to compute
-the similarity between image and text.</p>
-</dd>
-<dt class="field-even">param min_score<span class="colon">:</span></dt>
-<dd class="field-even"><p>The min similarity to keep samples.</p>
-</dd>
-<dt class="field-odd">param max_score<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The max similarity to keep samples.</p>
-</dd>
-<dt class="field-even">param any_or_all<span class="colon">:</span></dt>
-<dd class="field-even"><p>keep this sample with ‘any’ or ‘all’ strategy of
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hf_clip</strong> – clip model name on huggingface to compute
+the similarity between image and text.</p></li>
+<li><p><strong>min_score</strong> – The min similarity to keep samples.</p></li>
+<li><p><strong>max_score</strong> – The max similarity to keep samples.</p></li>
+<li><p><strong>any_or_all</strong> – keep this sample with ‘any’ or ‘all’ strategy of
 all images. ‘any’: keep this sample if any images meet the
 condition. ‘all’: keep this sample only if all images meet the
-condition.</p>
-</dd>
-<dt class="field-odd">param args<span class="colon">:</span></dt>
-<dd class="field-odd"><p>extra args</p>
-</dd>
-<dt class="field-even">param kwargs<span class="colon">:</span></dt>
-<dd class="field-even"><p>extra args</p>
+condition.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
 </dd>
 </dl>
-</div></blockquote>
 </dd></dl>
 
 <dl class="py method">
