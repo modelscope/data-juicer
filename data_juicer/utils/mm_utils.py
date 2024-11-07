@@ -808,7 +808,6 @@ def parse_string_to_roi(roi_string, roi_type='pixel'):
             'format of "x1, y1, x2, y2", "(x1, y1, x2, y2)", or '
             '"[x1, y1, x2, y2]".')
         return None
-    return None
 
 
 def close_video(container: av.container.InputContainer):
