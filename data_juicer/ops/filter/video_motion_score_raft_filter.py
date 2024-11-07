@@ -21,7 +21,6 @@ OP_NAME = 'video_motion_score_raft_filter'
 @OPERATORS.register_module(OP_NAME)
 class VideoMotionScoreRaftFilter(VideoMotionScoreFilter):
     """Filter to keep samples with video motion scores within a specified range.
-
     This operator utilizes the RAFT (Recurrent All-Pairs Field Transforms)
     model from torchvision to predict optical flow between video frames.
 
