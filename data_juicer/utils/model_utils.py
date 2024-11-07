@@ -5,10 +5,11 @@ from pickle import UnpicklingError
 from typing import Optional, Union
 
 import multiprocess as mp
+import requests
 import wget
 from loguru import logger
 
-from data_juicer import cuda_device_count, is_cuda_available
+from data_juicer import cuda_device_count
 from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
@@ -82,20 +83,19 @@ def check_model(model_name, force=False):
         if os.path.exists(cached_model_path):
             os.remove(cached_model_path)
             logger.info(
-                f'Model [{cached_model_path}] invalid, force to downloading...'
-            )
+                f'Model [{cached_model_path}] is invalid. Forcing download...')
         else:
             logger.info(
-                f'Model [{cached_model_path}] not found. Downloading...')
+                f'Model [{cached_model_path}] is not found. Downloading...')
 
         try:
             model_link = os.path.join(MODEL_LINKS, model_name)
-            wget.download(model_link, cached_model_path, bar=None)
+            wget.download(model_link, cached_model_path)
         except:  # noqa: E722
             try:
                 backup_model_link = os.path.join(
                     get_backup_model_link(model_name), model_name)
-                wget.download(backup_model_link, cached_model_path, bar=None)
+                wget.download(backup_model_link, cached_model_path)
             except:  # noqa: E722
                 logger.error(
                     f'Downloading model [{model_name}] error. '
@@ -105,7 +105,184 @@ def check_model(model_name, force=False):
     return cached_model_path
 
 
-def prepare_fasttext_model(model_name='lid.176.bin'):
+class APIModel:
+
+    def __init__(self,
+                 api_model,
+                 *,
+                 api_url=None,
+                 api_key=None,
+                 response_path=None):
+        self.api_model = api_model
+
+        if api_url is None:
+            api_url = os.getenv('DJ_API_URL')
+            if api_url is None:
+                base_url = os.getenv('OPENAI_BASE_URL',
+                                     'https://api.openai.com/v1')
+                api_url = base_url.rstrip('/') + '/chat/completions'
+        self.api_url = api_url
+
+        if api_key is None:
+            api_key = os.getenv('DJ_API_KEY') or os.getenv('OPENAI_API_KEY')
+        self.api_key = api_key
+
+        if response_path is None:
+            response_path = 'choices.0.message.content'
+        self.response_path = response_path
+
+        self.headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {self.api_key}'
+        }
+
+    def __call__(self, messages, **kwargs):
+        """Sends messages to the configured API model and returns the parsed response.
+
+        :param messages: The messages to send to the API.
+        :param model: The model to be used for generating responses.
+        :param kwargs: Additional parameters for the API request.
+
+        :return: The parsed response from the API, or None if an error occurs.
+        """
+        payload = {
+            'model': self.api_model,
+            'messages': messages,
+            **kwargs,
+        }
+        try:
+            response = requests.post(self.api_url,
+                                     json=payload,
+                                     headers=self.headers)
+            response.raise_for_status()
+            result = response.json()
+            return self.nested_access(result, self.response_path)
+        except Exception as e:
+            logger.exception(e)
+            return ''
+
+    @staticmethod
+    def nested_access(data, path):
+        """Access nested data using a dot-separated path.
+
+        :param data: The data structure to access.
+        :param path: A dot-separated string representing the path to access.
+        :return: The value at the specified path, if it exists.
+        """
+        keys = path.split('.')
+        for key in keys:
+            # Convert string keys to integers if they are numeric
+            key = int(key) if key.isdigit() else key
+            data = data[key]
+        return data
+
+
+def prepare_api_model(api_model,
+                      *,
+                      api_url=None,
+                      api_key=None,
+                      response_path=None,
+                      return_processor=False,
+                      processor_name=None,
+                      **model_params):
+    """Creates a callable API model for interacting with OpenAI-compatible API.
+
+    This callable object supports custom result parsing and is suitable for use
+    with incompatible proxy servers.
+
+    :param api_url: The URL of the API. If not provided, it will fallback to
+        the environment variables DJ_API_URL or OPENAI_BASE_URL.
+    :param api_key: The API key for authorization. If not provided, it will
+        fallback to the environment variables DJ_API_KEY or OPENAI_API_KEY.
+    :param response_path: The path to extract content from the API response.
+        Defaults to 'choices.0.message.content'.  This can be customized
+        based on the API's response structure.
+    :param return_processor: A boolean flag indicating whether to return a
+        processor along with the model. The processor is used for tasks like
+        tokenization or encoding. Defaults to False.
+    :param processor_name: The name of a specific processor from Hugging Face
+        to be used. This is only necessary if a custom processor is required.
+    :param model_params: Extra parameters to be passed to the processor.
+    :return: A tuple containing the callable API model object and optionally a
+        processor if `return_processor` is True.
+    """
+    model_params = model_params or {}
+
+    model = APIModel(api_model=api_model,
+                     api_url=api_url,
+                     api_key=api_key,
+                     response_path=response_path)
+    if not return_processor:
+        return model
+
+    def get_processor():
+        try:
+            import tiktoken
+            return tiktoken.encoding_for_model(api_model)
+        except Exception:
+            pass
+
+        try:
+            import dashscope
+            return dashscope.get_tokenizer(api_model)
+        except Exception:
+            pass
+
+        try:
+            return transformers.AutoProcessor.from_pretrained(
+                api_model, **model_params)
+        except Exception:
+            raise ValueError(
+                'Failed to initialize the processor. Please check the following:\n'  # noqa: E501
+                "- For OpenAI models: Install 'tiktoken' via `pip install tiktoken`.\n"  # noqa: E501
+                "- For DashScope models: Install both 'dashscope' and 'tiktoken' via `pip install dashscope tiktoken`.\n"  # noqa: E501
+                "- For custom models: Provide a valid Hugging Face name via the 'processor_name' parameter.\n"  # noqa: E501
+                'If the issue persists, check the provided `api_model`.')
+
+    if processor_name is not None:
+        processor = transformers.AutoProcessor.from_pretrained(
+            processor_name, **model_params)
+    else:
+        processor = get_processor()
+    return (model, processor)
+
+
+def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
+                            **model_params):
+    """
+        Prepare and load an Diffusion model from HuggingFace.
+
+        :param pretrained_model_name_or_path: input Diffusion model name
+            or local path to the model
+        :param diffusion_type: the use of the diffusion model. It can be
+            'image2image', 'text2image', 'inpainting'
+        :return: a Diffusion model.
+    """
+    AUTOINSTALL.check(['torch', 'transformers'])
+
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
+
+    diffusion_type_to_pipeline = {
+        'image2image': diffusers.AutoPipelineForImage2Image,
+        'text2image': diffusers.AutoPipelineForText2Image,
+        'inpainting': diffusers.AutoPipelineForInpainting
+    }
+
+    if diffusion_type not in diffusion_type_to_pipeline.keys():
+        raise ValueError(
+            f'Not support {diffusion_type} diffusion_type for diffusion '
+            'model. Can only be one of '
+            '["image2image", "text2image", "inpainting"].')
+
+    pipeline = diffusion_type_to_pipeline[diffusion_type]
+    model = pipeline.from_pretrained(pretrained_model_name_or_path,
+                                     **model_params)
+
+    return model
+
+
+def prepare_fasttext_model(model_name='lid.176.bin', **model_params):
     """
     Prepare and load a fasttext model.
 
@@ -120,7 +297,147 @@ def prepare_fasttext_model(model_name='lid.176.bin'):
     return ft_model
 
 
-def prepare_sentencepiece_model(model_path):
+def prepare_huggingface_model(pretrained_model_name_or_path,
+                              *,
+                              return_model=True,
+                              return_pipe=False,
+                              pipe_task='text-generation',
+                              **model_params):
+    """
+    Prepare and load a HuggingFace model with the correspoding processor.
+
+    :param pretrained_model_name_or_path: model name or path
+    :param return_model: return model or not
+    :param return_pipe: whether to wrap model into pipeline
+    :param model_params: model initialization parameters.
+    :return: a tuple of (model, input processor) if `return_model` is True;
+        otherwise, only the processor is returned.
+    """
+    # require torch for transformer model
+    AUTOINSTALL.check(['torch'])
+
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
+
+    processor = transformers.AutoProcessor.from_pretrained(
+        pretrained_model_name_or_path, **model_params)
+
+    if return_model:
+        config = transformers.AutoConfig.from_pretrained(
+            pretrained_model_name_or_path, **model_params)
+        if hasattr(config, 'auto_map'):
+            class_name = next(
+                (k for k in config.auto_map if k.startswith('AutoModel')),
+                'AutoModel')
+        else:
+            # TODO: What happens if more than one
+            class_name = config.architectures[0]
+
+        model_class = getattr(transformers, class_name)
+        model = model_class.from_pretrained(pretrained_model_name_or_path,
+                                            **model_params)
+
+        if return_pipe:
+            if isinstance(processor, transformers.PreTrainedTokenizerBase):
+                pipe_params = {'tokenizer': processor}
+            elif isinstance(processor, transformers.SequenceFeatureExtractor):
+                pipe_params = {'feature_extractor': processor}
+            elif isinstance(processor, transformers.BaseImageProcessor):
+                pipe_params = {'image_processor': processor}
+            pipe = transformers.pipeline(task=pipe_task,
+                                         model=model,
+                                         config=config,
+                                         **pipe_params)
+            model = pipe
+
+    return (model, processor) if return_model else processor
+
+
+def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin', **model_params):
+    """
+    Prepare and load a kenlm model.
+
+    :param model_name: input model name in formatting syntax.
+    :param lang: language to render model name
+    :return: model instance.
+    """
+    model_params.pop('device', None)
+
+    model_name = name_pattern.format(lang)
+
+    logger.info('Loading kenlm language model...')
+    try:
+        kenlm_model = kenlm.Model(check_model(model_name), **model_params)
+    except:  # noqa: E722
+        kenlm_model = kenlm.Model(check_model(model_name, force=True),
+                                  **model_params)
+    return kenlm_model
+
+
+def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle', **model_params):
+    """
+    Prepare and load a nltk punkt model.
+
+    :param model_name: input model name in formatting syntax
+    :param lang: language to render model name
+    :return: model instance.
+    """
+    model_params.pop('device', None)
+
+    nltk_to_punkt = {
+        'en': 'english',
+        'fr': 'french',
+        'pt': 'portuguese',
+        'es': 'spanish'
+    }
+    assert lang in nltk_to_punkt.keys(
+    ), 'lang must be one of the following: {}'.format(
+        list(nltk_to_punkt.keys()))
+    model_name = name_pattern.format(nltk_to_punkt[lang])
+
+    logger.info('Loading nltk punkt split model...')
+    try:
+        nltk_model = nltk.data.load(check_model(model_name), **model_params)
+    except:  # noqa: E722
+        nltk_model = nltk.data.load(check_model(model_name, force=True),
+                                    **model_params)
+    return nltk_model
+
+
+def prepare_opencv_classifier(model_path, **model_params):
+    model = cv2.CascadeClassifier(model_path)
+    return model
+
+
+def prepare_recognizeAnything_model(
+        pretrained_model_name_or_path='ram_plus_swin_large_14m.pth',
+        input_size=384,
+        **model_params):
+    """
+    Prepare and load recognizeAnything model.
+
+    :param model_name: input model name.
+    :param input_size: the input size of the model.
+    """
+    logger.info('Loading recognizeAnything model...')
+
+    try:
+        model = ram.ram_plus(
+            pretrained=check_model(pretrained_model_name_or_path),
+            image_size=input_size,
+            vit='swin_l')
+    except (RuntimeError, UnpicklingError) as e:  # noqa: E722
+        logger.warning(e)
+        model = ram.ram_plus(pretrained=check_model(
+            pretrained_model_name_or_path, force=True),
+                             image_size=input_size,
+                             vit='swin_l')
+    device = model_params.pop('device', 'cpu')
+    model.to(device).eval()
+    return model
+
+
+def prepare_sentencepiece_model(model_path, **model_params):
     """
     Prepare and load a sentencepiece model.
 
@@ -136,7 +453,9 @@ def prepare_sentencepiece_model(model_path):
     return sentencepiece_model
 
 
-def prepare_sentencepiece_for_lang(lang, name_pattern='{}.sp.model'):
+def prepare_sentencepiece_for_lang(lang,
+                                   name_pattern='{}.sp.model',
+                                   **model_params):
     """
     Prepare and load a sentencepiece model for specific langauge.
 
@@ -149,54 +468,107 @@ def prepare_sentencepiece_for_lang(lang, name_pattern='{}.sp.model'):
     return prepare_sentencepiece_model(model_name)
 
 
-def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin'):
+def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
+                                    *,
+                                    return_model=True,
+                                    **model_params):
     """
-    Prepare and load a kenlm model.
+    Prepare and load a simple aesthetics model.
 
-    :param model_name: input model name in formatting syntax.
-    :param lang: language to render model name
-    :return: model instance.
+    :param pretrained_model_name_or_path: model name or path
+    :param return_model: return model or not
+    :return: a tuple (model, input processor) if `return_model` is True;
+        otherwise, only the processor is returned.
     """
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
+
+    processor = transformers.CLIPProcessor.from_pretrained(
+        pretrained_model_name_or_path, **model_params)
+    if not return_model:
+        return processor
+    else:
+        if 'v1' in pretrained_model_name_or_path:
+            model = aes_pre.AestheticsPredictorV1.from_pretrained(
+                pretrained_model_name_or_path, **model_params)
+        elif ('v2' in pretrained_model_name_or_path
+              and 'linear' in pretrained_model_name_or_path):
+            model = aes_pre.AestheticsPredictorV2Linear.from_pretrained(
+                pretrained_model_name_or_path, **model_params)
+        elif ('v2' in pretrained_model_name_or_path
+              and 'relu' in pretrained_model_name_or_path):
+            model = aes_pre.AestheticsPredictorV2ReLU.from_pretrained(
+                pretrained_model_name_or_path, **model_params)
+        else:
+            raise ValueError(
+                'Not support {}'.format(pretrained_model_name_or_path))
+        return (model, processor)
+
+
+def prepare_spacy_model(lang,
+                        name_pattern='{}_core_web_md-3.7.0',
+                        **model_params):
+    """
+    Prepare spacy model for specific language.
+
+    :param lang: language of sapcy model. Should be one of ["zh",
+        "en"]
+    :return: corresponding spacy model
+    """
+    import spacy
+
+    assert lang in ['zh', 'en'], 'Diversity only support zh and en'
     model_name = name_pattern.format(lang)
+    logger.info(f'Loading spacy model [{model_name}]...')
+    compressed_model = '{}.tar.gz'.format(model_name)
 
-    logger.info('Loading kenlm language model...')
+    # decompress the compressed model if it's not decompressed
+    def decompress_model(compressed_model_path):
+        if not compressed_model_path.endswith('.tar.gz'):
+            raise ValueError('Only .tar.gz files are supported')
+
+        decompressed_model_path = compressed_model_path.replace('.tar.gz', '')
+        if os.path.exists(decompressed_model_path) \
+                and os.path.isdir(decompressed_model_path):
+            return decompressed_model_path
+
+        ver_name = os.path.basename(decompressed_model_path)
+        unver_name = ver_name.rsplit('-', maxsplit=1)[0]
+        target_dir_in_archive = f'{ver_name}/{unver_name}/{ver_name}/'
+
+        import tarfile
+        with tarfile.open(compressed_model_path, 'r:gz') as tar:
+            for member in tar.getmembers():
+                if member.name.startswith(target_dir_in_archive):
+                    # relative path without unnecessary directory levels
+                    relative_path = os.path.relpath(
+                        member.name, start=target_dir_in_archive)
+                    target_path = os.path.join(decompressed_model_path,
+                                               relative_path)
+
+                    if member.isfile():
+                        # ensure the directory exists
+                        target_directory = os.path.dirname(target_path)
+                        os.makedirs(target_directory, exist_ok=True)
+                        # for files, extract to the specific location
+                        with tar.extractfile(member) as source:
+                            with open(target_path, 'wb') as target:
+                                target.write(source.read())
+        return decompressed_model_path
+
     try:
-        kenlm_model = kenlm.Model(check_model(model_name))
+        diversity_model = spacy.load(
+            decompress_model(check_model(compressed_model)))
     except:  # noqa: E722
-        kenlm_model = kenlm.Model(check_model(model_name, force=True))
-    return kenlm_model
-
-
-def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
-    """
-    Prepare and load a nltk punkt model.
-
-    :param model_name: input model name in formatting syntax
-    :param lang: language to render model name
-    :return: model instance.
-    """
-    nltk_to_punkt = {
-        'en': 'english',
-        'fr': 'french',
-        'pt': 'portuguese',
-        'es': 'spanish'
-    }
-    assert lang in nltk_to_punkt.keys(
-    ), 'lang must be one of the following: {}'.format(
-        list(nltk_to_punkt.keys()))
-    model_name = name_pattern.format(nltk_to_punkt[lang])
-
-    logger.info('Loading nltk punkt split model...')
-    try:
-        nltk_model = nltk.data.load(check_model(model_name))
-    except:  # noqa: E722
-        nltk_model = nltk.data.load(check_model(model_name, force=True))
-    return nltk_model
+        diversity_model = spacy.load(
+            decompress_model(check_model(compressed_model, force=True)))
+    return diversity_model
 
 
 def prepare_video_blip_model(pretrained_model_name_or_path,
+                             *,
                              return_model=True,
-                             trust_remote_code=False):
+                             **model_params):
     """
     Prepare and load a video-clip model with the correspoding processor.
 
@@ -206,6 +578,8 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
     :return: a tuple (model, input processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
 
     class VideoBlipVisionModel(transformers.Blip2VisionModel):
         """A simple, augmented version of Blip2VisionModel to handle
@@ -325,283 +699,51 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
             self.post_init()
 
     processor = transformers.AutoProcessor.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+        pretrained_model_name_or_path, **model_params)
     if return_model:
         model_class = VideoBlipForConditionalGeneration
-        model = model_class.from_pretrained(
-            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+        model = model_class.from_pretrained(pretrained_model_name_or_path,
+                                            **model_params)
     return (model, processor) if return_model else processor
 
 
-def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
-                                    return_model=True,
-                                    trust_remote_code=False):
-    """
-    Prepare and load a simple aesthetics model.
-
-    :param pretrained_model_name_or_path: model name or path
-    :param return_model: return model or not
-    :return: a tuple (model, input processor) if `return_model` is True;
-        otherwise, only the processor is returned.
-    """
-    processor = transformers.CLIPProcessor.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-    if not return_model:
-        return processor
-    else:
-        if 'v1' in pretrained_model_name_or_path:
-            model = aes_pre.AestheticsPredictorV1.from_pretrained(
-                pretrained_model_name_or_path,
-                trust_remote_code=trust_remote_code)
-        elif ('v2' in pretrained_model_name_or_path
-              and 'linear' in pretrained_model_name_or_path):
-            model = aes_pre.AestheticsPredictorV2Linear.from_pretrained(
-                pretrained_model_name_or_path,
-                trust_remote_code=trust_remote_code)
-        elif ('v2' in pretrained_model_name_or_path
-              and 'relu' in pretrained_model_name_or_path):
-            model = aes_pre.AestheticsPredictorV2ReLU.from_pretrained(
-                pretrained_model_name_or_path,
-                trust_remote_code=trust_remote_code)
-        else:
-            raise ValueError(
-                'Not support {}'.format(pretrained_model_name_or_path))
-        return (model, processor)
-
-
-def prepare_huggingface_model(pretrained_model_name_or_path,
-                              return_model=True,
-                              trust_remote_code=False):
+def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     """
     Prepare and load a HuggingFace model with the correspoding processor.
 
     :param pretrained_model_name_or_path: model name or path
-    :param return_model: return model or not
-    :param trust_remote_code: passed to transformers
-    :return: a tuple (model, input processor) if `return_model` is True;
-        otherwise, only the processor is returned.
+    :param model_params: LLM initialization parameters.
+    :return: a tuple of (model, tokenizer)
     """
-    # require torch for transformer model
-    AUTOINSTALL.check(['torch'])
+    os.environ['VLLM_WORKER_MULTIPROC_METHOD'] = 'spawn'
 
-    processor = transformers.AutoProcessor.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+    if model_params.get('device', '').startswith('cuda:'):
+        model_params['device'] = 'cuda'
 
-    if return_model:
-        config = transformers.AutoConfig.from_pretrained(
-            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-        if hasattr(config, 'auto_map'):
-            class_name = next(
-                (k for k in config.auto_map if k.startswith('AutoModel')),
-                'AutoModel')
-        else:
-            # TODO: What happens if more than one
-            class_name = config.architectures[0]
+    model = vllm.LLM(model=pretrained_model_name_or_path, **model_params)
+    tokenizer = model.get_tokenizer()
 
-        model_class = getattr(transformers, class_name)
-        model = model_class.from_pretrained(
-            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-
-    return (model, processor) if return_model else processor
-
-
-def prepare_vllm_model(pretrained_model_name_or_path,
-                       return_model=True,
-                       trust_remote_code=False,
-                       tensor_parallel_size=1,
-                       max_model_len=None,
-                       max_num_seqs=256):
-    """
-    Prepare and load a HuggingFace model with the correspoding processor.
-
-    :param pretrained_model_name_or_path: model name or path
-    :param return_model: return model or not
-    :param trust_remote_code: passed to transformers
-    :param tensor_parallel_size: The number of GPUs to use for distributed
-        execution with tensor parallelism.
-    :param max_model_len: Model context length. If unspecified, will
-        be automatically derived from the model config.
-    :param max_num_seqs: Maximum number of sequences to be processed in a
-        single iteration.
-    :return: a tuple (model, input processor) if `return_model` is True;
-        otherwise, only the processor is returned.
-    """
-    processor = transformers.AutoProcessor.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-
-    if return_model:
-        model = vllm.LLM(model=pretrained_model_name_or_path,
-                         trust_remote_code=trust_remote_code,
-                         dtype=torch.float16,
-                         tensor_parallel_size=tensor_parallel_size,
-                         max_model_len=max_model_len,
-                         max_num_seqs=max_num_seqs)
-
-    return (model, processor) if return_model else processor
-
-
-def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.7.0'):
-    """
-    Prepare spacy model for specific language.
-
-    :param lang: language of sapcy model. Should be one of ["zh",
-        "en"]
-    :return: corresponding spacy model
-    """
-    import spacy
-
-    assert lang in ['zh', 'en'], 'Diversity only support zh and en'
-    model_name = name_pattern.format(lang)
-    logger.info(f'Loading spacy model [{model_name}]...')
-    compressed_model = '{}.tar.gz'.format(model_name)
-
-    # decompress the compressed model if it's not decompressed
-    def decompress_model(compressed_model_path):
-        if not compressed_model_path.endswith('.tar.gz'):
-            raise ValueError('Only .tar.gz files are supported')
-
-        decompressed_model_path = compressed_model_path.replace('.tar.gz', '')
-        if os.path.exists(decompressed_model_path) \
-                and os.path.isdir(decompressed_model_path):
-            return decompressed_model_path
-
-        ver_name = os.path.basename(decompressed_model_path)
-        unver_name = ver_name.rsplit('-', maxsplit=1)[0]
-        target_dir_in_archive = f'{ver_name}/{unver_name}/{ver_name}/'
-
-        import tarfile
-        with tarfile.open(compressed_model_path, 'r:gz') as tar:
-            for member in tar.getmembers():
-                if member.name.startswith(target_dir_in_archive):
-                    # relative path without unnecessary directory levels
-                    relative_path = os.path.relpath(
-                        member.name, start=target_dir_in_archive)
-                    target_path = os.path.join(decompressed_model_path,
-                                               relative_path)
-
-                    if member.isfile():
-                        # ensure the directory exists
-                        target_directory = os.path.dirname(target_path)
-                        os.makedirs(target_directory, exist_ok=True)
-                        # for files, extract to the specific location
-                        with tar.extractfile(member) as source:
-                            with open(target_path, 'wb') as target:
-                                target.write(source.read())
-        return decompressed_model_path
-
-    try:
-        diversity_model = spacy.load(
-            decompress_model(check_model(compressed_model)))
-    except:  # noqa: E722
-        diversity_model = spacy.load(
-            decompress_model(check_model(compressed_model, force=True)))
-    return diversity_model
-
-
-def prepare_diffusion_model(pretrained_model_name_or_path,
-                            diffusion_type,
-                            torch_dtype='fp32',
-                            revision='main',
-                            trust_remote_code=False):
-    """
-        Prepare and load an Diffusion model from HuggingFace.
-
-        :param pretrained_model_name_or_path: input Diffusion model name
-            or local path to the model
-        :param diffusion_type: the use of the diffusion model. It can be
-            'image2image', 'text2image', 'inpainting'
-        :param torch_dtype: the floating point to load the diffusion
-            model. Can be one of ['fp32', 'fp16', 'bf16']
-        :param revision: The specific model version to use. It can be a
-            branch name, a tag name, a commit id, or any identifier allowed
-            by Git.
-        :return: a Diffusion model.
-    """
-    AUTOINSTALL.check(['torch', 'transformers'])
-
-    diffusion_type_to_pipeline = {
-        'image2image': diffusers.AutoPipelineForImage2Image,
-        'text2image': diffusers.AutoPipelineForText2Image,
-        'inpainting': diffusers.AutoPipelineForInpainting
-    }
-
-    if diffusion_type not in diffusion_type_to_pipeline.keys():
-        raise ValueError(
-            f'Not support {diffusion_type} diffusion_type for diffusion '
-            'model. Can only be one of '
-            '["image2image", "text2image", "inpainting"].')
-
-    if torch_dtype not in ['fp32', 'fp16', 'bf16']:
-        raise ValueError(
-            f'Not support {torch_dtype} torch_dtype for diffusion '
-            'model. Can only be one of '
-            '["fp32", "fp16", "bf16"].')
-
-    if not is_cuda_available() and (torch_dtype == 'fp16'
-                                    or torch_dtype == 'bf16'):
-        raise ValueError(
-            'In cpu mode, only fp32 torch_dtype can be used for diffusion'
-            ' model.')
-
-    pipeline = diffusion_type_to_pipeline[diffusion_type]
-    if torch_dtype == 'bf16':
-        torch_dtype = torch.bfloat16
-    elif torch_dtype == 'fp16':
-        torch_dtype = torch.float16
-    else:
-        torch_dtype = torch.float32
-
-    model = pipeline.from_pretrained(pretrained_model_name_or_path,
-                                     revision=revision,
-                                     torch_dtype=torch_dtype,
-                                     trust_remote_code=trust_remote_code)
-
-    return model
-
-
-def prepare_recognizeAnything_model(
-        pretrained_model_name_or_path='ram_plus_swin_large_14m.pth',
-        input_size=384):
-    """
-    Prepare and load recognizeAnything model.
-
-    :param model_name: input model name.
-    :param input_size: the input size of the model.
-    """
-    logger.info('Loading recognizeAnything model...')
-    try:
-        model = ram.ram_plus(
-            pretrained=check_model(pretrained_model_name_or_path),
-            image_size=input_size,
-            vit='swin_l')
-    except (RuntimeError, UnpicklingError) as e:  # noqa: E722
-        logger.warning(e)
-        model = ram.ram_plus(pretrained=check_model(
-            pretrained_model_name_or_path, force=True),
-                             image_size=input_size,
-                             vit='swin_l')
-    model.eval()
-    return model
-
-
-def prepare_opencv_classifier(model_path):
-    model = cv2.CascadeClassifier(model_path)
-    return model
+    return (model, tokenizer)
 
 
 MODEL_FUNCTION_MAPPING = {
+    'api': prepare_api_model,
+    'diffusion': prepare_diffusion_model,
     'fasttext': prepare_fasttext_model,
-    'sentencepiece': prepare_sentencepiece_for_lang,
+    'huggingface': prepare_huggingface_model,
     'kenlm': prepare_kenlm_model,
     'nltk': prepare_nltk_model,
-    'huggingface': prepare_huggingface_model,
+    'opencv_classifier': prepare_opencv_classifier,
+    'recognizeAnything': prepare_recognizeAnything_model,
+    'sentencepiece': prepare_sentencepiece_for_lang,
     'simple_aesthetics': prepare_simple_aesthetics_model,
     'spacy': prepare_spacy_model,
-    'diffusion': prepare_diffusion_model,
     'video_blip': prepare_video_blip_model,
-    'recognizeAnything': prepare_recognizeAnything_model,
     'vllm': prepare_vllm_model,
-    'opencv_classifier': prepare_opencv_classifier,
+}
+
+_MODELS_WITHOUT_FILE_LOCK = {
+    'kenlm', 'nltk', 'recognizeAnything', 'sentencepiece', 'spacy'
 }
 
 
@@ -611,22 +753,10 @@ def prepare_model(model_type, **model_kwargs):
                 list(MODEL_FUNCTION_MAPPING.keys()))
     model_func = MODEL_FUNCTION_MAPPING[model_type]
     model_key = partial(model_func, **model_kwargs)
-    # always instantiate once for possible caching
-    if model_type != 'vllm':
+    if model_type in _MODELS_WITHOUT_FILE_LOCK:
+        # initialize once in the main process to safely download model files
         model_key()
     return model_key
-
-
-def move_to_cuda(model, rank):
-    # Assuming model can be either a single module or a tuple of modules
-    if not isinstance(model, tuple):
-        model = (model, )
-
-    for module in model:
-        if callable(getattr(module, 'to', None)):
-            logger.debug(
-                f'Moving {module.__class__.__name__} to CUDA device {rank}')
-            module.to(f'cuda:{rank}')
 
 
 def get_model(model_key=None, rank=None, use_cuda=False):
@@ -638,11 +768,13 @@ def get_model(model_key=None, rank=None, use_cuda=False):
         logger.debug(
             f'{model_key} not found in MODEL_ZOO ({mp.current_process().name})'
         )
-        MODEL_ZOO[model_key] = model_key()
-    if use_cuda:
-        rank = 0 if rank is None else rank
-        rank = rank % cuda_device_count()
-        move_to_cuda(MODEL_ZOO[model_key], rank)
+        if use_cuda:
+            rank = rank if rank is not None else 0
+            rank = rank % cuda_device_count()
+            device = f'cuda:{rank}'
+        else:
+            device = 'cpu'
+        MODEL_ZOO[model_key] = model_key(device=device)
     return MODEL_ZOO[model_key]
 
 

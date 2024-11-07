@@ -28,6 +28,17 @@ class Fields(object):
     # the name of directory to store the produced multimodal data
     multimodal_data_output_dir = DEFAULT_PREFIX + 'produced_data__'
 
+    # field names for info extraction
+    event_description = DEFAULT_PREFIX + 'event_description__'
+    # # a list of characters relavant to the event
+    relavant_characters = DEFAULT_PREFIX + 'relavant_characters__'
+    # # entity in the knowlege graph
+    entity = DEFAULT_PREFIX + 'entity__'
+    # # a list of attributes for the entity
+    entity_attribute = DEFAULT_PREFIX + 'entity_attribute__'
+    # # extract from raw data for support some summary
+    support_text = DEFAULT_PREFIX + 'support_text__'
+
 
 class StatsKeysMeta(type):
     """

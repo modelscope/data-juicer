@@ -6,7 +6,10 @@ from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.model_utils import get_model, prepare_model
+
+from ..common import split_text_by_punctuation
 
 OP_NAME = 'extract_event_mapper'
 
@@ -38,16 +41,18 @@ class ExtractEventMapper(Mapper):
                              '- **情节描述**： ...\n'
                              '- **相关人物**：人物1，...\n'
                              '...\n')
-    DEFAULT_INPUT_TEMPLATE = '文本：{text}\n'
+    DEFAULT_INPUT_TEMPLATE = '# 文本\n```\n{text}\n```\n'
     DEFAULT_OUTPUT_PATTERN = r"""
         \#\#\#\s*情节(\d+)：\s*
-        -\s*情节描述\s*：\s*(.*?)\s*
-        -\s*相关人物\s*：\s*(.*?)(?=\#\#\#|\Z)
+        -\s*\*\*情节描述\*\*\s*：\s*(.*?)\s*
+        -\s*\*\*相关人物\*\*\s*：\s*(.*?)(?=\#\#\#|\Z)
     """
 
     def __init__(self,
                  api_model: str = 'gpt-4o',
                  *,
+                 event_desc_key: str = Fields.event_description,
+                 relavant_char_key: str = Fields.relavant_characters,
                  api_url: Optional[str] = None,
                  api_key: Optional[str] = None,
                  response_path: Optional[str] = None,
@@ -60,6 +65,11 @@ class ExtractEventMapper(Mapper):
         """
         Initialization method.
         :param api_model: API model name.
+        :param event_desc_key: the field name to store the event descriptions
+            in response. It's "__dj__event_description__" in default.
+        :param relavant_char_key: the field name to store the relavant
+            characters to the events in response.
+            It's "__dj__relavant_characters__" in default.
         :param api_url: API URL. Defaults to DJ_API_URL environment variable.
         :param api_key: API key. Defaults to DJ_API_KEY environment variable.
         :param response_path: Path to extract content from the API response.
@@ -75,6 +85,9 @@ class ExtractEventMapper(Mapper):
         """
         super().__init__(**kwargs)
 
+        self.event_desc_key = event_desc_key
+        self.relavant_char_key = relavant_char_key
+
         self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
         self.input_template = input_template or self.DEFAULT_INPUT_TEMPLATE
         self.output_pattern = output_pattern or self.DEFAULT_OUTPUT_PATTERN
@@ -88,10 +101,6 @@ class ExtractEventMapper(Mapper):
 
         self.try_num = try_num
 
-    def build_input(self, sample):
-        input_prompt = self.input_template.format(text=sample[self.text_key])
-        return input_prompt
-
     def parse_output(self, raw_output):
         pattern = re.compile(self.output_pattern, re.VERBOSE | re.DOTALL)
         matches = pattern.findall(raw_output)
@@ -99,10 +108,11 @@ class ExtractEventMapper(Mapper):
         contents = []
         for match in matches:
             _, description, characters = match
-            description = description.strip()
             contents.append({
-                'event_description': description,
-                'relavant_characters': characters
+                self.event_desc_key:
+                description.strip(),
+                self.relavant_char_key:
+                split_text_by_punctuation(characters)
             })
 
         return contents
@@ -110,12 +120,13 @@ class ExtractEventMapper(Mapper):
     def process_single(self, sample=None, rank=None):
         client = get_model(self.model_key, rank=rank)
 
+        input_prompt = self.input_template.format(text=sample[self.text_key])
         messages = [{
             'role': 'system',
             'content': self.system_prompt
         }, {
             'role': 'user',
-            'content': self.build_input(sample)
+            'content': input_prompt
         }]
 
         contents = []
