@@ -107,9 +107,8 @@ class OptimizeQAMapper(Mapper):
 
     def parse_output(self, raw_output):
         logger.debug(raw_output)
-        matches = re.findall(self.output_pattern, raw_output, re.DOTALL)
-        if matches:
-            match = matches[0]
+        match = re.match(self.output_pattern, raw_output, re.DOTALL)
+        if match:
             return match.group(1).strip(), match.group(2).strip()
         else:
             return None, None
