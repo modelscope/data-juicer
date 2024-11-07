@@ -5,6 +5,7 @@ from pickle import UnpicklingError
 from typing import Optional, Union
 
 import multiprocess as mp
+import requests
 import wget
 from loguru import logger
 
@@ -102,6 +103,148 @@ def check_model(model_name, force=False):
                     f'manually from {model_link} or {backup_model_link} ')
                 exit(1)
     return cached_model_path
+
+
+class APIModel:
+
+    def __init__(self,
+                 api_model,
+                 *,
+                 api_url=None,
+                 api_key=None,
+                 response_path=None):
+        self.api_model = api_model
+
+        if api_url is None:
+            api_url = os.getenv('DJ_API_URL')
+            if api_url is None:
+                base_url = os.getenv('OPENAI_BASE_URL',
+                                     'https://api.openai.com/v1')
+                api_url = base_url.rstrip('/') + '/chat/completions'
+        self.api_url = api_url
+
+        if api_key is None:
+            api_key = os.getenv('DJ_API_KEY') or os.getenv('OPENAI_API_KEY')
+        self.api_key = api_key
+
+        if response_path is None:
+            response_path = 'choices.0.message.content'
+        self.response_path = response_path
+
+        self.headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {self.api_key}'
+        }
+
+    def __call__(self, messages, **kwargs):
+        """Sends messages to the configured API model and returns the parsed response.
+
+        :param messages: The messages to send to the API.
+        :param model: The model to be used for generating responses.
+        :param kwargs: Additional parameters for the API request.
+
+        :return: The parsed response from the API, or None if an error occurs.
+        """
+        payload = {
+            'model': self.api_model,
+            'messages': messages,
+            **kwargs,
+        }
+        try:
+            response = requests.post(self.api_url,
+                                     json=payload,
+                                     headers=self.headers)
+            response.raise_for_status()
+            result = response.json()
+            return self.nested_access(result, self.response_path)
+        except Exception as e:
+            logger.exception(e)
+            return ''
+
+    @staticmethod
+    def nested_access(data, path):
+        """Access nested data using a dot-separated path.
+
+        :param data: The data structure to access.
+        :param path: A dot-separated string representing the path to access.
+        :return: The value at the specified path, if it exists.
+        """
+        keys = path.split('.')
+        for key in keys:
+            # Convert string keys to integers if they are numeric
+            key = int(key) if key.isdigit() else key
+            data = data[key]
+        return data
+
+
+def prepare_api_model(api_model,
+                      *,
+                      api_url=None,
+                      api_key=None,
+                      response_path=None,
+                      return_processor=False,
+                      processor_name=None,
+                      **model_params):
+    """Creates a callable API model for interacting with OpenAI-compatible API.
+
+    This callable object supports custom result parsing and is suitable for use
+    with incompatible proxy servers.
+
+    :param api_url: The URL of the API. If not provided, it will fallback to
+        the environment variables DJ_API_URL or OPENAI_BASE_URL.
+    :param api_key: The API key for authorization. If not provided, it will
+        fallback to the environment variables DJ_API_KEY or OPENAI_API_KEY.
+    :param response_path: The path to extract content from the API response.
+        Defaults to 'choices.0.message.content'.  This can be customized
+        based on the API's response structure.
+    :param return_processor: A boolean flag indicating whether to return a
+        processor along with the model. The processor is used for tasks like
+        tokenization or encoding. Defaults to False.
+    :param processor_name: The name of a specific processor from Hugging Face
+        to be used. This is only necessary if a custom processor is required.
+    :param model_params: Extra parameters to be passed to the processor.
+    :return: A tuple containing the callable API model object and optionally a
+        processor if `return_processor` is True.
+    """
+    model_params = model_params or {}
+
+    model = APIModel(api_model=api_model,
+                     api_url=api_url,
+                     api_key=api_key,
+                     response_path=response_path)
+    if not return_processor:
+        return model
+
+    def get_processor():
+        try:
+            import tiktoken
+            return tiktoken.encoding_for_model(api_model)
+        except Exception:
+            pass
+
+        try:
+            import dashscope
+            return dashscope.get_tokenizer(api_model)
+        except Exception:
+            pass
+
+        try:
+            return transformers.AutoProcessor.from_pretrained(
+                api_model, **model_params)
+        except Exception:
+            raise ValueError(
+                'Failed to initialize the processor. Please check the following:\n'  # noqa: E501
+                "- For OpenAI models: Install 'tiktoken' via `pip install tiktoken`.\n"  # noqa: E501
+                "- For DashScope models: Install both 'dashscope' and 'tiktoken' via `pip install dashscope tiktoken`.\n"  # noqa: E501
+                "- For custom models: Provide a valid Hugging Face name via the 'processor_name' parameter.\n"  # noqa: E501
+                'If the issue persists, check the provided `api_model`.')
+
+    if processor_name is not None:
+        processor = transformers.AutoProcessor.from_pretrained(
+            processor_name, **model_params)
+    else:
+        processor = get_processor()
+    return (model, processor)
 
 
 def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
@@ -584,6 +727,7 @@ def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
 
 
 MODEL_FUNCTION_MAPPING = {
+    'api': prepare_api_model,
     'diffusion': prepare_diffusion_model,
     'fasttext': prepare_fasttext_model,
     'huggingface': prepare_huggingface_model,
