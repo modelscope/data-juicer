@@ -1,5 +1,10 @@
+import io
+import logging
+import os
 import unittest
+from unittest.mock import Mock, patch
 
+import httpx
 from loguru import logger
 
 from data_juicer.ops.mapper.calibrate_qa_mapper import CalibrateQAMapper
@@ -12,11 +17,9 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 @SKIPPED_TESTS.register_module()
 class CalibrateQAMapperTest(DataJuicerTestCaseBase):
 
-    def _run_op(self, api_model, response_path=None):
+    os.environ['OPENAI_LOG'] = 'debug'
 
-        op = CalibrateQAMapper(api_model=api_model,
-                               response_path=response_path)
-
+    def _run_op(self, op):
         reference = """# 角色语言风格
 1. 下面是李莲花的问答样例，你必须贴合他的语言风格：
 
@@ -69,9 +72,45 @@ class CalibrateQAMapperTest(DataJuicerTestCaseBase):
 
     def test(self):
         # before runing this test, set below environment variables:
-        # export DJ_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
-        # export DJ_API_KEY=your_key
-        self._run_op('qwen2.5-72b-instruct')
+        # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
+        # export OPENAI_API_KEY=your_dashscope_key
+        op = CalibrateQAMapper(api_model='qwen2.5-72b-instruct')
+        self._run_op(op)
+
+    def test_specified(self):
+        op = CalibrateQAMapper(
+            api_model='qwen2.5-72b-instruct',
+            api_url=
+            'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+            response_path='choices.0.message.content')
+        self._run_op(op)
+
+    @patch('httpx.Client.send')
+    def test_retry(self, mock_send):
+        mock_response = Mock()
+        mock_response.status_code = 408
+        mock_response.headers = {}
+        mock_request = Mock()
+        mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
+            '408 Client Error: Request Timeout',
+            request=mock_request,
+            response=mock_response)
+        mock_send.return_value = mock_response
+
+        log_stream = io.StringIO()
+        stream_handler = logging.StreamHandler(log_stream)
+        stream_handler.setLevel(logging.DEBUG)
+        logger = logging.getLogger()
+        logger.addHandler(stream_handler)
+        try:
+            op = CalibrateQAMapper(api_model='test',
+                                   model_params={'max_retries': 3})
+            op.process({'text': '', 'query': '', 'response': ''})
+            log_contents = log_stream.getvalue()
+            self.assertIn('3 retries left', log_contents)
+        finally:
+            logger.removeHandler(stream_handler)
+            log_stream.close()
 
 
 if __name__ == '__main__':
