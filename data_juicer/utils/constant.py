@@ -32,12 +32,16 @@ class Fields(object):
     event_description = DEFAULT_PREFIX + 'event_description__'
     # # a list of characters relavant to the event
     relavant_characters = DEFAULT_PREFIX + 'relavant_characters__'
-    # # entity in the knowlege graph
-    entity = DEFAULT_PREFIX + 'entity__'
-    # # a list of attributes for the entity
-    entity_attribute = DEFAULT_PREFIX + 'entity_attribute__'
-    # # extract from raw data for support some summary
-    support_text = DEFAULT_PREFIX + 'support_text__'
+    # # the given main entity for attribute extraction
+    main_entity = DEFAULT_PREFIX + 'main_entity__'
+    # # the given attribute to be extracted
+    attribute = DEFAULT_PREFIX + 'attribute__'
+    # # the extracted attribute description
+    attribute_description = DEFAULT_PREFIX + 'attribute_description__'
+    # # extract from raw data for support the attribute
+    attribute_support_text = DEFAULT_PREFIX + 'attribute_support_text__'
+    # # the nickname relationship
+    nickname = DEFAULT_PREFIX + 'nickname__'
 
 
 class StatsKeysMeta(type):

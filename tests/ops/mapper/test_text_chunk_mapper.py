@@ -189,7 +189,11 @@ class TextChunkMapperTest(DataJuicerTestCaseBase):
                 'text': '欢迎来到阿里巴巴！'
             },
         ]
-        op = TextChunkMapper(max_len=20, overlap_len=2, split_pattern='\n')
+        op = TextChunkMapper(
+            max_len=20,
+            overlap_len=2,
+            split_pattern='\n'
+        )
         self._run_helper(op, source, target)
 
     def test_tokenizer_text_chunk(self):
@@ -223,8 +227,56 @@ class TextChunkMapperTest(DataJuicerTestCaseBase):
                 'text': '欢迎来到阿里巴巴！'
             },
         ]
-        op = TextChunkMapper(max_len=10, overlap_len=1, split_pattern=None, hf_tokenizer='Qwen/Qwen-7B-Chat', trust_remote_code=True)
+        op = TextChunkMapper(
+            max_len=10,
+            overlap_len=1,
+            split_pattern=None,
+            tokenizer='Qwen/Qwen-7B-Chat',
+            trust_remote_code=True
+        )
         self._run_helper(op, source, target)
+
+    def test_api_tokenizer_text_chunk(self):
+        source = [
+            {
+                'text': "Today is Sunday and it's a happy day!"
+            },
+            {
+                'text':
+                "Sur la plateforme MT4, plusieurs manières d'accéder à "
+                'ces fonctionnalités sont conçues simultanément.'
+            },
+            {
+                'text': '欢迎来到阿里巴巴！'
+            },
+        ]
+        target = [
+            {
+                'text': "Today is Sunday and it's a happy day!"
+            },
+            {
+                'text': "Sur la plateforme MT4, plusieurs manières"
+            },
+            {
+                'text': "ières d'accéder à ces fonctionnalités"
+            },
+            {
+                'text': "ités sont conçues simultanément."
+            },
+            {
+                'text': '欢迎来到阿里巴巴！'
+            },
+        ]
+        op = TextChunkMapper(
+            max_len=10,
+            overlap_len=1,
+            split_pattern=None,
+            tokenizer='gpt-4o',
+            tokenizer_type='api',
+            trust_remote_code=True
+        )
+        self._run_helper(op, source, target)
+
 
     def test_all_text_chunk(self):
         source = [
@@ -260,7 +312,13 @@ class TextChunkMapperTest(DataJuicerTestCaseBase):
                 'text': '欢迎来到阿里巴巴！'
             },
         ]
-        op = TextChunkMapper(max_len=10, overlap_len=1, split_pattern='\n', hf_tokenizer='Qwen/Qwen-7B-Chat', trust_remote_code=True)
+        op = TextChunkMapper(
+            max_len=10,
+            overlap_len=1,
+            split_pattern='\n',
+            tokenizer='Qwen/Qwen-7B-Chat',
+            trust_remote_code=True
+        )
         self._run_helper(op, source, target)
 
 

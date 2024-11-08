@@ -1,8 +1,10 @@
 import unittest
 import json
+from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.extract_event_mapper import ExtractEventMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
+from data_juicer.utils.constant import Fields
 
 # Skip tests for this OP in the GitHub actions due to unknown DistNetworkError.
 # These tests have been tested locally.
@@ -51,9 +53,12 @@ class ExtractEventMapperTest(DataJuicerTestCaseBase):
             'text': raw_text,
         }]
 
-        for sample in samples:
-            result = op.process(sample)
-            self.assertNotEqual(result['response'], '[]')
+        dataset = Dataset.from_list(samples)
+        dataset = dataset.map(op.process, batch_size=2)
+        self.assertNotEqual(len(dataset), 0)
+        for sample in dataset:
+            self.assertNotEqual(sample[Fields.event_description], '')
+            self.assertNotEqual(sample[Fields.relavant_characters], [])
 
     def test(self):
         # before runing this test, set below environment variables:

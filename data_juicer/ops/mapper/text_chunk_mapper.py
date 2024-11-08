@@ -21,7 +21,8 @@ class TextChunkMapper(Mapper):
                  max_len: Union[PositiveInt, None] = None,
                  split_pattern: Union[str, None] = r'\n\n',
                  overlap_len: NonNegativeInt = 0,
-                 hf_tokenizer: Union[str, None] = None,
+                 tokenizer: Union[str, None] = None,
+                 tokenizer_type: str = 'huggingface',
                  trust_remote_code: bool = False,
                  *args,
                  **kwargs):
@@ -34,9 +35,11 @@ class TextChunkMapper(Mapper):
             and force cut if the length exceeds max_len.
         :param overlap_len: Overlap length of the split texts if not split in
             the split pattern.
-        :param hf_tokenizer: The tokenizer name of Hugging Face tokenizers.
+        :param tokenizer: The tokenizer name of Hugging Face tokenizers.
             The text length will be calculate as the token num if it is offerd.
             Otherwise, the text length equals to string length.
+        :param tokenizer_type: The type of tokenizer, it should be
+            'huggingface' or 'api'.
         :trust_remote_code: for loading huggingface model
         :param args: extra args
         :param kwargs: extra args
@@ -52,16 +55,16 @@ class TextChunkMapper(Mapper):
         self.max_len = max_len
         self.overlap_len = overlap_len
         self.split_pattern = split_pattern
-        self.hf_tokenizer = hf_tokenizer
-        if hf_tokenizer is not None:
+        self.tokenizer_name = tokenizer
+        if tokenizer is not None:
             self.model_key = prepare_model(
-                model_type='huggingface',
-                pretrained_model_name_or_path=hf_tokenizer,
+                model_type=tokenizer_type,
+                pretrained_model_name_or_path=tokenizer,
                 return_model=False,
                 trust_remote_code=trust_remote_code)
 
     def recursively_chunk(self, text):
-        if self.hf_tokenizer is not None:
+        if self.tokenizer_name is not None:
             tokenizer = get_model(self.model_key)
             tokens = tokenizer.tokenize(text)
             tokens = [t.decode(encoding='UTF-8') for t in tokens]
@@ -77,7 +80,7 @@ class TextChunkMapper(Mapper):
         matches = list(re.finditer(self.split_pattern, sub_text))
         if not matches:
             cur_text = sub_text
-            if self.hf_tokenizer is not None:
+            if self.tokenizer_name is not None:
                 left_text = ''.join(tokens[self.max_len - self.overlap_len:])
             else:
                 left_text = text[self.max_len - self.overlap_len:]
@@ -96,7 +99,7 @@ class TextChunkMapper(Mapper):
         elif self.split_pattern is None and self.max_len is not None:
             tokens = text
             total_len = len(text)
-            if self.hf_tokenizer is not None:
+            if self.tokenizer_name is not None:
                 tokenizer = get_model(self.model_key)
                 tokens = tokenizer.tokenize(text)
                 tokens = [t.decode(encoding='UTF-8') for t in tokens]
@@ -106,7 +109,7 @@ class TextChunkMapper(Mapper):
             chunks = []
             for start in range(0, total_len, self.max_len - self.overlap_len):
                 cur = tokens[start:start + self.max_len]
-                if self.hf_tokenizer is not None:
+                if self.tokenizer_name is not None:
                     cur = ''.join(cur)
                 chunks.append(cur)
         else:
@@ -126,7 +129,7 @@ class TextChunkMapper(Mapper):
             if key != self.text_key:
                 samples[key] = [[samples[key][i]] *
                                 len(samples[self.text_key][i])
-                                for i in range(len(sample_num))]
+                                for i in range(sample_num)]
 
         for key in samples:
             samples[key] = list(chain(*samples[key]))

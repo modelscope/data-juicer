@@ -1,4 +1,3 @@
-import json
 import re
 from itertools import chain
 from typing import Dict, List, Optional
@@ -21,6 +20,8 @@ class ExtractEntityAttributeMapper(Mapper):
     Extract attributes for given entities from the text
     """
 
+    _batched_op = True
+
     DEFAULT_SYSTEM_PROMPT_TEMPLATE = (
         '给定一段文本，从文本中总结{entity}的{attribute}，并且从原文摘录最能说明该{attribute}的代表性示例。\n'
         '要求：\n'
@@ -35,17 +36,18 @@ class ExtractEntityAttributeMapper(Mapper):
         '...\n')
 
     DEFAULT_INPUT_TEMPLATE = '# 文本\n```\n{text}\n```\n'
-    DEFAULT_ATTR_PATTERN_TEMPLATE = r'\#\#\s*\{attribute\}：\s*(?=\#\#\#|\Z)'
-    DEFAULT_DEMON_PATTERN = r'\#\#\#\s*代表性示例(\d+)：\s*(?=\#\#\#|\Z)'
+    DEFAULT_ATTR_PATTERN_TEMPLATE = r'\#\#\s*{attribute}：\s*(.*?)(?=\#\#\#|\Z)'
+    DEFAULT_DEMON_PATTERN = r'\#\#\#\s*代表性示例(\d+)：\s*(.*?)(?=\#\#\#|\Z)'
 
     def __init__(self,
                  query_entities: List[str],
                  query_attributes: List[str],
                  api_model: str = 'gpt-4o',
                  *,
-                 entity_key: str = Fields.entity,
-                 entity_attribute_key: str = Fields.entity_attribute,
-                 support_text_key: str = Fields.support_text,
+                 entity_key: str = Fields.main_entity,
+                 attribute_key: str = Fields.attribute,
+                 attribute_desc_key: str = Fields.attribute_description,
+                 support_text_key: str = Fields.attribute_support_text,
                  api_url: Optional[str] = None,
                  api_key: Optional[str] = None,
                  response_path: Optional[str] = None,
@@ -54,18 +56,22 @@ class ExtractEntityAttributeMapper(Mapper):
                  attr_pattern_template: Optional[str] = None,
                  demo_pattern: Optional[str] = None,
                  try_num: PositiveInt = 3,
+                 drop_text: bool = False,
                  api_params: Optional[Dict] = None,
                  **kwargs):
         """
         Initialization method.
-        :param query_entities: entity list to be queried.
-        :param query_attributes: attribute list to be queried.
+        :param query_entities: Entity list to be queried.
+        :param query_attributes: Attribute list to be queried.
         :param api_model: API model name.
-        :param entity_key: the field name to store the entity.
-            It's "__dj__entity__" in default.
-        :param entity_attribute_key: the field name to store the attribute.
-            It's "__dj__entity_attribute__" in default.
-        :param support_text_key: the field name to store the attribute
+        :param entity_key: The field name to store the given main entity for
+            attribute extraction. It's "__dj__entity__" in default.
+        :param entity_attribute_key: The field name to store the given
+            attribute to be extracted. It's "__dj__attribute__" in default.
+        :param attribute_desc_key: The field name to store the extracted
+            attribute description. It's "__dj__attribute_description__" in
+            default.
+        :param support_text_key: The field name to store the attribute
             support text extracted from the raw text. It's
             "__dj__support_text__" in default.
         :param api_url: API URL. Defaults to DJ_API_URL environment variable.
@@ -81,6 +87,7 @@ class ExtractEntityAttributeMapper(Mapper):
             output to support the attribute.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
+        :param drop_text: If drop the text in the output.
         :param api_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
         :param kwargs: Extra keyword arguments.
@@ -91,7 +98,8 @@ class ExtractEntityAttributeMapper(Mapper):
         self.query_attributes = query_attributes
 
         self.entity_key = entity_key
-        self.entity_attribute_key = entity_attribute_key
+        self.attribute_key = attribute_key
+        self.attribute_desc_key = attribute_desc_key
         self.support_text_key = support_text_key
 
         self.system_prompt_template = system_prompt_template \
@@ -109,40 +117,34 @@ class ExtractEntityAttributeMapper(Mapper):
                                        response_path=response_path)
 
         self.try_num = try_num
+        self.drop_text = drop_text
 
     def parse_output(self, raw_output, attribute_name):
 
         attribute_pattern = self.attr_pattern_template.format(
             attribute=attribute_name)
-        print('attribute_pattern', attribute_pattern)
         pattern = re.compile(attribute_pattern, re.VERBOSE | re.DOTALL)
         matches = pattern.findall(raw_output)
         if matches:
-            attribute = matches[0]
+            attribute = matches[0].strip()
         else:
             attribute = ''
 
         pattern = re.compile(self.demo_pattern, re.VERBOSE | re.DOTALL)
         matches = pattern.findall(raw_output)
+        demos = [demo.strip() for _, demo in matches if demo.strip()]
 
-        demos = []
-        for match in matches:
-            _, demo = match
-            demos.append(demo)
-
-        return {attribute_name: attribute, self.support_text_key: demos}
+        return attribute, demos
 
     def _process_single_sample(self, text='', rank=None):
         client = get_model(self.model_key, rank=rank)
 
-        results = []
+        entities, attributes, descs, demo_lists = [], [], [], []
         for entity in self.query_entities:
             for attribute in self.query_attributes:
                 system_prompt = self.system_prompt_template.format(
                     entity=entity, attribute=attribute)
-                print(system_prompt)
                 input_prompt = self.input_template.format(text=text)
-                print(input_prompt)
                 messages = [{
                     'role': 'system',
                     'content': system_prompt
@@ -151,40 +153,45 @@ class ExtractEntityAttributeMapper(Mapper):
                     'content': input_prompt
                 }]
 
-                result = {attribute: '', self.support_text_key: []}
+                desc, demos = '', []
                 for i in range(self.try_num):
                     try:
                         output = client(messages, **self.api_params)
-                        print(output)
-                        result = self.parse_output(output, attribute)
-                        if result[attribute]:
+                        desc, demos = self.parse_output(output, attribute)
+                        if desc and len(demos) > 0:
                             break
                     except Exception as e:
                         logger.warning(f'Exception: {e}')
-                result = json.dumps({
-                    self.entity_key: entity,
-                    self.entity_attribute_key: result
-                })
-                print(result)
+                entities.append(entity)
+                attributes.append(attribute)
+                descs.append(desc)
+                demo_lists.append(demos)
 
-                results.append(result)
-
-        return results
+        return entities, attributes, descs, demo_lists
 
     def process_batched(self, samples):
 
         sample_num = len(samples[self.text_key])
 
-        samples[self.response_key] = [
-            self._process_single_sample(text)
-            for text in samples[self.text_key]
-        ]
+        entities, attributes, descs, demo_lists = [], [], [], []
+        for text in samples[self.text_key]:
+            res = self._process_single_sample(text)
+            cur_ents, cur_attrs, cur_descs, cur_demos = res
+            entities.append(cur_ents)
+            attributes.append(cur_attrs)
+            descs.append(cur_descs)
+            demo_lists.append(cur_demos)
+
+        if self.drop_text:
+            samples.pop(self.text_key)
 
         for key in samples:
-            if key != self.response_key:
-                samples[key] = [[samples[key][i]] *
-                                len(samples[self.response_key][i])
-                                for i in range(len(sample_num))]
+            samples[key] = [[samples[key][i]] * len(descs[i])
+                            for i in range(sample_num)]
+        samples[self.entity_key] = entities
+        samples[self.attribute_key] = attributes
+        samples[self.attribute_desc_key] = descs
+        samples[self.support_text_key] = demo_lists
 
         for key in samples:
             samples[key] = list(chain(*samples[key]))

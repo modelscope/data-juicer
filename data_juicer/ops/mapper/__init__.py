@@ -11,6 +11,7 @@ from .clean_links_mapper import CleanLinksMapper
 from .expand_macro_mapper import ExpandMacroMapper
 from .extract_entity_attribute_mapper import ExtractEntityAttributeMapper
 from .extract_event_mapper import ExtractEventMapper
+from .extract_nickname_mapper import ExtractNicknameMapper
 from .fix_unicode_mapper import FixUnicodeMapper
 from .generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
 from .generate_qa_from_text_mapper import GenerateQAFromTextMapper
@@ -63,12 +64,12 @@ __all__ = [
     'CalibrateResponseMapper', 'ChineseConvertMapper', 'CleanCopyrightMapper',
     'CleanEmailMapper', 'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
     'ExpandMacroMapper', 'ExtractEntityAttributeMapper', 'ExtractEventMapper',
-    'FixUnicodeMapper', 'GenerateQAFromExamplesMapper',
-    'GenerateQAFromTextMapper', 'ImageBlurMapper',
-    'ImageCaptioningFromGPT4VMapper', 'ImageCaptioningMapper',
-    'ImageDiffusionMapper', 'ImageFaceBlurMapper', 'ImageTaggingMapper',
-    'NlpaugEnMapper', 'NlpcdaZhMapper', 'OptimizeQAMapper',
-    'OptimizeQueryMapper', 'OptimizeResponseMapper',
+    'ExtractNicknameMapper', 'FixUnicodeMapper',
+    'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
+    'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
+    'ImageCaptioningMapper', 'ImageDiffusionMapper', 'ImageFaceBlurMapper',
+    'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
+    'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
     'PunctuationNormalizationMapper', 'RemoveBibliographyMapper',
     'RemoveCommentsMapper', 'RemoveHeaderMapper', 'RemoveLongWordsMapper',
     'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',

@@ -1,5 +1,5 @@
-import json
 import re
+from itertools import chain
 from typing import Dict, Optional
 
 from loguru import logger
@@ -21,6 +21,8 @@ class ExtractEventMapper(Mapper):
     """
     Extract events and relavant characters in the text
     """
+
+    _batched_op = True
 
     DEFAULT_SYSTEM_PROMPT = ('给定一段文本，对文本的情节进行分点总结，并抽取与情节相关的人物。\n'
                              '要求：\n'
@@ -60,16 +62,17 @@ class ExtractEventMapper(Mapper):
                  input_template: Optional[str] = None,
                  output_pattern: Optional[str] = None,
                  try_num: PositiveInt = 3,
+                 drop_text: bool = False,
                  api_params: Optional[Dict] = None,
                  **kwargs):
         """
         Initialization method.
         :param api_model: API model name.
-        :param event_desc_key: the field name to store the event descriptions
-            in response. It's "__dj__event_description__" in default.
-        :param relavant_char_key: the field name to store the relavant
-            characters to the events in response.
-            It's "__dj__relavant_characters__" in default.
+        :param event_desc_key: The field name to store the event descriptions.
+            It's "__dj__event_description__" in default.
+        :param relavant_char_key: The field name to store the relavant
+            characters to the events. It's "__dj__relavant_characters__" in
+            default.
         :param api_url: API URL. Defaults to DJ_API_URL environment variable.
         :param api_key: API key. Defaults to DJ_API_KEY environment variable.
         :param response_path: Path to extract content from the API response.
@@ -79,6 +82,7 @@ class ExtractEventMapper(Mapper):
         :param output_pattern: Regular expression for parsing model output.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
+        :param drop_text: If drop the text in the output.
         :param api_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
         :param kwargs: Extra keyword arguments.
@@ -100,27 +104,27 @@ class ExtractEventMapper(Mapper):
                                        response_path=response_path)
 
         self.try_num = try_num
+        self.drop_text = drop_text
 
     def parse_output(self, raw_output):
         pattern = re.compile(self.output_pattern, re.VERBOSE | re.DOTALL)
         matches = pattern.findall(raw_output)
 
-        contents = []
+        event_list, character_list = [], []
+
         for match in matches:
-            _, description, characters = match
-            contents.append({
-                self.event_desc_key:
-                description.strip(),
-                self.relavant_char_key:
-                split_text_by_punctuation(characters)
-            })
+            _, desc, chars = match
+            chars = split_text_by_punctuation(chars)
+            if len(chars) > 0:
+                event_list.append(desc)
+                character_list.append(chars)
 
-        return contents
+        return event_list, character_list
 
-    def process_single(self, sample=None, rank=None):
+    def _process_single_sample(self, text='', rank=None):
         client = get_model(self.model_key, rank=rank)
 
-        input_prompt = self.input_template.format(text=sample[self.text_key])
+        input_prompt = self.input_template.format(text=text)
         messages = [{
             'role': 'system',
             'content': self.system_prompt
@@ -129,16 +133,38 @@ class ExtractEventMapper(Mapper):
             'content': input_prompt
         }]
 
-        contents = []
+        event_list, character_list = [], []
         for i in range(self.try_num):
             try:
                 output = client(messages, **self.api_params)
-                contents = self.parse_output(output)
-                if len(contents) > 0:
+                event_list, character_list = self.parse_output(output)
+                if len(event_list) > 0:
                     break
             except Exception as e:
                 logger.warning(f'Exception: {e}')
 
-        sample[self.response_key] = json.dumps(contents)
+        return event_list, character_list
 
-        return sample
+    def process_batched(self, samples):
+
+        sample_num = len(samples[self.text_key])
+
+        events, characters = [], []
+        for text in samples[self.text_key]:
+            cur_events, cur_characters = self._process_single_sample(text)
+            events.append(cur_events)
+            characters.append(cur_characters)
+
+        if self.drop_text:
+            samples.pop(self.text_key)
+
+        for key in samples:
+            samples[key] = [[samples[key][i]] * len(events[i])
+                            for i in range(sample_num)]
+        samples[self.event_desc_key] = events
+        samples[self.relavant_char_key] = characters
+
+        for key in samples:
+            samples[key] = list(chain(*samples[key]))
+
+        return samples
