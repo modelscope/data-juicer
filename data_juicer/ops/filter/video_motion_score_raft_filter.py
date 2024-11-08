@@ -35,7 +35,7 @@ class VideoMotionScoreRaftFilter(VideoMotionScoreFilter):
     _default_kwargs = {}
 
     def __init__(self,
-                 min_score: float = 0.25,
+                 min_score: float = 1.0,
                  max_score: float = sys.float_info.max,
                  sampling_fps: PositiveFloat = 2,
                  size: Union[PositiveInt, Tuple[PositiveInt],
