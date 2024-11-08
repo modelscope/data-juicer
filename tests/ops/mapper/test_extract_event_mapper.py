@@ -1,5 +1,8 @@
 import unittest
 import json
+
+from loguru import logger
+
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.extract_event_mapper import ExtractEventMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
@@ -57,7 +60,9 @@ class ExtractEventMapperTest(DataJuicerTestCaseBase):
         dataset = dataset.map(op.process, batch_size=2)
         self.assertNotEqual(len(dataset), 0)
         for sample in dataset:
+            logger.info(f"event: {sample[Fields.event_description]}")
             self.assertNotEqual(sample[Fields.event_description], '')
+            logger.info(f"characters: {sample[Fields.relavant_characters]}")
             self.assertNotEqual(sample[Fields.relavant_characters], [])
 
     def test(self):

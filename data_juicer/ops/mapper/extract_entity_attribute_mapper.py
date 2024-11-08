@@ -57,7 +57,8 @@ class ExtractEntityAttributeMapper(Mapper):
                  demo_pattern: Optional[str] = None,
                  try_num: PositiveInt = 3,
                  drop_text: bool = False,
-                 api_params: Optional[Dict] = None,
+                 model_params: Optional[Dict] = {},
+                 sampling_params: Optional[Dict] = {},
                  **kwargs):
         """
         Initialization method.
@@ -87,8 +88,8 @@ class ExtractEntityAttributeMapper(Mapper):
             output to support the attribute.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
-        :param drop_text: If drop the text in the output.
-        :param api_params: Extra parameters passed to the API call.
+        :param model_params: Parameters for initializing the model.
+        :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
         :param kwargs: Extra keyword arguments.
         """
@@ -109,12 +110,14 @@ class ExtractEntityAttributeMapper(Mapper):
             or self.DEFAULT_ATTR_PATTERN_TEMPLATE
         self.demo_pattern = demo_pattern or self.DEFAULT_DEMON_PATTERN
 
-        self.api_params = api_params or {}
+        self.model_params = model_params
+        self.sampling_params = sampling_params
         self.model_key = prepare_model(model_type='api',
                                        api_model=api_model,
                                        api_url=api_url,
                                        api_key=api_key,
-                                       response_path=response_path)
+                                       response_path=response_path,
+                                       **model_params)
 
         self.try_num = try_num
         self.drop_text = drop_text
@@ -156,7 +159,7 @@ class ExtractEntityAttributeMapper(Mapper):
                 desc, demos = '', []
                 for i in range(self.try_num):
                     try:
-                        output = client(messages, **self.api_params)
+                        output = client(messages, **self.sampling_params)
                         desc, demos = self.parse_output(output, attribute)
                         if desc and len(demos) > 0:
                             break

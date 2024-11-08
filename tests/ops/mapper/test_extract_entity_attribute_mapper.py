@@ -1,5 +1,8 @@
 import unittest
 import json
+
+from loguru import logger
+
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.extract_entity_attribute_mapper import ExtractEntityAttributeMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
@@ -46,6 +49,7 @@ class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(samples)
         dataset = dataset.map(op.process, batch_size=1)
         for sample in dataset:
+            logger.info(f'{sample[Fields.main_entity]} {sample[Fields.attribute]}: {sample[Fields.attribute_description]}')
             self.assertNotEqual(sample[Fields.attribute_description], '')
             self.assertNotEqual(len(sample[Fields.attribute_support_text]), 0)
 

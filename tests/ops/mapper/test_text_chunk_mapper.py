@@ -236,7 +236,47 @@ class TextChunkMapperTest(DataJuicerTestCaseBase):
         )
         self._run_helper(op, source, target)
 
-    def test_api_tokenizer_text_chunk(self):
+    def test_tiktoken_tokenizer_text_chunk(self):
+        source = [
+            {
+                'text': "Today is Sunday and it's a happy day!"
+            },
+            {
+                'text':
+                "Sur la plateforme MT4, plusieurs manières d'accéder à "
+                'ces fonctionnalités sont conçues simultanément.'
+            },
+            {
+                'text': '欢迎来到阿里巴巴！'
+            },
+        ]
+        target = [
+            {
+                'text': "Today is Sunday and it's a happy day!"
+            },
+            {
+                'text': "Sur la plateforme MT4, plusieurs manières d"
+            },
+            {
+                'text': " d'accéder à ces fonctionnalités sont conçues simult"
+            },
+            {
+                'text': " simultanément."
+            },
+            {
+                'text': '欢迎来到阿里巴巴！'
+            },
+        ]
+        op = TextChunkMapper(
+            max_len=10,
+            overlap_len=1,
+            split_pattern=None,
+            tokenizer='gpt-4o',
+            trust_remote_code=True
+        )
+        self._run_helper(op, source, target)
+
+    def test_dashscope_tokenizer_text_chunk(self):
         source = [
             {
                 'text': "Today is Sunday and it's a happy day!"
@@ -271,12 +311,10 @@ class TextChunkMapperTest(DataJuicerTestCaseBase):
             max_len=10,
             overlap_len=1,
             split_pattern=None,
-            tokenizer='gpt-4o',
-            tokenizer_type='api',
+            tokenizer='qwen2.5-72b-instruct',
             trust_remote_code=True
         )
         self._run_helper(op, source, target)
-
 
     def test_all_text_chunk(self):
         source = [

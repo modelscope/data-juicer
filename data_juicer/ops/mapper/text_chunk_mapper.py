@@ -22,7 +22,6 @@ class TextChunkMapper(Mapper):
                  split_pattern: Union[str, None] = r'\n\n',
                  overlap_len: NonNegativeInt = 0,
                  tokenizer: Union[str, None] = None,
-                 tokenizer_type: str = 'huggingface',
                  trust_remote_code: bool = False,
                  *args,
                  **kwargs):
@@ -37,9 +36,9 @@ class TextChunkMapper(Mapper):
             the split pattern.
         :param tokenizer: The tokenizer name of Hugging Face tokenizers.
             The text length will be calculate as the token num if it is offerd.
-            Otherwise, the text length equals to string length.
-        :param tokenizer_type: The type of tokenizer, it should be
-            'huggingface' or 'api'.
+            Otherwise, the text length equals to string length. Support
+            tiktoken tokenizer (such as gpt-4o), dashscope tokenizer (such as
+            qwen2.5-72b-instruct) and huggingface tokenizer.
         :trust_remote_code: for loading huggingface model
         :param args: extra args
         :param kwargs: extra args
@@ -57,19 +56,17 @@ class TextChunkMapper(Mapper):
         self.split_pattern = split_pattern
         self.tokenizer_name = tokenizer
         if tokenizer is not None:
-            self.model_key = prepare_model(
-                model_type=tokenizer_type,
-                pretrained_model_name_or_path=tokenizer,
-                return_model=False,
-                trust_remote_code=trust_remote_code)
+            self.model_key = prepare_model(model_type='api',
+                                           api_model=tokenizer,
+                                           return_processor=True,
+                                           trust_remote_code=trust_remote_code)
 
     def recursively_chunk(self, text):
         if self.tokenizer_name is not None:
-            tokenizer = get_model(self.model_key)
-            tokens = tokenizer.tokenize(text)
-            tokens = [t.decode(encoding='UTF-8') for t in tokens]
+            _, tokenizer = get_model(self.model_key)
+            tokens = tokenizer.encode(text)
             total_len = len(tokens)
-            sub_text = ''.join(tokens[:self.max_len])
+            sub_text = tokenizer.decode(tokens[:self.max_len])
         else:
             total_len = len(text)
             sub_text = text[:self.max_len]
@@ -81,7 +78,8 @@ class TextChunkMapper(Mapper):
         if not matches:
             cur_text = sub_text
             if self.tokenizer_name is not None:
-                left_text = ''.join(tokens[self.max_len - self.overlap_len:])
+                left_text = tokenizer.decode(tokens[self.max_len -
+                                                    self.overlap_len:])
             else:
                 left_text = text[self.max_len - self.overlap_len:]
         else:
@@ -100,9 +98,8 @@ class TextChunkMapper(Mapper):
             tokens = text
             total_len = len(text)
             if self.tokenizer_name is not None:
-                tokenizer = get_model(self.model_key)
-                tokens = tokenizer.tokenize(text)
-                tokens = [t.decode(encoding='UTF-8') for t in tokens]
+                _, tokenizer = get_model(self.model_key)
+                tokens = tokenizer.encode(text)
                 total_len = len(tokens)
             if total_len <= self.max_len:
                 return [text]
@@ -110,7 +107,7 @@ class TextChunkMapper(Mapper):
             for start in range(0, total_len, self.max_len - self.overlap_len):
                 cur = tokens[start:start + self.max_len]
                 if self.tokenizer_name is not None:
-                    cur = ''.join(cur)
+                    cur = tokenizer.decode(cur)
                 chunks.append(cur)
         else:
             chunks = self.recursively_chunk(text)
