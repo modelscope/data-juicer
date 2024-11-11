@@ -19,3 +19,11 @@ def stats_to_number(s, reverse=True):
             return -sys.maxsize
         else:
             return sys.maxsize
+
+
+def is_float(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False

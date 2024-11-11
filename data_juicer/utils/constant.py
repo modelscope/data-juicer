@@ -42,6 +42,12 @@ class Fields(object):
     attribute_support_text = DEFAULT_PREFIX + 'attribute_support_text__'
     # # the nickname relationship
     nickname = DEFAULT_PREFIX + 'nickname__'
+    # # the entity for knowledge graph
+    entity = DEFAULT_PREFIX + 'entity__'
+    # # the relationship for knowledge graph
+    relation = DEFAULT_PREFIX + 'relation__'
+    # # the keyword in a text
+    keyword = DEFAULT_PREFIX + 'keyword__'
 
 
 class StatsKeysMeta(type):

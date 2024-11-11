@@ -10,7 +10,9 @@ from .clean_ip_mapper import CleanIpMapper
 from .clean_links_mapper import CleanLinksMapper
 from .expand_macro_mapper import ExpandMacroMapper
 from .extract_entity_attribute_mapper import ExtractEntityAttributeMapper
+from .extract_entity_relation_mapper import ExtractEntityRelationMapper
 from .extract_event_mapper import ExtractEventMapper
+from .extract_keyword_mapper import ExtractKeywordMapper
 from .extract_nickname_mapper import ExtractNicknameMapper
 from .fix_unicode_mapper import FixUnicodeMapper
 from .generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
@@ -63,8 +65,9 @@ __all__ = [
     'AudioFFmpegWrappedMapper', 'CalibrateQAMapper', 'CalibrateQueryMapper',
     'CalibrateResponseMapper', 'ChineseConvertMapper', 'CleanCopyrightMapper',
     'CleanEmailMapper', 'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
-    'ExpandMacroMapper', 'ExtractEntityAttributeMapper', 'ExtractEventMapper',
-    'ExtractNicknameMapper', 'FixUnicodeMapper',
+    'ExpandMacroMapper', 'ExtractEntityAttributeMapper',
+    'ExtractEntityRelationMapper', 'ExtractEventMapper',
+    'ExtractKeywordMapper', 'ExtractNicknameMapper', 'FixUnicodeMapper',
     'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
     'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
     'ImageCaptioningMapper', 'ImageDiffusionMapper', 'ImageFaceBlurMapper',

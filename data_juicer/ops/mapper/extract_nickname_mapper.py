@@ -60,8 +60,8 @@ class ExtractNicknameMapper(Mapper):
                  output_pattern: Optional[str] = None,
                  try_num: PositiveInt = 3,
                  drop_text: bool = False,
-                 model_params: Optional[Dict] = {},
-                 sampling_params: Optional[Dict] = {},
+                 model_params: Dict = {},
+                 sampling_params: Dict = {},
                  **kwargs):
         """
         Initialization method.
@@ -126,10 +126,11 @@ class ExtractNicknameMapper(Mapper):
             nickname_relations = list(set(nickname_relations))
 
         nickname_relations = [{
-            'entity1': nr[0],
-            'entity2': nr[1],
+            'source_entity': nr[0],
+            'target_entity': nr[1],
             'description': nr[2],
-            'relation': 'nickname'
+            'keywords': ['nickname'],
+            'strength': None
         } for nr in nickname_relations]
 
         return nickname_relations
@@ -156,4 +157,7 @@ class ExtractNicknameMapper(Mapper):
                 logger.warning(f'Exception: {e}')
 
         sample[self.nickname_key] = nickname_relations
+        if self.drop_text:
+            sample.pop(self.text_key)
+
         return sample

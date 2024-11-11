@@ -57,8 +57,8 @@ class ExtractEntityAttributeMapper(Mapper):
                  demo_pattern: Optional[str] = None,
                  try_num: PositiveInt = 3,
                  drop_text: bool = False,
-                 model_params: Optional[Dict] = {},
-                 sampling_params: Optional[Dict] = {},
+                 model_params: Dict = {},
+                 sampling_params: Dict = {},
                  **kwargs):
         """
         Initialization method.
