@@ -30,8 +30,8 @@ class Fields(object):
 
     # field names for info extraction
     event_description = DEFAULT_PREFIX + 'event_description__'
-    # # a list of characters relavant to the event
-    relavant_characters = DEFAULT_PREFIX + 'relavant_characters__'
+    # # a list of characters relevant to the event
+    relevant_characters = DEFAULT_PREFIX + 'relevant_characters__'
     # # the given main entity for attribute extraction
     main_entity = DEFAULT_PREFIX + 'main_entity__'
     # # the given attribute to be extracted

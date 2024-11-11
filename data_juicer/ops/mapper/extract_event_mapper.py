@@ -19,7 +19,7 @@ OP_NAME = 'extract_event_mapper'
 @OPERATORS.register_module(OP_NAME)
 class ExtractEventMapper(Mapper):
     """
-    Extract events and relavant characters in the text
+    Extract events and relevant characters in the text
     """
 
     _batched_op = True
@@ -54,7 +54,7 @@ class ExtractEventMapper(Mapper):
                  api_model: str = 'gpt-4o',
                  *,
                  event_desc_key: str = Fields.event_description,
-                 relavant_char_key: str = Fields.relavant_characters,
+                 relevant_char_key: str = Fields.relevant_characters,
                  api_url: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt: Optional[str] = None,
@@ -70,8 +70,8 @@ class ExtractEventMapper(Mapper):
         :param api_model: API model name.
         :param event_desc_key: The field name to store the event descriptions.
             It's "__dj__event_description__" in default.
-        :param relavant_char_key: The field name to store the relavant
-            characters to the events. It's "__dj__relavant_characters__" in
+        :param relevant_char_key: The field name to store the relevant
+            characters to the events. It's "__dj__relevant_characters__" in
             default.
         :param api_url: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
@@ -90,7 +90,7 @@ class ExtractEventMapper(Mapper):
         super().__init__(**kwargs)
 
         self.event_desc_key = event_desc_key
-        self.relavant_char_key = relavant_char_key
+        self.relevant_char_key = relevant_char_key
 
         self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
         self.input_template = input_template or self.DEFAULT_INPUT_TEMPLATE
@@ -162,7 +162,7 @@ class ExtractEventMapper(Mapper):
             samples[key] = [[samples[key][i]] * len(events[i])
                             for i in range(sample_num)]
         samples[self.event_desc_key] = events
-        samples[self.relavant_char_key] = characters
+        samples[self.relevant_char_key] = characters
 
         for key in samples:
             samples[key] = list(chain(*samples[key]))

@@ -113,10 +113,10 @@ process:
       drop_text: false                                        # If drop the text in the output.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
-  - extract_event_mapper:                                   # Extract events and relavant characters in the text
+  - extract_event_mapper:                                   # Extract events and relevant characters in the text
       api_model: 'gpt-4o'                                     # API model name.
       event_desc_key: '__dj__event_description__'             # The field name to store the event descriptions.
-      relavant_char_key: '__dj__relavant_characters__'        # The field name to store the relavant characters to the events.
+      relevant_char_key: '__dj__relevant_characters__'        # The field name to store the relevant characters to the events.
       api_url: null                                           # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the task.

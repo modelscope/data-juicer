@@ -62,8 +62,8 @@ class ExtractEventMapperTest(DataJuicerTestCaseBase):
         for sample in dataset:
             logger.info(f"event: {sample[Fields.event_description]}")
             self.assertNotEqual(sample[Fields.event_description], '')
-            logger.info(f"characters: {sample[Fields.relavant_characters]}")
-            self.assertNotEqual(sample[Fields.relavant_characters], [])
+            logger.info(f"characters: {sample[Fields.relevant_characters]}")
+            self.assertNotEqual(sample[Fields.relevant_characters], [])
 
     def test(self):
         # before runing this test, set below environment variables:
