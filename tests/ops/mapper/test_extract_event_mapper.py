@@ -67,8 +67,8 @@ class ExtractEventMapperTest(DataJuicerTestCaseBase):
 
     def test(self):
         # before runing this test, set below environment variables:
-        # export DJ_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
-        # export DJ_API_KEY=your_key
+        # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
+        # export OPENAI_API_KEY=your_dashscope_key
         self._run_op('qwen2.5-72b-instruct')
 
 

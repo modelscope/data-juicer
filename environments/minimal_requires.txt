@@ -28,3 +28,4 @@ psutil
 pydantic>=2.0
 Pillow
 numpy<2
+fastapi[standard]>=0.100

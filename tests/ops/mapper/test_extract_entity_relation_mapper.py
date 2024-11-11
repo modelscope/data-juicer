@@ -61,8 +61,8 @@ class ExtractEntityRelationMapperTest(DataJuicerTestCaseBase):
 
     def test_default(self):
         # before runing this test, set below environment variables:
-        # export DJ_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
-        # export DJ_API_KEY=your_key
+        # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
+        # export OPENAI_API_KEY=your_dashscope_key
         op = ExtractEntityRelationMapper(api_model='qwen2.5-72b-instruct')
         self._run_op(op)
     

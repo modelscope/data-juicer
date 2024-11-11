@@ -160,7 +160,6 @@ Output:
                  entity_key: str = Fields.entity,
                  relation_key: str = Fields.relation,
                  api_url: Optional[str] = None,
-                 api_key: Optional[str] = None,
                  response_path: Optional[str] = None,
                  prompt_template: Optional[str] = None,
                  tuple_delimiter: Optional[str] = None,
@@ -184,8 +183,7 @@ Output:
             "__dj__entity__" in default.
         :param relation_key: The field name to store the relations between
             entities. It's "__dj__relation__" in default.
-        :param api_url: API URL. Defaults to DJ_API_URL environment variable.
-        :param api_key: API key. Defaults to DJ_API_KEY environment variable.
+        :param api_url: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
         :param prompt_template: The template of input prompt.
@@ -204,7 +202,7 @@ Output:
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
         :param drop_text: If drop the text in the output.
-        :param model_params: Parameters for initializing the model.
+        :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
         :param kwargs: Extra keyword arguments.
@@ -228,12 +226,10 @@ Output:
         self.relation_pattern = relation_pattern or \
             self.DEFAULT_RELATION_PATTERN
 
-        self.model_params = model_params
         self.sampling_params = sampling_params
         self.model_key = prepare_model(model_type='api',
-                                       api_model=api_model,
-                                       api_url=api_url,
-                                       api_key=api_key,
+                                       model=api_model,
+                                       url=api_url,
                                        response_path=response_path,
                                        **model_params)
 
@@ -244,6 +240,8 @@ Output:
         entities, relations = [], []
 
         def remove_outer_quotes(text):
+            if not text:
+                return text
             if (text[0] == '"' and text[-1] == '"') or (text[0] == "'"
                                                         and text[-1] == "'"):
                 return text[1:-1]

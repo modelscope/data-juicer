@@ -49,7 +49,6 @@ class ExtractEntityAttributeMapper(Mapper):
                  attribute_desc_key: str = Fields.attribute_description,
                  support_text_key: str = Fields.attribute_support_text,
                  api_url: Optional[str] = None,
-                 api_key: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt_template: Optional[str] = None,
                  input_template: Optional[str] = None,
@@ -75,8 +74,7 @@ class ExtractEntityAttributeMapper(Mapper):
         :param support_text_key: The field name to store the attribute
             support text extracted from the raw text. It's
             "__dj__support_text__" in default.
-        :param api_url: API URL. Defaults to DJ_API_URL environment variable.
-        :param api_key: API key. Defaults to DJ_API_KEY environment variable.
+        :param api_url: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
         :param system_prompt_template: System prompt for the calibration
@@ -88,7 +86,7 @@ class ExtractEntityAttributeMapper(Mapper):
             output to support the attribute.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
-        :param model_params: Parameters for initializing the model.
+        :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
         :param kwargs: Extra keyword arguments.
@@ -110,12 +108,10 @@ class ExtractEntityAttributeMapper(Mapper):
             or self.DEFAULT_ATTR_PATTERN_TEMPLATE
         self.demo_pattern = demo_pattern or self.DEFAULT_DEMON_PATTERN
 
-        self.model_params = model_params
         self.sampling_params = sampling_params
         self.model_key = prepare_model(model_type='api',
-                                       api_model=api_model,
-                                       api_url=api_url,
-                                       api_key=api_key,
+                                       model=api_model,
+                                       url=api_url,
                                        response_path=response_path,
                                        **model_params)
 
