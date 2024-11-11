@@ -83,12 +83,12 @@
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentError</span><span class="p">,</span> <span class="n">Namespace</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentError</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">yaml</span>
-<span class="kn">from</span> <span class="nn">jsonargparse</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ActionConfigFile</span><span class="p">,</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">dict_to_namespace</span><span class="p">,</span>
-                          <span class="n">namespace_to_dict</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">jsonargparse</span> <span class="kn">import</span> <span class="p">(</span><span class="n">ActionConfigFile</span><span class="p">,</span> <span class="n">ArgumentParser</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">,</span>
+                          <span class="n">dict_to_namespace</span><span class="p">,</span> <span class="n">namespace_to_dict</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">jsonargparse.typehints</span> <span class="kn">import</span> <span class="n">ActionTypeHint</span>
 <span class="kn">from</span> <span class="nn">jsonargparse.typing</span> <span class="kn">import</span> <span class="n">ClosedUnitInterval</span><span class="p">,</span> <span class="n">NonNegativeInt</span><span class="p">,</span> <span class="n">PositiveInt</span>
 <span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
@@ -101,7 +101,7 @@
 <span class="n">global_parser</span> <span class="o">=</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="init_configs"><a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.init_configs">[docs]</a><span class="k">def</span> <span class="nf">init_configs</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="init_configs"><a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.init_configs">[docs]</a><span class="k">def</span> <span class="nf">init_configs</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    initialize the jsonargparse parser and parse configs from one of:</span>
 <span class="sd">        1. POSIX-style commands line args;</span>
@@ -436,7 +436,7 @@
         <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_EXTRACTED_DATASETS_PATH</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">init_setup_from_cfg</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">init_setup_from_cfg</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Do some extra setup tasks after parsing config file or command line.</span>
 
@@ -707,7 +707,7 @@
     <span class="k">return</span> <span class="n">arg_list</span>
 
 
-<span class="k">def</span> <span class="nf">config_backup</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">config_backup</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
     <span class="n">cfg_path</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">absolute</span>
     <span class="n">work_dir</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span>
     <span class="n">target_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">))</span>
@@ -717,7 +717,7 @@
         <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">,</span> <span class="n">target_path</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">display_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">display_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">pprint</span>
 
     <span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
@@ -737,13 +737,13 @@
     <span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="export_config"><a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.export_config">[docs]</a><span class="k">def</span> <span class="nf">export_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span>
-                  <span class="n">path</span><span class="p">,</span>
-                  <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;yaml&#39;</span><span class="p">,</span>
-                  <span class="n">skip_none</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                  <span class="n">skip_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                  <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                  <span class="n">multifile</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="export_config"><a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.export_config">[docs]</a><span class="k">def</span> <span class="nf">export_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span>
+                  <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                  <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;yaml&#39;</span><span class="p">,</span>
+                  <span class="n">skip_none</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="n">skip_check</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                  <span class="n">multifile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Save the config object, some params are from jsonargparse</span>
 
@@ -779,7 +779,7 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Saved the configuration in </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="merge_config"><a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.merge_config">[docs]</a><span class="k">def</span> <span class="nf">merge_config</span><span class="p">(</span><span class="n">ori_cfg</span><span class="p">,</span> <span class="n">new_cfg</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<div class="viewcode-block" id="merge_config"><a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.merge_config">[docs]</a><span class="k">def</span> <span class="nf">merge_config</span><span class="p">(</span><span class="n">ori_cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">new_cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Merge configuration from new_cfg into ori_cfg</span>
 
@@ -837,7 +837,7 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Config merge failed&#39;</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">prepare_side_configs</span><span class="p">(</span><span class="n">ori_config</span><span class="p">):</span>
+<div class="viewcode-block" id="prepare_side_configs"><a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.prepare_side_configs">[docs]</a><span class="k">def</span> <span class="nf">prepare_side_configs</span><span class="p">(</span><span class="n">ori_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    parse the config if ori_config is a string of a config file path with</span>
 <span class="sd">        yaml, yml or json format</span>
@@ -866,10 +866,10 @@
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s1">&#39;Unrecognized side config type: [</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ori_config</span><span class="p">)</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">config</span>
+    <span class="k">return</span> <span class="n">config</span></div>
 
 
-<span class="k">def</span> <span class="nf">get_init_configs</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+<div class="viewcode-block" id="get_init_configs"><a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.get_init_configs">[docs]</a><span class="k">def</span> <span class="nf">get_init_configs</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    set init configs of datajucer for cfg</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -881,7 +881,7 @@
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
     <span class="n">inited_dj_cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">([</span><span class="s1">&#39;--config&#39;</span><span class="p">,</span> <span class="n">temp_file</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">inited_dj_cfg</span>
+    <span class="k">return</span> <span class="n">inited_dj_cfg</span></div>
 </pre></div>
 
            </div>
