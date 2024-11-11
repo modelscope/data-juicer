@@ -76,7 +76,7 @@ class ExtractEventMapper(Mapper):
         :param api_url: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
-        :param system_prompt: System prompt for the calibration task.
+        :param system_prompt: System prompt for the task.
         :param input_template: Template for building the model input.
         :param output_pattern: Regular expression for parsing model output.
         :param try_num: The number of retry attempts when there is an API

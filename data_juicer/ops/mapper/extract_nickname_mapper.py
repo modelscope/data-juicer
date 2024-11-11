@@ -16,7 +16,7 @@ OP_NAME = 'extract_nickname_mapper'
 @OPERATORS.register_module(OP_NAME)
 class ExtractNicknameMapper(Mapper):
     """
-    Extract nickname relationship in the text
+    Extract nickname relationship in the text.
     """
 
     DEFAULT_SYSTEM_PROMPT = ('给定你一段文本，你的任务是将人物之间的称呼方式（昵称）提取出来。\n'
@@ -70,7 +70,7 @@ class ExtractNicknameMapper(Mapper):
         :param api_url: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
-        :param system_prompt: System prompt for the calibration task.
+        :param system_prompt: System prompt for the task.
         :param input_template: Template for building the model input.
         :param output_pattern: Regular expression for parsing model output.
         :param try_num: The number of retry attempts when there is an API
@@ -119,7 +119,7 @@ class ExtractNicknameMapper(Mapper):
                 continue
             if role1 and role2 and nickname:
                 nickname_relations.append((role1, role2, nickname))
-            nickname_relations = list(set(nickname_relations))
+        nickname_relations = list(set(nickname_relations))
 
         nickname_relations = [{
             'source_entity': nr[0],

@@ -77,7 +77,7 @@ class ExtractEntityAttributeMapper(Mapper):
         :param api_url: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
-        :param system_prompt_template: System prompt for the calibration
+        :param system_prompt_template: System prompt template for the
             task. Need to be specified by given entity and attribute.
         :param input_template: Template for building the model input.
         :param attr_pattern_template: Pattern for parsing the attribute from
@@ -86,6 +86,7 @@ class ExtractEntityAttributeMapper(Mapper):
             output to support the attribute.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
+        :param drop_text: If drop the text in the output.
         :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
