@@ -8,6 +8,7 @@ from .clean_email_mapper import CleanEmailMapper
 from .clean_html_mapper import CleanHtmlMapper
 from .clean_ip_mapper import CleanIpMapper
 from .clean_links_mapper import CleanLinksMapper
+from .command_mapper import CommandMapper
 from .expand_macro_mapper import ExpandMacroMapper
 from .fix_unicode_mapper import FixUnicodeMapper
 from .generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
@@ -59,12 +60,12 @@ __all__ = [
     'AudioFFmpegWrappedMapper', 'CalibrateQAMapper', 'CalibrateQueryMapper',
     'CalibrateResponseMapper', 'ChineseConvertMapper', 'CleanCopyrightMapper',
     'CleanEmailMapper', 'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
-    'ExpandMacroMapper', 'FixUnicodeMapper', 'GenerateQAFromExamplesMapper',
-    'GenerateQAFromTextMapper', 'ImageBlurMapper',
-    'ImageCaptioningFromGPT4VMapper', 'ImageCaptioningMapper',
-    'ImageDiffusionMapper', 'ImageFaceBlurMapper', 'ImageTaggingMapper',
-    'NlpaugEnMapper', 'NlpcdaZhMapper', 'OptimizeQAMapper',
-    'OptimizeQueryMapper', 'OptimizeResponseMapper',
+    'CommandMapper', 'ExpandMacroMapper', 'FixUnicodeMapper',
+    'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
+    'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
+    'ImageCaptioningMapper', 'ImageDiffusionMapper', 'ImageFaceBlurMapper',
+    'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
+    'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
     'PunctuationNormalizationMapper', 'RemoveBibliographyMapper',
     'RemoveCommentsMapper', 'RemoveHeaderMapper', 'RemoveLongWordsMapper',
     'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',

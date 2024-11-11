@@ -8,6 +8,7 @@ MODULE_TO_PKGS = {
     'ram': ['ram@git+https://github.com/xinyu1205/recognize-anything.git'],
     'scenedetect': ['scenedetect[opencv]'],
     'simhash': ['simhash-pybind'],
+    'json_repair': ['json-repair'],
 }
 
 # Packages to corresponding ops that require them
@@ -104,5 +105,6 @@ PKG_TO_OPS = {
         'optimize_qa_mapper',
     ],
     'rouge': ['generate_qa_from_examples_mapper'],
-    'ram': ['image_tagging_mapper', 'video_tagging_from_frames_mapper']
+    'ram': ['image_tagging_mapper', 'video_tagging_from_frames_mapper'],
+    'json-repair': ['command_mapper'],
 }
