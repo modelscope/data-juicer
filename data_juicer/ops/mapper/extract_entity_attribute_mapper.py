@@ -40,8 +40,8 @@ class ExtractEntityAttributeMapper(Mapper):
     DEFAULT_DEMON_PATTERN = r'\#\#\#\s*代表性示例(\d+)：\s*(.*?)(?=\#\#\#|\Z)'
 
     def __init__(self,
-                 query_entities: List[str],
-                 query_attributes: List[str],
+                 query_entities: List[str] = [],
+                 query_attributes: List[str] = [],
                  api_model: str = 'gpt-4o',
                  *,
                  entity_key: str = Fields.main_entity,
