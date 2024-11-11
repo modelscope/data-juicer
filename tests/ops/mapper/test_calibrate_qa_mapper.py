@@ -1,5 +1,8 @@
+import os
 import unittest
+from unittest.mock import Mock, patch
 
+import httpx
 from loguru import logger
 
 from data_juicer.ops.mapper.calibrate_qa_mapper import CalibrateQAMapper
@@ -12,11 +15,7 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 @SKIPPED_TESTS.register_module()
 class CalibrateQAMapperTest(DataJuicerTestCaseBase):
 
-    def _run_op(self, api_model, response_path=None):
-
-        op = CalibrateQAMapper(api_model=api_model,
-                               response_path=response_path)
-
+    def _run_op(self, op):
         reference = """# 角色语言风格
 1. 下面是李莲花的问答样例，你必须贴合他的语言风格：
 
@@ -69,10 +68,36 @@ class CalibrateQAMapperTest(DataJuicerTestCaseBase):
 
     def test(self):
         # before runing this test, set below environment variables:
-        # export DJ_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
-        # export DJ_API_KEY=your_key
-        self._run_op('qwen2.5-72b-instruct')
+        # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
+        # export OPENAI_API_KEY=your_dashscope_key
+        op = CalibrateQAMapper(api_model='qwen2.5-72b-instruct')
+        self._run_op(op)
 
+    def test_args(self):
+        op = CalibrateQAMapper(
+            api_model='qwen2.5-72b-instruct',
+            api_url=
+            'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
+            response_path='choices.0.message.content')
+        self._run_op(op)
+
+    @patch('httpx.Client.send')
+    def test_retry(self, mock_send):
+        mock_response = Mock()
+        mock_response.status_code = 408
+        mock_response.headers = {}
+        mock_request = Mock()
+        mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
+            '408 Client Error: Request Timeout',
+            request=mock_request,
+            response=mock_response)
+        mock_send.return_value = mock_response
+
+        with self.assertLogs(level='DEBUG') as cm:
+            op = CalibrateQAMapper(api_model='test',
+                                   model_params={'max_retries': 3})
+            op.process({'text': '', 'query': '', 'response': ''})
+        self.assertIn('3 retries left', '\n'.join(cm.output))
 
 if __name__ == '__main__':
     unittest.main()

@@ -31,7 +31,6 @@ class CalibrateQAMapper(Mapper):
                  api_model: str = 'gpt-4o',
                  *,
                  api_url: Optional[str] = None,
-                 api_key: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt: Optional[str] = None,
                  input_template: Optional[str] = None,
@@ -45,8 +44,7 @@ class CalibrateQAMapper(Mapper):
         Initialization method.
 
         :param api_model: API model name.
-        :param api_url: API URL. Defaults to DJ_API_URL environment variable.
-        :param api_key: API key. Defaults to DJ_API_KEY environment variable.
+        :param api_url: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
         :param system_prompt: System prompt for the calibration task.
@@ -54,7 +52,7 @@ class CalibrateQAMapper(Mapper):
         :param reference_template: Template for formatting the reference text.
         :param qa_pair_template: Template for formatting question-answer pairs.
         :param output_pattern: Regular expression for parsing model output.
-        :param model_params: Parameters for initializing the model.
+        :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
         :param kwargs: Extra keyword arguments.
         """
@@ -67,13 +65,12 @@ class CalibrateQAMapper(Mapper):
         self.qa_pair_template = qa_pair_template or \
             self.DEFAULT_QA_PAIR_TEMPLATE
         self.output_pattern = output_pattern or self.DEFAULT_OUTPUT_PATTERN
-
-        self.model_params = model_params or {}
         self.sampling_params = sampling_params or {}
+
+        model_params = model_params or {}
         self.model_key = prepare_model(model_type='api',
-                                       api_model=api_model,
-                                       api_url=api_url,
-                                       api_key=api_key,
+                                       model=api_model,
+                                       url=api_url,
                                        response_path=response_path,
                                        **model_params)
 
