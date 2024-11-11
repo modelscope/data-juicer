@@ -15,8 +15,6 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 @SKIPPED_TESTS.register_module()
 class CalibrateQAMapperTest(DataJuicerTestCaseBase):
 
-    os.environ['OPENAI_LOG'] = 'debug'
-
     def _run_op(self, op):
         reference = """# 角色语言风格
 1. 下面是李莲花的问答样例，你必须贴合他的语言风格：
@@ -95,7 +93,7 @@ class CalibrateQAMapperTest(DataJuicerTestCaseBase):
             response=mock_response)
         mock_send.return_value = mock_response
 
-        with self.assertLogs() as cm:
+        with self.assertLogs(level='DEBUG') as cm:
             op = CalibrateQAMapper(api_model='test',
                                    model_params={'max_retries': 3})
             op.process({'text': '', 'query': '', 'response': ''})
