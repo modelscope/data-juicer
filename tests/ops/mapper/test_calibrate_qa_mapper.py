@@ -1,5 +1,3 @@
-import io
-import logging
 import os
 import unittest
 from unittest.mock import Mock, patch
@@ -77,7 +75,7 @@ class CalibrateQAMapperTest(DataJuicerTestCaseBase):
         op = CalibrateQAMapper(api_model='qwen2.5-72b-instruct')
         self._run_op(op)
 
-    def test_specified(self):
+    def test_args(self):
         op = CalibrateQAMapper(
             api_model='qwen2.5-72b-instruct',
             api_url=
@@ -97,21 +95,11 @@ class CalibrateQAMapperTest(DataJuicerTestCaseBase):
             response=mock_response)
         mock_send.return_value = mock_response
 
-        log_stream = io.StringIO()
-        stream_handler = logging.StreamHandler(log_stream)
-        stream_handler.setLevel(logging.DEBUG)
-        logger = logging.getLogger()
-        logger.addHandler(stream_handler)
-        try:
+        with self.assertLogs() as cm:
             op = CalibrateQAMapper(api_model='test',
                                    model_params={'max_retries': 3})
             op.process({'text': '', 'query': '', 'response': ''})
-            log_contents = log_stream.getvalue()
-            self.assertIn('3 retries left', log_contents)
-        finally:
-            logger.removeHandler(stream_handler)
-            log_stream.close()
-
+        self.assertIn('3 retries left', '\n'.join(cm.output))
 
 if __name__ == '__main__':
     unittest.main()
