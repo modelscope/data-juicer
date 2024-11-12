@@ -3,19 +3,19 @@ import unittest
 
 from datasets import Dataset
 
-from data_juicer.ops.filter.video_motion_score_filter import \
-    VideoMotionScoreFilter
+from data_juicer.ops.filter.video_motion_score_raft_filter import \
+    VideoMotionScoreRaftFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
+class VideoMotionScoreRaftFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
                              'data')
-    vid1_path = os.path.join(data_path, 'video1.mp4')  # 1.869317
-    vid2_path = os.path.join(data_path, 'video2.mp4')  # 3.52111
-    vid3_path = os.path.join(data_path, 'video3.mp4')  # 1.1731424
+    vid1_path = os.path.join(data_path, 'video1.mp4')  # 10.766147
+    vid2_path = os.path.join(data_path, 'video2.mp4')  # 10.098914
+    vid3_path = os.path.join(data_path, 'video3.mp4')  # 2.0731936
 
     def _run_helper(self, op, source_list, target_list, np=1):
         dataset = Dataset.from_list(source_list)
@@ -43,7 +43,7 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         }, {
             'videos': [self.vid3_path]
         }]
-        op = VideoMotionScoreFilter()
+        op = VideoMotionScoreRaftFilter()
         self._run_helper(op, ds_list, tgt_list)
 
     def test_downscale(self):
@@ -59,7 +59,7 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         }, {
             'videos': [self.vid2_path]
         }]
-        op = VideoMotionScoreFilter(min_score=1.0, size=120)
+        op = VideoMotionScoreRaftFilter(min_score=1.0, size=128)
         self._run_helper(op, ds_list, tgt_list)
 
     def test_downscale_max(self):
@@ -75,7 +75,7 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         }, {
             'videos': [self.vid2_path]
         }]
-        op = VideoMotionScoreFilter(min_score=1.0, size=120, max_size=160)
+        op = VideoMotionScoreRaftFilter(min_score=1.0, size=256, max_size=256)
         self._run_helper(op, ds_list, tgt_list)
 
     def test_downscale_relative(self):
@@ -91,7 +91,7 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         }, {
             'videos': [self.vid2_path]
         }]
-        op = VideoMotionScoreFilter(min_score=0.005, size=(120, 160), relative=True)
+        op = VideoMotionScoreRaftFilter(min_score=0.005, size=(128, 160), relative=True)
         self._run_helper(op, ds_list, tgt_list)
 
     def test_high(self):
@@ -102,8 +102,12 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         }, {
             'videos': [self.vid3_path]
         }]
-        tgt_list = [{'videos': [self.vid2_path]}]
-        op = VideoMotionScoreFilter(min_score=3.0)
+        tgt_list = [{
+            'videos': [self.vid1_path]
+        }, {
+            'videos': [self.vid2_path]
+        }]
+        op = VideoMotionScoreRaftFilter(min_score=10)
         self._run_helper(op, ds_list, tgt_list)
 
     def test_low(self):
@@ -115,7 +119,7 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
             'videos': [self.vid3_path]
         }]
         tgt_list = [{'videos': [self.vid3_path]}]
-        op = VideoMotionScoreFilter(min_score=0.0, max_score=1.50)
+        op = VideoMotionScoreRaftFilter(min_score=0.0, max_score=3)
         self._run_helper(op, ds_list, tgt_list)
 
     def test_middle(self):
@@ -126,8 +130,8 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         }, {
             'videos': [self.vid3_path]
         }]
-        tgt_list = [{'videos': [self.vid1_path]}]
-        op = VideoMotionScoreFilter(min_score=1.5, max_score=3.0)
+        tgt_list = [{'videos': [self.vid2_path]}]
+        op = VideoMotionScoreRaftFilter(min_score=3, max_score=10.5)
         self._run_helper(op, ds_list, tgt_list)
 
     def test_any(self):
@@ -141,10 +145,10 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         tgt_list = [{
             'videos': [self.vid1_path, self.vid2_path]
         }, {
-            'videos': [self.vid1_path, self.vid3_path]
+            'videos': [self.vid2_path, self.vid3_path]
         }]
-        op = VideoMotionScoreFilter(min_score=1.5,
-                                    max_score=3.0,
+        op = VideoMotionScoreRaftFilter(min_score=3,
+                                    max_score=10.5,
                                     any_or_all='any')
         self._run_helper(op, ds_list, tgt_list)
 
@@ -157,14 +161,14 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
             'videos': [self.vid1_path, self.vid3_path]
         }]
         tgt_list = []
-        op = VideoMotionScoreFilter(min_score=1.5,
-                                    max_score=3.0,
+        op = VideoMotionScoreRaftFilter(min_score=3,
+                                    max_score=10.5,
                                     any_or_all='all')
         self._run_helper(op, ds_list, tgt_list)
 
     def test_parallel(self):
         import multiprocess as mp
-        mp.set_start_method('forkserver', force=True)
+        mp.set_start_method('spawn', force=True)
 
         ds_list = [{
             'videos': [self.vid1_path]
@@ -173,8 +177,8 @@ class VideoMotionScoreFilterTest(DataJuicerTestCaseBase):
         }, {
             'videos': [self.vid3_path]
         }]
-        tgt_list = [{'videos': [self.vid1_path]}]
-        op = VideoMotionScoreFilter(min_score=1.5, max_score=3.0)
+        tgt_list = [{'videos': [self.vid2_path]}]
+        op = VideoMotionScoreRaftFilter(min_score=3, max_score=10.5)
         self._run_helper(op, ds_list, tgt_list, np=2)
 
 
