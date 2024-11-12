@@ -55,14 +55,14 @@ process:
   - audio_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg audio filters
   - calibrate_qa_mapper:                                    # calibrate question-answer pairs based on reference text.
       api_model: 'gpt-4o'                                     # API model name.
-      api_url: null                                           # API URL. Defaults to DJ_API_URL environment variable.
-      api_key: null                                           # API key. Defaults to DJ_API_KEY environment variable.
+      api_url: null                                           # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the calibration task.
       input_template: null                                    # Template for building the model input.
       reference_template: null                                # Template for formatting the reference text.
       qa_pair_template: null                                  # Template for formatting question-answer pairs.
       output_pattern: null                                    # Regular expression for parsing model output.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
       model_params: {}                                        # Parameters for initializing the model.
       sampling_params: {}                                     # Extra parameters passed to the API call.
   - calibrate_query_mapper:                                 # calibrate query in question-answer pairs based on reference text.
