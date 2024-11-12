@@ -2,11 +2,9 @@ import unittest
 
 from data_juicer.ops.load import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-@SKIPPED_TESTS.register_module()
 class OpFusionTest(DataJuicerTestCaseBase):
 
     def _run_op_fusion(self, original_process_list, target_process_list, probe_res=None):

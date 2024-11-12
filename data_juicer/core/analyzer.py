@@ -1,6 +1,9 @@
 import os
+from typing import Optional
 
+from jsonargparse import Namespace
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
@@ -24,11 +27,11 @@ class Analyzer:
     dataset better.
     """
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: Optional[Namespace] = None):
         """
         Initialization method.
 
-        :param cfg: optional config dict.
+        :param cfg: optional jsonargparse Namespace dict.
         """
         self.cfg = init_configs() if cfg is None else cfg
 
@@ -67,12 +70,16 @@ class Analyzer:
         self.overall_single_plot_path = None
         self.analysis_path = os.path.join(self.cfg.work_dir, 'analysis')
 
-    def run(self, load_data_np=None, skip_export=False):
+    def run(self,
+            load_data_np: Optional[PositiveInt] = None,
+            skip_export: bool = False,
+            skip_return: bool = False):
         """
         Running the dataset analysis pipeline.
 
         :param load_data_np: number of workers when loading the dataset.
         :param skip_export: whether export the results into disk
+        :param skip_return: skip return for API called.
         :return: analyzed dataset.
         """
         # 1. format data
@@ -142,4 +149,5 @@ class Analyzer:
         )
         column_wise_analysis.analyze(skip_export=skip_export)
 
-        return dataset
+        if not skip_return:
+            return dataset

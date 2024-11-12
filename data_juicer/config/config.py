@@ -4,12 +4,12 @@ import os
 import shutil
 import tempfile
 import time
-from argparse import ArgumentError, Namespace
-from typing import Dict, List, Union
+from argparse import ArgumentError
+from typing import Dict, List, Optional, Union
 
 import yaml
-from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
-                          namespace_to_dict)
+from jsonargparse import (ActionConfigFile, ArgumentParser, Namespace,
+                          dict_to_namespace, namespace_to_dict)
 from jsonargparse.typehints import ActionTypeHint
 from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
@@ -23,7 +23,7 @@ global_cfg = None
 global_parser = None
 
 
-def init_configs(args=None):
+def init_configs(args: Optional[List[str]] = None):
     """
     initialize the jsonargparse parser and parse configs from one of:
         1. POSIX-style commands line args;
@@ -374,7 +374,7 @@ def update_ds_cache_dir_and_related_vars(new_ds_cache_path):
         config.DEFAULT_EXTRACTED_DATASETS_PATH)
 
 
-def init_setup_from_cfg(cfg):
+def init_setup_from_cfg(cfg: Namespace):
     """
     Do some extra setup tasks after parsing config file or command line.
 
@@ -650,7 +650,7 @@ def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
     return arg_list
 
 
-def config_backup(cfg):
+def config_backup(cfg: Namespace):
     cfg_path = cfg.config[0].absolute
     work_dir = cfg.work_dir
     target_path = os.path.join(work_dir, os.path.basename(cfg_path))
@@ -660,7 +660,7 @@ def config_backup(cfg):
         shutil.copyfile(cfg_path, target_path)
 
 
-def display_config(cfg):
+def display_config(cfg: Namespace):
     import pprint
 
     from tabulate import tabulate
@@ -680,13 +680,13 @@ def display_config(cfg):
     print(table)
 
 
-def export_config(cfg,
-                  path,
-                  format='yaml',
-                  skip_none=True,
-                  skip_check=True,
-                  overwrite=False,
-                  multifile=True):
+def export_config(cfg: Namespace,
+                  path: str,
+                  format: str = 'yaml',
+                  skip_none: bool = True,
+                  skip_check: bool = True,
+                  overwrite: bool = False,
+                  multifile: bool = True):
     """
     Save the config object, some params are from jsonargparse
 
@@ -722,7 +722,7 @@ def export_config(cfg,
     logger.info(f'Saved the configuration in {path}')
 
 
-def merge_config(ori_cfg, new_cfg: Dict):
+def merge_config(ori_cfg: Namespace, new_cfg: Namespace):
     """
     Merge configuration from new_cfg into ori_cfg
 
@@ -780,7 +780,7 @@ def merge_config(ori_cfg, new_cfg: Dict):
         logger.error('Config merge failed')
 
 
-def prepare_side_configs(ori_config):
+def prepare_side_configs(ori_config: Union[str, Namespace, Dict]):
     """
     parse the config if ori_config is a string of a config file path with
         yaml, yml or json format
@@ -812,7 +812,7 @@ def prepare_side_configs(ori_config):
     return config
 
 
-def get_init_configs(cfg):
+def get_init_configs(cfg: Union[Namespace, Dict]):
     """
     set init configs of datajucer for cfg
     """

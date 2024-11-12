@@ -2,6 +2,7 @@ import copy
 import traceback
 from functools import wraps
 
+import numpy as np
 import pyarrow as pa
 from loguru import logger
 
@@ -133,6 +134,11 @@ class OP:
         self.image_key = kwargs.get('image_key', 'images')
         self.audio_key = kwargs.get('audio_key', 'audios')
         self.video_key = kwargs.get('video_key', 'videos')
+
+        self.query_key = kwargs.get('query_key', 'query')
+        self.response_key = kwargs.get('response_key', 'response')
+        self.history_key = kwargs.get('history_key', 'history')
+
         self.batch_size = kwargs.get('batch_size', 1000)
 
         # whether the model can be accelerated using cuda
@@ -209,6 +215,9 @@ class OP:
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
         return dataset
+
+    def empty_history(self):
+        return np.empty((0, 0), dtype=str)
 
 
 class Mapper(OP):
@@ -356,7 +365,7 @@ class Filter(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, *, exporter=None, tracer=None):
+    def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         dataset = super(Filter, self).run(dataset)
         if Fields.stats not in dataset.features:
             from data_juicer.core.data import add_same_content_to_new_column
@@ -375,13 +384,16 @@ class Filter(OP):
                               desc=self._name + '_compute_stats')
         if exporter and self.stats_export_path is not None:
             exporter.export_compute_stats(dataset, self.stats_export_path)
-        new_dataset = dataset.filter(self.process,
-                                     num_proc=self.runtime_np(),
-                                     batch_size=self.batch_size,
-                                     desc=self._name + '_process')
-        if tracer:
-            tracer.trace_filter(self._name, dataset, new_dataset)
-        return new_dataset
+        if reduce:
+            new_dataset = dataset.filter(self.process,
+                                         num_proc=self.runtime_np(),
+                                         batch_size=self.batch_size,
+                                         desc=self._name + '_process')
+            if tracer:
+                tracer.trace_filter(self._name, dataset, new_dataset)
+            return new_dataset
+        else:
+            return dataset
 
 
 class Deduplicator(OP):
@@ -427,17 +439,20 @@ class Deduplicator(OP):
         """
         raise NotImplementedError
 
-    def run(self, dataset, *, exporter=None, tracer=None):
+    def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         dataset = super(Deduplicator, self).run(dataset)
         dataset = dataset.map(self.compute_hash,
                               num_proc=self.runtime_np(),
                               with_rank=self.use_cuda(),
                               desc=self._name + '_compute_hash')
-        show_num = tracer.show_num if tracer else 0
-        new_dataset, dup_pairs = self.process(dataset, show_num)
-        if tracer:
-            tracer.trace_deduplicator(self._name, dup_pairs)
-        return new_dataset
+        if reduce:
+            show_num = tracer.show_num if tracer else 0
+            new_dataset, dup_pairs = self.process(dataset, show_num)
+            if tracer:
+                tracer.trace_deduplicator(self._name, dup_pairs)
+            return new_dataset
+        else:
+            return dataset
 
 
 class Selector(OP):

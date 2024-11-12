@@ -36,8 +36,8 @@ class RemoveTableTextMapper(Mapper):
 
     def process_batched(self, samples):
         for idx, text in enumerate(samples[self.text_key]):
-            for idx in range(self.min_col - 1, self.max_col):
-                pattern = re.compile(self.pattern % idx)
+            for i in range(self.min_col - 1, self.max_col):
+                pattern = re.compile(self.pattern % i)
                 text = pattern.sub('', text)
 
             samples[self.text_key][idx] = text
