@@ -17,6 +17,7 @@ from .image_captioning_from_gpt4v_mapper import ImageCaptioningFromGPT4VMapper
 from .image_captioning_mapper import ImageCaptioningMapper
 from .image_diffusion_mapper import ImageDiffusionMapper
 from .image_face_blur_mapper import ImageFaceBlurMapper
+from .image_segment_mapper import ImageSegmentMapper
 from .image_tagging_mapper import ImageTaggingMapper
 from .nlpaug_en_mapper import NlpaugEnMapper
 from .nlpcda_zh_mapper import NlpcdaZhMapper
@@ -36,7 +37,6 @@ from .remove_table_text_mapper import RemoveTableTextMapper
 from .remove_words_with_incorrect_substrings_mapper import \
     RemoveWordsWithIncorrectSubstringsMapper
 from .replace_content_mapper import ReplaceContentMapper
-from .segment_mapper import SegmentMapper
 from .sentence_split_mapper import SentenceSplitMapper
 from .video_captioning_from_audio_mapper import VideoCaptioningFromAudioMapper
 from .video_captioning_from_frames_mapper import \
@@ -63,15 +63,15 @@ __all__ = [
     'ExpandMacroMapper', 'FixUnicodeMapper', 'GenerateQAFromExamplesMapper',
     'GenerateQAFromTextMapper', 'ImageBlurMapper',
     'ImageCaptioningFromGPT4VMapper', 'ImageCaptioningMapper',
-    'ImageDiffusionMapper', 'ImageFaceBlurMapper', 'ImageTaggingMapper',
-    'NlpaugEnMapper', 'NlpcdaZhMapper', 'OptimizeQAMapper',
-    'OptimizeQueryMapper', 'OptimizeResponseMapper',
+    'ImageDiffusionMapper', 'ImageFaceBlurMapper', 'ImageSegmentMapper',
+    'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
+    'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
     'PunctuationNormalizationMapper', 'RemoveBibliographyMapper',
     'RemoveCommentsMapper', 'RemoveHeaderMapper', 'RemoveLongWordsMapper',
     'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',
     'RemoveSpecificCharsMapper', 'RemoveTableTextMapper',
     'RemoveWordsWithIncorrectSubstringsMapper', 'ReplaceContentMapper',
-    'SegmentMapper', 'SentenceSplitMapper', 'VideoCaptioningFromAudioMapper',
+    'SentenceSplitMapper', 'VideoCaptioningFromAudioMapper',
     'VideoCaptioningFromFramesMapper', 'VideoCaptioningFromSummarizerMapper',
     'VideoCaptioningFromVideoMapper', 'VideoFFmpegWrappedMapper',
     'VideoFaceBlurMapper', 'VideoRemoveWatermarkMapper',

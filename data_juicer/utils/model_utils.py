@@ -28,6 +28,7 @@ diffusers = LazyLoader('diffusers', 'diffusers')
 ram = LazyLoader('ram', 'ram.models')
 cv2 = LazyLoader('cv2', 'cv2')
 openai = LazyLoader('openai', 'openai')
+ultralytics = LazyLoader('ultralytics', 'ultralytics')
 
 MODEL_ZOO = {}
 
@@ -300,10 +301,8 @@ def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
     return model
 
 
-def prepare_fastsam_model(pretrained_model_name_or_path):
-    from ultralytics import FastSAM
-
-    return FastSAM(pretrained_model_name_or_path)
+def prepare_fastsam_model(model_path, **model_params):
+    return ultralytics.FastSAM(model_path)
 
 
 def prepare_fasttext_model(model_name='lid.176.bin', **model_params):
@@ -433,27 +432,24 @@ def prepare_opencv_classifier(model_path, **model_params):
     return model
 
 
-def prepare_recognizeAnything_model(
-        pretrained_model_name_or_path='ram_plus_swin_large_14m.pth',
-        input_size=384,
-        **model_params):
+def prepare_ram_model(model_path='ram_plus_swin_large_14m.pth',
+                      input_size=384,
+                      **model_params):
     """
-    Prepare and load recognizeAnything model.
+    Prepare and load Recognize Anything Model (RAM).
 
     :param model_name: input model name.
     :param input_size: the input size of the model.
     """
-    logger.info('Loading recognizeAnything model...')
+    logger.info('Loading Recognize Anything Model (RAM)...')
 
     try:
-        model = ram.ram_plus(
-            pretrained=check_model(pretrained_model_name_or_path),
-            image_size=input_size,
-            vit='swin_l')
+        model = ram.ram_plus(pretrained=check_model(model_path),
+                             image_size=input_size,
+                             vit='swin_l')
     except (RuntimeError, UnpicklingError) as e:  # noqa: E722
         logger.warning(e)
-        model = ram.ram_plus(pretrained=check_model(
-            pretrained_model_name_or_path, force=True),
+        model = ram.ram_plus(pretrained=check_model(model_path, force=True),
                              image_size=input_size,
                              vit='swin_l')
     device = model_params.pop('device', 'cpu')
@@ -759,7 +755,7 @@ MODEL_FUNCTION_MAPPING = {
     'kenlm': prepare_kenlm_model,
     'nltk': prepare_nltk_model,
     'opencv_classifier': prepare_opencv_classifier,
-    'recognizeAnything': prepare_recognizeAnything_model,
+    'ram': prepare_ram_model,
     'sentencepiece': prepare_sentencepiece_for_lang,
     'simple_aesthetics': prepare_simple_aesthetics_model,
     'spacy': prepare_spacy_model,
@@ -767,9 +763,7 @@ MODEL_FUNCTION_MAPPING = {
     'vllm': prepare_vllm_model,
 }
 
-_MODELS_WITHOUT_FILE_LOCK = {
-    'kenlm', 'nltk', 'recognizeAnything', 'sentencepiece', 'spacy'
-}
+_MODELS_WITHOUT_FILE_LOCK = {'kenlm', 'nltk', 'ram', 'sentencepiece', 'spacy'}
 
 
 def prepare_model(model_type, **model_kwargs):
