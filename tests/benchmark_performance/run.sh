@@ -1,0 +1,22 @@
+#!/bin/bash
+BENCH_PATH=$(cd "$(dirname "$0")"; pwd)
+RELATIVE_DJ_PATH=../..
+MODALITIES=("text" "image" "video" "audio")
+
+cd $BENCH_PATH
+
+# 1. prepare dataset
+wget http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/perf_bench_data/perf_bench_data.tar.gz && tar zxvf perf_bench_data.tar.gz
+
+# 2. run the benchmark
+for modality in ${MODALITIES[@]}
+do
+    python RELATIVE_DJ_PATH/tools/process_data.py --config configs/$modality.yaml
+done
+
+# 3. collect & upload benchmark results
+python report.py
+
+# 4. clear resources
+rm -rf perf_bench_data.tar.gz
+rm -rf perf_bench_data/
