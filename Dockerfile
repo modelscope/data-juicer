@@ -17,7 +17,7 @@ ENV JAVA_HOME=/opt/jdk
 WORKDIR /data-juicer
 
 # install requirements which need to be installed from source
-RUN pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000
+RUN pip install --upgrade setuptools && pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000
 
 # install requirements first to better reuse installed library cache
 COPY environments/ environments/
