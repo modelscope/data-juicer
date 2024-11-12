@@ -3,15 +3,19 @@ import datetime
 import os
 import re
 import shutil
-from typing import List, Union
+from typing import List, Optional, Tuple, Union
 
 import av
 import numpy as np
 from datasets import Audio, Image
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 from data_juicer.utils.file_utils import add_suffix_to_filename
+from data_juicer.utils.lazy_loader import LazyLoader
+
+cv2 = LazyLoader('cv2', 'cv2')
 
 # suppress most warnings from av
 av.logging.set_level(av.logging.PANIC)
@@ -128,8 +132,6 @@ def pil_to_opencv(pil_image):
 
 
 def detect_faces(image, detector, **extra_kwargs):
-    import cv2
-
     img = pil_to_opencv(image)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     dets = detector.detectMultiScale(gray, **extra_kwargs)
@@ -160,6 +162,58 @@ def iou(box1, box2):
     intersection = max(0, (ix_max - ix_min) * (iy_max - iy_min))
     union = area1 + area2 - intersection
     return 1.0 * intersection / union
+
+
+def calculate_resized_dimensions(
+        original_size: Tuple[PositiveInt, PositiveInt],
+        target_size: Union[PositiveInt, Tuple[PositiveInt, PositiveInt]],
+        max_length: Optional[int] = None,
+        divisible: PositiveInt = 1) -> Tuple[int, int]:
+    """
+    Resize dimensions based on specified constraints.
+
+    :param original_size: The original dimensions as (height, width).
+    :param target_size: Desired target size; can be a single integer
+        (short edge) or a tuple (height, width).
+    :param max_length: Maximum allowed length for the longer edge.
+    :param divisible: The number that the dimensions must be divisible by.
+    :return: Resized dimensions as (height, width).
+    """
+
+    height, width = original_size
+    short_edge, long_edge = sorted((width, height))
+
+    # Normalize target_size to a tuple
+    if isinstance(target_size, int):
+        target_size = (target_size, )
+
+    # Initialize new dimensions
+    if target_size:
+        if len(target_size) == 1:  # Only the smaller edge is specified
+            new_short_edge = target_size[0]
+            new_long_edge = int(new_short_edge * long_edge / short_edge)
+        else:  # Both dimensions are specified
+            new_short_edge = min(target_size)
+            new_long_edge = max(target_size)
+    else:  # No change
+        new_short_edge, new_long_edge = short_edge, long_edge
+
+    # Enforce maximum length constraint
+    if max_length is not None and new_long_edge > max_length:
+        scaling_factor = max_length / new_long_edge
+        new_short_edge = int(new_short_edge * scaling_factor)
+        new_long_edge = max_length
+
+    # Determine final dimensions based on original orientation
+    resized_dimensions = ((new_short_edge,
+                           new_long_edge) if width <= height else
+                          (new_long_edge, new_short_edge))
+
+    # Ensure final dimensions are divisible by the specified value
+    resized_dimensions = tuple(
+        int(dim / divisible) * divisible for dim in resized_dimensions)
+
+    return resized_dimensions
 
 
 # Audios
@@ -195,7 +249,7 @@ def load_video(path, mode='r'):
 
 
 def get_video_duration(input_video: Union[str, av.container.InputContainer],
-                       video_stream_index=0):
+                       video_stream_index: int = 0):
     """
     Get the video's duration from the container
 
@@ -222,7 +276,7 @@ def get_video_duration(input_video: Union[str, av.container.InputContainer],
 
 def get_decoded_frames_from_video(
         input_video: Union[str, av.container.InputContainer],
-        video_stream_index=0):
+        video_stream_index: int = 0):
     """
     Get the video's frames from the container
 
@@ -247,7 +301,7 @@ def cut_video_by_seconds(
     input_video: Union[str, av.container.InputContainer],
     output_video: str,
     start_seconds: float,
-    end_seconds: float = None,
+    end_seconds: Optional[float] = None,
 ):
     """
     Cut a video into several segments by times in second.
@@ -466,7 +520,7 @@ def get_key_frame_seconds(input_video: Union[str,
 
 def extract_video_frames_uniformly(
     input_video: Union[str, av.container.InputContainer],
-    frame_num: int,
+    frame_num: PositiveInt,
 ):
     """
     Extract a number of video frames uniformly within the video duration.
@@ -545,13 +599,18 @@ def extract_video_frames_uniformly(
             container.seek(0)
             search_idx = 0
             curr_pts = second_group[search_idx] / time_base
+            find_all = False
             for frame in container.decode(input_video_stream):
                 if frame.pts >= curr_pts:
                     extracted_frames.append(frame)
                     search_idx += 1
                     if search_idx >= len(second_group):
+                        find_all = True
                         break
                     curr_pts = second_group[search_idx] / time_base
+            if not find_all and frame is not None:
+                # add the last frame
+                extracted_frames.append(frame)
         else:
             # search from a key frame
             container.seek(int(key_frame_second * 1e6))
@@ -581,10 +640,10 @@ def extract_video_frames_uniformly(
 
 def extract_audio_from_video(
     input_video: Union[str, av.container.InputContainer],
-    output_audio: str = None,
+    output_audio: Optional[str] = None,
     start_seconds: int = 0,
-    end_seconds: int = None,
-    stream_indexes: Union[int, List[int]] = None,
+    end_seconds: Optional[int] = None,
+    stream_indexes: Union[int, List[int], None] = None,
 ):
     """
     Extract audio data for the given video.
@@ -801,10 +860,9 @@ def parse_string_to_roi(roi_string, roi_type='pixel'):
             'format of "x1, y1, x2, y2", "(x1, y1, x2, y2)", or '
             '"[x1, y1, x2, y2]".')
         return None
-    return None
 
 
-def close_video(container):
+def close_video(container: av.container.InputContainer):
     """
     Close the video stream and container to avoid memory leak.
 

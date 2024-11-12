@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List
 
 from ..base_op import OPERATORS, Filter
 
@@ -14,7 +14,7 @@ class SpecifiedFieldFilter(Filter):
 
     def __init__(self,
                  field_key: str = '',
-                 target_value: Union[List, Tuple] = [],
+                 target_value: List = [],
                  *args,
                  **kwargs):
         """
@@ -33,10 +33,10 @@ class SpecifiedFieldFilter(Filter):
         self.field_key = field_key
         self.target_value = target_value
 
-    def compute_stats(self, sample):
+    def compute_stats_single(self, sample):
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         if not (self.field_key and self.target_value):
             return True
 

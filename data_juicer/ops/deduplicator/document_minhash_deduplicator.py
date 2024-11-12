@@ -5,24 +5,25 @@
 import hashlib
 import struct
 from collections import defaultdict
+from typing import Optional
 
 import numpy as np
 import regex
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 from loguru import logger
+from pydantic import Field, PositiveInt
 from tqdm import tqdm
+from typing_extensions import Annotated
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import UnionFind, split_on_whitespace
 
-OP_NAME = 'document_minhash_deduplicator'
+integrate = LazyLoader('integrate', 'scipy.integrate')
 
-with AvailabilityChecking(['scipy'], OP_NAME):
-    from scipy.integrate import quad as integrate
+OP_NAME = 'document_minhash_deduplicator'
 
 MERSENNE_PRIME = np.uint64((1 << 61) - 1)
 MAX_HASH = np.uint64((1 << 32) - 1)
@@ -68,7 +69,7 @@ def optimal_param(
         def proba(s):
             return 1 - (1 - s**float(rows))**float(band)
 
-        a, _ = integrate(proba, 0.0, th)
+        a, _ = integrate.quad(proba, 0.0, th)
         return a
 
     def false_negative_probability(th: float, band: int, rows: int):
@@ -77,7 +78,7 @@ def optimal_param(
         def proba(s):
             return 1 - (1 - (1 - s**float(rows))**float(band))
 
-        a, _ = integrate(proba, th, 1.0)
+        a, _ = integrate.quad(proba, th, 1.0)
         return a
 
     # object: minimize the weighted FP and FN ratio
@@ -109,12 +110,12 @@ class DocumentMinhashDeduplicator(Deduplicator):
         tokenization: str = 'space',
         window_size: PositiveInt = 5,
         lowercase: bool = True,
-        ignore_pattern: str = None,
+        ignore_pattern: Optional[str] = None,
         num_permutations: PositiveInt = 256,
-        jaccard_threshold: ClosedUnitInterval = 0.7,
-        num_bands: PositiveInt = None,
-        num_rows_per_band: PositiveInt = None,
-        tokenizer_model: str = None,
+        jaccard_threshold: Annotated[float, Field(ge=0, le=1)] = 0.7,
+        num_bands: Optional[PositiveInt] = None,
+        num_rows_per_band: Optional[PositiveInt] = None,
+        tokenizer_model: Optional[str] = None,
         *args,
         **kwargs,
     ):

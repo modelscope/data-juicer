@@ -1,8 +1,10 @@
 import copy
+from typing import Optional
 
 import requests
-from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
+from pydantic import Field
+from typing_extensions import Annotated
 
 from data_juicer.utils.mm_utils import (SpecialTokens, image_byte_to_base64,
                                         insert_texts_after_placeholders,
@@ -104,10 +106,10 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
                  mode: str = 'description',
                  api_key: str = '',
                  max_token: int = 500,
-                 temperature: ClosedUnitInterval = 1.0,
+                 temperature: Annotated[float, Field(ge=0, le=1)] = 1.0,
                  system_prompt: str = '',
                  user_prompt: str = '',
-                 user_prompt_key: str = None,
+                 user_prompt_key: Optional[str] = None,
                  keep_original_sample: bool = True,
                  any_or_all: str = 'any',
                  *args,
@@ -246,7 +248,7 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
 
         return [generated_sample]
 
-    def process(self, samples):
+    def process_batched(self, samples):
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []
         for i in range(len(samples[self.text_key])):

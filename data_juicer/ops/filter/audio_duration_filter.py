@@ -2,7 +2,6 @@ import sys
 
 import librosa
 import numpy as np
-from jsonargparse.typing import NonNegativeInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import load_audio, load_data_with_context
@@ -20,8 +19,8 @@ class AudioDurationFilter(Filter):
     """
 
     def __init__(self,
-                 min_duration: NonNegativeInt = 0,
-                 max_duration: NonNegativeInt = sys.maxsize,
+                 min_duration: int = 0,
+                 max_duration: int = sys.maxsize,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -47,7 +46,7 @@ class AudioDurationFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.audio_duration in sample[Fields.stats]:
             return sample
@@ -75,7 +74,7 @@ class AudioDurationFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         audio_durations = sample[Fields.stats][StatsKeys.audio_duration]
         keep_bools = np.array([
             self.min_duration <= duration <= self.max_duration

@@ -53,7 +53,7 @@ class ImageBlurMapper(Mapper):
         else:
             self.blur = ImageFilter.GaussianBlur(radius)
 
-    def process(self, sample, context=False):
+    def process_single(self, sample, context=False):
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
             sample[Fields.source_file] = []

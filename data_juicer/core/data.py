@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import copy
 import inspect
+import json
+import os
 import traceback
 from abc import ABC, abstractmethod
 from functools import wraps
@@ -12,6 +14,7 @@ from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
+from data_juicer.core.monitor import Monitor
 from data_juicer.ops import UNFORKABLE
 from data_juicer.utils import cache_utils
 from data_juicer.utils.compress import (CompressionOff,
@@ -164,6 +167,7 @@ class NestedDataset(Dataset, DJDataset):
     def process(self,
                 operators,
                 *,
+                work_dir=None,
                 exporter=None,
                 checkpointer=None,
                 tracer=None):
@@ -173,6 +177,9 @@ class NestedDataset(Dataset, DJDataset):
         if not isinstance(operators, list):
             operators = [operators]
         unforkable_operators = set(UNFORKABLE.modules.keys())
+
+        # resource utilization monitor
+        resource_util_list = []
 
         dataset = self
         try:
@@ -184,10 +191,17 @@ class NestedDataset(Dataset, DJDataset):
 
                 start = time()
                 # run single op
-                dataset = op.run(dataset, exporter=exporter, tracer=tracer)
+                run_args = {
+                    'dataset': dataset,
+                    'exporter': exporter,
+                    'tracer': tracer,
+                }
+                dataset, resource_util_per_op = Monitor.monitor_func(
+                    op.run, args=run_args)
                 # record processed ops
                 if checkpointer is not None:
                     checkpointer.record(op._op_cfg)
+                resource_util_list.append(resource_util_per_op)
                 end = time()
                 logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
                             f'Left {len(dataset)} samples.')
@@ -201,6 +215,9 @@ class NestedDataset(Dataset, DJDataset):
                             'last op...')
                 dataset.cleanup_cache_files()
                 checkpointer.save_ckpt(dataset)
+            if work_dir:
+                with open(os.path.join(work_dir, 'monitor.json'), 'w') as out:
+                    json.dump(resource_util_list, out)
         return dataset
 
     def map(self, *args, **kargs):
@@ -227,11 +244,24 @@ class NestedDataset(Dataset, DJDataset):
                 called_func, '__wrapped__'):
             called_func = called_func.__wrapped__
 
-        # Batched is always required for fault tolerance
         if inspect.ismethod(called_func):
-            kargs['batched'] = True
-            kargs['batch_size'] = kargs.pop(
-                'batch_size', 1) if called_func.__self__.is_batched_op() else 1
+            # batched is required for fault-tolerant or batched OP
+            if callable(getattr(
+                    called_func.__self__,
+                    'is_batched_op')) and called_func.__self__.is_batched_op(
+                    ) or not getattr(called_func.__self__, 'turbo', False):
+                kargs['batched'] = True
+                kargs['batch_size'] = kargs.pop('batch_size', 1) if hasattr(
+                    called_func.__self__, 'is_batched_op'
+                ) and called_func.__self__.is_batched_op() else 1
+            else:
+                kargs['batched'] = False
+
+            # rank is required for cuda model loading
+            if callable(
+                    getattr(called_func.__self__,
+                            'use_cuda')) and called_func.__self__.use_cuda():
+                kargs['with_rank'] = True
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
@@ -262,12 +292,27 @@ class NestedDataset(Dataset, DJDataset):
                 args[0] = lambda x: nested_obj_factory(x)
             else:
                 args[0] = wrap_func_with_nested_access(args[0])
+            called_func = args[0]
         else:
             if 'function' not in kargs or kargs['function'] is None:
                 kargs['function'] = lambda x: nested_obj_factory(x)
             else:
                 kargs['function'] = wrap_func_with_nested_access(
                     kargs['function'])
+            called_func = kargs['function']
+
+        # For wrapped function, try to get its unwrapped (bound) method
+        while not inspect.ismethod(called_func) and hasattr(
+                called_func, '__wrapped__'):
+            called_func = called_func.__wrapped__
+
+        # Batched is always required for fault tolerance
+        if inspect.ismethod(called_func):
+            if callable(getattr(
+                    called_func.__self__,
+                    'is_batched_op')) and called_func.__self__.is_batched_op():
+                kargs['batched'] = True
+                kargs['batch_size'] = kargs.pop('batch_size', 1)
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
             new_fingerprint = generate_fingerprint(self, *args, **kargs)

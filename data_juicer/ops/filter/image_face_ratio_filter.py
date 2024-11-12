@@ -1,11 +1,10 @@
 import os
 
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (detect_faces, load_data_with_context,
                                         load_image)
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -13,10 +12,9 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, UNFORKABLE, Filter
 from ..op_fusion import LOADED_IMAGES
 
-OP_NAME = 'image_face_ratio_filter'
+cv2 = LazyLoader('cv2', 'cv2')
 
-with AvailabilityChecking(['opencv-python'], OP_NAME):
-    import cv2
+OP_NAME = 'image_face_ratio_filter'
 
 
 @UNFORKABLE.register_module(OP_NAME)
@@ -34,9 +32,9 @@ class ImageFaceRatioFilter(Filter):
     }
 
     def __init__(self,
-                 cv_classifier='',
-                 min_ratio: ClosedUnitInterval = 0.0,
-                 max_ratio: ClosedUnitInterval = 0.4,
+                 cv_classifier: str = '',
+                 min_ratio: float = 0.0,
+                 max_ratio: float = 0.4,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -75,7 +73,7 @@ class ImageFaceRatioFilter(Filter):
         self.model_key = prepare_model(model_type='opencv_classifier',
                                        model_path=cv_classifier)
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.face_ratios in sample[Fields.stats]:
             return sample
@@ -113,7 +111,7 @@ class ImageFaceRatioFilter(Filter):
         ]
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         face_ratios = sample[Fields.stats][StatsKeys.face_ratios]
         if len(face_ratios) <= 0:
             return True

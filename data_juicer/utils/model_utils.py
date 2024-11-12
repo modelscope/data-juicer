@@ -1,16 +1,33 @@
 import fnmatch
+import inspect
 import os
 from functools import partial
 from pickle import UnpicklingError
 from typing import Optional, Union
 
+import httpx
 import multiprocess as mp
 import wget
 from loguru import logger
 
-from data_juicer import cuda_device_count, is_cuda_available
+from data_juicer import cuda_device_count
+from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
+
+torch = LazyLoader('torch', 'torch')
+transformers = LazyLoader('transformers', 'transformers')
+nn = LazyLoader('nn', 'torch.nn')
+fasttext = LazyLoader('fasttext', 'fasttext')
+sentencepiece = LazyLoader('sentencepiece', 'sentencepiece')
+kenlm = LazyLoader('kenlm', 'kenlm')
+nltk = LazyLoader('nltk', 'nltk')
+aes_pre = LazyLoader('aes_pre', 'aesthetics_predictor')
+vllm = LazyLoader('vllm', 'vllm')
+diffusers = LazyLoader('diffusers', 'diffusers')
+ram = LazyLoader('ram', 'ram.models')
+cv2 = LazyLoader('cv2', 'cv2')
+openai = LazyLoader('openai', 'openai')
 
 MODEL_ZOO = {}
 
@@ -68,20 +85,19 @@ def check_model(model_name, force=False):
         if os.path.exists(cached_model_path):
             os.remove(cached_model_path)
             logger.info(
-                f'Model [{cached_model_path}] invalid, force to downloading...'
-            )
+                f'Model [{cached_model_path}] is invalid. Forcing download...')
         else:
             logger.info(
-                f'Model [{cached_model_path}] not found. Downloading...')
+                f'Model [{cached_model_path}] is not found. Downloading...')
 
         try:
             model_link = os.path.join(MODEL_LINKS, model_name)
-            wget.download(model_link, cached_model_path, bar=None)
+            wget.download(model_link, cached_model_path)
         except:  # noqa: E722
             try:
                 backup_model_link = os.path.join(
                     get_backup_model_link(model_name), model_name)
-                wget.download(backup_model_link, cached_model_path, bar=None)
+                wget.download(backup_model_link, cached_model_path)
             except:  # noqa: E722
                 logger.error(
                     f'Downloading model [{model_name}] error. '
@@ -91,15 +107,212 @@ def check_model(model_name, force=False):
     return cached_model_path
 
 
-def prepare_fasttext_model(model_name='lid.176.bin'):
+class APIModel:
+
+    def __init__(self, model, url=None, response_path=None, **kwargs):
+        """
+        Initializes an instance of the APIModel class.
+
+        :param model: The model name to use for the API.
+        :param url: URL endpoint for the API. If relative, it will be joined
+            with base_url or the OPENAI_BASE_URL environment variable. Defaults
+            to '/chat/completions' for OpenAI compatibility.
+        :param response_path: Dot-separated path to extract the desired
+            response content. Defaults to 'choices.0.message.content' for
+            OpenAI compatibility.
+        :param kwargs: Additional arguments to configure the OpenAI client.
+        """
+        self.model = model
+        self.url = url or '/chat/completions'
+        self.response_path = response_path or 'choices.0.message.content'
+
+        client_args = self._filter_arguments(openai.OpenAI, kwargs)
+        self.client = openai.OpenAI(**client_args)
+
+    def __call__(self, messages, **kwargs):
+        """
+        Sends messages to the configured API model and returns the parsed
+        response content.
+
+        :param messages: A list of message dictionaries to send to the API.
+                         Each message should have a 'role' (e.g., 'user',
+                         'assistant') and 'content' (the message text).
+        :param kwargs: Additional parameters for the API call.
+        :return: The parsed response content from the API call, or an empty
+            string if an error occurs.
+        """
+        body = {
+            'messages': messages,
+            'model': self.model,
+        }
+        body.update(kwargs)
+        stream = kwargs.get('stream', False)
+        stream_cls = openai.Stream[openai.types.chat.ChatCompletionChunk]
+
+        try:
+            response = self.client.post(self.url,
+                                        body=body,
+                                        cast_to=httpx.Response,
+                                        stream=stream,
+                                        stream_cls=stream_cls)
+            result = response.json()
+            return self._nested_access(result, self.response_path)
+        except Exception as e:
+            logger.exception(e)
+            return ''
+
+    @staticmethod
+    def _nested_access(data, path):
+        """
+        Access nested data using a dot-separated path.
+
+        :param data: A dictionary or a list to access the nested data from.
+        :param path: A dot-separated string representing the path to access.
+                     This can include numeric indices when accessing list
+                     elements.
+        :return: The value located at the specified path, or raises a KeyError
+                 or IndexError if the path does not exist.
+        """
+        keys = path.split('.')
+        for key in keys:
+            # Convert string keys to integers if they are numeric
+            key = int(key) if key.isdigit() else key
+            data = data[key]
+        return data
+
+    @staticmethod
+    def _filter_arguments(func, args_dict):
+        """
+        Filters and returns only the valid arguments for a given function
+        signature.
+
+        :param func: The function or callable to inspect.
+        :param args_dict: A dictionary of argument names and values to filter.
+        :return: A dictionary containing only the arguments that match the
+                 function's signature, preserving any **kwargs if applicable.
+        """
+        params = inspect.signature(func).parameters
+        filtered_args = {}
+        for name, param in params.items():
+            # If **kwargs is found, return without change
+            if param.kind == inspect.Parameter.VAR_KEYWORD:
+                return args_dict
+            # Collect valid parameters
+            if name not in {'self', 'cls'} and name in args_dict:
+                filtered_args[name] = args_dict[name]
+        return filtered_args
+
+
+def prepare_api_model(model,
+                      *,
+                      url=None,
+                      response_path=None,
+                      return_processor=False,
+                      processor_config=None,
+                      **model_params):
+    """Creates a callable API model for interacting with OpenAI-compatible API.
+    The callable supports custom response parsing and works with proxy servers
+    that may be incompatible.
+
+    :param model: The name of the model to interact with.
+    :param url: URL endpoint for the API.
+    :param response_path: The dot-separated  path to extract desired content
+        from the API response. Defaults to 'choices.0.message.content'.
+    :param return_processor: A boolean flag indicating whether to return a
+        processor along with the model. The processor can be used for tasks
+        like tokenization or encoding. Defaults to False.
+    :param processor_config: A dictionary containing configuration settings
+        for a specific processor from Hugging Face. It should include all
+        necessary parameters for initializing the processor. This parameter is
+        used only if `return_processor` is True.
+    :param model_params: Additional parameters to configure the API model.
+    :return: A tuple containing the callable API model object and optionally a
+        processor if `return_processor` is True.
+    """
+    model = APIModel(model=model,
+                     url=url,
+                     response_path=response_path,
+                     **model_params)
+
+    if not return_processor:
+        return model
+
+    def get_processor():
+        try:
+            import tiktoken
+            return tiktoken.encoding_for_model(model)
+        except Exception:
+            pass
+
+        try:
+            import dashscope
+            return dashscope.get_tokenizer(model)
+        except Exception:
+            pass
+
+        raise ValueError(
+            'Failed to initialize the processor. Please check the following:\n'  # noqa: E501
+            "- For OpenAI models: Install 'tiktoken' via `pip install tiktoken`.\n"  # noqa: E501
+            "- For DashScope models: Install both 'dashscope' and 'tiktoken' via `pip install dashscope tiktoken`.\n"  # noqa: E501
+            "- For custom models: Use the 'processor_config' parameter to configure a Hugging Face processor."  # noqa: E501
+        )
+
+    if processor_config is not None:
+        processor = transformers.AutoProcessor.from_pretrained(
+            **processor_config)
+    else:
+        processor = get_processor()
+    return (model, processor)
+
+
+def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
+                            **model_params):
+    """
+        Prepare and load an Diffusion model from HuggingFace.
+
+        :param pretrained_model_name_or_path: input Diffusion model name
+            or local path to the model
+        :param diffusion_type: the use of the diffusion model. It can be
+            'image2image', 'text2image', 'inpainting'
+        :return: a Diffusion model.
+    """
+    AUTOINSTALL.check(['torch', 'transformers'])
+
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
+
+    diffusion_type_to_pipeline = {
+        'image2image': diffusers.AutoPipelineForImage2Image,
+        'text2image': diffusers.AutoPipelineForText2Image,
+        'inpainting': diffusers.AutoPipelineForInpainting
+    }
+
+    if diffusion_type not in diffusion_type_to_pipeline.keys():
+        raise ValueError(
+            f'Not support {diffusion_type} diffusion_type for diffusion '
+            'model. Can only be one of '
+            '["image2image", "text2image", "inpainting"].')
+
+    pipeline = diffusion_type_to_pipeline[diffusion_type]
+    model = pipeline.from_pretrained(pretrained_model_name_or_path,
+                                     **model_params)
+
+    return model
+
+
+def prepare_fastsam_model(pretrained_model_name_or_path):
+    from ultralytics import FastSAM
+
+    return FastSAM(pretrained_model_name_or_path)
+
+
+def prepare_fasttext_model(model_name='lid.176.bin', **model_params):
     """
     Prepare and load a fasttext model.
 
     :param model_name: input model name
     :return: model instance.
     """
-    import fasttext
-
     logger.info('Loading fasttext language identification model...')
     try:
         ft_model = fasttext.load_model(check_model(model_name))
@@ -108,38 +321,63 @@ def prepare_fasttext_model(model_name='lid.176.bin'):
     return ft_model
 
 
-def prepare_sentencepiece_model(model_path):
+def prepare_huggingface_model(pretrained_model_name_or_path,
+                              *,
+                              return_model=True,
+                              return_pipe=False,
+                              pipe_task='text-generation',
+                              **model_params):
     """
-    Prepare and load a sentencepiece model.
+    Prepare and load a HuggingFace model with the correspoding processor.
 
-    :param model_path: input model path
-    :return: model instance
+    :param pretrained_model_name_or_path: model name or path
+    :param return_model: return model or not
+    :param return_pipe: whether to wrap model into pipeline
+    :param model_params: model initialization parameters.
+    :return: a tuple of (model, input processor) if `return_model` is True;
+        otherwise, only the processor is returned.
     """
-    import sentencepiece
+    # require torch for transformer model
+    AUTOINSTALL.check(['torch'])
 
-    logger.info('Loading sentencepiece model...')
-    sentencepiece_model = sentencepiece.SentencePieceProcessor()
-    try:
-        sentencepiece_model.load(check_model(model_path))
-    except:  # noqa: E722
-        sentencepiece_model.load(check_model(model_path, force=True))
-    return sentencepiece_model
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
+
+    processor = transformers.AutoProcessor.from_pretrained(
+        pretrained_model_name_or_path, **model_params)
+
+    if return_model:
+        config = transformers.AutoConfig.from_pretrained(
+            pretrained_model_name_or_path, **model_params)
+        if hasattr(config, 'auto_map'):
+            class_name = next(
+                (k for k in config.auto_map if k.startswith('AutoModel')),
+                'AutoModel')
+        else:
+            # TODO: What happens if more than one
+            class_name = config.architectures[0]
+
+        model_class = getattr(transformers, class_name)
+        model = model_class.from_pretrained(pretrained_model_name_or_path,
+                                            **model_params)
+
+        if return_pipe:
+            if isinstance(processor, transformers.PreTrainedTokenizerBase):
+                pipe_params = {'tokenizer': processor}
+            elif isinstance(processor, transformers.SequenceFeatureExtractor):
+                pipe_params = {'feature_extractor': processor}
+            elif isinstance(processor, transformers.BaseImageProcessor):
+                pipe_params = {'image_processor': processor}
+            pipe = transformers.pipeline(task=pipe_task,
+                                         model=model,
+                                         config=config,
+                                         **pipe_params)
+            model = pipe
+
+    return (model, processor) if return_model else processor
 
 
-def prepare_sentencepiece_for_lang(lang, name_pattern='{}.sp.model'):
-    """
-    Prepare and load a sentencepiece model for specific langauge.
-
-    :param lang: language to render model name
-    :param name_pattern: pattern to render the model name
-    :return: model instance.
-    """
-
-    model_name = name_pattern.format(lang)
-    return prepare_sentencepiece_model(model_name)
-
-
-def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin'):
+def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin', **model_params):
     """
     Prepare and load a kenlm model.
 
@@ -147,19 +385,20 @@ def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin'):
     :param lang: language to render model name
     :return: model instance.
     """
-    import kenlm
+    model_params.pop('device', None)
 
     model_name = name_pattern.format(lang)
 
     logger.info('Loading kenlm language model...')
     try:
-        kenlm_model = kenlm.Model(check_model(model_name))
+        kenlm_model = kenlm.Model(check_model(model_name), **model_params)
     except:  # noqa: E722
-        kenlm_model = kenlm.Model(check_model(model_name, force=True))
+        kenlm_model = kenlm.Model(check_model(model_name, force=True),
+                                  **model_params)
     return kenlm_model
 
 
-def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
+def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle', **model_params):
     """
     Prepare and load a nltk punkt model.
 
@@ -167,7 +406,7 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
     :param lang: language to render model name
     :return: model instance.
     """
-    from nltk.data import load
+    model_params.pop('device', None)
 
     nltk_to_punkt = {
         'en': 'english',
@@ -182,156 +421,81 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle'):
 
     logger.info('Loading nltk punkt split model...')
     try:
-        nltk_model = load(check_model(model_name))
+        nltk_model = nltk.data.load(check_model(model_name), **model_params)
     except:  # noqa: E722
-        nltk_model = load(check_model(model_name, force=True))
+        nltk_model = nltk.data.load(check_model(model_name, force=True),
+                                    **model_params)
     return nltk_model
 
 
-def prepare_video_blip_model(pretrained_model_name_or_path,
-                             return_model=True,
-                             trust_remote_code=False):
+def prepare_opencv_classifier(model_path, **model_params):
+    model = cv2.CascadeClassifier(model_path)
+    return model
+
+
+def prepare_recognizeAnything_model(
+        pretrained_model_name_or_path='ram_plus_swin_large_14m.pth',
+        input_size=384,
+        **model_params):
     """
-    Prepare and load a video-clip model with the correspoding processor.
+    Prepare and load recognizeAnything model.
 
-    :param pretrained_model_name_or_path: model name or path
-    :param return_model: return model or not
-    :param trust_remote_code: passed to transformers
-    :return: a tuple (model, input processor) if `return_model` is True;
-        otherwise, only the processor is returned.
+    :param model_name: input model name.
+    :param input_size: the input size of the model.
     """
-    import torch
-    import torch.nn as nn
-    from transformers import (AutoModelForCausalLM, AutoModelForSeq2SeqLM,
-                              Blip2Config, Blip2ForConditionalGeneration,
-                              Blip2QFormerModel, Blip2VisionModel)
-    from transformers.modeling_outputs import BaseModelOutputWithPooling
+    logger.info('Loading recognizeAnything model...')
 
-    class VideoBlipVisionModel(Blip2VisionModel):
-        """A simple, augmented version of Blip2VisionModel to handle
-        videos."""
+    try:
+        model = ram.ram_plus(
+            pretrained=check_model(pretrained_model_name_or_path),
+            image_size=input_size,
+            vit='swin_l')
+    except (RuntimeError, UnpicklingError) as e:  # noqa: E722
+        logger.warning(e)
+        model = ram.ram_plus(pretrained=check_model(
+            pretrained_model_name_or_path, force=True),
+                             image_size=input_size,
+                             vit='swin_l')
+    device = model_params.pop('device', 'cpu')
+    model.to(device).eval()
+    return model
 
-        def forward(
-            self,
-            pixel_values: Optional[torch.FloatTensor] = None,
-            output_attentions: Optional[bool] = None,
-            output_hidden_states: Optional[bool] = None,
-            return_dict: Optional[bool] = None,
-        ) -> Union[tuple, BaseModelOutputWithPooling]:
-            """Flatten `pixel_values` along the batch and time dimension,
-            pass it through the original vision model,
-            then unflatten it back.
 
-            :param pixel_values: a tensor of shape
-            (batch, channel, time, height, width)
+def prepare_sentencepiece_model(model_path, **model_params):
+    """
+    Prepare and load a sentencepiece model.
 
-            :returns:
-                last_hidden_state: a tensor of shape
-                (batch, time * seq_len, hidden_size)
-                pooler_output: a tensor of shape
-                (batch, time, hidden_size)
-                hidden_states:
-                    a tuple of tensors of shape
-                    (batch, time * seq_len, hidden_size),
-                    one for the output of the embeddings +
-                    one for each layer
-                attentions:
-                    a tuple of tensors of shape
-                    (batch, time, num_heads, seq_len, seq_len),
-                    one for each layer
-            """
-            if pixel_values is None:
-                raise ValueError('You have to specify pixel_values')
+    :param model_path: input model path
+    :return: model instance
+    """
+    logger.info('Loading sentencepiece model...')
+    sentencepiece_model = sentencepiece.SentencePieceProcessor()
+    try:
+        sentencepiece_model.load(check_model(model_path))
+    except:  # noqa: E722
+        sentencepiece_model.load(check_model(model_path, force=True))
+    return sentencepiece_model
 
-            batch, _, time, _, _ = pixel_values.size()
 
-            # flatten along the batch and time dimension to create a
-            # tensor of shape
-            # (batch * time, channel, height, width)
-            flat_pixel_values = pixel_values.permute(0, 2, 1, 3,
-                                                     4).flatten(end_dim=1)
+def prepare_sentencepiece_for_lang(lang,
+                                   name_pattern='{}.sp.model',
+                                   **model_params):
+    """
+    Prepare and load a sentencepiece model for specific langauge.
 
-            vision_outputs: BaseModelOutputWithPooling = super().forward(
-                pixel_values=flat_pixel_values,
-                output_attentions=output_attentions,
-                output_hidden_states=output_hidden_states,
-                return_dict=True,
-            )
+    :param lang: language to render model name
+    :param name_pattern: pattern to render the model name
+    :return: model instance.
+    """
 
-            # now restore the original dimensions
-            # vision_outputs.last_hidden_state is of shape
-            # (batch * time, seq_len, hidden_size)
-            seq_len = vision_outputs.last_hidden_state.size(1)
-            last_hidden_state = vision_outputs.last_hidden_state.view(
-                batch, time * seq_len, -1)
-            # vision_outputs.pooler_output is of shape
-            # (batch * time, hidden_size)
-            pooler_output = vision_outputs.pooler_output.view(batch, time, -1)
-            # hidden_states is a tuple of tensors of shape
-            # (batch * time, seq_len, hidden_size)
-            hidden_states = (tuple(
-                hidden.view(batch, time * seq_len, -1)
-                for hidden in vision_outputs.hidden_states)
-                             if vision_outputs.hidden_states is not None else
-                             None)
-            # attentions is a tuple of tensors of shape
-            # (batch * time, num_heads, seq_len, seq_len)
-            attentions = (tuple(
-                hidden.view(batch, time, -1, seq_len, seq_len)
-                for hidden in vision_outputs.attentions)
-                          if vision_outputs.attentions is not None else None)
-            if return_dict:
-                return BaseModelOutputWithPooling(
-                    last_hidden_state=last_hidden_state,
-                    pooler_output=pooler_output,
-                    hidden_states=hidden_states,
-                    attentions=attentions,
-                )
-            return (last_hidden_state, pooler_output, hidden_states,
-                    attentions)
-
-    class VideoBlipForConditionalGeneration(Blip2ForConditionalGeneration):
-
-        def __init__(self, config: Blip2Config) -> None:
-            # HACK: we call the grandparent super().__init__() to bypass
-            # Blip2ForConditionalGeneration.__init__() so we can replace
-            # self.vision_model
-            super(Blip2ForConditionalGeneration, self).__init__(config)
-
-            self.vision_model = VideoBlipVisionModel(config.vision_config)
-
-            self.query_tokens = nn.Parameter(
-                torch.zeros(1, config.num_query_tokens,
-                            config.qformer_config.hidden_size))
-            self.qformer = Blip2QFormerModel(config.qformer_config)
-
-            self.language_projection = nn.Linear(
-                config.qformer_config.hidden_size,
-                config.text_config.hidden_size)
-            if config.use_decoder_only_language_model:
-                language_model = AutoModelForCausalLM.from_config(
-                    config.text_config)
-            else:
-                language_model = AutoModelForSeq2SeqLM.from_config(
-                    config.text_config)
-            self.language_model = language_model
-
-            # Initialize weights and apply final processing
-            self.post_init()
-
-    from transformers import AutoProcessor
-    processor = AutoProcessor.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-    if return_model:
-        model_class = VideoBlipForConditionalGeneration
-        model = model_class.from_pretrained(
-            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-    return (model, processor) if return_model else processor
+    model_name = name_pattern.format(lang)
+    return prepare_sentencepiece_model(model_name)
 
 
 def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
+                                    *,
                                     return_model=True,
-                                    trust_remote_code=False):
+                                    **model_params):
     """
     Prepare and load a simple aesthetics model.
 
@@ -340,112 +504,34 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
     :return: a tuple (model, input processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
-    from aesthetics_predictor import (AestheticsPredictorV1,
-                                      AestheticsPredictorV2Linear,
-                                      AestheticsPredictorV2ReLU)
-    from transformers import CLIPProcessor
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
 
-    processor = CLIPProcessor.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
+    processor = transformers.CLIPProcessor.from_pretrained(
+        pretrained_model_name_or_path, **model_params)
     if not return_model:
         return processor
     else:
         if 'v1' in pretrained_model_name_or_path:
-            model = AestheticsPredictorV1.from_pretrained(
-                pretrained_model_name_or_path,
-                trust_remote_code=trust_remote_code)
+            model = aes_pre.AestheticsPredictorV1.from_pretrained(
+                pretrained_model_name_or_path, **model_params)
         elif ('v2' in pretrained_model_name_or_path
               and 'linear' in pretrained_model_name_or_path):
-            model = AestheticsPredictorV2Linear.from_pretrained(
-                pretrained_model_name_or_path,
-                trust_remote_code=trust_remote_code)
+            model = aes_pre.AestheticsPredictorV2Linear.from_pretrained(
+                pretrained_model_name_or_path, **model_params)
         elif ('v2' in pretrained_model_name_or_path
               and 'relu' in pretrained_model_name_or_path):
-            model = AestheticsPredictorV2ReLU.from_pretrained(
-                pretrained_model_name_or_path,
-                trust_remote_code=trust_remote_code)
+            model = aes_pre.AestheticsPredictorV2ReLU.from_pretrained(
+                pretrained_model_name_or_path, **model_params)
         else:
             raise ValueError(
                 'Not support {}'.format(pretrained_model_name_or_path))
         return (model, processor)
 
 
-def prepare_huggingface_model(pretrained_model_name_or_path,
-                              return_model=True,
-                              trust_remote_code=False):
-    """
-    Prepare and load a HuggingFace model with the correspoding processor.
-
-    :param pretrained_model_name_or_path: model name or path
-    :param return_model: return model or not
-    :param trust_remote_code: passed to transformers
-    :return: a tuple (model, input processor) if `return_model` is True;
-        otherwise, only the processor is returned.
-    """
-    import transformers
-    from transformers import AutoConfig, AutoProcessor
-
-    processor = AutoProcessor.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-
-    if return_model:
-        config = AutoConfig.from_pretrained(
-            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-        if hasattr(config, 'auto_map'):
-            class_name = next(
-                (k for k in config.auto_map if k.startswith('AutoModel')),
-                'AutoModel')
-        else:
-            # TODO: What happens if more than one
-            class_name = config.architectures[0]
-
-        model_class = getattr(transformers, class_name)
-        model = model_class.from_pretrained(
-            pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-
-    return (model, processor) if return_model else processor
-
-
-def prepare_vllm_model(pretrained_model_name_or_path,
-                       return_model=True,
-                       trust_remote_code=False,
-                       tensor_parallel_size=1,
-                       max_model_len=None,
-                       max_num_seqs=256):
-    """
-    Prepare and load a HuggingFace model with the correspoding processor.
-
-    :param pretrained_model_name_or_path: model name or path
-    :param return_model: return model or not
-    :param trust_remote_code: passed to transformers
-    :param tensor_parallel_size: The number of GPUs to use for distributed
-        execution with tensor parallelism.
-    :param max_model_len: Model context length. If unspecified, will
-        be automatically derived from the model config.
-    :param max_num_seqs: Maximum number of sequences to be processed in a
-        single iteration.
-    :return: a tuple (model, input processor) if `return_model` is True;
-        otherwise, only the processor is returned.
-    """
-    from transformers import AutoProcessor
-    from vllm import LLM as vLLM
-
-    processor = AutoProcessor.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code)
-
-    if return_model:
-        import torch
-        model = vLLM(model=pretrained_model_name_or_path,
-                     trust_remote_code=trust_remote_code,
-                     dtype=torch.float16,
-                     tensor_parallel_size=tensor_parallel_size,
-                     max_model_len=max_model_len,
-                     max_num_seqs=max_num_seqs)
-
-    return (model, processor) if return_model else processor
-
-
-def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.7.0'):
+def prepare_spacy_model(lang,
+                        name_pattern='{}_core_web_md-3.7.0',
+                        **model_params):
     """
     Prepare spacy model for specific language.
 
@@ -503,121 +589,186 @@ def prepare_spacy_model(lang, name_pattern='{}_core_web_md-3.7.0'):
     return diversity_model
 
 
-def prepare_diffusion_model(pretrained_model_name_or_path,
-                            diffusion_type,
-                            torch_dtype='fp32',
-                            revision='main',
-                            trust_remote_code=False):
+def prepare_video_blip_model(pretrained_model_name_or_path,
+                             *,
+                             return_model=True,
+                             **model_params):
     """
-        Prepare and load an Diffusion model from HuggingFace.
+    Prepare and load a video-clip model with the correspoding processor.
 
-        :param pretrained_model_name_or_path: input Diffusion model name
-            or local path to the model
-        :param diffusion_type: the use of the diffusion model. It can be
-            'image2image', 'text2image', 'inpainting'
-        :param torch_dtype: the floating point to load the diffusion
-            model. Can be one of ['fp32', 'fp16', 'bf16']
-        :param revision: The specific model version to use. It can be a
-            branch name, a tag name, a commit id, or any identifier allowed
-            by Git.
-        :return: a Diffusion model.
+    :param pretrained_model_name_or_path: model name or path
+    :param return_model: return model or not
+    :param trust_remote_code: passed to transformers
+    :return: a tuple (model, input processor) if `return_model` is True;
+        otherwise, only the processor is returned.
     """
-    import torch
-    from diffusers import (AutoPipelineForImage2Image,
-                           AutoPipelineForInpainting,
-                           AutoPipelineForText2Image)
+    if 'device' in model_params:
+        model_params['device_map'] = model_params.pop('device')
 
-    diffusion_type_to_pipeline = {
-        'image2image': AutoPipelineForImage2Image,
-        'text2image': AutoPipelineForText2Image,
-        'inpainting': AutoPipelineForInpainting
-    }
+    class VideoBlipVisionModel(transformers.Blip2VisionModel):
+        """A simple, augmented version of Blip2VisionModel to handle
+        videos."""
 
-    if diffusion_type not in diffusion_type_to_pipeline.keys():
-        raise ValueError(
-            f'Not support {diffusion_type} diffusion_type for diffusion '
-            'model. Can only be one of '
-            '["image2image", "text2image", "inpainting"].')
+        def forward(
+            self,
+            pixel_values: Optional[torch.FloatTensor] = None,
+            output_attentions: Optional[bool] = None,
+            output_hidden_states: Optional[bool] = None,
+            return_dict: Optional[bool] = None,
+        ) -> Union[tuple,
+                   transformers.modeling_outputs.BaseModelOutputWithPooling]:
+            """Flatten `pixel_values` along the batch and time dimension,
+            pass it through the original vision model,
+            then unflatten it back.
 
-    if torch_dtype not in ['fp32', 'fp16', 'bf16']:
-        raise ValueError(
-            f'Not support {torch_dtype} torch_dtype for diffusion '
-            'model. Can only be one of '
-            '["fp32", "fp16", "bf16"].')
+            :param pixel_values: a tensor of shape
+            (batch, channel, time, height, width)
 
-    if not is_cuda_available() and (torch_dtype == 'fp16'
-                                    or torch_dtype == 'bf16'):
-        raise ValueError(
-            'In cpu mode, only fp32 torch_dtype can be used for diffusion'
-            ' model.')
+            :returns:
+                last_hidden_state: a tensor of shape
+                (batch, time * seq_len, hidden_size)
+                pooler_output: a tensor of shape
+                (batch, time, hidden_size)
+                hidden_states:
+                    a tuple of tensors of shape
+                    (batch, time * seq_len, hidden_size),
+                    one for the output of the embeddings +
+                    one for each layer
+                attentions:
+                    a tuple of tensors of shape
+                    (batch, time, num_heads, seq_len, seq_len),
+                    one for each layer
+            """
+            if pixel_values is None:
+                raise ValueError('You have to specify pixel_values')
 
-    pipeline = diffusion_type_to_pipeline[diffusion_type]
-    if torch_dtype == 'bf16':
-        torch_dtype = torch.bfloat16
-    elif torch_dtype == 'fp16':
-        torch_dtype = torch.float16
-    else:
-        torch_dtype = torch.float32
+            batch, _, time, _, _ = pixel_values.size()
 
-    model = pipeline.from_pretrained(pretrained_model_name_or_path,
-                                     revision=revision,
-                                     torch_dtype=torch_dtype,
-                                     trust_remote_code=trust_remote_code)
+            # flatten along the batch and time dimension to create a
+            # tensor of shape
+            # (batch * time, channel, height, width)
+            flat_pixel_values = pixel_values.permute(0, 2, 1, 3,
+                                                     4).flatten(end_dim=1)
 
-    return model
+            vision_outputs: transformers.modeling_outputs.BaseModelOutputWithPooling = super(  # noqa: E501
+            ).forward(
+                pixel_values=flat_pixel_values,
+                output_attentions=output_attentions,
+                output_hidden_states=output_hidden_states,
+                return_dict=True,
+            )
+
+            # now restore the original dimensions
+            # vision_outputs.last_hidden_state is of shape
+            # (batch * time, seq_len, hidden_size)
+            seq_len = vision_outputs.last_hidden_state.size(1)
+            last_hidden_state = vision_outputs.last_hidden_state.view(
+                batch, time * seq_len, -1)
+            # vision_outputs.pooler_output is of shape
+            # (batch * time, hidden_size)
+            pooler_output = vision_outputs.pooler_output.view(batch, time, -1)
+            # hidden_states is a tuple of tensors of shape
+            # (batch * time, seq_len, hidden_size)
+            hidden_states = (tuple(
+                hidden.view(batch, time * seq_len, -1)
+                for hidden in vision_outputs.hidden_states)
+                             if vision_outputs.hidden_states is not None else
+                             None)
+            # attentions is a tuple of tensors of shape
+            # (batch * time, num_heads, seq_len, seq_len)
+            attentions = (tuple(
+                hidden.view(batch, time, -1, seq_len, seq_len)
+                for hidden in vision_outputs.attentions)
+                          if vision_outputs.attentions is not None else None)
+            if return_dict:
+                return transformers.modeling_outputs.BaseModelOutputWithPooling(  # noqa: E501
+                    last_hidden_state=last_hidden_state,
+                    pooler_output=pooler_output,
+                    hidden_states=hidden_states,
+                    attentions=attentions,
+                )
+            return (last_hidden_state, pooler_output, hidden_states,
+                    attentions)
+
+    class VideoBlipForConditionalGeneration(
+            transformers.Blip2ForConditionalGeneration):
+
+        def __init__(self, config: transformers.Blip2Config) -> None:
+            # HACK: we call the grandparent super().__init__() to bypass
+            # transformers.Blip2ForConditionalGeneration.__init__() so we can
+            # replace self.vision_model
+            super(transformers.Blip2ForConditionalGeneration,
+                  self).__init__(config)
+
+            self.vision_model = VideoBlipVisionModel(config.vision_config)
+
+            self.query_tokens = nn.Parameter(
+                torch.zeros(1, config.num_query_tokens,
+                            config.qformer_config.hidden_size))
+            self.qformer = transformers.Blip2QFormerModel(
+                config.qformer_config)
+
+            self.language_projection = nn.Linear(
+                config.qformer_config.hidden_size,
+                config.text_config.hidden_size)
+            if config.use_decoder_only_language_model:
+                language_model = transformers.AutoModelForCausalLM.from_config(
+                    config.text_config)
+            else:
+                language_model = transformers.AutoModelForSeq2SeqLM.from_config(  # noqa: E501
+                    config.text_config)
+            self.language_model = language_model
+
+            # Initialize weights and apply final processing
+            self.post_init()
+
+    processor = transformers.AutoProcessor.from_pretrained(
+        pretrained_model_name_or_path, **model_params)
+    if return_model:
+        model_class = VideoBlipForConditionalGeneration
+        model = model_class.from_pretrained(pretrained_model_name_or_path,
+                                            **model_params)
+    return (model, processor) if return_model else processor
 
 
-def prepare_recognizeAnything_model(
-        pretrained_model_name_or_path='ram_plus_swin_large_14m.pth',
-        input_size=384):
+def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     """
-    Prepare and load recognizeAnything model.
+    Prepare and load a HuggingFace model with the correspoding processor.
 
-    :param model_name: input model name.
-    :param input_size: the input size of the model.
+    :param pretrained_model_name_or_path: model name or path
+    :param model_params: LLM initialization parameters.
+    :return: a tuple of (model, tokenizer)
     """
-    from ram.models import ram_plus
-    logger.info('Loading recognizeAnything model...')
-    try:
-        model = ram_plus(pretrained=check_model(pretrained_model_name_or_path),
-                         image_size=input_size,
-                         vit='swin_l')
-    except (RuntimeError, UnpicklingError) as e:  # noqa: E722
-        logger.warning(e)
-        model = ram_plus(pretrained=check_model(pretrained_model_name_or_path,
-                                                force=True),
-                         image_size=input_size,
-                         vit='swin_l')
-    model.eval()
-    return model
+    os.environ['VLLM_WORKER_MULTIPROC_METHOD'] = 'spawn'
 
+    if model_params.get('device', '').startswith('cuda:'):
+        model_params['device'] = 'cuda'
 
-def prepare_fastsam_model(pretrained_model_name_or_path):
-    from ultralytics import FastSAM
+    model = vllm.LLM(model=pretrained_model_name_or_path, **model_params)
+    tokenizer = model.get_tokenizer()
 
-    return FastSAM(pretrained_model_name_or_path)
-
-
-def prepare_opencv_classifier(model_path):
-    import cv2
-    model = cv2.CascadeClassifier(model_path)
-    return model
+    return (model, tokenizer)
 
 
 MODEL_FUNCTION_MAPPING = {
+    'api': prepare_api_model,
+    'diffusion': prepare_diffusion_model,
+    'fastsam': prepare_fastsam_model,
     'fasttext': prepare_fasttext_model,
-    'sentencepiece': prepare_sentencepiece_for_lang,
+    'huggingface': prepare_huggingface_model,
     'kenlm': prepare_kenlm_model,
     'nltk': prepare_nltk_model,
-    'huggingface': prepare_huggingface_model,
+    'opencv_classifier': prepare_opencv_classifier,
+    'recognizeAnything': prepare_recognizeAnything_model,
+    'sentencepiece': prepare_sentencepiece_for_lang,
     'simple_aesthetics': prepare_simple_aesthetics_model,
     'spacy': prepare_spacy_model,
-    'diffusion': prepare_diffusion_model,
     'video_blip': prepare_video_blip_model,
-    'recognizeAnything': prepare_recognizeAnything_model,
     'vllm': prepare_vllm_model,
-    'opencv_classifier': prepare_opencv_classifier,
-    'fastsam': prepare_fastsam_model
+}
+
+_MODELS_WITHOUT_FILE_LOCK = {
+    'kenlm', 'nltk', 'recognizeAnything', 'sentencepiece', 'spacy'
 }
 
 
@@ -625,22 +776,12 @@ def prepare_model(model_type, **model_kwargs):
     assert (model_type in MODEL_FUNCTION_MAPPING.keys()
             ), 'model_type must be one of the following: {}'.format(
                 list(MODEL_FUNCTION_MAPPING.keys()))
-    global MODEL_ZOO
     model_func = MODEL_FUNCTION_MAPPING[model_type]
     model_key = partial(model_func, **model_kwargs)
+    if model_type in _MODELS_WITHOUT_FILE_LOCK:
+        # initialize once in the main process to safely download model files
+        model_key()
     return model_key
-
-
-def move_to_cuda(model, rank):
-    # Assuming model can be either a single module or a tuple of modules
-    if not isinstance(model, tuple):
-        model = (model, )
-
-    for module in model:
-        if callable(getattr(module, 'to', None)):
-            logger.debug(
-                f'Moving {module.__class__.__name__} to CUDA device {rank}')
-            module.to(f'cuda:{rank}')
 
 
 def get_model(model_key=None, rank=None, use_cuda=False):
@@ -652,9 +793,21 @@ def get_model(model_key=None, rank=None, use_cuda=False):
         logger.debug(
             f'{model_key} not found in MODEL_ZOO ({mp.current_process().name})'
         )
-        MODEL_ZOO[model_key] = model_key()
-    if use_cuda:
-        rank = 0 if rank is None else rank
-        rank = rank % cuda_device_count()
-        move_to_cuda(MODEL_ZOO[model_key], rank)
+        if use_cuda:
+            rank = rank if rank is not None else 0
+            rank = rank % cuda_device_count()
+            device = f'cuda:{rank}'
+        else:
+            device = 'cpu'
+        MODEL_ZOO[model_key] = model_key(device=device)
     return MODEL_ZOO[model_key]
+
+
+def free_models():
+    global MODEL_ZOO
+    for model_key in MODEL_ZOO:
+        try:
+            MODEL_ZOO[model_key].to('cpu')
+        except Exception:
+            pass
+    MODEL_ZOO.clear()

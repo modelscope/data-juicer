@@ -1,8 +1,5 @@
 import sys
 
-from jsonargparse.typing import PositiveFloat
-
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -11,19 +8,18 @@ from ..common import get_words_from_document
 
 OP_NAME = 'alphanumeric_filter'
 
-with AvailabilityChecking(['transformers'], OP_NAME):
-    import transformers  # noqa: F401
-
 
 @OPERATORS.register_module('alphanumeric_filter')
 class AlphanumericFilter(Filter):
     """Filter to keep samples with alphabet/numeric ratio within a specific
     range."""
 
+    _batched_op = True
+
     def __init__(self,
                  tokenization: bool = False,
                  min_ratio: float = 0.25,
-                 max_ratio: PositiveFloat = sys.maxsize,
+                 max_ratio: float = sys.maxsize,
                  *args,
                  **kwargs):
         """
@@ -54,36 +50,45 @@ class AlphanumericFilter(Filter):
                 pretrained_model_name_or_path='EleutherAI/pythia-6.9b-deduped',
                 return_model=False)
 
-    def compute_stats(self, sample):
-        if self.tokenization:
-            if StatsKeys.alpha_token_ratio in sample[Fields.stats]:
-                return sample
-            alpha_count = sum(
-                map(lambda char: 1
-                    if char.isalpha() else 0, sample[self.text_key]))
-            tokenizer = get_model(self.model_key)
-            token_count = len(
-                get_words_from_document(
-                    sample[self.text_key],
-                    token_func=tokenizer.tokenize if tokenizer else None))
-            sample[Fields.stats][StatsKeys.alpha_token_ratio] = (
-                alpha_count / token_count) if token_count != 0 else 0.0
-        else:
-            if StatsKeys.alnum_ratio in sample[Fields.stats]:
-                return sample
-            alnum_count = sum(
-                map(lambda char: 1
-                    if char.isalnum() else 0, sample[self.text_key]))
-            sample[Fields.stats][StatsKeys.alnum_ratio] = (
-                alnum_count / len(sample[self.text_key])) if len(
-                    sample[self.text_key]) != 0 else 0.0
-        return sample
+    def compute_stats_batched(self, samples):
+        samples_list = samples[self.text_key]
+        samples_stats = samples[Fields.stats]
 
-    def process(self, sample):
-        ratio = sample[Fields.stats][
-            StatsKeys.alpha_token_ratio] if self.tokenization else sample[
-                Fields.stats][StatsKeys.alnum_ratio]
-        if self.min_ratio <= ratio <= self.max_ratio:
-            return True
+        for idx, stat in enumerate(samples_stats):
+            cur_text = samples_list[idx]
+            if self.tokenization:
+                if StatsKeys.alpha_token_ratio in stat:
+                    continue
+                alpha_count = sum(
+                    map(lambda char: 1 if char.isalpha() else 0, cur_text))
+                tokenizer = get_model(self.model_key)
+                token_count = len(
+                    get_words_from_document(
+                        cur_text,
+                        token_func=tokenizer.tokenize if tokenizer else None))
+                samples_stats[idx][StatsKeys.alpha_token_ratio] = (
+                    alpha_count / token_count) if token_count != 0 else 0.0
+            else:
+                if StatsKeys.alnum_ratio in stat:
+                    continue
+                alnum_count = sum(
+                    map(lambda char: 1 if char.isalnum() else 0, cur_text))
+                samples_stats[idx][StatsKeys.alnum_ratio] = (
+                    alnum_count / len(cur_text)) if len(cur_text) != 0 else 0.0
+
+        return samples
+
+    def process_batched(self, samples):
+        ratio_key = StatsKeys.alpha_token_ratio if self.tokenization \
+            else StatsKeys.alnum_ratio
+        if isinstance(samples[Fields.stats], list):
+            return map(
+                lambda stat: self.min_ratio <= stat[ratio_key] <= self.
+                max_ratio, samples[Fields.stats])
         else:
-            return False
+            # single sample for ray filter
+            if self.min_ratio <= samples[
+                    Fields.stats][ratio_key] <= self.max_ratio:
+                return True
+            else:
+                return False

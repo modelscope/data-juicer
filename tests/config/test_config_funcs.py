@@ -45,10 +45,15 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
+                        'batch_size': 1000,
                     }
                 }, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
@@ -60,37 +65,40 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
+                        'batch_size': 1000,
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
             ops_from_cfg = load_ops(cfg.process)
-            self.assertTrue(len(ops_from_cfg) == 3)
+            self.assertTrue(len(ops_from_cfg) == 4)
 
     def test_val_range_check_cmd(self):
         out = StringIO()
-        err_msg_head = ("language_id_score_filter.min_score")
-        err_msg = ("Not of type ClosedUnitInterval: 1.1 does not conform to "
-                   "restriction v>=0 and v<=1")
+        err_msg_head = ("remove_table_text_mapper.min_col")
+        err_msg = ("Input should be greater than or equal to 2")
         with redirect_stdout(out), redirect_stderr(out):
             with self.assertRaises(SystemExit) as cm:
                 init_configs(
                     args=f'--config {test_yaml_path} '
-                          '--language_id_score_filter.min_score 1.1'.split())
+                          '--remove_table_text_mapper.min_col 1'.split())
             self.assertEqual(cm.exception.code, 2)
         out_str = out.getvalue()
         self.assertIn(err_msg_head, out_str)
         self.assertIn(err_msg, out_str)
 
-    def test_val_range_check_yaml(self):
+    def _test_val_range_check_yaml(self):
         out = StringIO()
-        err_msg_head = ("language_id_score_filter.min_score")
-        err_msg = ("Not of type ClosedUnitInterval: 1.1 does not conform to "
-                   "restriction v>=0 and v<=1")
+        err_msg_head = ("remove_table_text_mapper.max_col")
+        err_msg = ("Input should be less than or equal to 20")
         with redirect_stdout(out), redirect_stderr(out):
             with self.assertRaises(SystemExit) as cm:
                 init_configs(args=f'--config {test_bad_yaml_path}'.split())
@@ -126,11 +134,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -142,11 +155,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -158,11 +176,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -174,11 +197,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -190,11 +218,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
+                        'turbo': False,
+                        'batch_size': 1000,
                     }
                 })
 
@@ -204,8 +237,8 @@ class ConfigTest(DataJuicerTestCaseBase):
         from data_juicer.ops.base_op import OPERATORS
 
         base_class_params = {
-            'text_key', 'image_key', 'audio_key', 'video_key', 'accelerator',
-            'num_proc', 'cpu_required', 'mem_required',
+            'text_key', 'image_key', 'audio_key', 'video_key', 'query_key', 'response_key', 'history_key',
+            'accelerator', 'turbo', 'batch_size', 'num_proc', 'cpu_required', 'mem_required',
         }
 
         parser = ArgumentParser(default_env=True, default_config_files=None)

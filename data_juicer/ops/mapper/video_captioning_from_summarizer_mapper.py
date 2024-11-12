@@ -1,45 +1,16 @@
 import copy
-from typing import Dict
+from typing import Dict, Optional
 
-from jsonargparse.typing import PositiveInt
+from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.lazy_loader import AUTOINSTALL
 from data_juicer.utils.mm_utils import SpecialTokens, remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
 
 NAME = 'video_captioning_from_summarizer_mapper'
-CHECK_PKGS = [
-    'torch',
-    'transformers',
-    'simhash-pybind',  # by video caption
-    'transformers_stream_generator',
-    'einops',
-    'accelerate',
-    'tiktoken',  # by audio caption
-    'torchaudio',  # by audio tag
-    'git+https://github.com/xinyu1205/recognize-anything.git',  # by frame tag
-]
-
-with AvailabilityChecking(CHECK_PKGS, NAME):
-    # video caption
-    # audio caption
-    import accelerate  # noqa: F401
-    import einops  # noqa: F401
-    # frame tag
-    import ram  # noqa: F401
-    import simhash  # noqa: F401
-    import tiktoken  # noqa: F401
-    import torch
-    # audio tag
-    import torchaudio  # noqa: F401
-    import transformers  # noqa: F401
-    import transformers_stream_generator  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(NAME)
@@ -54,16 +25,16 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
 
     def __init__(self,
                  hf_summarizer: str = None,
-                 trust_remote_code=False,
+                 trust_remote_code: bool = False,
                  consider_video_caption_from_video: bool = True,
                  consider_video_caption_from_audio: bool = True,
                  consider_video_caption_from_frames: bool = True,
                  consider_video_tags_from_audio: bool = True,
                  consider_video_tags_from_frames: bool = True,
-                 vid_cap_from_vid_args: Dict = None,
-                 vid_cap_from_frm_args: Dict = None,
-                 vid_tag_from_aud_args: Dict = None,
-                 vid_tag_from_frm_args: Dict = None,
+                 vid_cap_from_vid_args: Optional[Dict] = None,
+                 vid_cap_from_frm_args: Optional[Dict] = None,
+                 vid_tag_from_aud_args: Optional[Dict] = None,
+                 vid_tag_from_frm_args: Optional[Dict] = None,
                  keep_tag_num: PositiveInt = 5,
                  keep_original_sample: bool = True,
                  *args,
@@ -111,6 +82,15 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check([
+            'torch',
+            'transformers',
+            'transformers_stream_generator',
+            'einops',
+            'accelerate',
+            'tiktoken',  # by audio caption
+            'torchaudio',  # by audio tag
+        ])
 
         self.keep_original_sample = keep_original_sample
         self.extra_args = kwargs
@@ -253,7 +233,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         captioned_sample[self.text_key] = captioned_texts
         return [captioned_sample]
 
-    def process(self, samples, rank=None):
+    def process_batched(self, samples, rank=None):
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []
         for i in range(len(samples[self.text_key])):

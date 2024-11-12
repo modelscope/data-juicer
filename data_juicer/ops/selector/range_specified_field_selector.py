@@ -1,6 +1,8 @@
 import heapq
+from typing import Optional
 
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
+from pydantic import Field, PositiveInt
+from typing_extensions import Annotated
 
 from data_juicer.utils.common_utils import stats_to_number
 
@@ -12,14 +14,17 @@ class RangeSpecifiedFieldSelector(Selector):
     """Selector to select a range of samples based on the sorted
     specified field value from smallest to largest. """
 
-    def __init__(self,
-                 field_key: str = '',
-                 lower_percentile: ClosedUnitInterval = None,
-                 upper_percentile: ClosedUnitInterval = None,
-                 lower_rank: PositiveInt = None,
-                 upper_rank: PositiveInt = None,
-                 *args,
-                 **kwargs):
+    def __init__(
+            self,
+            field_key: str = '',
+            lower_percentile: Optional[Annotated[float,
+                                                 Field(ge=0, le=1)]] = None,
+            upper_percentile: Optional[Annotated[float,
+                                                 Field(ge=0, le=1)]] = None,
+            lower_rank: Optional[PositiveInt] = None,
+            upper_rank: Optional[PositiveInt] = None,
+            *args,
+            **kwargs):
         """
         Initialization method.
 

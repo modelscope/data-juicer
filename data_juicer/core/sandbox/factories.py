@@ -1,5 +1,5 @@
-from data_juicer.core import Analyzer
-from data_juicer.core import Executor as DjExecutor
+from data_juicer.core import Analyzer as DJAnalyzer
+from data_juicer.core import Executor as DJExecutor
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  InceptionEvaluator,
                                                  VBenchEvaluator)
@@ -17,7 +17,7 @@ class DataExecutorFactory(object):
         if dj_cfg is None:
             return None
 
-        return DjExecutor(dj_cfg)
+        return DJExecutor(dj_cfg)
 
 
 data_executor_factory = DataExecutorFactory()
@@ -32,7 +32,7 @@ class DataAnalyzerFactory(object):
         if dj_cfg is None:
             return None
 
-        return Analyzer(dj_cfg)
+        return DJAnalyzer(dj_cfg)
 
 
 data_analyzer_factory = DataAnalyzerFactory()

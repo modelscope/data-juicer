@@ -5,25 +5,25 @@ from copy import deepcopy
 from loguru import logger
 
 
-def remove_dj_special_tokens(text, eoc_special_token, sent_seperator,
+def remove_dj_special_tokens(text, eoc_special_token, sent_separator,
                              video_special_token):
-    # remove possible sentence seperator
-    if text.startswith(sent_seperator):
-        text = text[len(sent_seperator):].strip()
-    if text.endswith(sent_seperator):
-        text = text[:-len(sent_seperator)].strip()
+    # remove possible sentence separator
+    if text.startswith(sent_separator):
+        text = text[len(sent_separator):].strip()
+    if text.endswith(sent_separator):
+        text = text[:-len(sent_separator)].strip()
     # remove eoc token
     if text.endswith(eoc_special_token):
         text = text[:-len(eoc_special_token)].strip()
     # remove possible video special token
     if text.startswith(video_special_token):
         text = text[len(video_special_token):].strip()
-        if text.startswith(sent_seperator):
-            text = text[len(sent_seperator):].strip()
+        if text.startswith(sent_separator):
+            text = text[len(sent_separator):].strip()
     elif text.endswith(video_special_token):
         text = text[:-len(video_special_token)].strip()
-        if text.endswith(sent_seperator):
-            text = text[:-len(sent_seperator)].strip()
+        if text.endswith(sent_separator):
+            text = text[:-len(sent_separator)].strip()
     return text
 
 
@@ -59,22 +59,22 @@ def check_args_load_to_dj_data(add_eoc_at_last, keep_other_fields,
 
 
 def convert_text_to_dj(text, original_sample, add_eoc_at_last,
-                       eoc_special_token, keep_other_fields, sent_seperator,
+                       eoc_special_token, keep_other_fields, sent_separator,
                        video_special_token, video_special_token_insert_pos):
     if video_special_token_insert_pos == 'before':
-        text = video_special_token + sent_seperator + text
+        text = video_special_token + sent_separator + text
     elif video_special_token_insert_pos == 'after':
-        text += sent_seperator + video_special_token
+        text += sent_separator + video_special_token
     else:
         if random.random() < 0.5:
             # before
-            text = video_special_token + sent_seperator \
+            text = video_special_token + sent_separator \
                    + text
         else:
             # after
-            text += sent_seperator + video_special_token
+            text += sent_separator + video_special_token
     if add_eoc_at_last:
-        text += f'{sent_seperator}{eoc_special_token}'
+        text += f'{sent_separator}{eoc_special_token}'
     if keep_other_fields:
         new_sample = deepcopy(original_sample)
     else:

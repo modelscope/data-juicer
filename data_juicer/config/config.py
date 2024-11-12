@@ -4,12 +4,12 @@ import os
 import shutil
 import tempfile
 import time
-from argparse import ArgumentError, Namespace
-from typing import Dict, List, Tuple, Union
+from argparse import ArgumentError
+from typing import Dict, List, Optional, Union
 
 import yaml
-from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
-                          namespace_to_dict)
+from jsonargparse import (ActionConfigFile, ArgumentParser, Namespace,
+                          dict_to_namespace, namespace_to_dict)
 from jsonargparse.typehints import ActionTypeHint
 from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
@@ -22,7 +22,7 @@ global_cfg = None
 global_parser = None
 
 
-def init_configs(args=None):
+def init_configs(args: Optional[List[str]] = None):
     """
     initialize the jsonargparse parser and parse configs from one of:
         1. POSIX-style commands line args;
@@ -194,11 +194,17 @@ def init_configs(args=None):
         'own special token according to your input dataset.')
     parser.add_argument(
         '--suffixes',
-        type=Union[str, List[str], Tuple[str]],
+        type=Union[str, List[str]],
         default=[],
         help='Suffixes of files that will be find and loaded. If not set, we '
         'will find all suffix files, and select a suitable formatter '
         'with the most files as default.')
+    parser.add_argument(
+        '--turbo',
+        type=bool,
+        default=False,
+        help='Enable Turbo mode to maximize processing speed. Stability '
+        'features like fault tolerance will be disabled.')
     parser.add_argument(
         '--use_cache',
         type=bool,
@@ -351,7 +357,7 @@ def update_ds_cache_dir_and_related_vars(new_ds_cache_path):
         config.DEFAULT_EXTRACTED_DATASETS_PATH)
 
 
-def init_setup_from_cfg(cfg):
+def init_setup_from_cfg(cfg: Namespace):
     """
     Do some extra setup tasks after parsing config file or command line.
 
@@ -470,6 +476,8 @@ def init_setup_from_cfg(cfg):
                     'image_key': cfg.image_key,
                     'audio_key': cfg.audio_key,
                     'video_key': cfg.video_key,
+                    'num_proc': cfg.np,
+                    'turbo': cfg.turbo,
                 }
             else:
                 if 'text_key' not in args or args['text_key'] is None:
@@ -480,6 +488,10 @@ def init_setup_from_cfg(cfg):
                     args['audio_key'] = cfg.audio_key
                 if 'video_key' not in args or args['video_key'] is None:
                     args['video_key'] = cfg.video_key
+                if 'num_proc' not in args or args['num_proc'] is None:
+                    args['num_proc'] = cfg.np
+                if 'turbo' not in args or args['turbo'] is None:
+                    args['turbo'] = cfg.turbo
             op[op_name] = args
 
     return cfg
@@ -574,14 +586,12 @@ def update_op_process(cfg, parser):
 
         # update op params of cfg.process
         internal_op_para = temp_cfg.get(op_in_process_name)
-        if internal_op_para is not None:
-            num_proc = internal_op_para.get('num_proc')
-            if 'num_proc' in internal_op_para:
-                internal_op_para['num_proc'] = num_proc or cfg.np
-            internal_op_para = namespace_to_dict(internal_op_para)
-        else:
-            internal_op_para = None
-        cfg.process[i] = {op_in_process_name: internal_op_para}
+
+        cfg.process[i] = {
+            op_in_process_name:
+            None if internal_op_para is None else
+            namespace_to_dict(internal_op_para)
+        }
 
     # check the op params via type hint
     temp_parser = copy.deepcopy(parser)
@@ -618,7 +628,7 @@ def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
     return arg_list
 
 
-def config_backup(cfg):
+def config_backup(cfg: Namespace):
     cfg_path = cfg.config[0].absolute
     work_dir = cfg.work_dir
     target_path = os.path.join(work_dir, os.path.basename(cfg_path))
@@ -628,7 +638,7 @@ def config_backup(cfg):
         shutil.copyfile(cfg_path, target_path)
 
 
-def display_config(cfg):
+def display_config(cfg: Namespace):
     import pprint
 
     from tabulate import tabulate
@@ -648,13 +658,13 @@ def display_config(cfg):
     print(table)
 
 
-def export_config(cfg,
-                  path,
-                  format='yaml',
-                  skip_none=True,
-                  skip_check=True,
-                  overwrite=False,
-                  multifile=True):
+def export_config(cfg: Namespace,
+                  path: str,
+                  format: str = 'yaml',
+                  skip_none: bool = True,
+                  skip_check: bool = True,
+                  overwrite: bool = False,
+                  multifile: bool = True):
     """
     Save the config object, some params are from jsonargparse
 
@@ -690,7 +700,7 @@ def export_config(cfg,
     logger.info(f'Saved the configuration in {path}')
 
 
-def merge_config(ori_cfg, new_cfg: Dict):
+def merge_config(ori_cfg: Namespace, new_cfg: Namespace):
     """
     Merge configuration from new_cfg into ori_cfg
 
@@ -748,7 +758,7 @@ def merge_config(ori_cfg, new_cfg: Dict):
         logger.error('Config merge failed')
 
 
-def prepare_side_configs(ori_config):
+def prepare_side_configs(ori_config: Union[str, Namespace, Dict]):
     """
     parse the config if ori_config is a string of a config file path with
         yaml, yml or json format
@@ -780,7 +790,7 @@ def prepare_side_configs(ori_config):
     return config
 
 
-def get_init_configs(cfg):
+def get_init_configs(cfg: Union[Namespace, Dict]):
     """
     set init configs of datajucer for cfg
     """

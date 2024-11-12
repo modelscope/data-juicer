@@ -1,18 +1,16 @@
-from typing import List, Tuple, Union
+from typing import List, Union
 
-from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 
-OP_NAME = 'language_id_score_filter'
+fasttext = LazyLoader('fasttext', 'fasttext')
 
-with AvailabilityChecking(['fasttext-wheel'], OP_NAME):
-    import fasttext  # noqa: F401
+OP_NAME = 'language_id_score_filter'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -21,8 +19,8 @@ class LanguageIDScoreFilter(Filter):
     larger than a specific min value."""
 
     def __init__(self,
-                 lang: Union[str, List[str], Tuple[str]] = '',
-                 min_score: ClosedUnitInterval = 0.8,
+                 lang: Union[str, List[str]] = '',
+                 min_score: float = 0.8,
                  *args,
                  **kwargs):
         """
@@ -47,7 +45,7 @@ class LanguageIDScoreFilter(Filter):
         self.min_score = min_score
         self.model_key = prepare_model(model_type='fasttext')
 
-    def compute_stats(self, sample):
+    def compute_stats_single(self, sample):
         # check if it's computed already
         if StatsKeys.lang in sample[
                 Fields.stats] and StatsKeys.lang_score in sample[Fields.stats]:
@@ -68,7 +66,7 @@ class LanguageIDScoreFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         if self.lang:
             return sample[Fields.stats][StatsKeys.lang] in self.lang \
                    and sample[Fields.stats][StatsKeys.lang_score] >= \

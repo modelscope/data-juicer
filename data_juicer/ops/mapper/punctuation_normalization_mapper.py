@@ -10,6 +10,8 @@ class PunctuationNormalizationMapper(Mapper):
     """Mapper to normalize unicode punctuations to English punctuations in text
     samples."""
 
+    _batched_op = True
+
     def __init__(self, *args, **kwargs):
         """
         Initialization method.
@@ -55,8 +57,9 @@ class PunctuationNormalizationMapper(Mapper):
             '►': '-',
         }
 
-    def process(self, sample):
-        sample[self.text_key] = ''.join([
-            self.punctuation_unicode.get(c, c) for c in sample[self.text_key]
-        ])
-        return sample
+    def process_batched(self, samples):
+        samples[self.text_key] = [
+            ''.join([self.punctuation_unicode.get(c, c) for c in text])
+            for text in samples[self.text_key]
+        ]
+        return samples

@@ -1,8 +1,6 @@
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 from PIL import ImageOps
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
@@ -12,14 +10,6 @@ from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_text_similarity_filter'
-
-with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
-
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -31,10 +21,10 @@ class ImageTextSimilarityFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_clip='openai/clip-vit-base-patch32',
-                 trust_remote_code=False,
-                 min_score: ClosedUnitInterval = 0.1,
-                 max_score: ClosedUnitInterval = 1.0,
+                 hf_clip: str = 'openai/clip-vit-base-patch32',
+                 trust_remote_code: bool = False,
+                 min_score: float = 0.1,
+                 max_score: float = 1.0,
                  horizontal_flip: bool = False,
                  vertical_flip: bool = False,
                  any_or_all: str = 'any',
@@ -79,7 +69,7 @@ class ImageTextSimilarityFilter(Filter):
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_text_similarity in sample[Fields.stats]:
             return sample
@@ -141,7 +131,7 @@ class ImageTextSimilarityFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         similarity = sample[Fields.stats][StatsKeys.image_text_similarity]
         if len(similarity) <= 0:
             return True

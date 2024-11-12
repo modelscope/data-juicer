@@ -1,18 +1,18 @@
 from copy import deepcopy
 
 from loguru import logger
+from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-OP_NAME = 'nlpaug_en_mapper'
+nlpaug = LazyLoader('nlpaug', 'nlpaug')
+nac = LazyLoader('nac', 'nlpaug.augmenter.char')
+naw = LazyLoader('naw', 'nlpaug.augmenter.word')
+naf = LazyLoader('naf', 'nlpaug.flow')
 
-with AvailabilityChecking(['nlpaug'], OP_NAME):
-    import nlpaug.augmenter.char as nac
-    import nlpaug.augmenter.word as naw
-    import nlpaug.flow as naf
-    from nlpaug.util import Action
+OP_NAME = 'nlpaug_en_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -23,7 +23,7 @@ class NlpaugEnMapper(Mapper):
 
     def __init__(self,
                  sequential: bool = False,
-                 aug_num: int = 1,
+                 aug_num: PositiveInt = 1,
                  keep_original_sample: bool = True,
                  delete_random_word: bool = False,
                  swap_random_word: bool = False,
@@ -97,6 +97,7 @@ class NlpaugEnMapper(Mapper):
 
         aug_pipeline = []
         # word level
+        Action = nlpaug.util.Action
         if delete_random_word:
             aug_pipeline.append(naw.RandomWordAug(action=Action.DELETE))
         if swap_random_word:
@@ -123,7 +124,7 @@ class NlpaugEnMapper(Mapper):
         else:
             self.aug = aug_pipeline
 
-    def process(self, samples):
+    def process_batched(self, samples):
         # no augmentation methods are opened
         if len(self.aug) == 0:
             if self.keep_original_sample:

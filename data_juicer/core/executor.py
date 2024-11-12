@@ -1,7 +1,10 @@
 import os
 from time import time
+from typing import Optional
 
+from jsonargparse import Namespace
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.config import init_configs
 from data_juicer.core.data import Dataset
@@ -27,11 +30,11 @@ class Executor:
     ops in the config file in order and generate a processed dataset.
     """
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: Optional[Namespace] = None):
         """
         Initialization method.
 
-        :param cfg: optional config dict.
+        :param cfg: optional jsonargparse Namespace.
         """
         self.cfg = init_configs() if cfg is None else cfg
 
@@ -48,10 +51,12 @@ class Executor:
 
         # setup formatter
         logger.info('Setting up data formatter...')
-        self.formatter = load_formatter(self.cfg.dataset_path,
-                                        self.cfg.generated_dataset_config,
-                                        self.cfg.text_keys, self.cfg.suffixes,
-                                        self.cfg.add_suffix)
+        self.formatter = load_formatter(
+            dataset_path=self.cfg.dataset_path,
+            generated_dataset_config=self.cfg.generated_dataset_config,
+            text_keys=self.cfg.text_keys,
+            suffixes=self.cfg.suffixes,
+            add_suffix=self.cfg.add_suffix)
 
         # whether to use checkpoint mechanism. If it's true, Executor will
         # check if there are existing checkpoints first and try to load the
@@ -133,11 +138,14 @@ class Executor:
         else:
             raise ValueError(f'Unsupported sample_algo: {sample_algo}')
 
-    def run(self, load_data_np=None):
+    def run(self,
+            load_data_np: Optional[PositiveInt] = None,
+            skip_return=False):
         """
         Running the dataset process pipeline.
 
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_return: skip return for API called.
         :return: processed dataset.
         """
         # 1. format data
@@ -160,6 +168,7 @@ class Executor:
         logger.info('Processing data...')
         tstart = time()
         dataset = dataset.process(ops,
+                                  work_dir=self.work_dir,
                                   exporter=self.exporter,
                                   checkpointer=self.ckpt_manager,
                                   tracer=self.tracer)
@@ -173,4 +182,6 @@ class Executor:
         if self.cfg.use_cache and self.cfg.cache_compress:
             from data_juicer.utils.compress import compress
             compress(dataset)
-        return dataset
+
+        if not skip_return:
+            return dataset

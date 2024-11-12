@@ -1,22 +1,24 @@
 import sys
 
-from jsonargparse.typing import PositiveInt
-
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_LINES
 
+OP_NAME = 'maximum_line_length_filter'
 
-@OPERATORS.register_module('maximum_line_length_filter')
-@INTER_LINES.register_module('maximum_line_length_filter')
+
+@OPERATORS.register_module(OP_NAME)
+@INTER_LINES.register_module(OP_NAME)
 class MaximumLineLengthFilter(Filter):
     """Filter to keep samples with maximum line length within a specific
     range."""
 
+    _batched_op = True
+
     def __init__(self,
-                 min_len: PositiveInt = 10,
-                 max_len: PositiveInt = sys.maxsize,
+                 min_len: int = 10,
+                 max_len: int = sys.maxsize,
                  *args,
                  **kwargs):
         """
@@ -35,26 +37,37 @@ class MaximumLineLengthFilter(Filter):
         self.min_len = min_len
         self.max_len = max_len
 
-    def compute_stats(self, sample, context=False):
-        # check if it's computed already
-        if StatsKeys.max_line_length in sample[Fields.stats]:
-            return sample
-
+    def compute_stats_batched(self, samples, context=False):
+        samples_list = samples[self.text_key]
+        samples_stats = samples[Fields.stats]
         context_key = f'{InterVars.lines}'
-        if context and context_key in sample[Fields.context]:
-            lines = sample[Fields.context][context_key]
-        else:
-            lines = sample[self.text_key].splitlines()
-            if context:
-                sample[Fields.context][context_key] = lines
-        line_lengths = list(map(len, lines))
-        sample[Fields.stats][StatsKeys.max_line_length] = max(
-            line_lengths) if line_lengths else 0
-        return sample
 
-    def process(self, sample):
-        if self.min_len <= sample[Fields.stats][
-                StatsKeys.max_line_length] <= self.max_len:
-            return True
+        for idx, stat in enumerate(samples_stats):
+            # check if it's computed already
+            if StatsKeys.max_line_length in stat:
+                continue
+
+            if context and context_key in samples[Fields.context][idx]:
+                lines = samples[Fields.context][idx][context_key]
+            else:
+                lines = samples_list[idx].splitlines()
+                if context:
+                    samples[Fields.context][idx][context_key] = lines
+            line_lengths = list(map(len, lines))
+            samples_stats[idx][StatsKeys.max_line_length] = max(
+                line_lengths) if line_lengths else 0
+
+        return samples
+
+    def process_batched(self, samples):
+        if isinstance(samples[Fields.stats], list):
+            return map(
+                lambda stat: self.min_len <= stat[StatsKeys.max_line_length] <=
+                self.max_len, samples[Fields.stats])
         else:
-            return False
+            # single sample for ray filter
+            if self.min_len <= samples[Fields.stats][
+                    StatsKeys.max_line_length] <= self.max_len:
+                return True
+            else:
+                return False

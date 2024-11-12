@@ -1,22 +1,16 @@
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
+torch = LazyLoader('torch', 'torch')
+
 OP_NAME = 'image_nsfw_filter'
-
-with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling nsfw detection in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -27,9 +21,9 @@ class ImageNSFWFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_nsfw_model='Falconsai/nsfw_image_detection',
-                 trust_remote_code=False,
-                 score_threshold: ClosedUnitInterval = 0.5,
+                 hf_nsfw_model: str = 'Falconsai/nsfw_image_detection',
+                 trust_remote_code: bool = False,
+                 score_threshold: float = 0.5,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -58,7 +52,7 @@ class ImageNSFWFilter(Filter):
             pretrained_model_name_or_path=hf_nsfw_model,
             trust_remote_code=trust_remote_code)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_nsfw_score in sample[Fields.stats]:
             return sample
@@ -88,7 +82,7 @@ class ImageNSFWFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         itm_scores = sample[Fields.stats][StatsKeys.image_nsfw_score]
         if len(itm_scores) <= 0:
             return True

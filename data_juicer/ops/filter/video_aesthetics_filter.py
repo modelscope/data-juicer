@@ -1,9 +1,9 @@
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval, PositiveInt
 from loguru import logger
+from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
@@ -12,17 +12,9 @@ from ...utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
+torch = LazyLoader('torch', 'torch')
+
 OP_NAME = 'video_aesthetics_filter'
-CHECK_PKGS = ['torch', 'transformers', 'simple-aesthetics-predictor']
-
-with AvailabilityChecking(CHECK_PKGS, OP_NAME):
-
-    import aesthetics_predictor  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -36,10 +28,10 @@ class VideoAestheticsFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_scorer_model='',
-                 trust_remote_code=False,
-                 min_score: ClosedUnitInterval = 0.4,
-                 max_score: ClosedUnitInterval = 1.0,
+                 hf_scorer_model: str = '',
+                 trust_remote_code: bool = False,
+                 min_score: float = 0.4,
+                 max_score: float = 1.0,
                  frame_sampling_method: str = 'uniform',
                  frame_num: PositiveInt = 3,
                  any_or_all: str = 'any',
@@ -118,7 +110,7 @@ class VideoAestheticsFilter(Filter):
             ('' if frame_sampling_method == 'all_keyframes'
              else f'-{frame_num}')
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_frames_aesthetics_score in sample[Fields.stats]:
             return sample
@@ -193,7 +185,7 @@ class VideoAestheticsFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         aesthetics_scores = (
             sample)[Fields.stats][StatsKeys.video_frames_aesthetics_score]
         if len(aesthetics_scores) <= 0:

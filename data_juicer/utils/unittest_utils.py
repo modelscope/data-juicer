@@ -3,14 +3,20 @@ import shutil
 import unittest
 
 import numpy
-import ray.data as rd
 
 from data_juicer import is_cuda_available
 from data_juicer.core.data import DJDataset, NestedDataset
 from data_juicer.core.ray_data import RayDataset
+from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.model_utils import free_models
 from data_juicer.utils.registry import Registry
 
+rd = LazyLoader('rd', 'ray.data')
+transformers = LazyLoader('transformers', 'transformers')
+
 SKIPPED_TESTS = Registry('SkippedTests')
+
+CLEAR_MODEL = False
 
 
 def TEST_TAG(*tags):
@@ -23,6 +29,15 @@ def TEST_TAG(*tags):
         return func
 
     return decorator
+
+
+def set_clear_model_flag(flag):
+    global CLEAR_MODEL
+    CLEAR_MODEL = flag
+    if CLEAR_MODEL:
+        print('CLEAR DOWNLOADED MODELS AFTER UNITTESTS.')
+    else:
+        print('KEEP DOWNLOADED MODELS AFTER UNITTESTS.')
 
 
 class DataJuicerTestCaseBase(unittest.TestCase):
@@ -44,8 +59,9 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         multiprocess.set_start_method(cls.original_mp_method, force=True)
 
         # clean the huggingface model cache files
-        import transformers
-        if hf_model_name:
+        if not CLEAR_MODEL:
+            pass
+        elif hf_model_name:
             # given the hf model name, remove this model only
             model_dir = os.path.join(
                 transformers.TRANSFORMERS_CACHE,
@@ -58,6 +74,10 @@ class DataJuicerTestCaseBase(unittest.TestCase):
             if os.path.exists(transformers.TRANSFORMERS_CACHE):
                 print('CLEAN all TRANSFORMERS_CACHE')
                 shutil.rmtree(transformers.TRANSFORMERS_CACHE)
+
+    @classmethod
+    def tearDown(cls) -> None:
+        free_models()
 
     def generate_dataset(self, data) -> DJDataset:
         """Generate dataset for a specific executor.

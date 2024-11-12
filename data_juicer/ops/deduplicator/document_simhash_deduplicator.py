@@ -3,23 +3,22 @@
 # --------------------------------------------------------
 
 from collections import defaultdict, deque
-from typing import Dict, Set
+from typing import Dict, Optional, Set
 
 import numpy as np
 import regex
-from jsonargparse.typing import PositiveInt
 from loguru import logger
+from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
 
-OP_NAME = 'document_simhash_deduplicator'
+simhash = LazyLoader('simhash', 'simhash')
 
-with AvailabilityChecking(['simhash-pybind'], OP_NAME):
-    import simhash
+OP_NAME = 'document_simhash_deduplicator'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -30,7 +29,7 @@ class DocumentSimhashDeduplicator(Deduplicator):
                  tokenization: str = 'space',
                  window_size: PositiveInt = 6,
                  lowercase: bool = True,
-                 ignore_pattern: str = None,
+                 ignore_pattern: Optional[str] = None,
                  num_blocks: PositiveInt = 6,
                  hamming_distance: PositiveInt = 4,
                  *args,

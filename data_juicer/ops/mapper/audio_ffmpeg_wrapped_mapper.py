@@ -1,16 +1,16 @@
 from typing import Dict, List, Optional
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import OPERATORS, Mapper
 
-OP_NAME = 'audio_ffmpeg_wrapped_mapper'
+with HiddenPrints():
+    ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
 
-with AvailabilityChecking(['ffmpeg-python'], OP_NAME), HiddenPrints():
-    import ffmpeg
+OP_NAME = 'audio_ffmpeg_wrapped_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -48,7 +48,7 @@ class AudioFFmpegWrappedMapper(Mapper):
         self.capture_stderr = capture_stderr
         self.overwrite_output = overwrite_output
 
-    def process(self, sample):
+    def process_single(self, sample):
         # there is no audio in this sample
         if self.audio_key not in sample or not sample[self.audio_key]:
             sample[Fields.source_file] = []

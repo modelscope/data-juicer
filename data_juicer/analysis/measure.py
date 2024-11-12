@@ -1,7 +1,8 @@
-import torch
-import torch.nn.functional as F
-from torch import Tensor
-from torch.distributions import Categorical
+from data_juicer.utils.lazy_loader import LazyLoader
+
+torch = LazyLoader('torch', 'torch')
+td = LazyLoader('td', 'torch.distributions')
+F = LazyLoader('F', 'torch.nn.functional')
 
 
 class Measure(object):
@@ -22,9 +23,9 @@ class Measure(object):
             [`scalar`,`list`, `tuple`, `torch binary file`, and `Categorical`].
         :return: torch tensor
         """
-        if isinstance(p, Tensor):
+        if isinstance(p, torch.Tensor):
             return p
-        elif isinstance(p, Categorical):
+        elif isinstance(p, td.Categorical):
             return p.probs
         elif isinstance(p, str):
             return torch.load(p)
@@ -38,14 +39,14 @@ class Measure(object):
             [`scalar`,`list`, `tuple`, `torch binary file`, and `Categorical`].
         :return: torch Categorical
         """
-        if isinstance(p, Categorical):
+        if isinstance(p, td.Categorical):
             return p
-        elif isinstance(p, Tensor):
-            return Categorical(p)
+        elif isinstance(p, torch.Tensor):
+            return td.Categorical(p)
         elif isinstance(p, str):
-            return Categorical(torch.load(p))
+            return td.Categorical(torch.load(p))
         else:
-            return Categorical(torch.tensor(p))
+            return td.Categorical(torch.tensor(p))
 
 
 class KLDivMeasure(Measure):

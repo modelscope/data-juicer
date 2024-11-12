@@ -2,8 +2,6 @@
 # https://huggingface.co/spaces/huggingface/text-data-filtering
 # --------------------------------------------------------
 
-from jsonargparse.typing import ClosedUnitInterval
-
 from data_juicer.utils.constant import Fields, StatsKeys
 
 from ..base_op import OPERATORS, Filter
@@ -15,9 +13,11 @@ class SpecialCharactersFilter(Filter):
     """Filter to keep samples with special-char ratio within a specific
     range."""
 
+    _batched_op = True
+
     def __init__(self,
-                 min_ratio: ClosedUnitInterval = 0.0,
-                 max_ratio: ClosedUnitInterval = 0.25,
+                 min_ratio: float = 0.0,
+                 max_ratio: float = 0.25,
                  *args,
                  **kwargs):
         """
@@ -36,23 +36,33 @@ class SpecialCharactersFilter(Filter):
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
 
-    def compute_stats(self, sample):
-        # check if it's computed already
-        if StatsKeys.special_char_ratio in sample[Fields.stats]:
-            return sample
+    def compute_stats_batched(self, samples):
+        samples_list = samples[self.text_key]
+        samples_stats = samples[Fields.stats]
 
-        # get ratio of special characters
-        sample[Fields.stats][StatsKeys.special_char_ratio] = (
-            len([c
-                 for c in sample[self.text_key] if c in SPECIAL_CHARACTERS]) /
-            len(sample[self.text_key])) if len(
-                sample[self.text_key]) != 0 else 0.0
-        return sample
+        for idx, stat in enumerate(samples_stats):
+            # check if it's computed already
+            if StatsKeys.special_char_ratio in stat:
+                continue
+            cur_text = samples_list[idx]
+            # get ratio of special characters
+            samples_stats[idx][StatsKeys.special_char_ratio] = (
+                len([c for c in cur_text if c in SPECIAL_CHARACTERS]) /
+                len(cur_text)) if len(cur_text) != 0 else 0.0
 
-    def process(self, sample):
-        if self.min_ratio <= \
-                sample[Fields.stats][StatsKeys.special_char_ratio] \
-                <= self.max_ratio:
-            return True
+        return samples
+
+    def process_batched(self, samples):
+        if isinstance(samples[Fields.stats], list):
+            return map(
+                lambda stat: self.min_ratio <= stat[
+                    StatsKeys.special_char_ratio] <= self.max_ratio,
+                samples[Fields.stats])
         else:
-            return False
+            # single sample for ray filter
+            if self.min_ratio <= \
+                    samples[Fields.stats][StatsKeys.special_char_ratio] \
+                    <= self.max_ratio:
+                return True
+            else:
+                return False

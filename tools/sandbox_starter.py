@@ -40,7 +40,7 @@ def init_sandbox_configs(args=None):
     parser.add_argument('--work_dir',
                         type=str,
                         default='./outputs/hello_world',
-                        help='Default output dir of meta infomations.')
+                        help='Default output dir of meta informations.')
 
     parser.add_argument(
         '--hpo_config',

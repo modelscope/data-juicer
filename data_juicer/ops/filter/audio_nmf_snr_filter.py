@@ -2,8 +2,8 @@ import sys
 
 import librosa
 import numpy as np
-from jsonargparse.typing import PositiveInt
 from librosa.decompose import decompose
+from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import load_audio, load_data_with_context
@@ -96,7 +96,7 @@ class AudioNMFSNRFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.audio_nmf_snr in sample[Fields.stats]:
             return sample
@@ -124,7 +124,7 @@ class AudioNMFSNRFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         audio_snrs = sample[Fields.stats][StatsKeys.audio_nmf_snr]
         keep_bools = np.array(
             [self.min_snr <= snr <= self.max_snr for snr in audio_snrs])

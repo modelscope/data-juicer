@@ -1,7 +1,6 @@
 import sys
 
 import numpy as np
-from jsonargparse.typing import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
@@ -17,10 +16,10 @@ class ImageShapeFilter(Filter):
     """
 
     def __init__(self,
-                 min_width: PositiveInt = 1,
-                 max_width: PositiveInt = sys.maxsize,
-                 min_height: PositiveInt = 1,
-                 max_height: PositiveInt = sys.maxsize,
+                 min_width: int = 1,
+                 max_width: int = sys.maxsize,
+                 min_height: int = 1,
+                 max_height: int = sys.maxsize,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -48,7 +47,7 @@ class ImageShapeFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.image_width in sample[Fields.stats] \
                 and StatsKeys.image_height in sample[Fields.stats]:
@@ -77,7 +76,7 @@ class ImageShapeFilter(Filter):
         ]
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         ws = sample[Fields.stats][StatsKeys.image_width]
         hs = sample[Fields.stats][StatsKeys.image_height]
         if len(ws) <= 0:

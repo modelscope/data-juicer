@@ -2,9 +2,10 @@
 # https://huggingface.co/spaces/huggingface/text-data-filtering
 # --------------------------------------------------------
 
-from jsonargparse.typing import ClosedUnitInterval, List
+from typing import List
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from pydantic import PositiveInt
+
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -16,9 +17,6 @@ from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'flagged_words_filter'
 
-with AvailabilityChecking(['sentencepiece'], OP_NAME):
-    import sentencepiece  # noqa: F401
-
 
 @OPERATORS.register_module(OP_NAME)
 @INTER_WORDS.register_module(OP_NAME)
@@ -29,10 +27,10 @@ class FlaggedWordFilter(Filter):
     def __init__(self,
                  lang: str = 'en',
                  tokenization: bool = False,
-                 max_ratio: ClosedUnitInterval = 0.045,
+                 max_ratio: float = 0.045,
                  flagged_words_dir: str = ASSET_DIR,
                  use_words_aug: bool = False,
-                 words_aug_group_sizes: List = [2],
+                 words_aug_group_sizes: List[PositiveInt] = [2],
                  words_aug_join_char: str = '',
                  *args,
                  **kwargs):
@@ -74,7 +72,7 @@ class FlaggedWordFilter(Filter):
             self.model_key = prepare_model(model_type='sentencepiece',
                                            lang=lang)
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.flagged_words_ratio in sample[Fields.stats]:
             return sample
@@ -121,6 +119,6 @@ class FlaggedWordFilter(Filter):
             StatsKeys.flagged_words_ratio] = flagged_words_ratio
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         return sample[Fields.stats][
             StatsKeys.flagged_words_ratio] <= self.max_ratio

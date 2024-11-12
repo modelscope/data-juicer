@@ -2,18 +2,18 @@ import math
 import os
 from fractions import Fraction
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import close_video, load_video
 
 from ..base_op import OPERATORS, Mapper
 
-OP_NAME = 'video_resize_aspect_ratio_mapper'
+with HiddenPrints():
+    ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
 
-with AvailabilityChecking(['ffmpeg-python'], OP_NAME), HiddenPrints():
-    import ffmpeg
+OP_NAME = 'video_resize_aspect_ratio_mapper'
 
 
 def rescale(width, height, ori_ratio, min_ratio, max_ratio, strategy):
@@ -100,7 +100,7 @@ class VideoResizeAspectRatioMapper(Mapper):
         self.max_ratio = Fraction(str(max_ratio).replace(':', '/'))
         self.strategy = strategy
 
-    def process(self, sample):
+    def process_single(self, sample):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

@@ -1,26 +1,17 @@
 import numpy as np
-from jsonargparse.typing import ClosedUnitInterval
 from loguru import logger
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ...utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
+torch = LazyLoader('torch', 'torch')
+
 OP_NAME = 'image_aesthetics_filter'
-CHECK_PKGs = ['torch', 'transformers', 'simple-aesthetics-predictor']
-
-with AvailabilityChecking(CHECK_PKGs, OP_NAME):
-
-    import aesthetics_predictor  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -32,10 +23,10 @@ class ImageAestheticsFilter(Filter):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_scorer_model='',
-                 trust_remote_code=False,
-                 min_score: ClosedUnitInterval = 0.5,
-                 max_score: ClosedUnitInterval = 1.0,
+                 hf_scorer_model: str = '',
+                 trust_remote_code: bool = False,
+                 min_score: float = 0.5,
+                 max_score: float = 1.0,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -76,7 +67,7 @@ class ImageAestheticsFilter(Filter):
         self.need_normalized_by_ten = ('shunk031/aesthetics-predictor'
                                        in hf_scorer_model)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_aesthetics_scores in sample[Fields.stats]:
             return sample
@@ -113,7 +104,7 @@ class ImageAestheticsFilter(Filter):
             aesthetics_scores
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         aesthetics_scores = (
             sample)[Fields.stats][StatsKeys.image_aesthetics_scores]
         if len(aesthetics_scores) <= 0:
