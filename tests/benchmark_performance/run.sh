@@ -1,4 +1,9 @@
 #!/bin/bash
+
+# setup wandb configs
+export WANDB_BASE_URL=$1
+export WANDB_API_KEY=$2
+
 BENCH_PATH=$(cd "$(dirname "$0")"; pwd)
 RELATIVE_DJ_PATH=../..
 MODALITIES=("text" "image" "video" "audio")
