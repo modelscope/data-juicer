@@ -41,7 +41,7 @@ class VideoMotionScoreRaftFilter(VideoMotionScoreFilter):
                  size: Union[PositiveInt, Tuple[PositiveInt],
                              Tuple[PositiveInt, PositiveInt], None] = None,
                  max_size: Optional[PositiveInt] = None,
-                 divisible: PositiveFloat = 8,
+                 divisible: PositiveInt = 8,
                  relative: bool = False,
                  any_or_all: str = 'any',
                  *args,
