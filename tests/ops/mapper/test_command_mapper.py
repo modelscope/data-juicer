@@ -52,6 +52,23 @@ class TestCommandMapper(DataJuicerTestCaseBase):
             op.process_single(sample)
         self.assertTrue('Execution failed:' in str(context.exception))
 
+    def test_python_command_with_input(self):
+        # Test executing a simple Python command that reads input and returns JSON.
+        python_command = 'python3 -c "import sys, json; ' \
+                         'input_data = sys.stdin.read(); ' \
+                         'data = json.loads(input_data); ' \
+                         'data[\'age\'] += 1; ' \
+                         'print(json.dumps(data))"'
+        op = CommandMapper(command=python_command)
+
+        # Create a sample input JSON for testing.
+        input_sample = {'name': 'Bob', 'age': 25}
+
+        # Process the input. The CommandMapper should read this input.
+        result = op.process_single(input_sample)
+        expected = {'name': 'Bob', 'age': 26}  # Expecting age to be incremented by 1.
+
+        self.assertEqual(result, expected)
 
 if __name__ == '__main__':
     unittest.main()
