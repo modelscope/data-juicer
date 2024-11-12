@@ -3,7 +3,7 @@ import datetime
 import os
 import re
 import shutil
-from typing import List, Optional, Union
+from typing import List, Optional, Tuple, Union
 
 import av
 import numpy as np
@@ -162,6 +162,58 @@ def iou(box1, box2):
     intersection = max(0, (ix_max - ix_min) * (iy_max - iy_min))
     union = area1 + area2 - intersection
     return 1.0 * intersection / union
+
+
+def calculate_resized_dimensions(
+        original_size: Tuple[PositiveInt, PositiveInt],
+        target_size: Union[PositiveInt, Tuple[PositiveInt, PositiveInt]],
+        max_length: Optional[int] = None,
+        divisible: PositiveInt = 1) -> Tuple[int, int]:
+    """
+    Resize dimensions based on specified constraints.
+
+    :param original_size: The original dimensions as (height, width).
+    :param target_size: Desired target size; can be a single integer
+        (short edge) or a tuple (height, width).
+    :param max_length: Maximum allowed length for the longer edge.
+    :param divisible: The number that the dimensions must be divisible by.
+    :return: Resized dimensions as (height, width).
+    """
+
+    height, width = original_size
+    short_edge, long_edge = sorted((width, height))
+
+    # Normalize target_size to a tuple
+    if isinstance(target_size, int):
+        target_size = (target_size, )
+
+    # Initialize new dimensions
+    if target_size:
+        if len(target_size) == 1:  # Only the smaller edge is specified
+            new_short_edge = target_size[0]
+            new_long_edge = int(new_short_edge * long_edge / short_edge)
+        else:  # Both dimensions are specified
+            new_short_edge = min(target_size)
+            new_long_edge = max(target_size)
+    else:  # No change
+        new_short_edge, new_long_edge = short_edge, long_edge
+
+    # Enforce maximum length constraint
+    if max_length is not None and new_long_edge > max_length:
+        scaling_factor = max_length / new_long_edge
+        new_short_edge = int(new_short_edge * scaling_factor)
+        new_long_edge = max_length
+
+    # Determine final dimensions based on original orientation
+    resized_dimensions = ((new_short_edge,
+                           new_long_edge) if width <= height else
+                          (new_long_edge, new_short_edge))
+
+    # Ensure final dimensions are divisible by the specified value
+    resized_dimensions = tuple(
+        int(dim / divisible) * divisible for dim in resized_dimensions)
+
+    return resized_dimensions
 
 
 # Audios

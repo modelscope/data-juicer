@@ -7,6 +7,7 @@ import pyarrow as pa
 from loguru import logger
 
 from data_juicer import is_cuda_available
+from data_juicer.core.data import NestedDataset
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.process_utils import calculate_np
@@ -128,6 +129,10 @@ class OP:
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
         """
         # init data keys
         self.text_key = kwargs.get('text_key', 'text')
@@ -211,7 +216,6 @@ class OP:
         return related_parameters
 
     def run(self, dataset):
-        from data_juicer.core.data import NestedDataset
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
         return dataset
@@ -234,6 +238,10 @@ class Mapper(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
         """
         super(Mapper, self).__init__(*args, **kwargs)
 
@@ -303,6 +311,10 @@ class Filter(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
         """
         super(Filter, self).__init__(*args, **kwargs)
         self.stats_export_path = kwargs.get('stats_export_path', None)
@@ -410,6 +422,10 @@ class Deduplicator(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
         """
         super(Deduplicator, self).__init__(*args, **kwargs)
 
@@ -469,6 +485,10 @@ class Selector(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
         """
         super(Selector, self).__init__(*args, **kwargs)
 
@@ -484,6 +504,45 @@ class Selector(OP):
     def run(self, dataset, *, exporter=None, tracer=None):
         dataset = super(Selector, self).run(dataset)
         new_dataset = self.process(dataset)
+        if tracer:
+            tracer.trace_filter(self._name, dataset, new_dataset)
+        return new_dataset
+
+
+class Grouper(OP):
+
+    def __init__(self, *args, **kwargs):
+        """
+        Base class that group samples.
+
+        :param text_key: the key name of field that stores sample texts
+            to be processed
+        :param image_key: the key name of field that stores sample image list
+            to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
+        """
+        super(Grouper, self).__init__(*args, **kwargs)
+
+    def process(self, dataset):
+        """
+        Dataset --> dataset.
+
+        :param dataset: input dataset
+        :return: dataset of batched samples.
+        """
+        raise NotImplementedError
+
+    def run(self, dataset, *, exporter=None, tracer=None):
+        dataset = super(Grouper, self).run(dataset)
+        batched_samples = self.process(dataset)
+        new_dataset = NestedDataset.from_list(batched_samples)
         if tracer:
             tracer.trace_filter(self._name, dataset, new_dataset)
         return new_dataset
