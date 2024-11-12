@@ -546,6 +546,16 @@ process:
       sampling_fps: 2                                         # the samplig rate of frames_per_second to compute optical flow
       size: null                                              # resize frames along the smaller edge before computing optical flow, or a sequence like (h, w)
       max_size: null                                          # maximum allowed for the longer edge of resized frames
+      divisible: 1                                            # The number that the dimensions must be divisible by.
+      relative: false                                         # whether to normalize the optical flow magnitude to [0, 1], relative to the frame's diagonal length
+      any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
+  - video_motion_score_raft_filter:                         # Keep samples with video motion scores (based on RAFT model) within a specific range.
+      min_score: 1.0                                          # the minimum motion score to keep samples
+      max_score: 10000.0                                      # the maximum motion score to keep samples
+      sampling_fps: 2                                         # the samplig rate of frames_per_second to compute optical flow
+      size: null                                              # resize frames along the smaller edge before computing optical flow, or a sequence like (h, w)
+      max_size: null                                          # maximum allowed for the longer edge of resized frames
+      divisible: 8                                            # The number that the dimensions must be divisible by.
       relative: false                                         # whether to normalize the optical flow magnitude to [0, 1], relative to the frame's diagonal length
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
   - video_nsfw_filter:                                      # filter samples according to the nsfw scores of videos in them
