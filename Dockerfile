@@ -21,7 +21,7 @@ RUN pip install --upgrade setuptools && pip install git+https://github.com/xinyu
 
 # install requirements first to better reuse installed library cache
 COPY environments/ environments/
-RUN cat environments/* | xargs pip install --default-timeout 1000
+RUN cat environments/* | grep -v '^#' | xargs pip install --default-timeout 1000
 
 # install data-juicer then
 COPY . .
