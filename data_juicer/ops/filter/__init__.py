@@ -35,6 +35,7 @@ from .video_duration_filter import VideoDurationFilter
 from .video_frames_text_similarity_filter import \
     VideoFramesTextSimilarityFilter
 from .video_motion_score_filter import VideoMotionScoreFilter
+from .video_motion_score_raft_filter import VideoMotionScoreRaftFilter
 from .video_nsfw_filter import VideoNSFWFilter
 from .video_ocr_area_ratio_filter import VideoOcrAreaRatioFilter
 from .video_resolution_filter import VideoResolutionFilter
@@ -57,7 +58,8 @@ __all__ = [
     'TextActionFilter', 'TextEntityDependencyFilter', 'TextLengthFilter',
     'TokenNumFilter', 'VideoAestheticsFilter', 'VideoAspectRatioFilter',
     'VideoDurationFilter', 'VideoFramesTextSimilarityFilter',
-    'VideoMotionScoreFilter', 'VideoNSFWFilter', 'VideoOcrAreaRatioFilter',
-    'VideoResolutionFilter', 'VideoTaggingFromFramesFilter',
-    'VideoWatermarkFilter', 'WordRepetitionFilter', 'WordsNumFilter'
+    'VideoMotionScoreFilter', 'VideoMotionScoreRaftFilter', 'VideoNSFWFilter',
+    'VideoOcrAreaRatioFilter', 'VideoResolutionFilter',
+    'VideoTaggingFromFramesFilter', 'VideoWatermarkFilter',
+    'WordRepetitionFilter', 'WordsNumFilter'
 ]

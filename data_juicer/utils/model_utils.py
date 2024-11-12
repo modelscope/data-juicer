@@ -1,9 +1,11 @@
 import fnmatch
+import inspect
 import os
 from functools import partial
 from pickle import UnpicklingError
 from typing import Optional, Union
 
+import httpx
 import multiprocess as mp
 import wget
 from loguru import logger
@@ -25,6 +27,7 @@ vllm = LazyLoader('vllm', 'vllm')
 diffusers = LazyLoader('diffusers', 'diffusers')
 ram = LazyLoader('ram', 'ram.models')
 cv2 = LazyLoader('cv2', 'cv2')
+openai = LazyLoader('openai', 'openai')
 
 MODEL_ZOO = {}
 
@@ -102,6 +105,164 @@ def check_model(model_name, force=False):
                     f'manually from {model_link} or {backup_model_link} ')
                 exit(1)
     return cached_model_path
+
+
+class APIModel:
+
+    def __init__(self, model, url=None, response_path=None, **kwargs):
+        """
+        Initializes an instance of the APIModel class.
+
+        :param model: The model name to use for the API.
+        :param url: URL endpoint for the API. If relative, it will be joined
+            with base_url or the OPENAI_BASE_URL environment variable. Defaults
+            to '/chat/completions' for OpenAI compatibility.
+        :param response_path: Dot-separated path to extract the desired
+            response content. Defaults to 'choices.0.message.content' for
+            OpenAI compatibility.
+        :param kwargs: Additional arguments to configure the OpenAI client.
+        """
+        self.model = model
+        self.url = url or '/chat/completions'
+        self.response_path = response_path or 'choices.0.message.content'
+
+        client_args = self._filter_arguments(openai.OpenAI, kwargs)
+        self.client = openai.OpenAI(**client_args)
+
+    def __call__(self, messages, **kwargs):
+        """
+        Sends messages to the configured API model and returns the parsed
+        response content.
+
+        :param messages: A list of message dictionaries to send to the API.
+                         Each message should have a 'role' (e.g., 'user',
+                         'assistant') and 'content' (the message text).
+        :param kwargs: Additional parameters for the API call.
+        :return: The parsed response content from the API call, or an empty
+            string if an error occurs.
+        """
+        body = {
+            'messages': messages,
+            'model': self.model,
+        }
+        body.update(kwargs)
+        stream = kwargs.get('stream', False)
+        stream_cls = openai.Stream[openai.types.chat.ChatCompletionChunk]
+
+        try:
+            response = self.client.post(self.url,
+                                        body=body,
+                                        cast_to=httpx.Response,
+                                        stream=stream,
+                                        stream_cls=stream_cls)
+            result = response.json()
+            return self._nested_access(result, self.response_path)
+        except Exception as e:
+            logger.exception(e)
+            return ''
+
+    @staticmethod
+    def _nested_access(data, path):
+        """
+        Access nested data using a dot-separated path.
+
+        :param data: A dictionary or a list to access the nested data from.
+        :param path: A dot-separated string representing the path to access.
+                     This can include numeric indices when accessing list
+                     elements.
+        :return: The value located at the specified path, or raises a KeyError
+                 or IndexError if the path does not exist.
+        """
+        keys = path.split('.')
+        for key in keys:
+            # Convert string keys to integers if they are numeric
+            key = int(key) if key.isdigit() else key
+            data = data[key]
+        return data
+
+    @staticmethod
+    def _filter_arguments(func, args_dict):
+        """
+        Filters and returns only the valid arguments for a given function
+        signature.
+
+        :param func: The function or callable to inspect.
+        :param args_dict: A dictionary of argument names and values to filter.
+        :return: A dictionary containing only the arguments that match the
+                 function's signature, preserving any **kwargs if applicable.
+        """
+        params = inspect.signature(func).parameters
+        filtered_args = {}
+        for name, param in params.items():
+            # If **kwargs is found, return without change
+            if param.kind == inspect.Parameter.VAR_KEYWORD:
+                return args_dict
+            # Collect valid parameters
+            if name not in {'self', 'cls'} and name in args_dict:
+                filtered_args[name] = args_dict[name]
+        return filtered_args
+
+
+def prepare_api_model(model,
+                      *,
+                      url=None,
+                      response_path=None,
+                      return_processor=False,
+                      processor_config=None,
+                      **model_params):
+    """Creates a callable API model for interacting with OpenAI-compatible API.
+    The callable supports custom response parsing and works with proxy servers
+    that may be incompatible.
+
+    :param model: The name of the model to interact with.
+    :param url: URL endpoint for the API.
+    :param response_path: The dot-separated  path to extract desired content
+        from the API response. Defaults to 'choices.0.message.content'.
+    :param return_processor: A boolean flag indicating whether to return a
+        processor along with the model. The processor can be used for tasks
+        like tokenization or encoding. Defaults to False.
+    :param processor_config: A dictionary containing configuration settings
+        for a specific processor from Hugging Face. It should include all
+        necessary parameters for initializing the processor. This parameter is
+        used only if `return_processor` is True.
+    :param model_params: Additional parameters to configure the API model.
+    :return: A tuple containing the callable API model object and optionally a
+        processor if `return_processor` is True.
+    """
+    model = APIModel(model=model,
+                     url=url,
+                     response_path=response_path,
+                     **model_params)
+
+    if not return_processor:
+        return model
+
+    def get_processor():
+        try:
+            import tiktoken
+            return tiktoken.encoding_for_model(model)
+        except Exception:
+            pass
+
+        try:
+            import dashscope
+            return dashscope.get_tokenizer(model)
+        except Exception:
+            pass
+
+        raise ValueError(
+            'Failed to initialize the processor. Please check the following:\n'  # noqa: E501
+            "- For OpenAI models: Install 'tiktoken' via `pip install tiktoken`.\n"  # noqa: E501
+            "- For DashScope models: Install both 'dashscope' and 'tiktoken' via `pip install dashscope tiktoken`.\n"  # noqa: E501
+            "- For custom models: Use the 'processor_config' parameter to configure a Hugging Face processor."  # noqa: E501
+        )
+
+    if processor_config is not None:
+        processor = transformers.AutoProcessor.from_pretrained(
+            **processor_config)
+    else:
+        processor = get_processor()
+    return (model, processor)
 
 
 def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
@@ -584,6 +745,7 @@ def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
 
 
 MODEL_FUNCTION_MAPPING = {
+    'api': prepare_api_model,
     'diffusion': prepare_diffusion_model,
     'fasttext': prepare_fasttext_model,
     'huggingface': prepare_huggingface_model,

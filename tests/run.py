@@ -63,6 +63,8 @@ def gather_test_cases(test_dir, pattern, tag):
         print('suite_discovered', suite_discovered)
         for test_suite in suite_discovered:
             print('test_suite', test_suite)
+            if isinstance(test_suite, unittest.loader._FailedTest):
+                raise test_suite._exception
             for test_case in test_suite:
                 if type(test_case) in SKIPPED_TESTS.modules.values():
                     continue

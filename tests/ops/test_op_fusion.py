@@ -1,8 +1,7 @@
 import unittest
 
 from data_juicer.ops.load import load_ops
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
 class OpFusionTest(DataJuicerTestCaseBase):

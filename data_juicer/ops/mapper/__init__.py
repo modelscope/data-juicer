@@ -1,4 +1,7 @@
 from .audio_ffmpeg_wrapped_mapper import AudioFFmpegWrappedMapper
+from .calibrate_qa_mapper import CalibrateQAMapper
+from .calibrate_query_mapper import CalibrateQueryMapper
+from .calibrate_response_mapper import CalibrateResponseMapper
 from .chinese_convert_mapper import ChineseConvertMapper
 from .clean_copyright_mapper import CleanCopyrightMapper
 from .clean_email_mapper import CleanEmailMapper
@@ -53,7 +56,8 @@ from .video_tagging_from_frames_mapper import VideoTaggingFromFramesMapper
 from .whitespace_normalization_mapper import WhitespaceNormalizationMapper
 
 __all__ = [
-    'AudioFFmpegWrappedMapper', 'ChineseConvertMapper', 'CleanCopyrightMapper',
+    'AudioFFmpegWrappedMapper', 'CalibrateQAMapper', 'CalibrateQueryMapper',
+    'CalibrateResponseMapper', 'ChineseConvertMapper', 'CleanCopyrightMapper',
     'CleanEmailMapper', 'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
     'ExpandMacroMapper', 'FixUnicodeMapper', 'GenerateQAFromExamplesMapper',
     'GenerateQAFromTextMapper', 'ImageBlurMapper',
