@@ -302,7 +302,9 @@ def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
 
 
 def prepare_fastsam_model(model_path, **model_params):
-    return ultralytics.FastSAM(model_path)
+    device = model_params.pop('device', 'cpu')
+    model = ultralytics.FastSAM(model_path).to(device)
+    return model
 
 
 def prepare_fasttext_model(model_name='lid.176.bin', **model_params):

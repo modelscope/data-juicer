@@ -33,12 +33,12 @@ class ImageSegmentMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
 
-        self.model_key = prepare_model(model_type='fastsam',
-                                       model_path='FastSAM-x.pt')
-
         self.imgsz = imgsz
         self.conf = conf
         self.iou = iou
+
+        self.model_key = prepare_model(model_type='fastsam',
+                                       model_path='FastSAM-x.pt')
 
     def process_single(self, sample, rank=None, context=False):
         # there is no image in this sample
@@ -61,7 +61,6 @@ class ImageSegmentMapper(Mapper):
                           conf=self.conf,
                           iou=self.iou,
                           verbose=False)[0]
-            # breakpoint()
             sample[Fields.bbox_tag].append(masks.boxes.xywh.cpu().numpy())
 
         # match schema
