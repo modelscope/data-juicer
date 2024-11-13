@@ -146,13 +146,6 @@ Output:
     DEFAULT_ENTITY_PATTERN = r'\("entity"(.*?)\)'
     DEFAULT_RELATION_PATTERN = r'\("relationship"(.*?)\)'
 
-    # DEFAULT_OUTPUT_PATTERN = r"""
-    #     \#\#\#\s*称呼方式(\d+)\s*
-    #     -\s*\*\*说话人\*\*\s*：\s*(.*?)\s*
-    #     -\s*\*\*被称呼人\*\*\s*：\s*(.*?)\s*
-    #     -\s*\*\*(.*?)对(.*?)的昵称\*\*\s*：\s*(.*?)(?=\#\#\#|\Z) # for double check
-    # """
-
     def __init__(self,
                  api_model: str = 'gpt-4o',
                  entity_types: List[str] = None,
@@ -228,7 +221,7 @@ Output:
 
         self.sampling_params = sampling_params
         self.model_key = prepare_model(model_type='api',
-                                       model=api_model,
+                                       api_model=api_model,
                                        url=api_url,
                                        response_path=response_path,
                                        **model_params)

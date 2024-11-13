@@ -56,10 +56,11 @@ class TextChunkMapper(Mapper):
         self.split_pattern = split_pattern
         self.tokenizer_name = tokenizer
         if tokenizer is not None:
-            self.model_key = prepare_model(model_type='api',
-                                           api_model=tokenizer,
-                                           return_processor=True,
-                                           trust_remote_code=trust_remote_code)
+            self.model_key = prepare_model(
+                model_type='api',
+                api_model=tokenizer,
+                return_processor=True,
+                processor_config={'trust_remote_code': trust_remote_code})
 
     def recursively_chunk(self, text):
         if self.tokenizer_name is not None:

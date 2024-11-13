@@ -98,7 +98,7 @@ class ExtractEventMapper(Mapper):
 
         self.sampling_params = sampling_params
         self.model_key = prepare_model(model_type='api',
-                                       model=api_model,
+                                       api_model=api_model,
                                        url=api_url,
                                        response_path=response_path,
                                        **model_params)
