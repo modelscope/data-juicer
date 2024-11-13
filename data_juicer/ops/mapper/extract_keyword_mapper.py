@@ -164,7 +164,7 @@ Output:
 
         return keywords
 
-    def process_single(self, sample=None, rank=None):
+    def process_single(self, sample, rank=None):
         client = get_model(self.model_key, rank=rank)
 
         input_prompt = self.prompt_template.format(

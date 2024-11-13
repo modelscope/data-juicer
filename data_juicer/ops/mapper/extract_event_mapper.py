@@ -145,13 +145,14 @@ class ExtractEventMapper(Mapper):
 
         return event_list, character_list
 
-    def process_batched(self, samples):
+    def process_batched(self, samples, rank=None):
 
         sample_num = len(samples[self.text_key])
 
         events, characters = [], []
         for text in samples[self.text_key]:
-            cur_events, cur_characters = self._process_single_sample(text)
+            cur_events, cur_characters = self._process_single_sample(text,
+                                                                     rank=rank)
             events.append(cur_events)
             characters.append(cur_characters)
 

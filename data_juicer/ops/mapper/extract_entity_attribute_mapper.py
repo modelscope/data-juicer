@@ -169,13 +169,13 @@ class ExtractEntityAttributeMapper(Mapper):
 
         return entities, attributes, descs, demo_lists
 
-    def process_batched(self, samples):
+    def process_batched(self, samples, rank=None):
 
         sample_num = len(samples[self.text_key])
 
         entities, attributes, descs, demo_lists = [], [], [], []
         for text in samples[self.text_key]:
-            res = self._process_single_sample(text)
+            res = self._process_single_sample(text, rank=rank)
             cur_ents, cur_attrs, cur_descs, cur_demos = res
             entities.append(cur_ents)
             attributes.append(cur_attrs)

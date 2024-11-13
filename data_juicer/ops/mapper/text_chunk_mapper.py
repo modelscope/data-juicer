@@ -90,7 +90,7 @@ class TextChunkMapper(Mapper):
 
         return [cur_text] + self.recursively_chunk(left_text)
 
-    def get_text_chunks(self, text):
+    def get_text_chunks(self, text, rank=None):
 
         if self.split_pattern is not None and self.max_len is None:
             chunks = re.split(f'({self.split_pattern})', text)
@@ -99,7 +99,7 @@ class TextChunkMapper(Mapper):
             tokens = text
             total_len = len(text)
             if self.tokenizer_name is not None:
-                _, tokenizer = get_model(self.model_key)
+                _, tokenizer = get_model(self.model_key, rank=rank)
                 tokens = tokenizer.encode(text)
                 total_len = len(tokens)
             if total_len <= self.max_len:
@@ -115,12 +115,13 @@ class TextChunkMapper(Mapper):
 
         return chunks
 
-    def process_batched(self, samples):
+    def process_batched(self, samples, rank=None):
 
         sample_num = len(samples[self.text_key])
 
         samples[self.text_key] = [
-            self.get_text_chunks(text) for text in samples[self.text_key]
+            self.get_text_chunks(text, rank=rank)
+            for text in samples[self.text_key]
         ]
 
         for key in samples:

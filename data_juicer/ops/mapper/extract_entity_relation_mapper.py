@@ -308,7 +308,7 @@ Output:
 
         return final_result
 
-    def process_single(self, sample=None, rank=None):
+    def process_single(self, sample, rank=None):
 
         input_prompt = self.prompt_template.format(
             tuple_delimiter=self.tuple_delimiter,
