@@ -39,7 +39,11 @@ class ExtractNicknameMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(samples)
         dataset = dataset.map(op.process, batch_size=2)
         result = dataset[0][Fields.nickname]
-        result = [(d['source_entity'], d['target_entity'], d['description']) for d in result]
+        result = [(
+            d[Fields.source_entity],
+            d[Fields.target_entity],
+            d[Fields.relation_description])
+            for d in result]
         logger.info(f'result: {result}')
         self.assertIn(("李莲花","方多病","方小宝"), result)
 

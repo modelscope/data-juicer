@@ -122,11 +122,11 @@ class ExtractNicknameMapper(Mapper):
         nickname_relations = list(set(nickname_relations))
 
         nickname_relations = [{
-            'source_entity': nr[0],
-            'target_entity': nr[1],
-            'description': nr[2],
-            'keywords': ['nickname'],
-            'strength': None
+            Fields.source_entity: nr[0],
+            Fields.target_entity: nr[1],
+            Fields.relation_description: nr[2],
+            Fields.relation_keywords: ['nickname'],
+            Fields.relation_strength: None
         } for nr in nickname_relations]
 
         return nickname_relations

@@ -44,8 +44,24 @@ class Fields(object):
     nickname = DEFAULT_PREFIX + 'nickname__'
     # # the entity for knowledge graph
     entity = DEFAULT_PREFIX + 'entity__'
+    # # # the name of entity
+    entity_name = DEFAULT_PREFIX + 'entity_name__'
+    # # # the type of entity
+    entity_type = DEFAULT_PREFIX + 'entity_type__'
+    # # # the description of entity
+    entity_description = DEFAULT_PREFIX + 'entity_entity_description__'
     # # the relationship for knowledge graph
     relation = DEFAULT_PREFIX + 'relation__'
+    # # # the source entity of the relation
+    source_entity = DEFAULT_PREFIX + 'relation_source_entity__'
+    # # # the target entity of the relation
+    target_entity = DEFAULT_PREFIX + 'relation_target_entity__'
+    # # # the description of the relation
+    relation_description = DEFAULT_PREFIX + 'relation_description__'
+    # # # the keywords of the relation
+    relation_keywords = DEFAULT_PREFIX + 'relation_keywords__'
+    # # # the strength of the relation
+    relation_strength = DEFAULT_PREFIX + 'relation_strength__'
     # # the keyword in a text
     keyword = DEFAULT_PREFIX + 'keyword__'
 

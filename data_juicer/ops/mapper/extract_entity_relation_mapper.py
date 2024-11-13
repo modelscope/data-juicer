@@ -257,9 +257,9 @@ Output:
             entities.append(items)
         entities = list(set(entities))
         entities = [{
-            'entity': e[0],
-            'type': e[1],
-            'description': e[2]
+            Fields.entity_name: e[0],
+            Fields.entity_type: e[1],
+            Fields.entity_description: e[2]
         } for e in entities]
 
         relation_pattern = re.compile(self.relation_pattern,
@@ -272,11 +272,11 @@ Output:
             relations.append(items)
         relations = list(set(relations))
         relations = [{
-            'source_entity': r[0],
-            'target_entity': r[1],
-            'description': r[2],
-            'keywords': split_text_by_punctuation(r[3]),
-            'strength': float(r[4])
+            Fields.source_entity: r[0],
+            Fields.target_entity: r[1],
+            Fields.relation_description: r[2],
+            Fields.relation_keywords: split_text_by_punctuation(r[3]),
+            Fields.relation_strength: float(r[4])
         } for r in relations]
 
         return entities, relations
