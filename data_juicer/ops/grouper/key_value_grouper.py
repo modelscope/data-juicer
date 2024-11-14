@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from data_juicer.utils.common_utils import dict_to_hash, get_val_by_nested_key
 
-from ..base_op import OPERATORS, Grouper
+from ..base_op import OPERATORS, Grouper, convert_list_dict_to_dict_list
 from .naive_grouper import NaiveGrouper
 
 
@@ -45,7 +45,7 @@ class KeyValueGrouper(Grouper):
                 sample_map[sample_key] = [sample]
 
         batched_samples = [
-            self.naive_grouper.process(sample_map[k])[0] for k in sample_map
+            convert_list_dict_to_dict_list(sample_map[k]) for k in sample_map
         ]
 
         return batched_samples

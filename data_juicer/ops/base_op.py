@@ -7,7 +7,6 @@ import pyarrow as pa
 from loguru import logger
 
 from data_juicer import is_cuda_available
-from data_juicer.core.data import NestedDataset
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import size_to_bytes
 from data_juicer.utils.process_utils import calculate_np
@@ -216,6 +215,7 @@ class OP:
         return related_parameters
 
     def run(self, dataset):
+        from data_juicer.core.data import NestedDataset
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
         return dataset
@@ -542,7 +542,55 @@ class Grouper(OP):
     def run(self, dataset, *, exporter=None, tracer=None):
         dataset = super(Grouper, self).run(dataset)
         batched_samples = self.process(dataset)
+        from data_juicer.core.data import NestedDataset
         new_dataset = NestedDataset.from_list(batched_samples)
         if tracer:
             tracer.trace_filter(self._name, dataset, new_dataset)
+        return new_dataset
+
+
+class Aggregator(OP):
+
+    def __init__(self, *args, **kwargs):
+        """
+        Base class that group samples.
+
+        :param text_key: the key name of field that stores sample texts
+            to be processed
+        :param image_key: the key name of field that stores sample image list
+            to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
+        """
+        super(Aggregator, self).__init__(*args, **kwargs)
+        self.process = catch_map_single_exception(self.process_single)
+
+    def process_single(self, sample):
+        """
+        For sample level, batched sample --> sample,
+        the input must be the output of some Grouper OP.
+
+        :param sample: batched sample to aggregate
+        :return: aggregated sample
+        """
+        raise NotImplementedError
+
+    def run(self, dataset, *, exporter=None, tracer=None):
+        dataset = super(Aggregator, self).run(dataset)
+        new_dataset = dataset.map(
+            self.process,
+            num_proc=self.runtime_np(),
+            with_rank=self.use_cuda(),
+            batch_size=self.batch_size,
+            desc=self._name + '_process',
+        )
+        if tracer:
+            tracer.trace_mapper(self._name, dataset, new_dataset,
+                                self.text_key)
         return new_dataset

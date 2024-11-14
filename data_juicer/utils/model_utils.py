@@ -203,7 +203,7 @@ class APIModel:
         return filtered_args
 
 
-def prepare_api_model(model,
+def prepare_api_model(api_model,
                       *,
                       url=None,
                       response_path=None,
@@ -214,7 +214,7 @@ def prepare_api_model(model,
     The callable supports custom response parsing and works with proxy servers
     that may be incompatible.
 
-    :param model: The name of the model to interact with.
+    :param api_model: The name of the model to interact with.
     :param url: URL endpoint for the API.
     :param response_path: The dot-separated  path to extract desired content
         from the API response. Defaults to 'choices.0.message.content'.
@@ -229,7 +229,7 @@ def prepare_api_model(model,
     :return: A tuple containing the callable API model object and optionally a
         processor if `return_processor` is True.
     """
-    model = APIModel(model=model,
+    model = APIModel(model=api_model,
                      url=url,
                      response_path=response_path,
                      **model_params)
@@ -240,13 +240,20 @@ def prepare_api_model(model,
     def get_processor():
         try:
             import tiktoken
-            return tiktoken.encoding_for_model(model)
+            return tiktoken.encoding_for_model(api_model)
         except Exception:
             pass
 
         try:
             import dashscope
-            return dashscope.get_tokenizer(model)
+            return dashscope.get_tokenizer(api_model)
+        except Exception:
+            pass
+
+        try:
+            processor = transformers.AutoProcessor.from_pretrained(
+                pretrained_model_name_or_path=api_model, **processor_config)
+            return processor
         except Exception:
             pass
 
@@ -257,7 +264,8 @@ def prepare_api_model(model,
             "- For custom models: Use the 'processor_config' parameter to configure a Hugging Face processor."  # noqa: E501
         )
 
-    if processor_config is not None:
+    if processor_config is not None and \
+            'pretrained_model_name_or_path' in processor_config:
         processor = transformers.AutoProcessor.from_pretrained(
             **processor_config)
     else:
@@ -804,3 +812,25 @@ def free_models():
         except Exception:
             pass
     MODEL_ZOO.clear()
+
+
+def parse_model_response(response):
+    """
+        Parse model response of LLM to text.
+    """
+    if isinstance(response, str):
+        return response
+    elif isinstance(response, dict) and 'content' in response:
+        return response['content']
+    elif isinstance(response, list):
+        res = None
+        for msg in response:
+            if not isinstance(
+                    msg, dict) or 'role' not in msg or 'content' not in msg:
+                logger.warning('Unvalid response of LLM!')
+                return None
+            if msg['role'] == 'assistant':
+                res = msg['content']
+        return res
+    logger.warning('Unvalid response of LLM!')
+    return None

@@ -1,4 +1,4 @@
-from ..base_op import OPERATORS, Grouper
+from ..base_op import OPERATORS, Grouper, convert_list_dict_to_dict_list
 
 
 @OPERATORS.register_module('naive_grouper')
@@ -19,10 +19,6 @@ class NaiveGrouper(Grouper):
         if len(dataset) == 0:
             return dataset
 
-        keys = dataset[0].keys()
-        batched_sample = {k: [None] * len(dataset) for k in keys}
-        for i, sample in enumerate(dataset):
-            for k in keys:
-                batched_sample[k][i] = sample[k]
+        batched_sample = convert_list_dict_to_dict_list(dataset)
 
         return [batched_sample]
