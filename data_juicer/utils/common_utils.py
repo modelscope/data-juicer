@@ -109,3 +109,11 @@ def avg_split_string_list_under_limit(str_list: list,
     if cur_list:
         res.append(cur_list)
     return res
+
+
+def is_float(s):
+    try:
+        float(s)
+        return True
+    except Exception:
+        return False

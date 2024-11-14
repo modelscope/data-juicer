@@ -198,3 +198,19 @@ def get_sentences_from_document(document, model_func=None):
     else:
         sentences = document.splitlines()
     return '\n'.join(sentences)
+
+
+def split_text_by_punctuation(text):
+    """
+    Split text by any zh and en punctuation
+
+    :param text: text to be splitted.
+    :return: sub texts splitted by any zh and en punctuation
+    """
+    # any zh and en punctuation
+    punctuation_pattern = r'[\u3000-\u303f\uff00-\uffef]|[!"#$%&\'()*+,-./:;<=>?@[\\\]^_`{|}~]'  # noqa: E501
+
+    result = re.split(punctuation_pattern, text)
+    result = [s.strip() for s in result if s.strip()]
+
+    return result

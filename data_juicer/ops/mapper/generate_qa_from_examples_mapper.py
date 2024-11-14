@@ -210,7 +210,7 @@ class GenerateQAFromExamplesMapper(Mapper):
             output_qa_pairs.append((question.strip(), answer.strip()))
         return output_qa_pairs
 
-    def process_single(self, sample=None, rank=None):
+    def process_single(self, sample, rank=None):
         model, _ = get_model(self.model_key, rank, self.use_cuda())
 
         random_qa_samples = random.sample(self.seed_qa_samples,

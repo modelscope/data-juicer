@@ -1,6 +1,9 @@
 import re
 from typing import Dict, Optional
 
+from loguru import logger
+from pydantic import PositiveInt
+
 from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -37,8 +40,9 @@ class CalibrateQAMapper(Mapper):
                  reference_template: Optional[str] = None,
                  qa_pair_template: Optional[str] = None,
                  output_pattern: Optional[str] = None,
-                 model_params: Optional[Dict] = None,
-                 sampling_params: Optional[Dict] = None,
+                 try_num: PositiveInt = 3,
+                 model_params: Dict = {},
+                 sampling_params: Dict = {},
                  **kwargs):
         """
         Initialization method.
@@ -54,6 +58,7 @@ class CalibrateQAMapper(Mapper):
         :param output_pattern: Regular expression for parsing model output.
         :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
+            e.g {'temperature': 0.9, 'top_p': 0.95}
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(**kwargs)
@@ -65,14 +70,16 @@ class CalibrateQAMapper(Mapper):
         self.qa_pair_template = qa_pair_template or \
             self.DEFAULT_QA_PAIR_TEMPLATE
         self.output_pattern = output_pattern or self.DEFAULT_OUTPUT_PATTERN
-        self.sampling_params = sampling_params or {}
 
-        model_params = model_params or {}
+        self.sampling_params = sampling_params
+
         self.model_key = prepare_model(model_type='api',
-                                       model=api_model,
+                                       api_model=api_model,
                                        url=api_url,
                                        response_path=response_path,
                                        **model_params)
+
+        self.try_num = try_num
 
     def build_input(self, sample):
         reference = self.reference_template.format(sample[self.text_key])
@@ -89,7 +96,7 @@ class CalibrateQAMapper(Mapper):
         else:
             return None, None
 
-    def process_single(self, sample=None, rank=None):
+    def process_single(self, sample, rank=None):
         client = get_model(self.model_key, rank=rank)
 
         messages = [{
@@ -99,9 +106,15 @@ class CalibrateQAMapper(Mapper):
             'role': 'user',
             'content': self.build_input(sample)
         }]
-        output = client(messages, **self.sampling_params)
-
-        parsed_q, parsed_a = self.parse_output(output)
+        parsed_q, parsed_a = None, None
+        for i in range(self.try_num):
+            try:
+                output = client(messages, **self.sampling_params)
+                parsed_q, parsed_a = self.parse_output(output)
+                if parsed_q or parsed_a:
+                    break
+            except Exception as e:
+                logger.warning(f'Exception: {e}')
         if parsed_q:
             sample[self.query_key] = parsed_q
         if parsed_a:
