@@ -130,12 +130,15 @@ class RayDataset(DJDataset):
                 if op.stats_export_path is not None:
                     self.data.write_json(op.stats_export_path,
                                          force_ascii=False)
-                self.data = self.data.map_batches(partial(
-                    filter_batch, filter_func=op.process),
-                                                  batch_format='pyarrow',
-                                                  batch_size=batch_size,
-                                                  num_gpus=num_gpus,
-                                                  zero_copy_batch=True)
+                if op.is_batched_op():
+                    self.data = self.data.map_batches(partial(
+                        filter_batch, filter_func=op.process),
+                                                      batch_format='pyarrow',
+                                                      batch_size=batch_size,
+                                                      num_gpus=num_gpus,
+                                                      zero_copy_batch=True)
+                else:
+                    self.data = self.data.filter(op.process)
             else:
                 logger.error(
                     'Ray executor only support Filter and Mapper OPs for now')
