@@ -123,7 +123,7 @@ class FlaggedWordFilter(Filter):
 
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
             return list(
                 map(
