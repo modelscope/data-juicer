@@ -19,13 +19,16 @@ class PairPreferenceMapper(Mapper):
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = (
-        '你的任务是根据提供的问答对生成新的回答，在语言风格、事实性、人物身份、立场等任一方面与原回答相反。'  # noqa: E501
+        '你的任务是根据参考信息修改问答对中的回答，在语言风格、事实性、人物身份、立场等任一方面与原回答相反。'
         '必须按照以下标记格式输出，不要输出其他多余内容。\n'
         '【回答】\n'
         '生成的新回答\n'
         '【原因】\n'
         '生成该回答的原因')
-    DEFAULT_INPUT_TEMPLATE = ('以下是原始问答对：\n'
+    DEFAULT_INPUT_TEMPLATE = ('【参考信息】\n'
+                              '{reference}\n'
+                              '\n'
+                              '以下是原始问答对：\n'
                               '【问题】\n'
                               '{query}\n'
                               '【回答】\n'
@@ -90,7 +93,7 @@ class PairPreferenceMapper(Mapper):
         mapping = {
             'query': sample[self.query_key],
             'response': sample[self.response_key],
-            'reference': sample[self.text_key]
+            'reference': sample.get(self.text_key, '')
         }
         return self.input_template.format_map(mapping)
 
