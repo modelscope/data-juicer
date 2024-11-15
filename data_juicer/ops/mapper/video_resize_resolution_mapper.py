@@ -4,19 +4,19 @@ import sys
 
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import close_video, load_video
 
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
-OP_NAME = 'video_resize_resolution_mapper'
+with HiddenPrints():
+    ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
 
-with AvailabilityChecking(['ffmpeg-python'], OP_NAME), HiddenPrints():
-    import ffmpeg
+OP_NAME = 'video_resize_resolution_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -84,7 +84,7 @@ class VideoResizeResolutionMapper(Mapper):
         self.force_original_aspect_ratio = force_original_aspect_ratio
         self.force_divisible_by = force_divisible_by
 
-    def process(self, sample, context=False):
+    def process_single(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

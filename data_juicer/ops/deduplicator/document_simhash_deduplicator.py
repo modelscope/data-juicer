@@ -10,16 +10,15 @@ import regex
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
 
-OP_NAME = 'document_simhash_deduplicator'
+simhash = LazyLoader('simhash', 'simhash')
 
-with AvailabilityChecking(['simhash-pybind'], OP_NAME):
-    import simhash
+OP_NAME = 'document_simhash_deduplicator'
 
 
 @OPERATORS.register_module(OP_NAME)

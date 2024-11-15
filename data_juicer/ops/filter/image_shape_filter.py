@@ -47,7 +47,7 @@ class ImageShapeFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.image_width in sample[Fields.stats] \
                 and StatsKeys.image_height in sample[Fields.stats]:
@@ -76,7 +76,7 @@ class ImageShapeFilter(Filter):
         ]
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         ws = sample[Fields.stats][StatsKeys.image_width]
         hs = sample[Fields.stats][StatsKeys.image_height]
         if len(ws) <= 0:

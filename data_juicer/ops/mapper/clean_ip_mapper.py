@@ -40,7 +40,7 @@ class CleanIpMapper(Mapper):
                 self.pattern = pattern[2:-1]
         self.repl = repl
 
-    def process(self, samples):
+    def process_batched(self, samples):
         for idx, text in enumerate(samples[self.text_key]):
             if not re.search(self.pattern, text, flags=re.DOTALL):
                 continue

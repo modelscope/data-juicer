@@ -40,7 +40,7 @@ class ImageSizeFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.image_sizes in sample[Fields.stats]:
             return sample
@@ -58,7 +58,7 @@ class ImageSizeFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         image_sizes = sample[Fields.stats][StatsKeys.image_sizes]
         keep_bools = np.array([
             self.min_size <= image_size <= self.max_size

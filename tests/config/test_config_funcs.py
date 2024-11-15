@@ -45,12 +45,15 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 }, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
@@ -62,13 +65,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
@@ -128,13 +134,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -146,13 +155,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -164,13 +176,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -182,13 +197,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 })
             self.assertDictEqual(
@@ -200,13 +218,16 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'image_key': 'images',
                         'audio_key': 'audios',
                         'video_key': 'videos',
+                        'query_key': 'query',
+                        'response_key': 'response',
+                        'history_key': 'history',
                         'accelerator': None,
                         'num_proc': 4,
                         'stats_export_path': None,
                         'cpu_required': 1,
                         'mem_required': 0,
                         'turbo': False,
-                        'batch_size': 1,
+                        'batch_size': 1000,
                     }
                 })
 
@@ -216,8 +237,8 @@ class ConfigTest(DataJuicerTestCaseBase):
         from data_juicer.ops.base_op import OPERATORS
 
         base_class_params = {
-            'text_key', 'image_key', 'audio_key', 'video_key', 'accelerator',
-            'num_proc', 'cpu_required', 'mem_required',
+            'text_key', 'image_key', 'audio_key', 'video_key', 'query_key', 'response_key', 'history_key',
+            'accelerator', 'turbo', 'batch_size', 'num_proc', 'cpu_required', 'mem_required',
         }
 
         parser = ArgumentParser(default_env=True, default_config_files=None)

@@ -37,7 +37,7 @@ class MaximumLineLengthFilter(Filter):
         self.min_len = min_len
         self.max_len = max_len
 
-    def compute_stats(self, samples, context=False):
+    def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
         context_key = f'{InterVars.lines}'
@@ -59,13 +59,11 @@ class MaximumLineLengthFilter(Filter):
 
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
-            return list(
-                map(
-                    lambda stat: self.min_len <= stat[StatsKeys.max_line_length
-                                                      ] <= self.max_len,
-                    samples[Fields.stats]))
+            return map(
+                lambda stat: self.min_len <= stat[StatsKeys.max_line_length] <=
+                self.max_len, samples[Fields.stats])
         else:
             # single sample for ray filter
             if self.min_len <= samples[Fields.stats][

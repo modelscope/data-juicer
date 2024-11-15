@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
@@ -9,9 +8,6 @@ from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       split_on_newline_tab_whitespace, strip)
 
 OP_NAME = 'remove_words_with_incorrect_substrings_mapper'
-
-with AvailabilityChecking(['sentencepiece'], OP_NAME):
-    import sentencepiece  # noqa: F401
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -50,7 +46,7 @@ class RemoveWordsWithIncorrectSubstringsMapper(Mapper):
         should_keep = all([(i_substr not in word) for i_substr in substrings])
         return should_keep
 
-    def process(self, samples):
+    def process_batched(self, samples):
         for idx, text in enumerate(samples[self.text_key]):
             if self.tokenization:
                 tokenizer = get_model(self.model_key)

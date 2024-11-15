@@ -30,14 +30,14 @@ class RemoveSpecificCharsMapper(Mapper):
         else:
             self.pattern = None
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if self.pattern is None:
             return samples
 
-        samples[self.text_key] = list(
-            map(
-                lambda text: re.sub(pattern=self.pattern,
-                                    repl=r'',
-                                    string=text,
-                                    flags=re.DOTALL), samples[self.text_key]))
+        samples[self.text_key] = [
+            re.sub(pattern=self.pattern,
+                   repl=r'',
+                   string=text,
+                   flags=re.DOTALL) for text in samples[self.text_key]
+        ]
         return samples

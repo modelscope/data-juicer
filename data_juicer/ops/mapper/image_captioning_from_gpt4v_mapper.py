@@ -248,7 +248,7 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
 
         return [generated_sample]
 
-    def process(self, samples):
+    def process_batched(self, samples):
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []
         for i in range(len(samples[self.text_key])):

@@ -4,8 +4,8 @@ import numpy as np
 from loguru import logger
 from PIL import ImageOps
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (SpecialTokens, iou,
                                         load_data_with_context, load_image,
                                         remove_special_tokens)
@@ -14,17 +14,10 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
+torch = LazyLoader('torch', 'torch')
+nltk = LazyLoader('nltk', 'nltk')
+
 OP_NAME = 'phrase_grounding_recall_filter'
-
-with AvailabilityChecking(['torch', 'transformers', 'nltk'], OP_NAME):
-
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
-
-    import nltk
 
 
 # NER algorithm adapted from GLIP starts
@@ -147,7 +140,7 @@ class PhraseGroundingRecallFilter(Filter):
         for nltk_data_pkg in requires_nltk_data:
             nltk.download(nltk_data_pkg)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.phrase_grounding_recall in sample[Fields.stats]:
             return sample
@@ -261,7 +254,7 @@ class PhraseGroundingRecallFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         recalls = sample[Fields.stats][StatsKeys.phrase_grounding_recall]
         if len(recalls) <= 0:
             return True

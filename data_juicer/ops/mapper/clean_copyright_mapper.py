@@ -54,8 +54,9 @@ class CleanCopyrightMapper(Mapper):
             sample = '\n'.join(lines[skip:])
         return sample
 
-    def process(self, samples):
-        samples[self.text_key] = list(
-            map(lambda text: self._process_single_sample(text),
-                samples[self.text_key]))
+    def process_batched(self, samples):
+        samples[self.text_key] = [
+            self._process_single_sample(text)
+            for text in samples[self.text_key]
+        ]
         return samples

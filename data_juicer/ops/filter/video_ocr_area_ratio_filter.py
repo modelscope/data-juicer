@@ -4,8 +4,8 @@ import numpy as np
 from pydantic import PositiveInt
 
 from data_juicer import cuda_device_count
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
@@ -13,10 +13,9 @@ from data_juicer.utils.mm_utils import (close_video,
 from ..base_op import OPERATORS, UNFORKABLE, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
-OP_NAME = 'video_ocr_area_ratio_filter'
+easyocr = LazyLoader('easyocr', 'easyocr')
 
-with AvailabilityChecking(['easyocr'], OP_NAME):
-    import easyocr
+OP_NAME = 'video_ocr_area_ratio_filter'
 
 
 def triangle_area(p1, p2, p3):
@@ -101,7 +100,7 @@ class VideoOcrAreaRatioFilter(Filter):
             self.reader.device = device
         return self.reader
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_ocr_area_ratio in sample[Fields.stats]:
             return sample
@@ -182,7 +181,7 @@ class VideoOcrAreaRatioFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         video_ocr_area_ratios = sample[Fields.stats][
             StatsKeys.video_ocr_area_ratio]
         keep_bools = np.array([

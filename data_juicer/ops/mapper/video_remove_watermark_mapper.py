@@ -5,9 +5,9 @@ import av
 import numpy as np
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import (close_video,
                                         extract_video_frames_uniformly,
@@ -18,10 +18,10 @@ from data_juicer.utils.mm_utils import (close_video,
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
-OP_NAME = 'video_remove_watermark_mapper'
+with HiddenPrints():
+    cv2 = LazyLoader('cv2', 'cv2')
 
-with AvailabilityChecking(['opencv-python'], OP_NAME), HiddenPrints():
-    import cv2 as cv
+OP_NAME = 'video_remove_watermark_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -113,9 +113,9 @@ class VideoRemoveWatermarkMapper(Mapper):
             for roi in rois:
                 # dimension of ndarray frame: height x width x channel
                 roi_frame = frame[roi[1]:roi[3], roi[0]:roi[2]]
-                gray_frame = cv.cvtColor(roi_frame, cv.COLOR_BGR2GRAY)
-                _, binary_frame = cv.threshold(
-                    gray_frame, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+                gray_frame = cv2.cvtColor(roi_frame, cv2.COLOR_BGR2GRAY)
+                _, binary_frame = cv2.threshold(
+                    gray_frame, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
                 # assume the watermark is located in the box, so the pixel in
                 # the edge must be 0, if not, reverse binary_frame
@@ -154,8 +154,8 @@ class VideoRemoveWatermarkMapper(Mapper):
             else:
                 scaled_diversity = np.zeros_like(pixel_diversity)
             scaled_diversity = scaled_diversity.astype(np.uint8)
-            _, binary_frame = cv.threshold(scaled_diversity, 0, 255,
-                                           cv.THRESH_BINARY + cv.THRESH_OTSU)
+            _, binary_frame = cv2.threshold(
+                scaled_diversity, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
             # the watermark pixels have less diversity
             binary_frame = ~binary_frame
             mask[roi[1]:roi[3],
@@ -194,14 +194,14 @@ class VideoRemoveWatermarkMapper(Mapper):
             mask = self._detect_watermark_via_pixel_diversity(frames, rois)
 
         kernel = np.ones((5, 5), np.uint8)
-        return cv.dilate(mask, kernel)
+        return cv2.dilate(mask, kernel)
 
     def _clean_watermark(self, frame, watermark_mask):
         np_frame = frame.to_ndarray(format='bgr24')
-        new_np_frame = cv.inpaint(np_frame, watermark_mask, 3, cv.INPAINT_NS)
+        new_np_frame = cv2.inpaint(np_frame, watermark_mask, 3, cv2.INPAINT_NS)
         return av.VideoFrame.from_ndarray(new_np_frame, format='bgr24')
 
-    def process(self, sample, context=False):
+    def process_single(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

@@ -42,7 +42,7 @@ class ImageAspectRatioFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, samples, context=False):
+    def compute_stats_batched(self, samples, context=False):
         image_list = samples[self.image_key]
         samples_stats = samples[Fields.stats]
 
@@ -73,7 +73,7 @@ class ImageAspectRatioFilter(Filter):
 
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
 
         def process_single(values):
             keep_bools = np.array([

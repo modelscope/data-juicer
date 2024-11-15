@@ -7,7 +7,6 @@ from typing import List
 from pydantic import PositiveInt
 
 from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -17,9 +16,6 @@ from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
 from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'stopwords_filter'
-
-with AvailabilityChecking(['sentencepiece'], OP_NAME):
-    import sentencepiece  # noqa: F401
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -74,7 +70,7 @@ class StopWordsFilter(Filter):
             self.model_key = prepare_model(model_type='sentencepiece',
                                            lang=lang)
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.stopwords_ratio in sample[Fields.stats]:
             return sample
@@ -121,6 +117,6 @@ class StopWordsFilter(Filter):
         sample[Fields.stats][StatsKeys.stopwords_ratio] = stopwords_ratio
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         return sample[Fields.stats][
             StatsKeys.stopwords_ratio] >= self.min_ratio

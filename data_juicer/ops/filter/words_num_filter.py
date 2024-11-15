@@ -1,6 +1,5 @@
 import sys
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -10,9 +9,6 @@ from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
 from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'words_num_filter'
-
-with AvailabilityChecking(['sentencepiece'], OP_NAME):
-    import sentencepiece  # noqa: F401
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -54,7 +50,7 @@ class WordsNumFilter(Filter):
             self.model_key = prepare_model(model_type='sentencepiece',
                                            lang=lang)
 
-    def compute_stats(self, samples, context=False):
+    def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
         words_key = f'{InterVars.words}-{self.model_key}'
@@ -78,12 +74,11 @@ class WordsNumFilter(Filter):
 
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
-            return list(
-                map(
-                    lambda stat: self.min_num <= stat[StatsKeys.num_words] <=
-                    self.max_num, samples[Fields.stats]))
+            return map(
+                lambda stat: self.min_num <= stat[StatsKeys.num_words] <= self.
+                max_num, samples[Fields.stats])
         else:
             # single sample for ray filter
             if self.min_num <= samples[Fields.stats][

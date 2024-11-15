@@ -26,3 +26,6 @@ multiprocess==0.70.12
 dill==0.3.4
 psutil
 pydantic>=2.0
+Pillow
+numpy<2
+fastapi[standard]>=0.100

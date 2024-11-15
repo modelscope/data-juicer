@@ -29,12 +29,12 @@ class RemoveBibliographyMapper(Mapper):
         self.pattern += r'\\bibliography\{.*\}'
         self.pattern += r').*$'
 
-    def process(self, samples):
-        samples[self.text_key] = list(
-            map(
-                lambda text: re.sub(pattern=self.pattern,
-                                    repl=r'',
-                                    string=text,
-                                    flags=re.DOTALL), samples[self.text_key]))
+    def process_batched(self, samples):
+        samples[self.text_key] = [
+            re.sub(pattern=self.pattern,
+                   repl=r'',
+                   string=text,
+                   flags=re.DOTALL) for text in samples[self.text_key]
+        ]
 
         return samples

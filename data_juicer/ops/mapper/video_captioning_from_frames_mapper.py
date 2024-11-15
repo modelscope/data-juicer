@@ -8,8 +8,8 @@ from loguru import logger
 from PIL import ImageOps
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
                                         extract_key_frames,
                                         extract_video_frames_uniformly,
@@ -22,17 +22,9 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
+simhash = LazyLoader('simhash', 'simhash')
+
 OP_NAME = 'video_captioning_from_frames_mapper'
-
-with AvailabilityChecking(['torch', 'transformers', 'simhash-pybind'],
-                          OP_NAME):
-
-    import simhash  # noqa: F401
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -302,8 +294,6 @@ class VideoCaptioningFromFramesMapper(Mapper):
             generated_text_per_chunk.extend(
                 generated_text_candidates_single_chunk)
         elif self.keep_candidate_mode == 'similar_one_simhash':
-            from simhash import num_differing_bits
-
             from ..deduplicator.document_simhash_deduplicator import \
                 DocumentSimhashDeduplicator
 
@@ -325,7 +315,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
                 for candidate_text in generated_text_candidates_single_chunk
             ]
             hamming_distances = [
-                num_differing_bits(ori_text_hash, generated_text_hash)
+                simhash.num_differing_bits(ori_text_hash, generated_text_hash)
                 for generated_text_hash in generated_text_hashes
             ]
             max_index = min(range(len(hamming_distances)),
@@ -334,7 +324,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
                 generated_text_candidates_single_chunk[max_index])
         return generated_text_per_chunk
 
-    def process(self, samples, rank=None, context=False):
+    def process_batched(self, samples, rank=None, context=False):
         """
         :param samples:
         :return:

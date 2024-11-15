@@ -3,7 +3,6 @@ from typing import List
 import numpy as np
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
 
 from ..base_op import OPERATORS, UNFORKABLE, Filter
@@ -12,15 +11,6 @@ from ..mapper.video_tagging_from_frames_mapper import \
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_tagging_from_frames_filter'
-
-with AvailabilityChecking(
-    ['torch', 'git+https://github.com/xinyu1205/recognize-anything.git'],
-        OP_NAME):
-    import ram  # noqa: F401
-    import torch
-
-    # avoid hanging when calling recognizeAnything in multiprocessing
-    torch.set_num_threads(1)
 
 
 @UNFORKABLE.register_module(OP_NAME)
@@ -93,13 +83,13 @@ class VideoTaggingFromFramesFilter(Filter):
             tag_field_name=self.tag_field_name,
         )
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
 
         sample = self.tagging_producer.process(sample, rank, context)
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         video_tags = sample[self.tag_field_name]
         if len(video_tags) <= 0:
             return True

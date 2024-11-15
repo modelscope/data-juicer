@@ -3,24 +3,13 @@ import os
 
 import regex as re
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.lazy_loader import AUTOINSTALL
 from data_juicer.utils.mm_utils import SpecialTokens, extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
 
 NAME = 'video_captioning_from_audio_mapper'
-CHECK_PKGS = [
-    'transformers', 'transformers_stream_generator', 'einops', 'accelerate',
-    'tiktoken'
-]
-
-with AvailabilityChecking(CHECK_PKGS, NAME):
-    import accelerate  # noqa: F401
-    import einops  # noqa: F401
-    import tiktoken  # noqa: F401
-    import transformers  # noqa: F401
-    import transformers_stream_generator  # noqa: F401
 
 
 @OPERATORS.register_module(NAME)
@@ -44,6 +33,10 @@ class VideoCaptioningFromAudioMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        AUTOINSTALL.check([
+            'transformers', 'transformers_stream_generator', 'einops',
+            'accelerate', 'tiktoken'
+        ])
 
         self.keep_original_sample = keep_original_sample
         self.extra_args = kwargs
@@ -123,7 +116,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
         captioned_sample[self.video_key] = left_video_keys
         return [captioned_sample]
 
-    def process(self, samples, rank=None):
+    def process_batched(self, samples, rank=None):
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []
         for i in range(len(samples[self.text_key])):

@@ -1,11 +1,10 @@
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, Mapper
 
-OP_NAME = 'fix_unicode_mapper'
+ftfy = LazyLoader('ftfy', 'ftfy')
 
-with AvailabilityChecking(['ftfy'], OP_NAME):
-    import ftfy
+OP_NAME = 'fix_unicode_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -35,10 +34,9 @@ class FixUnicodeMapper(Mapper):
                              'supported. Can only be one of '
                              '["NFC", "NFKC", "NFD", "NFKD"]')
 
-    def process(self, samples):
-        samples[self.text_key] = list(
-            map(
-                lambda text: ftfy.fix_text(text,
-                                           normalization=self.normalization),
-                samples[self.text_key]))
+    def process_batched(self, samples):
+        samples[self.text_key] = [
+            ftfy.fix_text(text, normalization=self.normalization)
+            for text in samples[self.text_key]
+        ]
         return samples

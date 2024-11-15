@@ -3,8 +3,8 @@ from collections import Counter
 import numpy as np
 from pydantic import PositiveInt
 
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
@@ -13,16 +13,10 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
+ram = LazyLoader('ram', 'ram')
+torch = LazyLoader('torch', 'torch')
+
 OP_NAME = 'video_tagging_from_frames_mapper'
-
-with AvailabilityChecking(
-    ['torch', 'git+https://github.com/xinyu1205/recognize-anything.git'],
-        OP_NAME):
-    import ram  # noqa: F401
-    import torch
-
-    # avoid hanging when calling recognizeAnything in multiprocessing
-    torch.set_num_threads(1)
 
 
 @UNFORKABLE.register_module(OP_NAME)
@@ -72,12 +66,11 @@ class VideoTaggingFromFramesMapper(Mapper):
             input_size=384)
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num
-        from ram import get_transform
-        self.transform = get_transform(image_size=384)
+        self.transform = ram.get_transform(image_size=384)
 
         self.tag_field_name = tag_field_name
 
-    def process(self, sample, rank=None, context=False):
+    def process_single(self, sample, rank=None, context=False):
         # check if it's generated already
         if self.tag_field_name in sample:
             return sample
