@@ -76,7 +76,7 @@ class CalibrateQAMapperTest(DataJuicerTestCaseBase):
     def test_args(self):
         op = CalibrateQAMapper(
             api_model='qwen2.5-72b-instruct',
-            api_url=
+            api_endpoint=
             'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
             response_path='choices.0.message.content')
         self._run_op(op)
