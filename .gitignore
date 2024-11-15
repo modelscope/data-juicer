@@ -15,3 +15,4 @@ dist
 wandb/
 __pycache__
 .vscode/
+**/__dj__produced_data__/*
