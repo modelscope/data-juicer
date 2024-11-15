@@ -239,7 +239,8 @@ class RayRedisMinhashDeduplicator(Deduplicator):
     def run(self, dataset):
         from ray.data.aggregate import AggregateFn
 
-        union_find = RedisUnionFind(prefix=uuid.uuid4().hex[:8], redis_address=self.redis_address)
+        union_find = RedisUnionFind(prefix=uuid.uuid4().hex[:8],
+                                    redis_address=self.redis_address)
 
         def add_uid_column(table: pa.Table) -> pa.Table:
             new_column_data = [union_find.get_uid() for _ in range(len(table))]
