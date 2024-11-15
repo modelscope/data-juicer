@@ -4,14 +4,13 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 OP_NAME = 'pair_preference_mapper'
 
 
 # TODO: Extend LLM-based OPs into API-based implementation.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class PairPreferenceMapper(Mapper):
     """

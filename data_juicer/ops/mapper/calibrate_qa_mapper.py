@@ -4,14 +4,13 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 OP_NAME = 'calibrate_qa_mapper'
 
 
 # TODO: LLM-based inference.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class CalibrateQAMapper(Mapper):
     """
@@ -107,7 +106,7 @@ class CalibrateQAMapper(Mapper):
             'content': self.build_input(sample)
         }]
         parsed_q, parsed_a = None, None
-        for i in range(self.try_num):
+        for _ in range(self.try_num):
             try:
                 output = client(messages, **self.sampling_params)
                 parsed_q, parsed_a = self.parse_output(output)
