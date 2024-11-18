@@ -302,8 +302,8 @@ class RayRedisMinhashDeduplicator(Deduplicator):
                                     batch_format='pyarrow').groupby(
                                         HashKeys.minhash).aggregate(
                                             UnionFn(union_find)).materialize()
-        result = dataset_with_id.map_batches(filter_with_union_find,
-                                             batch_format='pyarrow')
+        result = dataset_with_id.map_batches(
+            filter_with_union_find, batch_format='pyarrow').materialize()
         logger.info(f'Keep {result.count()} samples after MinHash dedup.')
         union_find.clean()
         return result
