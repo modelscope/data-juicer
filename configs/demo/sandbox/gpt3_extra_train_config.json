@@ -1,14 +1,14 @@
 {
   "type": "modelscope",
   "dataset_path": "./outputs/demo-process/demo-processed.jsonl",
-  "work_dir": "./demos/data/",
+  "work_dir": "./outputs/sandbox-train/",
   "model_name": "iic/nlp_gpt3_text-generation_chinese-base",
   "trainer_name": "nlp-base-trainer",
   "key_remapping": {
     "text": "src_txt"
   },
   "train": {
-    "max_epochs": 3,
+    "max_epochs": 2,
     "lr_scheduler": {
       "type": "StepLR",
       "step_size": 2,
