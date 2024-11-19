@@ -144,7 +144,7 @@ class RayRedisMinhashDeduplicator(Deduplicator):
         num_bands: Optional[PositiveInt] = None,
         num_rows_per_band: Optional[PositiveInt] = None,
         tokenizer_model: Optional[str] = None,
-        redis_address: str = 'redis://localhost:6379',
+        redis_address: str = 'redis://localhost:6380',
         *args,
         **kwargs,
     ):
@@ -303,7 +303,7 @@ class RayRedisMinhashDeduplicator(Deduplicator):
                                         HashKeys.minhash).aggregate(
                                             UnionFn(union_find)).materialize()
         result = dataset_with_id.map_batches(filter_with_union_find,
-                                             batch_format='pyarrow')
+                                             batch_format='pyarrow').materialize()
         logger.info(f'Keep {result.count()} samples after MinHash dedup.')
         union_find.clean()
         return result
@@ -349,20 +349,32 @@ class RayRedisMinhashDeduplicator(Deduplicator):
             raise NotImplementedError(
                 f'Unimplemented tokenization method [{self.tokenization}]')
 
-        # compute minhash value
-        hv = np.array([sha1_hash32(token) for token in tokens],
-                      dtype=np.uint64)
-        phv = np.bitwise_and(
-            ((hv * np.tile(self.perm_a,
-                           (len(hv), 1)).T).T + self.perm_b) % MERSENNE_PRIME,
-            MAX_HASH)
-        hash_values = np.vstack([
-            phv,
-            np.ones(self.num_permutation, dtype=np.uint64) * MAX_HASH
-        ]).min(axis=0)
+        # # compute minhash value
+        # hv = np.array([sha1_hash32(token) for token in tokens],
+        #               dtype=np.uint64)
+        # phv = np.bitwise_and(
+        #     ((hv * np.tile(self.perm_a,
+        #                    (len(hv), 1)).T).T + self.perm_b) % MERSENNE_PRIME,
+        #     MAX_HASH)
+        # hash_values = np.vstack([
+        #     phv,
+        #     np.ones(self.num_permutation, dtype=np.uint64) * MAX_HASH
+        # ]).min(axis=0)
+        if len(tokens) > 0:
+            hv = np.array(
+                [sha1_hash32(token) for token in tokens],
+                dtype=np.uint64
+            )
+            phv = (
+                (hv[:, None] * self.perm_a[None, :] 
+                    + self.perm_b) % MERSENNE_PRIME
+            ).astype(np.uint32)
+            hash_values = phv.min(axis=0)
+        else:
+            hash_values = np.full_like(self.perm_a, MAX_HASH, dtype=np.uint32)
         return [
             bytes(hash_values[start:end].byteswap().data) +
-            start.to_bytes(8, byteorder='little')
+            start.to_bytes(4, byteorder='little')
             for start, end in self.hash_ranges
             # groupby minhash||brand_id
         ]
