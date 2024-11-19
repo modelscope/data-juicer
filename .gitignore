@@ -16,3 +16,4 @@ wandb/
 __pycache__
 .vscode/
 **/__dj__produced_data__/*
+venv/
