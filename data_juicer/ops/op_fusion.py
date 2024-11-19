@@ -33,15 +33,11 @@ ALL_INTER_VARS = [
 FUSION_STRATEGIES = {'greedy', 'probe'}
 
 
-def fuse_operators(ops, fusion_strategy='greedy', probe_res=None):
+def fuse_operators(ops, probe_res=None):
     """
     Fuse the input ops list and return the fused ops list.
 
     :param ops: the corresponding list of op objects.
-    :param fusion_strategy: the OP fusion strategy. Should be one of {"greedy",
-        "probe"}. "greedy" means only put the fused OP to the last of OP group.
-        "probe" means reordering the OPs according to the probed processing
-        speed of each OP.
     :param probe_res: the probed speed for each OP from Monitor.
     :return: a list of fused op objects.
     """
@@ -58,7 +54,7 @@ def fuse_operators(ops, fusion_strategy='greedy', probe_res=None):
             filter_group.append((op, op_probe))
         elif in_group:
             # got a filter group, try to fuse them
-            fused_group = fuse_filter_group(filter_group, fusion_strategy)
+            fused_group = fuse_filter_group(filter_group)
             fused_ops.extend(fused_group)
             filter_group = []
             in_group = False
@@ -68,21 +64,17 @@ def fuse_operators(ops, fusion_strategy='greedy', probe_res=None):
             fused_ops.append(op)
     if in_group and len(filter_group) > 0:
         # the final filter group, try to fuse them
-        fused_group = fuse_filter_group(filter_group, fusion_strategy)
+        fused_group = fuse_filter_group(filter_group)
         fused_ops.extend(fused_group)
     return fused_ops
 
 
-def fuse_filter_group(original_filter_group, fusion_strategy='greedy'):
+def fuse_filter_group(original_filter_group):
     """
     Fuse single filter group and return the fused filter group.
 
     :param original_filter_group: the original filter group, including op
         definitions and objects.
-    :param fusion_strategy: the OP fusion strategy. Should be one of {"greedy",
-        "probe"}. "greedy" means only put the fused OP to the last of OP group.
-        "probe" means reordering the OPs according to the probed processing
-        speed of each OP.
     :return: the fused definitions and objects of the input filter group.
     """
     fused_group = []

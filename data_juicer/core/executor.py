@@ -175,7 +175,7 @@ class Executor:
 
             logger.info(f'Start OP fusion and reordering with strategy '
                         f'[{self.cfg.fusion_strategy}]...')
-            ops = fuse_operators(ops, self.cfg.fusion_strategy, probe_res)
+            ops = fuse_operators(ops, probe_res)
 
         # adaptive batch size
         if self.cfg.adaptive_batch_size:

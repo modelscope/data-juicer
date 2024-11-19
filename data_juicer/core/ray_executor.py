@@ -77,7 +77,7 @@ class RayExecutor:
 
             logger.info(f'Start OP fusion and reordering with strategy '
                         f'[{self.cfg.fusion_strategy}]...')
-            ops = fuse_operators(ops, self.cfg.fusion_strategy)
+            ops = fuse_operators(ops, probe_res)
 
         # 3. data process
         logger.info('Processing data...')

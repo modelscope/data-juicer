@@ -279,13 +279,13 @@ def init_configs(args: Optional[List[str]] = None):
     parser.add_argument(
         '--fusion_strategy',
         type=str,
-        default='greedy',
+        default='probe',
         help='OP fusion strategy. Support ["greedy", "probe"] now. "greedy" '
         'means keep the basic OP order and put the fused OP to the last '
         'of each fused OP group. "probe" means Data-Juicer will probe '
         'the running speed for each OP at the beginning and reorder the '
         'OPs and fused OPs according to their probed speed (fast to '
-        'slow). It\'s "greedy" in default.')
+        'slow). It\'s "probe" in default.')
     parser.add_argument(
         '--adaptive_batch_size',
         type=bool,

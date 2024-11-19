@@ -101,7 +101,7 @@ class Analyzer:
 
             logger.info(f'Start OP fusion and reordering with strategy '
                         f'[{self.cfg.fusion_strategy}]...')
-            ops = fuse_operators(ops, self.cfg.fusion_strategy, probe_res)
+            ops = fuse_operators(ops, probe_res)
 
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')
