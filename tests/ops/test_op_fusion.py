@@ -9,10 +9,7 @@ class OpFusionTest(DataJuicerTestCaseBase):
 
     def _run_op_fusion(self, original_process_list, target_process_list, probe_res=None):
         ops = load_ops(original_process_list)
-        if probe_res:
-            ops = fuse_operators(ops, True, probe_res)
-        else:
-            ops = fuse_operators(ops, True, probe_res)
+        ops = fuse_operators(ops, probe_res)
         new_process_list = [op._op_cfg for op in ops]
         self.assertEqual(new_process_list, target_process_list)
 
