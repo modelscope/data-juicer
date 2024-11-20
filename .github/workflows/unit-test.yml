@@ -18,7 +18,7 @@ env:
 
 jobs:
   unittest-single:
-    runs-on: [self-hosted, linux]
+    runs-on: [self-hosted, linux, unittest]
     environment: Testing
     steps:
     - uses: actions/checkout@v3

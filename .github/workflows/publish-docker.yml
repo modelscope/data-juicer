@@ -17,7 +17,7 @@ env:
 
 jobs:
   build:
-    runs-on: [self-hosted, linux]
+    runs-on: [docker]
     permissions:
       contents: read
       packages: write
