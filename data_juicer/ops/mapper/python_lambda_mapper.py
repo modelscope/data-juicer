@@ -1,4 +1,5 @@
 import ast
+from typing import Optional
 
 from ..base_op import OPERATORS, Mapper
 
@@ -8,9 +9,12 @@ OP_NAME = 'python_lambda_mapper'
 @OPERATORS.register_module(OP_NAME)
 class PythonLambdaMapper(Mapper):
 
-    def __init__(self, lambda_str: str):
+    def __init__(self, lambda_str: Optional[str] = None):
         # Parse and validate the lambda function
-        self.lambda_func = self._create_lambda(lambda_str)
+        if not lambda_str:
+            self.lambda_func = lambda sample: sample
+        else:
+            self.lambda_func = self._create_lambda(lambda_str)
 
     def _create_lambda(self, lambda_str: str):
         # Parse input string into an AST and check for a valid lambda function
