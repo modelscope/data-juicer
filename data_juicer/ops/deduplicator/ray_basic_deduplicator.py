@@ -1,5 +1,3 @@
-from pydantic import PositiveInt
-
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 

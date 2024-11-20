@@ -1,5 +1,4 @@
 import numpy as np
-from pydantic import PositiveInt
 
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
@@ -46,9 +45,7 @@ class RayImageDeduplicator(RayBasicDeduplicator):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(redis_address=redis_address,
-                         *args,
-                         **kwargs)
+        super().__init__(redis_address=redis_address, *args, **kwargs)
         if method not in HASH_METHOD:
             raise ValueError(f'Keep strategy [{method}] is not supported. '
                              f'Can only be one of {HASH_METHOD}.')

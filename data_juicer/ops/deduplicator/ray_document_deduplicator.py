@@ -2,7 +2,6 @@ import hashlib
 import string
 
 import regex as re
-from pydantic import PositiveInt
 
 from ..base_op import OPERATORS
 from .ray_basic_deduplicator import RayBasicDeduplicator
@@ -31,9 +30,7 @@ class RayDocumentDeduplicator(RayBasicDeduplicator):
         :param args: extra args
         :param kwargs: extra args.
         """
-        super().__init__(redis_address=redis_address,
-                         *args,
-                         **kwargs)
+        super().__init__(redis_address=redis_address, *args, **kwargs)
         self.lowercase = lowercase
         self.remove_non_character_regex = re.compile(
             f'\s+|\d+|[{re.escape(string.punctuation)}]'  # noqa: W605

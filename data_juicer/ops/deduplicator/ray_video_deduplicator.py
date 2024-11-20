@@ -1,7 +1,5 @@
 import hashlib
 
-from pydantic import PositiveInt
-
 from data_juicer.utils.mm_utils import (close_video, load_data_with_context,
                                         load_video)
 
@@ -30,9 +28,7 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(redis_address=redis_address,
-                         *args,
-                         **kwargs)
+        super().__init__(redis_address=redis_address, *args, **kwargs)
 
     def calculate_hash(self, sample, context=False):
         if self.video_key not in sample or not sample[self.video_key]:
