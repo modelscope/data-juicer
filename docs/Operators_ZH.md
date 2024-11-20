@@ -13,7 +13,7 @@ Data-Juicer 中的算子分为以下 5 种类型。
 | [ Formatter ]( #formatter )        |  9 | 发现、加载、规范化原始数据 |
 | [ Mapper ]( #mapper )              | 58 | 对数据样本进行编辑和转换  |
 | [ Filter ]( #filter )              | 44 | 过滤低质量样本       |
-| [ Deduplicator ]( #deduplicator )  |  8 | 识别、删除重复样本     |
+| [ Deduplicator ]( #deduplicator )  |  9 | 识别、删除重复样本     |
 | [ Selector ]( #selector )          |  4 | 基于排序选取高质量样本   |
 
 下面列出所有具体算子，每种算子都通过多个标签来注明其主要功能。

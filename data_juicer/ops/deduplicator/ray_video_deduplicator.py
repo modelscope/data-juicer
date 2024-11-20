@@ -21,19 +21,16 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
     """
 
     def __init__(self,
-                 redis_host: str = 'localhost',
-                 redis_port: PositiveInt = 6380,
+                 redis_address: str = 'redis://localhost:6379',
                  *args,
                  **kwargs):
         """
         Initialization.
-        :param redis_host: the hostname of redis server
-        :param redis_port: the port of redis server
+        :param redis_address: the address of redis server
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(redis_host=redis_host,
-                         redis_port=redis_port,
+        super().__init__(redis_address=redis_address,
                          *args,
                          **kwargs)
 

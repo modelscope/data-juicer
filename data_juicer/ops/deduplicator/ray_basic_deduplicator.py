@@ -19,23 +19,20 @@ class RayBasicDeduplicator(Filter):
     EMPTY_HASH_VALUE = 'EMPTY'
 
     def __init__(self,
-                 redis_host: str = 'localhost',
-                 redis_port: PositiveInt = 6380,
+                 redis_address: str = 'redis://localhost:6379',
                  *args,
                  **kwargs):
         """
         Initialization.
-        :param redis_host: the hostname of redis server
-        :param redis_port: the port of redis server
+        :param redis_address: the address of redis server
         :param args: extra args
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.redis_host = redis_host
-        self.redis_port = redis_port
+        self.redis_address = redis_address
         # TODO: add a barrier to ensure that flushdb is performed before
         # the operator is called
-        r = redis.StrictRedis(host=self.redis_host, port=self.redis_port, db=0)
+        r = redis.from_url(url=redis_address)
         r.flushdb(0)
 
     def calculate_hash(self, sample, context=False):
@@ -44,7 +41,7 @@ class RayBasicDeduplicator(Filter):
 
     def compute_stats_single(self, sample, context=False):
         # init redis client
-        r = redis.StrictRedis(host=self.redis_host, port=self.redis_port, db=0)
+        r = redis.from_url(url=self.redis_address)
         # compute hash
         md5_value = self.calculate_hash(sample, context)
         # check existing

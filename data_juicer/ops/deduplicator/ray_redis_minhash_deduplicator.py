@@ -128,9 +128,7 @@ OP_NAME = 'ray_redis_minhash_deduplicator'
 @OPERATORS.register_module(OP_NAME)
 class RayRedisMinhashDeduplicator(Deduplicator):
     """
-    A basic exact matching deduplicator for RAY.
-    Although its functionality is deduplication,
-    it is implemented as Filter sub-class.
+    A MinhashLSH deduplicator based on RAY and Redis.
     """
 
     def __init__(
