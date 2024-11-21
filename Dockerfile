@@ -3,17 +3,6 @@
 
 FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 
-# prepare the java env
-WORKDIR /opt
-# download jdk
-RUN wget https://aka.ms/download-jdk/microsoft-jdk-17.0.9-linux-x64.tar.gz -O jdk.tar.gz \
-    && tar -xzf jdk.tar.gz \
-    && rm -rf jdk.tar.gz \
-    && mv jdk-17.0.9+8 jdk
-
-# set the environment variable
-ENV JAVA_HOME=/opt/jdk
-
 # install python 3.10
 RUN apt-get update \
     && apt-get install -y git curl vim wget python3.10 libpython3.10-dev python3-pip \
@@ -26,6 +15,17 @@ RUN apt-get update \
 # install 3rd-party system dependencies
 RUN apt-get update \
     && apt-get install ffmpeg libsm6 libxext6 software-properties-common build-essential cmake  -y
+
+# prepare the java env
+WORKDIR /opt
+# download jdk
+RUN wget https://aka.ms/download-jdk/microsoft-jdk-17.0.9-linux-x64.tar.gz -O jdk.tar.gz \
+    && tar -xzf jdk.tar.gz \
+    && rm -rf jdk.tar.gz \
+    && mv jdk-17.0.9+8 jdk
+
+# set the environment variable
+ENV JAVA_HOME=/opt/jdk
 
 WORKDIR /data-juicer
 
