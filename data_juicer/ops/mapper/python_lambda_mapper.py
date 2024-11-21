@@ -9,7 +9,8 @@ OP_NAME = 'python_lambda_mapper'
 @OPERATORS.register_module(OP_NAME)
 class PythonLambdaMapper(Mapper):
 
-    def __init__(self, lambda_str: Optional[str] = None):
+    def __init__(self, lambda_str: Optional[str] = None, **kwargs):
+        super().__init__(**kwargs)
         # Parse and validate the lambda function
         if not lambda_str:
             self.lambda_func = lambda sample: sample
