@@ -1,7 +1,7 @@
 # The data-juicer image includes all open-source contents of data-juicer,
 # and it will be instaled in editable mode.
 
-FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
+FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
 # install python 3.10
 RUN apt-get update \
@@ -31,7 +31,6 @@ WORKDIR /data-juicer
 
 # install requirements which need to be installed from source
 RUN pip install --upgrade setuptools==69.5.1 setuptools_scm \
-    && pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 --default-timeout 1000 \
     && pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000
 
 # install requirements first to better reuse installed library cache
