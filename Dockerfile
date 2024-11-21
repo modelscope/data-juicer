@@ -33,6 +33,9 @@ WORKDIR /data-juicer
 RUN pip install --upgrade setuptools==69.5.1 setuptools_scm \
     && pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000
 
+# install torch on cuda:11.8 first
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 --default-timeout 1000
+
 # install requirements first to better reuse installed library cache
 COPY environments/ environments/
 RUN cat environments/* | grep -v '^#' | xargs pip install --default-timeout 1000
