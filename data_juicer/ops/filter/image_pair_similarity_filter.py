@@ -30,7 +30,7 @@ class ImagePairSimilarityFilter(Filter):
                  *args,
                  **kwargs):
         """
-    Initialization method.
+        Initialization method.
 
         :param hf_clip: clip model name on huggingface to compute
             the similarity between image and text.

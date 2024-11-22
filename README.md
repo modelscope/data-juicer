@@ -109,7 +109,7 @@ Table of Contents
   visualization, and multidimensional automatic evaluation, so that you can better understand and improve your data and models.
   ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
-- **Towards production environment **: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
+- **Towards production environment**: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
   requiring less memory and CPU usage, optimized with automatic fault-toleration.
   ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
 
@@ -305,8 +305,8 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 - To run data processing across multiple machines, it is necessary to ensure that all distributed nodes can access the corresponding data paths (for example, by mounting the respective data paths on a file-sharing system such as NAS).
 - The deduplicator operators for RAY mode are different from the single-machine version, and all those operators are prefixed with `ray`, e.g. `ray_video_deduplicator` and `ray_document_deduplicator`. Those operators also rely on a [Redis](https://redis.io/) instance. So in addition to starting the RAY cluster, you also need to setup your Redis instance in advance and provide `host` and `port` of your Redis instance in configuration.
 
-> Users can also opt not to use RAY and instead split the dataset to run on a cluster with [Slurm](https://slurm.schedmd.com/) / [Aliyun PAI-DLC](https://www.aliyun.com/activity/bigdata/pai-dlc). In this case, please use the default Data-Juicer without RAY.
-
+> Users can also opt not to use RAY and instead split the dataset to run on a cluster with [Slurm](https://slurm.schedmd.com/). In this case, please use the default Data-Juicer without RAY.
+> [Aliyun PAI-DLC](https://www.aliyun.com/activity/bigdata/pai-dlc) supports the RAY framework, Slurm framework, etc. Users can directly create RAY jobs and Slurm jobs on the DLC cluster.
 
 ### Data Analysis
 - Run `analyze_data.py` tool or `dj-analyze` command line tool with your config as the argument to analyze your dataset.

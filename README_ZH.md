@@ -282,7 +282,8 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
  - 如果需要在多机上使用RAY执行数据处理，需要确保所有节点都可以访问对应的数据路径，即将对应的数据路径挂载在共享文件系统（如NAS）中。
  - RAY 模式下的去重算子与单机版本不同，所有 RAY 模式下的去重算子名称都以 `ray` 作为前缀，例如 `ray_video_deduplicator` 和 `ray_document_deduplicator`。这些去重算子依赖于 [Redis](https://redis.io/) 实例.因此使用前除启动 RAY 集群外还需要启动 Redis 实例，并在对应的配置文件中填写 Redis 实例的 `host` 和 `port`。
 
-> 用户也可以不使用 RAY，拆分数据集后使用 [Slurm](https://slurm.schedmd.com/) / [阿里云 PAI-DLC](https://www.aliyun.com/activity/bigdata/pai-dlc) 在集群上运行，此时使用不包含 RAY 的原版 Data-Juicer 即可。
+> 用户也可以不使用 RAY，拆分数据集后使用 [Slurm](https://slurm.schedmd.com/) 在集群上运行，此时使用不包含 RAY 的原版 Data-Juicer 即可。
+> [阿里云 PAI-DLC](https://www.aliyun.com/activity/bigdata/pai-dlc) 支持 RAY 框架、Slurm 框架等，用户可以直接在DLC集群上创建 RAY 作业 和 Slurm 作业。
 
 ### 数据分析
 

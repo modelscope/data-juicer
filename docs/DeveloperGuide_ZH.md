@@ -266,13 +266,13 @@ if __name__ == '__main__':
    ```markdown
    ## Overview
    ...
-   | [ Filter ]( #filter )             |   21 (+1 HERE)   | Filters out low-quality samples                 |
+   | [ Filter ]( #filter )             |   43 (+1 HERE)   | Filters out low-quality samples                 |
    ...
    ## Filter <a name="filter"/>
    ...
-   | suffix_filter                  | General | en, zh | Keeps samples with specified suffixes                                                      |
-   | text_length_filter             | General | en, zh | Keeps samples with total text length within the specified range                            |
-   | token_num_filter               | General | en, zh | Keeps samples with token count within the specified range                                  |
+   | text_entity_dependency_filter | ![General](https://img.shields.io/badge/General-5FBF50?style=plastic) ![Text](https://img.shields.io/badge/Text-010326?style=plastic) ![en](https://img.shields.io/badge/en-A60D1A?style=plastic) ![zh](https://img.shields.io/badge/zh-F2D6A2?style=plastic)                                                               | Keeps samples containing dependency edges for an entity in the dependency tree of the texts | [code](../data_juicer/ops/filter/text_entity_dependency_filter.py) | [tests](../tests/ops/filter/test_text_entity_dependency_filter.py) |
+   | text_length_filter            | ![General](https://img.shields.io/badge/General-5FBF50?style=plastic) ![Text](https://img.shields.io/badge/Text-010326?style=plastic) ![en](https://img.shields.io/badge/en-A60D1A?style=plastic) ![zh](https://img.shields.io/badge/zh-F2D6A2?style=plastic)                                                               | Keeps samples with total text length within the specified range                             | [code](../data_juicer/ops/filter/text_length_filter.py)            | [tests](../tests/ops/filter/test_text_length_filter.py)            |
+   | token_num_filter              | ![General](https://img.shields.io/badge/General-5FBF50?style=plastic) ![Text](https://img.shields.io/badge/Text-010326?style=plastic) ![en](https://img.shields.io/badge/en-A60D1A?style=plastic) ![zh](https://img.shields.io/badge/zh-F2D6A2?style=plastic) ![GPU](https://img.shields.io/badge/GPU-F27649?style=plastic) | Keeps samples with token count within the specified range                                   | [code](../data_juicer/ops/filter/token_num_filter.py)              | [tests](../tests/ops/filter/test_token_num_filter.py)              |
    ...
    ```
 

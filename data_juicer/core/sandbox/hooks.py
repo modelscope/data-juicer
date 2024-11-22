@@ -168,6 +168,7 @@ class ProcessDataHook(BaseHook):
         # basic routine to process data, users can customize this freely
         logger.info('Begin to process the data with given dj recipe')
         data_executor.run()
+        kwargs['dataset_path'] = self.inited_dj_cfg.export_path
         return kwargs
 
 
@@ -184,6 +185,9 @@ class TrainModelHook(BaseHook):
 
     def hook(self, **kwargs):
         self.specify_dj_and_extra_configs()
+        # try to update train dataset
+        if 'dataset_path' in kwargs:
+            self.other_cfg['train_dataset'] = kwargs['dataset_path']
         model_trainer = model_train_executor_factory(self.other_cfg,
                                                      watcher=self.watcher)
         # basic routine to train model via the processed data,

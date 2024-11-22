@@ -11,7 +11,6 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 
 
-@SKIPPED_TESTS.register_module()
 class VideoRemoveWatermarkMapperTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',

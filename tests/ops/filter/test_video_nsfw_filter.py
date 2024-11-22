@@ -10,7 +10,6 @@ from data_juicer.ops.filter.video_nsfw_filter import VideoNSFWFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
-@SKIPPED_TESTS.register_module()
 class VideoNSFWFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',

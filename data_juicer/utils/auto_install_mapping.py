@@ -2,7 +2,7 @@
 MODULE_TO_PKGS = {
     'aesthetics_predictor': ['simple-aesthetics-predictor'],
     'cv2': ['opencv-python'],
-    'fasttext': ['fasttext', 'fasttext-wheel'],
+    'fasttext': ['fasttext-wheel'],
     'ffmpeg': ['ffmpeg-python'],
     'PIL': ['Pillow'],
     'ram': ['ram@git+https://github.com/xinyu1205/recognize-anything.git'],
@@ -18,10 +18,11 @@ PKG_TO_OPS = {
         'image_watermark_filter', 'phrase_grounding_recall_filter',
         'video_aesthetics_filter', 'video_frames_text_similarity_filter',
         'video_nsfw_filter', 'video_tagging_from_frames_filter',
-        'video_watermark_filter', 'extract_qa_mapper',
-        'generate_instruction_mapper', 'image_captioning_mapper',
+        'video_watermark_filter', 'generate_qa_from_text_mapper',
+        'generate_qa_from_examples_mapper', 'image_captioning_mapper',
         'image_diffusion_mapper', 'image_tagging_mapper',
-        'optimize_instruction_mapper', 'video_captioning_from_frames_mapper',
+        'optimize_query_mapper', 'optimize_response_mapper',
+        'optimize_qa_mapper', 'video_captioning_from_frames_mapper',
         'video_captioning_from_summarizer_mapper',
         'video_captioning_from_video_mapper',
         'video_tagging_from_audio_mapper', 'video_tagging_from_frames_mapper'
@@ -31,7 +32,6 @@ PKG_TO_OPS = {
         'video_tagging_from_audio_mapper'
     ],
     'easyocr': ['video_ocr_area_ratio_filter'],
-    'fasttext': ['language_id_score_filter'],
     'fasttext-wheel': ['language_id_score_filter'],
     'kenlm': ['perplexity_filter'],
     'sentencepiece': [
@@ -56,9 +56,10 @@ PKG_TO_OPS = {
         'image_watermark_filter', 'phrase_grounding_recall_filter',
         'token_num_filter', 'video_aesthetics_filter',
         'video_frames_text_similarity_filter', 'video_nsfw_filter',
-        'extract_qa_mapper', 'generate_instruction_mapper',
+        'generate_qa_from_text_mapper', 'generate_qa_from_examples_mapper',
         'image_captioning_mapper', 'image_diffusion_mapper',
-        'optimize_instruction_mapper', 'video_captioning_from_audio_mapper',
+        'optimize_query_mapper', 'optimize_response_mapper',
+        'optimize_qa_mapper', 'video_captioning_from_audio_mapper',
         'video_captioning_from_frames_mapper',
         'video_captioning_from_summarizer_mapper',
         'video_captioning_from_video_mapper', 'video_tagging_from_audio_mapper'
@@ -96,9 +97,12 @@ PKG_TO_OPS = {
         'video_remove_watermark_mapper'
     ],
     'vllm': [
-        'extract_qa_mapper', 'generate_instruction_mapper',
-        'optimize_instruction_mapper'
+        'generate_qa_from_text_mapper',
+        'generate_qa_from_examples_mapper',
+        'optimize_query_mapper',
+        'optimize_response_mapper',
+        'optimize_qa_mapper',
     ],
-    'rouge': ['generate_instruction_mapper'],
+    'rouge': ['generate_qa_from_examples_mapper'],
     'ram': ['image_tagging_mapper', 'video_tagging_from_frames_mapper']
 }
