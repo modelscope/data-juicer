@@ -40,9 +40,9 @@ class ExtractEntityAttributeMapper(Mapper):
     DEFAULT_DEMON_PATTERN = r'\#\#\#\s*代表性示例(\d+)：\s*(.*?)(?=\#\#\#|\Z)'
 
     def __init__(self,
+                 api_model: str = 'gpt-4o',
                  query_entities: List[str] = [],
                  query_attributes: List[str] = [],
-                 api_model: str = 'gpt-4o',
                  *,
                  entity_key: str = Fields.main_entity,
                  attribute_key: str = Fields.attribute,
@@ -61,9 +61,9 @@ class ExtractEntityAttributeMapper(Mapper):
                  **kwargs):
         """
         Initialization method.
+        :param api_model: API model name.
         :param query_entities: Entity list to be queried.
         :param query_attributes: Attribute list to be queried.
-        :param api_model: API model name.
         :param entity_key: The field name to store the given main entity for
             attribute extraction. It's "__dj__entity__" in default.
         :param entity_attribute_key: The field name to store the given

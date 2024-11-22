@@ -11,6 +11,10 @@ class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
 
     def _run_helper(self, op, samples):
 
+        # before runing this test, set below environment variables:
+        # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
+        # export OPENAI_API_KEY=your_dashscope_key
+
         dataset = Dataset.from_list(samples)
         new_dataset = op.run(dataset)
 
@@ -33,7 +37,7 @@ class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
             },
         ]
         op = EntityAttributeAggregator(
-            hf_or_api_model='qwen2.5-72b-instruct',
+            api_model='qwen2.5-72b-instruct',
             entity='李莲花',
             attribute='主要经历'
         )
@@ -52,7 +56,7 @@ class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
             },
         ]
         op = EntityAttributeAggregator(
-            hf_or_api_model='qwen2.5-72b-instruct',
+            api_model='qwen2.5-72b-instruct',
             entity='李莲花',
             attribute='身份背景',
             input_key='sub_docs',
@@ -73,7 +77,7 @@ class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
             },
         ]
         op = EntityAttributeAggregator(
-            hf_or_api_model='qwen2.5-72b-instruct',
+            api_model='qwen2.5-72b-instruct',
             entity='李莲花',
             attribute='身份背景',
             max_token_num=200
@@ -93,7 +97,7 @@ class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
             },
         ]
         op = EntityAttributeAggregator(
-            hf_or_api_model='qwen2.5-72b-instruct',
+            api_model='qwen2.5-72b-instruct',
             entity='李莲花',
             attribute='身份背景',
             word_limit=20
@@ -121,7 +125,7 @@ class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
         '孙行者、齐天大圣、美猴王\n'
     )
         op = EntityAttributeAggregator(
-            hf_or_api_model='qwen2.5-72b-instruct',
+            api_model='qwen2.5-72b-instruct',
             entity='李莲花',
             attribute='另外身份',
             example_prompt=example_prompt,
@@ -129,33 +133,6 @@ class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
         )
         self._run_helper(op, samples)
 
-
-    # def test_hf_model(self):
-    #     samples = [
-    #         {
-    #             'text': [
-    #                 "十年前，李相夷十五岁战胜西域天魔成为天下第一高手，十七岁建立四顾门，二十岁问鼎武林盟主，成为传奇人物。",
-    #                 "有人视李相夷为中原武林的希望，但也有人以战胜他为目标，包括魔教金鸳盟盟主笛飞声。笛飞声设计加害李相夷的师兄单孤刀，引得李相夷与之一战。",
-    #                 '在东海的一艘船上，李相夷独自一人对抗金鸳盟的高手，最终击败了大部分敌人。笛飞声突然出现，两人激战，李相夷在战斗中中毒，最终被笛飞声重伤，船只爆炸，李相夷沉入大海。',
-    #                 '十年后，李莲花在一个寒酸的莲花楼内醒来，表现出与李相夷截然不同的性格。他以神医的身份在小镇上行医，但生活贫困。',
-    #                 '小镇上的皮影戏摊讲述李相夷和笛飞声的故事，孩子们争论谁赢了。风火堂管事带着人来找李莲花，要求他救治一个“死人”。'
-    #             ]
-    #         },
-    #     ]
-    #     op = EntityAttributeAggregator(
-    #         hf_or_api_model='/mnt/workspace/shared/checkpoints/qwen/qwen2.5/Qwen2.5-3B-Instruct',
-    #         entity='李莲花',
-    #         attribute='身份背景',
-    #         is_hf_model=True,
-    #         model_params={
-    #             'trust_remote_code': True
-    #         },
-    #         sampling_params={
-    #             'max_new_tokens': 50
-    #         }
-    #     )
-    #     ## TODO：返回的是message而不是text
-    #     self._run_helper(op, samples)
 
 if __name__ == '__main__':
     unittest.main()

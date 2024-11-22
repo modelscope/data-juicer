@@ -6,11 +6,10 @@ from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Aggregator
 from data_juicer.utils.common_utils import (avg_split_string_list_under_limit,
-                                            get_val_by_nested_key,
-                                            is_string_list)
+                                            is_string_list, nested_access,
+                                            nested_set)
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.model_utils import (get_model, parse_model_response,
-                                           prepare_model)
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 from .nested_aggregator import NestedAggregator
 
@@ -56,7 +55,7 @@ class EntityAttributeAggregator(Aggregator):
     DEFAULT_OUTPUT_PATTERN_TEMPLATE = r'\#\s*{entity}\s*\#\#\s*{attribute}\s*(.*?)\Z'  # noqa: E501
 
     def __init__(self,
-                 hf_or_api_model: str = 'gpt-4o',
+                 api_model: str = 'gpt-4o',
                  entity: str = None,
                  attribute: str = None,
                  input_key: str = None,
@@ -71,14 +70,12 @@ class EntityAttributeAggregator(Aggregator):
                  input_template: Optional[str] = None,
                  output_pattern_template: Optional[str] = None,
                  try_num: PositiveInt = 3,
-                 is_hf_model: bool = False,
-                 enable_vllm: bool = False,
                  model_params: Dict = {},
                  sampling_params: Dict = {},
                  **kwargs):
         """
         Initialization method.
-        :param hf_or_api_model: Huggingface model or API model name.
+        :param api_model: API model name.
         :param entity: The given entity.
         :param attribute: The given attribute.
         :param input_key: The input field key in the samples. Support for
@@ -99,8 +96,6 @@ class EntityAttributeAggregator(Aggregator):
         :param output_pattern_template: The output template.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
-        :param is_hf_model: If the hf_or_api_model is huggingface model.
-        :param enable_vllm: Whether to use VLLM for inference acceleration.
         :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
@@ -118,61 +113,38 @@ class EntityAttributeAggregator(Aggregator):
         self.word_limit = word_limit
         self.max_token_num = max_token_num
 
-        self.system_prompt_template = system_prompt_template or \
+        system_prompt_template = system_prompt_template or \
             self.DEFAULT_SYSTEM_TEMPLATE
         self.example_prompt = example_prompt or self.DEFAULT_EXAMPLE_PROMPT
         self.input_template = input_template or self.DEFAULT_INPUT_TEMPLATE
         output_pattern_template = output_pattern_template or \
             self.DEFAULT_OUTPUT_PATTERN_TEMPLATE
+        self.system_prompt = system_prompt_template.format(
+            entity=self.entity,
+            attribute=self.attribute,
+            word_limit=self.word_limit,
+            example=self.example_prompt)
         self.output_pattern = output_pattern_template.format(
             entity=entity, attribute=attribute)
 
         self.sampling_params = sampling_params
-        self.is_hf_model = is_hf_model
-        self.enable_vllm = enable_vllm
-        if is_hf_model and enable_vllm:
-            assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
-            # cannot initialize vllm replicas on different GPUs
-            self.num_proc = 1
-            if model_params.get('tensor_parallel_size') is None:
-                tensor_parallel_size = torch.cuda.device_count()
-                logger.info(f'Set tensor_parallel_size to \
-                    {tensor_parallel_size} for vllm.')
-                model_params['tensor_parallel_size'] = tensor_parallel_size
-            self.model_key = prepare_model(
-                model_type='vllm',
-                pretrained_model_name_or_path=hf_or_api_model,
-                **model_params)
-            self.sampling_params = vllm.SamplingParams(**sampling_params)
-        elif is_hf_model:
-            self.model_key = prepare_model(
-                model_type='huggingface',
-                pretrained_model_name_or_path=hf_or_api_model,
-                return_pipe=True,
-                **model_params)
-            self.sampling_params = sampling_params
-        else:
-            self.model_key = prepare_model(model_type='api',
-                                           api_model=hf_or_api_model,
-                                           url=api_url,
-                                           response_path=response_path,
-                                           return_processor=True,
-                                           **model_params)
+        self.model_key = prepare_model(model_type='api',
+                                       api_model=api_model,
+                                       url=api_url,
+                                       response_path=response_path,
+                                       return_processor=True,
+                                       **model_params)
 
         self.try_num = try_num
-        self.nested_sum = NestedAggregator(hf_or_api_model=hf_or_api_model,
+        self.nested_sum = NestedAggregator(api_model=api_model,
                                            max_token_num=max_token_num,
                                            api_url=api_url,
                                            response_path=response_path,
                                            try_num=try_num,
-                                           is_hf_model=is_hf_model,
-                                           enable_vllm=enable_vllm,
                                            model_params=model_params,
                                            sampling_params=sampling_params)
 
     def parse_output(self, response):
-        response = parse_model_response(response)
-
         pattern = re.compile(self.output_pattern, re.VERBOSE | re.DOTALL)
         matches = pattern.findall(response)
         if matches:
@@ -192,18 +164,13 @@ class EntityAttributeAggregator(Aggregator):
                                                        self.max_token_num)
         results = []
         for docs in group_docs:
-            system_prompt = self.system_prompt_template.format(
-                entity=self.entity,
-                attribute=self.attribute,
-                word_limit=self.word_limit,
-                example=self.example_prompt)
             doc_str = '\n\n'.join(docs)
             input_prompt = self.input_template.format(entity=self.entity,
                                                       attribute=self.attribute,
                                                       sub_docs=doc_str)
             messages = [{
                 'role': 'system',
-                'content': system_prompt
+                'content': self.system_prompt
             }, {
                 'role': 'user',
                 'content': input_prompt
@@ -224,10 +191,11 @@ class EntityAttributeAggregator(Aggregator):
     def process_single(self, sample=None, rank=None):
 
         # if not batched sample
-        sub_docs = get_val_by_nested_key(sample, self.input_key)
+        sub_docs = nested_access(sample, self.input_key)
         if not is_string_list(sub_docs):
             return sample
 
-        sample[self.output_key] = self.attribute_summary(sub_docs, rank=rank)
+        sample = nested_set(sample, self.output_key,
+                            self.attribute_summary(sub_docs, rank=rank))
 
         return sample

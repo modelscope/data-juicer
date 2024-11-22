@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from data_juicer.utils.common_utils import dict_to_hash, get_val_by_nested_key
+from data_juicer.utils.common_utils import dict_to_hash, nested_access
 
 from ..base_op import OPERATORS, Grouper, convert_list_dict_to_dict_list
 from .naive_grouper import NaiveGrouper
@@ -37,7 +37,7 @@ class KeyValueGrouper(Grouper):
         for sample in dataset:
             cur_dict = {}
             for key in self.group_by_keys:
-                cur_dict[key] = get_val_by_nested_key(sample, key)
+                cur_dict[key] = nested_access(sample, key)
             sample_key = dict_to_hash(cur_dict)
             if sample_key in sample_map:
                 sample_map[sample_key].append(sample)

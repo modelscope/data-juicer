@@ -1,4 +1,4 @@
-from . import deduplicator, filter, mapper, selector
+from . import aggregator, deduplicator, filter, grouper, mapper, selector
 from .base_op import (OPERATORS, UNFORKABLE, Aggregator, Deduplicator, Filter,
                       Grouper, Mapper, Selector)
 from .load import load_ops

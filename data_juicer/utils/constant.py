@@ -64,6 +64,8 @@ class Fields(object):
     relation_strength = DEFAULT_PREFIX + 'relation_strength__'
     # # the keyword in a text
     keyword = DEFAULT_PREFIX + 'keyword__'
+    # # support text
+    support_text = DEFAULT_PREFIX + 'support_text__'
 
 
 class StatsKeysMeta(type):

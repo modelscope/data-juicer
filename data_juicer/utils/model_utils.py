@@ -11,6 +11,7 @@ import wget
 from loguru import logger
 
 from data_juicer import cuda_device_count
+from data_juicer.utils.common_utils import nested_access
 from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
@@ -156,29 +157,10 @@ class APIModel:
                                         stream=stream,
                                         stream_cls=stream_cls)
             result = response.json()
-            return self._nested_access(result, self.response_path)
+            return nested_access(result, self.response_path)
         except Exception as e:
             logger.exception(e)
             return ''
-
-    @staticmethod
-    def _nested_access(data, path):
-        """
-        Access nested data using a dot-separated path.
-
-        :param data: A dictionary or a list to access the nested data from.
-        :param path: A dot-separated string representing the path to access.
-                     This can include numeric indices when accessing list
-                     elements.
-        :return: The value located at the specified path, or raises a KeyError
-                 or IndexError if the path does not exist.
-        """
-        keys = path.split('.')
-        for key in keys:
-            # Convert string keys to integers if they are numeric
-            key = int(key) if key.isdigit() else key
-            data = data[key]
-        return data
 
     @staticmethod
     def _filter_arguments(func, args_dict):
@@ -812,25 +794,3 @@ def free_models():
         except Exception:
             pass
     MODEL_ZOO.clear()
-
-
-def parse_model_response(response):
-    """
-        Parse model response of LLM to text.
-    """
-    if isinstance(response, str):
-        return response
-    elif isinstance(response, dict) and 'content' in response:
-        return response['content']
-    elif isinstance(response, list):
-        res = None
-        for msg in response:
-            if not isinstance(
-                    msg, dict) or 'role' not in msg or 'content' not in msg:
-                logger.warning('Unvalid response of LLM!')
-                return None
-            if msg['role'] == 'assistant':
-                res = msg['content']
-        return res
-    logger.warning('Unvalid response of LLM!')
-    return None

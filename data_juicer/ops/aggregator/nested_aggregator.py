@@ -5,11 +5,9 @@ from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Aggregator
 from data_juicer.utils.common_utils import (avg_split_string_list_under_limit,
-                                            get_val_by_nested_key,
-                                            is_string_list)
+                                            is_string_list, nested_access)
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.model_utils import (get_model, parse_model_response,
-                                           prepare_model)
+from data_juicer.utils.model_utils import get_model, prepare_model
 
 torch = LazyLoader('torch', 'torch')
 vllm = LazyLoader('vllm', 'vllm')
@@ -53,7 +51,7 @@ class NestedAggregator(Aggregator):
     DEFAULT_SUB_DOC_TEMPLATE = '文档碎片：\n{text}\n'
 
     def __init__(self,
-                 hf_or_api_model: str = 'gpt-4o',
+                 api_model: str = 'gpt-4o',
                  input_key: str = None,
                  output_key: str = None,
                  max_token_num: Optional[PositiveInt] = None,
@@ -64,14 +62,12 @@ class NestedAggregator(Aggregator):
                  sub_doc_template: Optional[str] = None,
                  input_template: Optional[str] = None,
                  try_num: PositiveInt = 3,
-                 is_hf_model: bool = False,
-                 enable_vllm: bool = False,
                  model_params: Dict = {},
                  sampling_params: Dict = {},
                  **kwargs):
         """
         Initialization method.
-        :param hf_or_api_model: Huggingface model or API model name.
+        :param api_model: API model name.
         :param input_key: The input field key in the samples. Support for
             nested keys such as "__dj__stats__.text_len". It is text_key
             in default.
@@ -88,8 +84,6 @@ class NestedAggregator(Aggregator):
         :param input_template: The input template.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
-        :param is_hf_model: If the hf_or_api_model is huggingface model.
-        :param enable_vllm: Whether to use VLLM for inference acceleration.
         :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
@@ -107,41 +101,16 @@ class NestedAggregator(Aggregator):
         self.input_template = input_template or self.DEFAULT_INPUT_TEMPLATE
 
         self.sampling_params = sampling_params
-        self.is_hf_model = is_hf_model
-        self.enable_vllm = enable_vllm
-        if is_hf_model and enable_vllm:
-            assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
-            # cannot initialize vllm replicas on different GPUs
-            self.num_proc = 1
-            if model_params.get('tensor_parallel_size') is None:
-                tensor_parallel_size = torch.cuda.device_count()
-                logger.info(f'Set tensor_parallel_size to \
-                    {tensor_parallel_size} for vllm.')
-                model_params['tensor_parallel_size'] = tensor_parallel_size
-            self.model_key = prepare_model(
-                model_type='vllm',
-                pretrained_model_name_or_path=hf_or_api_model,
-                **model_params)
-            self.sampling_params = vllm.SamplingParams(**sampling_params)
-        elif is_hf_model:
-            self.model_key = prepare_model(
-                model_type='huggingface',
-                pretrained_model_name_or_path=hf_or_api_model,
-                return_pipe=True,
-                **model_params)
-            self.sampling_params = sampling_params
-        else:
-            self.model_key = prepare_model(model_type='api',
-                                           api_model=hf_or_api_model,
-                                           url=api_url,
-                                           response_path=response_path,
-                                           return_processor=True,
-                                           **model_params)
+        self.model_key = prepare_model(model_type='api',
+                                       api_model=api_model,
+                                       url=api_url,
+                                       response_path=response_path,
+                                       return_processor=True,
+                                       **model_params)
 
         self.try_num = try_num
 
     def parse_output(self, response):
-        response = parse_model_response(response)
 
         def if_match(text):
             quotes = [("'", "'"), ('"', '"'), ('“', '”'), ('‘', '’'),
@@ -202,7 +171,7 @@ class NestedAggregator(Aggregator):
     def process_single(self, sample=None, rank=None):
 
         # if not batched sample
-        sub_docs = get_val_by_nested_key(sample, self.input_key)
+        sub_docs = nested_access(sample, self.input_key)
         if not is_string_list(sub_docs):
             return sample
 

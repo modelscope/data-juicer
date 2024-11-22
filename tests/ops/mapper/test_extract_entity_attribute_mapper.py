@@ -21,9 +21,9 @@ class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
         query_attributes = ["语言风格", "角色性格"]
         
         op = ExtractEntityAttributeMapper(
+            api_model=api_model, 
             query_entities=query_entities,
-            query_attributes=query_attributes,
-            api_model=api_model,                  
+            query_attributes=query_attributes,                 
             response_path=response_path)
 
         raw_text = """△笛飞声独自坐在莲花楼屋顶上。李莲花边走边悠闲地给马喂草。方多病则走在一侧，却总不时带着怀疑地盯向楼顶的笛飞声。

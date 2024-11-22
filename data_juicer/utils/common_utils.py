@@ -39,20 +39,48 @@ def dict_to_hash(input_dict: dict, hash_length=None):
     return hash_value
 
 
-def get_val_by_nested_key(input_dict: dict, nested_key: str):
+def nested_access(data, path, digit_allowed=True):
     """
-        return val of the dict in the nested key.
+    Access nested data using a dot-separated path.
 
-        :param nested_key: the nested key, such as "__dj__stats__.text_len"
+    :param data: A dictionary or a list to access the nested data from.
+    :param path: A dot-separated string representing the path to access.
+                    This can include numeric indices when accessing list
+                    elements.
+    :param digit_allowed: Allow transfering string to digit.
+    :return: The value located at the specified path, or raises a KeyError
+                or IndexError if the path does not exist.
     """
-    keys = nested_key.split('.')
-    cur = input_dict
+    keys = path.split('.')
     for key in keys:
-        if key not in cur:
-            logger.warning(f'Unvisitable nested key: {nested_key}!')
+        # Convert string keys to integers if they are numeric
+        key = int(key) if key.isdigit() and digit_allowed else key
+        try:
+            data = data[key]
+        except Exception:
+            logger.warning(f'Unaccessible dot-separated path: {path}!')
             return None
+    return data
+
+
+def nested_set(data: dict, path: str, val):
+    """
+        Set the val to the nested data in the dot-separated path.
+
+        :param data: A dictionary with nested format.
+        :param path: A dot-separated string representing the path to set.
+                    This can include numeric indices when setting list
+                    elements.
+        :return: The nested data after the val set.
+    """
+    keys = path.split('.')
+    cur = data
+    for key in keys[:-1]:
+        if key not in cur:
+            cur[key] = {}
         cur = cur[key]
-    return cur
+    cur[keys[-1]] = val
+    return data
 
 
 def is_string_list(var):
