@@ -5,7 +5,8 @@ import numpy as np
 from datasets import Dataset, concatenate_datasets
 from loguru import logger
 
-from .formatter import BaseFormatter, load_formatter
+from ..core.dataset_builder import load_formatter
+from .formatter import BaseFormatter
 
 
 class MixtureFormatter(BaseFormatter):

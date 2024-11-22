@@ -1,3 +1,4 @@
+import unittest
 import tempfile
 from data_juicer.download.wikipedia import (
     get_wikipedia_urls, download_wikipedia
@@ -21,3 +22,7 @@ class TestDownload:
         wiki_df = download_wikipedia(output_directory, dump_date=dump_date, url_limit=url_limit, item_limit=item_limit)
         sample = wiki_df.take(50)
         assert len(sample) == 50
+
+
+if __name__ == '__main__':
+    unittest.main()

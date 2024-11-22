@@ -3,16 +3,17 @@ import codecs
 import os
 import re
 import subprocess
+import urllib.parse as up
 import xml.etree.cElementTree as etree
-from urllib.parse import quote, urlparse
 
 import mwparserfromhell
 from datasets import Dataset
 
 from data_juicer.utils.file_utils import expand_outdir_and_mkdir
 
-from .base import (DocumentDownloader, DocumentExtractor, DocumentIterator,
-                   download_and_extract, get_wikipedia_urls)
+from .downloader import (DocumentDownloader, DocumentExtractor,
+                         DocumentIterator, download_and_extract,
+                         get_wikipedia_urls)
 
 # The majority of this code is taken from the HuggingFace
 # implementation of the Wikipedia dataset preparation:
@@ -569,7 +570,7 @@ class WikipediaDownloader(DocumentDownloader):
         self._verbose = verbose
 
     def download(self, url):
-        urlpath = urlparse(url).path[1:]
+        urlpath = up.urlparse(url).path[1:]
         output_name = urlpath.replace('/', '-')
         output_file = os.path.join(self._download_dir, output_name)
         if os.path.exists(output_file):
@@ -621,7 +622,7 @@ class WikipediaIterator(DocumentIterator):
             id_ = elem.find(f'./{namespace}id').text
             red_ = elem.find(f'./{namespace}redirect')
 
-            url = f'https://{self._language}.wikipedia.org/wiki/{quote(title)}'
+            url = f'https://{self._language}.wikipedia.org/wiki/{up.quote(title)}'  # noqa: E501
 
             # Filter pages that are not in the "main" namespace.
             if ns != '0':

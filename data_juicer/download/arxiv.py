@@ -5,8 +5,8 @@ import subprocess
 import tarfile
 import tempfile
 
-from base import (DocumentDownloader, DocumentExtractor, DocumentIterator,
-                  download_and_extract, get_arxiv_urls)
+from downloader import (DocumentDownloader, DocumentExtractor,
+                        DocumentIterator, download_and_extract, get_arxiv_urls)
 
 from data_juicer.core.data import DJDataset
 from data_juicer.utils.file_utils import (expand_outdir_and_mkdir,
