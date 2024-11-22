@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.filter.alphanumeric_filter &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.filter.alphanumeric_filter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.filter.alphanumeric_filter</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
+
+<span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Filter</span>
+<span class="kn">from</span> <span class="nn">..common</span> <span class="kn">import</span> <span class="n">get_words_from_document</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;alphanumeric_filter&#39;</span>
+
+
+<div class="viewcode-block" id="AlphanumericFilter"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.AlphanumericFilter">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="s1">&#39;alphanumeric_filter&#39;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">AlphanumericFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with alphabet/numeric ratio within a specific</span>
+<span class="sd">    range.&quot;&quot;&quot;</span>
+
+    <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="AlphanumericFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.AlphanumericFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">tokenization</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">min_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
+                 <span class="n">max_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param tokenization: Whether to count the ratio of alphanumeric</span>
+<span class="sd">            to the total number of tokens. if tokenization=False, it</span>
+<span class="sd">            will count the ratio of alphanumeric to the total number of</span>
+<span class="sd">            characters.</span>
+<span class="sd">        :param min_ratio: The min filter ratio in alphanumeric op,</span>
+<span class="sd">            samples will be filtered if their alphabet/numeric ratio is</span>
+<span class="sd">            below this parameter.</span>
+<span class="sd">        :param max_ratio: The max filter ratio in alphanumeric op,</span>
+<span class="sd">            samples will be filtered if their alphabet/numeric ratio</span>
+<span class="sd">            exceeds this parameter.</span>
+<span class="sd">        :param args: extra args</span>
+<span class="sd">        :param kwargs: extra args</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">=</span> <span class="n">tokenization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">=</span> <span class="n">min_ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span> <span class="o">=</span> <span class="n">max_ratio</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">tokenization</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+                <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="s1">&#39;EleutherAI/pythia-6.9b-deduped&#39;</span><span class="p">,</span>
+                <span class="n">return_model</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="AlphanumericFilter.compute_stats_batched"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.AlphanumericFilter.compute_stats_batched">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="n">samples_list</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
+        <span class="n">samples_stats</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">samples_stats</span><span class="p">):</span>
+            <span class="n">cur_text</span> <span class="o">=</span> <span class="n">samples_list</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">alpha_token_ratio</span> <span class="ow">in</span> <span class="n">stat</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">alpha_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                    <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">char</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cur_text</span><span class="p">))</span>
+                <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">)</span>
+                <span class="n">token_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">get_words_from_document</span><span class="p">(</span>
+                        <span class="n">cur_text</span><span class="p">,</span>
+                        <span class="n">token_func</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">tokenize</span> <span class="k">if</span> <span class="n">tokenizer</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span>
+                <span class="n">samples_stats</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">alpha_token_ratio</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">alpha_count</span> <span class="o">/</span> <span class="n">token_count</span><span class="p">)</span> <span class="k">if</span> <span class="n">token_count</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">alnum_ratio</span> <span class="ow">in</span> <span class="n">stat</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">alnum_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                    <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">char</span><span class="p">:</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">char</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="n">cur_text</span><span class="p">))</span>
+                <span class="n">samples_stats</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">alnum_ratio</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">alnum_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_text</span><span class="p">))</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_text</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+        <span class="k">return</span> <span class="n">samples</span></div>
+
+<div class="viewcode-block" id="AlphanumericFilter.process_batched"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.AlphanumericFilter.process_batched">[docs]</a>    <span class="k">def</span> <span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="n">ratio_key</span> <span class="o">=</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">alpha_token_ratio</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> \
+            <span class="k">else</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">alnum_ratio</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">map</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">stat</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">&lt;=</span> <span class="n">stat</span><span class="p">[</span><span class="n">ratio_key</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span>
+                <span class="n">max_ratio</span><span class="p">,</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># single sample for ray filter</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_ratio</span> <span class="o">&lt;=</span> <span class="n">samples</span><span class="p">[</span>
+                    <span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">ratio_key</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_ratio</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

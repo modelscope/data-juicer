@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.mapper.nlpcda_zh_mapper &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.mapper.nlpcda_zh_mapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.mapper.nlpcda_zh_mapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.lazy_loader</span> <span class="kn">import</span> <span class="n">LazyLoader</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.logger_utils</span> <span class="kn">import</span> <span class="n">HiddenPrints</span>
+
+<span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
+
+<span class="n">nlpcda</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;nlpcda&#39;</span><span class="p">,</span> <span class="s1">&#39;nlpcda&#39;</span><span class="p">)</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;nlpcda_zh_mapper&#39;</span>
+
+
+<div class="viewcode-block" id="NlpcdaZhMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.NlpcdaZhMapper">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">NlpcdaZhMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to simply augment samples in Chinese based on nlpcda library.&quot;&quot;&quot;</span>
+
+    <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="NlpcdaZhMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.NlpcdaZhMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">sequential</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">aug_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">replace_similar_word</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">replace_homophone_char</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">delete_random_char</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">swap_random_char</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">replace_equivalent_num</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method. All augmentation methods use default parameters</span>
+<span class="sd">        in default. We recommend you to only use 1-3 augmentation methods at a</span>
+<span class="sd">        time. Otherwise, the semantics of samples might be changed</span>
+<span class="sd">        significantly. **Notice**: some augmentation method might not work for</span>
+<span class="sd">        some special texts, so there might be no augmented texts generated.</span>
+
+<span class="sd">        :param sequential: whether combine all augmentation methods to a</span>
+<span class="sd">            sequence. If it&#39;s True, a sample will be augmented by all opened</span>
+<span class="sd">            augmentation methods sequentially. If it&#39;s False, each opened</span>
+<span class="sd">            augmentation method would generate its augmented samples</span>
+<span class="sd">            independently.</span>
+<span class="sd">        :param aug_num: number of augmented samples to be generated. If</span>
+<span class="sd">            `sequential` is True, there will be total aug_num augmented samples</span>
+<span class="sd">            generated. If it&#39;s False, there will be (aug_num *</span>
+<span class="sd">            #opened_aug_method) augmented samples generated.</span>
+<span class="sd">        :param keep_original_sample: whether to keep the original sample. If</span>
+<span class="sd">            it&#39;s set to False, there will be only generated texts in the final</span>
+<span class="sd">            datasets and the original texts will be removed. It&#39;s True in</span>
+<span class="sd">            default.</span>
+<span class="sd">        :param replace_similar_word: whether to open the augmentation method of</span>
+<span class="sd">            replacing random words with their similar words in the original</span>
+<span class="sd">            texts. e.g. &quot;这里一共有5种不同的数据增强方法&quot; --&gt; &quot;这边一共有5种不同的数据增强方法&quot;</span>
+<span class="sd">        :param replace_homophone_char: whether to open the augmentation method</span>
+<span class="sd">            of replacing random characters with their homophones in the</span>
+<span class="sd">            original texts. e.g. &quot;这里一共有5种不同的数据增强方法&quot; --&gt; &quot;这里一共有5种不同的濖据增强方法&quot;</span>
+<span class="sd">        :param delete_random_char: whether to open the augmentation method of</span>
+<span class="sd">            deleting random characters from the original texts. e.g.</span>
+<span class="sd">            &quot;这里一共有5种不同的数据增强方法&quot; --&gt; &quot;这里一共有5种不同的数据增强&quot;</span>
+<span class="sd">        :param swap_random_char: whether to open the augmentation method of</span>
+<span class="sd">            swapping random contiguous characters in the original texts. e.g.</span>
+<span class="sd">            &quot;这里一共有5种不同的数据增强方法&quot; --&gt; &quot;这里一共有5种不同的数据强增方法&quot;</span>
+<span class="sd">        :param replace_equivalent_num: whether to open the augmentation method</span>
+<span class="sd">            of replacing random numbers with their equivalent representations</span>
+<span class="sd">            in the original texts. **Notice**: Only for numbers for now. e.g.</span>
+<span class="sd">            &quot;这里一共有5种不同的数据增强方法&quot; --&gt; &quot;这里一共有伍种不同的数据增强方法&quot;</span>
+<span class="sd">        :param args: extra args</span>
+<span class="sd">        :param kwargs: extra args</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">=</span> <span class="n">aug_num</span>
+        <span class="k">if</span> <span class="n">aug_num</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Relatively large augmentation number [</span><span class="si">{</span><span class="n">aug_num</span><span class="si">}</span><span class="s1">]&#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39; might generate large number of new samples and &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;requires more memory and disk space.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="o">=</span> <span class="n">sequential</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span> <span class="o">=</span> <span class="n">keep_original_sample</span>
+
+        <span class="c1"># hide the redundant outputs from nlpcda library</span>
+        <span class="k">with</span> <span class="n">HiddenPrints</span><span class="p">():</span>
+            <span class="kn">import</span> <span class="nn">warnings</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># sample level</span>
+
+            <span class="c1"># word level</span>
+            <span class="k">if</span> <span class="n">replace_similar_word</span><span class="p">:</span>
+                <span class="c1"># the first sample of augmented sample list is the same as the</span>
+                <span class="c1"># original sample, so we need generate one more augmented</span>
+                <span class="c1"># sample to get the expected number of augmented samples. Same</span>
+                <span class="c1"># below</span>
+                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
+                    <span class="k">else</span> <span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">Similarword</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span>
+
+            <span class="c1"># char level</span>
+            <span class="k">if</span> <span class="n">replace_homophone_char</span><span class="p">:</span>
+                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
+                    <span class="k">else</span> <span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">Homophone</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">delete_random_char</span><span class="p">:</span>
+                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
+                    <span class="k">else</span> <span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">RandomDeleteChar</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">swap_random_char</span><span class="p">:</span>
+                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
+                    <span class="k">else</span> <span class="mi">2</span>
+                <span class="c1"># only use char_gram=1 for relatively minor changes</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">CharPositionExchange</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">,</span>
+                                                <span class="n">char_gram</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+            <span class="c1"># only for numbers now</span>
+            <span class="k">if</span> <span class="n">replace_equivalent_num</span><span class="p">:</span>
+                <span class="n">create_num</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> \
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
+                    <span class="k">else</span> <span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">nlpcda</span><span class="o">.</span><span class="n">EquivalentChar</span><span class="p">(</span><span class="n">create_num</span><span class="o">=</span><span class="n">create_num</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NlpcdaZhMapper.process_batched"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.NlpcdaZhMapper.process_batched">[docs]</a>    <span class="k">def</span> <span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="c1"># no augmentation methods are opened</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">samples</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">}</span>
+
+        <span class="n">texts_to_aug</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
+        <span class="n">res_samples</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+        <span class="c1"># get augmented texts</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequential</span><span class="p">:</span>
+            <span class="n">aug_texts</span> <span class="o">=</span> <span class="n">texts_to_aug</span>
+            <span class="k">for</span> <span class="n">aug_method</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">:</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">aug_texts</span><span class="p">:</span>
+                    <span class="c1"># aug and skip the original text</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">aug_method</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+                    <span class="n">results</span> <span class="o">+=</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">result</span>
+                <span class="n">aug_texts</span> <span class="o">=</span> <span class="n">results</span><span class="p">[:]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">aug_texts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">aug_texts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">texts_to_aug</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">aug_texts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># apply each aug method to generate several augmented texts</span>
+            <span class="n">aug_texts</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">aug_method</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">aug_pipeline</span><span class="p">:</span>
+                <span class="n">aug_texts</span> <span class="o">+=</span> <span class="n">aug_method</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">texts_to_aug</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="mi">1</span><span class="p">:]</span>
+
+        <span class="c1"># add augmented samples to the batch with other replicate fields</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span><span class="p">:</span>
+            <span class="n">res_samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">aug_texts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res_samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">aug_texts</span>
+        <span class="c1"># add other replicate fields</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">res_samples</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span>
+                <span class="n">res_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">res_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">*</span> \
+                                   <span class="nb">len</span><span class="p">(</span><span class="n">res_samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">res_samples</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

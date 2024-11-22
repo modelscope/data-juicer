@@ -1,0 +1,257 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.core.adapter &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.core.adapter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.core.adapter</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">datasets.config</span> <span class="kn">import</span> <span class="n">DEFAULT_MAX_BATCH_SIZE</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.core.monitor</span> <span class="kn">import</span> <span class="n">Monitor</span>
+
+
+<div class="viewcode-block" id="Adapter"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter">[docs]</a><span class="k">class</span> <span class="nc">Adapter</span><span class="p">:</span>
+
+    <span class="n">MAX_BATCH_SIZE</span> <span class="o">=</span> <span class="mi">10000</span>
+
+<div class="viewcode-block" id="Adapter.__init__"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">monitor_current_resources</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Adapter.execute_and_probe"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.execute_and_probe">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">execute_and_probe</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">,</span> <span class="n">sample_interval</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the input dataset and probe related information for each OP in</span>
+<span class="sd">        the specified operator list.</span>
+
+<span class="sd">        For now, we support the following targets to probe:</span>
+<span class="sd">        &quot;resource&quot;: resource utilization for each OP.</span>
+<span class="sd">        &quot;speed&quot;: average processing speed for each OP.</span>
+
+<span class="sd">        The probe result is a list and each item in the list is the probe</span>
+<span class="sd">        result for each OP.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">operators</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">operators</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># resource utilization list</span>
+        <span class="n">resource_util_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># probe for each OP</span>
+        <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operators</span><span class="p">:</span>
+            <span class="c1"># set num_proc to 1 for each OP to focus on the influence of batch</span>
+            <span class="c1"># size only.</span>
+            <span class="n">old_num_proc</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">num_proc</span>
+            <span class="n">op</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="c1"># number of test samples</span>
+            <span class="n">sample_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="c1"># run single op and monitor the resource utilization</span>
+            <span class="n">dataset</span><span class="p">,</span> <span class="n">resource_util_per_op</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">monitor_func</span><span class="p">(</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="p">),</span> <span class="n">sample_interval</span><span class="o">=</span><span class="n">sample_interval</span><span class="p">)</span>
+
+            <span class="c1"># calculate speed</span>
+            <span class="n">resource_util_per_op</span><span class="p">[</span>
+                <span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_num</span> <span class="o">/</span> <span class="n">resource_util_per_op</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
+            <span class="n">resource_util_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource_util_per_op</span><span class="p">)</span>
+
+            <span class="c1"># restore to the original num_proc</span>
+            <span class="n">op</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="n">old_num_proc</span>
+
+        <span class="k">return</span> <span class="n">resource_util_list</span></div>
+
+<div class="viewcode-block" id="Adapter.take_batch"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.take_batch">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">take_batch</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Split the dataset into batches based on configuration and load factor.</span>
+
+<span class="sd">        :param dataset: The dataset to be split</span>
+<span class="sd">        :param config: Configuration settings, including batch size</span>
+<span class="sd">        :return: An iterator of batches</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get initial batch size</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="n">DEFAULT_MAX_BATCH_SIZE</span><span class="p">)</span>
+        <span class="c1"># should be in [1, 10000]</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Adapter</span><span class="o">.</span><span class="n">MAX_BATCH_SIZE</span><span class="p">)</span>
+
+        <span class="c1"># check if there are enough samples</span>
+        <span class="n">num_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">batch_size</span> <span class="o">&gt;=</span> <span class="n">num_samples</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dataset</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Adapter.adapt_workloads"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.adapt_workloads">[docs]</a>    <span class="k">def</span> <span class="nf">adapt_workloads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Manage the scheduling and load balancing for the dataset processing.</span>
+
+<span class="sd">        :param dataset: The dataset that needs to be processed</span>
+<span class="sd">        :param operators: Operators in the data recipe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: set batch size to 1 for all OPs for probing</span>
+        <span class="n">load_analysis_res</span><span class="p">,</span> <span class="n">probed_batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">probe_small_batch</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">)</span>
+
+        <span class="c1"># calculate batch size for each OP according to the analysis results</span>
+        <span class="n">bs_per_op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size_strategy</span><span class="p">(</span><span class="n">load_analysis_res</span><span class="p">,</span>
+                                             <span class="n">base_bs</span><span class="o">=</span><span class="n">probed_batch_size</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">bs_per_op</span></div>
+
+<div class="viewcode-block" id="Adapter.probe_small_batch"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.probe_small_batch">[docs]</a>    <span class="k">def</span> <span class="nf">probe_small_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform small batch pre-execution to probe available resources,</span>
+<span class="sd">        current load and estimated OP speed, returning load factors and speed</span>
+<span class="sd">        ranks for each OP.</span>
+
+<span class="sd">        :param dataset: The dataset to pre-execute small batch on</span>
+<span class="sd">        :param operators: The OP list to be pre-execution and probe</span>
+<span class="sd">        :return: A list of probe results for each OP and the length of data</span>
+<span class="sd">            batch to probe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># take a small batch</span>
+        <span class="n">data_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">take_batch</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="c1"># process and monitor the resource utilization</span>
+        <span class="n">resource_util_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">execute_and_probe</span><span class="p">(</span><span class="n">data_batch</span><span class="p">,</span> <span class="n">operators</span><span class="p">)</span>
+        <span class="c1"># analyze resource utilization</span>
+        <span class="n">analysis_res</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">analyze_resource_util_list</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">analysis_res</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_batch</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Adapter.batch_size_strategy"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.batch_size_strategy">[docs]</a>    <span class="k">def</span> <span class="nf">batch_size_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_analysis_res</span><span class="p">,</span> <span class="n">base_bs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">util_th</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decide the batch size for each op according to their workload analysis</span>
+<span class="sd">        result and expected utilization threshold. We need to guarantee that</span>
+<span class="sd">        the resource utilization won&#39;t exceed the threshold. Now we only</span>
+<span class="sd">        consider the buckets effect, which means the max batch size is decided</span>
+<span class="sd">        by the max utilization of all types of resources except GPU util</span>
+<span class="sd">        (decided by num_proc).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">batch_size_per_op</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># compute left utils according to the util_th</span>
+        <span class="n">left_utils</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;util.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s1">&#39;GPU&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">left_utils</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">util_th</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">load_analysis_res</span><span class="p">:</span>
+            <span class="n">max_util</span> <span class="o">=</span> <span class="mf">1e-5</span>
+            <span class="n">max_key</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">left_utils</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="n">it</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">analysis_res</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;resource_analysis&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">analysis_res</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;util.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="s1">&#39;GPU&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">used_util</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="n">analysis_res</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_resources</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">used_util</span> <span class="o">&gt;</span> <span class="n">max_util</span><span class="p">:</span>
+                    <span class="n">max_util</span> <span class="o">=</span> <span class="n">used_util</span>
+                    <span class="n">max_key</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="n">load_factor</span> <span class="o">=</span> <span class="n">left_utils</span><span class="p">[</span><span class="n">max_key</span><span class="p">]</span> <span class="o">/</span> <span class="n">max_util</span>
+            <span class="n">bs_this_op</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">base_bs</span> <span class="o">*</span> <span class="n">load_factor</span><span class="p">),</span> <span class="mi">1</span><span class="p">),</span>
+                             <span class="bp">self</span><span class="o">.</span><span class="n">MAX_BATCH_SIZE</span><span class="p">)</span>
+            <span class="n">batch_size_per_op</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bs_this_op</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">batch_size_per_op</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

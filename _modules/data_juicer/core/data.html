@@ -1,0 +1,555 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.core.data &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.core.data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.core.data</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DatasetDict</span><span class="p">,</span> <span class="n">is_caching_enabled</span>
+<span class="kn">from</span> <span class="nn">datasets.formatting.formatting</span> <span class="kn">import</span> <span class="n">LazyBatch</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.core.monitor</span> <span class="kn">import</span> <span class="n">Monitor</span>
+<span class="kn">from</span> <span class="nn">data_juicer.ops</span> <span class="kn">import</span> <span class="n">UNFORKABLE</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils</span> <span class="kn">import</span> <span class="n">cache_utils</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.compress</span> <span class="kn">import</span> <span class="p">(</span><span class="n">CompressionOff</span><span class="p">,</span>
+                                        <span class="n">cleanup_compressed_cache_files</span><span class="p">,</span>
+                                        <span class="n">compress</span><span class="p">,</span> <span class="n">decompress</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.fingerprint_utils</span> <span class="kn">import</span> <span class="n">generate_fingerprint</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.process_utils</span> <span class="kn">import</span> <span class="n">setup_mp</span>
+
+
+<span class="k">class</span> <span class="nc">DJDataset</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base dataset of DJ&quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">operators</span><span class="p">,</span>  <span class="c1"># TODO: add type hint</span>
+            <span class="o">*</span><span class="p">,</span>
+            <span class="n">exporter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">checkpointer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">tracer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DJDataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;process a list of operators on the dataset.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Before conducting actual function `f`, wrap its args and kargs into nested</span>
+<span class="sd">    ones.</span>
+
+<span class="sd">    :param f: function to be wrapped.</span>
+<span class="sd">    :return: wrapped function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">wrap_nested_structure</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+        <span class="n">wrapped_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">]</span>
+        <span class="n">wrapped_kargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">kargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">wrapped_args</span><span class="p">,</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">wrapped_kargs</span><span class="p">)</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapped_f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+        <span class="n">args</span><span class="p">,</span> <span class="n">kargs</span> <span class="o">=</span> <span class="n">wrap_nested_structure</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+        <span class="c1"># to ensure the args passing to the final calling of f can be nested,</span>
+        <span class="c1"># in case of deeper-order wrapper funcs de-wrap this nesting behavior</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">else</span> <span class="n">arg</span>
+            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span>
+        <span class="p">]</span>
+        <span class="n">kargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">else</span> <span class="n">arg</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span> <span class="ow">in</span> <span class="n">kargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapped_f</span>
+
+
+<span class="k">def</span> <span class="nf">nested_obj_factory</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use nested classes to wrap the input object.</span>
+
+<span class="sd">    :param obj: object to be nested.</span>
+<span class="sd">    :return: nested object</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">DatasetDict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">NestedDatasetDict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">NestedQueryDict</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">LazyBatch</span><span class="p">):</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">NestedQueryDict</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+
+<span class="k">class</span> <span class="nc">NestedQueryDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced dict for better usability.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Dataset</span><span class="p">):</span>
+            <span class="c1"># init from another DatasetDict instance</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># init from scratch</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+
+        <span class="c1"># batched sample, (k &amp; v) are organized by list manner</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">NestedQueryDict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">nested_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">NestedDatasetDict</span><span class="p">(</span><span class="n">DatasetDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced HuggingFace-DatasetDict for better usability and efficiency.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Dataset</span><span class="p">):</span>
+            <span class="c1"># init from another DatasetDict instance</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># init from scratch</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">nested_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the map func, which is called by most common operations,</span>
+<span class="sd">        such that the processed samples can be accessed by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;function&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">args</span> <span class="ow">or</span> <span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="NestedDataset"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset">[docs]</a><span class="k">class</span> <span class="nc">NestedDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">DJDataset</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced HuggingFace-Dataset for better usability and efficiency.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="NestedDataset.__init__"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Dataset</span><span class="p">):</span>
+            <span class="c1"># init from another Dataset instance</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># init from scratch</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">is_caching_enabled</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># to index columns by query as string name(s)</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">nested_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># to index rows by query as integer index, slices,</span>
+            <span class="c1"># or iter of indices or bools</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NestedDataset.process"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">operators</span><span class="p">,</span>
+                <span class="o">*</span><span class="p">,</span>
+                <span class="n">work_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">exporter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">checkpointer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">tracer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">operators</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">operators</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">operators</span> <span class="o">=</span> <span class="p">[</span><span class="n">operators</span><span class="p">]</span>
+        <span class="n">unforkable_operators</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">UNFORKABLE</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="c1"># resource utilization monitor</span>
+        <span class="n">resource_util_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operators</span><span class="p">:</span>
+                <span class="n">mp_context</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;forkserver&#39;</span><span class="p">,</span> <span class="s1">&#39;spawn&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()</span>
+                    <span class="ow">or</span> <span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">unforkable_operators</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">setup_mp</span><span class="p">(</span><span class="n">mp_context</span><span class="p">)</span>
+
+                <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+                <span class="c1"># run single op</span>
+                <span class="n">run_args</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;dataset&#39;</span><span class="p">:</span> <span class="n">dataset</span><span class="p">,</span>
+                    <span class="s1">&#39;exporter&#39;</span><span class="p">:</span> <span class="n">exporter</span><span class="p">,</span>
+                    <span class="s1">&#39;tracer&#39;</span><span class="p">:</span> <span class="n">tracer</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="n">dataset</span><span class="p">,</span> <span class="n">resource_util_per_op</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">monitor_func</span><span class="p">(</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">run_args</span><span class="p">)</span>
+                <span class="c1"># record processed ops</span>
+                <span class="k">if</span> <span class="n">checkpointer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">checkpointer</span><span class="o">.</span><span class="n">record</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">_op_cfg</span><span class="p">)</span>
+                <span class="n">resource_util_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource_util_per_op</span><span class="p">)</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;OP [</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s1">] Done in </span><span class="si">{</span><span class="n">end</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">s. &#39;</span>
+                            <span class="sa">f</span><span class="s1">&#39;Left </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa: E722</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;An error occurred during Op [</span><span class="si">{</span><span class="n">op</span><span class="o">.</span><span class="n">_name</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">checkpointer</span> <span class="ow">and</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing checkpoint of dataset processed by &#39;</span>
+                            <span class="s1">&#39;last op...&#39;</span><span class="p">)</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">cleanup_cache_files</span><span class="p">()</span>
+                <span class="n">checkpointer</span><span class="o">.</span><span class="n">save_ckpt</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">work_dir</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;monitor.json&#39;</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
+                    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span></div>
+
+<div class="viewcode-block" id="NestedDataset.map"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.map">[docs]</a>    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the map func, which is called by most common operations,</span>
+<span class="sd">        such that the processed samples can be accessed by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="c1"># the first positional para is function</span>
+            <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">called_func</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;function&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span>
+                    <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">])</span>
+            <span class="n">called_func</span> <span class="o">=</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span>
+
+        <span class="c1"># For wrapped function, try to get its unwrapped (bound) method</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">called_func</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
+                <span class="n">called_func</span><span class="p">,</span> <span class="s1">&#39;__wrapped__&#39;</span><span class="p">):</span>
+            <span class="n">called_func</span> <span class="o">=</span> <span class="n">called_func</span><span class="o">.</span><span class="n">__wrapped__</span>
+
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">called_func</span><span class="p">):</span>
+            <span class="c1"># batched is required for fault-tolerant or batched OP</span>
+            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span>
+                    <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span>
+                    <span class="s1">&#39;is_batched_op&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">(</span>
+                    <span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span> <span class="s1">&#39;turbo&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batched&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span>
+                    <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span> <span class="s1">&#39;is_batched_op&#39;</span>
+                <span class="p">)</span> <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">()</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batched&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># rank is required for cuda model loading</span>
+            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span>
+                            <span class="s1">&#39;use_cuda&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">():</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;with_rank&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="s1">&#39;new_fingerprint&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_fingerprint</span> <span class="o">=</span> <span class="n">generate_fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+            <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_fingerprint</span>
+
+        <span class="k">if</span> <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span><span class="p">:</span>
+            <span class="n">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">],</span>
+                       <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">new_ds</span> <span class="o">=</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span><span class="p">:</span>
+            <span class="n">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_ds</span><span class="p">,</span>
+                     <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span><span class="p">:</span>
+            <span class="n">new_ds</span><span class="o">.</span><span class="n">cleanup_cache_files</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">new_ds</span></div>
+
+<div class="viewcode-block" id="NestedDataset.filter"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the filter func, which is called by most common operations,</span>
+<span class="sd">        such that the processed samples can be accessed by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="c1"># the first positional para is function</span>
+            <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">called_func</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;function&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span>
+                    <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">])</span>
+            <span class="n">called_func</span> <span class="o">=</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span>
+
+        <span class="c1"># For wrapped function, try to get its unwrapped (bound) method</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">called_func</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
+                <span class="n">called_func</span><span class="p">,</span> <span class="s1">&#39;__wrapped__&#39;</span><span class="p">):</span>
+            <span class="n">called_func</span> <span class="o">=</span> <span class="n">called_func</span><span class="o">.</span><span class="n">__wrapped__</span>
+
+        <span class="c1"># Batched is always required for fault tolerance</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">(</span><span class="n">called_func</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span>
+                    <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="p">,</span>
+                    <span class="s1">&#39;is_batched_op&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">called_func</span><span class="o">.</span><span class="vm">__self__</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batched&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;batch_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;batch_size&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;new_fingerprint&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="ow">or</span> <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_fingerprint</span> <span class="o">=</span> <span class="n">generate_fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+            <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_fingerprint</span>
+
+        <span class="c1"># For filter, it involves a map and a filter operations, so the final</span>
+        <span class="c1"># cache files includes two sets with different fingerprint (before and</span>
+        <span class="c1"># after). So we need to decompress these two sets of compressed cache</span>
+        <span class="c1"># files</span>
+        <span class="k">if</span> <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span><span class="p">:</span>
+            <span class="n">decompress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;new_fingerprint&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fingerprint</span><span class="p">],</span>
+                       <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Turn off the compression due to it invokes map actually in the filter</span>
+        <span class="c1"># function. For cache file changes, map: A -&gt; B, filter: A -&gt; A, B. If</span>
+        <span class="c1"># we compress the caches of map, ops after filter cannot find the cache</span>
+        <span class="c1"># files A. So we turn off the inner cache compression for filter.</span>
+        <span class="c1"># Same for cleaning up cache files.</span>
+        <span class="k">with</span> <span class="n">CompressionOff</span><span class="p">():</span>
+            <span class="n">prev_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">new_ds</span> <span class="o">=</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span> <span class="o">=</span> <span class="n">prev_state</span>
+
+        <span class="k">if</span> <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span><span class="p">:</span>
+            <span class="n">compress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_ds</span><span class="p">,</span>
+                     <span class="n">kargs</span><span class="p">[</span><span class="s1">&#39;num_proc&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;num_proc&#39;</span> <span class="ow">in</span> <span class="n">kargs</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">need_to_cleanup_caches</span><span class="p">:</span>
+            <span class="n">new_ds</span><span class="o">.</span><span class="n">cleanup_cache_files</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">new_ds</span></div>
+
+<div class="viewcode-block" id="NestedDataset.select"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.select">[docs]</a>    <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the select func, such that selected samples can be accessed</span>
+<span class="sd">        by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NestedDataset.from_dict"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the from_dict func, which is called by most from_xx</span>
+<span class="sd">        constructors, such that the constructed dataset object is</span>
+<span class="sd">        NestedDataset.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NestedDataset.add_column"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.add_column">[docs]</a>    <span class="k">def</span> <span class="nf">add_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the add column func, such that the processed samples</span>
+<span class="sd">        can be accessed by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NestedDataset.select_columns"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.select_columns">[docs]</a>    <span class="k">def</span> <span class="nf">select_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the select columns func, such that the processed samples</span>
+<span class="sd">        can be accessed by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NestedDataset.remove_columns"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.remove_columns">[docs]</a>    <span class="k">def</span> <span class="nf">remove_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the remove columns func, such that the processed samples</span>
+<span class="sd">        can be accessed by nested manner.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NestedDataset.cleanup_cache_files"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.cleanup_cache_files">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup_cache_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the cleanup_cache_files func, clear raw and compressed</span>
+<span class="sd">        cache files.&quot;&quot;&quot;</span>
+        <span class="n">cleanup_compressed_cache_files</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">cleanup_cache_files</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NestedDataset.load_from_disk"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.load_from_disk">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">load_from_disk</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">load_from_disk</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div></div>
+
+
+<span class="k">def</span> <span class="nf">nested_query</span><span class="p">(</span><span class="n">root_obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NestedDatasetDict</span><span class="p">,</span> <span class="n">NestedDataset</span><span class="p">,</span>
+                                 <span class="n">NestedQueryDict</span><span class="p">],</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find item from a given object, by first checking flatten layer, then</span>
+<span class="sd">    checking nested layers.</span>
+
+<span class="sd">    :param root_obj: the object</span>
+<span class="sd">    :param key: the stored item to be queried, e.g., &quot;meta&quot; or</span>
+<span class="sd">        &quot;meta.date&quot;</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">subkeys</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">root_obj</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">subkeys</span><span class="p">)):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">key_to_query</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subkeys</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">subkeys</span><span class="p">)])</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span>
+                          <span class="p">(</span><span class="n">NestedQueryDict</span><span class="p">,</span> <span class="n">NestedDataset</span><span class="p">,</span> <span class="n">NestedDatasetDict</span><span class="p">)):</span>
+                <span class="c1"># access field using base_class&#39;s func to avoid endless loop</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">tmp</span><span class="p">)</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key_to_query</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="c1"># NestedDataset may return multiple rows as list</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">nested_query</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">key_to_query</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">tmp</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># NestedQueryDict may return single row</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">key_to_query</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">res</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">outer_get_error</span><span class="p">:</span>
+            <span class="n">exist_in_dict</span> <span class="o">=</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> \
+                                <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subkeys</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="ow">in</span> <span class="n">tmp</span>
+            <span class="n">exist_in_dataset</span> <span class="o">=</span> <span class="nb">issubclass</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">Dataset</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">subkeys</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span> <span class="ow">in</span> <span class="n">tmp</span><span class="o">.</span><span class="n">features</span>
+            <span class="k">if</span> <span class="n">exist_in_dict</span> <span class="ow">or</span> <span class="n">exist_in_dataset</span><span class="p">:</span>
+                <span class="c1"># dive into next level</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subkeys</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;cannot find item given key=</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1"> in dataset=&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">root_obj</span><span class="si">}</span><span class="s1">. For the final caught outer-exception,&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;type is: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">outer_get_error</span><span class="p">)</span><span class="si">}</span><span class="s1">, &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;info is: </span><span class="si">{</span><span class="n">outer_get_error</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">add_same_content_to_new_column</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span>
+                                   <span class="n">new_column_name</span><span class="p">,</span>
+                                   <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A helper function to speed up add_column function. Apply map on this</span>
+<span class="sd">    function in parallel instead of using add_column.</span>
+<span class="sd">    :param sample: a single sample to add this new column/field.</span>
+<span class="sd">    :param new_column_name: the name of this new column/field.</span>
+<span class="sd">    :param initial_value: the initial value of this new column/field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sample</span><span class="p">[</span><span class="n">new_column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_value</span>
+    <span class="k">return</span> <span class="n">sample</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

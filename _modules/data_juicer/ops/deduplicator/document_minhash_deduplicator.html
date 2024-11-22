@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.deduplicator.document_minhash_deduplicator &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.deduplicator.document_minhash_deduplicator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.deduplicator.document_minhash_deduplicator</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Some code here has been modified from:</span>
+<span class="c1"># https://github.com/bigcode-project/bigcode-dataset/blob/main/near_deduplication/minhash_deduplication.py</span>
+<span class="c1"># --------------------------------------------------------</span>
+
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">regex</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">PositiveInt</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Annotated</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">HashKeys</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.lazy_loader</span> <span class="kn">import</span> <span class="n">LazyLoader</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">prepare_sentencepiece_model</span>
+
+<span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Deduplicator</span>
+<span class="kn">from</span> <span class="nn">..common.helper_func</span> <span class="kn">import</span> <span class="n">UnionFind</span><span class="p">,</span> <span class="n">split_on_whitespace</span>
+
+<span class="n">integrate</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;integrate&#39;</span><span class="p">,</span> <span class="s1">&#39;scipy.integrate&#39;</span><span class="p">)</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;document_minhash_deduplicator&#39;</span>
+
+<span class="n">MERSENNE_PRIME</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">61</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">MAX_HASH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">32</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">sha1_hash32</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Directly taken from datasketch package to avoid dependency.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : bytes</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;I&#39;</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">4</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">optimal_param</span><span class="p">(</span>
+    <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">num_perm</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">false_positive_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">false_negative_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the optimal `MinHashLSH` parameter that minimizes the weighted sum</span>
+<span class="sd">    of probabilities of false positive and false negative, taken from</span>
+<span class="sd">    datasketch.</span>
+
+<span class="sd">    :param threshold: float. The threshold for similarity</span>
+<span class="sd">    :param num_perm: int. The number of permutations</span>
+<span class="sd">    :param false_positive_weight: float. The weight of false positive</span>
+<span class="sd">    :param false_negative_weight: float. The weight of false negative</span>
+<span class="sd">    :return: Tuple[int, int]. The optimal `b` and `r` parameters. The number of</span>
+<span class="sd">        bands, and the number of rows per band respectively</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">false_positive_probability</span><span class="p">(</span><span class="n">th</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">band</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Source: `datasketch.lsh`&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">proba</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">s</span><span class="o">**</span><span class="nb">float</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span><span class="o">**</span><span class="nb">float</span><span class="p">(</span><span class="n">band</span><span class="p">)</span>
+
+        <span class="n">a</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">quad</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">th</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">a</span>
+
+    <span class="k">def</span> <span class="nf">false_negative_probability</span><span class="p">(</span><span class="n">th</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">band</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rows</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Source: `datasketch.lsh`&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">proba</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">s</span><span class="o">**</span><span class="nb">float</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span><span class="o">**</span><span class="nb">float</span><span class="p">(</span><span class="n">band</span><span class="p">))</span>
+
+        <span class="n">a</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">integrate</span><span class="o">.</span><span class="n">quad</span><span class="p">(</span><span class="n">proba</span><span class="p">,</span> <span class="n">th</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">a</span>
+
+    <span class="c1"># object: minimize the weighted FP and FN ratio</span>
+    <span class="n">min_error</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+    <span class="n">opt</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_perm</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">max_r</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_perm</span> <span class="o">/</span> <span class="n">b</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_r</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">false_positive_probability</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+            <span class="n">fn</span> <span class="o">=</span> <span class="n">false_negative_probability</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="n">fp</span> <span class="o">*</span> <span class="n">false_positive_weight</span> <span class="o">+</span> <span class="n">fn</span> <span class="o">*</span> <span class="n">false_negative_weight</span>
+            <span class="k">if</span> <span class="n">error</span> <span class="o">&lt;</span> <span class="n">min_error</span><span class="p">:</span>
+                <span class="n">min_error</span> <span class="o">=</span> <span class="n">error</span>
+                <span class="n">opt</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">opt</span>
+
+
+<div class="viewcode-block" id="DocumentMinhashDeduplicator"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentMinhashDeduplicator">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">DocumentMinhashDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deduplicator to deduplicate samples at document-level using MinHashLSH.</span>
+
+<span class="sd">    Different from simhash, minhash is stored as bytes, so they won&#39;t be</span>
+<span class="sd">    kept in the final dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DocumentMinhashDeduplicator.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentMinhashDeduplicator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tokenization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;space&#39;</span><span class="p">,</span>
+        <span class="n">window_size</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">lowercase</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">ignore_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_permutations</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="n">jaccard_threshold</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">num_bands</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_rows_per_band</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tokenizer_model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param tokenization: tokenization method for sample texts. It</span>
+<span class="sd">            should be one of [space, punctuation, character,</span>
+<span class="sd">            sentencepiece]. For English-like languages, we recommend</span>
+<span class="sd">            to use &#39;space&#39;, for Chinese-like languages, we recommend</span>
+<span class="sd">            to use &#39;character&#39;, and for multiple languages, we recommend</span>
+<span class="sd">            to use &#39;sentencepiece&#39;. If using &#39;sentencepiece&#39;, please</span>
+<span class="sd">            provided the model path in the &#39;tokenizer_model&#39; field.</span>
+<span class="sd">        :param window_size: window size of shingling</span>
+<span class="sd">        :param lowercase: whether to convert text to lower case first</span>
+<span class="sd">        :param ignore_pattern: whether to ignore sub-strings with</span>
+<span class="sd">            specific pattern when computing minhash</span>
+<span class="sd">        :param num_permutations: number of permutations in minhash</span>
+<span class="sd">            computing</span>
+<span class="sd">        :param jaccard_threshold: the min jaccard similarity threshold</span>
+<span class="sd">            in near-duplicate detection. When the jaccard similarity of</span>
+<span class="sd">            two sample texts is &gt;= this threshold, they are regarded as</span>
+<span class="sd">            similar samples and this op will only keep one of them after</span>
+<span class="sd">            deduplication</span>
+<span class="sd">        :param num_bands: number of bands in LSH. Default it&#39;s None, and</span>
+<span class="sd">            it will be determined by an optimal params computation</span>
+<span class="sd">            algorithm by minimize the weighted sum of probs of False</span>
+<span class="sd">            Positives and False Negatives</span>
+<span class="sd">        :param num_rows_per_band: number of rows in each band in LSH.</span>
+<span class="sd">            Default it&#39;s None, and it will be determined by an optimal</span>
+<span class="sd">            params computation algorithm</span>
+<span class="sd">        :param tokenizer_model: path for the sentencepiece model, used for</span>
+<span class="sd">            sentencepiece tokenization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># about minhash computation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">=</span> <span class="n">tokenization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowercase</span> <span class="o">=</span> <span class="n">lowercase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="o">=</span> <span class="n">ignore_pattern</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="p">)</span>
+
+        <span class="c1"># check parameters</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;punctuation&#39;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Be careful that tokenization with punctuations &#39;</span>
+                           <span class="s1">&#39;won</span><span class="se">\&#39;</span><span class="s1">t work if the ignore pattern includes &#39;</span>
+                           <span class="s1">&#39;punctuations.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">punctuation_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\p</span><span class="si">{P}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;sentencepiece&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tokenizer_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;To use &#39;sentencepiece&#39; tokenization, &quot;</span>
+                                 <span class="s2">&quot;&#39;tokenizer_model&#39; is required.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">prepare_sentencepiece_model</span><span class="p">(</span><span class="n">tokenizer_model</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># about deduplication</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_permutation</span> <span class="o">=</span> <span class="n">num_permutations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jaccard_threshold</span> <span class="o">=</span> <span class="n">jaccard_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span> <span class="o">=</span> <span class="n">num_bands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_rows_per_band</span> <span class="o">=</span> <span class="n">num_rows_per_band</span>
+
+        <span class="c1"># initialize deduplication parameters</span>
+        <span class="c1"># check number of bands and rows</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_rows_per_band</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_rows_per_band</span> <span class="o">=</span> <span class="n">optimal_param</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">jaccard_threshold</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_permutation</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># compute hash ranges and create hash tables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash_ranges</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_rows_per_band</span><span class="p">,</span>
+                             <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_rows_per_band</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash_tables</span> <span class="o">=</span> <span class="p">[</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_bands</span><span class="p">)]</span>
+
+        <span class="c1"># generate permutations</span>
+        <span class="n">gen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perm_a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">perm_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[(</span>
+                <span class="n">gen</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">MERSENNE_PRIME</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">),</span>
+                <span class="n">gen</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">MERSENNE_PRIME</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">),</span>
+            <span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_permutation</span><span class="p">)],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">T</span></div>
+
+<div class="viewcode-block" id="DocumentMinhashDeduplicator.compute_hash"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentMinhashDeduplicator.compute_hash">[docs]</a>    <span class="k">def</span> <span class="nf">compute_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute minhash values for the sample.</span>
+
+<span class="sd">        :param sample: input sample</span>
+<span class="sd">        :return: sample with minhash value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check if it&#39;s computed already</span>
+        <span class="k">if</span> <span class="n">HashKeys</span><span class="o">.</span><span class="n">minhash</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sample</span>
+
+        <span class="n">text</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowercase</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+        <span class="c1"># get tokens for different tokenization method</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;character&#39;</span><span class="p">:</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;punctuation&#39;</span><span class="p">:</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">punctuation_pattern</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;space&#39;</span><span class="p">:</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="n">split_on_whitespace</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;sentencepiece&#39;</span><span class="p">:</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">out_type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Unimplemented tokenization method [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
+
+        <span class="c1"># compute minhash value</span>
+        <span class="n">hv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">sha1_hash32</span><span class="p">(</span><span class="n">token</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">],</span>
+                      <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
+        <span class="n">phv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span>
+            <span class="p">((</span><span class="n">hv</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">perm_a</span><span class="p">,</span>
+                           <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hv</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">perm_b</span><span class="p">)</span> <span class="o">%</span> <span class="n">MERSENNE_PRIME</span><span class="p">,</span>
+            <span class="n">MAX_HASH</span><span class="p">)</span>
+        <span class="n">hash_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span>
+            <span class="n">phv</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_permutation</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span> <span class="o">*</span> <span class="n">MAX_HASH</span>
+        <span class="p">])</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">minhash</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">bytes</span><span class="p">(</span><span class="n">hash_values</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span><span class="o">.</span><span class="n">byteswap</span><span class="p">()</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash_ranges</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">sample</span></div>
+
+<div class="viewcode-block" id="DocumentMinhashDeduplicator.process"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentMinhashDeduplicator.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">show_num</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For doc-level, dataset --&gt; dataset.</span>
+
+<span class="sd">        :param dataset: input dataset</span>
+<span class="sd">        :param show_num: number of traced samples used when tracer is</span>
+<span class="sd">            open.</span>
+<span class="sd">        :return: deduplicated dataset and the sampled duplicate pairs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># no need to deduplicate because too few samples</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dataset</span><span class="p">,</span> <span class="p">{}</span>
+
+        <span class="n">minhashes</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">minhash</span><span class="p">]</span>
+        <span class="c1"># remove bytes minhash column otherwise unexpected error would occur</span>
+        <span class="c1"># when exporting the processed dataset</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">([</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">minhash</span><span class="p">])</span>
+
+        <span class="c1"># make clusters -- construct the minhash lookup tables of seg to ids</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Start clustering for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples...&#39;</span><span class="p">)</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10000</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">minhashes</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">),</span>
+                      <span class="n">dynamic_ncols</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                      <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Iterating MinHashes of samples...&#39;</span><span class="p">):</span>
+            <span class="n">batch</span> <span class="o">=</span> <span class="n">minhashes</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">hs</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">h</span><span class="p">,</span> <span class="n">hashtable</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">hs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash_tables</span><span class="p">):</span>
+                    <span class="n">hashtable</span><span class="p">[</span><span class="n">h</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
+
+        <span class="c1"># using UnionFind set to union samples within the same clusters</span>
+        <span class="n">union_find</span> <span class="o">=</span> <span class="n">UnionFind</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">table</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_tables</span><span class="p">,</span>
+                          <span class="n">dynamic_ncols</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                          <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Clustering&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">:</span>
+                    <span class="n">union_find</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">union_find</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span><span class="si">}</span><span class="s1"> &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;clusters that includes multiple near-duplicate samples.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># record the duplicate sample pairs</span>
+        <span class="n">dup_pairs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">show_num</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)):</span>
+                <span class="n">cluster_idx</span> <span class="o">=</span> <span class="n">union_find</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cluster_idx</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dup_pairs</span> <span class="ow">and</span> <span class="n">cluster_idx</span> <span class="o">!=</span> <span class="n">i</span><span class="p">:</span>
+                    <span class="n">dup_pairs</span><span class="p">[</span><span class="n">cluster_idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="n">dataset</span><span class="p">[</span><span class="n">cluster_idx</span><span class="p">],</span>
+                        <span class="n">dataset</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">show_num</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># filtering -- only keep those samples whose parent index is itself,</span>
+        <span class="c1"># including:</span>
+        <span class="c1"># 1. samples that form a cluster by themselves</span>
+        <span class="c1"># 2. the first sample in a cluster that includes multiple samples</span>
+        <span class="k">def</span> <span class="nf">_filter_minhash_dup_helper</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">union_find</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="n">index</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">_filter_minhash_dup_helper</span><span class="p">,</span>
+            <span class="n">with_indices</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Keep </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples after MinHash dedup.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">dup_pairs</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

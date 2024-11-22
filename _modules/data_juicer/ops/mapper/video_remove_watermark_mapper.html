@@ -1,0 +1,355 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.mapper.video_remove_watermark_mapper &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.mapper.video_remove_watermark_mapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.mapper.video_remove_watermark_mapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">av</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.file_utils</span> <span class="kn">import</span> <span class="n">transfer_filename</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.lazy_loader</span> <span class="kn">import</span> <span class="n">LazyLoader</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.logger_utils</span> <span class="kn">import</span> <span class="n">HiddenPrints</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">close_video</span><span class="p">,</span>
+                                        <span class="n">extract_video_frames_uniformly</span><span class="p">,</span>
+                                        <span class="n">load_data_with_context</span><span class="p">,</span> <span class="n">load_video</span><span class="p">,</span>
+                                        <span class="n">parse_string_to_roi</span><span class="p">,</span>
+                                        <span class="n">process_each_frame</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
+<span class="kn">from</span> <span class="nn">..op_fusion</span> <span class="kn">import</span> <span class="n">LOADED_VIDEOS</span>
+
+<span class="k">with</span> <span class="n">HiddenPrints</span><span class="p">():</span>
+    <span class="n">cv2</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;cv2&#39;</span><span class="p">,</span> <span class="s1">&#39;cv2&#39;</span><span class="p">)</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;video_remove_watermark_mapper&#39;</span>
+
+
+<div class="viewcode-block" id="VideoRemoveWatermarkMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoRemoveWatermarkMapper">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">VideoRemoveWatermarkMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove the watermarks in videos given regions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="VideoRemoveWatermarkMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoRemoveWatermarkMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">roi_strings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;0,0,0.1,0.1&#39;</span><span class="p">],</span>
+                 <span class="n">roi_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ratio&#39;</span><span class="p">,</span>
+                 <span class="n">roi_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+                 <span class="n">min_frame_threshold</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>
+                 <span class="n">detection_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;pixel_value&#39;</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param roi_strings: a given list of regions the watermarks locate.</span>
+<span class="sd">            The format of each can be &quot;x1, y1, x2, y2&quot;, &quot;(x1, y1, x2, y2)&quot;,</span>
+<span class="sd">            or &quot;[x1, y1, x2, y2]&quot;.</span>
+<span class="sd">        :param roi_type: the roi string type. When the type is &#39;pixel&#39;, (x1,</span>
+<span class="sd">            y1), (x2, y2) are the locations of pixels in the top left corner</span>
+<span class="sd">            and the bottom right corner respectively. If the roi_type is</span>
+<span class="sd">            &#39;ratio&#39;, the coordinates are normalized by wights and heights.</span>
+<span class="sd">        :param roi_key: the key name of fields in samples to store roi_strings</span>
+<span class="sd">            for each sample. It&#39;s used for set different rois for different</span>
+<span class="sd">            samples. If it&#39;s none, use rois in parameter &quot;roi_strings&quot;.</span>
+<span class="sd">            It&#39;s None in default.</span>
+<span class="sd">        :param frame_num: the number of frames to be extracted uniformly from</span>
+<span class="sd">            the video to detect the pixels of watermark.</span>
+<span class="sd">        :param min_frame_threshold: a coodination is considered as the</span>
+<span class="sd">            location of a watermark pixel when it is that in no less</span>
+<span class="sd">            min_frame_threshold frames.</span>
+<span class="sd">        :param detection_method: the method to detect the pixels of watermark.</span>
+<span class="sd">            If it is &#39;pixel_value&#39;, we consider the distribution of pixel</span>
+<span class="sd">            value in each frame. If it is &#39;pixel_diversity&#39;, we will consider</span>
+<span class="sd">            the pixel diversity in different frames. The min_frame_threshold</span>
+<span class="sd">            is useless and frame_num must be greater than 1 in</span>
+<span class="sd">            &#39;pixel_diversity&#39; mode.</span>
+<span class="sd">        :param args: extra args</span>
+<span class="sd">        :param kwargs: extra args</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">roi_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;ratio&#39;</span><span class="p">,</span> <span class="s1">&#39;pixel&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;roi_type [</span><span class="si">{</span><span class="n">roi_type</span><span class="si">}</span><span class="s1">]&#39;</span>
+                             <span class="sa">f</span><span class="s1">&#39; is not supported. &#39;</span>
+                             <span class="sa">f</span><span class="s2">&quot;Can only be one of [&#39;ratio&#39;, &#39;pixel&#39;]. &quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">detection_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;pixel_value&#39;</span><span class="p">,</span> <span class="s1">&#39;pixel_diversity&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;etection_method [</span><span class="si">{</span><span class="n">detection_method</span><span class="si">}</span><span class="s1">]&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39; is not supported. &#39;</span>
+                <span class="sa">f</span><span class="s2">&quot;Can only be one of [&#39;pixel_value&#39;, &#39;pixel_diversity&#39;]. &quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">detection_method</span> <span class="o">==</span> <span class="s1">&#39;pixel_diversity&#39;</span> <span class="ow">and</span> <span class="n">frame_num</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;frame_num must be gteater than 1 in &#39;pixel_diversity&#39; mode.&quot;</span><span class="p">)</span>
+
+        <span class="n">rois</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">roi_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">roi_string</span> <span class="ow">in</span> <span class="n">roi_strings</span><span class="p">:</span>
+                <span class="n">roi</span> <span class="o">=</span> <span class="n">parse_string_to_roi</span><span class="p">(</span><span class="n">roi_string</span><span class="p">,</span> <span class="n">roi_type</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">roi</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="s1">&#39;The roi in roi_strings must be four no negative&#39;</span>
+                        <span class="s1">&#39; numbers in the format of &quot;x1, y1, x2, y2&quot;, &#39;</span>
+                        <span class="s1">&#39;&quot;(x1, y1, x2, y2)&quot;, or &quot;[x1, y1, x2, y2]&quot;.&#39;</span><span class="p">)</span>
+                <span class="n">rois</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_type</span> <span class="o">=</span> <span class="n">roi_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rois</span> <span class="o">=</span> <span class="n">rois</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_key</span> <span class="o">=</span> <span class="n">roi_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_num</span> <span class="o">=</span> <span class="n">frame_num</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_frame_threshold</span> <span class="o">=</span> <span class="n">min_frame_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detection_method</span> <span class="o">=</span> <span class="n">detection_method</span></div>
+
+    <span class="k">def</span> <span class="nf">_detect_watermark_via_pixel_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frames</span><span class="p">,</span> <span class="n">rois</span><span class="p">):</span>
+
+        <span class="n">masks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">frames</span><span class="p">:</span>
+            <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">to_ndarray</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;bgr24&#39;</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">frame</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="n">rois</span><span class="p">:</span>
+                <span class="c1"># dimension of ndarray frame: height x width x channel</span>
+                <span class="n">roi_frame</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+                <span class="n">gray_frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">roi_frame</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2GRAY</span><span class="p">)</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">binary_frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">threshold</span><span class="p">(</span>
+                    <span class="n">gray_frame</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">THRESH_BINARY</span> <span class="o">+</span> <span class="n">cv2</span><span class="o">.</span><span class="n">THRESH_OTSU</span><span class="p">)</span>
+
+                <span class="c1"># assume the watermark is located in the box, so the pixel in</span>
+                <span class="c1"># the edge must be 0, if not, reverse binary_frame</span>
+                <span class="n">edge_postive_num</span> <span class="o">=</span> <span class="p">(</span><span class="n">binary_frame</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span>
+                                    <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="n">binary_frame</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="n">total</span> <span class="o">=</span> <span class="n">binary_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">binary_frame</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">edge_postive_num</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">&gt;</span> <span class="n">total</span><span class="p">:</span>
+                    <span class="n">binary_frame</span> <span class="o">=</span> <span class="o">~</span><span class="n">binary_frame</span>
+
+                <span class="n">mask</span><span class="p">[</span><span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                     <span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                                           <span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">|</span> <span class="n">binary_frame</span>
+            <span class="n">masks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+        <span class="n">final_mask</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">)</span>
+        <span class="n">final_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">final_mask</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_frame_threshold</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">final_mask</span> <span class="o">=</span> <span class="n">final_mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">final_mask</span>
+
+    <span class="k">def</span> <span class="nf">_detect_watermark_via_pixel_diversity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frames</span><span class="p">,</span> <span class="n">rois</span><span class="p">):</span>
+
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">width</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frame</span><span class="o">.</span><span class="n">to_ndarray</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;bgr24&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">frames</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="n">rois</span><span class="p">:</span>
+            <span class="n">roi_frames</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">frame</span><span class="p">[</span><span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="n">frames</span>
+            <span class="p">]</span>
+            <span class="n">roi_frames</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">roi_frames</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">pixel_diversity</span> <span class="o">=</span> <span class="n">roi_frames</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">pixel_diversity</span> <span class="o">=</span> <span class="n">pixel_diversity</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">max_diversity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">pixel_diversity</span><span class="p">)</span>
+            <span class="n">min_diversity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">pixel_diversity</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">max_diversity</span> <span class="o">&gt;</span> <span class="n">min_diversity</span><span class="p">:</span>
+                <span class="n">scaled_diversity</span> <span class="o">=</span> <span class="mi">255</span> <span class="o">*</span> <span class="p">(</span><span class="n">pixel_diversity</span> <span class="o">-</span> <span class="n">min_diversity</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+                    <span class="n">max_diversity</span> <span class="o">-</span> <span class="n">min_diversity</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">scaled_diversity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">pixel_diversity</span><span class="p">)</span>
+            <span class="n">scaled_diversity</span> <span class="o">=</span> <span class="n">scaled_diversity</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">binary_frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">threshold</span><span class="p">(</span>
+                <span class="n">scaled_diversity</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">THRESH_BINARY</span> <span class="o">+</span> <span class="n">cv2</span><span class="o">.</span><span class="n">THRESH_OTSU</span><span class="p">)</span>
+            <span class="c1"># the watermark pixels have less diversity</span>
+            <span class="n">binary_frame</span> <span class="o">=</span> <span class="o">~</span><span class="n">binary_frame</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                 <span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                                       <span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">|</span> <span class="n">binary_frame</span>
+
+        <span class="k">return</span> <span class="n">mask</span>
+
+    <span class="k">def</span> <span class="nf">_generate_watermark_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="n">extract_video_frames_uniformly</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_num</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">roi_strings</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">roi_strings</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">roi_strings</span> <span class="o">=</span> <span class="p">[</span><span class="n">roi_strings</span><span class="p">]</span>
+            <span class="n">rois</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">parse_string_to_roi</span><span class="p">(</span><span class="n">roi_string</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_type</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">roi_string</span> <span class="ow">in</span> <span class="n">roi_strings</span>
+            <span class="p">]</span>
+            <span class="n">rois</span> <span class="o">=</span> <span class="p">[</span><span class="n">roi</span> <span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="n">rois</span> <span class="k">if</span> <span class="n">roi</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rois</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rois</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_type</span> <span class="o">==</span> <span class="s1">&#39;ratio&#39;</span><span class="p">:</span>
+            <span class="n">rois</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">tuple</span><span class="p">([</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">roi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">width</span><span class="p">),</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">roi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">roi</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">width</span><span class="p">),</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">roi</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+                <span class="p">])</span> <span class="k">for</span> <span class="n">roi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rois</span>
+            <span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">detection_method</span> <span class="o">==</span> <span class="s1">&#39;pixel_value&#39;</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_watermark_via_pixel_value</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">rois</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_watermark_via_pixel_diversity</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">rois</span><span class="p">)</span>
+
+        <span class="n">kernel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cv2</span><span class="o">.</span><span class="n">dilate</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_clean_watermark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">frame</span><span class="p">,</span> <span class="n">watermark_mask</span><span class="p">):</span>
+        <span class="n">np_frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">to_ndarray</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;bgr24&#39;</span><span class="p">)</span>
+        <span class="n">new_np_frame</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">inpaint</span><span class="p">(</span><span class="n">np_frame</span><span class="p">,</span> <span class="n">watermark_mask</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">INPAINT_NS</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">av</span><span class="o">.</span><span class="n">VideoFrame</span><span class="o">.</span><span class="n">from_ndarray</span><span class="p">(</span><span class="n">new_np_frame</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;bgr24&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="VideoRemoveWatermarkMapper.process_single"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoRemoveWatermarkMapper.process_single">[docs]</a>    <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># there is no video in this sample</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]:</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="n">sample</span>
+
+        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]:</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
+
+        <span class="n">loaded_video_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
+        <span class="n">sample</span><span class="p">,</span> <span class="n">videos</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span>
+                                                <span class="n">loaded_video_keys</span><span class="p">,</span> <span class="n">load_video</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_video_keys</span><span class="p">):</span>
+            <span class="n">video</span> <span class="o">=</span> <span class="n">videos</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span>
+            <span class="n">cleaned_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
+                                                  <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cleaned_video_key</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="n">cleaned_video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">):</span>
+                <span class="n">watermark_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_watermark_mask</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <span class="n">sample</span><span class="p">)</span>
+
+                <span class="k">def</span> <span class="nf">process_frame_func</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_watermark</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span> <span class="n">watermark_mask</span><span class="p">)</span>
+
+                <span class="n">cleaned_video_key</span> <span class="o">=</span> <span class="n">process_each_frame</span><span class="p">(</span><span class="n">video</span><span class="p">,</span>
+                                                       <span class="n">cleaned_video_key</span><span class="p">,</span>
+                                                       <span class="n">process_frame_func</span><span class="p">)</span>
+
+            <span class="n">loaded_video_keys</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">cleaned_video_key</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">vid_key</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
+                <span class="n">close_video</span><span class="p">(</span><span class="n">videos</span><span class="p">[</span><span class="n">vid_key</span><span class="p">])</span>
+
+        <span class="c1"># when the file is modified, its source file needs to be updated.</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">loaded_video_keys</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">loaded_video_keys</span>
+        <span class="k">return</span> <span class="n">sample</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

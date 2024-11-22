@@ -1,0 +1,380 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.mapper.generate_qa_from_examples_mapper &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.mapper.generate_qa_from_examples_mapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.mapper.generate_qa_from_examples_mapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.lazy_loader</span> <span class="kn">import</span> <span class="n">LazyLoader</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
+
+<span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">UNFORKABLE</span><span class="p">,</span> <span class="n">Mapper</span>
+
+<span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;torch&#39;</span><span class="p">,</span> <span class="s1">&#39;torch&#39;</span><span class="p">)</span>
+<span class="n">vllm</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;vllm&#39;</span><span class="p">,</span> <span class="s1">&#39;vllm&#39;</span><span class="p">)</span>
+<span class="n">rouge</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;rouge&#39;</span><span class="p">,</span> <span class="s1">&#39;rouge&#39;</span><span class="p">)</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;generate_qa_from_examples_mapper&#39;</span>
+
+
+<span class="c1"># TODO: Extend LLM-based OPs into API-based implementation.</span>
+<div class="viewcode-block" id="GenerateQAFromExamplesMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper">[docs]</a><span class="nd">@UNFORKABLE</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">GenerateQAFromExamplesMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mapper to generate question and answer pairs from examples.</span>
+<span class="sd">    You should configure an empty dataset in your yaml config file:</span>
+<span class="sd">    ```</span>
+<span class="sd">    generated_dataset_config:</span>
+<span class="sd">      type: &#39;EmptyFormatter&#39;  # use `RayEmptyFormatter` when enable ray</span>
+<span class="sd">      length: ${The number of generated samples}</span>
+<span class="sd">      feature_keys: ${text key}</span>
+<span class="sd">    ```</span>
+<span class="sd">    The number of samples generated is determined by</span>
+<span class="sd">    the length of the empty dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s1">&#39;请你仔细观察多个示例数据的输入和输出，按照你的理解，总结出相应规矩，然后写出一个新的【问题】和【回答】。&#39;</span>
+        <span class="s1">&#39;注意，新生成的【问题】和【回答】需要满足如下要求：</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="s1">&#39;1. 生成的【问题】和【回答】不能与输入的【问题】和【回答】一致，但是需要保持格式相同。</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="s1">&#39;2. 生成的【问题】不一定要局限于输入【问题】的话题或领域，生成的【回答】需要正确回答生成的【问题】。</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="s1">&#39;3. 提供的【问题】和【回答】可能是多轮对话，生成的【问题】和【回答】也可以是多轮，但是需要保持格式相同。</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="s1">&#39;4. 生成的【问题】和【回答】必须成对出现，而且【问题】需要在【回答】之前。</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_EXAMPLE_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">如下是一条示例数据：</span><span class="se">\n</span><span class="si">{}</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_QA_PAIR_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;【问题】</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">【回答】</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_OUTPUT_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;【问题】(.*?)【回答】(.*?)(?=【问题】|$)&#39;</span>
+
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+
+<div class="viewcode-block" id="GenerateQAFromExamplesMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">hf_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Qwen/Qwen2.5-7B-Instruct&#39;</span><span class="p">,</span>
+                 <span class="o">*</span><span class="p">,</span>
+                 <span class="n">seed_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                 <span class="n">example_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                 <span class="n">similarity_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">,</span>
+                 <span class="n">system_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">example_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">qa_pair_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">output_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">enable_vllm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">model_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param hf_model: Hugginface model ID.</span>
+<span class="sd">        :param seed_file: Path to the seed file in chatml format.</span>
+<span class="sd">        :param example_num: The number of selected examples.</span>
+<span class="sd">            Randomly select N examples from &quot;seed_file&quot; and</span>
+<span class="sd">            put them into prompt as QA examples.</span>
+<span class="sd">        :param similarity_threshold: The similarity score threshold</span>
+<span class="sd">            between the generated samples and the seed examples.</span>
+<span class="sd">            Range from 0 to 1. Samples with similarity score less than</span>
+<span class="sd">            this threshold will be kept.</span>
+<span class="sd">        :param system_prompt: System prompt for guiding the generation task.</span>
+<span class="sd">        :param input_template: Template for building the input prompt. It must</span>
+<span class="sd">            include one placeholder &#39;{}&#39;, which will be replaced by</span>
+<span class="sd">            `example_num` formatted examples defined by `example_template`.</span>
+<span class="sd">        :param example_template: Template for formatting one QA example. It</span>
+<span class="sd">            must include one placeholder &#39;{}&#39;, which will be replaced by one</span>
+<span class="sd">            formatted qa_pair.</span>
+<span class="sd">        :param qa_pair_template: Template for formatting a single QA pair</span>
+<span class="sd">            within each example. Must include two placeholders &#39;{}&#39; for the</span>
+<span class="sd">            question and answer.</span>
+<span class="sd">        :param output_pattern: Regular expression pattern to extract questions</span>
+<span class="sd">            and answers from model response.</span>
+<span class="sd">        :param enable_vllm: Whether to use vllm for inference acceleration.</span>
+<span class="sd">        :param model_params: Parameters for initializing the model.</span>
+<span class="sd">        :param sampling_params: Sampling parameters for text generation.</span>
+<span class="sd">            e.g {&#39;temperature&#39;: 0.9, &#39;top_p&#39;: 0.95}</span>
+<span class="sd">        :param kwargs: Extra keyword arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">seed_file</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Please provide `seed_file` in chatml format.&#39;</span>
+                <span class="s1">&#39;Example: data-juicer/demos/data/demo-dataset-chatml.jsonl&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed_file</span> <span class="o">=</span> <span class="n">seed_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">example_num</span> <span class="o">=</span> <span class="n">example_num</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">similarity_threshold</span> <span class="o">=</span> <span class="n">similarity_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">similarity_type</span> <span class="o">=</span> <span class="s1">&#39;rouge_l&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span> <span class="o">=</span> <span class="n">system_prompt</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SYSTEM_PROMPT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_template</span> <span class="o">=</span> <span class="n">input_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_INPUT_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">example_template</span> <span class="o">=</span> <span class="n">example_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_EXAMPLE_TEMPLATE</span>  <span class="c1"># noqa: E501</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qa_pair_template</span> <span class="o">=</span> <span class="n">qa_pair_template</span> <span class="ow">or</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_QA_PAIR_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span> <span class="o">=</span> <span class="n">output_pattern</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_OUTPUT_PATTERN</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span> <span class="o">=</span> <span class="n">enable_vllm</span>
+        <span class="n">model_params</span> <span class="o">=</span> <span class="n">model_params</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">enable_vllm</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;must be executed in CUDA&#39;</span>
+            <span class="c1"># cannot initialize vllm replicas on different GPUs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">model_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tensor_parallel_size&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">tensor_parallel_size</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Set tensor_parallel_size to </span><span class="se">\</span>
+<span class="s1">                    </span><span class="si">{</span><span class="n">tensor_parallel_size</span><span class="si">}</span><span class="s1"> for vllm.&#39;</span><span class="p">)</span>
+                <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;tensor_parallel_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tensor_parallel_size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+                <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;vllm&#39;</span><span class="p">,</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_model</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">vllm</span><span class="o">.</span><span class="n">SamplingParams</span><span class="p">(</span><span class="o">**</span><span class="n">sampling_params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+                <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_model</span><span class="p">,</span>
+                <span class="n">return_pipe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed_qa_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_seed_qa_samples</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_qa_samples</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No QA data was parsed from the seed file!&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_load_seed_qa_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load QA pairs from chatml format file.&quot;&quot;&quot;</span>
+        <span class="n">qa_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_file</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">qa_pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_chatml_str</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">qa_pairs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">qa_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">qa_pairs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">qa_samples</span>
+
+    <span class="k">def</span> <span class="nf">_sample_to_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qa_sample</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">qa_pair</span><span class="p">)</span> <span class="k">for</span> <span class="n">qa_pair</span> <span class="ow">in</span> <span class="n">qa_sample</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_max_rouge_l_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hypothesis</span><span class="p">,</span> <span class="n">references</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">rouge</span><span class="o">.</span><span class="n">Rouge</span><span class="p">()</span>
+        <span class="n">max_score</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">hyp_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_to_str</span><span class="p">(</span><span class="n">hypothesis</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">reference</span> <span class="ow">in</span> <span class="n">references</span><span class="p">:</span>
+            <span class="n">ref_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_to_str</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span>
+            <span class="n">scores</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">get_scores</span><span class="p">(</span><span class="n">hyp_str</span><span class="p">,</span> <span class="n">ref_str</span><span class="p">)</span>
+            <span class="n">rouge_l_score</span> <span class="o">=</span> <span class="n">scores</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;rouge-l&#39;</span><span class="p">][</span><span class="s1">&#39;f&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">rouge_l_score</span> <span class="o">&gt;</span> <span class="n">max_score</span><span class="p">:</span>
+                <span class="n">max_score</span> <span class="o">=</span> <span class="n">rouge_l_score</span>
+        <span class="k">return</span> <span class="n">max_score</span>
+
+    <span class="k">def</span> <span class="nf">_parse_chatml_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_str</span><span class="p">):</span>
+        <span class="n">user_input</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">assistant_output</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">qa_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">sample_str</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;messages&#39;</span><span class="p">]:</span>
+            <span class="n">role</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="s1">&#39;role&#39;</span><span class="p">]</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;user&#39;</span><span class="p">:</span>
+                <span class="n">user_input</span> <span class="o">=</span> <span class="n">content</span>
+            <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;assistant&#39;</span><span class="p">:</span>
+                <span class="n">assistant_output</span> <span class="o">=</span> <span class="n">content</span>
+                <span class="n">qa_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">user_input</span><span class="p">,</span> <span class="n">assistant_output</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">qa_pairs</span>
+
+<div class="viewcode-block" id="GenerateQAFromExamplesMapper.build_input"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.build_input">[docs]</a>    <span class="k">def</span> <span class="nf">build_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qa_examples</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">format_qa_pairs</span><span class="p">(</span><span class="n">qa_example</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">qa_pair_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">qa_example</span>
+                <span class="k">if</span> <span class="n">q</span> <span class="ow">and</span> <span class="n">a</span>
+            <span class="p">])</span>
+
+        <span class="n">formatted_examples</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">example_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">qa_pairs</span><span class="o">=</span><span class="n">format_qa_pairs</span><span class="p">(</span><span class="n">qa_example</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">qa_example</span> <span class="ow">in</span> <span class="n">qa_examples</span>
+        <span class="p">])</span>
+        <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">examples</span><span class="o">=</span><span class="n">formatted_examples</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">input_prompt</span></div>
+
+<div class="viewcode-block" id="GenerateQAFromExamplesMapper.parse_output"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.parse_output">[docs]</a>    <span class="k">def</span> <span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_output</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">raw_output</span><span class="p">)</span>
+        <span class="n">output_qa_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span><span class="p">,</span> <span class="n">raw_output</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+            <span class="n">question</span><span class="p">,</span> <span class="n">answer</span> <span class="o">=</span> <span class="n">match</span>
+            <span class="n">output_qa_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">question</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">answer</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">output_qa_pairs</span></div>
+
+<div class="viewcode-block" id="GenerateQAFromExamplesMapper.process_single"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.GenerateQAFromExamplesMapper.process_single">[docs]</a>    <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">model</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
+
+        <span class="n">random_qa_samples</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_qa_samples</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">example_num</span><span class="p">)</span>
+        <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input</span><span class="p">(</span><span class="n">random_qa_samples</span><span class="p">)</span>
+
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span>
+            <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span>
+        <span class="p">},</span> <span class="p">{</span>
+            <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">input_prompt</span>
+        <span class="p">}]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># model is pipe</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span>
+                             <span class="n">return_full_text</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;generated_text&#39;</span><span class="p">]</span>
+
+        <span class="n">output_qa_pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_output</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_qa_pairs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Parse model response error! &#39;</span>
+                           <span class="s1">&#39;No data generated for the current response!&#39;</span><span class="p">)</span>
+            <span class="n">sample</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">response_key</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">history_key</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_history</span><span class="p">()</span>
+            <span class="p">})</span>
+            <span class="k">return</span> <span class="n">sample</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">similarity_type</span> <span class="o">==</span> <span class="s1">&#39;rouge_l&#39;</span><span class="p">:</span>
+            <span class="n">sim_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_rouge_l_score</span><span class="p">(</span><span class="n">output_qa_pairs</span><span class="p">,</span>
+                                                <span class="n">random_qa_samples</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Not support similarity type &quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">similarity_type</span><span class="si">}</span><span class="s1">&quot;!&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sim_score</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">similarity_threshold</span><span class="p">:</span>
+            <span class="n">query</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">output_qa_pairs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">history</span> <span class="o">=</span> <span class="n">output_qa_pairs</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_history</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">response</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty_history</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Filter this generated sample due to similarity.&#39;</span><span class="p">)</span>
+
+        <span class="n">sample</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">:</span> <span class="n">query</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">response_key</span><span class="p">:</span> <span class="n">response</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">history_key</span><span class="p">:</span> <span class="n">history</span>
+        <span class="p">})</span>
+        <span class="k">return</span> <span class="n">sample</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

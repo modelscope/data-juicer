@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.mapper.video_split_by_duration_mapper &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.mapper.video_split_by_duration_mapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.mapper.video_split_by_duration_mapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.file_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">add_suffix_to_filename</span><span class="p">,</span>
+                                          <span class="n">transfer_filename</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SpecialTokens</span><span class="p">,</span> <span class="n">close_video</span><span class="p">,</span>
+                                        <span class="n">cut_video_by_seconds</span><span class="p">,</span>
+                                        <span class="n">get_video_duration</span><span class="p">,</span> <span class="n">load_video</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
+<span class="kn">from</span> <span class="nn">..op_fusion</span> <span class="kn">import</span> <span class="n">LOADED_VIDEOS</span>
+
+
+<span class="k">def</span> <span class="nf">create_replacer</span><span class="p">(</span><span class="n">replacements</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">replacer</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">replacements</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">replacer</span>
+
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;video_split_by_duration_mapper&#39;</span>
+
+
+<div class="viewcode-block" id="VideoSplitByDurationMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitByDurationMapper">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="nd">@LOADED_VIDEOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">VideoSplitByDurationMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to split video by duration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="VideoSplitByDurationMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitByDurationMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">split_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+                 <span class="n">min_last_split_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param split_duration: duration of each video split in seconds.</span>
+<span class="sd">        :param min_last_split_duration: The minimum allowable duration in</span>
+<span class="sd">            seconds for the last video split. If the duration of the last</span>
+<span class="sd">            split is less than this value, it will be discarded.</span>
+<span class="sd">        :param keep_original_sample: whether to keep the original sample. If</span>
+<span class="sd">            it&#39;s set to False, there will be only cut sample in the</span>
+<span class="sd">            final datasets and the original sample will be removed. It&#39;s True</span>
+<span class="sd">            in default.</span>
+<span class="sd">        :param args: extra args</span>
+<span class="sd">        :param kwargs: extra args</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">split_duration</span> <span class="o">=</span> <span class="n">split_duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_last_split_duration</span> <span class="o">=</span> <span class="n">min_last_split_duration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span> <span class="o">=</span> <span class="n">keep_original_sample</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extra_args</span> <span class="o">=</span> <span class="n">kwargs</span></div>
+
+<div class="viewcode-block" id="VideoSplitByDurationMapper.split_videos_by_duration"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitByDurationMapper.split_videos_by_duration">[docs]</a>    <span class="k">def</span> <span class="nf">split_videos_by_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video_key</span><span class="p">,</span> <span class="n">container</span><span class="p">):</span>
+        <span class="n">video_duration</span> <span class="o">=</span> <span class="n">get_video_duration</span><span class="p">(</span><span class="n">container</span><span class="p">)</span>
+        <span class="n">timestamps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">video_duration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_duration</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">split_video_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">unique_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
+                                             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)):</span>
+            <span class="n">split_video_key</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">unique_video_key</span><span class="p">,</span>
+                                                     <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cut_video_by_seconds</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">split_video_key</span><span class="p">,</span>
+                                    <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">timestamps</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="n">split_video_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">split_video_key</span><span class="p">)</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">video_duration</span> <span class="o">-</span> <span class="n">timestamps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_last_split_duration</span><span class="p">:</span>
+            <span class="n">split_video_key</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">unique_video_key</span><span class="p">,</span>
+                                                     <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">cut_video_by_seconds</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">split_video_key</span><span class="p">,</span>
+                                    <span class="n">timestamps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="n">split_video_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">split_video_key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">split_video_keys</span></div>
+
+    <span class="k">def</span> <span class="nf">_process_single_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+        <span class="c1"># there is no video in this sample</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="n">sample</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]:</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
+
+        <span class="c1"># the split results</span>
+        <span class="n">split_sample</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+        <span class="n">split_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">split_sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># load all video(s)</span>
+        <span class="n">loaded_video_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
+        <span class="n">videos</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">loaded_video_key</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">loaded_video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">videos</span><span class="p">:</span>
+                <span class="c1"># avoid loading the same videos</span>
+                <span class="n">video</span> <span class="o">=</span> <span class="n">load_video</span><span class="p">(</span><span class="n">loaded_video_key</span><span class="p">)</span>
+                <span class="n">videos</span><span class="p">[</span><span class="n">loaded_video_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">video</span>
+
+        <span class="n">split_video_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># split each video chunk by chunk</span>
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="p">):</span>
+            <span class="c1"># skip empty chunks or contents after the last eoc token</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">video_count</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">)</span>
+                <span class="n">place_holders</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">offset</span> <span class="o">+</span>
+                                                   <span class="n">video_count</span><span class="p">]:</span>
+                    <span class="n">video</span> <span class="o">=</span> <span class="n">videos</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span>
+                    <span class="n">new_video_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_videos_by_duration</span><span class="p">(</span>
+                        <span class="n">video_key</span><span class="p">,</span> <span class="n">video</span><span class="p">)</span>
+                    <span class="n">close_video</span><span class="p">(</span><span class="n">video</span><span class="p">)</span>
+                    <span class="n">split_video_keys</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_video_keys</span><span class="p">)</span>
+                    <span class="n">place_holders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span> <span class="o">*</span>
+                                         <span class="nb">len</span><span class="p">(</span><span class="n">new_video_keys</span><span class="p">))</span>
+                    <span class="n">split_sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_video_keys</span><span class="p">))</span>
+
+                <span class="c1"># insert the generated text according to given mode</span>
+                <span class="n">replacer_function</span> <span class="o">=</span> <span class="n">create_replacer</span><span class="p">(</span><span class="n">place_holders</span><span class="p">)</span>
+                <span class="n">new_split_text_per_chunk</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">,</span>
+                                                  <span class="n">replacer_function</span><span class="p">,</span> <span class="n">chunk</span><span class="p">)</span>
+                <span class="n">split_sample</span><span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span>
+                    <span class="n">text_key</span><span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">new_split_text_per_chunk</span><span class="si">}{</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="si">}</span><span class="s1">&#39;</span>  <span class="c1"># noqa: E501</span>
+                <span class="n">offset</span> <span class="o">+=</span> <span class="n">video_count</span>
+
+        <span class="n">split_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">split_video_keys</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">split_sample</span><span class="p">]</span>
+
+<div class="viewcode-block" id="VideoSplitByDurationMapper.process_batched"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitByDurationMapper.process_batched">[docs]</a>    <span class="k">def</span> <span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="c1"># reconstruct samples from &quot;dict of lists&quot; to &quot;list of dicts&quot;</span>
+        <span class="n">reconstructed_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])):</span>
+            <span class="n">reconstructed_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">})</span>
+        <span class="n">samples_after_split</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># do split for each sample within the batch</span>
+        <span class="k">for</span> <span class="n">ori_sample</span> <span class="ow">in</span> <span class="n">reconstructed_samples</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span><span class="p">:</span>
+                <span class="n">samples_after_split</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">)</span>
+            <span class="n">generated_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">generated_samples</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">samples_after_split</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">generated_samples</span><span class="p">)</span>
+        <span class="c1"># reconstruct samples from &quot;list of dicts&quot; to &quot;dict of lists&quot;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">samples_after_split</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">res_samples</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">res_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">samples_after_split</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">res_samples</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

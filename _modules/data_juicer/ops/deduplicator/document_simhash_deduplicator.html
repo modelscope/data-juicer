@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.deduplicator.document_simhash_deduplicator &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.deduplicator.document_simhash_deduplicator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.deduplicator.document_simhash_deduplicator</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Some code here has been modified from:</span>
+<span class="c1"># https://github.com/bigscience-workshop/data-preparation</span>
+<span class="c1"># --------------------------------------------------------</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">regex</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">HashKeys</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.lazy_loader</span> <span class="kn">import</span> <span class="n">LazyLoader</span>
+
+<span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Deduplicator</span>
+<span class="kn">from</span> <span class="nn">..common.helper_func</span> <span class="kn">import</span> <span class="n">split_on_whitespace</span>
+
+<span class="n">simhash</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;simhash&#39;</span><span class="p">,</span> <span class="s1">&#39;simhash&#39;</span><span class="p">)</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;document_simhash_deduplicator&#39;</span>
+
+
+<div class="viewcode-block" id="DocumentSimhashDeduplicator"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentSimhashDeduplicator">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">DocumentSimhashDeduplicator</span><span class="p">(</span><span class="n">Deduplicator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deduplicator to deduplicate samples at document-level using SimHash.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DocumentSimhashDeduplicator.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentSimhashDeduplicator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">tokenization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;space&#39;</span><span class="p">,</span>
+                 <span class="n">window_size</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+                 <span class="n">lowercase</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">ignore_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">num_blocks</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
+                 <span class="n">hamming_distance</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method :param tokenization: tokenization method for</span>
+<span class="sd">        sample texts.</span>
+
+<span class="sd">        It should be one of [space, punctuation, character]. For</span>
+<span class="sd">        English-like languages, we recommend to use &#39;space&#39;. And for</span>
+<span class="sd">        Chinese-like languages, we recommend to use &#39;character&#39;</span>
+
+<span class="sd">        :param window_size: window size of shingling</span>
+<span class="sd">        :param lowercase: whether to convert text to lower case first</span>
+<span class="sd">        :param ignore_pattern: whether to ignore sub-strings with</span>
+<span class="sd">            specific pattern when computing simhash</span>
+<span class="sd">        :param num_blocks: number of blocks in simhash computing</span>
+<span class="sd">        :param hamming_distance: the max hamming distance threshold in</span>
+<span class="sd">            near-duplicate detection. When the hamming distance of two</span>
+<span class="sd">            sample texts is &lt;= this threshold, they are regarded as</span>
+<span class="sd">            similar samples and this op will only keep one of them after</span>
+<span class="sd">            deduplication. This threshold should be always less than</span>
+<span class="sd">            num_blocks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># about simhash computation</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">=</span> <span class="n">tokenization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span> <span class="o">=</span> <span class="n">window_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lowercase</span> <span class="o">=</span> <span class="n">lowercase</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="o">=</span> <span class="n">ignore_pattern</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="p">)</span>
+
+        <span class="c1"># check parameters</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;punctuation&#39;</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Be careful that tokenization with punctuations &#39;</span>
+                           <span class="s1">&#39;won</span><span class="se">\&#39;</span><span class="s1">t work if the ignore pattern includes &#39;</span>
+                           <span class="s1">&#39;punctuations.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">punctuation_pattern</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\p</span><span class="si">{P}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># about deduplication</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_blocks</span> <span class="o">=</span> <span class="n">num_blocks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hamming_distance</span> <span class="o">=</span> <span class="n">hamming_distance</span></div>
+
+<div class="viewcode-block" id="DocumentSimhashDeduplicator.compute_hash"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentSimhashDeduplicator.compute_hash">[docs]</a>    <span class="k">def</span> <span class="nf">compute_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute simhash values for the sample.</span>
+
+<span class="sd">        :param sample: input sample</span>
+<span class="sd">        :return: sample with simhash value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check if it&#39;s computed already</span>
+        <span class="k">if</span> <span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sample</span>
+
+        <span class="n">text</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lowercase</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignore_pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+
+        <span class="c1"># get tokens for different tokenization method</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;character&#39;</span><span class="p">:</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;punctuation&#39;</span><span class="p">:</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">punctuation_pattern</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span> <span class="o">==</span> <span class="s1">&#39;space&#39;</span><span class="p">:</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="n">split_on_whitespace</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Unimplemented tokenization method [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenization</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
+
+        <span class="c1"># compute simhash</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="n">simhash</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">simhash</span><span class="o">.</span><span class="n">unsigned_hash</span><span class="p">,</span> <span class="n">tokens</span><span class="p">))))</span>
+        <span class="k">return</span> <span class="n">sample</span></div>
+
+<div class="viewcode-block" id="DocumentSimhashDeduplicator.process"><a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentSimhashDeduplicator.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">show_num</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For doc-level, dataset --&gt; dataset.</span>
+
+<span class="sd">        :param dataset: input dataset</span>
+<span class="sd">        :param show_num: number of traced samples used when tracer is</span>
+<span class="sd">            open.</span>
+<span class="sd">        :return: deduplicated dataset and the sampled duplicate pairs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># no need to deduplicate because too few samples</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dataset</span><span class="p">,</span> <span class="p">{}</span>
+
+        <span class="c1"># find matches</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Start querying </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples.&#39;</span><span class="p">)</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">simhash</span><span class="o">.</span><span class="n">find_all</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_blocks</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hamming_distance</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Querying done, found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span><span class="si">}</span><span class="s1"> matches.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># compute hash diff distribution</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+            <span class="n">graph</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="n">graph</span><span class="p">[</span><span class="n">y</span><span class="p">][</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">hash2ids</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+        <span class="n">hashes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">])</span>
+        <span class="n">hash2cluster</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">cluster_id</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">sid</span><span class="p">,</span> <span class="n">hash_val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]):</span>
+            <span class="n">hash2ids</span><span class="p">[</span><span class="n">hash_val</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sid</span><span class="p">))</span>
+
+        <span class="c1"># clustering</span>
+        <span class="n">dup_pairs</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># store duplicate pairs when show_num &gt; 0</span>
+        <span class="k">while</span> <span class="n">hashes</span><span class="p">:</span>
+            <span class="n">hash_val</span> <span class="o">=</span> <span class="n">hashes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">hash_val</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># if this hash value is not in the matches list, it&#39;s regarded as a</span>
+            <span class="c1"># single cluster</span>
+            <span class="k">if</span> <span class="n">hash_val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">graph</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Otherwise, BFS to find the cluster</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([</span><span class="n">hash_val</span><span class="p">])</span>
+            <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">hash_val</span><span class="p">)</span>
+            <span class="n">hash2cluster</span><span class="p">[</span><span class="n">hash_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster_id</span>
+            <span class="k">if</span> <span class="n">show_num</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">show_num</span><span class="p">:</span>
+                <span class="n">dup_pairs</span><span class="p">[</span><span class="n">cluster_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">while</span> <span class="n">q</span><span class="p">:</span>
+                <span class="n">curr</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">graph</span><span class="p">[</span><span class="n">curr</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">neighbor</span><span class="p">)</span>
+                    <span class="n">q</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neighbor</span><span class="p">)</span>
+                    <span class="n">hash2cluster</span><span class="p">[</span><span class="n">neighbor</span><span class="p">]</span> <span class="o">=</span> <span class="n">cluster_id</span>
+
+            <span class="n">cluster_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Found </span><span class="si">{</span><span class="n">cluster_id</span><span class="si">}</span><span class="s1"> clusters and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span><span class="si">}</span><span class="s1"> hashes.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># filter duplicated samples</span>
+        <span class="c1"># NOTICE: For now, we only keep the first sample in a cluster. Maybe</span>
+        <span class="c1"># there are some better strategies later.</span>
+        <span class="k">def</span> <span class="nf">_filter_simhash_dup_helper</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">visited_clusters</span><span class="p">,</span>
+                                       <span class="n">visited_hashes</span><span class="p">):</span>
+            <span class="n">sample_hash_val</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">HashKeys</span><span class="o">.</span><span class="n">simhash</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">sample_hash_val</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hash2cluster</span><span class="p">:</span>
+                <span class="c1"># single-sample cluster, we need to check hash value still.</span>
+                <span class="k">if</span> <span class="n">sample_hash_val</span> <span class="ow">in</span> <span class="n">visited_hashes</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">visited_hashes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sample_hash_val</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cluster_num</span> <span class="o">=</span> <span class="n">hash2cluster</span><span class="p">[</span><span class="n">sample_hash_val</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">show_num</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">cluster_num</span> <span class="ow">in</span> <span class="n">dup_pairs</span> \
+                        <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">dup_pairs</span><span class="p">[</span><span class="n">cluster_num</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">dup_pairs</span><span class="p">[</span><span class="n">cluster_num</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+                <span class="c1"># regular cluster, check cluster number.</span>
+                <span class="k">if</span> <span class="n">cluster_num</span> <span class="ow">in</span> <span class="n">visited_clusters</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">visited_clusters</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cluster_num</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">cluster_record</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">hash_record</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">_filter_simhash_dup_helper</span><span class="p">,</span>
+            <span class="n">fn_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">visited_clusters</span><span class="o">=</span><span class="n">cluster_record</span><span class="p">,</span>
+                           <span class="n">visited_hashes</span><span class="o">=</span><span class="n">hash_record</span><span class="p">),</span>
+            <span class="n">load_from_cache_file</span><span class="o">=</span><span class="kc">False</span> <span class="k">if</span> <span class="n">show_num</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Keep </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s1"> samples after SimHash dedup.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">dup_pairs</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

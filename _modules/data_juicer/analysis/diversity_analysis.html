@@ -1,0 +1,267 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.analysis.diversity_analysis &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.analysis.diversity_analysis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.analysis.diversity_analysis</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">spacy</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
+
+
+<span class="c1"># Modify from self_instruct, please refer to</span>
+<span class="c1"># https://github.com/yizhongw/self-instruct/blob/main/self_instruct/instruction_visualize.ipynb</span>
+<span class="k">def</span> <span class="nf">find_root_verb_and_its_dobj</span><span class="p">(</span><span class="n">tree_root</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the verb and its object closest to the root.</span>
+
+<span class="sd">    :param tree_root: the root of lexical tree</span>
+<span class="sd">    :return: valid verb and its object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># first check if the current node and its children satisfy the condition</span>
+    <span class="k">if</span> <span class="n">tree_root</span><span class="o">.</span><span class="n">pos_</span> <span class="o">==</span> <span class="s1">&#39;VERB&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree_root</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">dep_</span> <span class="o">==</span> <span class="s1">&#39;dobj&#39;</span> <span class="ow">and</span> <span class="n">child</span><span class="o">.</span><span class="n">pos_</span> <span class="o">==</span> <span class="s1">&#39;NOUN&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">tree_root</span><span class="o">.</span><span class="n">lemma_</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">tree_root</span><span class="o">.</span><span class="n">lemma_</span><span class="p">)</span> <span class="k">else</span> <span class="n">tree_root</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">lemma_</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span>
+                        <span class="n">child</span><span class="o">.</span><span class="n">lemma_</span><span class="p">)</span> <span class="k">else</span> <span class="n">child</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">return</span> <span class="n">tree_root</span><span class="o">.</span><span class="n">lemma_</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span>
+            <span class="n">tree_root</span><span class="o">.</span><span class="n">lemma_</span><span class="p">)</span> <span class="k">else</span> <span class="n">tree_root</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="c1"># if not, check its children</span>
+    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree_root</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">find_root_verb_and_its_dobj</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
+    <span class="c1"># if no children satisfy the condition, return None</span>
+    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+
+<span class="c1"># Modify from self_instruct, please refer to</span>
+<span class="c1"># https://github.com/yizhongw/self-instruct/blob/main/self_instruct/instruction_visualize.ipynb</span>
+<span class="k">def</span> <span class="nf">find_root_verb_and_its_dobj_in_string</span><span class="p">(</span><span class="n">nlp</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">first_sent</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the verb and its object closest to the root of lexical tree of input</span>
+<span class="sd">    string.</span>
+
+<span class="sd">    :param nlp: the diversity model to analyze the diversity strings</span>
+<span class="sd">    :param s: the string to be analyzed</span>
+<span class="sd">    :param first_sent: whether to analyze the first sentence in the</span>
+<span class="sd">        input string only. If it&#39;s true, return the analysis result of</span>
+<span class="sd">        the first sentence no matter it&#39;s valid or not. If it&#39;s false,</span>
+<span class="sd">        return the first valid result over all sentences</span>
+<span class="sd">    :return: valid verb and its object of this string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">sents</span><span class="p">:</span>
+        <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span> <span class="o">=</span> <span class="n">find_root_verb_and_its_dobj</span><span class="p">(</span><span class="n">sent</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">first_sent</span> <span class="ow">or</span> <span class="p">(</span><span class="n">verb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">noun</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span>
+    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">get_diversity</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">top_k_verbs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">top_k_nouns</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given the lexical tree analysis result, return the diversity results.</span>
+
+<span class="sd">    :param dataset: lexical tree analysis result</span>
+<span class="sd">    :param top_k_verbs: only keep the top_k_verbs largest verb groups</span>
+<span class="sd">    :param top_k_nouns: only keep the top_k_nouns largest noun groups</span>
+<span class="sd">        for each verb group</span>
+<span class="sd">    :param kwargs: extra args</span>
+<span class="sd">    :return: the diversity results</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">phrases</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;find valid verb-noun structure </span><span class="se">\</span>
+<span class="s1">                </span><span class="si">{</span><span class="n">phrases</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> of </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">top_verbs</span> <span class="o">=</span> <span class="n">phrases</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;verb&#39;</span>
+                                 <span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">nlargest</span><span class="p">(</span><span class="n">top_k_verbs</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">phrases</span><span class="p">[</span><span class="n">phrases</span><span class="p">[</span><span class="s1">&#39;verb&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">top_verbs</span><span class="p">[</span><span class="s1">&#39;verb&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;verb&#39;</span><span class="p">,</span> <span class="s1">&#39;noun&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;count&#39;</span>
+    <span class="p">})</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;verb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+        <span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">top_k_nouns</span><span class="p">))</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+
+<div class="viewcode-block" id="DiversityAnalysis"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis">[docs]</a><span class="k">class</span> <span class="nc">DiversityAnalysis</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply diversity analysis for each sample and get an overall analysis</span>
+<span class="sd">    result.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DiversityAnalysis.__init__"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">lang_or_model</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization method :param dataset: the dataset to be analyzed</span>
+<span class="sd">        :param output_path: path to store the analysis results :param</span>
+<span class="sd">        lang_or_model: the diversity model or a specific language used to load</span>
+<span class="sd">        the diversity model.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">output_path</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lang_or_model</span> <span class="o">=</span> <span class="n">lang_or_model</span></div>
+
+<div class="viewcode-block" id="DiversityAnalysis.compute"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang_or_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply lexical tree analysis on each sample.</span>
+
+<span class="sd">        :param lang_or_model: the diversity model or a specific language</span>
+<span class="sd">            used to load the diversity model</span>
+<span class="sd">        :param column_name: the name of column to be analyzed</span>
+<span class="sd">        :return: the analysis result.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># load diversity model</span>
+        <span class="n">lang_or_model</span> <span class="o">=</span> <span class="n">lang_or_model</span> <span class="k">if</span> <span class="n">lang_or_model</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang_or_model</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lang_or_model</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="s1">&#39;spacy&#39;</span><span class="p">,</span> <span class="n">lang</span><span class="o">=</span><span class="n">lang_or_model</span><span class="p">)</span>
+            <span class="n">diversity_model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">diversity_model</span> <span class="o">=</span> <span class="n">lang_or_model</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">diversity_model</span><span class="p">,</span> <span class="n">spacy</span><span class="o">.</span><span class="n">Language</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">find_verb_noun</span><span class="p">(</span><span class="n">sample</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span> <span class="o">=</span> <span class="n">find_root_verb_and_its_dobj_in_string</span><span class="p">(</span>
+                    <span class="n">diversity_model</span><span class="p">,</span> <span class="n">sample</span><span class="p">[</span><span class="n">column_name</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;verb&#39;</span><span class="p">:</span> <span class="n">verb</span><span class="p">,</span> <span class="s1">&#39;noun&#39;</span><span class="p">:</span> <span class="n">noun</span><span class="p">}</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">find_verb_noun</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DiversityAnalysis.analyze"><a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis.analyze">[docs]</a>    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">lang_or_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">column_name</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                <span class="n">postproc_func</span><span class="o">=</span><span class="n">get_diversity</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">postproc_kwarg</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply diversity analysis on the whole dataset.</span>
+
+<span class="sd">        :param lang_or_model: the diversity model or a specific language</span>
+<span class="sd">            used to load the diversity model</span>
+<span class="sd">        :param column_name: the name of column to be analyzed</span>
+<span class="sd">        :param postproc_func: function to analyze diversity. In default,</span>
+<span class="sd">            it&#39;s function get_diversity</span>
+<span class="sd">        :param postproc_kwarg: arguments of the postproc_func</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># get the lexical tree analysis result</span>
+        <span class="n">raw_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">lang_or_model</span><span class="o">=</span><span class="n">lang_or_model</span><span class="p">,</span>
+                              <span class="n">column_name</span><span class="o">=</span><span class="n">column_name</span><span class="p">)</span>
+        <span class="c1"># get the result of diversity analysis</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">postproc_func</span><span class="p">(</span><span class="n">raw_df</span><span class="p">,</span> <span class="o">**</span><span class="n">postproc_kwarg</span><span class="p">)</span>
+
+        <span class="c1"># export to result report file</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;diversity.csv&#39;</span><span class="p">))</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;diversity.md&#39;</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">df</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

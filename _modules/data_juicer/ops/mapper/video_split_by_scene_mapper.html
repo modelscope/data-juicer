@@ -1,0 +1,259 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.mapper.video_split_by_scene_mapper &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.mapper.video_split_by_scene_mapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.mapper.video_split_by_scene_mapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">NonNegativeFloat</span><span class="p">,</span> <span class="n">NonNegativeInt</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.file_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">add_suffix_to_filename</span><span class="p">,</span>
+                                          <span class="n">transfer_filename</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.lazy_loader</span> <span class="kn">import</span> <span class="n">LazyLoader</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="n">SpecialTokens</span>
+
+<span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
+
+<span class="n">scenedetect</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;scenedetect&#39;</span><span class="p">,</span> <span class="s1">&#39;scenedetect&#39;</span><span class="p">)</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;video_split_by_scene_mapper&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">replace_func</span><span class="p">(</span><span class="n">match</span><span class="p">,</span> <span class="n">scene_counts_iter</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">scene_counts_iter</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span> <span class="o">*</span> <span class="n">count</span>
+    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="VideoSplitBySceneMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitBySceneMapper">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">VideoSplitBySceneMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to cut videos into scene clips.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Define shared detector keys and their properties</span>
+    <span class="n">avaliable_detectors</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ContentDetector&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">,</span> <span class="s1">&#39;luma_only&#39;</span><span class="p">,</span> <span class="s1">&#39;kernel_size&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;AdaptiveDetector&#39;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s1">&#39;window_width&#39;</span><span class="p">,</span> <span class="s1">&#39;min_content_val&#39;</span><span class="p">,</span> <span class="s1">&#39;weights&#39;</span><span class="p">,</span> <span class="s1">&#39;luma_only&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;kernel_size&#39;</span><span class="p">,</span> <span class="s1">&#39;video_manager&#39;</span><span class="p">,</span> <span class="s1">&#39;min_delta_hsv&#39;</span>
+        <span class="p">],</span>
+        <span class="s1">&#39;ThresholdDetector&#39;</span><span class="p">:</span>
+        <span class="p">[</span><span class="s1">&#39;fade_bias&#39;</span><span class="p">,</span> <span class="s1">&#39;add_final_scene&#39;</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="s1">&#39;block_size&#39;</span><span class="p">]</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="VideoSplitBySceneMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitBySceneMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">detector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ContentDetector&#39;</span><span class="p">,</span>
+                 <span class="n">threshold</span><span class="p">:</span> <span class="n">NonNegativeFloat</span> <span class="o">=</span> <span class="mf">27.0</span><span class="p">,</span>
+                 <span class="n">min_scene_len</span><span class="p">:</span> <span class="n">NonNegativeInt</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+                 <span class="n">show_progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param detector: Algorithm from `scenedetect.detectors`. Should be one</span>
+<span class="sd">            of [&#39;ContentDetector&#39;, &#39;ThresholdDetector&#39;, &#39;AdaptiveDetector`].</span>
+<span class="sd">        :param threshold: Threshold passed to the detector.</span>
+<span class="sd">        :param min_scene_len: Minimum length of any scene.</span>
+<span class="sd">        :param show_progress: Whether to show progress from scenedetect.</span>
+<span class="sd">        :param args: extra args</span>
+<span class="sd">        :param kwargs: extra args</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">detector</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">avaliable_detectors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Scene detector </span><span class="si">{</span><span class="n">detector</span><span class="si">}</span><span class="s1"> is not supported. &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;Can only be one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">avaliable_detectors</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">detector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_scene_len</span> <span class="o">=</span> <span class="n">min_scene_len</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_progress</span> <span class="o">=</span> <span class="n">show_progress</span>
+
+        <span class="c1"># prepare detector args</span>
+        <span class="n">avaliable_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">avaliable_detectors</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detector_class</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">scenedetect</span><span class="o">.</span><span class="n">detectors</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detector_kwargs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">avaliable_kwargs</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">kwargs</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="VideoSplitBySceneMapper.process_single"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.VideoSplitBySceneMapper.process_single">[docs]</a>    <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># there is no video in this sample</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]:</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="n">sample</span>
+
+        <span class="c1"># load videos</span>
+        <span class="n">loaded_video_keys</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span>
+        <span class="n">output_video_keys</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">scene_counts</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">:</span>
+
+            <span class="c1"># skip duplicate</span>
+            <span class="k">if</span> <span class="n">video_key</span> <span class="ow">in</span> <span class="n">output_video_keys</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">redirected_video_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span>
+                                                     <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">)</span>
+            <span class="n">output_template</span> <span class="o">=</span> <span class="n">add_suffix_to_filename</span><span class="p">(</span><span class="n">redirected_video_key</span><span class="p">,</span>
+                                                     <span class="s1">&#39;_$SCENE_NUMBER&#39;</span><span class="p">)</span>
+
+            <span class="c1"># detect scenes</span>
+            <span class="n">detector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_scene_len</span><span class="p">,</span>
+                                           <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">detector_kwargs</span><span class="p">)</span>
+            <span class="n">scene_list</span> <span class="o">=</span> <span class="n">scenedetect</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">video_key</span><span class="p">,</span>
+                                            <span class="n">detector</span><span class="p">,</span>
+                                            <span class="n">show_progress</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">show_progress</span><span class="p">,</span>
+                                            <span class="n">start_in_scene</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">scene_counts</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">scene_list</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scene_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># sync with split_video_ffmpeg internal</span>
+                <span class="n">scene_num_format</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;%0</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">scene_list</span><span class="p">),</span><span class="w"> </span><span class="mi">10</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s1">d&#39;</span>  <span class="c1"># noqa: E501</span>
+                <span class="n">output_video_keys</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">output_template</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$SCENE_NUMBER&#39;</span><span class="p">,</span>
+                                            <span class="n">scene_num_format</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">scene_list</span><span class="p">))</span>
+                <span class="p">]</span>
+                <span class="c1"># split video into clips</span>
+                <span class="n">scenedetect</span><span class="o">.</span><span class="n">split_video_ffmpeg</span><span class="p">(</span>
+                    <span class="n">input_video_path</span><span class="o">=</span><span class="n">video_key</span><span class="p">,</span>
+                    <span class="n">scene_list</span><span class="o">=</span><span class="n">scene_list</span><span class="p">,</span>
+                    <span class="n">output_file_template</span><span class="o">=</span><span class="n">output_template</span><span class="p">,</span>
+                    <span class="n">show_progress</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">show_progress</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">output_video_keys</span><span class="p">[</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">video_key</span><span class="p">]</span>
+
+        <span class="c1"># replace splited video tokens</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+            <span class="n">scene_counts_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">scene_counts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">])</span>
+            <span class="n">updated_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">video</span><span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">match</span><span class="p">:</span> <span class="n">replace_func</span><span class="p">(</span><span class="n">match</span><span class="p">,</span> <span class="n">scene_counts_iter</span><span class="p">),</span>
+                <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])</span>
+            <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">updated_text</span>
+
+        <span class="c1"># when the file is modified, its source file needs to be updated.</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">:</span>
+            <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">source_file</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">value</span><span class="p">]</span> <span class="o">*</span>
+                                              <span class="nb">len</span><span class="p">(</span><span class="n">output_video_keys</span><span class="p">[</span><span class="n">value</span><span class="p">]))</span>
+
+        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">output_video_keys</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loaded_video_keys</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">sample</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

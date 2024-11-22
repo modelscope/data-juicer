@@ -1,0 +1,351 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.mapper.image_diffusion_mapper &mdash; data_juicer 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.mapper.image_diffusion_mapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.mapper.image_diffusion_mapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">PositiveInt</span>
+<span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Annotated</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.file_utils</span> <span class="kn">import</span> <span class="n">transfer_filename</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.mm_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">SpecialTokens</span><span class="p">,</span> <span class="n">load_data_with_context</span><span class="p">,</span>
+                                        <span class="n">load_image</span><span class="p">,</span> <span class="n">remove_special_tokens</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
+
+<span class="kn">from</span> <span class="nn">..base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
+<span class="kn">from</span> <span class="nn">..op_fusion</span> <span class="kn">import</span> <span class="n">LOADED_IMAGES</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;image_diffusion_mapper&#39;</span>
+
+
+<div class="viewcode-block" id="ImageDiffusionMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageDiffusionMapper">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ImageDiffusionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate image by diffusion model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+    <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="ImageDiffusionMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageDiffusionMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">hf_diffusion</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;CompVis/stable-diffusion-v1-4&#39;</span><span class="p">,</span>
+                 <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">torch_dtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;fp32&#39;</span><span class="p">,</span>
+                 <span class="n">revision</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;main&#39;</span><span class="p">,</span>
+                 <span class="n">strength</span><span class="p">:</span> <span class="n">Annotated</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+                 <span class="n">guidance_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.5</span><span class="p">,</span>
+                 <span class="n">aug_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">keep_original_sample</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">caption_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">hf_img2seq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Salesforce/blip2-opt-2.7b&#39;</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param hf_diffusion: diffusion model name on huggingface to generate</span>
+<span class="sd">            the image.</span>
+<span class="sd">        :param torch_dtype: the floating point type used to load the diffusion</span>
+<span class="sd">            model. Can be one of [&#39;fp32&#39;, &#39;fp16&#39;, &#39;bf16&#39;]</span>
+<span class="sd">        :param revision: The specific model version to use. It can be a</span>
+<span class="sd">            branch name, a tag name, a commit id, or any identifier allowed</span>
+<span class="sd">            by Git.</span>
+<span class="sd">        :param strength: Indicates extent to transform the reference image.</span>
+<span class="sd">            Must be between 0 and 1. image is used as a starting point and</span>
+<span class="sd">            more noise is added the higher the strength. The number of</span>
+<span class="sd">            denoising steps depends on the amount of noise initially added.</span>
+<span class="sd">            When strength is 1, added noise is maximum and the denoising</span>
+<span class="sd">            process runs for the full number of iterations specified in</span>
+<span class="sd">            num_inference_steps. A value of 1 essentially ignores image.</span>
+<span class="sd">        :param guidance_scale: A higher guidance scale value encourages the</span>
+<span class="sd">            model to generate images closely linked to the text prompt at the</span>
+<span class="sd">            expense of lower image quality. Guidance scale is enabled when</span>
+<span class="sd">            guidance_scale &gt; 1.</span>
+<span class="sd">        :param aug_num: The image number to be produced by stable-diffusion</span>
+<span class="sd">            model.</span>
+<span class="sd">        :param keep_candidate_mode: retain strategy for the generated</span>
+<span class="sd">            $caption_num$ candidates.</span>
+
+<span class="sd">            &#39;random_any&#39;: Retain the random one from generated captions</span>
+
+<span class="sd">            &#39;similar_one_simhash&#39;: Retain the generated one that is most</span>
+<span class="sd">                similar to the original caption</span>
+
+<span class="sd">            &#39;all&#39;: Retain all generated captions by concatenation</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This is a batched_OP, whose input and output type are</span>
+<span class="sd">            both list. Suppose there are $N$ list of input samples, whose batch</span>
+<span class="sd">            size is $b$, and denote caption_num as $M$.</span>
+<span class="sd">            The number of total samples after generation is $2Nb$ when</span>
+<span class="sd">            keep_original_sample is True and $Nb$ when keep_original_sample is</span>
+<span class="sd">            False. For &#39;random_any&#39; and &#39;similar_one_simhash&#39; mode,</span>
+<span class="sd">            it&#39;s $(1+M)Nb$ for &#39;all&#39; mode when keep_original_sample is True</span>
+<span class="sd">            and $MNb$ when keep_original_sample is False.</span>
+
+<span class="sd">        :param caption_key: the key name of fields in samples to store captions</span>
+<span class="sd">            for each images. It can be a string if there is only one image in</span>
+<span class="sd">            each sample. Otherwise, it should be a list. If it&#39;s none,</span>
+<span class="sd">            ImageDiffusionMapper will produce captions for each images.</span>
+<span class="sd">        :param hf_img2seq: model name on huggingface to generate caption if</span>
+<span class="sd">            caption_key is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strength</span> <span class="o">=</span> <span class="n">strength</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">guidance_scale</span> <span class="o">=</span> <span class="n">guidance_scale</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span> <span class="o">=</span> <span class="n">aug_num</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span> <span class="o">=</span> <span class="n">keep_original_sample</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caption_key</span> <span class="o">=</span> <span class="n">caption_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="s1">&#39;A photo of a &#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">caption_key</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">.image_captioning_mapper</span> <span class="kn">import</span> <span class="n">ImageCaptioningMapper</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">op_generate_caption</span> <span class="o">=</span> <span class="n">ImageCaptioningMapper</span><span class="p">(</span>
+                <span class="n">hf_img2seq</span><span class="o">=</span><span class="n">hf_img2seq</span><span class="p">,</span>
+                <span class="n">keep_original_sample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">prompt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prompt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+            <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;diffusion&#39;</span><span class="p">,</span>
+            <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_diffusion</span><span class="p">,</span>
+            <span class="n">diffusion_type</span><span class="o">=</span><span class="s1">&#39;image2image&#39;</span><span class="p">,</span>
+            <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch_dtype</span><span class="p">,</span>
+            <span class="n">revision</span><span class="o">=</span><span class="n">revision</span><span class="p">,</span>
+            <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_real_guidance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caption</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">canvas</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span> <span class="n">Image</span><span class="o">.</span><span class="n">BILINEAR</span><span class="p">)</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="n">caption</span>
+
+        <span class="n">diffusion_model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span>
+                                    <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
+                                    <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
+
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">image</span><span class="o">=</span><span class="n">canvas</span><span class="p">,</span>
+                      <span class="n">prompt</span><span class="o">=</span><span class="p">[</span><span class="n">prompt</span><span class="p">],</span>
+                      <span class="n">strength</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">strength</span><span class="p">,</span>
+                      <span class="n">guidance_scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">guidance_scale</span><span class="p">)</span>
+
+        <span class="n">has_nsfw_concept</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">while</span> <span class="n">has_nsfw_concept</span><span class="p">:</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="n">diffusion_model</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="n">has_nsfw_concept</span> <span class="o">=</span> <span class="p">(</span><span class="n">diffusion_model</span><span class="o">.</span><span class="n">safety_checker</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                                <span class="ow">and</span> <span class="n">outputs</span><span class="o">.</span><span class="n">nsfw_content_detected</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">canvas</span> <span class="o">=</span> <span class="n">outputs</span><span class="o">.</span><span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">BILINEAR</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">canvas</span>
+
+    <span class="k">def</span> <span class="nf">_process_single_sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ori_sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ori_sample: a single data sample before applying generation</span>
+<span class="sd">        :return: batched results after generation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># there is no image in this sample</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ori_sample</span> <span class="ow">or</span> \
+                <span class="ow">not</span> <span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># load images</span>
+        <span class="n">loaded_image_keys</span> <span class="o">=</span> <span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span>
+        <span class="n">ori_sample</span><span class="p">,</span> <span class="n">images</span> <span class="o">=</span> <span class="n">load_data_with_context</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span>
+                                                    <span class="n">loaded_image_keys</span><span class="p">,</span>
+                                                    <span class="n">load_image</span><span class="p">)</span>
+
+        <span class="c1"># load captions</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">caption_key</span><span class="p">:</span>
+            <span class="n">captions</span> <span class="o">=</span> <span class="n">ori_sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">caption_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">captions</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="c1"># one caption for all images</span>
+                <span class="n">captions</span> <span class="o">=</span> <span class="p">[</span><span class="n">captions</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">captions</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">images</span>
+                <span class="p">),</span> <span class="s1">&#39;The num of captions must match the num of images.&#39;</span>
+            <span class="n">captions</span> <span class="o">=</span> <span class="p">[</span><span class="n">remove_special_tokens</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">captions</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">caption_samples</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">:</span> <span class="p">[</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">:</span> <span class="p">[[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">loaded_image_keys</span><span class="p">]</span>
+            <span class="p">}</span>
+            <span class="n">caption_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_generate_caption</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">caption_samples</span><span class="p">,</span>
+                                                               <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+            <span class="n">captions</span> <span class="o">=</span> <span class="n">caption_samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
+            <span class="n">captions</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">+</span> <span class="n">remove_special_tokens</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">captions</span>
+            <span class="p">]</span>
+
+        <span class="c1"># the generated results</span>
+        <span class="n">generated_samples</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">aug_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aug_num</span><span class="p">):</span>
+            <span class="n">diffusion_image_keys</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_image_keys</span><span class="p">):</span>
+                <span class="n">related_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="n">captions</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+                <span class="n">diffusion_image_key</span> <span class="o">=</span> <span class="n">transfer_filename</span><span class="p">(</span>
+                    <span class="n">value</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">,</span> <span class="o">**</span><span class="n">related_parameters</span><span class="p">)</span>
+                <span class="n">diffusion_image_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diffusion_image_key</span><span class="p">)</span>
+                <span class="c1"># TODO: duplicated generation if image is reused</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">diffusion_image_key</span>
+                                      <span class="p">)</span> <span class="ow">or</span> <span class="n">diffusion_image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+                    <span class="n">diffusion_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_real_guidance</span><span class="p">(</span><span class="n">captions</span><span class="p">[</span><span class="n">index</span><span class="p">],</span>
+                                                          <span class="n">images</span><span class="p">[</span><span class="n">value</span><span class="p">],</span>
+                                                          <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+                    <span class="n">images</span><span class="p">[</span><span class="n">diffusion_image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">diffusion_image</span>
+                    <span class="n">diffusion_image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">diffusion_image_key</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
+                        <span class="n">generated_samples</span><span class="p">[</span><span class="n">aug_id</span><span class="p">][</span><span class="n">Fields</span><span class="o">.</span><span class="n">context</span><span class="p">][</span>
+                            <span class="n">diffusion_image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">diffusion_image</span>
+            <span class="n">generated_samples</span><span class="p">[</span><span class="n">aug_id</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">diffusion_image_keys</span>
+
+        <span class="k">return</span> <span class="n">generated_samples</span>
+
+<div class="viewcode-block" id="ImageDiffusionMapper.process_batched"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ImageDiffusionMapper.process_batched">[docs]</a>    <span class="k">def</span> <span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Note:</span>
+<span class="sd">                This is a batched_OP, whose the input and output type are</span>
+<span class="sd">                both list. Suppose there are $N$ input sample list with batch</span>
+<span class="sd">                size as $b$, and denote aug_num as $M$.</span>
+<span class="sd">                the number of total samples after generation is  $(1+M)Nb$.</span>
+
+<span class="sd">            :param samples:</span>
+<span class="sd">            :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># reconstruct samples from &quot;dict of lists&quot; to &quot;list of dicts&quot;</span>
+        <span class="n">reconstructed_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">])):</span>
+            <span class="n">reconstructed_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">samples</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">})</span>
+
+        <span class="c1"># do generation for each sample within the batch</span>
+        <span class="n">samples_after_generation</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ori_sample</span> <span class="ow">in</span> <span class="n">reconstructed_samples</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_original_sample</span><span class="p">:</span>
+                <span class="n">samples_after_generation</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">)</span>
+            <span class="n">generated_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_sample</span><span class="p">(</span><span class="n">ori_sample</span><span class="p">,</span>
+                                                            <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">generated_samples</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">samples_after_generation</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">generated_samples</span><span class="p">)</span>
+
+        <span class="c1"># reconstruct samples from &quot;list of dicts&quot; to &quot;dict of lists&quot;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">samples_after_generation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">res_samples</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">res_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">samples_after_generation</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">res_samples</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
