@@ -14,6 +14,8 @@ class ImageAspectRatioFilter(Filter):
     AspectRatio = W / H.
     """
 
+    _batched_op = True
+
     def __init__(self,
                  min_ratio: float = 0.333,
                  max_ratio: float = 3.0,

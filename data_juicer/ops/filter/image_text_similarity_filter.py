@@ -19,6 +19,7 @@ class ImageTextSimilarityFilter(Filter):
     within a specific range."""
 
     _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(self,
                  hf_clip: str = 'openai/clip-vit-base-patch32',

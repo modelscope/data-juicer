@@ -113,7 +113,7 @@ class OptimizeQAMapper(Mapper):
         else:
             return None, None
 
-    def process_single(self, sample=None, rank=None):
+    def process_single(self, sample, rank=None):
         model, _ = get_model(self.model_key, rank, self.use_cuda())
 
         input_prompt = self.build_input(sample)
