@@ -77,9 +77,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.core.adapter</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">datasets.config</span> <span class="kn">import</span> <span class="n">DEFAULT_MAX_BATCH_SIZE</span>
+<span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">concatenate_datasets</span>
+<span class="kn">from</span> <span class="nn">datasets.config</span> <span class="kn">import</span> <span class="n">DEFAULT_MAX_BATCH_SIZE</span>
 
 <span class="kn">from</span> <span class="nn">data_juicer.core.monitor</span> <span class="kn">import</span> <span class="n">Monitor</span>
+<span class="kn">from</span> <span class="nn">data_juicer.ops</span> <span class="kn">import</span> <span class="n">UNFORKABLE</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.process_utils</span> <span class="kn">import</span> <span class="n">setup_mp</span>
 
 
 <div class="viewcode-block" id="Adapter"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter">[docs]</a><span class="k">class</span> <span class="nc">Adapter</span><span class="p">:</span>
@@ -106,28 +109,43 @@
         <span class="k">if</span> <span class="n">operators</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">operators</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
 
+        <span class="c1"># number of test samples</span>
+        <span class="n">sample_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
         <span class="c1"># resource utilization list</span>
         <span class="n">resource_util_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># probe for each OP</span>
+        <span class="n">unforkable_operators</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">UNFORKABLE</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">operators</span><span class="p">:</span>
-            <span class="c1"># set num_proc to 1 for each OP to focus on the influence of batch</span>
-            <span class="c1"># size only.</span>
-            <span class="n">old_num_proc</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">num_proc</span>
-            <span class="n">op</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="c1"># select suitable mp method for each OP</span>
+            <span class="n">mp_context</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;forkserver&#39;</span><span class="p">,</span> <span class="s1">&#39;spawn&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">()</span> <span class="ow">or</span> <span class="n">op</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">unforkable_operators</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">setup_mp</span><span class="p">(</span><span class="n">mp_context</span><span class="p">)</span>
+            <span class="c1"># expand the test dataset according to the runtime number of</span>
+            <span class="c1"># processes to ensure enough data for a batch and probe the true</span>
+            <span class="c1"># resource utilization for each OP</span>
+            <span class="n">expanded_dataset</span> <span class="o">=</span> <span class="n">concatenate_datasets</span><span class="p">([</span><span class="n">dataset</span><span class="p">]</span> <span class="o">*</span>
+                                                    <span class="n">op</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">())</span>
 
-            <span class="c1"># number of test samples</span>
-            <span class="n">sample_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+            <span class="c1"># set the test batch size and save the old one</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
+                <span class="n">old_batch_size</span> <span class="o">=</span> <span class="n">op</span><span class="o">.</span><span class="n">batch_size</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">sample_num</span>
+
             <span class="c1"># run single op and monitor the resource utilization</span>
-            <span class="n">dataset</span><span class="p">,</span> <span class="n">resource_util_per_op</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">monitor_func</span><span class="p">(</span>
-                <span class="n">op</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="p">),</span> <span class="n">sample_interval</span><span class="o">=</span><span class="n">sample_interval</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">resource_util_per_op</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">monitor_func</span><span class="p">(</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">run</span><span class="p">,</span>
+                <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">expanded_dataset</span><span class="p">,</span> <span class="p">),</span>
+                <span class="n">sample_interval</span><span class="o">=</span><span class="n">sample_interval</span><span class="p">)</span>
 
             <span class="c1"># calculate speed</span>
             <span class="n">resource_util_per_op</span><span class="p">[</span>
                 <span class="s1">&#39;speed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_num</span> <span class="o">/</span> <span class="n">resource_util_per_op</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span>
             <span class="n">resource_util_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource_util_per_op</span><span class="p">)</span>
 
-            <span class="c1"># restore to the original num_proc</span>
-            <span class="n">op</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="n">old_num_proc</span>
+            <span class="c1"># # restore the batch size</span>
+            <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">is_batched_op</span><span class="p">():</span>
+                <span class="n">op</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">old_batch_size</span>
 
         <span class="k">return</span> <span class="n">resource_util_list</span></div>
 
@@ -175,17 +193,30 @@
 <span class="sd">        current load and estimated OP speed, returning load factors and speed</span>
 <span class="sd">        ranks for each OP.</span>
 
+<span class="sd">        Notice: the probe should be run with cache enabled.</span>
+
 <span class="sd">        :param dataset: The dataset to pre-execute small batch on</span>
 <span class="sd">        :param operators: The OP list to be pre-execution and probe</span>
 <span class="sd">        :return: A list of probe results for each OP and the length of data</span>
 <span class="sd">            batch to probe.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># record the cache state and enable the cache</span>
+        <span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="p">(</span><span class="n">disable_caching</span><span class="p">,</span> <span class="n">enable_caching</span><span class="p">,</span>
+                              <span class="n">is_caching_enabled</span><span class="p">)</span>
+        <span class="n">previous_state</span> <span class="o">=</span> <span class="n">is_caching_enabled</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">previous_state</span><span class="p">:</span>
+            <span class="n">enable_caching</span><span class="p">()</span>
+
         <span class="c1"># take a small batch</span>
         <span class="n">data_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">take_batch</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
         <span class="c1"># process and monitor the resource utilization</span>
         <span class="n">resource_util_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">execute_and_probe</span><span class="p">(</span><span class="n">data_batch</span><span class="p">,</span> <span class="n">operators</span><span class="p">)</span>
         <span class="c1"># analyze resource utilization</span>
         <span class="n">analysis_res</span> <span class="o">=</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">analyze_resource_util_list</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">)</span>
+
+        <span class="c1"># if the cache is disabled before, disable it again</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">previous_state</span><span class="p">:</span>
+            <span class="n">disable_caching</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">analysis_res</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_batch</span><span class="p">)</span></div>
 

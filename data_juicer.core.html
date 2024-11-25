@@ -152,6 +152,7 @@ result for each OP.</p>
 <dd><p>Perform small batch pre-execution to probe available resources,
 current load and estimated OP speed, returning load factors and speed
 ranks for each OP.</p>
+<p>Notice: the probe should be run with cache enabled.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -536,6 +537,7 @@ processing.</p>
 {</p>
 <blockquote>
 <div><p>‘time’: 10,
+‘sampling interval’: 0.5,
 ‘resource’: [</p>
 <blockquote>
 <div><dl class="simple">
@@ -565,6 +567,7 @@ add several extra fields on the first level:
 {</p>
 <blockquote>
 <div><p>‘time’: 10,
+‘sampling interval’: 0.5,
 ‘resource’: […],
 ‘resource_analysis’: {</p>
 <blockquote>
@@ -604,6 +607,11 @@ add several extra fields on the first level:
 All data of “util.” is ratios in the range of [0.0, 1.0]. All data of
 “mem.” is in MB.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.core.Monitor.draw_resource_util_graph">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">draw_resource_util_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_util_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.draw_resource_util_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.Monitor.draw_resource_util_graph" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.core.Monitor.analyze_resource_util_list">

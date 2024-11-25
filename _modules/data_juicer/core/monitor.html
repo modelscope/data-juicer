@@ -77,7 +77,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.core.monitor</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">get_context</span>
 
@@ -107,6 +108,7 @@
 <span class="sd">    &#39;&#39;&#39;python</span>
 <span class="sd">    {</span>
 <span class="sd">        &#39;time&#39;: 10,</span>
+<span class="sd">        &#39;sampling interval&#39;: 0.5,</span>
 <span class="sd">        &#39;resource&#39;: [</span>
 <span class="sd">            {</span>
 <span class="sd">                &#39;timestamp&#39;: xxx,</span>
@@ -129,6 +131,7 @@
 <span class="sd">    &#39;&#39;&#39;python</span>
 <span class="sd">    {</span>
 <span class="sd">        &#39;time&#39;: 10,</span>
+<span class="sd">        &#39;sampling interval&#39;: 0.5,</span>
 <span class="sd">        &#39;resource&#39;: [...],</span>
 <span class="sd">        &#39;resource_analysis&#39;: {</span>
 <span class="sd">            &#39;GPU free mem.&#39;: {</span>
@@ -196,6 +199,24 @@
             <span class="p">]</span>
 
         <span class="k">return</span> <span class="n">resource_dict</span></div>
+
+<div class="viewcode-block" id="Monitor.draw_resource_util_graph"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.draw_resource_util_graph">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">draw_resource_util_graph</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">,</span> <span class="n">store_dir</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">resource_util_dict</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">):</span>
+            <span class="n">resource_list</span> <span class="o">=</span> <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;resource&#39;</span><span class="p">]</span>
+            <span class="n">interval</span> <span class="o">=</span> <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;sampling interval&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">focus_metric</span> <span class="ow">in</span> <span class="n">Monitor</span><span class="o">.</span><span class="n">DYNAMIC_FIELDS</span><span class="p">:</span>
+                <span class="n">fn</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;func_</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">focus_metric</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;_&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">.jpg&#39;</span>
+                <span class="n">ylbl</span> <span class="o">=</span> <span class="s1">&#39;%&#39;</span> <span class="k">if</span> <span class="n">focus_metric</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;util.&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;MB&#39;</span>
+                <span class="n">metric_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="n">focus_metric</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">resource_list</span><span class="p">]</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="n">interval</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">metric_list</span><span class="p">))],</span>
+                         <span class="n">metric_list</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">focus_metric</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Time (s)&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">ylbl</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">store_dir</span><span class="p">,</span> <span class="n">fn</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Monitor.analyze_resource_util_list"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.analyze_resource_util_list">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">analyze_resource_util_list</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">):</span>
@@ -287,6 +308,9 @@
             <span class="n">monitor_proc</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
 
             <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;resource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;resource&#39;</span><span class="p">]</span>
+
+            <span class="c1"># record interval</span>
+            <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;sampling interval&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample_interval</span>
 
             <span class="c1"># calculate speed</span>
             <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
