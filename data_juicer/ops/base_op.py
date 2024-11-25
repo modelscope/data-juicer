@@ -132,6 +132,7 @@ class OP:
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
             queries and responses
+        :param index_key: index the samples before process if not None
         """
         # init data keys
         self.text_key = kwargs.get('text_key', 'text')
@@ -142,6 +143,8 @@ class OP:
         self.query_key = kwargs.get('query_key', 'query')
         self.response_key = kwargs.get('response_key', 'response')
         self.history_key = kwargs.get('history_key', 'history')
+
+        self.index_key = kwargs.get('index_key', None)
 
         self.batch_size = kwargs.get('batch_size', 1000)
 
@@ -218,6 +221,14 @@ class OP:
         from data_juicer.core.data import NestedDataset
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
+        if self.index_key is not None:
+
+            def add_index(sample, idx):
+                sample[self.index_key] = idx
+                return sample
+
+            dataset = dataset.map(add_index, with_indices=True)
+
         return dataset
 
     def empty_history(self):
