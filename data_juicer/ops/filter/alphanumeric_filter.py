@@ -3,7 +3,7 @@ import sys
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..common import get_words_from_document
 
 OP_NAME = 'alphanumeric_filter'
@@ -39,7 +39,6 @@ class AlphanumericFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['transformers'])
         self.tokenization = tokenization
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
@@ -51,7 +50,7 @@ class AlphanumericFilter(Filter):
                 pretrained_model_name_or_path='EleutherAI/pythia-6.9b-deduped',
                 return_model=False)
 
-    def compute_stats(self, samples):
+    def compute_stats_batched(self, samples):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
 
@@ -79,7 +78,7 @@ class AlphanumericFilter(Filter):
 
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         ratio_key = StatsKeys.alpha_token_ratio if self.tokenization \
             else StatsKeys.alnum_ratio
         if isinstance(samples[Fields.stats], list):

@@ -3,20 +3,14 @@ from jsonargparse.typing import ClosedUnitInterval
 
 from data_juicer.ops.base_op import OPERATORS, Filter
 from data_juicer.ops.op_fusion import LOADED_IMAGES
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
+torch = LazyLoader('torch', 'torch')
+
 OP_NAME = 'image_pair_similarity_filter'
-
-with AvailabilityChecking(['torch', 'transformers'], OP_NAME):
-
-    import torch
-    import transformers  # noqa: F401
-
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -36,7 +30,7 @@ class ImagePairSimilarityFilter(Filter):
                  *args,
                  **kwargs):
         """
-    Initialization method.
+        Initialization method.
 
         :param hf_clip: clip model name on huggingface to compute
             the similarity between image and text.
@@ -60,7 +54,7 @@ class ImagePairSimilarityFilter(Filter):
                                        pretrained_model_name_or_path=hf_clip,
                                        trust_remote_code=trust_remote_code)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
 
         # check if it's computed already
         if StatsKeys.image_pair_similarity in sample[Fields.stats]:
@@ -97,7 +91,7 @@ class ImagePairSimilarityFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         similarity = sample[Fields.stats][StatsKeys.image_pair_similarity]
         if len(similarity) <= 0:
             return True

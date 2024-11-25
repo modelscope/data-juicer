@@ -1,20 +1,20 @@
-import lazy_loader as lazy
 import numpy as np
 from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 
 from ...utils.model_utils import get_model, prepare_model
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
-OP_NAME = 'video_aesthetics_filter'
+torch = LazyLoader('torch', 'torch')
 
-torch = lazy.load('torch')
+OP_NAME = 'video_aesthetics_filter'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -75,8 +75,6 @@ class VideoAestheticsFilter(Filter):
         """
 
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(
-            ['torch', 'transformers', 'simple-aesthetics-predictor'])
         if hf_scorer_model == '':
             hf_scorer_model = \
                 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE'
@@ -112,7 +110,7 @@ class VideoAestheticsFilter(Filter):
             ('' if frame_sampling_method == 'all_keyframes'
              else f'-{frame_num}')
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_frames_aesthetics_score in sample[Fields.stats]:
             return sample
@@ -187,7 +185,7 @@ class VideoAestheticsFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         aesthetics_scores = (
             sample)[Fields.stats][StatsKeys.video_frames_aesthetics_score]
         if len(aesthetics_scores) <= 0:

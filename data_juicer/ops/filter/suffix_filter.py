@@ -26,10 +26,10 @@ class SuffixFilter(Filter):
         else:
             self.suffixes = suffixes
 
-    def compute_stats(self, sample):
+    def compute_stats_single(self, sample):
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         if self.suffixes:
             if sample[Fields.suffix] in self.suffixes:
                 return True

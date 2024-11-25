@@ -1,16 +1,12 @@
 import sys
 
-import lazy_loader as lazy
-
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..common import get_words_from_document
 
 OP_NAME = 'token_num_filter'
-
-transformers = lazy.load('transformers')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -38,7 +34,6 @@ class TokenNumFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['transformers'])
         self.min_num = min_num
         self.max_num = max_num
         self.hf_tokenizer = hf_tokenizer
@@ -47,7 +42,7 @@ class TokenNumFilter(Filter):
             pretrained_model_name_or_path=hf_tokenizer,
             return_model=False)
 
-    def compute_stats(self, sample):
+    def compute_stats_single(self, sample):
         # check if it's computed already
         if StatsKeys.num_token in sample[Fields.stats]:
             return sample
@@ -59,7 +54,7 @@ class TokenNumFilter(Filter):
         sample[Fields.stats][StatsKeys.num_token] = len(tokens)
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         if self.min_num <= sample[Fields.stats][
                 StatsKeys.num_token] <= self.max_num:
             return True

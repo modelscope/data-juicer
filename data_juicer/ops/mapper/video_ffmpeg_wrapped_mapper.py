@@ -1,17 +1,16 @@
 from typing import Dict, List, Optional
 
-import lazy_loader as lazy
-
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
-
-OP_NAME = 'video_ffmpeg_wrapped_mapper'
+from ..base_op import OPERATORS, Mapper
 
 with HiddenPrints():
-    ffmpeg = lazy.load('ffmpeg')
+    ffmpeg = LazyLoader('ffmpeg', 'ffmpeg')
+
+OP_NAME = 'video_ffmpeg_wrapped_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -41,7 +40,6 @@ class VideoFFmpegWrappedMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['ffmpeg-python'])
         self._init_parameters = self.remove_extra_parameters(locals())
 
         self.filter_name = filter_name
@@ -50,7 +48,7 @@ class VideoFFmpegWrappedMapper(Mapper):
         self.capture_stderr = capture_stderr
         self.overwrite_output = overwrite_output
 
-    def process(self, sample):
+    def process_single(self, sample):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

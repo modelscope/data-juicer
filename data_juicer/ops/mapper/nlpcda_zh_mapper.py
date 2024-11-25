@@ -1,16 +1,16 @@
 from copy import deepcopy
 
-import lazy_loader as lazy
 from loguru import logger
 from pydantic import PositiveInt
 
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
+
+nlpcda = LazyLoader('nlpcda', 'nlpcda')
 
 OP_NAME = 'nlpcda_zh_mapper'
-
-nlpcda = lazy.load('nlpcda')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -70,7 +70,6 @@ class NlpcdaZhMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['nlpcda'])
 
         self.aug_num = aug_num
         if aug_num >= 10:
@@ -130,7 +129,7 @@ class NlpcdaZhMapper(Mapper):
                 self.aug_pipeline.append(
                     nlpcda.EquivalentChar(create_num=create_num))
 
-    def process(self, samples):
+    def process_batched(self, samples):
         # no augmentation methods are opened
         if len(self.aug_pipeline) == 0:
             if self.keep_original_sample:

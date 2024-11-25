@@ -1,18 +1,17 @@
-import lazy_loader as lazy
 import numpy as np
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 
 from ...utils.model_utils import get_model, prepare_model
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-OP_NAME = 'image_aesthetics_filter'
-CHECK_PKGs = ['torch', 'transformers', 'simple-aesthetics-predictor']
+torch = LazyLoader('torch', 'torch')
 
-torch = lazy.load('torch')
+OP_NAME = 'image_aesthetics_filter'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -49,8 +48,6 @@ class ImageAestheticsFilter(Filter):
         """
 
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(
-            ['torch', 'transformers', 'simple-aesthetics-predictor'])
         if hf_scorer_model == '':
             hf_scorer_model = \
                 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE'
@@ -70,7 +67,7 @@ class ImageAestheticsFilter(Filter):
         self.need_normalized_by_ten = ('shunk031/aesthetics-predictor'
                                        in hf_scorer_model)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_aesthetics_scores in sample[Fields.stats]:
             return sample
@@ -107,7 +104,7 @@ class ImageAestheticsFilter(Filter):
             aesthetics_scores
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         aesthetics_scores = (
             sample)[Fields.stats][StatsKeys.image_aesthetics_scores]
         if len(aesthetics_scores) <= 0:

@@ -27,3 +27,7 @@ dill==0.3.4
 psutil
 pydantic>=2.0
 mwparserfromhell
+Pillow
+numpy<2
+fastapi[standard]>=0.100
+httpx

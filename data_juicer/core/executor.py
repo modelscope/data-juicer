@@ -1,13 +1,17 @@
 import os
 from time import time
+from typing import Optional
 
+from jsonargparse import Namespace
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.config import init_configs
 from data_juicer.core.data import Dataset
 from data_juicer.format.load import load_formatter
 from data_juicer.format.mixture_formatter import MixtureFormatter
 from data_juicer.ops import OPERATORS, load_ops
+from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 
@@ -15,6 +19,7 @@ from ..ops.selector.frequency_specified_field_selector import \
     FrequencySpecifiedFieldSelector
 from ..ops.selector.topk_specified_field_selector import \
     TopkSpecifiedFieldSelector
+from .adapter import Adapter
 from .exporter import Exporter
 from .tracer import Tracer
 
@@ -27,11 +32,11 @@ class Executor:
     ops in the config file in order and generate a processed dataset.
     """
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: Optional[Namespace] = None):
         """
         Initialization method.
 
-        :param cfg: optional config dict.
+        :param cfg: optional jsonargparse Namespace.
         """
         self.cfg = init_configs() if cfg is None else cfg
 
@@ -39,6 +44,8 @@ class Executor:
 
         self.tracer = None
         self.ckpt_manager = None
+
+        self.adapter = Adapter(self.cfg)
 
         # only enable it when using cache
         if self.cfg.use_cache:
@@ -135,11 +142,14 @@ class Executor:
         else:
             raise ValueError(f'Unsupported sample_algo: {sample_algo}')
 
-    def run(self, load_data_np=None):
+    def run(self,
+            load_data_np: Optional[PositiveInt] = None,
+            skip_return=False):
         """
         Running the dataset process pipeline.
 
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_return: skip return for API called.
         :return: processed dataset.
         """
         # 1. format data
@@ -152,9 +162,31 @@ class Executor:
                 load_data_np = self.cfg.np
             dataset = self.formatter.load_dataset(load_data_np, self.cfg)
 
-        # 2. extract processes
+        # 2. extract processes and optimize their orders
         logger.info('Preparing process operators...')
-        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process)
+
+        # OP fusion
+        if self.cfg.op_fusion:
+            probe_res = None
+            if self.cfg.fusion_strategy == 'probe':
+                logger.info('Probe the OP speed for OP reordering...')
+                probe_res, _ = self.adapter.probe_small_batch(dataset, ops)
+
+            logger.info(f'Start OP fusion and reordering with strategy '
+                        f'[{self.cfg.fusion_strategy}]...')
+            ops = fuse_operators(ops, probe_res)
+
+        # adaptive batch size
+        if self.cfg.adaptive_batch_size:
+            # calculate the adaptive batch size
+            bs_per_op = self.adapter.adapt_workloads(dataset, ops)
+            assert len(bs_per_op) == len(ops)
+            # update the adaptive batch size
+            logger.info(f'Adapt batch sizes for each OP to {bs_per_op}')
+            for i, op in enumerate(ops):
+                if op.is_batched_op():
+                    op.batch_size = bs_per_op[i]
 
         # 3. data process
         # - If tracer is open, trace each op after it's processed
@@ -176,4 +208,6 @@ class Executor:
         if self.cfg.use_cache and self.cfg.cache_compress:
             from data_juicer.utils.compress import compress
             compress(dataset)
-        return dataset
+
+        if not skip_return:
+            return dataset

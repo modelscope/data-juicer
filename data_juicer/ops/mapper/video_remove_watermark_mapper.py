@@ -2,12 +2,12 @@ import os
 from typing import List, Optional
 
 import av
-import lazy_loader as lazy
 import numpy as np
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import transfer_filename
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 from data_juicer.utils.mm_utils import (close_video,
                                         extract_video_frames_uniformly,
@@ -15,13 +15,13 @@ from data_juicer.utils.mm_utils import (close_video,
                                         parse_string_to_roi,
                                         process_each_frame)
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
-OP_NAME = 'video_remove_watermark_mapper'
-
 with HiddenPrints():
-    cv2 = lazy.load('cv2')
+    cv2 = LazyLoader('cv2', 'cv2')
+
+OP_NAME = 'video_remove_watermark_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -69,7 +69,6 @@ class VideoRemoveWatermarkMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['opencv-python'])
         self._init_parameters = self.remove_extra_parameters(locals())
 
         if roi_type not in ['ratio', 'pixel']:
@@ -202,7 +201,7 @@ class VideoRemoveWatermarkMapper(Mapper):
         new_np_frame = cv2.inpaint(np_frame, watermark_mask, 3, cv2.INPAINT_NS)
         return av.VideoFrame.from_ndarray(new_np_frame, format='bgr24')
 
-    def process(self, sample, context=False):
+    def process_single(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

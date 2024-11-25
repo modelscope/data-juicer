@@ -1,4 +1,3 @@
-import lazy_loader as lazy
 import numpy as np
 from PIL import ImageOps
 
@@ -7,13 +6,10 @@ from data_juicer.utils.mm_utils import (SpecialTokens, load_data_with_context,
                                         load_image, remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
 OP_NAME = 'image_text_similarity_filter'
-
-torch = lazy.load('torch')
-transformers = lazy.load('transformers')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -23,6 +19,7 @@ class ImageTextSimilarityFilter(Filter):
     within a specific range."""
 
     _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(self,
                  hf_clip: str = 'openai/clip-vit-base-patch32',
@@ -57,7 +54,6 @@ class ImageTextSimilarityFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['torch', 'transformers'])
         self.min_score = min_score
         self.max_score = max_score
         if reduce_mode not in ['avg', 'max', 'min']:
@@ -74,7 +70,7 @@ class ImageTextSimilarityFilter(Filter):
         self.horizontal_flip = horizontal_flip
         self.vertical_flip = vertical_flip
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_text_similarity in sample[Fields.stats]:
             return sample
@@ -136,7 +132,7 @@ class ImageTextSimilarityFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         similarity = sample[Fields.stats][StatsKeys.image_text_similarity]
         if len(similarity) <= 0:
             return True

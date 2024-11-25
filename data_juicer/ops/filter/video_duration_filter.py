@@ -46,7 +46,7 @@ class VideoDurationFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.video_duration in sample[Fields.stats]:
             return sample
@@ -77,7 +77,7 @@ class VideoDurationFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         video_durations = sample[Fields.stats][StatsKeys.video_duration]
         keep_bools = np.array([
             self.min_duration <= duration <= self.max_duration

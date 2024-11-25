@@ -1,4 +1,3 @@
-import lazy_loader as lazy
 import numpy as np
 from PIL import ImageOps
 from pydantic import PositiveInt
@@ -11,13 +10,10 @@ from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import INTER_SAMPLED_FRAMES, LOADED_VIDEOS
 
 OP_NAME = 'video_frames_text_similarity_filter'
-
-torch = lazy.load('torch')
-transformers = lazy.load('transformers')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -79,7 +75,6 @@ class VideoFramesTextSimilarityFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['torch', 'transformers'])
         self.min_score = min_score
         self.max_score = max_score
         if frame_sampling_method not in ['all_keyframes', 'uniform']:
@@ -107,7 +102,7 @@ class VideoFramesTextSimilarityFilter(Filter):
             ('' if frame_sampling_method == 'all_keyframes'
              else f'-{frame_num}')
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_frames_text_similarity in sample[Fields.stats]:
             return sample
@@ -201,7 +196,7 @@ class VideoFramesTextSimilarityFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         similarity = sample[Fields.stats][
             StatsKeys.video_frames_text_similarity]
         if len(similarity) <= 0:

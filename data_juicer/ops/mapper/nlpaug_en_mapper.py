@@ -1,17 +1,18 @@
 from copy import deepcopy
 
-import lazy_loader as lazy
 from loguru import logger
 from pydantic import PositiveInt
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from data_juicer.utils.lazy_loader import LazyLoader
+
+from ..base_op import OPERATORS, Mapper
+
+nlpaug = LazyLoader('nlpaug', 'nlpaug')
+nac = LazyLoader('nac', 'nlpaug.augmenter.char')
+naw = LazyLoader('naw', 'nlpaug.augmenter.word')
+naf = LazyLoader('naf', 'nlpaug.flow')
 
 OP_NAME = 'nlpaug_en_mapper'
-
-nlpaug = lazy.load('nlpaug')
-nac = lazy.load('nlpaug.augmenter.char')
-naw = lazy.load('nlpaug.augmenter.word')
-naf = lazy.load('nlpaug.flow')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -85,7 +86,6 @@ class NlpaugEnMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['nlpaug'])
 
         self.aug_num = aug_num
         if aug_num >= 10:
@@ -124,7 +124,7 @@ class NlpaugEnMapper(Mapper):
         else:
             self.aug = aug_pipeline
 
-    def process(self, samples):
+    def process_batched(self, samples):
         # no augmentation methods are opened
         if len(self.aug) == 0:
             if self.keep_original_sample:

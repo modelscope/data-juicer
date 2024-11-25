@@ -7,7 +7,7 @@ from pydantic import PositiveInt
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
 from ..op_fusion import INTER_WORDS
@@ -47,7 +47,6 @@ class WordRepetitionFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['sentencepiece'])
         self.n = rep_len
         self.min_ratio = min_ratio
         self.max_ratio = max_ratio
@@ -58,7 +57,7 @@ class WordRepetitionFilter(Filter):
             self.model_key = prepare_model(model_type='sentencepiece',
                                            lang=lang)
 
-    def compute_stats(self, samples, context=False):
+    def compute_stats_batched(self, samples, context=False):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
         words_key = f'{InterVars.words}-{self.model_key}'
@@ -111,7 +110,7 @@ class WordRepetitionFilter(Filter):
 
         return samples
 
-    def process(self, samples):
+    def process_batched(self, samples):
         if isinstance(samples[Fields.stats], list):
             return map(
                 lambda stat: self.min_ratio <= stat[StatsKeys.word_rep_ratio]

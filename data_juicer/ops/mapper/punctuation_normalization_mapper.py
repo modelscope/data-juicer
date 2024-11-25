@@ -57,7 +57,7 @@ class PunctuationNormalizationMapper(Mapper):
             '►': '-',
         }
 
-    def process(self, samples):
+    def process_batched(self, samples):
         samples[self.text_key] = [
             ''.join([self.punctuation_unicode.get(c, c) for c in text])
             for text in samples[self.text_key]

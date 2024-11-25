@@ -7,14 +7,17 @@ from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (SpecialTokens,
                                         insert_texts_after_placeholders,
                                         load_image, remove_non_special_tokens,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
+
+simhash = LazyLoader('simhash', 'simhash')
 
 OP_NAME = 'image_captioning_mapper'
 
@@ -79,7 +82,6 @@ class ImageCaptioningMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['torch', 'transformers', 'simhash-pybind'])
 
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'
@@ -237,7 +239,6 @@ class ImageCaptioningMapper(Mapper):
             new_generated_text_per_chunk.extend(
                 generated_text_candidates_single_chunk)
         elif self.keep_candidate_mode == 'similar_one_simhash':
-            from simhash import num_differing_bits
 
             from ..deduplicator.document_simhash_deduplicator import \
                 DocumentSimhashDeduplicator
@@ -259,7 +260,7 @@ class ImageCaptioningMapper(Mapper):
                 for candidate_text in generated_text_candidates_single_chunk
             ]
             hamming_distances = [
-                num_differing_bits(ori_text_hash, generated_text_hash)
+                simhash.num_differing_bits(ori_text_hash, generated_text_hash)
                 for generated_text_hash in generated_text_hashes
             ]
             max_index = min(range(len(hamming_distances)),
@@ -268,7 +269,7 @@ class ImageCaptioningMapper(Mapper):
                 generated_text_candidates_single_chunk[max_index])
         return new_generated_text_per_chunk
 
-    def process(self, samples, rank=None):
+    def process_batched(self, samples, rank=None):
         """
         Note:
             This is a batched_OP, whose input and output type are

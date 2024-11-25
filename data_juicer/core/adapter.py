@@ -1,6 +1,9 @@
+from datasets import concatenate_datasets
 from datasets.config import DEFAULT_MAX_BATCH_SIZE
 
 from data_juicer.core.monitor import Monitor
+from data_juicer.ops import UNFORKABLE
+from data_juicer.utils.process_utils import setup_mp
 
 
 class Adapter:
@@ -27,28 +30,43 @@ class Adapter:
         if operators is None or len(operators) == 0:
             return []
 
+        # number of test samples
+        sample_num = len(dataset)
+
         # resource utilization list
         resource_util_list = []
         # probe for each OP
+        unforkable_operators = set(UNFORKABLE.modules.keys())
         for op in operators:
-            # set num_proc to 1 for each OP to focus on the influence of batch
-            # size only.
-            old_num_proc = op.num_proc
-            op.num_proc = 1
+            # select suitable mp method for each OP
+            mp_context = ['forkserver', 'spawn'] if (
+                op.use_cuda() or op._name in unforkable_operators) else None
+            setup_mp(mp_context)
+            # expand the test dataset according to the runtime number of
+            # processes to ensure enough data for a batch and probe the true
+            # resource utilization for each OP
+            expanded_dataset = concatenate_datasets([dataset] *
+                                                    op.runtime_np())
 
-            # number of test samples
-            sample_num = len(dataset)
+            # set the test batch size and save the old one
+            if op.is_batched_op():
+                old_batch_size = op.batch_size
+                op.batch_size = sample_num
+
             # run single op and monitor the resource utilization
-            dataset, resource_util_per_op = Monitor.monitor_func(
-                op.run, args=(dataset, ), sample_interval=sample_interval)
+            _, resource_util_per_op = Monitor.monitor_func(
+                op.run,
+                args=(expanded_dataset, ),
+                sample_interval=sample_interval)
 
             # calculate speed
             resource_util_per_op[
                 'speed'] = sample_num / resource_util_per_op['time']
             resource_util_list.append(resource_util_per_op)
 
-            # restore to the original num_proc
-            op.num_proc = old_num_proc
+            # # restore the batch size
+            if op.is_batched_op():
+                op.batch_size = old_batch_size
 
         return resource_util_list
 
@@ -96,17 +114,30 @@ class Adapter:
         current load and estimated OP speed, returning load factors and speed
         ranks for each OP.
 
+        Notice: the probe should be run with cache enabled.
+
         :param dataset: The dataset to pre-execute small batch on
         :param operators: The OP list to be pre-execution and probe
         :return: A list of probe results for each OP and the length of data
             batch to probe.
         """
+        # record the cache state and enable the cache
+        from datasets import (disable_caching, enable_caching,
+                              is_caching_enabled)
+        previous_state = is_caching_enabled()
+        if not previous_state:
+            enable_caching()
+
         # take a small batch
         data_batch = self.take_batch(dataset, self.cfg)
         # process and monitor the resource utilization
         resource_util_list = self.execute_and_probe(data_batch, operators)
         # analyze resource utilization
         analysis_res = Monitor.analyze_resource_util_list(resource_util_list)
+
+        # if the cache is disabled before, disable it again
+        if not previous_state:
+            disable_caching()
 
         return analysis_res, len(data_batch)
 

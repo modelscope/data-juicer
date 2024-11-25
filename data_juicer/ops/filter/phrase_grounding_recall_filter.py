@@ -1,24 +1,23 @@
 from typing import List
 
-import lazy_loader as lazy
 import numpy as np
 from loguru import logger
 from PIL import ImageOps
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (SpecialTokens, iou,
                                         load_data_with_context, load_image,
                                         remove_special_tokens)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-OP_NAME = 'phrase_grounding_recall_filter'
+torch = LazyLoader('torch', 'torch')
+nltk = LazyLoader('nltk', 'nltk')
 
-torch = lazy.load('torch')
-transformers = lazy.load('transformers')
-nltk = lazy.load('nltk')
+OP_NAME = 'phrase_grounding_recall_filter'
 
 
 # NER algorithm adapted from GLIP starts
@@ -116,7 +115,6 @@ class PhraseGroundingRecallFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['torch', 'transformers', 'nltk'])
         self.min_recall = min_recall
         self.max_recall = max_recall
         if reduce_mode not in ['avg', 'max', 'min']:
@@ -142,7 +140,7 @@ class PhraseGroundingRecallFilter(Filter):
         for nltk_data_pkg in requires_nltk_data:
             nltk.download(nltk_data_pkg)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.phrase_grounding_recall in sample[Fields.stats]:
             return sample
@@ -256,7 +254,7 @@ class PhraseGroundingRecallFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         recalls = sample[Fields.stats][StatsKeys.phrase_grounding_recall]
         if len(recalls) <= 0:
             return True

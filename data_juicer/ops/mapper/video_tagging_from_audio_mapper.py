@@ -1,16 +1,16 @@
-import lazy_loader as lazy
 import librosa
 import numpy as np
 
 from data_juicer.utils.constant import Fields
+from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
 from data_juicer.utils.mm_utils import extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
+
+torch = LazyLoader('torch', 'torch')
 
 OP_NAME = 'video_tagging_from_audio_mapper'
-
-torch = lazy.load('torch')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -38,7 +38,7 @@ class VideoTaggingFromAudioMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['torch', 'transformers', 'torchaudio'])
+        AUTOINSTALL.check(['torchaudio'])
         self.model_key = prepare_model(model_type='huggingface',
                                        pretrained_model_name_or_path=hf_ast,
                                        trust_remote_code=trust_remote_code)
@@ -47,7 +47,7 @@ class VideoTaggingFromAudioMapper(Mapper):
 
         self.tag_field_name = tag_field_name
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         # check if it's generated already
         if self.tag_field_name in sample:
             return sample

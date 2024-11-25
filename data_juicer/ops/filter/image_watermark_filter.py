@@ -1,17 +1,16 @@
-import lazy_loader as lazy
 import numpy as np
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..op_fusion import LOADED_IMAGES
 
-OP_NAME = 'image_watermark_filter'
+torch = LazyLoader('torch', 'torch')
 
-torch = lazy.load('torch')
-transformers = lazy.load('transformers')
+OP_NAME = 'image_watermark_filter'
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -47,7 +46,6 @@ class ImageWatermarkFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['torch', 'transformers'])
         self.prob_threshold = prob_threshold
         if any_or_all not in ['any', 'all']:
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
@@ -58,7 +56,7 @@ class ImageWatermarkFilter(Filter):
             pretrained_model_name_or_path=hf_watermark_model,
             trust_remote_code=trust_remote_code)
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.image_watermark_prob in sample[Fields.stats]:
             return sample
@@ -88,7 +86,7 @@ class ImageWatermarkFilter(Filter):
 
         return sample
 
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         itm_probs = sample[Fields.stats][StatsKeys.image_watermark_prob]
         if len(itm_probs) <= 0:
             return True

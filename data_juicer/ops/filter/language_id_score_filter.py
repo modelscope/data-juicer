@@ -1,16 +1,16 @@
 from typing import List, Union
 
-import lazy_loader as lazy
 from loguru import logger
 
 from data_juicer.utils.constant import Fields, StatsKeys
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
+
+fasttext = LazyLoader('fasttext', 'fasttext')
 
 OP_NAME = 'language_id_score_filter'
-
-fasttext = lazy.load('fasttext')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -33,7 +33,6 @@ class LanguageIDScoreFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['fasttext', 'fasttext-wheel'])
         if not lang:
             # lang is [], '' or None
             self.lang = None
@@ -46,7 +45,7 @@ class LanguageIDScoreFilter(Filter):
         self.min_score = min_score
         self.model_key = prepare_model(model_type='fasttext')
 
-    def compute_stats(self, sample):
+    def compute_stats_single(self, sample):
         # check if it's computed already
         if StatsKeys.lang in sample[
                 Fields.stats] and StatsKeys.lang_score in sample[Fields.stats]:
@@ -67,7 +66,7 @@ class LanguageIDScoreFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         if self.lang:
             return sample[Fields.stats][StatsKeys.lang] in self.lang \
                    and sample[Fields.stats][StatsKeys.lang_score] >= \

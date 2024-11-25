@@ -14,6 +14,8 @@ class ImageAspectRatioFilter(Filter):
     AspectRatio = W / H.
     """
 
+    _batched_op = True
+
     def __init__(self,
                  min_ratio: float = 0.333,
                  max_ratio: float = 3.0,
@@ -40,7 +42,7 @@ class ImageAspectRatioFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.aspect_ratios in sample[Fields.stats]:
             return sample
@@ -66,7 +68,7 @@ class ImageAspectRatioFilter(Filter):
         ]
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         aspect_ratios = sample[Fields.stats][StatsKeys.aspect_ratios]
         keep_bools = np.array([
             self.min_ratio <= aspect_ratio <= self.max_ratio

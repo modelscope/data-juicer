@@ -2,19 +2,19 @@ import math
 import re
 from itertools import chain
 
-import lazy_loader as lazy
 from pydantic import NonNegativeFloat, NonNegativeInt
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import (add_suffix_to_filename,
                                           transfer_filename)
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import SpecialTokens
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
+
+scenedetect = LazyLoader('scenedetect', 'scenedetect')
 
 OP_NAME = 'video_split_by_scene_mapper'
-
-scenedetect = lazy.load('scenedetect')
 
 
 def replace_func(match, scene_counts_iter):
@@ -60,7 +60,6 @@ class VideoSplitBySceneMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['scenedetect[opencv]'])
         self._init_parameters = self.remove_extra_parameters(locals())
 
         if detector not in self.avaliable_detectors:
@@ -81,7 +80,7 @@ class VideoSplitBySceneMapper(Mapper):
             for key in avaliable_kwargs if key in kwargs
         }
 
-    def process(self, sample, context=False):
+    def process_single(self, sample, context=False):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []

@@ -28,6 +28,43 @@ class Fields(object):
     # the name of directory to store the produced multimodal data
     multimodal_data_output_dir = DEFAULT_PREFIX + 'produced_data__'
 
+    # field names for info extraction
+    event_description = DEFAULT_PREFIX + 'event_description__'
+    # # a list of characters relevant to the event
+    relevant_characters = DEFAULT_PREFIX + 'relevant_characters__'
+    # # the given main entity for attribute extraction
+    main_entity = DEFAULT_PREFIX + 'main_entity__'
+    # # the given attribute to be extracted
+    attribute = DEFAULT_PREFIX + 'attribute__'
+    # # the extracted attribute description
+    attribute_description = DEFAULT_PREFIX + 'attribute_description__'
+    # # extract from raw data for support the attribute
+    attribute_support_text = DEFAULT_PREFIX + 'attribute_support_text__'
+    # # the nickname relationship
+    nickname = DEFAULT_PREFIX + 'nickname__'
+    # # the entity for knowledge graph
+    entity = DEFAULT_PREFIX + 'entity__'
+    # # # the name of entity
+    entity_name = DEFAULT_PREFIX + 'entity_name__'
+    # # # the type of entity
+    entity_type = DEFAULT_PREFIX + 'entity_type__'
+    # # # the description of entity
+    entity_description = DEFAULT_PREFIX + 'entity_entity_description__'
+    # # the relationship for knowledge graph
+    relation = DEFAULT_PREFIX + 'relation__'
+    # # # the source entity of the relation
+    source_entity = DEFAULT_PREFIX + 'relation_source_entity__'
+    # # # the target entity of the relation
+    target_entity = DEFAULT_PREFIX + 'relation_target_entity__'
+    # # # the description of the relation
+    relation_description = DEFAULT_PREFIX + 'relation_description__'
+    # # # the keywords of the relation
+    relation_keywords = DEFAULT_PREFIX + 'relation_keywords__'
+    # # # the strength of the relation
+    relation_strength = DEFAULT_PREFIX + 'relation_strength__'
+    # # the keyword in a text
+    keyword = DEFAULT_PREFIX + 'keyword__'
+
 
 class StatsKeysMeta(type):
     """
@@ -141,6 +178,7 @@ class StatsKeysConstant(object):
     image_sizes = 'image_sizes'
     face_ratios = 'face_ratios'
     face_detections = 'face_detections'
+    face_counts = 'face_counts'
     image_aesthetics_scores = 'image_aesthetics_scores'
     image_nsfw_score = 'image_nsfw_score'
     image_watermark_prob = 'image_watermark_prob'

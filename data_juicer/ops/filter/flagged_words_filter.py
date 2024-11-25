@@ -10,7 +10,7 @@ from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ...utils.asset_utils import ASSET_DIR, load_words_asset
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
 from ..op_fusion import INTER_WORDS
@@ -54,7 +54,6 @@ class FlaggedWordFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['sentencepiece'])
         self.lang = lang
         self.max_ratio = max_ratio
         self.use_words_aug = use_words_aug
@@ -73,7 +72,7 @@ class FlaggedWordFilter(Filter):
             self.model_key = prepare_model(model_type='sentencepiece',
                                            lang=lang)
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.flagged_words_ratio in sample[Fields.stats]:
             return sample
@@ -120,6 +119,6 @@ class FlaggedWordFilter(Filter):
             StatsKeys.flagged_words_ratio] = flagged_words_ratio
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         return sample[Fields.stats][
             StatsKeys.flagged_words_ratio] <= self.max_ratio

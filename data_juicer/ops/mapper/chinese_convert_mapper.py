@@ -1,10 +1,10 @@
-import lazy_loader as lazy
+from data_juicer.utils.lazy_loader import LazyLoader
 
-from ..base_op import AUTOINSTALL, OPERATORS, Mapper
+from ..base_op import OPERATORS, Mapper
+
+opencc = LazyLoader('opencc', 'opencc')
 
 OP_NAME = 'chinese_convert_mapper'
-
-opencc = lazy.load('opencc')
 
 OPENCC_CONVERTER = None
 
@@ -74,7 +74,6 @@ class ChineseConvertMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['opencc'])
         mode_list = [
             's2t', 't2s', 's2tw', 'tw2s', 's2hk', 'hk2s', 's2twp', 'tw2sp',
             't2tw', 'tw2t', 'hk2t', 't2hk', 't2jp', 'jp2t'
@@ -84,7 +83,7 @@ class ChineseConvertMapper(Mapper):
         self.mode = mode
         prepare_converter(self.mode)
 
-    def process(self, samples):
+    def process_batched(self, samples):
         prepare_converter(self.mode)
 
         samples[self.text_key] = [

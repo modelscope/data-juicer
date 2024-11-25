@@ -4,21 +4,18 @@
 
 from typing import List
 
-import lazy_loader as lazy
 from pydantic import PositiveInt
 
 from data_juicer.utils.asset_utils import ASSET_DIR, load_words_asset
 from data_juicer.utils.constant import Fields, InterVars, StatsKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import AUTOINSTALL, OPERATORS, Filter
+from ..base_op import OPERATORS, Filter
 from ..common import (SPECIAL_CHARACTERS, get_words_from_document,
                       words_refinement)
 from ..op_fusion import INTER_WORDS
 
 OP_NAME = 'stopwords_filter'
-
-sentencepiece = lazy.load('sentencepiece')
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -56,7 +53,6 @@ class StopWordsFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['sentencepiece'])
         self.lang = lang
         self.min_ratio = min_ratio
         self.use_words_aug = use_words_aug
@@ -74,7 +70,7 @@ class StopWordsFilter(Filter):
             self.model_key = prepare_model(model_type='sentencepiece',
                                            lang=lang)
 
-    def compute_stats(self, sample, context=False):
+    def compute_stats_single(self, sample, context=False):
         # check if it's computed already
         if StatsKeys.stopwords_ratio in sample[Fields.stats]:
             return sample
@@ -121,6 +117,6 @@ class StopWordsFilter(Filter):
         sample[Fields.stats][StatsKeys.stopwords_ratio] = stopwords_ratio
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         return sample[Fields.stats][
             StatsKeys.stopwords_ratio] >= self.min_ratio

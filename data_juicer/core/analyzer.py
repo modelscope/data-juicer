@@ -1,13 +1,18 @@
 import os
+from typing import Optional
 
+from jsonargparse import Namespace
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
 from data_juicer.format import load_formatter
 from data_juicer.ops import Filter, load_ops
+from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils import cache_utils
 
+from .adapter import Adapter
 from .exporter import Exporter
 
 
@@ -22,11 +27,11 @@ class Analyzer:
     dataset better.
     """
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: Optional[Namespace] = None):
         """
         Initialization method.
 
-        :param cfg: optional config dict.
+        :param cfg: optional jsonargparse Namespace dict.
         """
         self.cfg = init_configs() if cfg is None else cfg
 
@@ -65,12 +70,16 @@ class Analyzer:
         self.overall_single_plot_path = None
         self.analysis_path = os.path.join(self.cfg.work_dir, 'analysis')
 
-    def run(self, load_data_np=None, skip_export=False):
+    def run(self,
+            load_data_np: Optional[PositiveInt] = None,
+            skip_export: bool = False,
+            skip_return: bool = False):
         """
         Running the dataset analysis pipeline.
 
         :param load_data_np: number of workers when loading the dataset.
         :param skip_export: whether export the results into disk
+        :param skip_return: skip return for API called.
         :return: analyzed dataset.
         """
         # 1. format data
@@ -81,7 +90,18 @@ class Analyzer:
 
         # extract processes
         logger.info('Preparing process operators...')
-        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process)
+
+        if self.cfg.op_fusion:
+            probe_res = None
+            if self.cfg.fusion_strategy == 'probe':
+                logger.info('Probe the OP speed for OP reordering...')
+                adapter = Adapter(self.cfg)
+                probe_res, _ = adapter.probe_small_batch(dataset, ops)
+
+            logger.info(f'Start OP fusion and reordering with strategy '
+                        f'[{self.cfg.fusion_strategy}]...')
+            ops = fuse_operators(ops, probe_res)
 
         # 2. stats precompute only for filter ops
         logger.info('Computing the stats of dataset...')
@@ -129,4 +149,5 @@ class Analyzer:
         )
         column_wise_analysis.analyze(skip_export=skip_export)
 
-        return dataset
+        if not skip_return:
+            return dataset
