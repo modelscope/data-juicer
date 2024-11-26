@@ -21,9 +21,11 @@ open_tracer: false                                          # whether to open th
 op_list_to_trace: []                                        # only ops in this list will be traced by tracer. If it's empty, all ops will be traced. Only available when tracer is opened.
 trace_num: 10                                               # number of samples to show the differences between datasets before and after each op. Only available when tracer is opened.
 op_fusion: false                                            # whether to fuse operators that share the same intermediate variables automatically. Op fusion might reduce the memory requirements slightly but speed up the whole process.
+fusion_strategy: 'probe'                                    # OP fusion strategy. Support ['greedy', 'probe'] now. 'greedy' means keep the basic OP order and put the fused OP to the last of each fused OP group. 'probe' means Data-Juicer will probe the running speed for each OP at the beginning and reorder the OPs and fused OPs according to their probed speed (fast to slow). It's 'probe' in default.
 cache_compress: null                                        # the compression method of the cache file, which can be specified in ['gzip', 'zstd', 'lz4']. If this parameter is None, the cache file will not be compressed. We recommend you turn on this argument when your input dataset is larger than tens of GB and your disk space is not enough.
 keep_stats_in_res_ds: false                                 # whether to keep the computed stats in the result dataset. The intermediate fields to store the stats computed by Filters will be removed if it's False. It's False in default.
 keep_hashes_in_res_ds: false                                # whether to keep the computed hashes in the result dataset. The intermediate fields to store the hashes computed by Deduplicators will be removed if it's False. It's False in default.
+adaptive_batch_size: false                                  # whether to use adaptive batch sizes for each OP according to the probed results. It's False in default.
 
 # for multimodal data processing
 image_key: 'images'                                         # key name of field to store the list of sample image paths.
@@ -55,16 +57,16 @@ process:
   - audio_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg audio filters
   - calibrate_qa_mapper:                                    # calibrate question-answer pairs based on reference text.
       api_model: 'gpt-4o'                                     # API model name.
-      api_url: null                                           # API URL. Defaults to DJ_API_URL environment variable.
-      api_key: null                                           # API key. Defaults to DJ_API_KEY environment variable.
+      api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the calibration task.
       input_template: null                                    # Template for building the model input.
       reference_template: null                                # Template for formatting the reference text.
       qa_pair_template: null                                  # Template for formatting question-answer pairs.
       output_pattern: null                                    # Regular expression for parsing model output.
-      model_params: null                                      # Parameters for initializing the model.
-      sampling_params: null                                   # Extra parameters passed to the API call.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the model.
+      sampling_params: {}                                     # Extra parameters passed to the API call.
   - calibrate_query_mapper:                                 # calibrate query in question-answer pairs based on reference text.
   - calibrate_response_mapper:                              # calibrate response in question-answer pairs based on reference text.
   - chinese_convert_mapper:                                 # convert Chinese between Traditional Chinese, Simplified Chinese and Japanese Kanji.
@@ -75,6 +77,81 @@ process:
   - clean_links_mapper:                                     # remove web links from text.
   - clean_copyright_mapper:                                 # remove copyright comments.
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
+  - extract_entity_attribute_mapper:                        # Extract attributes for given entities from the text.
+      query_entities: ["孙悟空", "猪八戒"]                      # Entity list to be queried.
+      query_attributes: ["人物性格"]                            # Attribute list to be queried.
+      api_model: 'gpt-4o'                                     # API model name.
+      entity_key: '__dj__entity__'                            # The field name to store the given main entity for attribute extraction.
+      entity_attribute_key: '__dj__attribute__'               # The field name to store the given attribute to be extracted.
+      attribute_desc_key: '__dj__attribute_description__'     # The field name to store the extracted attribute description.
+      support_text_key: '__dj__support_text__'                # The field name to store the attribute support text extracted from the raw text.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt_template: null                            # System prompt template for the task. Need to be specified by given entity and attribute.
+      input_template: null                                    # Template for building the model input.
+      attr_pattern_template: null                             # Pattern for parsing the attribute from output. Need to be specified by given attribute.
+      demo_pattern: null                                      # Pattern for parsing the demonstraction from output to support the attribute.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      drop_text: false                                        # If drop the text in the output.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - extract_entity_relation_mapper:                         # Extract entities and relations in the text for knowledge graph.
+      api_model: 'gpt-4o'                                     # API model name.
+      entity_types: ['person', 'organization', 'location']    # Pre-defined entity types for knowledge graph.
+      entity_key: '__dj__entity__'                            # The field name to store the entities.
+      relation_key: '__dj__relation__'                        # The field name to store the relations between entities.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      prompt_template: null                                   # The template of input prompt.
+      tuple_delimiter: null                                   # Delimiter to separate items in outputs.
+      record_delimiter: null                                  # Delimiter to separate records in outputs.
+      completion_delimiter: null                              # To mark the end of the output.
+      max_gleaning: 1                                         # the extra max num to call LLM to glean entities and relations.
+      continue_prompt: null                                   # the prompt for gleaning entities and relations.
+      if_loop_prompt: null                                    # the prompt to determine whether to stop gleaning.
+      entity_pattern: null                                    # Regular expression for parsing entity record.
+      relation_pattern: null                                  # Regular expression for parsing relation record.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      drop_text: false                                        # If drop the text in the output.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - extract_event_mapper:                                   # Extract events and relevant characters in the text
+      api_model: 'gpt-4o'                                     # API model name.
+      event_desc_key: '__dj__event_description__'             # The field name to store the event descriptions.
+      relevant_char_key: '__dj__relevant_characters__'        # The field name to store the relevant characters to the events.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      input_template: null                                    # Template for building the model input.
+      output_pattern: null                                    # Regular expression for parsing model output.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      drop_text: false                                        # If drop the text in the output.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - extract_keyword_mapper:                                 # Generate keywords for the text.
+      api_model: 'gpt-4o'                                     # API model name.
+      keyword_key: '__dj__keyword__'                          # The field name to store the keywords.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      prompt_template: null                                   # The template of input prompt.
+      completion_delimiter: null                              # To mark the end of the output.
+      output_pattern: null                                    # Regular expression for parsing keywords.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      drop_text: false                                        # If drop the text in the output.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - extract_nickname_mapper:                                # Extract nickname relationship in the text.
+      api_model: 'gpt-4o'                                     # API model name.
+      nickname_key: '__dj__nickname__'                        # The field name to store the nickname relationship.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      input_template: null                                    # Template for building the model input.
+      output_pattern: null                                    # Regular expression for parsing model output.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      drop_text: false                                        # If drop the text in the output.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - generate_qa_from_examples_mapper:                       # mapper to generate question and answer pairs from examples.
       hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # Model name on huggingface to generate question and answer pairs.
@@ -87,14 +164,14 @@ process:
       qa_pair_template: null                                  # Template for formatting a single QA pair within each example.
       output_pattern: null                                    # Regular expression pattern to extract questions and answers from model response.
       enable_vllm: false                                      # Whether to use vllm for inference acceleration.
-      model_params: null                                      # Parameters for initializing the model.
+      model_params: {}                                        # Parameters for initializing the model.
       sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
   - generate_qa_from_text_mapper:                           # mapper to generate question and answer pairs from text.
       hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'           # Model name on huggingface to generate question and answer pairs.
       output_pattern: null                                    # Regular expression pattern to extract questions and answers from model response.
       enable_vllm: false                                      # Whether to use vllm for inference acceleration.
-      model_params: null                                      # Parameters for initializing the model.
-      sampling_params: null                                   # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
+      model_params: {}                                        # Parameters for initializing the model.
+      sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
   - image_blur_mapper:                                      # mapper to blur images.
       p: 0.2                                                  # probability of the image being blured
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
@@ -167,8 +244,8 @@ process:
       qa_pair_template: null                                  # Template for formatting the question and answer pair.
       output_pattern: null                                    # Regular expression pattern to extract question and answer from model response.
       enable_vllm: false                                      # whether to use vllm for inference acceleration.
-      model_params: null                                      # Parameters for initializing the model.
-      sampling_params: null                                   # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
+      model_params: {}                                        # Parameters for initializing the model.
+      sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
   - optimize_query_mapper:                                  # optimize query in question-answer pairs.
   - optimize_response_mapper:                               # optimize response in question-answer pairs.
   - punctuation_normalization_mapper:                       # normalize unicode punctuations to English punctuations.
@@ -201,6 +278,12 @@ process:
       substrings: ['http', 'www', '.com', 'href', '//']       # incorrect substrings to remove
   - sentence_split_mapper:                                  # split text to multiple sentences and join them with '\n'
       lang: 'en'                                              # split text in what language
+  - text_chunk_mapper:                                      # Split input text to chunks.
+      max_len: 2000                                           # Split text into multi texts with this max len if not None.
+      split_pattern: '\n\n'                                   # Make sure split in this pattern if it is not None and force cut if the length exceeds max_len.
+      overlap_len: 200                                        # Overlap length of the split texts if not split in the split pattern.
+      tokenizer: 'gpt-4o'                                     # The tokenizer name of Hugging Face tokenizers. The text length will be calculate as the token num if it is offerd. Otherwise, the text length equals to string length.
+      trust_remote_code: True                                 # for loading huggingface model.
   - video_captioning_from_audio_mapper:                     # caption a video according to its audio streams based on Qwen-Audio model
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only captioned sample in the final datasets and the original sample will be removed. It's True in default.
       mem_required: '30GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched

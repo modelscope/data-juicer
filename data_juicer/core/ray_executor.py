@@ -5,7 +5,10 @@ from loguru import logger
 from data_juicer.config import init_configs
 from data_juicer.core.ray_data import RayDataset
 from data_juicer.ops import load_ops
+from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
+
+from .adapter import Adapter
 
 ray = LazyLoader('ray', 'ray')
 rd = LazyLoader('rd', 'ray.data')
@@ -32,6 +35,8 @@ class RayExecutor:
         self.cfg = init_configs() if cfg is None else cfg
 
         self.work_dir = self.cfg.work_dir
+
+        self.adapter = Adapter(self.cfg)
 
         # init ray
         logger.info('Initing Ray ...')
@@ -62,7 +67,17 @@ class RayExecutor:
         dataset = RayDataset(dataset, self.cfg.dataset_path, self.cfg)
         # 2. extract processes
         logger.info('Preparing process operators...')
-        ops = load_ops(self.cfg.process, self.cfg.op_fusion)
+        ops = load_ops(self.cfg.process)
+
+        if self.cfg.op_fusion:
+            probe_res = None
+            if self.cfg.fusion_strategy == 'probe':
+                logger.info('Probe the OP speed for OP reordering...')
+                probe_res, _ = self.adapter.probe_small_batch(dataset, ops)
+
+            logger.info(f'Start OP fusion and reordering with strategy '
+                        f'[{self.cfg.fusion_strategy}]...')
+            ops = fuse_operators(ops, probe_res)
 
         # 3. data process
         logger.info('Processing data...')

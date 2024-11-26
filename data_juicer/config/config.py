@@ -15,6 +15,7 @@ from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS
+from data_juicer.ops.op_fusion import FUSION_STRATEGIES
 from data_juicer.utils.logger_utils import setup_logger
 from data_juicer.utils.mm_utils import SpecialTokens
 
@@ -276,6 +277,22 @@ def init_configs(args: Optional[List[str]] = None):
         'variables automatically. Op fusion might reduce the memory '
         'requirements slightly but speed up the whole process.')
     parser.add_argument(
+        '--fusion_strategy',
+        type=str,
+        default='probe',
+        help='OP fusion strategy. Support ["greedy", "probe"] now. "greedy" '
+        'means keep the basic OP order and put the fused OP to the last '
+        'of each fused OP group. "probe" means Data-Juicer will probe '
+        'the running speed for each OP at the beginning and reorder the '
+        'OPs and fused OPs according to their probed speed (fast to '
+        'slow). It\'s "probe" in default.')
+    parser.add_argument(
+        '--adaptive_batch_size',
+        type=bool,
+        default=False,
+        help='Whether to use adaptive batch sizes for each OP according to '
+        'the probed results. It\'s False in default.')
+    parser.add_argument(
         '--process',
         type=List[Dict],
         default=[],
@@ -436,6 +453,11 @@ def init_setup_from_cfg(cfg: Namespace):
     # The checkpoint mode is not compatible with op fusion for now.
     if cfg.op_fusion:
         cfg.use_checkpoint = False
+        cfg.fusion_strategy = cfg.fusion_strategy.lower()
+        if cfg.fusion_strategy not in FUSION_STRATEGIES:
+            raise NotImplementedError(
+                f'Unsupported OP fusion strategy [{cfg.fusion_strategy}]. '
+                f'Should be one of {FUSION_STRATEGIES}.')
 
     # update huggingface datasets cache directory only when ds_cache_dir is set
     from datasets import config

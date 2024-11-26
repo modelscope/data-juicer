@@ -9,6 +9,11 @@ from .clean_html_mapper import CleanHtmlMapper
 from .clean_ip_mapper import CleanIpMapper
 from .clean_links_mapper import CleanLinksMapper
 from .expand_macro_mapper import ExpandMacroMapper
+from .extract_entity_attribute_mapper import ExtractEntityAttributeMapper
+from .extract_entity_relation_mapper import ExtractEntityRelationMapper
+from .extract_event_mapper import ExtractEventMapper
+from .extract_keyword_mapper import ExtractKeywordMapper
+from .extract_nickname_mapper import ExtractNicknameMapper
 from .fix_unicode_mapper import FixUnicodeMapper
 from .generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
 from .generate_qa_from_text_mapper import GenerateQAFromTextMapper
@@ -38,6 +43,7 @@ from .remove_words_with_incorrect_substrings_mapper import \
     RemoveWordsWithIncorrectSubstringsMapper
 from .replace_content_mapper import ReplaceContentMapper
 from .sentence_split_mapper import SentenceSplitMapper
+from .text_chunk_mapper import TextChunkMapper
 from .video_captioning_from_audio_mapper import VideoCaptioningFromAudioMapper
 from .video_captioning_from_frames_mapper import \
     VideoCaptioningFromFramesMapper
@@ -60,10 +66,12 @@ __all__ = [
     'AudioFFmpegWrappedMapper', 'CalibrateQAMapper', 'CalibrateQueryMapper',
     'CalibrateResponseMapper', 'ChineseConvertMapper', 'CleanCopyrightMapper',
     'CleanEmailMapper', 'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
-    'ExpandMacroMapper', 'FixUnicodeMapper', 'GenerateQAFromExamplesMapper',
-    'GenerateQAFromTextMapper', 'ImageBlurMapper',
-    'ImageCaptioningFromGPT4VMapper', 'ImageCaptioningMapper',
-    'ImageDiffusionMapper', 'ImageFaceBlurMapper', 'ImageSegmentMapper',
+    'ExpandMacroMapper', 'ExtractEntityAttributeMapper',
+    'ExtractEntityRelationMapper', 'ExtractEventMapper',
+    'ExtractKeywordMapper', 'ExtractNicknameMapper', 'FixUnicodeMapper',
+    'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
+    'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
+    'ImageCaptioningMapper', 'ImageDiffusionMapper', 'ImageFaceBlurMapper', 'ImageSegmentMapper',
     'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
     'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
     'PunctuationNormalizationMapper', 'RemoveBibliographyMapper',
@@ -71,7 +79,7 @@ __all__ = [
     'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',
     'RemoveSpecificCharsMapper', 'RemoveTableTextMapper',
     'RemoveWordsWithIncorrectSubstringsMapper', 'ReplaceContentMapper',
-    'SentenceSplitMapper', 'VideoCaptioningFromAudioMapper',
+    'SentenceSplitMapper', 'TextChunkMapper', 'VideoCaptioningFromAudioMapper',
     'VideoCaptioningFromFramesMapper', 'VideoCaptioningFromSummarizerMapper',
     'VideoCaptioningFromVideoMapper', 'VideoFFmpegWrappedMapper',
     'VideoFaceBlurMapper', 'VideoRemoveWatermarkMapper',
