@@ -1,0 +1,6 @@
+# global parameters
+project_name: 'dataset-local-parquet'
+dataset:
+  type: 'local'
+  format: 'parquet'
+  path: 'path/to/parquet/file'

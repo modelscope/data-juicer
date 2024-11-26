@@ -1,0 +1,7 @@
+# global parameters
+project_name: 'dataset-remote-modelscope'
+dataset:
+  type: 'remote'
+  source: 'modelscope'
+  org: "modelscope"
+  name: 'clue'

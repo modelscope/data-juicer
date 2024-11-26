@@ -1,0 +1,7 @@
+# global parameters
+project_name: 'dataset-remote-huggingface'
+dataset:
+  type: 'remote'
+  source: 'huggingface'
+  org: "HuggingFaceFW"
+  name: 'fineweb'

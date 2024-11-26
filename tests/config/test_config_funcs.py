@@ -15,6 +15,8 @@ test_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
 test_bad_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                               'demo_4_test_bad_val.yaml')
 
+test_yaml_dataset_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                              'demo_4_dataset_test.yaml')
 
 class ConfigTest(DataJuicerTestCaseBase):
 

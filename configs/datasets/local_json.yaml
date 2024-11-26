@@ -1,0 +1,6 @@
+# global parameters
+project_name: 'dataset-local-json'
+dataset:
+  type: 'local'
+  format: 'json'
+  path: 'path/to/json/file'
