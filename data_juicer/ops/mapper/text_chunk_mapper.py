@@ -58,7 +58,7 @@ class TextChunkMapper(Mapper):
         if tokenizer is not None:
             self.model_key = prepare_model(
                 model_type='api',
-                api_model=tokenizer,
+                model=tokenizer,
                 return_processor=True,
                 processor_config={'trust_remote_code': trust_remote_code})
 

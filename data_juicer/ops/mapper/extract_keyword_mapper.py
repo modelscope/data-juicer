@@ -104,7 +104,7 @@ Output:
                  api_model: str = 'gpt-4o',
                  *,
                  keyword_key: str = Fields.keyword,
-                 api_url: Optional[str] = None,
+                 api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  prompt_template: Optional[str] = None,
                  completion_delimiter: Optional[str] = None,
@@ -119,7 +119,7 @@ Output:
         :param api_model: API model name.
         :param keyword_key: The field name to store the keywords. It's
             "__dj__keyword__" in default.
-        :param api_url: URL endpoint for the API.
+        :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
         :param prompt_template: The template of input prompt.
@@ -144,8 +144,8 @@ Output:
 
         self.sampling_params = sampling_params
         self.model_key = prepare_model(model_type='api',
-                                       api_model=api_model,
-                                       url=api_url,
+                                       model=api_model,
+                                       endpoint=api_endpoint,
                                        response_path=response_path,
                                        **model_params)
 

@@ -63,7 +63,7 @@ class EntityAttributeAggregator(Aggregator):
                  word_limit: PositiveInt = 100,
                  max_token_num: Optional[PositiveInt] = None,
                  *,
-                 api_url: Optional[str] = None,
+                 api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt_template: Optional[str] = None,
                  example_prompt: Optional[str] = None,
@@ -87,7 +87,7 @@ class EntityAttributeAggregator(Aggregator):
         :param word_limit: Prompt the output length.
         :param max_token_num: The max token num of the total tokens of the
             sub documents. Without limitation if it is None.
-        :param api_url: URL endpoint for the API.
+        :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
         :param system_prompt_template: The system prompt template.
@@ -129,16 +129,16 @@ class EntityAttributeAggregator(Aggregator):
 
         self.sampling_params = sampling_params
         self.model_key = prepare_model(model_type='api',
-                                       api_model=api_model,
-                                       url=api_url,
+                                       model=api_model,
+                                       endpoint=api_endpoint,
                                        response_path=response_path,
                                        return_processor=True,
                                        **model_params)
 
         self.try_num = try_num
-        self.nested_sum = NestedAggregator(api_model=api_model,
+        self.nested_sum = NestedAggregator(model=api_model,
                                            max_token_num=max_token_num,
-                                           api_url=api_url,
+                                           api_endpoint=api_endpoint,
                                            response_path=response_path,
                                            try_num=try_num,
                                            model_params=model_params,

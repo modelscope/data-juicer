@@ -110,25 +110,31 @@ def check_model(model_name, force=False):
 
 class APIModel:
 
-    def __init__(self, model, url=None, response_path=None, **kwargs):
+    def __init__(self, model, endpoint=None, response_path=None, **kwargs):
         """
         Initializes an instance of the APIModel class.
 
-        :param model: The model name to use for the API.
-        :param url: URL endpoint for the API. If relative, it will be joined
-            with base_url or the OPENAI_BASE_URL environment variable. Defaults
-            to '/chat/completions' for OpenAI compatibility.
-        :param response_path: Dot-separated path to extract the desired
-            response content. Defaults to 'choices.0.message.content' for
+        :param model: The name of the model to be used for making API
+            calls. This should correspond to a valid model identifier
+            recognized by the API server.
+        :param endpoint: The URL endpoint for the API. If provided as a
+            relative path, it will be appended to the base URL (defined by the
+            `OPENAI_BASE_URL` environment variable or through an additional
+            `base_url` parameter). Defaults to '/chat/completions' for
             OpenAI compatibility.
-        :param kwargs: Additional arguments to configure the OpenAI client.
+        :param response_path: A dot-separated string specifying the path to
+            extract the desired content from the API response. The default
+            value is 'choices.0.message.content', which corresponds to the
+            typical structure of an OpenAI API response.
+        :param kwargs: Additional keyword arguments for configuring the
+            internal OpenAI client.
         """
         self.model = model
-        self.url = url or '/chat/completions'
+        self.endpoint = endpoint or '/chat/completions'
         self.response_path = response_path or 'choices.0.message.content'
 
         client_args = self._filter_arguments(openai.OpenAI, kwargs)
-        self.client = openai.OpenAI(**client_args)
+        self._client = openai.OpenAI(**client_args)
 
     def __call__(self, messages, **kwargs):
         """
@@ -151,11 +157,11 @@ class APIModel:
         stream_cls = openai.Stream[openai.types.chat.ChatCompletionChunk]
 
         try:
-            response = self.client.post(self.url,
-                                        body=body,
-                                        cast_to=httpx.Response,
-                                        stream=stream,
-                                        stream_cls=stream_cls)
+            response = self._client.post(self.endpoint,
+                                         body=body,
+                                         cast_to=httpx.Response,
+                                         stream=stream,
+                                         stream_cls=stream_cls)
             result = response.json()
             return nested_access(result, self.response_path)
         except Exception as e:
@@ -185,9 +191,9 @@ class APIModel:
         return filtered_args
 
 
-def prepare_api_model(api_model,
+def prepare_api_model(model,
                       *,
-                      url=None,
+                      endpoint=None,
                       response_path=None,
                       return_processor=False,
                       processor_config=None,
@@ -196,45 +202,48 @@ def prepare_api_model(api_model,
     The callable supports custom response parsing and works with proxy servers
     that may be incompatible.
 
-    :param api_model: The name of the model to interact with.
-    :param url: URL endpoint for the API.
+    :param model: The name of the model to interact with.
+    :param endpoint: The URL endpoint for the API. If provided as a relative
+        path, it will be appended to the base URL (defined by the
+        `OPENAI_BASE_URL` environment variable or through an additional
+        `base_url` parameter). By default, it is set to
+        '/chat/completions' for OpenAI compatibility.
     :param response_path: The dot-separated  path to extract desired content
         from the API response. Defaults to 'choices.0.message.content'.
     :param return_processor: A boolean flag indicating whether to return a
         processor along with the model. The processor can be used for tasks
         like tokenization or encoding. Defaults to False.
-    :param processor_config: A dictionary containing configuration settings
-        for a specific processor from Hugging Face. It should include all
-        necessary parameters for initializing the processor. This parameter is
-        used only if `return_processor` is True.
-    :param model_params: Additional parameters to configure the API model.
-    :return: A tuple containing the callable API model object and optionally a
-        processor if `return_processor` is True.
+    :param processor_config: A dictionary containing configuration parameters
+        for initializing a Hugging Face processor. It is only relevant if
+        `return_processor` is set to True.
+    :param model_params: Additional parameters for configuring the API model.
+    :return: A callable APIModel instance, and optionally a processor
+        if `return_processor` is True.
     """
-    model = APIModel(model=api_model,
-                     url=url,
-                     response_path=response_path,
-                     **model_params)
+    client = APIModel(model=model,
+                      endpoint=endpoint,
+                      response_path=response_path,
+                      **model_params)
 
     if not return_processor:
-        return model
+        return client
 
     def get_processor():
         try:
             import tiktoken
-            return tiktoken.encoding_for_model(api_model)
+            return tiktoken.encoding_for_model(model)
         except Exception:
             pass
 
         try:
             import dashscope
-            return dashscope.get_tokenizer(api_model)
+            return dashscope.get_tokenizer(model)
         except Exception:
             pass
 
         try:
             processor = transformers.AutoProcessor.from_pretrained(
-                pretrained_model_name_or_path=api_model, **processor_config)
+                pretrained_model_name_or_path=model, **processor_config)
             return processor
         except Exception:
             pass
@@ -252,7 +261,7 @@ def prepare_api_model(api_model,
             **processor_config)
     else:
         processor = get_processor()
-    return (model, processor)
+    return (client, processor)
 
 
 def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,

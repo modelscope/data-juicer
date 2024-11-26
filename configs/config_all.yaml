@@ -55,7 +55,7 @@ process:
   - audio_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg audio filters
   - calibrate_qa_mapper:                                    # calibrate question-answer pairs based on reference text.
       api_model: 'gpt-4o'                                     # API model name.
-      api_url: null                                           # URL endpoint for the API.
+      api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the calibration task.
       input_template: null                                    # Template for building the model input.
@@ -83,7 +83,7 @@ process:
       entity_attribute_key: '__dj__attribute__'               # The field name to store the given attribute to be extracted.
       attribute_desc_key: '__dj__attribute_description__'     # The field name to store the extracted attribute description.
       support_text_key: '__dj__support_text__'                # The field name to store the attribute support text extracted from the raw text.
-      api_url: null                                           # URL endpoint for the API.
+      api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt_template: null                            # System prompt template for the task. Need to be specified by given entity and attribute.
       input_template: null                                    # Template for building the model input.
@@ -98,7 +98,7 @@ process:
       entity_types: ['person', 'organization', 'location']    # Pre-defined entity types for knowledge graph.
       entity_key: '__dj__entity__'                            # The field name to store the entities.
       relation_key: '__dj__relation__'                        # The field name to store the relations between entities.
-      api_url: null                                           # URL endpoint for the API.
+      api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       prompt_template: null                                   # The template of input prompt.
       tuple_delimiter: null                                   # Delimiter to separate items in outputs.
@@ -117,7 +117,7 @@ process:
       api_model: 'gpt-4o'                                     # API model name.
       event_desc_key: '__dj__event_description__'             # The field name to store the event descriptions.
       relevant_char_key: '__dj__relevant_characters__'        # The field name to store the relevant characters to the events.
-      api_url: null                                           # URL endpoint for the API.
+      api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the task.
       input_template: null                                    # Template for building the model input.
@@ -129,7 +129,7 @@ process:
   - extract_keyword_mapper:                                 # Generate keywords for the text.
       api_model: 'gpt-4o'                                     # API model name.
       keyword_key: '__dj__keyword__'                          # The field name to store the keywords.
-      api_url: null                                           # URL endpoint for the API.
+      api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       prompt_template: null                                   # The template of input prompt.
       completion_delimiter: null                              # To mark the end of the output.
@@ -141,7 +141,7 @@ process:
   - extract_nickname_mapper:                                # Extract nickname relationship in the text.
       api_model: 'gpt-4o'                                     # API model name.
       nickname_key: '__dj__nickname__'                        # The field name to store the nickname relationship.
-      api_url: null                                           # URL endpoint for the API.
+      api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the task.
       input_template: null                                    # Template for building the model input.

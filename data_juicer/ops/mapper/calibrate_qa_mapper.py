@@ -33,7 +33,7 @@ class CalibrateQAMapper(Mapper):
     def __init__(self,
                  api_model: str = 'gpt-4o',
                  *,
-                 api_url: Optional[str] = None,
+                 api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt: Optional[str] = None,
                  input_template: Optional[str] = None,
@@ -48,7 +48,7 @@ class CalibrateQAMapper(Mapper):
         Initialization method.
 
         :param api_model: API model name.
-        :param api_url: URL endpoint for the API.
+        :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
         :param system_prompt: System prompt for the calibration task.
@@ -74,8 +74,8 @@ class CalibrateQAMapper(Mapper):
         self.sampling_params = sampling_params
 
         self.model_key = prepare_model(model_type='api',
-                                       api_model=api_model,
-                                       url=api_url,
+                                       model=api_model,
+                                       endpoint=api_endpoint,
                                        response_path=response_path,
                                        **model_params)
 

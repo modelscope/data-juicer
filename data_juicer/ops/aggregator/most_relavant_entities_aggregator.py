@@ -52,7 +52,7 @@ class MostRelavantEntitiesAggregator(Aggregator):
                  output_key: str = None,
                  max_token_num: Optional[PositiveInt] = None,
                  *,
-                 api_url: Optional[str] = None,
+                 api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt_template: Optional[str] = None,
                  input_template: Optional[str] = None,
@@ -74,7 +74,7 @@ class MostRelavantEntitiesAggregator(Aggregator):
             input_key in default.
         :param max_token_num: The max token num of the total tokens of the
             sub documents. Without limitation if it is None.
-        :param api_url: URL endpoint for the API.
+        :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
         :param system_prompt_template: The system prompt template.
@@ -108,8 +108,8 @@ class MostRelavantEntitiesAggregator(Aggregator):
 
         self.sampling_params = sampling_params
         self.model_key = prepare_model(model_type='api',
-                                       api_model=api_model,
-                                       url=api_url,
+                                       model=api_model,
+                                       url=api_endpoint,
                                        response_path=response_path,
                                        return_processor=True,
                                        **model_params)

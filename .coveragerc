@@ -9,3 +9,6 @@ omit =
 
     # avoid measuring code of unittest
     tests/*
+
+[report]
+ignore_errors = True
