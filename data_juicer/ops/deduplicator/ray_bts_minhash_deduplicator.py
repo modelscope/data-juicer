@@ -4,6 +4,7 @@ import uuid
 from collections import defaultdict
 from typing import Optional
 
+import os
 import ray
 import numpy as np
 import pandas as pd
@@ -36,7 +37,19 @@ def merge_edge_list_dict_list(edge_list_dict_list):
 
 def BTS_hash(x, parallel_num):
     # return int(x[-8:], 16) % parallel_num
-    return int.from_bytes(x, byteorder='big') % parallel_num
+    # return int.from_bytes(x, byteorder='big') % parallel_num
+    return x % parallel_num
+
+
+@ray.remote
+class IdGenerator:
+    def __init__(self):
+        self.next_id = 0
+
+    def get_next_id(self, count):
+        current_id = self.next_id
+        self.next_id += count
+        return range(current_id, self.next_id)
 
 
 @ray.remote
@@ -193,6 +206,14 @@ class BTSUnionFind:
     def get_nodes(self):
         return set(self.parent.keys())
 
+    def squeeze(self):
+        dup_keys = {
+            x
+            for x in self.parent
+            if self.hash(x) == self.parallel_id
+        }
+        self.parent = dup_keys
+
     def is_dup(self, queries):
         return [
             query in self.parent
@@ -227,6 +248,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         num_rows_per_band: Optional[PositiveInt] = None,
         tokenizer_model: Optional[str] = None,
         union_find_parallel_num: Optional[int] = 16,
+        tmp_file_name: Optional[str] = './output/ray-dedup-tmp/',
         *args,
         **kwargs,
     ):
@@ -325,6 +347,8 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             for i in range(self.union_find_parallel_num)
         ]
 
+        self.tmp_file_name = os.path.join(os.getcwd(), tmp_file_name)
+
     def calc_minhash(self, text_list: pa.Array) -> pa.Table:
         all_hash_values = [[] for _ in range(self.num_bands)]
 
@@ -408,6 +432,10 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 union_find.communication.remote()
                 for union_find in self.union_find_list
             ])
+        ray.get([
+            union_find.squeeze.remote()
+            for union_find in self.union_find_list
+        ])
 
     def filter_with_union_find(self, samples: pa.Table) -> pa.Table:
         hash_id_list = []
@@ -432,15 +460,28 @@ class RayBTSMinhashDeduplicator(Deduplicator):
 
     def run(self, dataset):
         start_time = time.time()
+        id_generator = IdGenerator.remote()
         def add_uid_column(table: pa.Table) -> pa.Table:
-            uuid_list = [uuid.uuid4().bytes for _ in range(table.num_rows)]
-            new_table = table.append_column(HashKeys.uid, pa.array(uuid_list))
+            # uuid_list = [uuid.uuid4().bytes for _ in range(table.num_rows)]
+            # new_table = table.append_column(HashKeys.uid, pa.array(uuid_list))
+            # return new_table
+            num_rows = len(table)
+            ids = ray.get(id_generator.get_next_id.remote(num_rows))
+            new_table = table.append_column(HashKeys.uid, pa.array(list(ids)))
             return new_table
 
-        dataset = dataset.map_batches(
+        # dataset = dataset.map_batches(
+        #     add_uid_column,
+        #     batch_format='pyarrow',
+        # ).materialize()
+        dataset.map_batches(
             add_uid_column,
             batch_format='pyarrow',
-        ).materialize()
+        ).write_json(
+            self.tmp_file_name,
+            force_ascii=False
+        )
+        dataset = ray.data.read_json(self.tmp_file_name)
         end_time = time.time()
         print(f'uid time = {end_time - start_time}')
 
@@ -482,6 +523,5 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             batch_format='pyarrow'
         ).drop_columns(
             HashKeys.uid
-        ).materialize()
-        logger.info(f'Keep {result.count()} samples after MinHash dedup.')
+        )
         return result
