@@ -14,7 +14,7 @@ RUN apt-get update \
 
 # install 3rd-party system dependencies
 RUN apt-get update \
-    && apt-get install ffmpeg libsm6 libxext6 software-properties-common build-essential cmake  -y
+    && apt-get install ffmpeg libsm6 libxext6 software-properties-common build-essential cmake gfortran libopenblas-dev liblapack-dev -y
 
 # prepare the java env
 WORKDIR /opt
