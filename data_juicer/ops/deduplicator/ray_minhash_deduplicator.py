@@ -218,7 +218,7 @@ class RayMinhashDeduplicator(Deduplicator):
 
     def compute_stats(self, samples: pa.Table) -> pa.Table:
         samples_list = samples[self.text_key]
-        uuid_list = [uuid.uuid4().hex for _ in range(samples.num_rows)]
+        uuid_list = [uuid.uuid4().bytes for _ in range(samples.num_rows)]
         all_hash_values = [[] for _ in range(self.num_bands)]
 
         for text in samples_list:
@@ -369,6 +369,8 @@ class RayMinhashDeduplicator(Deduplicator):
         ).map_batches(
             self.filter_with_union_find,
             batch_format='pyarrow'
+        ).drop_columns(
+            HashKeys.uid
         ).materialize()
         logger.info(f'Keep {result.count()} samples after MinHash dedup.')
         return result

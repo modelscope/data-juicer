@@ -7,6 +7,7 @@ from .ray_document_deduplicator import RayDocumentDeduplicator
 from .ray_image_deduplicator import RayImageDeduplicator
 from .ray_minhash_deduplicator import RayMinhashDeduplicator
 from .ray_bts_minhash_deduplicator import RayBTSMinhashDeduplicator
+from .ray_bts_v2_minhash_deduplicator import RayBTSV2MinhashDeduplicator
 from .ray_redis_minhash_deduplicator import RayRedisMinhashDeduplicator
 from .ray_multi_redis_minhash_deduplicator import RayMultiRedisMinhashDeduplicator
 from .ray_video_deduplicator import RayVideoDeduplicator
@@ -18,5 +19,6 @@ __all__ = [
     'RayDocumentDeduplicator', 'RayImageDeduplicator', 'RayVideoDeduplicator',
     'RayImageDeduplicator', 'RayRedisMinhashDeduplicator',
     'RayMinhashDeduplicator', 'RayBTSMinhashDeduplicator',
+    'RayBTSV2MinhashDeduplicator',
     'RayMultiRedisMinhashDeduplicator', 'VideoDeduplicator',
 ]

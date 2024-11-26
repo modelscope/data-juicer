@@ -35,32 +35,59 @@ def merge_edge_list_dict_list(edge_list_dict_list):
 
 
 def BTS_hash(x, parallel_num):
-    return int(x[-8:], 16) % parallel_num
+    # return int(x[-8:], 16) % parallel_num
+    return int.from_bytes(x, byteorder='big') % parallel_num
+
+
+@ray.remote
+class EdgeBuffer:
+    def __init__(self):
+        self.edge_dict = {}
+
+    def clear(self):
+        self.edge_dict = {}
+
+    def set_edges(self, edge_dict):
+        self.edge_dict = edge_dict
+
+    def get_edges(self, key):
+        return self.edge_dict.get(key, [])
 
 
 @ray.remote
 class BTSUnionFind:
-    def __init__(self, parallel_num, parallel_id):
+    def __init__(self, parallel_num, parallel_id, remote_edge_buffers):
         self.parallel_num = parallel_num
         self.parallel_id = parallel_id
         self.parent = {}
+        self.old_parent = {}
+        self.remote_edge_buffers = remote_edge_buffers
         self.edge_buffer = []
         self.edge_list_dict = {}
 
     def init_union_find_list(self, union_find_list):
         self.union_find_list = union_find_list
 
-    def receive_edges(self, edge_list):
-        self.edge_buffer.extend(edge_list)
+    def receive_edges(self):
+        edge_list = ray.get([
+            remote_edge_buffer.get_edges.remote(self.parallel_id)
+            for remote_edge_buffer in self.remote_edge_buffers
+        ])
+        for edges in edge_list:
+            self.edge_buffer.extend(edges)
 
     def balanced_union_find(self):
-        parent = self.parent.copy()
+        self.receive_edges()
         for x, y in self.edge_buffer:
             self.union(x, y)
         self.edge_buffer = []
         self.rebalancing()
-        for u in parent:
-            if parent[u] != self.parent.get(u, None):
+        old_parent_keys = set(self.old_parent.keys())
+        parent_keys = set(self.parent.keys())
+        if old_parent_keys ^ parent_keys:
+            return True
+        for u in parent_keys:
+            if self.old_parent.get(u, u) != self.parent.get(u, u):
                 return True
         return False
 
@@ -70,33 +97,30 @@ class BTSUnionFind:
     def distribute_edge(self, u, v):
         hash_u = self.hash(u)
         hash_v = self.hash(v)
-        # if hash_u != self.parallel_id:
-        if True:
-            if hash_u not in self.edge_list_dict:
-                self.edge_list_dict[hash_u] = []
-            self.edge_list_dict[hash_u].append((u, v))
-        # if hash_v != self.parallel_id and hash_u != hash_v:
+        if hash_u not in self.edge_list_dict:
+            self.edge_list_dict[hash_u] = []
+        self.edge_list_dict[hash_u].append((u, v))
         if hash_u != hash_v:
             if hash_v not in self.edge_list_dict:
                 self.edge_list_dict[hash_v] = []
-            self.edge_list_dict[hash_v].append((v, u))
+            self.edge_list_dict[hash_v].append((u, v))
 
-    def simplify_edge_list(self):
+    def set_edge_buffer(self):
         if self.parallel_id in self.edge_list_dict:
-            self.edge_buffer.extend(self.edge_list_dict[self.parallel_id])
+            self.edge_buffer = self.edge_list_dict[self.parallel_id]
             del self.edge_list_dict[self.parallel_id]
-
-    def get_edge_list_dict(self):
-        return self.edge_list_dict
+        else:
+            self.edge_buffer = []
+        ray.get(self.remote_edge_buffers[self.parallel_id].set_edges.remote(self.edge_list_dict))
 
     def edge_redistribution(self):
+        self.rebalancing()
         self.edge_list_dict = {}
         for u in self.parent:
             v = self.parent[u]
             self.distribute_edge(u, v)
-        self.simplify_edge_list()
-        # print(f'{self.parallel_id} {self.edge_list_dict}')
         self.parent = {}
+        self.set_edge_buffer()
 
     def communication(self):
         self.edge_list_dict = {}
@@ -104,14 +128,14 @@ class BTSUnionFind:
         for u in self.parent:
             hash_u = self.hash(u)
             v = self.parent[u]
-            if self.parent[u] != self.old_parent[u] or (hash_u != self.parallel_id and v not in self.parent):
+            if self.parent[u] != self.old_parent.get(u, u) or (hash_u != self.parallel_id and v not in self.parent):
                 self.distribute_edge(u, v)
             if hash_u != self.parallel_id:
                 del_list.append(u)
+        self.old_parent = self.parent.copy()
         for u in del_list:
             del self.parent[u]
-        self.simplify_edge_list()
-        # return len(self.edge_list_dict) > 0
+        self.set_edge_buffer()
 
     def find(self, x):
         if x not in self.parent:
@@ -137,7 +161,6 @@ class BTSUnionFind:
                 self.parent[px] = p
 
     def rebalancing(self):
-        self.old_parent = self.parent.copy()
         new_px_dict = {}
         for x in self.parent:
             hash_x = self.hash(x)
@@ -170,6 +193,12 @@ class BTSUnionFind:
     def get_nodes(self):
         return set(self.parent.keys())
 
+    def is_dup(self, queries):
+        return [
+            query in self.parent
+            for query in queries
+        ]
+
 
 OP_NAME = 'ray_bts_minhash_deduplicator'
 
@@ -198,7 +227,6 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         num_rows_per_band: Optional[PositiveInt] = None,
         tokenizer_model: Optional[str] = None,
         union_find_parallel_num: Optional[int] = 16,
-        union_find_merge_num: Optional[int] = 2,
         *args,
         **kwargs,
     ):
@@ -288,18 +316,19 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         ).T
 
         self.union_find_parallel_num = union_find_parallel_num
-        self.union_find_merge_num = union_find_merge_num
+        self.remote_edge_buffers = [
+            EdgeBuffer.remote()
+            for i in range(self.union_find_parallel_num)
+        ]
         self.union_find_list = [
-            BTSUnionFind.remote(union_find_parallel_num, i)
+            BTSUnionFind.remote(union_find_parallel_num, i, self.remote_edge_buffers)
             for i in range(self.union_find_parallel_num)
         ]
 
-    def compute_stats(self, samples: pa.Table) -> pa.Table:
-        samples_list = samples[self.text_key]
-        uuid_list = [uuid.uuid4().hex for _ in range(samples.num_rows)]
+    def calc_minhash(self, text_list: pa.Array) -> pa.Table:
         all_hash_values = [[] for _ in range(self.num_bands)]
 
-        for text in samples_list:
+        for text in text_list:
             text = text.as_py()
             if self.lowercase:
                 text = text.lower()
@@ -352,121 +381,90 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                     i.to_bytes(4, 'big') + 
                     bytes(hash_values[start:end].byteswap().data)
                 )
-
-        samples = samples.append_column(HashKeys.uid, pa.array(uuid_list))
-        for i, hash_values in enumerate(all_hash_values):
-            samples = samples.append_column(HashKeys.minhash + f"_{i}", pa.array(hash_values))
-        return samples
-
-    def map_batched(self, samples: pa.Table) -> pa.Table:
-        table = pa.Table.from_arrays(
-            [
-                pa.concat_arrays(
-                    [samples[HashKeys.uid].combine_chunks()] * len(self.hash_ranges)
-                ),
-                # pa.array(
-                #     [uid.as_py() for uid in samples[HashKeys.uid]] * len(self.hash_ranges)
-                # ),
-                pa.concat_arrays(
-                    [
-                        samples[HashKeys.minhash + f'_{i}'].combine_chunks()
-                        for i in range(len(self.hash_ranges))
-                    ]
-                ),
-            ],
-            names=[HashKeys.uid, HashKeys.minhash]
-        )
-        return table
+        return all_hash_values
 
     def agg_func(self, group: pa.Table) -> pa.Table:
         if group.num_rows != 1:
             uuid_list = [uid.as_py() for uid in group[HashKeys.uid]]
-            union_find_id = np.random.randint(0, self.union_find_parallel_num)
+            # union_find_id = np.random.randint(0, self.union_find_parallel_num)
+            min_uuid = min(uuid_list)
+            union_find_id = BTS_hash(min_uuid, self.union_find_parallel_num)
             union_find = self.union_find_list[union_find_id]
             ray.get(union_find.union_list.remote(uuid_list))
         return group
     
     def merge(self):
         ray.get([
-            union_find.rebalancing.remote()
-            for union_find in self.union_find_list
-        ])
-        ray.get([
             union_find.edge_redistribution.remote()
             for union_find in self.union_find_list
         ])
-        edge_list_dict_list = ray.get([
-            union_find.get_edge_list_dict.remote()
-            for union_find in self.union_find_list
-        ])
-        edge_list_dict = merge_edge_list_dict_list(edge_list_dict_list)
-        ray.get([
-            self.union_find_list[i].receive_edges.remote(edge_list)
-            for i, edge_list in edge_list_dict.items()
-        ])
-        ray.get([
-            union_find.balanced_union_find.remote()
-            for union_find in self.union_find_list
-        ])
-        while True:
+        while any(
+            ray.get([
+                union_find.balanced_union_find.remote()
+                for union_find in self.union_find_list
+            ])
+        ):
             ray.get([
                 union_find.communication.remote()
                 for union_find in self.union_find_list
             ])
-            edge_list_dict_list = ray.get([
-                union_find.get_edge_list_dict.remote()
-                for union_find in self.union_find_list
-            ])
-            edge_list_dict = merge_edge_list_dict_list(edge_list_dict_list)
-            ray.get([
-                self.union_find_list[i].receive_edges.remote(edge_list)
-                for i, edge_list in edge_list_dict.items()
-            ])
-            update_list = ray.get([
-                union_find.balanced_union_find.remote()
-                for union_find in self.union_find_list
-            ])
-
-            break_flag = True
-            for update in update_list:
-                if update:
-                    break_flag = False
-                    break
-            if break_flag:
-                break
-        self.parents = ray.get([
-            union_find.get_nodes.remote()
-            for union_find in self.union_find_list
-        ])
-
-    def is_dup(self, uid):
-        part = BTS_hash(uid, self.union_find_parallel_num)
-        return uid in self.parents[part]
 
     def filter_with_union_find(self, samples: pa.Table) -> pa.Table:
+        hash_id_list = []
+        query_dict = {}
+        for uid in samples[HashKeys.uid]:
+            uid = uid.as_py()
+            hash_id = BTS_hash(uid, self.union_find_parallel_num)
+            hash_id_list.append(hash_id)
+            if hash_id not in query_dict:
+                query_dict[hash_id] = []
+            query_dict[hash_id].append(uid)
+        results = ray.get([self.union_find_list[hash_id].is_dup.remote(query) for hash_id, query in query_dict.items()])
+        result_dict = {
+            hash_id: result
+            for hash_id, result in zip(query_dict.keys(), results)
+        }
         mask = [
-            not self.is_dup(uid.as_py())
-            for uid in samples[HashKeys.uid]
+            not result_dict[hash_id].pop(0)
+            for hash_id in hash_id_list
         ]
         return samples.filter(mask)
 
     def run(self, dataset):
-        import time
         start_time = time.time()
+        def add_uid_column(table: pa.Table) -> pa.Table:
+            uuid_list = [uuid.uuid4().bytes for _ in range(table.num_rows)]
+            new_table = table.append_column(HashKeys.uid, pa.array(uuid_list))
+            return new_table
+
         dataset = dataset.map_batches(
-            self.compute_stats,
+            add_uid_column,
             batch_format='pyarrow',
         ).materialize()
-        drop_columns = []
-        for i in range(len(self.hash_ranges)):
-            drop_column = HashKeys.minhash + f'_{i}'
-            drop_columns.append(drop_column)
         end_time = time.time()
-        print(f'minhash time = {end_time - start_time}')
+        print(f'uid time = {end_time - start_time}')
+
+        def minhash_with_uid(table: pa.Table) -> pa.Table:
+            minhash_values = self.calc_minhash(table[self.text_key])
+            new_table = pa.Table.from_arrays(
+                [
+                    pa.concat_arrays(
+                        [table[HashKeys.uid].combine_chunks()] * len(self.hash_ranges)
+                    ),
+                    pa.concat_arrays(
+                        [
+                            pa.array(minhash_values[i])
+                            for i in range(len(self.hash_ranges))
+                        ]
+                    ),
+                ],
+                names=[HashKeys.uid, HashKeys.minhash]
+            )
+            return new_table
 
         start_time = time.time()
         dataset.map_batches(
-            self.map_batched,
+            minhash_with_uid,
             batch_format='pyarrow',
         ).groupby(
             HashKeys.minhash
@@ -479,11 +477,11 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         self.merge()
         end_time = time.time()
         print(f'merge time = {end_time - start_time}')
-        result = dataset.drop_columns(
-            drop_columns
-        ).map_batches(
+        result = dataset.map_batches(
             self.filter_with_union_find,
             batch_format='pyarrow'
+        ).drop_columns(
+            HashKeys.uid
         ).materialize()
         logger.info(f'Keep {result.count()} samples after MinHash dedup.')
         return result
