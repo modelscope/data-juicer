@@ -15,6 +15,8 @@ class ImageShapeFilter(Filter):
     """Filter to keep samples with image shape (w, h) within specific ranges.
     """
 
+    _batched_op = True
+
     def __init__(self,
                  min_width: int = 1,
                  max_width: int = sys.maxsize,
