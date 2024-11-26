@@ -8,8 +8,7 @@ MODULE_TO_PKGS = {
     'ffmpeg': ['ffmpeg-python'],
     'ram': ['ram@git+https://github.com/xinyu1205/recognize-anything.git'],
     'scenedetect': ['scenedetect[opencv]'],
-    'simhash': ['simhash-pybind'],
-    'ultralytics': ['ultralytics']
+    'simhash': ['simhash-pybind']
 }
 
 # Packages to corresponding ops that require them
