@@ -4,7 +4,7 @@ easyocr==1.7.1
 fasttext-wheel
 kenlm
 sentencepiece
-scipy
+scipy==1.14.1
 ftfy
 simhash-pybind
 selectolax

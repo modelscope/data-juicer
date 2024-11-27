@@ -386,6 +386,10 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 ```shell
 # run the data processing directly
 docker run --rm \  # remove container after the processing
+  --privileged \
+  --shm-size 256g \
+  --network host \
+  --gpus all \
   --name dj \  # name of the container
   -v <host_data_path>:<image_data_path> \  # mount data or config directory into the container
   -v ~/.cache/:/root/.cache/ \  # mount the cache directory into the container to reuse caches and models (recommended)
@@ -398,6 +402,10 @@ docker run --rm \  # remove container after the processing
 ```shell
 # start the container
 docker run -dit \  # run the container in the background
+  --privileged \
+  --shm-size 256g \
+  --network host \
+  --gpus all \
   --rm \
   --name dj \
   -v <host_data_path>:<image_data_path> \
