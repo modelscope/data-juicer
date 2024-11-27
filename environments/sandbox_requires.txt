@@ -3,7 +3,7 @@ wandb
 fire
 pyspark
 # vbench-related
-vbench
+vbench==0.1.0
 # modelscope-related
 modelscope
 # easyanimate-related
@@ -17,7 +17,7 @@ opencv-python
 omegaconf
 imageio[ffmpeg]
 imageio[pyav]
-tensorboard
+tensorboard==2.18.0
 diffusers==0.27.0
 transformers==4.37.2
 func_timeout

@@ -14,7 +14,7 @@ nltk<3.9
 transformers>=4.37
 transformers_stream_generator
 einops
-accelerate
+accelerate==1.1.1
 tiktoken
 opencc==1.1.6
 imagededup
