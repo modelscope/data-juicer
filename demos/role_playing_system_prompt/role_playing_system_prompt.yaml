@@ -1,5 +1,3 @@
-# Process config example for dataset
-
 # global parameters
 project_name: 'role-play-demo-process'
 dataset_path: 'path_to_the_lianhualou_novel_json_file'
@@ -8,28 +6,45 @@ np: 1  # number of subprocess to process your dataset
 export_path: 'path_to_output_jsonl_file'
 
 # process schedule
-# a list of several process operators with their arguments
 process:
-  # - text_chunk_mapper:    # if not chunked
-  #     max_len: 8000
-  #     split_pattern: '\n\n'
-  #     overlap_len: 400
-  #     tokenizer: 'qwen2.5-72b-instruct'
-  #     trust_remote_code: True
-  - extract_entity_attribute_mapper:       # extract attribute of '李莲花'                   
+#   # chunk the novel
+#   - text_chunk_mapper: 
+#       max_len: 8000
+#       split_pattern: '\n\n'
+#       overlap_len: 400
+#       tokenizer: 'qwen2.5-72b-instruct'
+#       trust_remote_code: True
+  # extract language_style, role_charactor and role_skill
+  - extract_entity_attribute_mapper:                  
       api_model: 'qwen2.5-72b-instruct'                                   
       query_entities: ['李莲花']
       query_attributes: ["语言风格", "角色性格", "角色能力"]
-  - extract_nickname_mapper:               # extract nicknames in the novel
+  # extract nickname
+  - extract_nickname_mapper:
       api_model: 'qwen2.5-72b-instruct'
-  - extract_event_mapper:                  # extract events for each chunk
+  # extract events
+  - extract_event_mapper:
       api_model: 'qwen2.5-72b-instruct'
       index_key: 'chunk_id'                # chunk_id for deduplicating attributes and nicknames
-  - naive_grouper:                         # grouper all events
-  - most_relavant_entities_aggregator:     # identify important roles relavant to '李莲花'
+  # group all events
+  - naive_grouper:=
+  # role experiences summary from events
+  - entity_attribute_aggregator:
+      api_model: 'qwen2.5-72b-instruct' 
+      entity: '李莲花'
+      attribute: '主要经历'
+      input_key: '__dj__event_description__'
+      output_key: '__dj__role_experience__'
+      word_limit: 150
+  # most relavant roles summary from events
+  - most_relavant_entities_aggregator: 
       api_model: 'qwen2.5-72b-instruct' 
       entity: '李莲花'
       query_entity_type: '人物'
       input_key: '__dj__event_description__'
       output_key: '__dj__important_relavant_roles__'
-
+  # generate the system prompt
+  - python_file_mapper:
+      file_path: 'path_to_system_prompt_gereration_python_file'
+      function_name: 'get_system_prompt'
+  

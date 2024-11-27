@@ -222,7 +222,7 @@ Output:
         self.sampling_params = sampling_params
         self.model_key = prepare_model(model_type='api',
                                        model=api_model,
-                                       url=api_endpoint,
+                                       endpoint=api_endpoint,
                                        response_path=response_path,
                                        **model_params)
 
