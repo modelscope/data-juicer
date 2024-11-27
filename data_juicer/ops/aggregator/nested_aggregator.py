@@ -3,7 +3,7 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Aggregator
+from data_juicer.ops.base_op import OPERATORS, Aggregator
 from data_juicer.utils.common_utils import (avg_split_string_list_under_limit,
                                             is_string_list, nested_access)
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -16,7 +16,6 @@ OP_NAME = 'nested_aggregator'
 
 
 # TODO: LLM-based inference.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class NestedAggregator(Aggregator):
     """
