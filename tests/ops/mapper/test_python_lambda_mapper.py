@@ -5,6 +5,11 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 class PythonLambdaMapperMapper(DataJuicerTestCaseBase):
 
+    def test_lambda_function_batched(self):
+        mapper = PythonLambdaMapper("lambda d: {'value': d['value'] + [6]}", batched=True)  # Append '6' to value
+        result = mapper.process_batched({'value': [5]})
+        self.assertEqual(result, {'value': [5, 6]})
+
     def test_lambda_modifies_values(self):
         mapper = PythonLambdaMapper("lambda d: {'value': d['value'] + 1}")  # '+1' to 'value'
         result = mapper.process_single({'value': 5})

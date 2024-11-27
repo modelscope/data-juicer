@@ -1,5 +1,4 @@
 import ast
-from typing import Optional
 
 from ..base_op import OPERATORS, Mapper
 
@@ -8,9 +7,21 @@ OP_NAME = 'python_lambda_mapper'
 
 @OPERATORS.register_module(OP_NAME)
 class PythonLambdaMapper(Mapper):
+    """Mapper for executing Python lambda function on data samples."""
 
-    def __init__(self, lambda_str: Optional[str] = None, **kwargs):
+    def __init__(self, lambda_str: str = '', batched: bool = False, **kwargs):
+        """
+        Initialization method.
+
+        :param lambda_str: A string representation of the lambda function to be
+            executed on data samples. If empty, the identity function is used.
+        :param batched: A boolean indicating whether to process input data in
+            batches.
+        :param kwargs: Additional keyword arguments passed to the parent class.
+        """
+        self._batched_op = bool(batched)
         super().__init__(**kwargs)
+
         # Parse and validate the lambda function
         if not lambda_str:
             self.lambda_func = lambda sample: sample
@@ -43,6 +54,17 @@ class PythonLambdaMapper(Mapper):
     def process_single(self, sample):
         # Process the input through the lambda function and return the result
         result = self.lambda_func(sample)
+
+        # Check if the result is a valid
+        if not isinstance(result, dict):
+            raise ValueError(f'Lambda function must return a dictionary, '
+                             f'got {type(result).__name__} instead.')
+
+        return result
+
+    def process_batched(self, samples):
+        # Process the input through the lambda function and return the result
+        result = self.lambda_func(samples)
 
         # Check if the result is a valid
         if not isinstance(result, dict):

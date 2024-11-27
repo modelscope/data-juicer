@@ -11,7 +11,7 @@ The operators in Data-Juicer are categorized into 5 types.
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
 | [ Formatter ]( #formatter )       |   9    | Discovers, loads, and canonicalizes source data |
-| [ Mapper ]( #mapper )             |   58   | Edits and transforms samples                    |
+| [ Mapper ]( #mapper )             |   59   | Edits and transforms samples                    |
 | [ Filter ]( #filter )             |   44   | Filters out low-quality samples                 |
 | [ Deduplicator ]( #deduplicator ) |   8    | Detects and removes duplicate samples           |
 | [ Selector ]( #selector )         |   4    | Selects top samples based on ranking            |
