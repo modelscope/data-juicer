@@ -213,6 +213,9 @@ class BTSUnionFind:
             if self.hash(x) == self.parallel_id
         }
         self.parent = dup_keys
+        self.old_parent = {}
+        self.edge_buffer = []
+        ray.get(self.remote_edge_buffers[self.parallel_id].clear.remote())
 
     def is_dup(self, queries):
         return [
@@ -248,7 +251,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         num_rows_per_band: Optional[PositiveInt] = None,
         tokenizer_model: Optional[str] = None,
         union_find_parallel_num: Optional[int] = 16,
-        tmp_file_name: Optional[str] = './output/ray-dedup-tmp/',
+        tmp_file_name: Optional[str] = './outputs/ray-dedup-tmp/',
         *args,
         **kwargs,
     ):
@@ -347,7 +350,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             for i in range(self.union_find_parallel_num)
         ]
 
-        self.tmp_file_name = os.path.join(os.getcwd(), tmp_file_name)
+        self.tmp_file_name = os.path.join(os.getcwd(), tmp_file_name, str(uuid.uuid4()))
 
     def calc_minhash(self, text_list: pa.Array) -> pa.Table:
         all_hash_values = [[] for _ in range(self.num_bands)]
@@ -456,24 +459,19 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             not result_dict[hash_id].pop(0)
             for hash_id in hash_id_list
         ]
-        return samples.filter(mask)
+        columns_to_keep = [name for name in samples.column_names if name != HashKeys.uid]
+        del hash_id_list, query_dict, result_dict
+        return samples.select(columns_to_keep).filter(mask)
 
     def run(self, dataset):
         start_time = time.time()
         id_generator = IdGenerator.remote()
         def add_uid_column(table: pa.Table) -> pa.Table:
-            # uuid_list = [uuid.uuid4().bytes for _ in range(table.num_rows)]
-            # new_table = table.append_column(HashKeys.uid, pa.array(uuid_list))
-            # return new_table
             num_rows = len(table)
             ids = ray.get(id_generator.get_next_id.remote(num_rows))
             new_table = table.append_column(HashKeys.uid, pa.array(list(ids)))
             return new_table
 
-        # dataset = dataset.map_batches(
-        #     add_uid_column,
-        #     batch_format='pyarrow',
-        # ).materialize()
         dataset.map_batches(
             add_uid_column,
             batch_format='pyarrow',
@@ -520,8 +518,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         print(f'merge time = {end_time - start_time}')
         result = dataset.map_batches(
             self.filter_with_union_find,
-            batch_format='pyarrow'
-        ).drop_columns(
-            HashKeys.uid
+            batch_format='pyarrow',
+            zero_copy_batch=True,
         )
         return result
