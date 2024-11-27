@@ -1,7 +1,7 @@
 datasets>=2.19.0
 fsspec==2023.5.0
-pandas==2.0.3
-numpy<2
+pandas
+numpy
 av
 soundfile
 librosa>=0.10
