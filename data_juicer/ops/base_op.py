@@ -166,9 +166,8 @@ class OP:
                 method = wrap_func_with_nested_access(method)
                 setattr(self, name, method)
 
-    @classmethod
-    def is_batched_op(cls):
-        return cls._batched_op
+    def is_batched_op(self):
+        return self._batched_op
 
     def process(self, *args, **kwargs):
         raise NotImplementedError

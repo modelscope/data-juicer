@@ -13,7 +13,9 @@ class PythonFileMapper(Mapper):
     def __init__(self,
                  file_path: str = '',
                  function_name: str = 'process_single',
+                 batched: bool = False,
                  **kwargs):
+        self._batched_op = bool(batched)
         super().__init__(**kwargs)
 
         self.file_path = file_path
@@ -62,6 +64,17 @@ class PythonFileMapper(Mapper):
     def process_single(self, sample):
         """Invoke the loaded function with the provided sample."""
         result = self.func(sample)
+
+        if not isinstance(result, dict):
+            raise ValueError(
+                f'Function must return a dictionary, got {type(result).__name__} instead.'  # noqa: E501
+            )
+
+        return result
+
+    def process_batched(self, samples):
+        """Invoke the loaded function with the provided samples."""
+        result = self.func(samples)
 
         if not isinstance(result, dict):
             raise ValueError(

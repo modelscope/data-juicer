@@ -18,6 +18,18 @@ class TestPythonFileMapper(DataJuicerTestCaseBase):
             result = mapper.process_single({'value': 5})
             self.assertEqual(result, {'result': 15})
 
+    def test_function_batched(self):
+        """Test for a funtion that processes a batch."""
+        with tempfile.NamedTemporaryFile(delete=True, suffix='.py', mode='w+') as temp_file:
+            temp_file.write(
+                "def process_data(samples):\n"
+                "    return {'result': samples['value'] + [10]}\n"
+            )
+            temp_file.seek(0)  # Rewind the file so it can be read
+            mapper = PythonFileMapper(temp_file.name, "process_data", batched=True)
+            result = mapper.process_batched({'value': [5]})
+            self.assertEqual(result, {'result': [5, 10]})
+
     def test_function_with_import(self):
         """Test for a function that contains an import statement."""
         with tempfile.NamedTemporaryFile(delete=True, suffix='.py', mode='w+') as temp_file:
