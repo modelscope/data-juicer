@@ -4,7 +4,7 @@ easyocr==1.7.1
 fasttext-wheel
 kenlm
 sentencepiece
-scipy==1.14.1
+scipy
 ftfy
 simhash-pybind
 selectolax
@@ -14,7 +14,7 @@ nltk<3.9
 transformers>=4.37
 transformers_stream_generator
 einops
-accelerate==1.1.1
+accelerate
 tiktoken
 opencc==1.1.6
 imagededup
