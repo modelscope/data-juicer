@@ -3,7 +3,7 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.common_utils import nested_access, nested_set
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -12,7 +12,6 @@ OP_NAME = 'extract_support_text_mapper'
 
 
 # TODO: LLM-based inference.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractSupportTextMapper(Mapper):
     """

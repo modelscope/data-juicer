@@ -1,11 +1,10 @@
 import re
-from itertools import chain
 from typing import Dict, List, Optional
 
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -13,26 +12,24 @@ OP_NAME = 'extract_entity_attribute_mapper'
 
 
 # TODO: LLM-based inference.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractEntityAttributeMapper(Mapper):
     """
     Extract attributes for given entities from the text
     """
 
-    _batched_op = True
-
     DEFAULT_SYSTEM_PROMPT_TEMPLATE = (
         '给定一段文本，从文本中总结{entity}的{attribute}，并且从原文摘录最能说明该{attribute}的代表性示例。\n'
         '要求：\n'
         '- 摘录的示例应该简短。\n'
         '- 遵循如下的回复格式：\n'
+        '# {entity}\n'
         '## {attribute}：\n'
-        '{entity}的{attribute}描述...\n'
-        '### 代表性示例1：\n'
-        '说明{entity}该{attribute}的原文摘录1...\n'
-        '### 代表性示例2：\n'
-        '说明{entity}该{attribute}的原文摘录2...\n'
+        '...\n'
+        '### 代表性示例摘录1：\n'
+        '...\n'
+        '### 代表性示例摘录2：\n'
+        '...\n'
         '...\n')
 
     DEFAULT_INPUT_TEMPLATE = '# 文本\n```\n{text}\n```\n'
@@ -44,10 +41,10 @@ class ExtractEntityAttributeMapper(Mapper):
                  query_entities: List[str] = [],
                  query_attributes: List[str] = [],
                  *,
-                 entity_key: str = Fields.main_entity,
-                 attribute_key: str = Fields.attribute,
-                 attribute_desc_key: str = Fields.attribute_description,
-                 support_text_key: str = Fields.attribute_support_text,
+                 entity_key: str = Fields.main_entities,
+                 attribute_key: str = Fields.attributes,
+                 attribute_desc_key: str = Fields.attribute_descriptions,
+                 support_text_key: str = Fields.attribute_support_texts,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt_template: Optional[str] = None,
@@ -111,7 +108,7 @@ class ExtractEntityAttributeMapper(Mapper):
 
         self.sampling_params = sampling_params
         self.model_key = prepare_model(model_type='api',
-                                       api_model=api_model,
+                                       model=api_model,
                                        endpoint=api_endpoint,
                                        response_path=response_path,
                                        **model_params)
@@ -136,7 +133,7 @@ class ExtractEntityAttributeMapper(Mapper):
 
         return attribute, demos
 
-    def _process_single_sample(self, text='', rank=None):
+    def _process_single_text(self, text='', rank=None):
         client = get_model(self.model_key, rank=rank)
 
         entities, attributes, descs, demo_lists = [], [], [], []
@@ -169,31 +166,17 @@ class ExtractEntityAttributeMapper(Mapper):
 
         return entities, attributes, descs, demo_lists
 
-    def process_batched(self, samples, rank=None):
+    def process_single(self, sample, rank=None):
 
-        sample_num = len(samples[self.text_key])
-
-        entities, attributes, descs, demo_lists = [], [], [], []
-        for text in samples[self.text_key]:
-            res = self._process_single_sample(text, rank=rank)
-            cur_ents, cur_attrs, cur_descs, cur_demos = res
-            entities.append(cur_ents)
-            attributes.append(cur_attrs)
-            descs.append(cur_descs)
-            demo_lists.append(cur_demos)
+        res = self._process_single_text(sample[self.text_key], rank=rank)
+        entities, attributes, descs, demo_lists = res
 
         if self.drop_text:
-            samples.pop(self.text_key)
+            sample.pop(self.text_key)
 
-        for key in samples:
-            samples[key] = [[samples[key][i]] * len(descs[i])
-                            for i in range(sample_num)]
-        samples[self.entity_key] = entities
-        samples[self.attribute_key] = attributes
-        samples[self.attribute_desc_key] = descs
-        samples[self.support_text_key] = demo_lists
+        sample[self.entity_key] = entities
+        sample[self.attribute_key] = attributes
+        sample[self.attribute_desc_key] = descs
+        sample[self.support_text_key] = demo_lists
 
-        for key in samples:
-            samples[key] = list(chain(*samples[key]))
-
-        return samples
+        return sample

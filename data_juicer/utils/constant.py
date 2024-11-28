@@ -32,14 +32,14 @@ class Fields(object):
     event_description = DEFAULT_PREFIX + 'event_description__'
     # # a list of characters relevant to the event
     relevant_characters = DEFAULT_PREFIX + 'relevant_characters__'
-    # # the given main entity for attribute extraction
-    main_entity = DEFAULT_PREFIX + 'main_entity__'
-    # # the given attribute to be extracted
-    attribute = DEFAULT_PREFIX + 'attribute__'
-    # # the extracted attribute description
-    attribute_description = DEFAULT_PREFIX + 'attribute_description__'
-    # # extract from raw data for support the attribute
-    attribute_support_text = DEFAULT_PREFIX + 'attribute_support_text__'
+    # # the given main entities for attribute extraction
+    main_entities = DEFAULT_PREFIX + 'main_entities__'
+    # # the given attributes to be extracted
+    attributes = DEFAULT_PREFIX + 'attributes__'
+    # # the extracted attribute descriptions
+    attribute_descriptions = DEFAULT_PREFIX + 'attribute_descriptions__'
+    # # extract from raw datas for support the attribute
+    attribute_support_texts = DEFAULT_PREFIX + 'attribute_support_texts__'
     # # the nickname relationship
     nickname = DEFAULT_PREFIX + 'nickname__'
     # # the entity for knowledge graph

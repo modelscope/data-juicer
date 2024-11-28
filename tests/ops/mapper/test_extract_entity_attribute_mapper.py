@@ -49,9 +49,14 @@ class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(samples)
         dataset = dataset.map(op.process, batch_size=1)
         for sample in dataset:
-            logger.info(f'{sample[Fields.main_entity]} {sample[Fields.attribute]}: {sample[Fields.attribute_description]}')
-            self.assertNotEqual(sample[Fields.attribute_description], '')
-            self.assertNotEqual(len(sample[Fields.attribute_support_text]), 0)
+            ents = sample[Fields.main_entities]
+            attrs = sample[Fields.attributes]
+            descs = sample[Fields.attribute_descriptions]
+            sups = sample[Fields.attribute_support_texts]
+            for ent, attr, desc, sup in zip(ents, attrs, descs, sups):
+                logger.info(f'{ent} {attr}: {desc}')
+                self.assertNotEqual(desc, '')
+                self.assertNotEqual(len(sup), 0)
 
     def test(self):
         # before runing this test, set below environment variables:

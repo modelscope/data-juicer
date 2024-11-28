@@ -30,7 +30,7 @@ class MostRelavantEntitiesAggregator(Aggregator):
         '总结一些与`{entity}`最为相关的`{entity_type}`。\n'
         '要求：\n'
         '- 不用包含与{entity}为同一{entity_type}的{entity_type}。\n'
-        '- 请按照人物的重要性进行排序，越重要人物在列表越前面。\n'
+        '- 请按照人物的重要性进行排序，**越重要人物在列表越前面**。\n'
         '- 你的返回格式如下：\n'
         '## 分析\n'
         '你对各个{entity_type}与{entity}关联度的分析\n'
