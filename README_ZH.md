@@ -144,7 +144,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 ## 前置条件
 
-* 推荐 Python>=3.8,<=3.10
+* 推荐 Python>=3.9,<=3.10
 * gcc >= 5 (at least C++14 support)
 
 ## 安装

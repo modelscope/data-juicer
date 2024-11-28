@@ -163,7 +163,7 @@ Table of Contents
 
 ## Prerequisites
 
-- Recommend Python>=3.8,<=3.10
+- Recommend Python>=3.9,<=3.10
 - gcc >= 5 (at least C++14 support)
 
 ## Installation
