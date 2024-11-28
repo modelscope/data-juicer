@@ -77,15 +77,14 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.ops.mapper.calibrate_response_mapper</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">data_juicer.ops.base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">UNFORKABLE</span>
+<span></span><span class="kn">from</span> <span class="nn">data_juicer.ops.base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span>
 <span class="kn">from</span> <span class="nn">data_juicer.ops.mapper.calibrate_qa_mapper</span> <span class="kn">import</span> <span class="n">CalibrateQAMapper</span>
 
 <span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;calibrate_response_mapper&#39;</span>
 
 
 <span class="c1"># TODO: LLM-based inference.</span>
-<div class="viewcode-block" id="CalibrateResponseMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.CalibrateResponseMapper">[docs]</a><span class="nd">@UNFORKABLE</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
-<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<div class="viewcode-block" id="CalibrateResponseMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.CalibrateResponseMapper">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">CalibrateResponseMapper</span><span class="p">(</span><span class="n">CalibrateQAMapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mapper to calibrate response in question-answer pairs based on reference text.</span>
