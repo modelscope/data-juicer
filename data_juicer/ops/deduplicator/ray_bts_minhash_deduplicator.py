@@ -13,7 +13,9 @@ import regex
 from loguru import logger
 from pydantic import Field, PositiveInt
 from typing_extensions import Annotated
-from typing import Dict
+from typing import Dict, Union
+from ray.data.block import BlockAccessor
+from ray.data.aggregate import AggregateFn
 
 from data_juicer.utils.constant import HashKeys, Fields
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -25,19 +27,7 @@ from .document_minhash_deduplicator import (MAX_HASH, MERSENNE_PRIME,
                                             optimal_param, sha1_hash32)
 
 
-def merge_edge_list_dict_list(edge_list_dict_list):
-    final_edge_list_dict = {}
-    for edge_list_dict in edge_list_dict_list:
-        for hash_v, edge_list in edge_list_dict.items():
-            if hash_v not in final_edge_list_dict:
-                final_edge_list_dict[hash_v] = []
-            final_edge_list_dict[hash_v].extend(edge_list)
-    return final_edge_list_dict
-
-
 def BTS_hash(x, parallel_num):
-    # return int(x[-8:], 16) % parallel_num
-    # return int.from_bytes(x, byteorder='big') % parallel_num
     return x % parallel_num
 
 
@@ -49,10 +39,10 @@ class IdGenerator:
     def get_next_id(self, count):
         current_id = self.next_id
         self.next_id += count
-        return range(current_id, self.next_id)
+        return (current_id, self.next_id)
 
 
-@ray.remote
+@ray.remote(scheduling_strategy="SPREAD")
 class EdgeBuffer:
     def __init__(self):
         self.edge_dict = {}
@@ -64,10 +54,10 @@ class EdgeBuffer:
         self.edge_dict = edge_dict
 
     def get_edges(self, key):
-        return self.edge_dict.get(key, [])
+        return self.edge_dict.pop(key, [])
 
 
-@ray.remote
+@ray.remote(scheduling_strategy="SPREAD")
 class BTSUnionFind:
     def __init__(self, parallel_num, parallel_id, remote_edge_buffers):
         self.parallel_num = parallel_num
@@ -78,21 +68,17 @@ class BTSUnionFind:
         self.edge_buffer = []
         self.edge_list_dict = {}
 
-    def init_union_find_list(self, union_find_list):
-        self.union_find_list = union_find_list
-
-    def receive_edges(self):
+    def balanced_union_find(self):
+        for x, y in self.edge_buffer:
+            self.union(x, y)
         edge_list = ray.get([
             remote_edge_buffer.get_edges.remote(self.parallel_id)
             for remote_edge_buffer in self.remote_edge_buffers
         ])
         for edges in edge_list:
-            self.edge_buffer.extend(edges)
-
-    def balanced_union_find(self):
-        self.receive_edges()
-        for x, y in self.edge_buffer:
-            self.union(x, y)
+            for x, y in edges:
+                self.union(x, y)
+        del edge_list
         self.edge_buffer = []
         self.rebalancing()
         old_parent_keys = set(self.old_parent.keys())
@@ -125,6 +111,7 @@ class BTSUnionFind:
         else:
             self.edge_buffer = []
         ray.get(self.remote_edge_buffers[self.parallel_id].set_edges.remote(self.edge_list_dict))
+        self.edge_list_dict = {}
 
     def edge_redistribution(self):
         self.rebalancing()
@@ -250,7 +237,8 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         num_bands: Optional[PositiveInt] = None,
         num_rows_per_band: Optional[PositiveInt] = None,
         tokenizer_model: Optional[str] = None,
-        union_find_parallel_num: Optional[int] = 16,
+        union_find_parallel_num: Union[str, int] = 'auto',
+        union_threshold: Optional[int] = 128,
         tmp_file_name: Optional[str] = './outputs/ray-dedup-tmp/',
         *args,
         **kwargs,
@@ -340,7 +328,11 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             dtype=np.uint64,
         ).T
 
+        if union_find_parallel_num == 'auto':
+            union_find_parallel_num = int(ray.cluster_resources().get('CPU', 32)) // 2
+        logger.info(f'union_find_parallel_num = {union_find_parallel_num}')
         self.union_find_parallel_num = union_find_parallel_num
+        self.union_threshold = union_threshold
         self.remote_edge_buffers = [
             EdgeBuffer.remote()
             for i in range(self.union_find_parallel_num)
@@ -468,18 +460,18 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         id_generator = IdGenerator.remote()
         def add_uid_column(table: pa.Table) -> pa.Table:
             num_rows = len(table)
-            ids = ray.get(id_generator.get_next_id.remote(num_rows))
-            new_table = table.append_column(HashKeys.uid, pa.array(list(ids)))
+            min_id, max_id = ray.get(id_generator.get_next_id.remote(num_rows))
+            new_table = table.append_column(HashKeys.uid, pa.array(list(range(min_id, max_id))))
             return new_table
 
         dataset.map_batches(
             add_uid_column,
             batch_format='pyarrow',
-        ).write_json(
+        ).write_parquet(
             self.tmp_file_name,
             force_ascii=False
-        )
-        dataset = ray.data.read_json(self.tmp_file_name)
+        ) # TODO: balance file size
+        dataset = ray.data.read_parquet(self.tmp_file_name, ray_remote_args=dict(scheduling_strategy="SPREAD"))
         end_time = time.time()
         print(f'uid time = {end_time - start_time}')
 
@@ -501,14 +493,64 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             )
             return new_table
 
+        class UnionFn(AggregateFn):
+
+            def __init__(self, union_find_list, union_threshold=128):
+                union_find_parallel_num = len(union_find_list)
+                union_threshold = union_threshold
+                def union_list(uuid_list):
+                    min_uuid = min(uuid_list)
+                    if len(uuid_list) > 1:
+                        union_find_id = BTS_hash(min_uuid, union_find_parallel_num)
+                        union_find = union_find_list[union_find_id]
+                        ray.get(union_find.union_list.remote(uuid_list))
+                    return min_uuid
+
+                def accumulate(cur, block):
+                    uuid_list = []
+                    if cur is not None:
+                        uuid_list.extend(cur)
+                    block_acc = BlockAccessor.for_block(block)
+                    for row in block_acc.iter_rows(public_row_format=False):
+                        uuid_list.append(row[HashKeys.uid])
+                    if len(uuid_list) > union_threshold:
+                        uuid_list = [union_list(uuid_list)]
+                    return uuid_list
+
+                def merge(a, b):
+                    if a is None:
+                        return b
+                    if b is None:
+                        return a
+                    uuid_list = a + b
+                    if len(uuid_list) > union_threshold:
+                        uuid_list = [union_list(uuid_list)]
+                    return uuid_list
+
+                def finalize(a):
+                    if a is None:
+                        return 0
+                    return union_list(a)
+
+                super().__init__(
+                    init=lambda k: None,
+                    accumulate_block=accumulate,
+                    merge=merge,
+                    finalize=finalize,
+                    name='union',
+                )
+
         start_time = time.time()
         dataset.map_batches(
             minhash_with_uid,
             batch_format='pyarrow',
         ).groupby(
             HashKeys.minhash
-        ).map_groups(
-            self.agg_func, batch_format='pyarrow'
+        ).aggregate(
+            UnionFn(
+                self.union_find_list,
+                self.union_threshold,
+            )
         ).materialize()
         end_time = time.time()
         print(f'group time = {end_time - start_time}')
