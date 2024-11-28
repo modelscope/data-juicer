@@ -12,6 +12,8 @@ class ImageSizeFilter(Filter):
     specific range.
     """
 
+    _batched_op = True
+
     def __init__(self,
                  min_size: str = '0',
                  max_size: str = '1TB',

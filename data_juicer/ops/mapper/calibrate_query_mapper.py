@@ -1,11 +1,10 @@
-from data_juicer.ops.base_op import OPERATORS, UNFORKABLE
+from data_juicer.ops.base_op import OPERATORS
 from data_juicer.ops.mapper.calibrate_qa_mapper import CalibrateQAMapper
 
 OP_NAME = 'calibrate_query_mapper'
 
 
 # TODO: LLM-based inference.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class CalibrateQueryMapper(CalibrateQAMapper):
     """
