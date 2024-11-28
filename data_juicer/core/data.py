@@ -216,8 +216,13 @@ class NestedDataset(Dataset, DJDataset):
                 dataset.cleanup_cache_files()
                 checkpointer.save_ckpt(dataset)
             if work_dir:
-                with open(os.path.join(work_dir, 'monitor.json'), 'w') as out:
+                monitor_dir = os.path.join(work_dir, 'monitor')
+                os.makedirs(monitor_dir, exist_ok=True)
+                with open(os.path.join(monitor_dir, 'monitor.json'),
+                          'w') as out:
                     json.dump(resource_util_list, out)
+                Monitor.draw_resource_util_graph(resource_util_list,
+                                                 monitor_dir)
         return dataset
 
     def map(self, *args, **kargs):
@@ -251,9 +256,7 @@ class NestedDataset(Dataset, DJDataset):
                     'is_batched_op')) and called_func.__self__.is_batched_op(
                     ) or not getattr(called_func.__self__, 'turbo', False):
                 kargs['batched'] = True
-                kargs['batch_size'] = kargs.pop('batch_size', 1) if hasattr(
-                    called_func.__self__, 'is_batched_op'
-                ) and called_func.__self__.is_batched_op() else 1
+                kargs['batch_size'] = kargs.pop('batch_size', 1)
             else:
                 kargs['batched'] = False
 
