@@ -14,7 +14,7 @@ RUN apt-get update \
 
 # install 3rd-party system dependencies
 RUN apt-get update \
-    && apt-get install ffmpeg libsm6 libxext6 software-properties-common build-essential cmake  -y
+    && apt-get install ffmpeg libsm6 libxext6 software-properties-common build-essential cmake gfortran libopenblas-dev liblapack-dev -y
 
 # prepare the java env
 WORKDIR /opt
@@ -33,11 +33,7 @@ WORKDIR /data-juicer
 RUN pip install --upgrade setuptools==69.5.1 setuptools_scm \
     && pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000
 
-# install requirements first to better reuse installed library cache
-COPY environments/ environments/
-RUN cat environments/* | grep -v '^#' | xargs pip install --default-timeout 1000
-
 # install data-juicer then
 COPY . .
-RUN pip install -v -e .[all]
-RUN pip install -v -e .[sandbox]
+RUN pip install -v -e .[all] --default-timeout 1000
+RUN pip install -v -e .[sandbox] --default-timeout 1000
