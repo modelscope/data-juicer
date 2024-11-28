@@ -243,6 +243,10 @@ process:
   - optimize_query_mapper:                                  # optimize query in question-answer pairs.
   - optimize_response_mapper:                               # optimize response in question-answer pairs.
   - punctuation_normalization_mapper:                       # normalize unicode punctuations to English punctuations.
+  - python_python_mapper:                                   # executing Python lambda function defined in a file.
+      file_path: ''                                           # The path to the Python file containing the function to be executed.
+      function_name: 'process_single'                         # The name of the function defined in the file to be executed.
+      batched: False                                          # A boolean indicating whether to process input data in batches.
   - remove_bibliography_mapper:                             # remove bibliography from Latex text.
   - remove_comments_mapper:                                 # remove comments from Latex text, code, etc.
       doc_type: tex                                           # comment type you want to remove. Only support 'tex' for now.

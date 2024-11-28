@@ -9,12 +9,24 @@ OP_NAME = 'python_file_mapper'
 
 @OPERATORS.register_module(OP_NAME)
 class PythonFileMapper(Mapper):
+    """Mapper for executing Python function defined in a file."""
 
     def __init__(self,
                  file_path: str = '',
                  function_name: str = 'process_single',
                  batched: bool = False,
                  **kwargs):
+        """
+        Initialization method.
+
+        :param file_path: The path to the Python file containing the function
+            to be executed.
+        :param function_name: The name of the function defined in the file
+            to be executed.
+        :param batched: A boolean indicating whether to process input data in
+            batches.
+        :param kwargs: Additional keyword arguments passed to the parent class.
+        """
         self._batched_op = bool(batched)
         super().__init__(**kwargs)
 
