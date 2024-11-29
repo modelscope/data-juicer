@@ -6,7 +6,7 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -16,7 +16,6 @@ OP_NAME = 'extract_keyword_mapper'
 
 
 # TODO: LLM-based inference.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractKeywordMapper(Mapper):
     """
@@ -173,7 +172,7 @@ Output:
         messages = [{'role': 'user', 'content': input_prompt}]
 
         keywords = []
-        for i in range(self.try_num):
+        for _ in range(self.try_num):
             try:
                 result = client(messages, **self.sampling_params)
                 keywords = self.parse_output(result)
