@@ -160,6 +160,10 @@ class BTSUnionFind:
             if p != px:
                 self.parent[px] = p
 
+    def union_batch_list(self, batch_x_list):
+        for x_list in batch_x_list:
+            self.union_list(x_list)
+
     def rebalancing(self):
         new_px_dict = {}
         for x in self.parent:
@@ -209,6 +213,28 @@ class BTSUnionFind:
             query in self.parent
             for query in queries
         ]
+
+
+@ray.remote(scheduling_strategy="SPREAD")
+class HashTable:
+    def __init__(self):
+        self.hash_table = {}
+
+    def add_key_value_pairs(self, pairs):
+        for key, value in pairs:
+            if key not in self.hash_table:
+                self.hash_table[key] = []
+            self.hash_table[key].append(value)
+
+    def union(self, union_find):
+        task = []
+        for value in self.hash_table.values():
+            if len(value) > 1:
+                # task.append(union_find.union_list.remote(value))
+                task.append(value)
+        # ray.get(task)
+        ray.get(union_find.union_batch_list.remote(task))
+        del self.hash_table
 
 
 OP_NAME = 'ray_bts_minhash_deduplicator'
@@ -316,7 +342,6 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         self.hash_ranges = [(i * self.num_rows_per_band,
                              (i + 1) * self.num_rows_per_band)
                             for i in range(self.num_bands)]
-        self.hash_tables = [defaultdict(set) for _ in range(self.num_bands)]
 
         # generate permutations
         gen = np.random.RandomState(seed=42)
@@ -341,14 +366,19 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             BTSUnionFind.remote(union_find_parallel_num, i, self.remote_edge_buffers)
             for i in range(self.union_find_parallel_num)
         ]
+        self.hash_tables = [
+            HashTable.remote()
+            for i in range(self.union_find_parallel_num)
+        ]
 
         self.tmp_file_name = os.path.join(os.getcwd(), tmp_file_name, str(uuid.uuid4()))
 
-    def calc_minhash(self, text_list: pa.Array) -> pa.Table:
-        all_hash_values = [[] for _ in range(self.num_bands)]
+    def calc_minhash(self, text_list: pa.Array, uid_list: pa.Array) -> pa.Table:
+        pairs = {}
 
-        for text in text_list:
+        for text, uid in zip(text_list, uid_list):
             text = text.as_py()
+            uid = uid.as_py()
             if self.lowercase:
                 text = text.lower()
             if self.ignore_pattern:
@@ -396,23 +426,27 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             else:
                 hash_values = np.full_like(self.perm_a, MAX_HASH, dtype=np.uint32)
             for i, (start, end) in enumerate(self.hash_ranges):
-                all_hash_values[i].append(
-                    i.to_bytes(4, 'big') + 
-                    bytes(hash_values[start:end].byteswap().data)
-                )
-        return all_hash_values
-
-    def agg_func(self, group: pa.Table) -> pa.Table:
-        if group.num_rows != 1:
-            uuid_list = [uid.as_py() for uid in group[HashKeys.uid]]
-            # union_find_id = np.random.randint(0, self.union_find_parallel_num)
-            min_uuid = min(uuid_list)
-            union_find_id = BTS_hash(min_uuid, self.union_find_parallel_num)
-            union_find = self.union_find_list[union_find_id]
-            ray.get(union_find.union_list.remote(uuid_list))
-        return group
+                hash_value = i.to_bytes(4, 'big') + bytes(hash_values[start:end].byteswap().data)
+                hash_table_id = hash_values[start] % self.union_find_parallel_num
+                if hash_table_id not in pairs:
+                    pairs[hash_table_id] = []
+                pairs[hash_table_id].append((hash_value, uid))
+        ray.get([
+            self.hash_tables[i].add_key_value_pairs.remote(p)
+            for i, p in pairs.items()
+        ])
+        #     for i, (start, end) in enumerate(self.hash_ranges):
+        #         all_hash_values[i].append(
+        #             i.to_bytes(4, 'big') + 
+        #             bytes(hash_values[start:end].byteswap().data)
+        #         )
+        # return all_hash_values
     
     def merge(self):
+        ray.get([
+            self.hash_tables[i].union.remote(self.union_find_list[i])
+            for i in range(self.union_find_parallel_num)
+        ])
         ray.get([
             union_find.edge_redistribution.remote()
             for union_find in self.union_find_list
@@ -476,81 +510,19 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         print(f'uid time = {end_time - start_time}')
 
         def minhash_with_uid(table: pa.Table) -> pa.Table:
-            minhash_values = self.calc_minhash(table[self.text_key])
+            self.calc_minhash(table[self.text_key], table[HashKeys.uid])
             new_table = pa.Table.from_arrays(
                 [
-                    pa.concat_arrays(
-                        [table[HashKeys.uid].combine_chunks()] * len(self.hash_ranges)
-                    ),
-                    pa.concat_arrays(
-                        [
-                            pa.array(minhash_values[i])
-                            for i in range(len(self.hash_ranges))
-                        ]
-                    ),
                 ],
-                names=[HashKeys.uid, HashKeys.minhash]
+                names=[
+                ]
             )
             return new_table
-
-        class UnionFn(AggregateFn):
-
-            def __init__(self, union_find_list, union_threshold=128):
-                union_find_parallel_num = len(union_find_list)
-                union_threshold = union_threshold
-                def union_list(uuid_list):
-                    min_uuid = min(uuid_list)
-                    if len(uuid_list) > 1:
-                        union_find_id = BTS_hash(min_uuid, union_find_parallel_num)
-                        union_find = union_find_list[union_find_id]
-                        ray.get(union_find.union_list.remote(uuid_list))
-                    return min_uuid
-
-                def accumulate(cur, block):
-                    uuid_list = []
-                    if cur is not None:
-                        uuid_list.extend(cur)
-                    block_acc = BlockAccessor.for_block(block)
-                    for row in block_acc.iter_rows(public_row_format=False):
-                        uuid_list.append(row[HashKeys.uid])
-                    if len(uuid_list) > union_threshold:
-                        uuid_list = [union_list(uuid_list)]
-                    return uuid_list
-
-                def merge(a, b):
-                    if a is None:
-                        return b
-                    if b is None:
-                        return a
-                    uuid_list = a + b
-                    if len(uuid_list) > union_threshold:
-                        uuid_list = [union_list(uuid_list)]
-                    return uuid_list
-
-                def finalize(a):
-                    if a is None:
-                        return 0
-                    return union_list(a)
-
-                super().__init__(
-                    init=lambda k: None,
-                    accumulate_block=accumulate,
-                    merge=merge,
-                    finalize=finalize,
-                    name='union',
-                )
 
         start_time = time.time()
         dataset.map_batches(
             minhash_with_uid,
             batch_format='pyarrow',
-        ).groupby(
-            HashKeys.minhash
-        ).aggregate(
-            UnionFn(
-                self.union_find_list,
-                self.union_threshold,
-            )
         ).materialize()
         end_time = time.time()
         print(f'group time = {end_time - start_time}')
