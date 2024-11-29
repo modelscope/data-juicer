@@ -4,7 +4,11 @@ pandas
 numpy
 av
 soundfile
+# librosa-related: installed to avoid failure of lazy_loader in librosa during multiprocessing
 librosa>=0.10
+samplerate
+resampy
+# librosa-related
 loguru
 tabulate
 tqdm
