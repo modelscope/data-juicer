@@ -6,6 +6,7 @@ av
 soundfile
 # librosa-related: installed to avoid failure of lazy_loader in librosa during multiprocessing
 librosa>=0.10
+cmake
 samplerate
 resampy
 # librosa-related
