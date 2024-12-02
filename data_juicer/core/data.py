@@ -253,10 +253,12 @@ class NestedDataset(Dataset, DJDataset):
             # batched is required for fault-tolerant or batched OP
             if callable(getattr(
                     called_func.__self__,
-                    'is_batched_op')) and called_func.__self__.is_batched_op(
-                    ) or not getattr(called_func.__self__, 'turbo', False):
+                    'is_batched_op')) and called_func.__self__.is_batched_op():
                 kargs['batched'] = True
                 kargs['batch_size'] = kargs.pop('batch_size', 1)
+            elif not getattr(called_func.__self__, 'turbo', False):
+                kargs['batched'] = True
+                kargs['batch_size'] = 1
             else:
                 kargs['batched'] = False
 
