@@ -6,6 +6,28 @@ from data_juicer.utils.file_utils import (find_files_with_suffix,
                                           is_absolute_path)
 
 
+class DatasetBuilder(object):
+
+    def __init__(self, cfg):
+        self.formatters = self.build(cfg)
+
+    def build_formatters(self, cfg):
+        # build out all the formatters with cfg
+        formatters = []
+        for ds_config in cfg.configs:
+            formatters.append(self._build_formatter(ds_config))
+        return formatters
+
+    def _build_formatter(self, ds_config):
+        # initialize formatter based on remote or local dataset config
+        return None
+
+    def build_dataaset(self):
+        # handle mixture dataset, nested dataset
+        for f in self.formatters:
+            f.load_dataset()
+
+
 def load_formatter(dataset_path,
                    text_keys=None,
                    suffixes=None,
