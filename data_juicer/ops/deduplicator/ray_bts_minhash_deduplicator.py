@@ -59,14 +59,33 @@ class EdgeBuffer:
 
 @ray.remote(scheduling_strategy="SPREAD")
 class BTSUnionFind:
-    def __init__(self, parallel_num, parallel_id, remote_edge_buffers):
+    def __init__(self, union_threshold, parallel_num, parallel_id, remote_edge_buffers):
+        self.union_threshold = union_threshold
         self.parallel_num = parallel_num
         self.parallel_id = parallel_id
+        self.hash_table = {}
         self.parent = {}
         self.old_parent = {}
         self.remote_edge_buffers = remote_edge_buffers
         self.edge_buffer = []
         self.edge_list_dict = {}
+
+    def add_key_value_pairs(self, pairs):
+        key_set = set()
+        for key, value in pairs:
+            if key not in self.hash_table:
+                self.hash_table[key] = []
+            self.hash_table[key].append(value)
+            if len(self.hash_table[key]) > self.union_threshold:
+                key_set.add(key)
+        for key in key_set:
+            self.hash_table[key] = [self.union_list(self.hash_table[key])]
+
+    def flush_key_value_pairs(self):
+        for value in self.hash_table.values():
+            if len(value) > 1:
+                self.union_list(value)
+        del self.hash_table
 
     def balanced_union_find(self):
         for x, y in self.edge_buffer:
@@ -114,6 +133,7 @@ class BTSUnionFind:
         self.edge_list_dict = {}
 
     def edge_redistribution(self):
+        self.flush_key_value_pairs()
         self.rebalancing()
         self.edge_list_dict = {}
         for u in self.parent:
@@ -159,6 +179,7 @@ class BTSUnionFind:
         for px in px_list:
             if p != px:
                 self.parent[px] = p
+        return p
 
     def union_batch_list(self, batch_x_list):
         for x_list in batch_x_list:
@@ -215,28 +236,6 @@ class BTSUnionFind:
         ]
 
 
-@ray.remote(scheduling_strategy="SPREAD")
-class HashTable:
-    def __init__(self):
-        self.hash_table = {}
-
-    def add_key_value_pairs(self, pairs):
-        for key, value in pairs:
-            if key not in self.hash_table:
-                self.hash_table[key] = []
-            self.hash_table[key].append(value)
-
-    def union(self, union_find):
-        task = []
-        for value in self.hash_table.values():
-            if len(value) > 1:
-                # task.append(union_find.union_list.remote(value))
-                task.append(value)
-        # ray.get(task)
-        ray.get(union_find.union_batch_list.remote(task))
-        del self.hash_table
-
-
 OP_NAME = 'ray_bts_minhash_deduplicator'
 
 
@@ -264,7 +263,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         num_rows_per_band: Optional[PositiveInt] = None,
         tokenizer_model: Optional[str] = None,
         union_find_parallel_num: Union[str, int] = 'auto',
-        union_threshold: Optional[int] = 128,
+        union_threshold: Optional[int] = 256,
         tmp_file_name: Optional[str] = './outputs/ray-dedup-tmp/',
         *args,
         **kwargs,
@@ -363,11 +362,12 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             for i in range(self.union_find_parallel_num)
         ]
         self.union_find_list = [
-            BTSUnionFind.remote(union_find_parallel_num, i, self.remote_edge_buffers)
-            for i in range(self.union_find_parallel_num)
-        ]
-        self.hash_tables = [
-            HashTable.remote()
+            BTSUnionFind.remote(
+                union_threshold,
+                union_find_parallel_num,
+                i,
+                self.remote_edge_buffers
+            )
             for i in range(self.union_find_parallel_num)
         ]
 
@@ -432,21 +432,11 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                     pairs[hash_table_id] = []
                 pairs[hash_table_id].append((hash_value, uid))
         ray.get([
-            self.hash_tables[i].add_key_value_pairs.remote(p)
+            self.union_find_list[i].add_key_value_pairs.remote(p)
             for i, p in pairs.items()
         ])
-        #     for i, (start, end) in enumerate(self.hash_ranges):
-        #         all_hash_values[i].append(
-        #             i.to_bytes(4, 'big') + 
-        #             bytes(hash_values[start:end].byteswap().data)
-        #         )
-        # return all_hash_values
     
     def merge(self):
-        ray.get([
-            self.hash_tables[i].union.remote(self.union_find_list[i])
-            for i in range(self.union_find_parallel_num)
-        ])
         ray.get([
             union_find.edge_redistribution.remote()
             for union_find in self.union_find_list
@@ -476,7 +466,10 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             if hash_id not in query_dict:
                 query_dict[hash_id] = []
             query_dict[hash_id].append(uid)
-        results = ray.get([self.union_find_list[hash_id].is_dup.remote(query) for hash_id, query in query_dict.items()])
+        results = ray.get([
+            self.union_find_list[hash_id].is_dup.remote(query)
+            for hash_id, query in query_dict.items()
+        ])
         result_dict = {
             hash_id: result
             for hash_id, result in zip(query_dict.keys(), results)
@@ -511,18 +504,13 @@ class RayBTSMinhashDeduplicator(Deduplicator):
 
         def minhash_with_uid(table: pa.Table) -> pa.Table:
             self.calc_minhash(table[self.text_key], table[HashKeys.uid])
-            new_table = pa.Table.from_arrays(
-                [
-                ],
-                names=[
-                ]
-            )
-            return new_table
+            return table
 
         start_time = time.time()
         dataset.map_batches(
             minhash_with_uid,
             batch_format='pyarrow',
+            zero_copy_batch=True,
         ).materialize()
         end_time = time.time()
         print(f'group time = {end_time - start_time}')
