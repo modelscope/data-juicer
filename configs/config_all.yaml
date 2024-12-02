@@ -244,6 +244,18 @@ process:
       sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
   - optimize_query_mapper:                                  # optimize query in question-answer pairs.
   - optimize_response_mapper:                               # optimize response in question-answer pairs.
+  - pair_preference_mapper:                                 # construct paired preference samples.
+      api_model: 'gpt-4o'                                     # API model name.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for guiding the generation task.
+      input_template: null                                    # Template for building the model input.
+      output_pattern: null                                    # Regular expression for parsing model output.
+      rejected_key: 'rejected_response'                       # The field name in the sample to store the generated rejected response.
+      reason_key: 'reason'                                    # The field name in the sample to store the reason for generating the response.
+      try_num: 3                                              # The number of retries for the API call in case of response parsing failure.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call.
   - punctuation_normalization_mapper:                       # normalize unicode punctuations to English punctuations.
   - remove_bibliography_mapper:                             # remove bibliography from Latex text.
   - remove_comments_mapper:                                 # remove comments from Latex text, code, etc.
