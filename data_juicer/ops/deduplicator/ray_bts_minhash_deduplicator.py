@@ -1,24 +1,18 @@
-import random
 import time
 import uuid
-from collections import defaultdict
 from typing import Optional
 
 import os
 import ray
 import numpy as np
-import pandas as pd
 import pyarrow as pa
 import regex
 from loguru import logger
 from pydantic import Field, PositiveInt
 from typing_extensions import Annotated
-from typing import Dict, Union
-from ray.data.block import BlockAccessor
-from ray.data.aggregate import AggregateFn
+from typing import List, Union
 
-from data_juicer.utils.constant import HashKeys, Fields
-from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
 from ..base_op import OPERATORS, Deduplicator
@@ -373,12 +367,11 @@ class RayBTSMinhashDeduplicator(Deduplicator):
 
         self.tmp_file_name = os.path.join(os.getcwd(), tmp_file_name, str(uuid.uuid4()))
 
-    def calc_minhash(self, text_list: pa.Array, uid_list: pa.Array) -> pa.Table:
+    def calc_minhash(self, text_list: pa.Array, uid_list: List) -> pa.Table:
         pairs = {}
 
         for text, uid in zip(text_list, uid_list):
             text = text.as_py()
-            uid = uid.as_py()
             if self.lowercase:
                 text = text.lower()
             if self.ignore_pattern:
@@ -485,14 +478,16 @@ class RayBTSMinhashDeduplicator(Deduplicator):
     def run(self, dataset):
         start_time = time.time()
         id_generator = IdGenerator.remote()
-        def add_uid_column(table: pa.Table) -> pa.Table:
+        def minhash_with_uid(table: pa.Table) -> pa.Table:
             num_rows = len(table)
             min_id, max_id = ray.get(id_generator.get_next_id.remote(num_rows))
-            new_table = table.append_column(HashKeys.uid, pa.array(list(range(min_id, max_id))))
+            uid_list = range(min_id, max_id)
+            self.calc_minhash(table[self.text_key], uid_list)
+            new_table = table.append_column(HashKeys.uid, pa.array(list(uid_list)))
             return new_table
 
         dataset.map_batches(
-            add_uid_column,
+            minhash_with_uid,
             batch_format='pyarrow',
         ).write_parquet(
             self.tmp_file_name,
@@ -500,20 +495,8 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         ) # TODO: balance file size
         dataset = ray.data.read_parquet(self.tmp_file_name, ray_remote_args=dict(scheduling_strategy="SPREAD"))
         end_time = time.time()
-        print(f'uid time = {end_time - start_time}')
+        print(f'MinHash time = {end_time - start_time}')
 
-        def minhash_with_uid(table: pa.Table) -> pa.Table:
-            self.calc_minhash(table[self.text_key], table[HashKeys.uid])
-            return table
-
-        start_time = time.time()
-        dataset.map_batches(
-            minhash_with_uid,
-            batch_format='pyarrow',
-            zero_copy_batch=True,
-        ).materialize()
-        end_time = time.time()
-        print(f'group time = {end_time - start_time}')
         start_time = time.time()
         self.merge()
         end_time = time.time()
