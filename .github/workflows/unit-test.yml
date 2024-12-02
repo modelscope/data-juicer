@@ -33,8 +33,8 @@ jobs:
     - name: Install data-juicer
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        docker compose exec ray-head apt -y install cmake && pip install cmake
-        docker compose exec ray-worker apt -y install cmake && pip install cmake
+        docker compose exec ray-head pip uninstall cmake && apt -y install cmake && pip install cmake
+        docker compose exec ray-worker pip uninstall cmake && apt -y install cmake && pip install cmake
         docker compose exec ray-head pip install -e .\[all\]
         docker compose exec ray-worker pip install -e .\[all\]
 
