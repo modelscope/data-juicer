@@ -26,7 +26,7 @@ relation_identity_text_template = """
 """
 
 nested_sum = NestedAggregator(
-    model=api_model,
+    api_model=api_model,
     try_num=3)
 
 def dedup_sort_val_by_chunk_id(sample, id_key, val_key):

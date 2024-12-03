@@ -27,14 +27,18 @@ class ExtractEntityAttributeMapper(Mapper):
         '## {attribute}：\n'
         '...\n'
         '### 代表性示例摘录1：\n'
+        '```\n'
         '...\n'
+        '```\n'
         '### 代表性示例摘录2：\n'
+        '```\n'
         '...\n'
+        '```\n'
         '...\n')
 
     DEFAULT_INPUT_TEMPLATE = '# 文本\n```\n{text}\n```\n'
     DEFAULT_ATTR_PATTERN_TEMPLATE = r'\#\#\s*{attribute}：\s*(.*?)(?=\#\#\#|\Z)'
-    DEFAULT_DEMON_PATTERN = r'\#\#\#\s*代表性示例(\d+)：\s*(.*?)(?=\#\#\#|\Z)'
+    DEFAULT_DEMON_PATTERN = r'\#\#\#\s*代表性示例摘录(\d+)：\s*```\s*(.*?)```\s*(?=\#\#\#|\Z)'  # noqa: E501
 
     def __init__(self,
                  api_model: str = 'gpt-4o',
