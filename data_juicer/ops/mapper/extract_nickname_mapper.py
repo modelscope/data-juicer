@@ -142,7 +142,7 @@ class ExtractNicknameMapper(Mapper):
             'content': input_prompt
         }]
         nickname_relations = []
-        for i in range(self.try_num):
+        for _ in range(self.try_num):
             try:
                 output = client(messages, **self.sampling_params)
                 nickname_relations = self.parse_output(output)

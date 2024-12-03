@@ -151,7 +151,7 @@ class ExtractEntityAttributeMapper(Mapper):
                 }]
 
                 desc, demos = '', []
-                for i in range(self.try_num):
+                for _ in range(self.try_num):
                     try:
                         output = client(messages, **self.sampling_params)
                         desc, demos = self.parse_output(output, attribute)

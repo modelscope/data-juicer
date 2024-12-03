@@ -133,7 +133,7 @@ class ExtractEventMapper(Mapper):
         }]
 
         event_list, character_list = [], []
-        for i in range(self.try_num):
+        for _ in range(self.try_num):
             try:
                 output = client(messages, **self.sampling_params)
                 event_list, character_list = self.parse_output(output)

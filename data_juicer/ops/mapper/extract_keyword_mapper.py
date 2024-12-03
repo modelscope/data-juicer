@@ -172,7 +172,7 @@ Output:
         messages = [{'role': 'user', 'content': input_prompt}]
 
         keywords = []
-        for i in range(self.try_num):
+        for _ in range(self.try_num):
             try:
                 result = client(messages, **self.sampling_params)
                 keywords = self.parse_output(result)

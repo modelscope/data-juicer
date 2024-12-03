@@ -318,7 +318,7 @@ Output:
         messages = [{'role': 'user', 'content': input_prompt}]
 
         entities, relations = [], []
-        for i in range(self.try_num):
+        for _ in range(self.try_num):
             try:
                 result = self.light_rag_extraction(messages, rank=rank)
                 entities, relations = self.parse_output(result)

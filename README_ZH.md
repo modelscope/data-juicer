@@ -144,7 +144,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 ## 前置条件
 
-* 推荐 Python>=3.8,<=3.10
+* 推荐 Python>=3.9,<=3.10
 * gcc >= 5 (at least C++14 support)
 
 ## 安装
@@ -363,6 +363,10 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 ```shell
 # 直接运行数据处理
 docker run --rm \  # 在处理结束后将容器移除
+  --privileged \
+  --shm-size 256g \
+  --network host \
+  --gpus all \
   --name dj \  # 容器名称
   -v <host_data_path>:<image_data_path> \  # 将本地的数据或者配置目录挂载到容器中
   -v ~/.cache/:/root/.cache/ \  # 将 cache 目录挂载到容器以复用 cache 和模型资源（推荐）
@@ -375,6 +379,10 @@ docker run --rm \  # 在处理结束后将容器移除
 ```shell
 # 启动容器
 docker run -dit \  # 在后台启动容器
+  --privileged \
+  --shm-size 256g \
+  --network host \
+  --gpus all \
   --rm \
   --name dj \
   -v <host_data_path>:<image_data_path> \

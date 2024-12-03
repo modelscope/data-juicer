@@ -225,9 +225,7 @@ class NestedDataset(Dataset, DJDataset):
                                                  monitor_dir)
         return dataset
 
-    def map(self, *args, **kargs):
-        """Override the map func, which is called by most common operations,
-        such that the processed samples can be accessed by nested manner."""
+    def update_common_args(self, args, kargs):
         if args:
             args = list(args)
             # the first positional para is function
@@ -272,6 +270,14 @@ class NestedDataset(Dataset, DJDataset):
             new_fingerprint = generate_fingerprint(self, *args, **kargs)
             kargs['new_fingerprint'] = new_fingerprint
 
+        return args, kargs
+
+    def map(self, *args, **kargs):
+        """Override the map func, which is called by most common operations,
+        such that the processed samples can be accessed by nested manner."""
+
+        args, kargs = self.update_common_args(args, kargs)
+
         if cache_utils.CACHE_COMPRESS:
             decompress(self, kargs['new_fingerprint'],
                        kargs['num_proc'] if 'num_proc' in kargs else 1)
@@ -290,38 +296,7 @@ class NestedDataset(Dataset, DJDataset):
     def filter(self, *args, **kargs):
         """Override the filter func, which is called by most common operations,
         such that the processed samples can be accessed by nested manner."""
-        if args:
-            args = list(args)
-            # the first positional para is function
-            if args[0] is None:
-                args[0] = lambda x: nested_obj_factory(x)
-            else:
-                args[0] = wrap_func_with_nested_access(args[0])
-            called_func = args[0]
-        else:
-            if 'function' not in kargs or kargs['function'] is None:
-                kargs['function'] = lambda x: nested_obj_factory(x)
-            else:
-                kargs['function'] = wrap_func_with_nested_access(
-                    kargs['function'])
-            called_func = kargs['function']
-
-        # For wrapped function, try to get its unwrapped (bound) method
-        while not inspect.ismethod(called_func) and hasattr(
-                called_func, '__wrapped__'):
-            called_func = called_func.__wrapped__
-
-        # Batched is always required for fault tolerance
-        if inspect.ismethod(called_func):
-            if callable(getattr(
-                    called_func.__self__,
-                    'is_batched_op')) and called_func.__self__.is_batched_op():
-                kargs['batched'] = True
-                kargs['batch_size'] = kargs.pop('batch_size', 1)
-
-        if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
-            new_fingerprint = generate_fingerprint(self, *args, **kargs)
-            kargs['new_fingerprint'] = new_fingerprint
+        args, kargs = self.update_common_args(args, kargs)
 
         # For filter, it involves a map and a filter operations, so the final
         # cache files includes two sets with different fingerprint (before and
