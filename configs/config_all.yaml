@@ -209,6 +209,10 @@ process:
       cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
+  - image_segment_mapper:                                   # perform segment-anything on images and return the bounding boxes.
+      imgsz: 1024                                             # image resolution after image resizing
+      conf: 0.05                                              # confidence score threshold
+      iou: 0.5                                                # IoU (Intersection over Union) score threshold
   - image_tagging_mapper:                                   # Mapper to generate image tags.
       tag_field_name: '__dj__image_tags__'                    # the field name to store the tags. It's "__dj__image_tags__" in default.
   - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library

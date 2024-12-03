@@ -61,8 +61,8 @@ class VideoTaggingFromFramesMapper(Mapper):
                 f'Frame sampling method [{frame_sampling_method}] is not '
                 f'supported. Can only be one of ["all_keyframes", "uniform"].')
         self.model_key = prepare_model(
-            model_type='recognizeAnything',
-            pretrained_model_name_or_path='ram_plus_swin_large_14m.pth',
+            model_type='ram',
+            model_path='ram_plus_swin_large_14m.pth',
             input_size=384)
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num

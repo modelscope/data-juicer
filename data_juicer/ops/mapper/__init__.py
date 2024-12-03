@@ -22,6 +22,7 @@ from .image_captioning_from_gpt4v_mapper import ImageCaptioningFromGPT4VMapper
 from .image_captioning_mapper import ImageCaptioningMapper
 from .image_diffusion_mapper import ImageDiffusionMapper
 from .image_face_blur_mapper import ImageFaceBlurMapper
+from .image_segment_mapper import ImageSegmentMapper
 from .image_tagging_mapper import ImageTaggingMapper
 from .nlpaug_en_mapper import NlpaugEnMapper
 from .nlpcda_zh_mapper import NlpcdaZhMapper
@@ -72,20 +73,20 @@ __all__ = [
     'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
     'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
     'ImageCaptioningMapper', 'ImageDiffusionMapper', 'ImageFaceBlurMapper',
-    'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
-    'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
-    'PairPreferenceMapper', 'PunctuationNormalizationMapper',
-    'RemoveBibliographyMapper', 'RemoveCommentsMapper', 'RemoveHeaderMapper',
-    'RemoveLongWordsMapper', 'RemoveNonChineseCharacterlMapper',
-    'RemoveRepeatSentencesMapper', 'RemoveSpecificCharsMapper',
-    'RemoveTableTextMapper', 'RemoveWordsWithIncorrectSubstringsMapper',
-    'ReplaceContentMapper', 'SentenceSplitMapper', 'TextChunkMapper',
-    'VideoCaptioningFromAudioMapper', 'VideoCaptioningFromFramesMapper',
-    'VideoCaptioningFromSummarizerMapper', 'VideoCaptioningFromVideoMapper',
-    'VideoFFmpegWrappedMapper', 'VideoFaceBlurMapper',
-    'VideoRemoveWatermarkMapper', 'VideoResizeAspectRatioMapper',
-    'VideoResizeResolutionMapper', 'VideoSplitByDurationMapper',
-    'VideoSplitByKeyFrameMapper', 'VideoSplitBySceneMapper',
-    'VideoTaggingFromAudioMapper', 'VideoTaggingFromFramesMapper',
-    'WhitespaceNormalizationMapper'
+    'ImageSegmentMapper', 'ImageTaggingMapper', 'NlpaugEnMapper',
+    'NlpcdaZhMapper', 'OptimizeQAMapper', 'OptimizeQueryMapper',
+    'OptimizeResponseMapper', 'PairPreferenceMapper',
+    'PunctuationNormalizationMapper', 'RemoveBibliographyMapper',
+    'RemoveCommentsMapper', 'RemoveHeaderMapper', 'RemoveLongWordsMapper',
+    'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',
+    'RemoveSpecificCharsMapper', 'RemoveTableTextMapper',
+    'RemoveWordsWithIncorrectSubstringsMapper', 'ReplaceContentMapper',
+    'SentenceSplitMapper', 'TextChunkMapper', 'VideoCaptioningFromAudioMapper',
+    'VideoCaptioningFromFramesMapper', 'VideoCaptioningFromSummarizerMapper',
+    'VideoCaptioningFromVideoMapper', 'VideoFFmpegWrappedMapper',
+    'VideoFaceBlurMapper', 'VideoRemoveWatermarkMapper',
+    'VideoResizeAspectRatioMapper', 'VideoResizeResolutionMapper',
+    'VideoSplitByDurationMapper', 'VideoSplitByKeyFrameMapper',
+    'VideoSplitBySceneMapper', 'VideoTaggingFromAudioMapper',
+    'VideoTaggingFromFramesMapper', 'WhitespaceNormalizationMapper'
 ]
