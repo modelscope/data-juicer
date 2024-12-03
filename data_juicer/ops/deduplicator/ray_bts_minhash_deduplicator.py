@@ -1,5 +1,6 @@
 import time
 import uuid
+from collections import defaultdict
 from typing import Optional
 
 import os
@@ -19,10 +20,6 @@ from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
 from .document_minhash_deduplicator import (MAX_HASH, MERSENNE_PRIME,
                                             optimal_param, sha1_hash32)
-
-
-def BTS_hash(x, parallel_num):
-    return x % parallel_num
 
 
 @ray.remote
@@ -65,15 +62,12 @@ class BTSUnionFind:
         self.edge_list_dict = {}
 
     def add_key_value_pairs(self, pairs):
-        key_set = set()
         for key, value in pairs:
             if key not in self.hash_table:
                 self.hash_table[key] = []
             self.hash_table[key].append(value)
             if len(self.hash_table[key]) > self.union_threshold:
-                key_set.add(key)
-        for key in key_set:
-            self.hash_table[key] = [self.union_list(self.hash_table[key])]
+                self.hash_table[key] = [self.union_list(self.hash_table[key])]
 
     def flush_key_value_pairs(self):
         for value in self.hash_table.values():
@@ -94,21 +88,11 @@ class BTSUnionFind:
         del edge_list
         self.edge_buffer = []
         self.rebalancing()
-        old_parent_keys = set(self.old_parent.keys())
-        parent_keys = set(self.parent.keys())
-        if old_parent_keys ^ parent_keys:
-            return True
-        for u in parent_keys:
-            if self.old_parent.get(u, u) != self.parent.get(u, u):
-                return True
-        return False
-
-    def hash(self, u):
-        return BTS_hash(u, self.parallel_num)
+        return self.old_parent != self.parent
 
     def distribute_edge(self, u, v):
-        hash_u = self.hash(u)
-        hash_v = self.hash(v)
+        hash_u = u % self.parallel_num
+        hash_v = v % self.parallel_num
         if hash_u not in self.edge_list_dict:
             self.edge_list_dict[hash_u] = []
         self.edge_list_dict[hash_u].append((u, v))
@@ -130,8 +114,7 @@ class BTSUnionFind:
         self.flush_key_value_pairs()
         self.rebalancing()
         self.edge_list_dict = {}
-        for u in self.parent:
-            v = self.parent[u]
+        for u, v in self.parent.items():
             self.distribute_edge(u, v)
         self.parent = {}
         self.set_edge_buffer()
@@ -139,9 +122,8 @@ class BTSUnionFind:
     def communication(self):
         self.edge_list_dict = {}
         del_list = []
-        for u in self.parent:
-            hash_u = self.hash(u)
-            v = self.parent[u]
+        for u, v in self.parent.items():
+            hash_u = u % self.parallel_num
             if self.parent[u] != self.old_parent.get(u, u) or (hash_u != self.parallel_id and v not in self.parent):
                 self.distribute_edge(u, v)
             if hash_u != self.parallel_id:
@@ -157,7 +139,7 @@ class BTSUnionFind:
         else:
             self.parent[x] = self.find(self.parent[x])
             return self.parent[x]
-    
+
     def union(self, x, y):
         px = self.find(x)
         py = self.find(y)
@@ -166,7 +148,7 @@ class BTSUnionFind:
         if px > py:
             px, py = py, px
         self.parent[py] = px
-    
+
     def union_list(self, x_list):
         px_list = [self.find(x) for x in x_list]
         p = min(px_list)
@@ -175,14 +157,10 @@ class BTSUnionFind:
                 self.parent[px] = p
         return p
 
-    def union_batch_list(self, batch_x_list):
-        for x_list in batch_x_list:
-            self.union_list(x_list)
-
     def rebalancing(self):
         new_px_dict = {}
         for x in self.parent:
-            hash_x = self.hash(x)
+            hash_x = x % self.parallel_num
             px = self.find(x)
             key = (px, hash_x)
             if key not in new_px_dict:
@@ -191,7 +169,7 @@ class BTSUnionFind:
                 new_px_dict[key] = min(new_px_dict[key], x)
         px_set = set(px for px, _ in new_px_dict)
         for px in px_set:
-            hash_px = self.hash(px)
+            hash_px = px % self.parallel_num
             key = (px, hash_px)
             if key not in new_px_dict:
                 new_px_dict[key] = px
@@ -199,24 +177,18 @@ class BTSUnionFind:
                 new_px_dict[key] = min(new_px_dict[key], px)
 
         for x in self.parent:
-            hash_x = self.hash(x)
+            hash_x = x % self.parallel_num
             px = self.find(x)
             key = (px, hash_x)
             if x == new_px_dict[key]:
                 continue
             self.parent[x] = new_px_dict[key]
 
-    def get_parent(self):
-        return self.parent
-    
-    def get_nodes(self):
-        return set(self.parent.keys())
-
     def squeeze(self):
         dup_keys = {
             x
             for x in self.parent
-            if self.hash(x) == self.parallel_id
+            if x % self.parallel_num == self.parallel_id
         }
         self.parent = dup_keys
         self.old_parent = {}
@@ -317,6 +289,38 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         else:
             self.tokenizer = None
 
+        if self.tokenization == 'character':
+            def tokenization_func(text):
+                return {
+                    str.encode(text[i:i + self.window_size])
+                    for i in range(len(text) - self.window_size)
+                }
+        elif self.tokenization == 'punctuation':
+            def tokenization_func(text):
+                tokens = self.punctuation_pattern.split(text)
+                return {
+                    str.encode(' '.join(tokens[i:i + self.window_size]))
+                    for i in range(len(tokens) - self.window_size)
+                }
+        elif self.tokenization == 'space':
+            def tokenization_func(text):
+                tokens = split_on_whitespace(text)
+                return {
+                    str.encode(' '.join(tokens[i:i + self.window_size]))
+                    for i in range(len(tokens) - self.window_size)
+                }
+        elif self.tokenization == 'sentencepiece':
+            def tokenization_func(text):
+                tokens = self.tokenizer.encode(text, out_type=str)
+                return {
+                    str.encode(''.join(tokens[i:i + self.window_size]))
+                    for i in range(len(tokens) - self.window_size)
+                }
+        else:
+            raise NotImplementedError(
+                f'Unimplemented tokenization method [{self.tokenization}]')
+        self.tokenization_func = tokenization_func
+
         # about deduplication
         self.num_permutation = num_permutations
         self.jaccard_threshold = jaccard_threshold
@@ -367,6 +371,10 @@ class RayBTSMinhashDeduplicator(Deduplicator):
 
         self.tmp_file_name = os.path.join(os.getcwd(), tmp_file_name, str(uuid.uuid4()))
 
+        empty_hash_value = np.full((self.num_rows_per_band,), MAX_HASH, dtype=np.uint32)
+        self.empty_hash_value = b'\x00\x00\x00\x00' + empty_hash_value.tobytes()
+        self.empty_hash_table_id = int(MAX_HASH % self.union_find_parallel_num)
+
     def calc_minhash(self, text_list: pa.Array, uid_list: List) -> pa.Table:
         pairs = {}
 
@@ -377,34 +385,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             if self.ignore_pattern:
                 text = self.ignore_pattern.sub('', text)
 
-            # get tokens for different tokenization method
-            tokens = set()
-            if self.tokenization == 'character':
-                tokens = {
-                    str.encode(text[i:i + self.window_size])
-                    for i in range(len(text) - self.window_size)
-                }
-            elif self.tokenization == 'punctuation':
-                tokens = self.punctuation_pattern.split(text)
-                tokens = {
-                    str.encode(' '.join(tokens[i:i + self.window_size]))
-                    for i in range(len(tokens) - self.window_size)
-                }
-            elif self.tokenization == 'space':
-                tokens = split_on_whitespace(text)
-                tokens = {
-                    str.encode(' '.join(tokens[i:i + self.window_size]))
-                    for i in range(len(tokens) - self.window_size)
-                }
-            elif self.tokenization == 'sentencepiece':
-                tokens = self.tokenizer.encode(text, out_type=str)
-                tokens = {
-                    str.encode(''.join(tokens[i:i + self.window_size]))
-                    for i in range(len(tokens) - self.window_size)
-                }
-            else:
-                raise NotImplementedError(
-                    f'Unimplemented tokenization method [{self.tokenization}]')
+            tokens = self.tokenization_func(text)
 
             if len(tokens) > 0:
                 hv = np.array(
@@ -416,19 +397,21 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                      + self.perm_b) % MERSENNE_PRIME
                 ).astype(np.uint32)
                 hash_values = phv.min(axis=0)
+                for i, (start, end) in enumerate(self.hash_ranges):
+                    hash_value = i.to_bytes(4, 'big') + hash_values[start:end].tobytes()
+                    hash_table_id = hash_values[start] % self.union_find_parallel_num
+                    if hash_table_id not in pairs:
+                        pairs[hash_table_id] = []
+                    pairs[hash_table_id].append((hash_value, uid))
             else:
-                hash_values = np.full_like(self.perm_a, MAX_HASH, dtype=np.uint32)
-            for i, (start, end) in enumerate(self.hash_ranges):
-                hash_value = i.to_bytes(4, 'big') + bytes(hash_values[start:end].byteswap().data)
-                hash_table_id = hash_values[start] % self.union_find_parallel_num
-                if hash_table_id not in pairs:
-                    pairs[hash_table_id] = []
-                pairs[hash_table_id].append((hash_value, uid))
+                if self.empty_hash_table_id not in pairs:
+                    pairs[self.empty_hash_table_id] = []
+                pairs[self.empty_hash_table_id].append((self.empty_hash_value, uid))
         ray.get([
             self.union_find_list[i].add_key_value_pairs.remote(p)
             for i, p in pairs.items()
         ])
-    
+
     def merge(self):
         ray.get([
             union_find.edge_redistribution.remote()
@@ -454,7 +437,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         query_dict = {}
         for uid in samples[HashKeys.uid]:
             uid = uid.as_py()
-            hash_id = BTS_hash(uid, self.union_find_parallel_num)
+            hash_id = uid % self.union_find_parallel_num
             hash_id_list.append(hash_id)
             if hash_id not in query_dict:
                 query_dict[hash_id] = []
@@ -489,6 +472,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         dataset.map_batches(
             minhash_with_uid,
             batch_format='pyarrow',
+            zero_copy_batch=True,
         ).write_parquet(
             self.tmp_file_name,
             force_ascii=False
