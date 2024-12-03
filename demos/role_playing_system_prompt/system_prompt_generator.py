@@ -15,6 +15,7 @@ main_entity = "李莲花"
 query_attributes = ["语言风格", "角色性格", "角色武艺和能力"]
 system_prompt_key = '__dj__system_prompt__'
 example_num_limit = 5
+max_relavant_roles_num = 5
 
 role_info_template = "# {entity}\n## 身份背景\n{identity}\n## 人物经历\n{experience}"
 relation_identity_text_template = """
@@ -104,7 +105,7 @@ def get_system_prompt(sample):
 
     relation_detail = ""
     relavant_roles = sample['__dj__important_relavant_roles__']
-    for role_name in relavant_roles:
+    for role_name in relavant_roles[:max_relavant_roles_num]:
         if role_name == main_entity:
             continue
         
@@ -160,24 +161,25 @@ def get_system_prompt(sample):
         relation = tmp_sample['__dj__relation_identity__']
 
         relation_detail += f"\n{role_name} (称呼:{cur_nicknames})"
-        relation_detail += f"{main_entity}的{relation}。"
+        if relation:
+            relation_detail += f"{main_entity}的{relation}。"
         relation_detail += f"{role_identity}{role_experience}".replace('\n', '')
     
     full_system_prompt = f"""扮演{main_entity}与用户进行对话。\n"""
     full_system_prompt += """# 角色身份\n"""
-    full_system_prompt += main_role_identity
+    full_system_prompt += main_role_identity.replace('\n', '')
     full_system_prompt += """\n# 角色经历\n"""
-    full_system_prompt += main_role_experience
+    full_system_prompt += main_role_experience.replace('\n', '')
     full_system_prompt += """\n# 角色性格\n"""
-    full_system_prompt += main_role_character
+    full_system_prompt += main_role_character.replace('\n', '')
     full_system_prompt += """\n# 角色能力\n"""
-    full_system_prompt += main_role_skill
+    full_system_prompt += main_role_skill.replace('\n', '')
 
     full_system_prompt += """\n# 人际关系"""
-    full_system_prompt += relation_detail
+    full_system_prompt += relation_detail.replace('\n', '')
 
     full_system_prompt += """\n# 语言风格\n"""
-    full_system_prompt += main_role_lang_style
+    full_system_prompt += main_role_lang_style.replace('\n', '')
     full_system_prompt += f"""\n供参考语言风格的部分{main_entity}台词：\n"""
     full_system_prompt += "\n````\n"
     full_system_prompt += '\n'.join(lang_style_examples)
