@@ -1,27 +1,54 @@
 import wandb
 import fire
 import os
+import json
+import yaml
 import regex as re
 from loguru import logger
 
 PROJECT = 'Data-Juicer Reports'
-IDS = {
-    'text': 'lxjhedh2',
-    'image': 'm4ree4t1',
-    'video': '5lsusuby',
-    'audio': '4ijnw0n2',
-}
+RUN_NAME = 'Performance Benchmark -- %s'
+MODALITIES = {'text', 'image', 'video', 'audio'}
 DIFF_TH = 0.1
 
+def get_run_id(project, run_name, entity='dail'):
+    api = wandb.Api()
+    runs = api.runs(path=f'{entity}/{project}')
+    for run in runs:
+        if run.name == run_name:
+            return run.id
+    return ''
+
+def init_run(modality, config=None):
+    # get the run object for specified modality
+    # if it's not existed, create one
+    # if it's existed, get the run id and resume from it
+    run_id = get_run_id(PROJECT, RUN_NAME % modality)
+    if run_id == '':
+        # no existing run, create one
+        run = wandb.init(project=PROJECT,
+                         config=config,
+                         tags=['performance benchmark', modality],
+                         name=RUN_NAME % modality)
+        run_id = get_run_id(PROJECT, RUN_NAME % modality)
+    else:
+        run = wandb.init(project=PROJECT,
+                         id=run_id,
+                         resume='must')
+    return run, run_id
+
 def main():
-    for modality in IDS:
+    wandb.login()
+    for modality in MODALITIES:
         logger.info(f'--------------- {modality} ---------------')
         work_dir = f'outputs/performance_benchmark_{modality}/'
 
-        wandb.login()
-        run = wandb.init(project=PROJECT,
-                         id=IDS[modality],
-                         resume='must')
+        # read config
+        with open(os.path.join(work_dir, f'{modality}.yaml')) as fin:
+            config = yaml.load(fin, yaml.FullLoader)
+
+        # init the wandb run
+        run, run_id = init_run(modality, config)
 
         # collect results from logs
         log_pt = r'export_(.*?)_time_(\d*?).txt'
@@ -41,20 +68,34 @@ def main():
         op_pt = r'OP \[(.*?)\] Done in (.*?)s'
         total_pt = r'All OPs are done in (.*?)s'
         op_data = re.findall(op_pt, log_content)
+        ops = [it[0] for it in op_data]
         total_data = re.findall(total_pt, log_content)
 
         res = dict(op_data)
-        res['total'] = total_data[0]
-        res = {key: float(res[key]) for key in res}
+        res['total_time'] = total_data[0]
+        res = {key: {'time': float(res[key])} for key in res}
+
+        # collect resource utilization from monitor logs
+        monitor_file = os.path.join(work_dir, 'monitor', 'monitor.json')
+        with open(monitor_file) as fin:
+            monitor_res = json.load(fin)
+        assert len(monitor_res) == len(ops)
+        for op, resource_util_dict in zip(ops, monitor_res):
+            res[op].update(resource_util_dict['resource_analysis'])
 
         # upload results and finish the run
-        run.log(res)
+        upload_res = {
+            modality: res
+        }
+        run.log(upload_res)
         run.finish()
 
         # compare with the last run
         api = wandb.Api()
-        api_run = api.run(f'{PROJECT}/{IDS[modality]}')
+        api_run = api.run(f'{PROJECT}/{run_id}')
         run_history = api_run.history()
+        if len(run_history) < 1:
+            exit(0)
         last_record = run_history.iloc[-1]
 
         for op_name, time in op_data:
