@@ -1,6 +1,8 @@
 import time
+from typing import Optional
 
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.config import init_configs
 from data_juicer.core.ray_data import RayDataset
@@ -9,12 +11,13 @@ from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
 
 from .adapter import Adapter
+from .executor import ExecutorBase
 
 ray = LazyLoader('ray', 'ray')
 rd = LazyLoader('rd', 'ray.data')
 
 
-class RayExecutor:
+class RayExecutor(ExecutorBase):
     """
     Executor based on Ray.
 
@@ -42,11 +45,14 @@ class RayExecutor:
         logger.info('Initing Ray ...')
         ray.init(self.cfg.ray_address)
 
-    def run(self, load_data_np=None):
+    def run(self,
+            load_data_np: Optional[PositiveInt] = None,
+            skip_return=False):
         """
-        Running the dataset process pipeline.
+        Running the dataset process pipeline
 
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_return: skip return for API called.
         :return: processed dataset.
         """
         # 1. load data
@@ -89,4 +95,5 @@ class RayExecutor:
         # 4. data export
         logger.info('Exporting dataset to disk...')
         dataset.data.write_json(self.cfg.export_path, force_ascii=False)
-        return dataset
+        if not skip_return:
+            return dataset
