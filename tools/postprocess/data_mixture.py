@@ -58,7 +58,7 @@ def run_mixture():
         e.g.
         1) a single data path
         2) multiple datasets in the format: <w1> dataset1-path
-            <w2> dataset1-file  <w3>dataset3-path ...'
+            <w2> dataset1-file  <w3> dataset3-path ...'
 
     """
     args = parse_args()

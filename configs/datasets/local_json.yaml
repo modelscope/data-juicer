@@ -2,6 +2,5 @@
 project_name: 'dataset-local-json'
 dataset:
   type: 'local'
-  subtype: 'json'
   path:
     - 'path/to/json/file'

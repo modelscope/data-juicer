@@ -2,6 +2,5 @@
 project_name: 'dataset-local-parquet'
 dataset:
   type: 'local'
-  subtype: 'parquet'
   path:
     - 'path/to/parquet/file'
