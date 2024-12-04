@@ -2,7 +2,7 @@
 project_name: 'dataset-remote-huggingface'
 dataset:
   type: 'remote'
-  subtype: 'huggingface'
+  source: 'huggingface'
   path: "HuggingFaceFW/fineweb"
   name: "CC-MAIN-2024-10"
   split: "train"
