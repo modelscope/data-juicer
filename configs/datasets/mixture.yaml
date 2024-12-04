@@ -1,0 +1,12 @@
+project_name: 'dataset-mixture'
+dataset:
+  - type: 'local'
+    subtype: 'json'
+    weight: 1.0
+    path:
+      - 'path/to/json/file'
+  - type: 'local'
+    subtype: 'csv'
+    weight: 1.0
+    files:
+      - 'path/to/csv/file'

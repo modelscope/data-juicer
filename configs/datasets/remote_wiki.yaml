@@ -2,7 +2,7 @@
 project_name: 'dataset-remote-wiki'
 dataset:
   type: 'remote'
-  source: 'wiki'
+  subtype: 'wiki'
   lang: 'en'
   dump_date: 'latest'
   force_download: false

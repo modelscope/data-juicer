@@ -2,6 +2,8 @@
 project_name: 'dataset-remote-huggingface'
 dataset:
   type: 'remote'
-  source: 'huggingface'
-  org: "HuggingFaceFW"
-  name: 'fineweb'
+  subtype: 'huggingface'
+  path: "HuggingFaceFW/fineweb"
+  name: "CC-MAIN-2024-10"
+  split: "train"
+  limit: 1000

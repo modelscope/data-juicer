@@ -2,6 +2,8 @@
 project_name: 'dataset-remote-modelscope'
 dataset:
   type: 'remote'
-  source: 'modelscope'
-  org: "modelscope"
-  name: 'clue'
+  subtype: 'modelscope'
+  path: 'modelscope/clue'
+  subset_name: 'afqmc'
+  split: 'train'
+  limit: 1000

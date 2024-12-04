@@ -2,7 +2,7 @@
 project_name: 'dataset-remote-commoncrawl'
 dataset:
   type: 'remote'
-  source: 'commoncrawl'
+  subtype: 'commoncrawl'
   start_snapshot: '2020-50'
   end_snapshot: '2021-04'
   aws: true

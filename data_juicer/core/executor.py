@@ -1,6 +1,7 @@
 import os
+from abc import ABC, abstractmethod
 from time import time
-from typing import Optional
+from typing import List, Optional, Tuple
 
 from jsonargparse import Namespace
 from loguru import logger
@@ -24,7 +25,29 @@ from .exporter import Exporter
 from .tracer import Tracer
 
 
-class Executor:
+class ExecutorBase(ABC):
+
+    @abstractmethod
+    def __init__(self, cfg: Optional[Namespace] = None):
+        pass
+
+    @abstractmethod
+    def run(self,
+            load_data_np: Optional[PositiveInt] = None,
+            skip_return=False):
+        pass
+
+    @abstractmethod
+    def can_handle_data(self, types: List[Tuple[str, str]]):
+        """
+        types is a list of tuples, [(type, subtype), (type, subtype), ...];
+        different executor types will specific whether it can handle these
+        type/subtype combos
+        """
+        pass
+
+
+class Executor(ExecutorBase):
     """
     This Executor class is used to process a specific dataset.
 
@@ -152,7 +175,7 @@ class Executor:
         :param skip_return: skip return for API called.
         :return: processed dataset.
         """
-        # 1. format data
+        # 1. load data
         if self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
             logger.info('Loading dataset from checkpoint...')
             dataset = self.ckpt_manager.load_ckpt()
@@ -211,3 +234,6 @@ class Executor:
 
         if not skip_return:
             return dataset
+
+    def can_handle_data(self, types: List[Tuple[str, str]]):
+        pass
