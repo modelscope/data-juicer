@@ -19,6 +19,7 @@ class BaseFormatter:
         raise NotImplementedError
 
 
+@FORMATTERS.register_module()
 class LocalFormatter(BaseFormatter):
     """The class is used to load a dataset from local files or local
     directory."""
@@ -81,6 +82,7 @@ class LocalFormatter(BaseFormatter):
         return ds
 
 
+@FORMATTERS.register_module()
 class RemoteFormatter(BaseFormatter):
     """The class is used to load a dataset from repository of huggingface
     hub."""
@@ -109,10 +111,7 @@ class RemoteFormatter(BaseFormatter):
         :param global_cfg: the global cfg used in consequent processes,
         :return: formatted dataset
         """
-        ds = load_dataset(self.path,
-                          split='train',
-                          num_proc=num_proc,
-                          **self.kwargs)
+        ds = load_dataset(self.path, num_proc=num_proc, **self.kwargs)
         ds = unify_format(ds,
                           text_keys=self.text_keys,
                           num_proc=num_proc,

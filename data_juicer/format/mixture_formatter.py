@@ -5,9 +5,10 @@ import numpy as np
 from datasets import Dataset, concatenate_datasets
 from loguru import logger
 
-from .formatter import BaseFormatter, load_formatter
+from .formatter import FORMATTERS, BaseFormatter, load_formatter
 
 
+@FORMATTERS.register_module()
 class MixtureFormatter(BaseFormatter):
     """The class mixes multiple datasets by randomly selecting samples from
     every dataset and merging them, and then exports the merged datasset as a
