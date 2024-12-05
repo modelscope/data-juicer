@@ -2,7 +2,7 @@ datasets>=2.19.0
 fsspec==2023.5.0
 pandas
 numpy
-av
+av==13.1.0
 soundfile
 librosa>=0.10
 loguru

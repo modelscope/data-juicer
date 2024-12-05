@@ -16,7 +16,7 @@ wget http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/perf_bench_data
 # 2. run the benchmark
 for modality in ${MODALITIES[@]}
 do
-    python RELATIVE_DJ_PATH/tools/process_data.py --config configs/$modality.yaml
+    python $RELATIVE_DJ_PATH/tools/process_data.py --config configs/$modality.yaml
 done
 
 # 3. collect & upload benchmark results
