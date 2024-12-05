@@ -27,6 +27,7 @@ class IdGenerator:
     def __init__(self):
         self.next_id = 0
 
+    @ray.method(num_returns=2)
     def get_next_id(self, count):
         current_id = self.next_id
         self.next_id += count
@@ -50,7 +51,15 @@ class EdgeBuffer:
 
 @ray.remote(scheduling_strategy="SPREAD")
 class BTSUnionFind:
-    def __init__(self, union_threshold, parallel_num, parallel_id, remote_edge_buffers):
+    def __init__(
+            self,
+            union_threshold,
+            parallel_num,
+            parallel_id,
+            remote_edge_buffers,
+            max_pending_edge_buffer_task,
+            num_edge_buffer_task_returns,
+        ):
         self.union_threshold = union_threshold
         self.parallel_num = parallel_num
         self.parallel_id = parallel_id
@@ -60,6 +69,8 @@ class BTSUnionFind:
         self.remote_edge_buffers = remote_edge_buffers
         self.edge_buffer = []
         self.edge_list_dict = {}
+        self.max_pending_edge_buffer_task = max_pending_edge_buffer_task
+        self.num_edge_buffer_task_returns = num_edge_buffer_task_returns
 
     def add_key_value_pairs(self, pairs):
         for key, value in pairs:
@@ -78,15 +89,27 @@ class BTSUnionFind:
     def balanced_union_find(self):
         for x, y in self.edge_buffer:
             self.union(x, y)
-        edge_list = ray.get([
-            remote_edge_buffer.get_edges.remote(self.parallel_id)
-            for remote_edge_buffer in self.remote_edge_buffers
-        ])
+        self.edge_buffer = []
+        result_refs = []
+        for remote_edge_buffer in self.remote_edge_buffers:
+            if len(result_refs) > self.max_pending_edge_buffer_task:
+                ready_refs, result_refs = ray.wait(
+                    result_refs,
+                    num_returns=self.num_edge_buffer_task_returns
+                )
+                edge_list = ray.get(ready_refs)
+                for edges in edge_list:
+                    for x, y in edges:
+                        self.union(x, y)
+                del ready_refs
+            result_refs.append(
+                remote_edge_buffer.get_edges.remote(self.parallel_id)
+            )
+        edge_list = ray.get(result_refs)
         for edges in edge_list:
             for x, y in edges:
                 self.union(x, y)
-        del edge_list
-        self.edge_buffer = []
+        del edge_list, result_refs
         self.rebalancing()
         return self.old_parent != self.parent
 
@@ -195,10 +218,11 @@ class BTSUnionFind:
         self.edge_buffer = []
         ray.get(self.remote_edge_buffers[self.parallel_id].clear.remote())
 
-    def is_dup(self, queries):
+    def dup_idx(self, queries):
         return [
-            query in self.parent
-            for query in queries
+            idx
+            for uid, idx in queries
+            if uid in self.parent
         ]
 
 
@@ -230,6 +254,11 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         tokenizer_model: Optional[str] = None,
         union_find_parallel_num: Union[str, int] = 'auto',
         union_threshold: Optional[int] = 256,
+        max_pending_edge_buffer_task: Optional[int] = 20,
+        num_edge_buffer_task_returns: Optional[int] = 10,
+        max_pending_filter_tasks: Optional[int] = 20,
+        num_filter_task_returns: Optional[int] = 10,
+        merge_batch_size: Optional[int] = 1000,
         tmp_file_name: Optional[str] = './outputs/ray-dedup-tmp/',
         *args,
         **kwargs,
@@ -352,19 +381,28 @@ class RayBTSMinhashDeduplicator(Deduplicator):
 
         if union_find_parallel_num == 'auto':
             union_find_parallel_num = int(ray.cluster_resources().get('CPU', 32)) // 2
+
+        self.max_pending_edge_buffer_task = max_pending_edge_buffer_task
+        self.num_edge_buffer_task_returns = num_edge_buffer_task_returns
+        self.max_pending_filter_tasks = max_pending_filter_tasks
+        self.num_filter_task_returns = num_filter_task_returns
+        self.merge_batch_size = min(merge_batch_size, union_find_parallel_num)
+
         logger.info(f'union_find_parallel_num = {union_find_parallel_num}')
         self.union_find_parallel_num = union_find_parallel_num
         self.union_threshold = union_threshold
         self.remote_edge_buffers = [
             EdgeBuffer.remote()
-            for i in range(self.union_find_parallel_num)
+            for _ in range(self.union_find_parallel_num)
         ]
         self.union_find_list = [
             BTSUnionFind.remote(
-                union_threshold,
-                union_find_parallel_num,
+                self.union_threshold,
+                self.union_find_parallel_num,
                 i,
-                self.remote_edge_buffers
+                self.remote_edge_buffers,
+                self.max_pending_edge_buffer_task,
+                self.num_edge_buffer_task_returns,
             )
             for i in range(self.union_find_parallel_num)
         ]
@@ -407,55 +445,78 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 if self.empty_hash_table_id not in pairs:
                     pairs[self.empty_hash_table_id] = []
                 pairs[self.empty_hash_table_id].append((self.empty_hash_value, uid))
-        ray.get([
-            self.union_find_list[i].add_key_value_pairs.remote(p)
-            for i, p in pairs.items()
-        ])
+        result_refs = []
+        for i, p in pairs.items():
+            if len(result_refs) > self.max_pending_filter_tasks:
+                ready_refs, result_refs = ray.wait(
+                    result_refs,
+                    num_returns=self.num_filter_task_returns
+                )
+                ray.get(ready_refs)
+            result_refs.append(
+                self.union_find_list[i].add_key_value_pairs.remote(p)
+            )
+        ray.get(result_refs)
+
+    def merge_op_batch(self, object_refs):
+        results = []
+        while object_refs:
+            ready_refs, object_refs = ray.wait(object_refs, num_returns=self.merge_batch_size)
+            results.extend(ray.get(ready_refs))
+        return results
 
     def merge(self):
-        ray.get([
+        self.merge_op_batch([
             union_find.edge_redistribution.remote()
             for union_find in self.union_find_list
         ])
         while any(
-            ray.get([
+            self.merge_op_batch([
                 union_find.balanced_union_find.remote()
                 for union_find in self.union_find_list
             ])
         ):
-            ray.get([
+            self.merge_op_batch([
                 union_find.communication.remote()
                 for union_find in self.union_find_list
             ])
-        ray.get([
+        self.merge_op_batch([
             union_find.squeeze.remote()
             for union_find in self.union_find_list
         ])
 
     def filter_with_union_find(self, samples: pa.Table) -> pa.Table:
-        hash_id_list = []
         query_dict = {}
-        for uid in samples[HashKeys.uid]:
+        for idx, uid in enumerate(samples[HashKeys.uid]):
             uid = uid.as_py()
             hash_id = uid % self.union_find_parallel_num
-            hash_id_list.append(hash_id)
             if hash_id not in query_dict:
                 query_dict[hash_id] = []
-            query_dict[hash_id].append(uid)
-        results = ray.get([
-            self.union_find_list[hash_id].is_dup.remote(query)
-            for hash_id, query in query_dict.items()
-        ])
-        result_dict = {
-            hash_id: result
-            for hash_id, result in zip(query_dict.keys(), results)
-        }
-        mask = [
-            not result_dict[hash_id].pop(0)
-            for hash_id in hash_id_list
+            query_dict[hash_id].append((uid, idx))
+        mask = np.ones(len(samples), dtype=np.bool_)
+        result_refs = []
+        for hash_id, query in query_dict.items():
+            if len(result_refs) > self.max_pending_filter_tasks:
+                ready_refs, result_refs = ray.wait(
+                    result_refs,
+                    num_returns=self.num_filter_task_returns
+                )
+                results = ray.get(ready_refs)
+                for result in results:
+                    mask[result] = False
+                del ready_refs
+            result_refs.append(
+                self.union_find_list[hash_id].dup_idx.remote(query)
+            )
+        results = ray.get(result_refs)
+        for result in results:
+            mask[result] = False
+        del query_dict, results
+        columns_to_keep = [
+            name
+            for name in samples.column_names
+            if name != HashKeys.uid
         ]
-        columns_to_keep = [name for name in samples.column_names if name != HashKeys.uid]
-        del hash_id_list, query_dict, result_dict
         return samples.select(columns_to_keep).filter(mask)
 
     def run(self, dataset):
@@ -490,4 +551,5 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             batch_format='pyarrow',
             zero_copy_batch=True,
         )
+        # logger.info(f'origin count = {dataset.count()}, keep count = {result.count()}')
         return result
