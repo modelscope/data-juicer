@@ -252,7 +252,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         num_bands: Optional[PositiveInt] = None,
         num_rows_per_band: Optional[PositiveInt] = None,
         tokenizer_model: Optional[str] = None,
-        union_find_parallel_num: Union[str, int] = 'auto',
+        union_find_parallel_num: Union[int, str] = 'auto',
         union_threshold: Optional[int] = 256,
         max_pending_edge_buffer_task: Optional[int] = 20,
         num_edge_buffer_task_returns: Optional[int] = 10,
@@ -381,6 +381,8 @@ class RayBTSMinhashDeduplicator(Deduplicator):
 
         if union_find_parallel_num == 'auto':
             union_find_parallel_num = int(ray.cluster_resources().get('CPU', 32)) // 2
+        else:
+            union_find_parallel_num = int(union_find_parallel_num)
 
         self.max_pending_edge_buffer_task = max_pending_edge_buffer_task
         self.num_edge_buffer_task_returns = num_edge_buffer_task_returns
@@ -461,7 +463,10 @@ class RayBTSMinhashDeduplicator(Deduplicator):
     def merge_op_batch(self, object_refs):
         results = []
         while object_refs:
-            ready_refs, object_refs = ray.wait(object_refs, num_returns=self.merge_batch_size)
+            ready_refs, object_refs = ray.wait(
+                object_refs,
+                num_returns=min(self.merge_batch_size, len(object_refs))
+            )
             results.extend(ray.get(ready_refs))
         return results
 
