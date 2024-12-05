@@ -7,13 +7,13 @@ export_path: 'path_to_output_jsonl_file'
 
 # process schedule
 process:
-  # chunk the novel
-  - text_chunk_mapper: 
-      max_len: 8000
-      split_pattern: '\n\n'
-      overlap_len: 400
-      tokenizer: 'qwen2.5-72b-instruct'
-      trust_remote_code: True
+#   # chunk the novel if necessary
+#   - text_chunk_mapper: 
+#       max_len: 8000
+#       split_pattern: '\n\n'
+#       overlap_len: 400
+#       tokenizer: 'qwen2.5-72b-instruct'
+#       trust_remote_code: True
   # extract language_style, role_charactor and role_skill
   - extract_entity_attribute_mapper:                  
       api_model: 'qwen2.5-72b-instruct'                                   

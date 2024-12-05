@@ -58,14 +58,14 @@ class RelationIdentityMapper(Mapper):
         :param api_model: API model name.
         :param source_entity: The source entity of the relation to be
             identified.
-        :param api_endpoint: The target entity of the relation to be
+        :param target_entity: The target entity of the relation to be
             identified.
         :param input_key: The input field key in the samples. Support for
             nested keys such as "__dj__stats__.text_len". It is text_key
             in default.
         :param output_key: The output field key in the samples. Support
             for nested keys such as "__dj__stats__.text_len". It is
-            "__dj__relation_identity__".
+            input_key in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.

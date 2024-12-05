@@ -22,7 +22,8 @@ OP_NAME = 'most_relavant_entities_aggregator'
 @OPERATORS.register_module(OP_NAME)
 class MostRelavantEntitiesAggregator(Aggregator):
     """
-    Return most relavant entities with the given entity from some docs.
+    Extract entities closely related to a given entity from some texts,
+    and sort them in descending order of importance.
     """
 
     DEFAULT_SYSTEM_TEMPLATE = (
