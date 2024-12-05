@@ -152,6 +152,18 @@ process:
       drop_text: false                                        # If drop the text in the output.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - extract_support_text_mapper:                            # extract support sub text for a summary.
+      api_model: 'gpt-4o'                                     # API model name.
+      summary_key: '__dj__event_description__'                # The field name to store the input summary. Support for nested keys such as "__dj__stats__.text_len".
+      support_text_key: '__dj__support_text__'                # The field name to store the output support text for the summary.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      input_template: null                                    # Template for building the model input.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      drop_text: false                                        # If drop the text in the output.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - generate_qa_from_examples_mapper:                       # mapper to generate question and answer pairs from examples.
       hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # Model name on huggingface to generate question and answer pairs.

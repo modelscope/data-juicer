@@ -63,7 +63,7 @@ class ExtractSupportTextMapper(Mapper):
         :param summary_key: The field name to store the input summary.
             Support for nested keys such as "__dj__stats__.text_len".
             It's "__dj__event_description__" in default.
-        :param relevant_char_key: The field name to store the output
+        :param support_text_key: The field name to store the output
             support text for the summary. It's "__dj__support_text__" in
             default.
         :param api_endpoint: URL endpoint for the API.
