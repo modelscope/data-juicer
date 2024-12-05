@@ -4,16 +4,16 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Aggregator
+from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.common_utils import nested_access, nested_set
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-OP_NAME = 'relation_identity_aggregator'
+OP_NAME = 'relation_identity_mapper'
 
 
 # TODO: LLM-based inference.
 @OPERATORS.register_module(OP_NAME)
-class RelationIdentityAggregator(Aggregator):
+class RelationIdentityMapper(Mapper):
     """
     identify relation between two entity in the text.
     """

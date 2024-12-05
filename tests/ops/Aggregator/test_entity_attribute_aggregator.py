@@ -118,12 +118,12 @@ class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
             },
         ]
         example_prompt=(
-        '- 例如，根据相关文档总结`孙悟空`的`另外身份`，样例如下：\n'
-        '`孙悟空`的`另外身份`总结：\n'
-        '# 孙悟空\n'
-        '## 另外身份\n'
-        '孙行者、齐天大圣、美猴王\n'
-    )
+            '- 例如，根据相关文档总结`孙悟空`的`另外身份`，样例如下：\n'
+            '`孙悟空`的`另外身份`总结：\n'
+            '# 孙悟空\n'
+            '## 另外身份\n'
+            '孙行者、齐天大圣、美猴王\n'
+        )
         op = EntityAttributeAggregator(
             api_model='qwen2.5-72b-instruct',
             entity='李莲花',

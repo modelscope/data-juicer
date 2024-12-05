@@ -6,7 +6,7 @@ from collections import Counter
 
 from data_juicer.ops.aggregator import NestedAggregator
 from data_juicer.ops.aggregator import EntityAttributeAggregator
-from data_juicer.ops.aggregator import RelationIdentityAggregator
+from data_juicer.ops.mapper import RelationIdentityMapper
 from data_juicer.utils.constant import Fields
 
 api_model = 'qwen2.5-72b-instruct'
@@ -119,7 +119,7 @@ def get_system_prompt(sample):
             word_limit=30
         )
         sample = op.process_single(sample)
-        role_identity = sample['__dj__role_background__']
+        role_identity = sample['__dj__role_background__'].replace('\n', '')
 
         # get sub role experience
         op = EntityAttributeAggregator(
@@ -131,7 +131,7 @@ def get_system_prompt(sample):
             word_limit=100
         )
         sample = op.process_single(sample)
-        role_experience = sample['__dj__role_experience__']
+        role_experience = sample['__dj__role_experience__'].replace('\n', '')
 
         # get relation identity with main role
         role_info = role_info_template.format(
@@ -139,7 +139,7 @@ def get_system_prompt(sample):
             identity=role_identity,
             experience=role_experience
         )
-        op = RelationIdentityAggregator(
+        op = RelationIdentityMapper(
             api_model=api_model,
             source_entity=main_entity,
             target_entity=role_name,
@@ -176,7 +176,7 @@ def get_system_prompt(sample):
     full_system_prompt += main_role_skill.replace('\n', '')
 
     full_system_prompt += """\n# 人际关系"""
-    full_system_prompt += relation_detail.replace('\n', '')
+    full_system_prompt += relation_detail
 
     full_system_prompt += """\n# 语言风格\n"""
     full_system_prompt += main_role_lang_style.replace('\n', '')
