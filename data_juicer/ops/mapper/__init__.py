@@ -31,6 +31,7 @@ from .optimize_response_mapper import OptimizeResponseMapper
 from .pair_preference_mapper import PairPreferenceMapper
 from .punctuation_normalization_mapper import PunctuationNormalizationMapper
 from .python_file_mapper import PythonFileMapper
+from .python_lambda_mapper import PythonLambdaMapper
 from .remove_bibliography_mapper import RemoveBibliographyMapper
 from .remove_comments_mapper import RemoveCommentsMapper
 from .remove_header_mapper import RemoveHeaderMapper
@@ -76,8 +77,8 @@ __all__ = [
     'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
     'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
     'PairPreferenceMapper', 'PunctuationNormalizationMapper',
-    'PythonFileMapper', 'RemoveBibliographyMapper', 'RemoveCommentsMapper',
-    'RemoveHeaderMapper', 'RemoveLongWordsMapper',
+    'PythonFileMapper', 'PythonLambdaMapper', 'RemoveBibliographyMapper',
+    'RemoveCommentsMapper', 'RemoveHeaderMapper', 'RemoveLongWordsMapper',
     'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',
     'RemoveSpecificCharsMapper', 'RemoveTableTextMapper',
     'RemoveWordsWithIncorrectSubstringsMapper', 'ReplaceContentMapper',

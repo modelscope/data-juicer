@@ -260,6 +260,8 @@ process:
   - python_python_mapper:                                   # executing Python lambda function defined in a file.
       file_path: ''                                           # The path to the Python file containing the function to be executed.
       function_name: 'process_single'                         # The name of the function defined in the file to be executed.
+  - python_lambda_mapper:                                   # executing Python lambda function on data samples.
+      lambda_str: ''                                          # A string representation of the lambda function to be executed on data samples. If empty, the identity function is used.
       batched: False                                          # A boolean indicating whether to process input data in batches.
   - remove_bibliography_mapper:                             # remove bibliography from Latex text.
   - remove_comments_mapper:                                 # remove comments from Latex text, code, etc.

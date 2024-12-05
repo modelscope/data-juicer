@@ -327,8 +327,7 @@ def cut_video_by_seconds(
     input_video_stream = container.streams.video[0]
     codec_name = input_video_stream.codec_context.name
     fps = input_video_stream.base_rate
-    output_video_stream = output_container.add_stream(codec_name,
-                                                      rate=str(fps))
+    output_video_stream = output_container.add_stream(codec_name, rate=fps)
     output_video_stream.width = input_video_stream.codec_context.width
     output_video_stream.height = input_video_stream.codec_context.height
     output_video_stream.pix_fmt = input_video_stream.codec_context.pix_fmt
@@ -431,8 +430,7 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
 
         codec_name = input_video_stream.codec_context.name
         fps = input_video_stream.base_rate
-        output_video_stream = output_container.add_stream(codec_name,
-                                                          rate=str(fps))
+        output_video_stream = output_container.add_stream(codec_name, rate=fps)
         output_video_stream.pix_fmt = input_video_stream.codec_context.pix_fmt
         output_video_stream.width = input_video_stream.codec_context.width
         output_video_stream.height = input_video_stream.codec_context.height
