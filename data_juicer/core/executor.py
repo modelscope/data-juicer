@@ -9,6 +9,7 @@ from pydantic import PositiveInt
 
 from data_juicer.config import init_configs
 from data_juicer.core.data import Dataset
+from data_juicer.core.dataset_builder import DatasetBuilder
 from data_juicer.format.load import load_formatter
 from data_juicer.format.mixture_formatter import MixtureFormatter
 from data_juicer.ops import OPERATORS, load_ops
@@ -76,14 +77,15 @@ class Executor(ExecutorBase):
                         f'[{self.cfg.cache_compress}]')
             cache_utils.CACHE_COMPRESS = self.cfg.cache_compress
 
-        # setup formatter
-        logger.info('Setting up data formatter...')
+        # setup dataset builder
+        logger.info('Setting up dataset builder...')
         self.formatter = load_formatter(
             dataset_path=self.cfg.dataset_path,
             generated_dataset_config=self.cfg.generated_dataset_config,
             text_keys=self.cfg.text_keys,
             suffixes=self.cfg.suffixes,
             add_suffix=self.cfg.add_suffix)
+        self.dataset_builder = DatasetBuilder(cfg)
 
         # whether to use checkpoint mechanism. If it's true, Executor will
         # check if there are existing checkpoints first and try to load the

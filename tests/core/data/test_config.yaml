@@ -1,0 +1,5 @@
+project_name: 'dataset-local-json'
+dataset:
+  type: 'local'
+  path:
+    - 'sample.json'

@@ -1,86 +1,83 @@
 import os
+from typing import List, Tuple, Union
 
-from data_juicer.format import RemoteFormatter
-from data_juicer.format.formatter import FORMATTERS, BaseFormatter
-from data_juicer.utils.file_utils import (find_files_with_suffix,
-                                          is_absolute_path)
+from data_juicer.core.data import NestedDataset
+from data_juicer.core.ray_data import RayDataset
+from data_juicer.utils.file_utils import is_absolute_path
 
 
 class DatasetBuilder(object):
 
-    def __init__(self, cfg):
-        self.formatters = self.build(cfg)
+    def __init__(self,
+                 dataset_cfg,
+                 max_samples=0,
+                 generated_dataset_config=None,
+                 text_keys=None,
+                 suffixes=None,
+                 add_suffix=False,
+                 **kwargs):
+        self.loaders = []
+        # mixture or single
 
-    def build_formatters(self, cfg):
-        # build out all the formatters with cfg
-        formatters = []
-        for ds_config in cfg.configs:
-            formatters.append(self._build_formatter(ds_config))
-        return formatters
-
-    def _build_formatter(self, ds_config):
-        # initialize formatter based on remote or local dataset config
-        return None
-
-    def build_dataaset(self):
+    def load_dataset(self) -> Union[NestedDataset, RayDataset]:
         # handle mixture dataset, nested dataset
+        # handle sampling of mixture datasets
+        #
         for f in self.formatters:
             f.load_dataset()
+        return None
 
 
-def load_formatter(dataset_path,
-                   text_keys=None,
-                   suffixes=None,
-                   add_suffix=False,
-                   **kwargs) -> BaseFormatter:
+def rewrite_cli_datapath(dataset_path) -> List:
     """
-    Load the appropriate formatter for different types of data formats.
+    rewrite the dataset_path from CLI into proper dataset config format
+    that is compatible with YAML config style; retrofitting CLI input
+    of local files and huggingface path
 
-    :param dataset_path: Path to dataset file or dataset directory
-    :param text_keys: key names of field that stores sample text.
-        Default: None
-    :param suffixes: the suffix of files that will be read. Default:
-        None
-    :return: a dataset formatter.
+    :param dataset_path: a dataset file or a dataset dir or a list of
+        them, e.g. `<w1> ds1.jsonl <w2> ds2_dir <w3> ds3_file.json`
+    :return: list of dataset configs
     """
+    paths, weights = parse_cli_datapath(dataset_path)
+    ret = []
+    for p, w in zip(paths, weights):
+        if os.path.isdir(p) or os.path.isfile(p):
+            # local files
+            ret.append({'type': 'local', 'path': [p], 'weight': w})
+        elif not is_absolute_path(p) and not p.startswith(
+                '.') and p.count('/') <= 1:
+            # remote huggingface
+            ret.append({'type': 'huggingface', 'path': p, 'split': 'train'})
+        else:
+            #
+            raise ValueError(
+                f'Unable to load the dataset from [{dataset_path}]. '
+                f'Data-Juicer CLI mode only supports local files '
+                f'w or w/o weights, or huggingface path')
+    return ret
 
-    if suffixes is None:
-        suffixes = []
-    ext_num = {}
-    if os.path.isdir(dataset_path) or os.path.isfile(dataset_path):
-        file_dict = find_files_with_suffix(dataset_path, suffixes)
-        if not file_dict:
-            raise IOError(
-                'Unable to find files matching the suffix from {}'.format(
-                    dataset_path))
-        for ext in file_dict:
-            ext_num[ext] = len(file_dict[ext])
 
-    # local dataset
-    if ext_num:
-        formatter_num = {}
-        for name, formatter in FORMATTERS.modules.items():
-            formatter_num[name] = 0
-            for ext in ext_num:
-                if ext in formatter.SUFFIXES:
-                    formatter_num[name] += ext_num[ext]
-        formatter = max(formatter_num, key=lambda x: formatter_num[x])
-        target_suffixes = set(ext_num.keys()).intersection(
-            set(FORMATTERS.modules[formatter].SUFFIXES))
-        return FORMATTERS.modules[formatter](dataset_path,
-                                             text_keys=text_keys,
-                                             suffixes=target_suffixes,
-                                             add_suffix=add_suffix,
-                                             **kwargs)
+def parse_cli_datapath(dataset_path) -> Tuple[List[str], List[float]]:
+    """
+    Split every dataset path and its weight.
 
-    # try huggingface dataset hub
-    elif not is_absolute_path(dataset_path) and dataset_path.count('/') <= 1:
-        return RemoteFormatter(dataset_path, text_keys=text_keys, **kwargs)
+    :param dataset_path: a dataset file or a dataset dir or a list of
+        them, e.g. `<w1> ds1.jsonl <w2> ds2_dir <w3> ds3_file.json`
+    :return: list of dataset path and list of weights
+    """
+    data_prefix = dataset_path.split()
+    prefixes = []
+    weights = []
 
-    # no data
-    else:
-        raise ValueError(f'Unable to load the dataset from [{dataset_path}]. '
-                         f'It might be because Data-Juicer doesn\'t support '
-                         f'the format of this dataset, or the path of this '
-                         f'dataset is incorrect.Please check if it\'s a valid '
-                         f'dataset path and retry.')
+    for i in range(len(data_prefix)):
+        try:
+            value = max(float(data_prefix[i]), 0.0)
+            weights.append(value)
+        except:  # noqa: E722
+            value = data_prefix[i].strip()
+            # if not set weight, use 1.0 as default
+            if i == 0 or len(weights) == len(prefixes):
+                weights.append(1.0)
+            prefixes.append(value)
+
+    return prefixes, weights

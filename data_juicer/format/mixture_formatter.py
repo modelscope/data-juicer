@@ -1,12 +1,15 @@
-from itertools import chain, repeat
+import os
 from typing import List, Union
 
 import numpy as np
 from datasets import Dataset, concatenate_datasets
 from loguru import logger
 
-from ..core.dataset_builder import load_formatter
-from .formatter import BaseFormatter
+from data_juicer.format.formatter import (FORMATTERS, BaseFormatter,
+                                          RemoteFormatter)
+from data_juicer.utils.file_utils import (find_files_with_suffix,
+                                          is_absolute_path)
+from data_juicer.utils.sample import random_sample
 
 
 class MixtureFormatter(BaseFormatter):
@@ -89,38 +92,6 @@ class MixtureFormatter(BaseFormatter):
                 prefixes.append(value)
         return prefixes, weights
 
-    @classmethod
-    def random_sample(cls, dataset, weight=1.0, sample_number=0, seed=None):
-        """
-        Randomly sample a subset from a dataset with weight or number,
-        if sample number is bigger than 0, we will use sample
-        number instead of weight.
-        :param dataset: a HuggingFace dataset
-        :param weight: sample ratio of dataset
-        :param sample_number: sample number of dataset
-        :param seed: random sample seed, if None, 42 as default
-        :return: a subset of dataset
-        """
-        if seed is None:
-            seed = 42
-
-        ds_samples = dataset.num_rows
-        if sample_number <= 0:
-            sample_number = int(np.ceil(ds_samples * weight))
-
-        if sample_number == ds_samples:
-            return dataset
-
-        sample_index = range(sample_number)
-
-        n_repeat = int(np.ceil(sample_number / ds_samples)) - 1
-        if n_repeat > 0:
-            remain_samples = sample_number - n_repeat * ds_samples
-            sample_index = chain(*repeat(range(ds_samples), n_repeat),
-                                 range(remain_samples))
-
-        return dataset.shuffle(seed=seed).select(sample_index)
-
     def load_dataset(self, num_proc: int = 1, global_cfg=None) -> Dataset:
         """
         Load a mixed dataset.
@@ -134,7 +105,7 @@ class MixtureFormatter(BaseFormatter):
                                                  self.sample_numbers,
                                                  self.formatters):
             dataset = formatter.load_dataset(num_proc, global_cfg)
-            sampled = self.random_sample(dataset, weight, sample_num)
+            sampled = random_sample(dataset, weight, sample_num)
             logger.info(f'sampled {len(sampled)} from '
                         f'{len(dataset)}')
             dataset_list.append(sampled)
@@ -143,3 +114,61 @@ class MixtureFormatter(BaseFormatter):
         mixed_dataset = NestedDataset(concatenate_datasets(dataset_list))
         logger.info(f'There are {len(mixed_dataset)} in final dataset')
         return mixed_dataset
+
+
+def load_formatter(dataset_path,
+                   text_keys=None,
+                   suffixes=None,
+                   add_suffix=False,
+                   **kwargs) -> BaseFormatter:
+    """
+    Load the appropriate formatter for different types of data formats.
+
+    :param dataset_path: Path to dataset file or dataset directory
+    :param text_keys: key names of field that stores sample text.
+        Default: None
+    :param suffixes: the suffix of files that will be read. Default:
+        None
+    :return: a dataset formatter.
+    """
+
+    if suffixes is None:
+        suffixes = []
+    ext_num = {}
+    if os.path.isdir(dataset_path) or os.path.isfile(dataset_path):
+        file_dict = find_files_with_suffix(dataset_path, suffixes)
+        if not file_dict:
+            raise IOError(
+                'Unable to find files matching the suffix from {}'.format(
+                    dataset_path))
+        for ext in file_dict:
+            ext_num[ext] = len(file_dict[ext])
+
+    # local dataset
+    if ext_num:
+        formatter_num = {}
+        for name, formatter in FORMATTERS.modules.items():
+            formatter_num[name] = 0
+            for ext in ext_num:
+                if ext in formatter.SUFFIXES:
+                    formatter_num[name] += ext_num[ext]
+        formatter = max(formatter_num, key=lambda x: formatter_num[x])
+        target_suffixes = set(ext_num.keys()).intersection(
+            set(FORMATTERS.modules[formatter].SUFFIXES))
+        return FORMATTERS.modules[formatter](dataset_path,
+                                             text_keys=text_keys,
+                                             suffixes=target_suffixes,
+                                             add_suffix=add_suffix,
+                                             **kwargs)
+
+    # try huggingface dataset hub
+    elif not is_absolute_path(dataset_path) and dataset_path.count('/') <= 1:
+        return RemoteFormatter(dataset_path, text_keys=text_keys, **kwargs)
+
+    # no data
+    else:
+        raise ValueError(f'Unable to load the dataset from [{dataset_path}]. '
+                         f'It might be because Data-Juicer doesn\'t support '
+                         f'the format of this dataset, or the path of this '
+                         f'dataset is incorrect.Please check if it\'s a valid '
+                         f'dataset path and retry.')
