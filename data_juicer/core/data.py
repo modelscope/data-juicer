@@ -225,7 +225,7 @@ class NestedDataset(Dataset, DJDataset):
                                                  monitor_dir)
         return dataset
 
-    def update_common_args(self, args, kargs):
+    def update_args(self, args, kargs, is_filter=False):
         if args:
             args = list(args)
             # the first positional para is function
@@ -260,8 +260,8 @@ class NestedDataset(Dataset, DJDataset):
             else:
                 kargs['batched'] = False
 
-            # rank is required for cuda model loading
-            if callable(
+            # rank is required for cuda model loading for map
+            if not is_filter and callable(
                     getattr(called_func.__self__,
                             'use_cuda')) and called_func.__self__.use_cuda():
                 kargs['with_rank'] = True
@@ -276,7 +276,7 @@ class NestedDataset(Dataset, DJDataset):
         """Override the map func, which is called by most common operations,
         such that the processed samples can be accessed by nested manner."""
 
-        args, kargs = self.update_common_args(args, kargs)
+        args, kargs = self.update_args(args, kargs)
 
         if cache_utils.CACHE_COMPRESS:
             decompress(self, kargs['new_fingerprint'],
@@ -296,7 +296,7 @@ class NestedDataset(Dataset, DJDataset):
     def filter(self, *args, **kargs):
         """Override the filter func, which is called by most common operations,
         such that the processed samples can be accessed by nested manner."""
-        args, kargs = self.update_common_args(args, kargs)
+        args, kargs = self.update_args(args, kargs, is_filter=True)
 
         # For filter, it involves a map and a filter operations, so the final
         # cache files includes two sets with different fingerprint (before and
