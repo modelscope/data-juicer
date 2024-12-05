@@ -257,6 +257,9 @@ process:
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call.
   - punctuation_normalization_mapper:                       # normalize unicode punctuations to English punctuations.
+  - python_lambda_mapper:                                   # executing Python lambda function on data samples.
+      lambda_str: ''                                          # A string representation of the lambda function to be executed on data samples. If empty, the identity function is used.
+      batched: False                                          # A boolean indicating whether to process input data in batches.
   - remove_bibliography_mapper:                             # remove bibliography from Latex text.
   - remove_comments_mapper:                                 # remove comments from Latex text, code, etc.
       doc_type: tex                                           # comment type you want to remove. Only support 'tex' for now.
