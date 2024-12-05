@@ -94,29 +94,32 @@ def main():
         api = wandb.Api()
         api_run = api.run(f'{PROJECT}/{run_id}')
         run_history = api_run.history()
-        if len(run_history) < 1:
-            exit(0)
-        last_record = run_history.iloc[-1]
+        if len(run_history) < 2:
+            continue
+        last_record = run_history.iloc[-2]
 
         for op_name, time in op_data:
-            last_time = last_record[op_name]
-            dif = (time - last_time) / last_time
+            last_time = last_record[f'{modality}.{op_name}.time']
+            this_time = res[op_name]['time']
+            dif = (this_time - last_time) / last_time
             if dif > 0.1:
                 logger.warning(f'Time cost for OP {[op_name]} increased by '
                                f'{dif * 100}% (> 10%). Before-{last_time} vs. '
-                               f'Now-{time}')
+                               f'Now-{this_time}')
             else:
                 logger.info(f'Time cost for OP {[op_name]} increased by '
-                            f'{dif * 100}%. Before-{last_time} vs. Now-{time}')
-        last_total = last_record['total']
-        dif_total = (res['total'] - last_total) / last_total
+                            f'{dif * 100}%. Before-{last_time} vs. '
+                            f'Now-{this_time}')
+        last_total = last_record[f'{modality}.total_time.time']
+        this_total = res['total_time']['time']
+        dif_total = (this_total - last_total) / last_total
         if dif_total > 0.1:
             logger.warning(f'Total time cost increased by {dif_total * 100}% '
                            f'(> 10%). Before-{last_total} vs. '
-                           f'Now-{res["total"]}')
+                           f'Now-{this_total}')
         else:
             logger.info(f'Total time cost increased by {dif_total * 100}%. '
-                        f'Before-{last_total} vs. Now-{res["total"]}')
+                        f'Before-{last_total} vs. Now-{this_total}')
 
 
 if __name__ == '__main__':
