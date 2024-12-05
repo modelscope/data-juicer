@@ -32,6 +32,7 @@ from .optimize_response_mapper import OptimizeResponseMapper
 from .pair_preference_mapper import PairPreferenceMapper
 from .punctuation_normalization_mapper import PunctuationNormalizationMapper
 from .python_file_mapper import PythonFileMapper
+from .python_lambda_mapper import PythonLambdaMapper
 from .relation_identity_mapper import RelationIdentityMapper
 from .remove_bibliography_mapper import RemoveBibliographyMapper
 from .remove_comments_mapper import RemoveCommentsMapper
@@ -79,17 +80,18 @@ __all__ = [
     'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
     'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
     'PairPreferenceMapper', 'PunctuationNormalizationMapper',
-    'PythonFileMapper', 'RelationIdentityMapper', 'RemoveBibliographyMapper',
-    'RemoveCommentsMapper', 'RemoveHeaderMapper', 'RemoveLongWordsMapper',
-    'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',
-    'RemoveSpecificCharsMapper', 'RemoveTableTextMapper',
-    'RemoveWordsWithIncorrectSubstringsMapper', 'ReplaceContentMapper',
-    'SentenceSplitMapper', 'TextChunkMapper', 'VideoCaptioningFromAudioMapper',
-    'VideoCaptioningFromFramesMapper', 'VideoCaptioningFromSummarizerMapper',
-    'VideoCaptioningFromVideoMapper', 'VideoFFmpegWrappedMapper',
-    'VideoFaceBlurMapper', 'VideoRemoveWatermarkMapper',
-    'VideoResizeAspectRatioMapper', 'VideoResizeResolutionMapper',
-    'VideoSplitByDurationMapper', 'VideoSplitByKeyFrameMapper',
-    'VideoSplitBySceneMapper', 'VideoTaggingFromAudioMapper',
-    'VideoTaggingFromFramesMapper', 'WhitespaceNormalizationMapper'
+    'PythonFileMapper', 'PythonLambdaMapper', 'RelationIdentityMapper',
+    'RemoveBibliographyMapper', 'RemoveCommentsMapper', 'RemoveHeaderMapper',
+    'RemoveLongWordsMapper', 'RemoveNonChineseCharacterlMapper',
+    'RemoveRepeatSentencesMapper', 'RemoveSpecificCharsMapper',
+    'RemoveTableTextMapper', 'RemoveWordsWithIncorrectSubstringsMapper',
+    'ReplaceContentMapper', 'SentenceSplitMapper', 'TextChunkMapper',
+    'VideoCaptioningFromAudioMapper', 'VideoCaptioningFromFramesMapper',
+    'VideoCaptioningFromSummarizerMapper', 'VideoCaptioningFromVideoMapper',
+    'VideoFFmpegWrappedMapper', 'VideoFaceBlurMapper',
+    'VideoRemoveWatermarkMapper', 'VideoResizeAspectRatioMapper',
+    'VideoResizeResolutionMapper', 'VideoSplitByDurationMapper',
+    'VideoSplitByKeyFrameMapper', 'VideoSplitBySceneMapper',
+    'VideoTaggingFromAudioMapper', 'VideoTaggingFromFramesMapper',
+    'WhitespaceNormalizationMapper'
 ]
