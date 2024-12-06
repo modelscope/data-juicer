@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Union
 import yaml
 from jsonargparse import (ActionConfigFile, ArgumentParser, Namespace,
                           dict_to_namespace, namespace_to_dict)
-from jsonargparse.typehints import ActionTypeHint
+from jsonargparse._typehints import ActionTypeHint
 from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
 
@@ -87,6 +87,13 @@ def init_configs(args: Optional[List[str]] = None):
         help='Path to datasets with optional weights(0.0-1.0), 1.0 as '
         'default. Accepted format:<w1> dataset1-path <w2> dataset2-path '
         '<w3> dataset3-path ...')
+    parser.add_argument(
+        '--dataset',
+        type=Union[List[Dict], Dict],
+        default=[],
+        help='Dataset setting to define local/remote datasets; could be a '
+        'dict or a list of dicts; refer to configs/datasets for more '
+        'detailed examples')
     parser.add_argument(
         '--generated_dataset_config',
         type=Dict,

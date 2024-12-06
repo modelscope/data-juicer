@@ -54,8 +54,29 @@ class DataLoadStrategy(ABC):
         pass
 
 
+class RayDataLoadStrategy(DataLoadStrategy):
+
+    @abstractmethod
+    def load_data(self) -> RayDataset:
+        pass
+
+
+class LocalDataLoadStrategy(DataLoadStrategy):
+
+    @abstractmethod
+    def load_data(self) -> DJDataset:
+        pass
+
+
+# TODO dask support
+# class DaskDataLoadStrategy(DataLoadStrategy):
+#     @abstractmethod
+#     def load_data(self) -> Union[DaskDataset]:
+#         pass
+
+
 @DATALOAD_STRATEGY_REGISTRY.register_decorator(('ray', 'ondisk', 'json'))
-class RayOndiskJsonDataLoadStrategy(DataLoadStrategy):
+class RayOndiskJsonDataLoadStrategy(RayDataLoadStrategy):
 
     def load_data(self):
         pass
@@ -63,21 +84,21 @@ class RayOndiskJsonDataLoadStrategy(DataLoadStrategy):
 
 @DATALOAD_STRATEGY_REGISTRY.register_decorator(
     ('ray', 'remote', 'huggingface'))
-class RayHuggingfaceDataLoadStrategy(DataLoadStrategy):
+class RayHuggingfaceDataLoadStrategy(RayDataLoadStrategy):
 
     def load_data(self):
         pass
 
 
 @DATALOAD_STRATEGY_REGISTRY.register_decorator(('local', 'ondisk', 'Json'))
-class LocalOndiskJsonDataLoadStrategy(DataLoadStrategy):
+class LocalOndiskJsonDataLoadStrategy(LocalDataLoadStrategy):
 
     def load_data(self):
         pass
 
 
 @DATALOAD_STRATEGY_REGISTRY.register_decorator(('local', 'ondisk', 'Parquet'))
-class LocalOndiskParquetDataLoadStrategy(DataLoadStrategy):
+class LocalOndiskParquetDataLoadStrategy(LocalDataLoadStrategy):
 
     def load_data(self):
         pass
@@ -85,7 +106,7 @@ class LocalOndiskParquetDataLoadStrategy(DataLoadStrategy):
 
 @DATALOAD_STRATEGY_REGISTRY.register_decorator(
     ('local', 'remote', 'huggingface'))
-class LocalHuggingfaceDataLoadStrategy(DataLoadStrategy):
+class LocalHuggingfaceDataLoadStrategy(LocalDataLoadStrategy):
 
     def load_data(self):
         pass
@@ -93,21 +114,21 @@ class LocalHuggingfaceDataLoadStrategy(DataLoadStrategy):
 
 @DATALOAD_STRATEGY_REGISTRY.register_decorator(
     ('local', 'remote', 'modelscope'))
-class LocalModelScopeDataLoadStrategy(DataLoadStrategy):
+class LocalModelScopeDataLoadStrategy(LocalDataLoadStrategy):
 
     def load_data(self):
         pass
 
 
 @DATALOAD_STRATEGY_REGISTRY.register_decorator(('local', 'remote', 'arxiv'))
-class LocalArxivDataLoadStrategy(DataLoadStrategy):
+class LocalArxivDataLoadStrategy(LocalDataLoadStrategy):
 
     def load_data(self):
         pass
 
 
 @DATALOAD_STRATEGY_REGISTRY.register_decorator(('local', 'remote', 'wiki'))
-class LocalWikiDataLoadStrategy(DataLoadStrategy):
+class LocalWikiDataLoadStrategy(LocalDataLoadStrategy):
 
     def load_data(self):
         pass
@@ -115,7 +136,7 @@ class LocalWikiDataLoadStrategy(DataLoadStrategy):
 
 @DATALOAD_STRATEGY_REGISTRY.register_decorator(
     ('local', 'remote', 'commoncrawl'))
-class LocalCommonCrawlDataLoadStrategy(DataLoadStrategy):
+class LocalCommonCrawlDataLoadStrategy(LocalDataLoadStrategy):
 
     def load_data(self):
         pass
