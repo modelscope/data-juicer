@@ -70,7 +70,7 @@ def catch_map_batches_exception(method):
     return wrapper
 
 
-def catch_map_single_exception(method):
+def catch_map_single_exception(method, return_sample=True):
     """
     For single-map sample-level fault tolerance.
     The input sample is expected batch_size = 1.
@@ -92,8 +92,11 @@ def catch_map_single_exception(method):
         if is_batched(sample):
             try:
                 sample = convert_dict_list_to_list_dict(sample)[0]
-                res_sample = method(sample, *args, **kwargs)
-                return convert_list_dict_to_dict_list([res_sample])
+                res = method(sample, *args, **kwargs)
+                if return_sample:
+                    return convert_list_dict_to_dict_list([res])
+                else:
+                    return [res]
             except Exception as e:
                 from loguru import logger
                 logger.error(
@@ -315,7 +318,8 @@ class Filter(OP):
         else:
             self.compute_stats = catch_map_single_exception(
                 self.compute_stats_single)
-            self.process = catch_map_single_exception(self.process_single)
+            self.process = catch_map_single_exception(self.process_single,
+                                                      return_sample=False)
 
     # set the process method is not allowed to be overridden
     def __init_subclass__(cls, **kwargs):
