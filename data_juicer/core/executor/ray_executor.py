@@ -4,14 +4,12 @@ from typing import Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.config import init_configs
-from data_juicer.core.ray_data import RayDataset
+from data_juicer.core.adapter import Adapter
+from data_juicer.core.data.ray_dataset import RayDataset
+from data_juicer.core.executor import ExecutorBase
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
-
-from .adapter import Adapter
-from .executor import ExecutorBase
 
 ray = LazyLoader('ray', 'ray')
 rd = LazyLoader('rd', 'ray.data')
@@ -35,14 +33,13 @@ class RayExecutor(ExecutorBase):
 
         :param cfg: optional config dict.
         """
-        self.cfg = init_configs() if cfg is None else cfg
+        super().__init__(cfg)
 
         self.work_dir = self.cfg.work_dir
-
         self.adapter = Adapter(self.cfg)
 
         # init ray
-        logger.info('Initing Ray ...')
+        logger.info('Initializing Ray ...')
         ray.init(self.cfg.ray_address)
 
     def run(self,

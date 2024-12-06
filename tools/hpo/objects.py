@@ -33,7 +33,7 @@ def obj_quality_score(dj_cfg):
     if dj_cfg.executor_type == 'default':
         executor = Executor(dj_cfg)
     elif dj_cfg.executor_type == 'ray':
-        from data_juicer.core.ray_executor import RayExecutor
+        from data_juicer.core.executor.ray_executor import RayExecutor
         executor = RayExecutor(dj_cfg)
     else:
         raise NotImplementedError(

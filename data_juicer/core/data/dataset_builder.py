@@ -2,22 +2,24 @@ import os
 from typing import List, Tuple, Union
 
 from data_juicer.core.data import NestedDataset
-from data_juicer.core.ray_data import RayDataset
+from data_juicer.core.data.ray_dataset import RayDataset
 from data_juicer.utils.file_utils import is_absolute_path
 
 
 class DatasetBuilder(object):
 
-    def __init__(self,
-                 dataset_cfg,
-                 max_samples=0,
-                 generated_dataset_config=None,
-                 text_keys=None,
-                 suffixes=None,
-                 add_suffix=False,
-                 **kwargs):
-        self.loaders = []
-        # mixture or single
+    def __init__(self, cfg):
+        if cfg.dataset_path is not None:
+            ds_configs = rewrite_cli_datapath(cfg.dataset_path)
+        elif cfg.dataset is not None:
+            ds_configs = cfg.dataset
+        else:
+            raise ValueError(
+                'Unable to initialize dataset; should have one of '
+                'dataset_path or dataset in configurations')
+        for config in ds_configs:
+            # initialize data loader from strategy
+            pass
 
     def load_dataset(self) -> Union[NestedDataset, RayDataset]:
         # handle mixture dataset, nested dataset
@@ -43,9 +45,9 @@ def rewrite_cli_datapath(dataset_path) -> List:
     for p, w in zip(paths, weights):
         if os.path.isdir(p) or os.path.isfile(p):
             # local files
-            ret.append({'type': 'local', 'path': [p], 'weight': w})
-        elif not is_absolute_path(p) and not p.startswith(
-                '.') and p.count('/') <= 1:
+            ret.append({'type': 'ondisk', 'path': [p], 'weight': w})
+        elif (not is_absolute_path(p) and not p.startswith('.')
+              and p.count('/') <= 1):
             # remote huggingface
             ret.append({'type': 'huggingface', 'path': p, 'split': 'train'})
         else:

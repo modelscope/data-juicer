@@ -6,7 +6,7 @@ import numpy
 
 from data_juicer import is_cuda_available
 from data_juicer.core.data import DJDataset, NestedDataset
-from data_juicer.core.ray_data import RayDataset
+from data_juicer.core.data.ray_dataset import RayDataset
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import free_models
 from data_juicer.utils.registry import Registry

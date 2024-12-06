@@ -36,7 +36,7 @@ def main():
     if cfg.executor_type == 'default':
         executor = Executor(cfg)
     elif cfg.executor_type == 'ray':
-        from data_juicer.core.ray_executor import RayExecutor
+        from data_juicer.core.executor.ray_executor import RayExecutor
         executor = RayExecutor(cfg)
     executor.run()
 

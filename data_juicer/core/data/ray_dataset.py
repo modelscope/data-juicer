@@ -13,6 +13,63 @@ from data_juicer.utils.process_utils import calculate_np
 rd = LazyLoader('rd', 'ray.data')
 
 
+class RayDataset(DJDataset):
+
+    def __init__(self,
+                 dataset: rd.Dataset,
+                 dataset_path: str = None,
+                 cfg=None) -> None:
+        self.data = preprocess_dataset(dataset, dataset_path, cfg)
+        self.num_proc = None
+        if cfg:
+            self.num_proc = cfg.np
+
+    def process(self,
+                operators,
+                *,
+                exporter=None,
+                checkpointer=None,
+                tracer=None) -> DJDataset:
+        if operators is None:
+            return self
+        if not isinstance(operators, list):
+            operators = [operators]
+        for op in operators:
+            self._run_single_op(op)
+        return self
+
+    def _run_single_op(self, op):
+        op_proc = calculate_np(op._name, op.mem_required, op.cpu_required,
+                               self.num_proc, op.use_cuda())
+        num_gpus = get_num_gpus(op, op_proc)
+        try:
+            batch_size = getattr(op, 'batch_size',
+                                 1) if op.is_batched_op() else 1
+            if isinstance(op, Mapper):
+                self.data = self.data.map_batches(op.process,
+                                                  batch_size=batch_size,
+                                                  batch_format='pyarrow',
+                                                  num_gpus=num_gpus)
+            elif isinstance(op, Filter):
+                self.data = self.data.map_batches(op.compute_stats,
+                                                  batch_size=batch_size,
+                                                  batch_format='pyarrow',
+                                                  num_gpus=num_gpus)
+                if op.stats_export_path is not None:
+                    self.data.write_json(op.stats_export_path,
+                                         force_ascii=False)
+                self.data = self.data.filter(op.process)
+            else:
+                logger.error(
+                    'Ray executor only support Filter and Mapper OPs for now')
+                raise NotImplementedError
+        except:  # noqa: E722
+            logger.error(f'An error occurred during Op [{op._name}].')
+            import traceback
+            traceback.print_exc()
+            exit(1)
+
+
 def is_valid_path(item, dataset_dir):
     full_path = os.path.abspath(os.path.join(dataset_dir, item))
     return os.path.exists(full_path)
@@ -75,60 +132,3 @@ def get_num_gpus(op, op_proc):
         return 0
     proc_per_gpu = op_proc / cuda_device_count()
     return 1.0 / proc_per_gpu
-
-
-class RayDataset(DJDataset):
-
-    def __init__(self,
-                 dataset: rd.Dataset,
-                 dataset_path: str = None,
-                 cfg=None) -> None:
-        self.data = preprocess_dataset(dataset, dataset_path, cfg)
-        self.num_proc = None
-        if cfg:
-            self.num_proc = cfg.np
-
-    def process(self,
-                operators,
-                *,
-                exporter=None,
-                checkpointer=None,
-                tracer=None) -> DJDataset:
-        if operators is None:
-            return self
-        if not isinstance(operators, list):
-            operators = [operators]
-        for op in operators:
-            self._run_single_op(op)
-        return self
-
-    def _run_single_op(self, op):
-        op_proc = calculate_np(op._name, op.mem_required, op.cpu_required,
-                               self.num_proc, op.use_cuda())
-        num_gpus = get_num_gpus(op, op_proc)
-        try:
-            batch_size = getattr(op, 'batch_size',
-                                 1) if op.is_batched_op() else 1
-            if isinstance(op, Mapper):
-                self.data = self.data.map_batches(op.process,
-                                                  batch_size=batch_size,
-                                                  batch_format='pyarrow',
-                                                  num_gpus=num_gpus)
-            elif isinstance(op, Filter):
-                self.data = self.data.map_batches(op.compute_stats,
-                                                  batch_size=batch_size,
-                                                  batch_format='pyarrow',
-                                                  num_gpus=num_gpus)
-                if op.stats_export_path is not None:
-                    self.data.write_json(op.stats_export_path,
-                                         force_ascii=False)
-                self.data = self.data.filter(op.process)
-            else:
-                logger.error(
-                    'Ray executor only support Filter and Mapper OPs for now')
-                raise NotImplementedError
-        except:  # noqa: E722
-            logger.error(f'An error occurred during Op [{op._name}].')
-            import traceback
-            traceback.print_exc()
-            exit(1)

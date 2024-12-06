@@ -51,7 +51,7 @@ class DocumentExtractor(ABC):
         pass
 
 
-def _download_and_extract_single_partition(paths: List[Tuple[str, str]],
+def _download_and_extract_single_partition(paths: Tuple[str, str],
                                            downloader: DocumentDownloader,
                                            iterator: DocumentIterator,
                                            extractor: DocumentExtractor,
@@ -131,6 +131,7 @@ def download_and_extract(urls: List[str],
         directly read from them instead.
       input_meta: A dictionary or a string formatted as a dictionary, which outlines
         the field names and their respective data types within the JSONL input file.
+      item_limit: limit on number of items downloaded; for sampling and testing purposes
 
     Returns:
       A HuggingFace DataSet of the downloaded data

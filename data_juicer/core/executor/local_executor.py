@@ -1,54 +1,30 @@
 import os
-from abc import ABC, abstractmethod
 from time import time
-from typing import List, Optional, Tuple
+from typing import Optional
 
+from datasets import Dataset
 from jsonargparse import Namespace
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.config import init_configs
-from data_juicer.core.data import Dataset
-from data_juicer.core.dataset_builder import DatasetBuilder
+from data_juicer.core.adapter import Adapter
+from data_juicer.core.data.dataset_builder import DatasetBuilder
+from data_juicer.core.executor import ExecutorBase
+from data_juicer.core.exporter import Exporter
+from data_juicer.core.tracer import Tracer
 from data_juicer.format.load import load_formatter
 from data_juicer.format.mixture_formatter import MixtureFormatter
 from data_juicer.ops import OPERATORS, load_ops
 from data_juicer.ops.op_fusion import fuse_operators
+from data_juicer.ops.selector.frequency_specified_field_selector import \
+    FrequencySpecifiedFieldSelector
+from data_juicer.ops.selector.topk_specified_field_selector import \
+    TopkSpecifiedFieldSelector
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
 
-from ..ops.selector.frequency_specified_field_selector import \
-    FrequencySpecifiedFieldSelector
-from ..ops.selector.topk_specified_field_selector import \
-    TopkSpecifiedFieldSelector
-from .adapter import Adapter
-from .exporter import Exporter
-from .tracer import Tracer
 
-
-class ExecutorBase(ABC):
-
-    @abstractmethod
-    def __init__(self, cfg: Optional[Namespace] = None):
-        pass
-
-    @abstractmethod
-    def run(self,
-            load_data_np: Optional[PositiveInt] = None,
-            skip_return=False):
-        pass
-
-    @abstractmethod
-    def can_handle_data(self, types: List[Tuple[str, str]]):
-        """
-        types is a list of tuples, [(type, subtype), (type, subtype), ...];
-        different executor types will specific whether it can handle these
-        type/subtype combos
-        """
-        pass
-
-
-class Executor(ExecutorBase):
+class LocalExecutor(ExecutorBase):
     """
     This Executor class is used to process a specific dataset.
 
@@ -62,7 +38,7 @@ class Executor(ExecutorBase):
 
         :param cfg: optional jsonargparse Namespace.
         """
-        self.cfg = init_configs() if cfg is None else cfg
+        super().__init__(cfg)
 
         self.work_dir = self.cfg.work_dir
 
@@ -236,6 +212,3 @@ class Executor(ExecutorBase):
 
         if not skip_return:
             return dataset
-
-    def can_handle_data(self, types: List[Tuple[str, str]]):
-        pass

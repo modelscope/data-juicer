@@ -1,6 +1,6 @@
 # global parameters
-project_name: 'dataset-local-json'
+project_name: 'dataset-ondisk-json'
 dataset:
-  type: 'local'
+  type: 'ondisk'
   path:
     - 'path/to/json/file'
