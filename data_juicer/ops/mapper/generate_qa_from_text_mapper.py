@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 from loguru import logger
 
-from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -14,7 +14,6 @@ OP_NAME = 'generate_qa_from_text_mapper'
 
 
 # TODO: Extend LLM-based OPs into API-based implementation.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class GenerateQAFromTextMapper(Mapper):
     """

@@ -62,7 +62,10 @@ PKG_TO_OPS = {
         'optimize_qa_mapper', 'video_captioning_from_audio_mapper',
         'video_captioning_from_frames_mapper',
         'video_captioning_from_summarizer_mapper',
-        'video_captioning_from_video_mapper', 'video_tagging_from_audio_mapper'
+        'video_captioning_from_video_mapper',
+        'video_tagging_from_audio_mapper', 'text_chunk_mapper',
+        'entity_attribute_aggregator', 'most_relavant_entities_aggregator',
+        'nested_aggregator'
     ],
     'transformers_stream_generator': [
         'video_captioning_from_audio_mapper',
@@ -104,5 +107,19 @@ PKG_TO_OPS = {
         'optimize_qa_mapper',
     ],
     'rouge': ['generate_qa_from_examples_mapper'],
-    'ram': ['image_tagging_mapper', 'video_tagging_from_frames_mapper']
+    'ram': ['image_tagging_mapper', 'video_tagging_from_frames_mapper'],
+    'dashscope': [
+        'text_chunk_mapper', 'entity_attribute_aggregator',
+        'most_relavant_entities_aggregator', 'nested_aggregator'
+    ],
+    'openai': [
+        'calibrate_qa_mapper', 'calibrate_query_mapper',
+        'calibrate_response_mapper', 'extract_entity_attribute_mapper',
+        'extract_entity_relation_mapper', 'extract_event_mapper',
+        'extract_keyword_mapper', 'extract_nickname_mapper',
+        'extract_support_text_mapper', 'pair_preference_mapper',
+        'relation_identity_mapper', 'text_chunk_mapper',
+        'entity_attribute_aggregator', 'most_relavant_entities_aggregator',
+        'nested_aggregator'
+    ]
 }

@@ -1,11 +1,10 @@
-from data_juicer.ops.base_op import OPERATORS, UNFORKABLE
+from data_juicer.ops.base_op import OPERATORS
 from data_juicer.ops.mapper.optimize_qa_mapper import OptimizeQAMapper
 
 OP_NAME = 'optimize_query_mapper'
 
 
 # TODO: Extend LLM-based OPs into API-based implementation.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class OptimizeQueryMapper(OptimizeQAMapper):
     """
