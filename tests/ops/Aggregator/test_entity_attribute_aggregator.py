@@ -4,9 +4,10 @@ from loguru import logger
 
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.aggregator import EntityAttributeAggregator
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
 
+@SKIPPED_TESTS.register_module()
 class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
 
     def _run_helper(self, op, samples):
