@@ -16,8 +16,8 @@ env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
 jobs:
-  unittest-single:
-    runs-on: [self-hosted, linux]
+  perf_bench:
+    runs-on: [GPU, unittest]
     environment: Testing
     steps:
     - uses: actions/checkout@v3

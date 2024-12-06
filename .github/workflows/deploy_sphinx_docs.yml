@@ -15,10 +15,10 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-    - name: Setup Python ${{ matrix.python-version }}
+    - name: Setup Python ${{ matrix.python_version }}
       uses: actions/setup-python@master
       with:
-        python_version: ${{ matrix.python-version }}
+        python_version: ${{ matrix.python_version }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
