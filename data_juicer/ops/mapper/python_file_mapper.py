@@ -39,7 +39,8 @@ class PythonFileMapper(Mapper):
 
     def _load_function(self):
         if not os.path.isfile(self.file_path):
-            raise ValueError(f"The file '{self.file_path}' does not exist.")
+            raise FileNotFoundError(
+                f"The file '{self.file_path}' does not exist.")
 
         if not self.file_path.endswith('.py'):
             raise ValueError(

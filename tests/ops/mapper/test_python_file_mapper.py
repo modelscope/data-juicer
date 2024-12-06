@@ -45,7 +45,7 @@ class TestPythonFileMapper(DataJuicerTestCaseBase):
 
     def test_file_not_found(self):
         """Test for a non-existent file."""
-        with self.assertRaises(ValueError) as cm:
+        with self.assertRaises(FileNotFoundError) as cm:
             PythonFileMapper("non_existent.py", "process_data")
         self.assertIn("does not exist", str(cm.exception))
 

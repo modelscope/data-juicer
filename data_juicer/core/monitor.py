@@ -205,7 +205,10 @@ class Monitor:
         resource_util_dict = {}
 
         # start monitor
-        ctx = get_context('fork')
+        start_method = 'fork'
+        if os.name == 'nt':  # for Windows
+            start_method = 'spawn'
+        ctx = get_context(start_method)
         with ctx.Manager() as manager:
             mdict = manager.dict()
             mdict['stop'] = False

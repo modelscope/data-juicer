@@ -164,13 +164,16 @@ class NestedDataset(Dataset, DJDataset):
             res = super().__getitem__(key)
         return nested_obj_factory(res)
 
-    def process(self,
-                operators,
-                *,
-                work_dir=None,
-                exporter=None,
-                checkpointer=None,
-                tracer=None):
+    def process(
+        self,
+        operators,
+        *,
+        work_dir=None,
+        exporter=None,
+        checkpointer=None,
+        tracer=None,
+        open_monitor=True,
+    ):
         if operators is None:
             return self
 
@@ -179,7 +182,8 @@ class NestedDataset(Dataset, DJDataset):
         unforkable_operators = set(UNFORKABLE.modules.keys())
 
         # resource utilization monitor
-        resource_util_list = []
+        if open_monitor:
+            resource_util_list = []
 
         dataset = self
         try:
@@ -196,12 +200,16 @@ class NestedDataset(Dataset, DJDataset):
                     'exporter': exporter,
                     'tracer': tracer,
                 }
-                dataset, resource_util_per_op = Monitor.monitor_func(
-                    op.run, args=run_args)
+                if open_monitor:
+                    dataset, resource_util_per_op = Monitor.monitor_func(
+                        op.run, args=run_args)
+                else:
+                    dataset = op.run(**run_args)
                 # record processed ops
                 if checkpointer is not None:
                     checkpointer.record(op._op_cfg)
-                resource_util_list.append(resource_util_per_op)
+                if open_monitor:
+                    resource_util_list.append(resource_util_per_op)
                 end = time()
                 logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
                             f'Left {len(dataset)} samples.')
@@ -215,7 +223,10 @@ class NestedDataset(Dataset, DJDataset):
                             'last op...')
                 dataset.cleanup_cache_files()
                 checkpointer.save_ckpt(dataset)
-            if work_dir:
+            if work_dir and open_monitor:
+                # get the analyzed version
+                resource_util_list = Monitor.analyze_resource_util_list(
+                    resource_util_list)
                 monitor_dir = os.path.join(work_dir, 'monitor')
                 os.makedirs(monitor_dir, exist_ok=True)
                 with open(os.path.join(monitor_dir, 'monitor.json'),
