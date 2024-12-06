@@ -45,6 +45,7 @@ class PerplexityFilter(Filter):
         samples_list = samples[self.text_key]
         samples_stats = samples[Fields.stats]
         words_key = f'{InterVars.words}-{self.sp_model_key}'
+        tokenizer = get_model(self.sp_model_key)
 
         for idx, stat in enumerate(samples_stats):
             # check if it's computed already
@@ -54,7 +55,6 @@ class PerplexityFilter(Filter):
             if context and words_key in samples[Fields.context][idx]:
                 words = samples[Fields.context][idx][words_key]
             else:
-                tokenizer = get_model(self.sp_model_key)
                 words = get_words_from_document(
                     samples_list[idx],
                     token_func=tokenizer.encode_as_pieces
