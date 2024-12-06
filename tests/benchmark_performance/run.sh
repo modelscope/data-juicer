@@ -11,7 +11,7 @@ MODALITIES=("text" "image" "video" "audio")
 cd $BENCH_PATH
 
 # 1. prepare dataset
-wget http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/perf_bench_data/perf_bench_data.tar.gz && tar zxvf perf_bench_data.tar.gz
+wget -q http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/perf_bench_data/perf_bench_data.tar.gz && tar zxf perf_bench_data.tar.gz
 
 # 2. run the benchmark
 for modality in ${MODALITIES[@]}
