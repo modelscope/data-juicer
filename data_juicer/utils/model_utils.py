@@ -51,6 +51,11 @@ BACKUP_MODEL_LINKS = {
     'punkt.*.pickle':
     'https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/'
     'data_juicer/models/',
+
+    # ram
+    'ram_plus_swin_large_14m.pth':
+    'http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/models/'
+    'ram_plus_swin_large_14m.pth',
 }
 
 
