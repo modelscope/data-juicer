@@ -194,11 +194,14 @@ class LocalExecutor(ExecutorBase):
         # - If checkpoint is open, clean the cache files after each process
         logger.info('Processing data...')
         tstart = time()
-        dataset = dataset.process(ops,
-                                  work_dir=self.work_dir,
-                                  exporter=self.exporter,
-                                  checkpointer=self.ckpt_manager,
-                                  tracer=self.tracer)
+        dataset = dataset.process(
+            ops,
+            work_dir=self.work_dir,
+            exporter=self.exporter,
+            checkpointer=self.ckpt_manager,
+            tracer=self.tracer,
+            open_monitor=self.cfg.open_monitor,
+        )
         tend = time()
         logger.info(f'All OPs are done in {tend - tstart:.3f}s.')
 

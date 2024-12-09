@@ -5,11 +5,8 @@ from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.filter.audio_nmf_snr_filter import AudioNMFSNRFilter
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-# skip due to conflicts when run lazy_load in multiprocessing in librosa
-# tests passed locally.
-@SKIPPED_TESTS.register_module()
 class AudioNMFSNRFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',

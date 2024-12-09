@@ -15,6 +15,7 @@ text_keys: 'text'                                           # the key name of fi
 suffixes: []                                                # the suffix of files that will be read. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
 use_cache: true                                             # whether to use the cache management of Hugging Face datasets. It might take up lots of disk space when using cache
 ds_cache_dir: null                                          # cache dir for Hugging Face datasets. In default, it\'s the same as the environment variable `HF_DATASETS_CACHE`, whose default value is usually "~/.cache/huggingface/datasets". If this argument is set to a valid path by users, it will override the default cache dir
+open_monitor: true                                          # Whether to open the monitor to trace resource utilization for each OP during data processing. It\'s True in default.
 use_checkpoint: false                                       # whether to use the checkpoint management to save the latest version of dataset to work dir when processing. Rerun the same config will reload the checkpoint and skip ops before it. Cache will be disabled when using checkpoint. If args of ops before the checkpoint are changed, all ops will be rerun from the beginning.
 temp_dir: null                                              # the path to the temp directory to store intermediate caches when cache is disabled, these cache files will be removed on-the-fly. In default, it's None, so the temp dir will be specified by system. NOTICE: you should be caution when setting this argument because it might cause unexpected program behaviors when this path is set to an unsafe directory.
 open_tracer: false                                          # whether to open the tracer to trace the changes during process. It might take more time when opening tracer
@@ -211,6 +212,7 @@ process:
       radius: 2                                               # radius of blur kernel
   - image_tagging_mapper:                                   # Mapper to generate image tags.
       tag_field_name: '__dj__image_tags__'                    # the field name to store the tags. It's "__dj__image_tags__" in default.
+      mem_required: '9GB'
   - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library
       sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
       aug_num: 1                                              # number of augmented samples to be generated. If `sequential` is True, there will be total aug_num augmented samples generated. If it's False, there will be (aug_num * #opened_aug_method) augmented samples generated.
@@ -257,6 +259,9 @@ process:
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call.
   - punctuation_normalization_mapper:                       # normalize unicode punctuations to English punctuations.
+  - python_python_mapper:                                   # executing Python lambda function defined in a file.
+      file_path: ''                                           # The path to the Python file containing the function to be executed.
+      function_name: 'process_single'                         # The name of the function defined in the file to be executed.
   - python_lambda_mapper:                                   # executing Python lambda function on data samples.
       lambda_str: ''                                          # A string representation of the lambda function to be executed on data samples. If empty, the identity function is used.
       batched: False                                          # A boolean indicating whether to process input data in batches.
@@ -378,6 +383,7 @@ process:
       frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       tag_field_name: '__dj__video_frame_tags__'              # the field name to store the tags. It's "__dj__video_frame_tags__" in default.
+      mem_required: '9GB'
   - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
 
   # Filter ops
@@ -610,6 +616,7 @@ process:
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       tag_field_name: '__dj__video_frame_tags__'              # the field name to store the tags. It's "__dj__video_frame_tags__" in default.
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
+      mem_required: '9GB'
   - words_num_filter:                                       # filter text with number of words out of specific range
       lang: en                                                # sample in which language
       tokenization: false                                     # whether to use model to tokenize documents

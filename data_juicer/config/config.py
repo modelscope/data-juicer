@@ -238,6 +238,12 @@ def init_configs(args: Optional[List[str]] = None):
         'specified in ["gzip", "zstd", "lz4"]. If this parameter is'
         'None, the cache file will not be compressed.')
     parser.add_argument(
+        '--open_monitor',
+        type=bool,
+        default=True,
+        help='Whether to open the monitor to trace resource utilization for '
+        'each OP during data processing. It\'s True in default.')
+    parser.add_argument(
         '--use_checkpoint',
         type=bool,
         default=False,
