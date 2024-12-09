@@ -1,18 +1,18 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.core.executor &mdash; data_juicer 1.0.0 documentation</title>
+  <title>data_juicer.core.executor &mdash; data_juicer 1.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=af2ce170"></script>
-      <script src="../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/documentation_options.js?v=292eb321"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -103,7 +103,9 @@
 <span class="kn">from</span> <span class="nn">.tracer</span> <span class="kn">import</span> <span class="n">Tracer</span>
 
 
-<div class="viewcode-block" id="Executor"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Executor">[docs]</a><span class="k">class</span> <span class="nc">Executor</span><span class="p">:</span>
+<div class="viewcode-block" id="Executor">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Executor">[docs]</a>
+<span class="k">class</span> <span class="nc">Executor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This Executor class is used to process a specific dataset.</span>
 
@@ -111,7 +113,9 @@
 <span class="sd">    ops in the config file in order and generate a processed dataset.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Executor.__init__"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Executor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Namespace</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Executor.__init__">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Executor.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Namespace</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
@@ -175,7 +179,10 @@
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Trace for all ops.&#39;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">op_list_to_trace</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">OPERATORS</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="Executor.sample_data"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Executor.sample_data">[docs]</a>    <span class="k">def</span> <span class="nf">sample_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+
+<div class="viewcode-block" id="Executor.sample_data">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Executor.sample_data">[docs]</a>
+    <span class="k">def</span> <span class="nf">sample_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                     <span class="n">dataset_to_sample</span><span class="p">:</span> <span class="n">Dataset</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                     <span class="n">load_data_np</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">sample_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
@@ -221,7 +228,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported sample_algo: </span><span class="si">{</span><span class="n">sample_algo</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Executor.run"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Executor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+
+<div class="viewcode-block" id="Executor.run">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Executor.run">[docs]</a>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">load_data_np</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">skip_return</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -272,11 +282,14 @@
         <span class="c1"># - If checkpoint is open, clean the cache files after each process</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Processing data...&#39;</span><span class="p">)</span>
         <span class="n">tstart</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span>
-                                  <span class="n">work_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span>
-                                  <span class="n">exporter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="p">,</span>
-                                  <span class="n">checkpointer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span><span class="p">,</span>
-                                  <span class="n">tracer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tracer</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">process</span><span class="p">(</span>
+            <span class="n">ops</span><span class="p">,</span>
+            <span class="n">work_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span>
+            <span class="n">exporter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">exporter</span><span class="p">,</span>
+            <span class="n">checkpointer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_manager</span><span class="p">,</span>
+            <span class="n">tracer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tracer</span><span class="p">,</span>
+            <span class="n">open_monitor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">open_monitor</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">tend</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;All OPs are done in </span><span class="si">{</span><span class="n">tend</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tstart</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">s.&#39;</span><span class="p">)</span>
 
@@ -289,7 +302,9 @@
             <span class="n">compress</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_return</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">dataset</span></div></div>
+            <span class="k">return</span> <span class="n">dataset</span></div>
+</div>
+
 </pre></div>
 
            </div>

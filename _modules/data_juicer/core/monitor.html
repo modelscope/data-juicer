@@ -1,18 +1,18 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.core.monitor &mdash; data_juicer 1.0.0 documentation</title>
+  <title>data_juicer.core.monitor &mdash; data_juicer 1.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
 
   
-      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=af2ce170"></script>
-      <script src="../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../_static/documentation_options.js?v=292eb321"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -99,7 +99,9 @@
     <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;resource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">this_states</span>
 
 
-<div class="viewcode-block" id="Monitor"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor">[docs]</a><span class="k">class</span> <span class="nc">Monitor</span><span class="p">:</span>
+<div class="viewcode-block" id="Monitor">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor">[docs]</a>
+<span class="k">class</span> <span class="nc">Monitor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Monitor resource utilization and other information during the data</span>
 <span class="sd">    processing.</span>
@@ -157,17 +159,25 @@
         <span class="s1">&#39;GPU util.&#39;</span><span class="p">,</span>
     <span class="p">}</span>
 
-<div class="viewcode-block" id="Monitor.__init__"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Monitor.__init__">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="Monitor.monitor_all_resources"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.monitor_all_resources">[docs]</a>    <span class="k">def</span> <span class="nf">monitor_all_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Monitor.monitor_all_resources">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.monitor_all_resources">[docs]</a>
+    <span class="k">def</span> <span class="nf">monitor_all_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Detect the resource utilization of all distributed nodes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="Monitor.monitor_current_resources"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.monitor_current_resources">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Monitor.monitor_current_resources">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.monitor_current_resources">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">monitor_current_resources</span><span class="p">():</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Detect the resource utilization of the current environment/machine.</span>
@@ -200,7 +210,10 @@
 
         <span class="k">return</span> <span class="n">resource_dict</span></div>
 
-<div class="viewcode-block" id="Monitor.draw_resource_util_graph"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.draw_resource_util_graph">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Monitor.draw_resource_util_graph">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.draw_resource_util_graph">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">draw_resource_util_graph</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">,</span> <span class="n">store_dir</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">resource_util_dict</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">):</span>
@@ -218,7 +231,10 @@
                 <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">store_dir</span><span class="p">,</span> <span class="n">fn</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Monitor.analyze_resource_util_list"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.analyze_resource_util_list">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Monitor.analyze_resource_util_list">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.analyze_resource_util_list">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">analyze_resource_util_list</span><span class="p">(</span><span class="n">resource_util_list</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Analyze the resource utilization for a given resource util list.</span>
@@ -229,7 +245,10 @@
             <span class="n">res_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Monitor</span><span class="o">.</span><span class="n">analyze_single_resource_util</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">res_list</span></div>
 
-<div class="viewcode-block" id="Monitor.analyze_single_resource_util"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.analyze_single_resource_util">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Monitor.analyze_single_resource_util">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.analyze_single_resource_util">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">analyze_single_resource_util</span><span class="p">(</span><span class="n">resource_util_dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Analyze the resource utilization for a single resource util dict.</span>
@@ -258,7 +277,10 @@
 
         <span class="k">return</span> <span class="n">resource_util_dict</span></div>
 
-<div class="viewcode-block" id="Monitor.monitor_func"><a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.monitor_func">[docs]</a>    <span class="nd">@staticmethod</span>
+
+<div class="viewcode-block" id="Monitor.monitor_func">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Monitor.monitor_func">[docs]</a>
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">monitor_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample_interval</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Process the input dataset and probe related information for each OP in</span>
@@ -284,7 +306,10 @@
         <span class="n">resource_util_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="c1"># start monitor</span>
-        <span class="n">ctx</span> <span class="o">=</span> <span class="n">get_context</span><span class="p">(</span><span class="s1">&#39;fork&#39;</span><span class="p">)</span>
+        <span class="n">start_method</span> <span class="o">=</span> <span class="s1">&#39;fork&#39;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>  <span class="c1"># for Windows</span>
+            <span class="n">start_method</span> <span class="o">=</span> <span class="s1">&#39;spawn&#39;</span>
+        <span class="n">ctx</span> <span class="o">=</span> <span class="n">get_context</span><span class="p">(</span><span class="n">start_method</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">ctx</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span> <span class="k">as</span> <span class="n">manager</span><span class="p">:</span>
             <span class="n">mdict</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
             <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
@@ -315,7 +340,9 @@
             <span class="c1"># calculate speed</span>
             <span class="n">resource_util_dict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span>
 
-        <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">resource_util_dict</span></div></div>
+        <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">resource_util_dict</span></div>
+</div>
+
 </pre></div>
 
            </div>

@@ -1,18 +1,18 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.common.helper_func &mdash; data_juicer 1.0.0 documentation</title>
+  <title>data_juicer.ops.common.helper_func &mdash; data_juicer 1.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
-      <script src="../../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/documentation_options.js?v=292eb321"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -104,7 +104,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">px</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">py</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="strip"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.strip">[docs]</a><span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">strip_characters</span><span class="p">):</span>
+<div class="viewcode-block" id="strip">
+<a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.strip">[docs]</a>
+<span class="k">def</span> <span class="nf">strip</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">strip_characters</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Way faster than document.strip(strip_characters) since strip_characters is</span>
 <span class="sd">    now a set instead of a str, and it contains a lot of elements (all the</span>
@@ -132,7 +134,10 @@
     <span class="k">return</span> <span class="n">document_stripped</span></div>
 
 
-<div class="viewcode-block" id="split_on_whitespace"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.split_on_whitespace">[docs]</a><span class="k">def</span> <span class="nf">split_on_whitespace</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">new_line</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="split_on_whitespace">
+<a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.split_on_whitespace">[docs]</a>
+<span class="k">def</span> <span class="nf">split_on_whitespace</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">new_line</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tab</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This method also removes concatenated spaces.</span>
 
@@ -148,7 +153,10 @@
     <span class="k">return</span> <span class="n">split_document</span></div>
 
 
-<div class="viewcode-block" id="split_on_newline_tab_whitespace"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.split_on_newline_tab_whitespace">[docs]</a><span class="k">def</span> <span class="nf">split_on_newline_tab_whitespace</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
+
+<div class="viewcode-block" id="split_on_newline_tab_whitespace">
+<a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.split_on_newline_tab_whitespace">[docs]</a>
+<span class="k">def</span> <span class="nf">split_on_newline_tab_whitespace</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This method is used to split the document into different levels of sub-</span>
 <span class="sd">    sentences.</span>
@@ -165,7 +173,10 @@
     <span class="k">return</span> <span class="n">sentences</span></div>
 
 
-<div class="viewcode-block" id="merge_on_whitespace_tab_newline"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.merge_on_whitespace_tab_newline">[docs]</a><span class="k">def</span> <span class="nf">merge_on_whitespace_tab_newline</span><span class="p">(</span><span class="n">sentences</span><span class="p">):</span>
+
+<div class="viewcode-block" id="merge_on_whitespace_tab_newline">
+<a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.merge_on_whitespace_tab_newline">[docs]</a>
+<span class="k">def</span> <span class="nf">merge_on_whitespace_tab_newline</span><span class="p">(</span><span class="n">sentences</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This method is used to merge different levels of sub-sentences into one</span>
 <span class="sd">    document. Invert the method split_on_newline_tab_whitespace. Removes</span>
@@ -184,7 +195,10 @@
     <span class="k">return</span> <span class="n">document</span></div>
 
 
-<div class="viewcode-block" id="words_augmentation"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.words_augmentation">[docs]</a><span class="k">def</span> <span class="nf">words_augmentation</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">group_size</span><span class="p">,</span> <span class="n">join_char</span><span class="p">):</span>
+
+<div class="viewcode-block" id="words_augmentation">
+<a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.words_augmentation">[docs]</a>
+<span class="k">def</span> <span class="nf">words_augmentation</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="n">group_size</span><span class="p">,</span> <span class="n">join_char</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Augment words, especially for Chinese (without a space between words) and</span>
 <span class="sd">    Vietnamese (with a space between syllables).</span>
@@ -201,7 +215,10 @@
     <span class="k">return</span> <span class="n">augmentation</span></div>
 
 
-<div class="viewcode-block" id="get_words_from_document"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.get_words_from_document">[docs]</a><span class="k">def</span> <span class="nf">get_words_from_document</span><span class="p">(</span>
+
+<div class="viewcode-block" id="get_words_from_document">
+<a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.get_words_from_document">[docs]</a>
+<span class="k">def</span> <span class="nf">get_words_from_document</span><span class="p">(</span>
     <span class="n">document</span><span class="p">,</span>
     <span class="n">token_func</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">new_line</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -225,7 +242,10 @@
     <span class="k">return</span> <span class="n">words</span></div>
 
 
-<div class="viewcode-block" id="words_refinement"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.words_refinement">[docs]</a><span class="k">def</span> <span class="nf">words_refinement</span><span class="p">(</span><span class="n">words</span><span class="p">,</span>
+
+<div class="viewcode-block" id="words_refinement">
+<a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.words_refinement">[docs]</a>
+<span class="k">def</span> <span class="nf">words_refinement</span><span class="p">(</span><span class="n">words</span><span class="p">,</span>
                      <span class="n">lower_case</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                      <span class="n">strip_chars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">use_words_aug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -262,7 +282,10 @@
     <span class="k">return</span> <span class="n">words</span></div>
 
 
-<div class="viewcode-block" id="get_sentences_from_document"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.get_sentences_from_document">[docs]</a><span class="k">def</span> <span class="nf">get_sentences_from_document</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">model_func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="get_sentences_from_document">
+<a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.get_sentences_from_document">[docs]</a>
+<span class="k">def</span> <span class="nf">get_sentences_from_document</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">model_func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get sentences from a document.</span>
 
@@ -279,7 +302,10 @@
     <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="split_text_by_punctuation"><a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.split_text_by_punctuation">[docs]</a><span class="k">def</span> <span class="nf">split_text_by_punctuation</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+
+<div class="viewcode-block" id="split_text_by_punctuation">
+<a class="viewcode-back" href="../../../../data_juicer.ops.common.html#data_juicer.ops.common.split_text_by_punctuation">[docs]</a>
+<span class="k">def</span> <span class="nf">split_text_by_punctuation</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Split text by any zh and en punctuation</span>
 
@@ -293,6 +319,7 @@
     <span class="n">result</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">result</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
 
     <span class="k">return</span> <span class="n">result</span></div>
+
 </pre></div>
 
            </div>

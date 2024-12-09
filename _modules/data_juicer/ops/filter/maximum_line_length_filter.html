@@ -1,18 +1,18 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.filter.maximum_line_length_filter &mdash; data_juicer 1.0.0 documentation</title>
+  <title>data_juicer.ops.filter.maximum_line_length_filter &mdash; data_juicer 1.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
-      <script src="../../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/documentation_options.js?v=292eb321"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -87,7 +87,9 @@
 <span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;maximum_line_length_filter&#39;</span>
 
 
-<div class="viewcode-block" id="MaximumLineLengthFilter"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.MaximumLineLengthFilter">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<div class="viewcode-block" id="MaximumLineLengthFilter">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.MaximumLineLengthFilter">[docs]</a>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@INTER_LINES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">MaximumLineLengthFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter to keep samples with maximum line length within a specific</span>
@@ -95,7 +97,9 @@
 
     <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="MaximumLineLengthFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.MaximumLineLengthFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="MaximumLineLengthFilter.__init__">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.MaximumLineLengthFilter.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">min_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
                  <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
                  <span class="o">*</span><span class="n">args</span><span class="p">,</span>
@@ -116,7 +120,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">min_len</span> <span class="o">=</span> <span class="n">min_len</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_len</span> <span class="o">=</span> <span class="n">max_len</span></div>
 
-<div class="viewcode-block" id="MaximumLineLengthFilter.compute_stats_batched"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.MaximumLineLengthFilter.compute_stats_batched">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MaximumLineLengthFilter.compute_stats_batched">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.MaximumLineLengthFilter.compute_stats_batched">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_stats_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">samples_list</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
         <span class="n">samples_stats</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]</span>
         <span class="n">context_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">InterVars</span><span class="o">.</span><span class="n">lines</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -138,7 +145,10 @@
 
         <span class="k">return</span> <span class="n">samples</span></div>
 
-<div class="viewcode-block" id="MaximumLineLengthFilter.process_batched"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.MaximumLineLengthFilter.process_batched">[docs]</a>    <span class="k">def</span> <span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+
+<div class="viewcode-block" id="MaximumLineLengthFilter.process_batched">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.MaximumLineLengthFilter.process_batched">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">samples</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">map</span><span class="p">(</span>
                 <span class="k">lambda</span> <span class="n">stat</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_len</span> <span class="o">&lt;=</span> <span class="n">stat</span><span class="p">[</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">max_line_length</span><span class="p">]</span> <span class="o">&lt;=</span>
@@ -149,7 +159,9 @@
                     <span class="n">StatsKeys</span><span class="o">.</span><span class="n">max_line_length</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_len</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">False</span></div></div>
+                <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
 </pre></div>
 
            </div>

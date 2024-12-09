@@ -1,18 +1,18 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.mapper.extract_entity_relation_mapper &mdash; data_juicer 1.0.0 documentation</title>
+  <title>data_juicer.ops.mapper.extract_entity_relation_mapper &mdash; data_juicer 1.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
-      <script src="../../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/documentation_options.js?v=292eb321"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -99,7 +99,9 @@
 
 
 <span class="c1"># TODO: LLM-based inference.</span>
-<div class="viewcode-block" id="ExtractEntityRelationMapper"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<div class="viewcode-block" id="ExtractEntityRelationMapper">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper">[docs]</a>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">ExtractEntityRelationMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract entities and relations in the text for knowledge graph.</span>
@@ -224,7 +226,9 @@
     <span class="n">DEFAULT_ENTITY_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\(&quot;entity&quot;(.*?)\)&#39;</span>
     <span class="n">DEFAULT_RELATION_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\(&quot;relationship&quot;(.*?)\)&#39;</span>
 
-<div class="viewcode-block" id="ExtractEntityRelationMapper.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="ExtractEntityRelationMapper.__init__">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
                  <span class="n">entity_types</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="o">*</span><span class="p">,</span>
@@ -307,7 +311,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_text</span> <span class="o">=</span> <span class="n">drop_text</span></div>
 
-<div class="viewcode-block" id="ExtractEntityRelationMapper.parse_output"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper.parse_output">[docs]</a>    <span class="k">def</span> <span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_output</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExtractEntityRelationMapper.parse_output">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper.parse_output">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_output</span><span class="p">):</span>
         <span class="n">entities</span><span class="p">,</span> <span class="n">relations</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
 
         <span class="k">def</span> <span class="nf">remove_outer_quotes</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
@@ -359,10 +366,16 @@
 
         <span class="k">return</span> <span class="n">entities</span><span class="p">,</span> <span class="n">relations</span></div>
 
-<div class="viewcode-block" id="ExtractEntityRelationMapper.add_message"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper.add_message">[docs]</a>    <span class="k">def</span> <span class="nf">add_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">role</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExtractEntityRelationMapper.add_message">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper.add_message">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">role</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">messages</span> <span class="o">+</span> <span class="p">[{</span><span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="n">role</span><span class="p">,</span> <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">content</span><span class="p">}]</span></div>
 
-<div class="viewcode-block" id="ExtractEntityRelationMapper.light_rag_extraction"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper.light_rag_extraction">[docs]</a>    <span class="k">def</span> <span class="nf">light_rag_extraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExtractEntityRelationMapper.light_rag_extraction">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper.light_rag_extraction">[docs]</a>
+    <span class="k">def</span> <span class="nf">light_rag_extraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">messages</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
 
         <span class="n">final_result</span> <span class="o">=</span> <span class="n">client</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
@@ -386,7 +399,10 @@
 
         <span class="k">return</span> <span class="n">final_result</span></div>
 
-<div class="viewcode-block" id="ExtractEntityRelationMapper.process_single"><a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper.process_single">[docs]</a>    <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ExtractEntityRelationMapper.process_single">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.ExtractEntityRelationMapper.process_single">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">tuple_delimiter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tuple_delimiter</span><span class="p">,</span>
@@ -408,7 +424,9 @@
 
         <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">entities</span>
         <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">relation_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">relations</span>
-        <span class="k">return</span> <span class="n">sample</span></div></div>
+        <span class="k">return</span> <span class="n">sample</span></div>
+</div>
+
 </pre></div>
 
            </div>

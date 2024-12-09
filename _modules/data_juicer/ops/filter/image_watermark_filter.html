@@ -1,18 +1,18 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
+<html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.filter.image_watermark_filter &mdash; data_juicer 1.0.0 documentation</title>
+  <title>data_juicer.ops.filter.image_watermark_filter &mdash; data_juicer 1.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
-      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=af2ce170"></script>
-      <script src="../../../../_static/doctools.js?v=888ff710"></script>
-      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script src="../../../../_static/documentation_options.js?v=292eb321"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -92,7 +92,9 @@
 <span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;image_watermark_filter&#39;</span>
 
 
-<div class="viewcode-block" id="ImageWatermarkFilter"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter">[docs]</a><span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<div class="viewcode-block" id="ImageWatermarkFilter">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter">[docs]</a>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">ImageWatermarkFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -102,7 +104,9 @@
 
     <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
 
-<div class="viewcode-block" id="ImageWatermarkFilter.__init__"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="ImageWatermarkFilter.__init__">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_watermark_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;amrul-hzz/watermark_detector&#39;</span><span class="p">,</span>
                  <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="n">prob_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
@@ -135,7 +139,10 @@
             <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">hf_watermark_model</span><span class="p">,</span>
             <span class="n">trust_remote_code</span><span class="o">=</span><span class="n">trust_remote_code</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ImageWatermarkFilter.compute_stats_single"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter.compute_stats_single">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ImageWatermarkFilter.compute_stats_single">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter.compute_stats_single">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_watermark_prob</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">sample</span>
@@ -165,7 +172,10 @@
 
         <span class="k">return</span> <span class="n">sample</span></div>
 
-<div class="viewcode-block" id="ImageWatermarkFilter.process_single"><a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter.process_single">[docs]</a>    <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="ImageWatermarkFilter.process_single">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.ImageWatermarkFilter.process_single">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">itm_probs</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_watermark_prob</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">itm_probs</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -177,7 +187,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">any</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">keep_bools</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">keep_bools</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div></div>
+            <span class="k">return</span> <span class="n">keep_bools</span><span class="o">.</span><span class="n">all</span><span class="p">()</span></div>
+</div>
+
 </pre></div>
 
            </div>
