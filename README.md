@@ -31,15 +31,15 @@ One of 'Emotion Perception', 'Person Recognition', 'Human Behavior Analysis', 'C
 1. 在(benchmark存放网址)下载所有任务的jsonl文件，和每个任务的视频集合。将task_jsonls_path指定为存放jsonl的存放路径。(task_jsonls_path下直接为17个jsonl), videos_save_path指定为存放所有出题视频的目录，存放格式满足
 
 (videos_save_path)--  
-&nbsp;&nbsp;&nbsp;&nbspAction_Temporal_Analysis--  
-&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp（.mp4）  
-&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp（.mp4）  
-&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp（.mp4）  
-&nbsp;&nbsp;&nbsp;&nbspActive_speaker_detection--  
-&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp（.mp4）  
-&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp（.mp4）  
-&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp（.mp4）  
-&nbsp;&nbsp;&nbsp;&nbsp...  
+&nbsp;&nbsp;Action_Temporal_Analysis--  
+&nbsp;&nbsp;&nbsp;&nbsp;（.mp4）  
+&nbsp;&nbsp;&nbsp;&nbsp;（.mp4）  
+&nbsp;&nbsp;&nbsp;&nbsp;（.mp4）  
+&nbsp;&nbsp;Active_speaker_detection--  
+&nbsp;&nbsp;&nbsp;&nbsp;（.mp4）  
+&nbsp;&nbsp;&nbsp;&nbsp;（.mp4）  
+&nbsp;&nbsp;&nbsp;&nbsp;（.mp4）  
+&nbsp;&nbsp; ...  
 
 2. 完善模型加载部分（if __name__ == "__main__":中"load your model here"）,获得 model,processor,tokenizer
 
