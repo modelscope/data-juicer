@@ -14,7 +14,8 @@ jsonl存放位置为path/dj_process_flow/raw_videos.jsonl, 然后就可以开始
 # 运行方式
 python tools/process_data.py --config /HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml
 
-# 在上述标注结果的帮助下，可以构建HumanVBench中绝大多数任务。构建细节详见论文附录。我们会尽快公布17个任务的构建流程代码。
+
+在上述标注结果的帮助下，可以构建HumanVBench中绝大多数任务。构建细节详见论文附录。我们会尽快公布17个任务的构建流程代码。
 
 
 ## HumanVBench下载和测评方法
