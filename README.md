@@ -1,7 +1,7 @@
 # HumanVBench
 
 ## 前置条件
-参照datajuicer（https://github.com/modelscope/data-juicer）的环境配置方法，
+参照datajuicer （https://github.com/modelscope/data-juicer） 的环境配置方法，
 并且需要将
 
 ## 数据Annotation Pipeline
