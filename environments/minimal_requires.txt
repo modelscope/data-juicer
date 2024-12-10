@@ -2,9 +2,13 @@ datasets>=2.19.0
 fsspec==2023.5.0
 pandas
 numpy
-av
+av==13.1.0
 soundfile
+# need to install two dependencies by librosa to avoid lazy_loader error
 librosa>=0.10
+samplerate
+resampy
+# need to install two dependencies by librosa to avoid lazy_loader error
 loguru
 tabulate
 tqdm
