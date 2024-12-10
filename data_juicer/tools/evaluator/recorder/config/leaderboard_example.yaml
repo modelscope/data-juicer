@@ -1,0 +1,13 @@
+project: <your wandb project name>
+base_url: <your wandb instance url>
+leaderboard: True
+leaderboard_metrics:
+  - mmlu.EM
+  - boolq.EM
+  - quac.F1
+  - raft.EM
+  - hellaswag.EM
+  - ...
+excluded_runs:
+  - <run1 to exclude>
+  - ...

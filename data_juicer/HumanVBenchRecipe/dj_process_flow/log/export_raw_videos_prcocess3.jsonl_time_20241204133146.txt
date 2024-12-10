@@ -1,0 +1,282 @@
+2024-12-04 13:31:49.714 | INFO     | data_juicer.config.config:config_backup:646 - Back up the input config file [/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml] into the work_dir [/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/dj_process_flow]
+2024-12-04 13:31:49.752 | INFO     | data_juicer.config.config:display_config:668 - Configuration table: 
+╒════════════════════════════╤════════════════════════════════════════════════════════════════════════════════════════════════════════════╕
+│ key                        │ values                                                                                                     │
+╞════════════════════════════╪════════════════════════════════════════════════════════════════════════════════════════════════════════════╡
+│ config                     │ [Path_fr(/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml)] │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ hpo_config                 │ None                                                                                                       │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ path_k_sigma_recipe        │ None                                                                                                       │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ path_model_feedback_recipe │ None                                                                                                       │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ model_infer_config         │ None                                                                                                       │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ model_train_config         │ None                                                                                                       │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ data_eval_config           │ None                                                                                                       │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ model_eval_config          │ None                                                                                                       │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ data_probe_algo            │ 'uniform'                                                                                                  │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ data_probe_ratio           │ 1.0                                                                                                        │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ project_name               │ 'all'                                                                                                      │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ executor_type              │ 'default'                                                                                                  │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ dataset_path               │ '/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/dj_process_flow/raw_videos_prcocess2.jsonl'                │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ export_path                │ '/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/dj_process_flow/raw_videos_prcocess3.jsonl'                │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ export_shard_size          │ 0                                                                                                          │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ export_in_parallel         │ False                                                                                                      │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ keep_stats_in_res_ds       │ False                                                                                                      │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ keep_hashes_in_res_ds      │ False                                                                                                      │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ np                         │ 1                                                                                                          │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ text_keys                  │ 'text'                                                                                                     │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ image_key                  │ 'images'                                                                                                   │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ image_special_token        │ '<__dj__image>'                                                                                            │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ audio_key                  │ 'audios'                                                                                                   │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ audio_special_token        │ '<__dj__audio>'                                                                                            │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ video_key                  │ 'videos'                                                                                                   │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ video_special_token        │ '<__dj__video>'                                                                                            │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ eoc_special_token          │ '<|__dj__eoc|>'                                                                                            │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ suffixes                   │ []                                                                                                         │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ use_cache                  │ True                                                                                                       │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ ds_cache_dir               │ '/home/daoyuan_mm/.cache/huggingface/datasets'                                                             │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ cache_compress             │ None                                                                                                       │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ use_checkpoint             │ False                                                                                                      │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ temp_dir                   │ None                                                                                                       │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ open_tracer                │ False                                                                                                      │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ op_list_to_trace           │ []                                                                                                         │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ trace_num                  │ 10                                                                                                         │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ op_fusion                  │ False                                                                                                      │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ process                    │ [{'video_active_speaker_mapper': {'Light_ASD_model_path': 'weight/finetuning_TalkSet.model',               │
+│                            │                                   'accelerator': 'cpu',                                                    │
+│                            │                                   'audio_key': 'audios',                                                   │
+│                            │                                   'batched_op': False,                                                     │
+│                            │                                   'cpu_required': 1,                                                       │
+│                            │                                   'face_track_bbox_path': '/mnt/zt_dj_output/face_bbox_pexel230k',         │
+│                            │                                   'image_key': 'images',                                                   │
+│                            │                                   'mem_required': '10GB',                                                  │
+│                            │                                   'num_proc': 0,                                                           │
+│                            │                                   'tempt_save_path': '/mnt3/daoyuan_mm/dj_ASD_tempt',                      │
+│                            │                                   'text_key': 'text',                                                      │
+│                            │                                   'use_actor': False,                                                      │
+│                            │                                   'video_key': 'videos'}}]                                                 │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ percentiles                │ []                                                                                                         │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ export_original_dataset    │ False                                                                                                      │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ save_stats_in_one_file     │ False                                                                                                      │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ ray_address                │ 'auto'                                                                                                     │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ debug                      │ False                                                                                                      │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ work_dir                   │ '/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/dj_process_flow'                                           │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ timestamp                  │ '20241204133146'                                                                                           │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ dataset_dir                │ '/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/dj_process_flow'                                           │
+├────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ add_suffix                 │ False                                                                                                      │
+╘════════════════════════════╧════════════════════════════════════════════════════════════════════════════════════════════════════════════╛
+2024-12-04 13:31:49.752 | INFO     | data_juicer.core.executor:__init__:49 - Using cache compression method: [None]
+2024-12-04 13:31:49.753 | INFO     | data_juicer.core.executor:__init__:54 - Setting up data formatter...
+2024-12-04 13:31:49.753 | INFO     | data_juicer.core.executor:__init__:76 - Preparing exporter...
+2024-12-04 13:31:49.754 | INFO     | data_juicer.core.executor:run:153 - Loading dataset from data formatter...
+Generating jsonl split: 0 examples [00:00, ? examples/s]Generating jsonl split: 0 examples [00:00, ? examples/s]
+2024-12-04 13:31:50.567 | ERROR    | __main__:<module>:27 - An error has been caught in function '<module>', process 'MainProcess' (3893174), thread 'MainThread' (140523670651328):
+Traceback (most recent call last):
+
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/site-packages/datasets/packaged_modules/json/json.py", line 144, in _generate_tables
+    dataset = json.load(f)
+              │    │    └ <_io.TextIOWrapper name='/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/dj_process_flow/raw_videos_prcocess2.jsonl' mode='r' ...
+              │    └ <function load at 0x7fce29f9c700>
+              └ <module 'json' from '/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/json/__init__.py'>
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           │     │  └ <method 'read' of '_io.TextIOWrapper' objects>
+           │     └ <_io.TextIOWrapper name='/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/dj_process_flow/raw_videos_prcocess2.jsonl' mode='r' ...
+           └ <function loads at 0x7fce29f9c790>
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           │                │      └ '{"videos":["\\/home\\/daoyuan_mm\\/data_juicer\\/HumanVBenchRecipe\\/test_video\\/video1.mp4"],"text":"","__dj__video_audio_...
+           │                └ <function JSONDecoder.decode at 0x7fce29f9c160>
+           └ <json.decoder.JSONDecoder object at 0x7fce29f8f1c0>
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               │    │          │      │  └ '{"videos":["\\/home\\/daoyuan_mm\\/data_juicer\\/HumanVBenchRecipe\\/test_video\\/video1.mp4"],"text":"","__dj__video_audio_...
+               │    │          │      └ <built-in method match of re.Pattern object at 0x7fce2a000ab0>
+               │    │          └ '{"videos":["\\/home\\/daoyuan_mm\\/data_juicer\\/HumanVBenchRecipe\\/test_video\\/video1.mp4"],"text":"","__dj__video_audio_...
+               │    └ <function JSONDecoder.raw_decode at 0x7fce29f9c1f0>
+               └ <json.decoder.JSONDecoder object at 0x7fce29f8f1c0>
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/json/decoder.py", line 353, in raw_decode
+    obj, end = self.scan_once(s, idx)
+               │    │         │  └ 0
+               │    │         └ '{"videos":["\\/home\\/daoyuan_mm\\/data_juicer\\/HumanVBenchRecipe\\/test_video\\/video1.mp4"],"text":"","__dj__video_audio_...
+               │    └ <_json.Scanner object at 0x7fce29fa1040>
+               └ <json.decoder.JSONDecoder object at 0x7fce29f8f1c0>
+
+json.decoder.JSONDecodeError: Expecting property name enclosed in double quotes: line 1 column 138 (char 137)
+
+
+During handling of the above exception, another exception occurred:
+
+
+Traceback (most recent call last):
+
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/site-packages/datasets/builder.py", line 1973, in _prepare_split_single
+    for _, table in generator:
+                    └ <generator object Json._generate_tables at 0x7fcb14db8eb0>
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/site-packages/datasets/packaged_modules/json/json.py", line 147, in _generate_tables
+    raise e
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/site-packages/datasets/packaged_modules/json/json.py", line 121, in _generate_tables
+    pa_table = paj.read_json(
+               │   └ <built-in function read_json>
+               └ <module 'pyarrow.json' from '/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/site-packages/pyarrow/json.py'>
+  File "pyarrow/_json.pyx", line 258, in pyarrow._json.read_json
+    table = GetResultValue(reader.get().Read())
+  File "pyarrow/error.pxi", line 144, in pyarrow.lib.pyarrow_internal_check_status
+    return check_status(status)
+  File "pyarrow/error.pxi", line 100, in pyarrow.lib.check_status
+    raise ArrowInvalid(message)
+          └ <class 'pyarrow.lib.ArrowInvalid'>
+
+pyarrow.lib.ArrowInvalid: JSON parse error: Missing a name for object member. in row 0
+
+
+The above exception was the direct cause of the following exception:
+
+
+Traceback (most recent call last):
+
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/runpy.py", line 197, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+           │         │     └ {'__name__': '__main__', '__doc__': None, '__package__': '', '__loader__': <_frozen_importlib_external.SourceFileLoader objec...
+           │         └ <code object <module> at 0x7fce29fe6450, file "/home/daoyuan_mm/.vscode-server/extensions/ms-python.debugpy-2024.0.0-linux-x6...
+           └ <function _run_code at 0x7fce29fe39d0>
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+         │     └ {'__name__': '__main__', '__doc__': None, '__package__': '', '__loader__': <_frozen_importlib_external.SourceFileLoader objec...
+         └ <code object <module> at 0x7fce29fe6450, file "/home/daoyuan_mm/.vscode-server/extensions/ms-python.debugpy-2024.0.0-linux-x6...
+
+  File "/home/daoyuan_mm/.vscode-server/extensions/ms-python.debugpy-2024.0.0-linux-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/__main__.py", line 39, in <module>
+    cli.main()
+    │   └ <function main at 0x7fce28b47280>
+    └ <module 'debugpy.server.cli' from '/home/daoyuan_mm/.vscode-server/extensions/ms-python.debugpy-2024.0.0-linux-x64/bundled/li...
+
+  File "/home/daoyuan_mm/.vscode-server/extensions/ms-python.debugpy-2024.0.0-linux-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/../debugpy/server/cli.py", line 430, in main
+    run()
+    └ <function run_file at 0x7fce28b47040>
+
+  File "/home/daoyuan_mm/.vscode-server/extensions/ms-python.debugpy-2024.0.0-linux-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher/../../debugpy/../debugpy/server/cli.py", line 284, in run_file
+    runpy.run_path(target, run_name="__main__")
+    │     │        └ '/home/daoyuan_mm/data_juicer/tools/process_data.py'
+    │     └ <function run_path at 0x7fce29045820>
+    └ <module '_pydevd_bundle.pydevd_runpy' from '/home/daoyuan_mm/.vscode-server/extensions/ms-python.debugpy-2024.0.0-linux-x64/b...
+
+  File "/home/daoyuan_mm/.vscode-server/extensions/ms-python.debugpy-2024.0.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 321, in run_path
+    return _run_module_code(code, init_globals, run_name,
+           │                │     │             └ '__main__'
+           │                │     └ None
+           │                └ <code object <module> at 0x7fce289bd2f0, file "/home/daoyuan_mm/data_juicer/tools/process_data.py", line 4>
+           └ <function _run_module_code at 0x7fce29036e50>
+
+  File "/home/daoyuan_mm/.vscode-server/extensions/ms-python.debugpy-2024.0.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 135, in _run_module_code
+    _run_code(code, mod_globals, init_globals,
+    │         │     │            └ None
+    │         │     └ {'__name__': '__main__', '__doc__': None, '__package__': '', '__loader__': None, '__spec__': None, '__file__': '/home/daoyuan...
+    │         └ <code object <module> at 0x7fce289bd2f0, file "/home/daoyuan_mm/data_juicer/tools/process_data.py", line 4>
+    └ <function _run_code at 0x7fce29036b80>
+
+  File "/home/daoyuan_mm/.vscode-server/extensions/ms-python.debugpy-2024.0.0-linux-x64/bundled/libs/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_runpy.py", line 124, in _run_code
+    exec(code, run_globals)
+         │     └ {'__name__': '__main__', '__doc__': None, '__package__': '', '__loader__': None, '__spec__': None, '__file__': '/home/daoyuan...
+         └ <code object <module> at 0x7fce289bd2f0, file "/home/daoyuan_mm/data_juicer/tools/process_data.py", line 4>
+
+> File "/home/daoyuan_mm/data_juicer/tools/process_data.py", line 27, in <module>
+    main()
+    └ <function main at 0x7fcb2dadbaf0>
+
+  File "/home/daoyuan_mm/data_juicer/tools/process_data.py", line 23, in main
+    executor.run()
+    │        └ <function Executor.run at 0x7fcb2dadb940>
+    └ <data_juicer.core.executor.Executor object at 0x7fcb1dd96340>
+
+  File "/home/daoyuan_mm/data_juicer/data_juicer/core/executor.py", line 156, in run
+    dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+              │    │         │            │             │    └ Namespace(config=[Path_fr(/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml)], ...
+              │    │         │            │             └ <data_juicer.core.executor.Executor object at 0x7fcb1dd96340>
+              │    │         │            └ 1
+              │    │         └ <function MixtureFormatter.load_dataset at 0x7fcb3ccade50>
+              │    └ <data_juicer.format.mixture_formatter.MixtureFormatter object at 0x7fcb14d8c670>
+              └ <data_juicer.core.executor.Executor object at 0x7fcb1dd96340>
+
+  File "/home/daoyuan_mm/data_juicer/data_juicer/format/mixture_formatter.py", line 135, in load_dataset
+    dataset = formatter.load_dataset(num_proc, global_cfg)
+              │         │            │         └ Namespace(config=[Path_fr(/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml)], ...
+              │         │            └ 1
+              │         └ <function LocalFormatter.load_dataset at 0x7fcb3ccad670>
+              └ <data_juicer.format.json_formatter.JsonFormatter object at 0x7fcb21f507c0>
+
+  File "/home/daoyuan_mm/data_juicer/data_juicer/format/formatter.py", line 63, in load_dataset
+    datasets = load_dataset(self.type,
+               │            │    └ 'json'
+               │            └ <data_juicer.format.json_formatter.JsonFormatter object at 0x7fcb21f507c0>
+               └ <function load_dataset at 0x7fcd285d5700>
+
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/site-packages/datasets/load.py", line 2582, in load_dataset
+    builder_instance.download_and_prepare(
+    │                └ <function DatasetBuilder.download_and_prepare at 0x7fcd2870e8b0>
+    └ <datasets.packaged_modules.json.json.Json object at 0x7fcb1dcb6160>
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/site-packages/datasets/builder.py", line 1005, in download_and_prepare
+    self._download_and_prepare(
+    │    └ <function DatasetBuilder._download_and_prepare at 0x7fcd2870ea60>
+    └ <datasets.packaged_modules.json.json.Json object at 0x7fcb1dcb6160>
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/site-packages/datasets/builder.py", line 1100, in _download_and_prepare
+    self._prepare_split(split_generator, **prepare_split_kwargs)
+    │    │              │                  └ {'file_format': 'arrow', 'num_proc': 1}
+    │    │              └ SplitGenerator(name='jsonl', gen_kwargs={'files': [FilesIterable(current=/home/daoyuan_mm/data_juicer/HumanVBenchRecipe/dj_pr...
+    │    └ <function ArrowBasedBuilder._prepare_split at 0x7fcd28716820>
+    └ <datasets.packaged_modules.json.json.Json object at 0x7fcb1dcb6160>
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/site-packages/datasets/builder.py", line 1860, in _prepare_split
+    for job_id, done, content in self._prepare_split_single(
+        │       │     │          │    └ <function ArrowBasedBuilder._prepare_split_single at 0x7fcd287168b0>
+        │       │     │          └ <datasets.packaged_modules.json.json.Json object at 0x7fcb1dcb6160>
+        │       │     └ 0
+        │       └ False
+        └ 0
+  File "/home/daoyuan_mm/miniconda3/envs/videollama/lib/python3.9/site-packages/datasets/builder.py", line 2016, in _prepare_split_single
+    raise DatasetGenerationError("An error occurred while generating the dataset") from e
+          └ <class 'datasets.exceptions.DatasetGenerationError'>
+
+datasets.exceptions.DatasetGenerationError: An error occurred while generating the dataset

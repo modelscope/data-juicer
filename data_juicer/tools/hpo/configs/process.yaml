@@ -1,0 +1,19 @@
+# Process config example for dataset
+
+# global parameters
+project_name: 'demo-process-hpo'
+dataset_path: 'demo-redpajama-c4-refined.jsonl'
+np: 4  # number of subprocess to process your dataset
+
+export_path: './outputs/demo-hpo-process/demo-hpo-processed.jsonl'
+
+# process schedule
+# a list of several process operators with their arguments
+process:
+  - character_repetition_filter: # filter text with the character repetition ratio out of specific range
+      rep_len: 10                  # repetition length for char-level n-gram
+      min_ratio: 0.0               # the min ratio of filter range
+      max_ratio: 0.5
+  - text_length_filter: # filter text with length out of specific range
+      min_len: 10        # the min length of filter range
+      max_len: 10000

@@ -1,0 +1,23 @@
+lr0: 0.010                    # initial learning rate (SGD=1E-2, Adam=1E-3)
+lrf: 0.010                    # final OneCycleLR learning rate (lr0 * lrf)
+momentum: 0.93700000          # SGD momentum/Adam beta1
+weight_decay: 0.0005          # optimizer weight decay 5e-4
+warmup_epochs: 3.000          # warmup epochs
+warmup_momentum: 0.8          # warmup initial momentum
+warmup_bias_lr: 0.10          # warmup initial bias lr
+box: 7.5                      # box loss gain
+cls: 0.5                      # cls loss gain
+dfl: 1.5                      # cls loss gain
+hsv_h: 0.015000               # image HSV-Hue augmentation (fraction)
+hsv_s: 0.700000               # image HSV-Saturation augmentation (fraction)
+hsv_v: 0.400000               # image HSV-Value augmentation (fraction)
+degrees: 0.0000               # image rotation (+/- deg)
+translate: 0.10               # image translation (+/- fraction)
+scale: 0.500000               # image scale (+/- gain)
+shear: 0.000000               # image shear (+/- deg)
+flip_ud: 0.0000               # image flip up-down (probability)
+flip_lr: 0.5000               # image flip left-right (probability)
+mosaic: 1.00000               # image mosaic (probability)
+mix_up: 0.00000               # image mix-up (probability)
+names:
+  0: person

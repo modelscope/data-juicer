@@ -1,0 +1,8 @@
+torch>=1.11.0,<2.0.0
+wandb
+fire
+pyspark
+# vbench-related
+vbench
+# modelscope-related
+modelscope

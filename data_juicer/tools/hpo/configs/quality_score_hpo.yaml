@@ -1,0 +1,28 @@
+
+sweep_name: hpo_for_data-juicer
+sweep_max_count: 1000  # the maximal number of trials; `None` for unlimited
+
+# hpo configuration from original sweep, see more options and details in
+# https://docs.wandb.ai/guides/sweeps/define-sweep-configuration
+
+method: bayes   # ["random", "grid", "bayes"]
+
+metric:
+  name: quality_score  # defined in hpo/objects.py
+  goal: maximize  # ["maximize", "minimize", +"target"]
+
+parameters:
+# can be [single value, multiple values, probabilities, distribution, nested]
+  character_repetition_filter.rep_len:
+      values: [2, 4, 8, 16]
+  character_repetition_filter.max_ratio:
+    values: [0.3, 0.5, 0.7]
+  text_length_filter.min_len:
+      distribution: q_log_uniform_values
+      min: 256
+      max: 8192
+
+early_terminate:
+  type: hyperband
+  max_iter: 27
+  s: 2
