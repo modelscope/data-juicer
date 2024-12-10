@@ -13,15 +13,13 @@ from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.exporter import Exporter
 from data_juicer.core.tracer import Tracer
 from data_juicer.format.load import load_formatter
-from data_juicer.format.mixture_formatter import MixtureFormatter
 from data_juicer.ops import OPERATORS, load_ops
 from data_juicer.ops.op_fusion import fuse_operators
-from data_juicer.ops.selector.frequency_specified_field_selector import \
-    FrequencySpecifiedFieldSelector
-from data_juicer.ops.selector.topk_specified_field_selector import \
-    TopkSpecifiedFieldSelector
+from data_juicer.ops.selector import (FrequencySpecifiedFieldSelector,
+                                      TopkSpecifiedFieldSelector)
 from data_juicer.utils import cache_utils
 from data_juicer.utils.ckpt_utils import CheckpointManager
+from data_juicer.utils.sample import random_sample
 
 
 class LocalExecutor(ExecutorBase):
@@ -97,52 +95,6 @@ class LocalExecutor(ExecutorBase):
                 logger.info('Trace for all ops.')
                 self.op_list_to_trace = set(OPERATORS.modules.keys())
 
-    def sample_data(self,
-                    dataset_to_sample: Dataset = None,
-                    load_data_np=None,
-                    sample_ratio: float = 1.0,
-                    sample_algo: str = 'uniform',
-                    **kwargs):
-        """
-        Sample a subset from the given dataset.
-
-        :param dataset_to_sample: Dataset to sample from. If None, will use
-            the formatter linked by the executor. Default is None.
-        :param load_data_np: number of workers when loading the dataset.
-        :param sample_ratio: The ratio of the sample size to the original
-            dataset size. Default is 1.0 (no sampling).
-        :param sample_algo: Sampling algorithm to use. Options are "uniform",
-            "frequency_specified_field_selector", or
-            "topk_specified_field_selector".
-            Default is "uniform".
-        :return: A sampled Dataset.
-        """
-        # Determine the dataset to sample from
-        if dataset_to_sample is not None:
-            dataset = dataset_to_sample
-        elif self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
-            logger.info('Loading dataset from checkpoint...')
-            dataset = self.ckpt_manager.load_ckpt()
-        elif hasattr(self, 'formatter'):
-            logger.info('Loading dataset from data formatter...')
-            if load_data_np is None:
-                load_data_np = self.cfg.np
-            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
-        else:
-            raise ValueError('No dataset available to sample from.')
-
-        # Perform sampling based on the specified algorithm
-        if sample_algo == 'uniform':
-            return MixtureFormatter.random_sample(dataset, sample_ratio)
-        elif sample_algo == 'frequency_specified_field_selector':
-            dj_op = FrequencySpecifiedFieldSelector(**kwargs)
-            return dj_op.process(dataset)
-        elif sample_algo == 'topk_specified_field_selector':
-            dj_op = TopkSpecifiedFieldSelector(**kwargs)
-            return dj_op.process(dataset)
-        else:
-            raise ValueError(f'Unsupported sample_algo: {sample_algo}')
-
     def run(self,
             load_data_np: Optional[PositiveInt] = None,
             skip_return=False):
@@ -215,3 +167,51 @@ class LocalExecutor(ExecutorBase):
 
         if not skip_return:
             return dataset
+
+    def sample_data(self,
+                    dataset_to_sample: Dataset = None,
+                    load_data_np=None,
+                    sample_ratio: float = 1.0,
+                    sample_algo: str = 'uniform',
+                    **kwargs):
+        """
+        Sample a subset from the given dataset.
+        TODO add support other than LocalExecutor
+
+        :param executor: executor
+        :param dataset_to_sample: Dataset to sample from. If None, will use
+            the formatter linked by the executor. Default is None.
+        :param load_data_np: number of workers when loading the dataset.
+        :param sample_ratio: The ratio of the sample size to the original
+            dataset size. Default is 1.0 (no sampling).
+        :param sample_algo: Sampling algorithm to use. Options are "uniform",
+            "frequency_specified_field_selector", or
+            "topk_specified_field_selector".
+            Default is "uniform".
+        :return: A sampled Dataset.
+        """
+        # Determine the dataset to sample from
+        if dataset_to_sample is not None:
+            dataset = dataset_to_sample
+        elif self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
+            logger.info('Loading dataset from checkpoint...')
+            dataset = self.ckpt_manager.load_ckpt()
+        elif hasattr(self, 'formatter'):
+            logger.info('Loading dataset from data formatter...')
+            if load_data_np is None:
+                load_data_np = self.cfg.np
+            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+        else:
+            raise ValueError('No dataset available to sample from.')
+
+        # Perform sampling based on the specified algorithm
+        if sample_algo == 'uniform':
+            return random_sample(dataset, sample_ratio)
+        elif sample_algo == 'frequency_specified_field_selector':
+            dj_op = FrequencySpecifiedFieldSelector(**kwargs)
+            return dj_op.process(dataset)
+        elif sample_algo == 'topk_specified_field_selector':
+            dj_op = TopkSpecifiedFieldSelector(**kwargs)
+            return dj_op.process(dataset)
+        else:
+            raise ValueError(f'Unsupported sample_algo: {sample_algo}')

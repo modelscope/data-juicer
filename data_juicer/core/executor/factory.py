@@ -1,7 +1,7 @@
 from typing import Union
 
-from local_executor import LocalExecutor
-from ray_executor import RayExecutor
+from .local_executor import LocalExecutor
+from .ray_executor import RayExecutor
 
 
 class ExecutorFactory:
