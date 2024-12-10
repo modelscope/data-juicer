@@ -257,11 +257,22 @@ class Mapper(OP):
         keys = samples.keys()
         first_key = next(iter(keys))
         num_samples = len(samples[first_key])
+
+        new_keys = {}
         for i in range(num_samples):
             this_sample = {key: samples[key][i] for key in keys}
             res_sample = self.process_single(this_sample, *args, **kwargs)
-            for key in keys:
-                samples[key][i] = res_sample[key]
+            res_keys = res_sample.keys()
+            for key in res_keys:
+                if key not in keys:
+                    if key not in new_keys:
+                        new_keys.update({key: []})
+                    new_keys[key].append(res_sample[key])
+                else:
+                    samples[key][i] = res_sample[key]
+
+        for k, v in new_keys.items():
+            samples[k] = v
 
         return samples
 
