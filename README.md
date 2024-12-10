@@ -197,6 +197,18 @@ The dependency options are listed below:
 | `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers.                       |
 | `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
 
+- Install dependencies for specific OPs
+
+With the growth of the number of OPs, the dependencies of all OPs becomes very heavy. Instead of using the command `pip install -v -e .[sci]` to install all dependencies,
+we provide two alternative, lighter options:
+
+  - Automatic Minimal Dependency Installation: During the execution of Data-Juicer, minimal dependencies will be automatically installed. This allows for immediate execution, but may potentially lead to dependency conflicts.
+
+  - Manual Minimal Dependency Installation: To manually install minimal dependencies tailored to a specific execution configuration, run the following command:
+    ```shell
+    python tools/install_by_recipe.py --config path_to_your_data-juicer_config_file
+    ```
+
 ### Using pip
 
 - Run the following command to install the latest released `data_juicer` using `pip`:

@@ -178,6 +178,17 @@ pip install -v -e .[tools] # 安装部分工具库的依赖
 | `.[tools]`       | 安装专用工具库（如质量分类器）所需的依赖项        |
 | `.[sandbox]`     | 安装沙盒实验室的基础依赖                 |
 
+* 只安装部分算子依赖
+
+随着OP数量的增长，所有OP的依赖变得很重。为此，我们提供了两个替代的、更轻量的选项，作为使用命令`pip install -v -e .[sci]`安装所有依赖的替代：
+
+  * 自动最小依赖安装：在执行Data-Juicer的过程中，将自动安装最小依赖。也就是说你可以直接执行，但这种方式可能会导致一些依赖冲突。
+
+  * 手动最小依赖安装：可以通过如下指令手动安装适合特定执行配置的最小依赖：
+    ```shell
+    python tools/install_by_recipe.py --config path_to_your_data-juicer_config_file
+    ```
+
 ### 使用 pip 安装
 
 * 运行以下命令用 `pip` 安装 `data_juicer` 的最新发布版本：
