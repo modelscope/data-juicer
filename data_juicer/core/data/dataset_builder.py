@@ -2,6 +2,7 @@ import os
 from typing import List, Tuple, Union
 
 from data_juicer.core.data import NestedDataset
+from data_juicer.core.data.load_strategy import DataLoadStrategyRegistry
 from data_juicer.core.data.ray_dataset import RayDataset
 from data_juicer.utils.file_utils import is_absolute_path
 
@@ -9,6 +10,7 @@ from data_juicer.utils.file_utils import is_absolute_path
 class DatasetBuilder(object):
 
     def __init__(self, cfg):
+        # defaults to use dataset_path
         if cfg.dataset_path is not None:
             ds_configs = rewrite_cli_datapath(cfg.dataset_path)
         elif cfg.dataset is not None:
@@ -17,17 +19,26 @@ class DatasetBuilder(object):
             raise ValueError(
                 'Unable to initialize dataset; should have one of '
                 'dataset_path or dataset in configurations')
-        for config in ds_configs:
-            # initialize data loader from strategy
-            pass
+        # dataset config could be a list or a single entry; retrofit
+        if not isinstance(ds_configs, list):
+            ds_configs = [ds_configs]
+        self.load_strategies = []
+        for ds_config in ds_configs:
+            # initialize data loading strategy
+            executor_type = cfg.get('executor_type', None)
+            data_type = ds_config.get('type', None)
+            data_source = ds_config.get('source', None)
+            self.load_strategies.append(
+                DataLoadStrategyRegistry.get_strategy_class(
+                    executor_type, data_type, data_source)(ds_config))
 
     def load_dataset(self) -> Union[NestedDataset, RayDataset]:
         # handle mixture dataset, nested dataset
         # handle sampling of mixture datasets
-        #
-        for f in self.formatters:
-            f.load_dataset()
-        return None
+        _datasets = []
+        for f in self.load_strategies:
+            _datasets.append(f.load_data())
+        return _datasets[0]
 
 
 def rewrite_cli_datapath(dataset_path) -> List:

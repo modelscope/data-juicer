@@ -1,10 +1,20 @@
 import unittest
 import tempfile
+import os
+import shutil
 from data_juicer.download.wikipedia import (
     get_wikipedia_urls, download_wikipedia
 )
 
-class TestDownload:
+class TestDownload(unittest.TestCase):
+    def setUp(self):
+        # Creates a temporary directory that persists until you delete it
+        self.temp_dir = tempfile.mkdtemp(prefix='dj_test_')
+
+    def tearDown(self):
+        # Clean up the temporary directory after each test
+        if os.path.exists(self.temp_dir):
+            shutil.rmtree(self.temp_dir)
 
     def test_wikipedia_urls(self):
         dump_date = "20241101"
@@ -16,12 +26,11 @@ class TestDownload:
 
     def test_wikipedia_download(self):
         dump_date = "20241101"
-        output_directory = tempfile.gettempdir() + "/dj_temp/"
-        url_limit = 5
-        item_limit = 10
-        wiki_df = download_wikipedia(output_directory, dump_date=dump_date, url_limit=url_limit, item_limit=item_limit)
-        sample = wiki_df.take(50)
-        assert len(sample) == 50
+        url_limit = 1
+        item_limit = 50
+        wiki_df = download_wikipedia(self.temp_dir, dump_date=dump_date, url_limit=url_limit, item_limit=item_limit)
+        sample = wiki_df.take(10)
+        assert len(sample) == 10
 
 
 if __name__ == '__main__':

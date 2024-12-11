@@ -75,7 +75,7 @@ def _download_and_extract_single_partition(paths: Tuple[str, str],
     item_count = 0
     for item in iterator.iterate(downloaded_file):
         item_count += 1
-        if item_limit and item_count >= item_limit:
+        if item_limit and item_count > item_limit:
             break
         record_meta, content = item
         # Extract the text from the record
