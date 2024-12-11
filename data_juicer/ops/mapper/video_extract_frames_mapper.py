@@ -6,10 +6,11 @@ from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.file_utils import create_directory_if_not_exists
-from data_juicer.utils.mm_utils import (SpecialTokens, close_video,
-                                        extract_key_frames,
-                                        extract_video_frames_uniformly,
-                                        load_data_with_context, load_video)
+from data_juicer.utils.mm_utils import (
+    SpecialTokens, close_video, extract_key_frames,
+    extract_key_frames_by_seconds, extract_video_frames_uniformly,
+    extract_video_frames_uniformly_by_seconds, load_data_with_context,
+    load_video)
 
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
@@ -44,6 +45,7 @@ class VideoExtractFramesMapper(Mapper):
         self,
         frame_sampling_method: str = 'all_keyframes',
         frame_num: PositiveInt = 3,
+        duration: float = 0,
         frame_dir: str = None,
         frame_key=Fields.video_frames,
         *args,
@@ -57,6 +59,7 @@ class VideoExtractFramesMapper(Mapper):
             The former one extracts all key frames (the number
             of which depends on the duration of the video) and the latter
             one extract specified number of frames uniformly from the video.
+            If "duration" > 0, frame_sampling_method acts on every segment.
             Default: "all_keyframes".
         :param frame_num: the number of frames to be extracted uniformly from
             the video. Only works when frame_sampling_method is "uniform". If
@@ -64,6 +67,11 @@ class VideoExtractFramesMapper(Mapper):
             the first and the last frames will be extracted. If it's larger
             than 2, in addition to the first and the last frames, other frames
             will be extracted uniformly within the video duration.
+            If "duration" > 0, frame_num is the number of frames per segment.
+        :param duration: The duration of each segment in seconds.
+            If 0, frames are extracted from the entire video.
+            If duration > 0, the video is segmented into multiple segments
+            based on duration, and frames are extracted from each segment.
         :param frame_dir: Output directory to save extracted frames.
             If None, a default directory based on the video file path is used.
         :param frame_key: The name of field to save generated frames info.
@@ -82,6 +90,7 @@ class VideoExtractFramesMapper(Mapper):
         self.frame_dir = frame_dir
         self.frame_sampling_method = frame_sampling_method
         self.frame_num = frame_num
+        self.duration = duration
         self.frame_key = frame_key
         self.frame_fname_template = 'frame_{}.jpg'
 
@@ -109,7 +118,7 @@ class VideoExtractFramesMapper(Mapper):
         loaded_video_keys = sample[self.video_key]
         sample, videos = load_data_with_context(sample, context,
                                                 loaded_video_keys, load_video)
-        video_to_frames = {}
+        video_to_frame_dir = {}
         text = sample[self.text_key]
         offset = 0
 
@@ -124,10 +133,18 @@ class VideoExtractFramesMapper(Mapper):
                     video = videos[video_key]
                     # extract frame videos
                     if self.frame_sampling_method == 'all_keyframes':
-                        frames = extract_key_frames(video)
+                        if self.duration:
+                            frames = extract_key_frames_by_seconds(
+                                video, self.duration)
+                        else:
+                            frames = extract_key_frames(video)
                     elif self.frame_sampling_method == 'uniform':
-                        frames = extract_video_frames_uniformly(
-                            video, self.frame_num)
+                        if self.duration:
+                            frames = extract_video_frames_uniformly_by_seconds(
+                                video, self.frame_num, duration=self.duration)
+                        else:
+                            frames = extract_video_frames_uniformly(
+                                video, self.frame_num)
                     else:
                         raise ValueError(f'Not support sampling method \
                             `{self.frame_sampling_method}`.')
@@ -141,15 +158,13 @@ class VideoExtractFramesMapper(Mapper):
                         # video path as frames directory
                         frame_dir = self._get_default_frame_dir(video_key)
                     os.makedirs(frame_dir, exist_ok=True)
+                    video_to_frame_dir[video_key] = frame_dir
 
-                    video_to_frames[video_key] = []
                     for i, frame in enumerate(frames):
                         frame_path = osp.join(
                             frame_dir, self.frame_fname_template.format(i))
                         if not os.path.exists(frame_path):
                             frame.save(frame_path)
-
-                        video_to_frames[video_key].append(frame_path)
 
                 offset += video_count
 
@@ -157,7 +172,6 @@ class VideoExtractFramesMapper(Mapper):
             for vid_key in videos:
                 close_video(videos[vid_key])
 
-        sample[self.frame_key] = json.dumps(video_to_frames)
-        # sample[self.frame_key] = video_to_frames
+        sample[self.frame_key] = json.dumps(video_to_frame_dir)
 
         return sample
