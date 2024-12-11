@@ -93,41 +93,86 @@ def HumanVBench_eval(task_jsonls_path,
 
     elif eval_goal == 'all':
         ave_2 = {}
-        ave_2['Emotion Perception'] # = 5个平均
-        ave_2['Person Recognition']
-        ave_2['Human Behavior Analysis']
-        ave_2['Cross-Modal Speech-Visual Alignment']
-        
+        ave_2['Emotion Perception'] = (ave["Emotion Recognition"] + ave["Emotion Temporal Analysis"] + ave["Attitude Recognition"] + ave["Emotion Intensity Comparison"] + ave["Emotion Recognition in Conversation"])/5
+        ave_2['Person Recognition'] = (ave["Text2Human"] + ave["Human2Text"] + ave["Human Counting"] + ave["Appearance Time Detection"])/4
+        ave_2['Human Behavior Analysis'] = (ave["Behavior Temporal Analysis"] + ave["Behavior Causualty Analysis"] + ave["Action at Specified Time"] + ave["Time of Specific Action"])/4
+        ave_2['Cross-Modal Speech-Visual Alignment'] = (ave["Audio-Visual Speaker Matching"] + ave["Active Speaker Detection"] + ave["Audio-Visual Alignment Detection"] + ave["Speech Content Matching"])/4
+        with open(os.path.join(result_save_path, 'avg_modelname_result.json'), 'w') as file:
+            json.dump(acc_dict, file, indent=1)
+            json.dump(ave, file, indent=1)
+            json.dump(random_acc_dict, file, indent=1)
+            json.dump(ave_2, file, indent=1)
+        print(f'Evaluation Finish!')
+    
+    elif eval_goal == 'Emotion Perception':
+        ave_2 = {}
+        ave_2['Emotion Perception'] = (ave["Emotion Recognition"] + ave["Emotion Temporal Analysis"] + ave["Attitude Recognition"] + ave["Emotion Intensity Comparison"] + ave["Emotion Recognition in Conversation"])/5
+        with open(os.path.join(result_save_path, 'avg_modelname_result.json'), 'w') as file:
+            json.dump(acc_dict, file, indent=1)
+            json.dump(ave, file, indent=1)
+            json.dump(random_acc_dict, file, indent=1)
+            json.dump(ave_2, file, indent=1)
+        print(f'Evaluation Finish!')
+
+    elif eval_goal == 'Person Recognition':
+        ave_2 = {}
+        ave_2['Person Recognition'] = (ave["Text2Human"] + ave["Human2Text"] + ave["Human Counting"] + ave["Appearance Time Detection"])/4
+        with open(os.path.join(result_save_path, 'avg_modelname_result.json'), 'w') as file:
+            json.dump(acc_dict, file, indent=1)
+            json.dump(ave, file, indent=1)
+            json.dump(random_acc_dict, file, indent=1)
+            json.dump(ave_2, file, indent=1)
+        print(f'Evaluation Finish!')
+
+    elif eval_goal == 'Human Behavior Analysis':
+        ave_2 = {}
+        ave_2['Human Behavior Analysis'] = (ave["Behavior Temporal Analysis"] + ave["Behavior Causualty Analysis"] + ave["Action at Specified Time"] + ave["Time of Specific Action"])/4
+        with open(os.path.join(result_save_path, 'avg_modelname_result.json'), 'w') as file:
+            json.dump(acc_dict, file, indent=1)
+            json.dump(ave, file, indent=1)
+            json.dump(random_acc_dict, file, indent=1)
+            json.dump(ave_2, file, indent=1)
+        print(f'Evaluation Finish!')
+    elif eval_goal == 'Cross-Modal Speech-Visual Alignment':
+        ave_2 = {}
+        ave_2['Cross-Modal Speech-Visual Alignment'] = (ave["Audio-Visual Speaker Matching"] + ave["Active Speaker Detection"] + ave["Audio-Visual Alignment Detection"] + ave["Speech Content Matching"])/4
+        with open(os.path.join(result_save_path, 'avg_modelname_result.json'), 'w') as file:
+            json.dump(acc_dict, file, indent=1)
+            json.dump(ave, file, indent=1)
+            json.dump(random_acc_dict, file, indent=1)
+            json.dump(ave_2, file, indent=1)
+        print(f'Evaluation Finish!')
+
 
 
 
 Evaluation_items = ['all', 'Emotion Perception', 'Person Recognition', 'Human Behavior Analysis', 'Cross-Modal Speech-Visual Alignment', 'Self Selection']
-all_task_names = ["Time_of_Specific_Action", "Appearance_time_recognition", "Audio_Visual_Alignment_Moment_Detection", "MMERC_ready_for_eval", "MMERC_ready_for_eval_only_target",
-                        "Speaker_Audio_matching_156", "Speech_content_matching", "Text2Human", "Action_at_specific_time", "Action_Temporal_Analysis",
-                        "Active_speaker_detection", "Attitude_Recognition", "Behavior_Causualty_Analysis", "Emotion_Intensity_Compare", "Emotion_Temporal_Analysis",
-                        "Human_Count_raw", "Human_Emotion_Recognition", "Human_Emotion_Recognition_speaker", "Human2Text"]
+all_task_names = ["Emotion Recognition", "Emotion Temporal Analysis", "Attitude Recognition", "Emotion Intensity Comparison", "Emotion Recognition in Conversation",
+                  "Text2Human", "Human2Text", "Human Counting", "Appearance Time Detection",
+                  "Behavior Temporal Analysis", "Behavior Causualty Analysis", "Action at Specified Time", "Time of Specific Action",
+                  "Audio-Visual Speaker Matching", "Active Speaker Detection", "Audio-Visual Alignment Detection", "Speech Content Matching"]
 
 if __name__ == "__main__":
     '''
     load your model here
     '''
     # The following interfaces are used to control the evaluation
-    task_jsonls_path = None  # '/home/daoyuan_mm/HumanCentricBenchmark/AAReallyFinalBenchmark/for_Eval'
-    videos_save_path = None  # '/mnt/daoyuan_open_research/zt_data/zt_videos/HumanCentricVideoBenchmark'
+    task_jsonls_path = None  # './task_jsonls'
+    videos_save_path = None  # './HumanVBench_videos'
     eval_goal = None  # select one from Evaluation_items
     select_tasks = []  # when eval_goal == 'Self Selection' fill it. 
-    result_save_path = None  # '/home/daoyuan_mm/tempt3'
-    fold_time = 2  # random evaluation times
+    result_save_path = None 
+    fold_time = 5  # random evaluation times
 
     
     if eval_goal == 'Emotion Perception':
-        select_tasks = ["A", "B", "C"]
+        select_tasks = ["Emotion Recognition", "Emotion Temporal Analysis", "Attitude Recognition", "Emotion Intensity Comparison", "Emotion Recognition in Conversation"]
     if eval_goal == 'Person Recognition':
-        select_tasks = ["A", "B", "C"]
+        select_tasks = ["Text2Human", "Human2Text", "Human Counting", "Appearance Time Detection"]
     if eval_goal == 'Human Behavior Analysis':
-        select_tasks = ["A", "B", "C"]
+        select_tasks = ["Behavior Temporal Analysis", "Behavior Causualty Analysis", "Action at Specified Time", "Time of Specific Action"]
     if eval_goal == 'Cross-Modal Speech-Visual Alignment':
-        select_tasks = ["A", "B", "C"]
+        select_tasks = ["Audio-Visual Speaker Matching", "Active Speaker Detection", "Audio-Visual Alignment Detection", "Speech Content Matching"]
     if eval_goal == 'all':
         select_tasks = all_task_names
 
