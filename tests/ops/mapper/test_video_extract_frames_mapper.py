@@ -24,7 +24,18 @@ class VideoExtractFramesMapperTest(DataJuicerTestCaseBase):
 
     def tearDown(self):
         super().tearDown()
-        shutil.rmtree(self.tmp_dir)
+        if osp.exists(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
+
+        default_frame_dir_prefix = self._get_default_frame_dir_prefix()
+        if osp.exists(default_frame_dir_prefix):
+            shutil.rmtree(osp.dirname(default_frame_dir_prefix))
+
+    def _get_default_frame_dir_prefix(self):
+        from data_juicer.ops.mapper.video_extract_frames_mapper import OP_NAME
+        default_frame_dir_prefix = osp.abspath(osp.join(self.data_path, 
+            f'{Fields.multimodal_data_output_dir}/{OP_NAME}/'))
+        return default_frame_dir_prefix
 
     def _get_frames_list(self, filepath, frame_dir, frame_num):
         frames_dir = osp.join(frame_dir, osp.splitext(osp.basename(filepath))[0])
@@ -174,6 +185,57 @@ class VideoExtractFramesMapperTest(DataJuicerTestCaseBase):
         self.assertListEqual(
             self._sort_files(os.listdir(vid3_frame_dir)),
             [f'frame_{i}.jpg' for i in range(13)])
+
+    def test_default_frame_dir(self):
+        ds_list = [{
+            'text': f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
+            'videos': [self.vid1_path]
+        }, {
+            'text':
+            f'{SpecialTokens.video} 身穿白色上衣的男子，拿着一个东西，拍打自己的胃部。{SpecialTokens.eoc}',
+            'videos': [self.vid2_path]
+        }, {
+            'text':
+            f'{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
+            'videos': [self.vid3_path]
+        }]
+
+        frame_num = 2
+        op = VideoExtractFramesMapper(
+            frame_sampling_method='uniform',
+            frame_num=frame_num,
+            duration=5,
+            )
+
+        vid1_frame_dir =  op._get_default_frame_dir(self.vid1_path)
+        vid2_frame_dir =  op._get_default_frame_dir(self.vid2_path)
+        vid3_frame_dir =  op._get_default_frame_dir(self.vid3_path)
+
+        tgt_list = copy.deepcopy(ds_list)
+        tgt_list[0].update({Fields.video_frames: json.dumps({self.vid1_path: vid1_frame_dir})})
+        tgt_list[1].update({Fields.video_frames: json.dumps({self.vid2_path: vid2_frame_dir})})
+        tgt_list[2].update({Fields.video_frames: json.dumps({self.vid3_path: vid3_frame_dir})})
+
+        dataset = Dataset.from_list(ds_list)
+        dataset = dataset.map(op.process, batch_size=2, num_proc=1)
+        res_list = dataset.to_list()
+
+        frame_dir_prefix = self._get_default_frame_dir_prefix()
+        self.assertIn(frame_dir_prefix, osp.abspath(vid1_frame_dir))
+        self.assertIn(frame_dir_prefix, osp.abspath(vid2_frame_dir))
+        self.assertIn(frame_dir_prefix, osp.abspath(vid3_frame_dir))
+
+        self.assertEqual(res_list, tgt_list)
+
+        self.assertListEqual(
+            self._sort_files(os.listdir(vid1_frame_dir)),
+            [f'frame_{i}.jpg' for i in range(4)])
+        self.assertListEqual(
+            self._sort_files(os.listdir(vid2_frame_dir)),
+            [f'frame_{i}.jpg' for i in range(8)])
+        self.assertListEqual(
+            self._sort_files(os.listdir(vid3_frame_dir)),
+            [f'frame_{i}.jpg' for i in range(18)])
 
 
 if __name__ == '__main__':
