@@ -1,4 +1,5 @@
 import os
+import shlex
 from typing import List, Tuple, Union
 
 from data_juicer.core.data import NestedDataset
@@ -78,16 +79,25 @@ def parse_cli_datapath(dataset_path) -> Tuple[List[str], List[float]]:
         them, e.g. `<w1> ds1.jsonl <w2> ds2_dir <w3> ds3_file.json`
     :return: list of dataset path and list of weights
     """
-    data_prefix = dataset_path.split()
+    # Handle empty input
+    if not dataset_path or not dataset_path.strip():
+        return [], []
+
+    # Use shlex to properly handle quoted strings
+    try:
+        tokens = shlex.split(dataset_path)
+    except ValueError as e:
+        raise ValueError(f'Invalid dataset path format: {e}')
+
     prefixes = []
     weights = []
 
-    for i in range(len(data_prefix)):
+    for i in range(len(tokens)):
         try:
-            value = max(float(data_prefix[i]), 0.0)
+            value = max(float(tokens[i]), 0.0)
             weights.append(value)
         except:  # noqa: E722
-            value = data_prefix[i].strip()
+            value = tokens[i].strip()
             # if not set weight, use 1.0 as default
             if i == 0 or len(weights) == len(prefixes):
                 weights.append(1.0)
