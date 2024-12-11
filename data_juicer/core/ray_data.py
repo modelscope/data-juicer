@@ -110,15 +110,55 @@ class RayDataset(DJDataset):
             batch_size = getattr(op, 'batch_size',
                                  1) if op.is_batched_op() else 1
             if isinstance(op, Mapper):
-                self.data = self.data.map_batches(op.process,
-                                                  batch_size=batch_size,
-                                                  batch_format='pyarrow',
-                                                  num_gpus=num_gpus)
+                if op.use_ray_actor():
+                    # TODO: auto calculate concurrency
+                    concurrency = getattr(op, 'concurrency', 1)
+
+                    init_params = op._init_parameters
+                    op_args = init_params.pop('args', ())
+                    op_kwargs = init_params.pop('kwargs', {})
+                    op_kwargs.update(init_params)
+
+                    self.data = self.data.map_batches(
+                        op.__class__,
+                        fn_args=None,
+                        fn_kwargs=None,
+                        fn_constructor_args=op_args,
+                        fn_constructor_kwargs=op_kwargs,
+                        batch_size=batch_size,
+                        num_gpus=num_gpus,
+                        concurrency=concurrency,
+                        batch_format='pyarrow')
+                else:
+                    self.data = self.data.map_batches(op.process,
+                                                      batch_size=batch_size,
+                                                      batch_format='pyarrow',
+                                                      num_gpus=num_gpus)
             elif isinstance(op, Filter):
-                self.data = self.data.map_batches(op.compute_stats,
-                                                  batch_size=batch_size,
-                                                  batch_format='pyarrow',
-                                                  num_gpus=num_gpus)
+                if op.use_ray_actor():
+                    # TODO: auto calculate concurrency
+                    concurrency = getattr(op, 'concurrency', 1)
+
+                    init_params = op._init_parameters
+                    op_args = init_params.pop('args', ())
+                    op_kwargs = init_params.pop('kwargs', {})
+                    op_kwargs.update(init_params)
+
+                    self.data = self.data.map_batches(
+                        op.__class__,
+                        fn_args=None,
+                        fn_kwargs=None,
+                        fn_constructor_args=op_args,
+                        fn_constructor_kwargs=op_kwargs,
+                        batch_size=batch_size,
+                        num_gpus=num_gpus,
+                        concurrency=concurrency,
+                        batch_format='pyarrow')
+                else:
+                    self.data = self.data.map_batches(op.compute_stats,
+                                                      batch_size=batch_size,
+                                                      batch_format='pyarrow',
+                                                      num_gpus=num_gpus)
                 if op.stats_export_path is not None:
                     self.data.write_json(op.stats_export_path,
                                          force_ascii=False)
