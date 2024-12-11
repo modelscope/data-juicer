@@ -5,7 +5,7 @@ import os.path as osp
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.file_utils import create_directory_if_not_exists
+from data_juicer.utils.file_utils import dict_to_hash
 from data_juicer.utils.mm_utils import (
     SpecialTokens, close_video, extract_key_frames,
     extract_key_frames_by_seconds, extract_video_frames_uniformly,
@@ -24,17 +24,11 @@ class VideoExtractFramesMapper(Mapper):
     """Mapper to extract frames from video files according to specified methods.
     Extracted Frames Data Format:
         The data format for the extracted frames is a dictionary mapping
-        video keys to lists of file paths where the extracted frames are saved.
-        The dictionary follows the structure:
+        video key to extracted frames directory where the extracted
+        frames are saved. The dictionary follows the structure:
         {
-            "video_key_1": [
-                "/${frame_dir}/video_key_1_filename/frame_1.jpg",
-                "/${frame_dir}/video_key_1_filename/frame_2.jpg",
-                ...],
-            "video_key_2": [
-                "/${frame_dir}/video_key_2_filename/frame_1.jpg",
-                "/${frame_dir}/video_key_2_filename/frame_2.jpg",
-                ...],
+            "video_key_1": "/${frame_dir}/video_key_1_filename/",
+            "video_key_2": "/${frame_dir}/video_key_2_filename/",
             ...
         }
     """
@@ -99,11 +93,13 @@ class VideoExtractFramesMapper(Mapper):
         dir_token = f'/{Fields.multimodal_data_output_dir}/'
         if dir_token in original_dir:
             original_dir = original_dir.split(dir_token)[0]
-        new_dir = os.path.join(
+        saved_dir = os.path.join(
             original_dir, f'{Fields.multimodal_data_output_dir}/{OP_NAME}')
-        create_directory_if_not_exists(new_dir)
-        return osp.join(new_dir,
-                        osp.splitext(osp.basename(original_filepath))[0])
+        original_filename = osp.splitext(osp.basename(original_filepath))[0]
+        hash_val = dict_to_hash(self._init_parameters)
+
+        return osp.join(saved_dir,
+                        f'{original_filename}__dj_hash_#{hash_val}#')
 
     def process_single(self, sample, context=False):
         # check if it's generated already
