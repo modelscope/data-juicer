@@ -126,7 +126,7 @@ class FlaggedWordFilter(Filter):
     def process_batched(self, samples):
         return list(
             map(
-                lambda stat: stat[StatsKeys.flagged_words_ratio] <= self.max_ratio,
+                lambda stat: stat[StatsKeys.flagged_words_ratio] <= self.
+                max_ratio,
                 samples[Fields.stats],
-            )
-        )
+            ))
