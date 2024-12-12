@@ -10,116 +10,90 @@ MODULE_TO_PKGS = {
     'simhash': ['simhash-pybind'],
 }
 
-# Packages to corresponding ops that require them
-PKG_TO_OPS = {
-    'torch': [
-        'image_aesthetics_filter', 'image_nsfw_filter',
-        'image_text_matching_filter', 'image_text_similarity_filter',
-        'image_watermark_filter', 'phrase_grounding_recall_filter',
-        'video_aesthetics_filter', 'video_frames_text_similarity_filter',
-        'video_nsfw_filter', 'video_tagging_from_frames_filter',
-        'video_watermark_filter', 'generate_qa_from_text_mapper',
-        'generate_qa_from_examples_mapper', 'image_captioning_mapper',
-        'image_diffusion_mapper', 'image_tagging_mapper',
-        'optimize_query_mapper', 'optimize_response_mapper',
-        'optimize_qa_mapper', 'video_captioning_from_frames_mapper',
-        'video_captioning_from_summarizer_mapper',
-        'video_captioning_from_video_mapper',
-        'video_tagging_from_audio_mapper', 'video_tagging_from_frames_mapper'
+# Extra packages required by each op
+OPS_TO_PKG = {
+    'video_aesthetics_filter':
+    ['simple-aesthetics-predictor', 'torch', 'transformers'],
+    'document_simhash_deduplicator': ['simhash-pybind'],
+    'nlpcda_zh_mapper': ['nlpcda'],
+    'image_aesthetics_filter':
+    ['simple-aesthetics-predictor', 'torch', 'transformers'],
+    'video_nsfw_filter': ['torch', 'transformers'],
+    'video_face_blur_mapper': ['opencv-python'],
+    'stopwords_filter': ['sentencepiece'],
+    'fix_unicode_mapper': ['ftfy'],
+    'token_num_filter': ['transformers'],
+    'optimize_qa_mapper': ['torch', 'transformers', 'vllm'],
+    'video_motion_score_filter': ['opencv-python'],
+    'image_tagging_mapper': ['ram', 'torch'],
+    'video_resize_aspect_ratio_mapper': ['ffmpeg-python'],
+    'video_captioning_from_audio_mapper': [
+        'accelerate', 'einops', 'tiktoken', 'transformers',
+        'transformers_stream_generator'
     ],
-    'torchaudio': [
-        'video_captioning_from_summarizer_mapper',
-        'video_tagging_from_audio_mapper'
+    'clean_html_mapper': ['selectolax'],
+    'video_tagging_from_audio_mapper': ['torch', 'torchaudio', 'transformers'],
+    'image_deduplicator': ['imagededup'],
+    'image_diffusion_mapper':
+    ['diffusers', 'simhash-pybind', 'torch', 'transformers'],
+    'image_text_similarity_filter': ['torch', 'transformers'],
+    'alphanumeric_filter': ['transformers'],
+    'image_nsfw_filter': ['torch', 'transformers'],
+    'image_watermark_filter': ['torch', 'transformers'],
+    'ray_image_deduplicator': ['imagededup'],
+    'video_captioning_from_frames_mapper':
+    ['simhash-pybind', 'torch', 'transformers'],
+    'video_tagging_from_frames_filter': ['torch'],
+    'video_resize_resolution_mapper': ['ffmpeg-python'],
+    'optimize_query_mapper': ['torch', 'transformers', 'vllm'],
+    'sentence_split_mapper': ['nltk'],
+    'image_text_matching_filter': ['torch', 'transformers'],
+    'phrase_grounding_recall_filter': ['nltk', 'torch', 'transformers'],
+    'video_split_by_scene_mapper': ['scenedetect[opencv]'],
+    'image_face_blur_mapper': ['opencv-python'],
+    'image_face_ratio_filter': ['opencv-python'],
+    'document_minhash_deduplicator': ['scipy'],
+    'flagged_words_filter': ['sentencepiece'],
+    'language_id_score_filter': ['fasttext-wheel'],
+    'words_num_filter': ['sentencepiece'],
+    'chinese_convert_mapper': ['opencc'],
+    'video_frames_text_similarity_filter': ['torch', 'transformers'],
+    'generate_qa_from_text_mapper': ['torch', 'transformers', 'vllm'],
+    'video_ffmpeg_wrapped_mapper': ['ffmpeg-python'],
+    'image_captioning_mapper': ['simhash-pybind', 'torch', 'transformers'],
+    'video_ocr_area_ratio_filter': ['easyocr'],
+    'video_captioning_from_video_mapper':
+    ['simhash-pybind', 'torch', 'transformers'],
+    'video_remove_watermark_mapper': ['opencv-python'],
+    'text_action_filter': ['spacy-pkuseg'],
+    'nlpaug_en_mapper': ['nlpaug'],
+    'word_repetition_filter': ['sentencepiece'],
+    'video_watermark_filter': ['torch'],
+    'video_captioning_from_summarizer_mapper': [
+        'accelerate', 'einops', 'simhash-pybind', 'tiktoken', 'torch',
+        'torchaudio', 'transformers', 'transformers_stream_generator'
     ],
-    'easyocr': ['video_ocr_area_ratio_filter'],
-    'fasttext-wheel': ['language_id_score_filter'],
-    'kenlm': ['perplexity_filter'],
-    'sentencepiece': [
-        'flagged_words_filter', 'perplexity_filter', 'stopwords_filter',
-        'word_repetition_filter', 'words_num_filter'
-    ],
-    'scipy': ['document_minhash_deduplicator'],
-    'ftfy': ['fix_unicode_mapper'],
-    'simhash-pybind': [
-        'document_simhash_deduplicator', 'image_captioning_mapper',
-        'image_diffusion_mapper', 'video_captioning_from_frames_mapper',
-        'video_captioning_from_summarizer_mapper',
-        'video_captioning_from_video_mapper'
-    ],
-    'selectolax': ['clean_html_mapper'],
-    'nlpaug': ['nlpaug_en_mapper'],
-    'nlpcda': ['nlpcda'],
-    'nltk': ['phrase_grounding_recall_filter', 'sentence_split_mapper'],
-    'transformers': [
-        'alphanumeric_filter', 'image_aesthetics_filter', 'image_nsfw_filter',
-        'image_text_matching_filter', 'image_text_similarity_filter',
-        'image_watermark_filter', 'phrase_grounding_recall_filter',
-        'token_num_filter', 'video_aesthetics_filter',
-        'video_frames_text_similarity_filter', 'video_nsfw_filter',
-        'generate_qa_from_text_mapper', 'generate_qa_from_examples_mapper',
-        'image_captioning_mapper', 'image_diffusion_mapper',
-        'optimize_query_mapper', 'optimize_response_mapper',
-        'optimize_qa_mapper', 'video_captioning_from_audio_mapper',
-        'video_captioning_from_frames_mapper',
-        'video_captioning_from_summarizer_mapper',
-        'video_captioning_from_video_mapper',
-        'video_tagging_from_audio_mapper', 'text_chunk_mapper',
-        'entity_attribute_aggregator', 'most_relavant_entities_aggregator',
-        'nested_aggregator'
-    ],
-    'transformers_stream_generator': [
-        'video_captioning_from_audio_mapper',
-        'video_captioning_from_summarizer_mapper'
-    ],
-    'einops': [
-        'video_captioning_from_audio_mapper',
-        'video_captioning_from_summarizer_mapper'
-    ],
-    'accelerate': [
-        'video_captioning_from_audio_mapper',
-        'video_captioning_from_summarizer_mapper'
-    ],
-    'tiktoken': [
-        'video_captioning_from_audio_mapper',
-        'video_captioning_from_summarizer_mapper'
-    ],
-    'opencc': ['chinese_convert_mapper'],
-    'imagededup': ['image_deduplicator', 'ray_image_deduplicator'],
-    'spacy-pkuseg': ['text_action_filter', 'text_entity_dependency_filter'],
-    'diffusers': ['image_diffusion_mapper'],
-    'simple-aesthetics-predictor':
-    ['image_aesthetics_filter', 'video_aesthetics_filter'],
-    'scenedetect[opencv]': ['video_split_by_scene_mapper'],
-    'ffmpeg-python': [
-        'audio_ffmpeg_wrapped_mapper', 'video_ffmpeg_wrapped_mapper',
-        'video_resize_aspect_ratio_mapper', 'video_resize_resolution_mapper'
-    ],
-    'opencv-python': [
-        'image_face_ratio_filter', 'video_motion_score_filter',
-        'image_face_blur_mapper', 'video_face_blur_mapper',
-        'video_remove_watermark_mapper'
-    ],
-    'vllm': [
-        'generate_qa_from_text_mapper',
-        'generate_qa_from_examples_mapper',
-        'optimize_query_mapper',
-        'optimize_response_mapper',
-        'optimize_qa_mapper',
-    ],
-    'rouge': ['generate_qa_from_examples_mapper'],
-    'ram': ['image_tagging_mapper', 'video_tagging_from_frames_mapper'],
-    'dashscope': [
-        'text_chunk_mapper', 'entity_attribute_aggregator',
-        'most_relavant_entities_aggregator', 'nested_aggregator'
-    ],
-    'openai': [
-        'calibrate_qa_mapper', 'calibrate_query_mapper',
-        'calibrate_response_mapper', 'extract_entity_attribute_mapper',
-        'extract_entity_relation_mapper', 'extract_event_mapper',
-        'extract_keyword_mapper', 'extract_nickname_mapper',
-        'extract_support_text_mapper', 'pair_preference_mapper',
-        'relation_identity_mapper', 'text_chunk_mapper',
-        'entity_attribute_aggregator', 'most_relavant_entities_aggregator',
-        'nested_aggregator'
-    ]
+    'audio_ffmpeg_wrapped_mapper': ['ffmpeg-python'],
+    'perplexity_filter': ['kenlm', 'sentencepiece'],
+    'generate_qa_from_examples_mapper':
+    ['rouge', 'torch', 'transformers', 'vllm'],
+    'video_tagging_from_frames_mapper': ['ram', 'torch'],
+    'text_entity_dependency_filter': ['spacy-pkuseg'],
+    'optimize_response_mapper': ['torch', 'transformers', 'vllm'],
+    'text_chunk_mapper': ['transformers', 'dashscope', 'openai'],
+    'entity_attribute_aggregator': ['transformers', 'dashscope', 'openai'],
+    'most_relavant_entities_aggregator':
+    ['transformers', 'dashscope', 'openai'],
+    'nested_aggregator': ['transformers', 'dashscope', 'openai'],
+    'calibrate_qa_mapper': ['openai'],
+    'calibrate_query_mapper': ['openai'],
+    'calibrate_response_mapper': ['openai'],
+    'extract_entity_attribute_mapper': ['openai'],
+    'extract_entity_relation_mapper': ['openai'],
+    'extract_event_mapper': ['openai'],
+    'extract_keyword_mapper': ['openai'],
+    'extract_nickname_mapper': ['openai'],
+    'extract_support_text_mapper': ['openai'],
+    'pair_preference_mapper': ['openai'],
+    'relation_identity_mapper': ['openai'],
 }

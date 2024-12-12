@@ -12,13 +12,16 @@ on:
 jobs:
   pages:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [ "3.9", "3.10" ]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@master
       with:
-        python_version: ${{ matrix.python-version }}
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
