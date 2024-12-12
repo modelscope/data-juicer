@@ -76,9 +76,9 @@ class ImageAspectRatioFilter(Filter):
     def process_batched(self, samples):
 
         def process_single(values):
-            keep_bools = np.array([
-                self.min_ratio <= value <= self.max_ratio for value in values
-            ])
+            keep_bools = np.array(
+                [self.min_ratio <= value <= self.max_ratio for value in values]
+            )
             if len(keep_bools) <= 0:
                 return True
 
@@ -88,10 +88,7 @@ class ImageAspectRatioFilter(Filter):
             else:
                 return keep_bools.all()
 
-        if isinstance(samples[Fields.stats], list):
-            return map(
-                lambda stat: process_single(stat[StatsKeys.aspect_ratios]),
-                samples[Fields.stats])
-        else:
-            return process_single(
-                samples[Fields.stats][StatsKeys.aspect_ratios])
+        return map(
+            lambda stat: process_single(stat[StatsKeys.aspect_ratios]),
+            samples[Fields.stats],
+        )
