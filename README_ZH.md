@@ -186,7 +186,11 @@ pip install -v -e .[tools] # 安装部分工具库的依赖
 
   * 手动最小依赖安装：可以通过如下指令手动安装适合特定执行配置的最小依赖：
     ```shell
+    # 适用于从源码安装
     python tools/dj_install.py --config path_to_your_data-juicer_config_file
+    
+    # 使用命令行工具
+    dj-install --config path_to_your_data-juicer_config_file
     ```
 
 ### 使用 pip 安装

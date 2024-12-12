@@ -206,7 +206,11 @@ we provide two alternative, lighter options:
 
   - Manual Minimal Dependency Installation: To manually install minimal dependencies tailored to a specific execution configuration, run the following command:
     ```shell
+    # only for installation from source
     python tools/dj_install.py --config path_to_your_data-juicer_config_file
+
+    # use command line tool
+    dj-install --config path_to_your_data-juicer_config_file
     ```
 
 ### Using pip
