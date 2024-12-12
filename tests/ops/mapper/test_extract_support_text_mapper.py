@@ -10,7 +10,7 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.common_utils import nested_access
 
-# Skip tests for this OP in the GitHub actions due to unknown DistNetworkError.
+# Skip tests for this OP.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class ExtractSupportTextMapperTest(DataJuicerTestCaseBase):

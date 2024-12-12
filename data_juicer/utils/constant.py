@@ -10,6 +10,12 @@ from loguru import logger
 DEFAULT_PREFIX = '__dj__'
 
 
+class MetaKeys(object):
+
+    sentiment_intensity = DEFAULT_PREFIX + 'meta.sentiment.intensity'
+    sentiment_analysis = DEFAULT_PREFIX + 'meta.sentiment.analysis'
+
+
 class Fields(object):
     stats = DEFAULT_PREFIX + 'stats__'
     meta = DEFAULT_PREFIX + 'meta__'
