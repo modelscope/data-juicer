@@ -1,9 +1,14 @@
 import fnmatch
 from abc import ABC, abstractmethod
+from argparse import Namespace
 from dataclasses import dataclass
 from typing import Dict, Optional, Type, Union
 
 from data_juicer.core.data import DJDataset, RayDataset
+from data_juicer.utils.lazy_loader import LazyLoader
+
+ray = LazyLoader('ray', 'ray')
+rd = LazyLoader('rd', 'ray.data')
 
 # based on executor type and data source type, use different
 # data load strategy to product corresponding datasets
@@ -34,16 +39,72 @@ class StrategyKey:
                 and fnmatch.fnmatch(other.data_source, self.data_source))
 
 
-class DataLoadStrategy(ABC):
+class ValidationError(Exception):
+    """Custom exception for validation errors"""
+    pass
+
+
+class ConfigValidator:
+    """Mixin class for configuration validation"""
+
+    # Define validation rules for each strategy type
+    VALIDATION_RULES = {
+        'required_fields': [],  # Fields that must be present
+        'field_types': {},  # Expected types for fields
+        'custom_validators': {}  # Custom validation functions
+    }
+
+    def validate_config(self, ds_config: Dict) -> None:
+        """
+        Validate the configuration dictionary.
+
+        Args:
+            ds_config: Configuration dictionary to validate
+
+        Raises:
+            ValidationError: If validation fails
+        """
+        # Check required fields
+        missing_fields = [
+            field for field in self.VALIDATION_RULES['required_fields']
+            if field not in ds_config
+        ]
+        if missing_fields:
+            raise ValidationError(
+                f"Missing required fields: {', '.join(missing_fields)}")
+
+        # Check field types
+        for field, expected_type in self.VALIDATION_RULES['field_types'].items(
+        ):
+            if field in ds_config:
+                value = ds_config[field]
+                if not isinstance(value, expected_type):
+                    raise ValidationError(f"Field '{field}' must be of "
+                                          "type '{expected_type.__name__}', "
+                                          f"got '{type(value).__name__}'")
+
+        # Run custom validators
+        for field, validator in self.VALIDATION_RULES[
+                'custom_validators'].items():
+            if field in ds_config:
+                try:
+                    validator(ds_config[field])
+                except Exception as e:
+                    raise ValidationError(
+                        f"Validation failed for field '{field}': {str(e)}")
+
+
+class DataLoadStrategy(ABC, ConfigValidator):
     """
     abstract class for data load strategy
     """
 
     def __init__(self, ds_config: Dict):
+        self.validate_config(ds_config)
         self.ds_config = ds_config
 
     @abstractmethod
-    def load_data(self) -> Union[DJDataset, RayDataset]:
+    def load_data(self, cfg: Namespace) -> Union[DJDataset, RayDataset]:
         pass
 
 
@@ -140,7 +201,7 @@ class LocalDataLoadStrategy(DataLoadStrategy):
     """
 
     @abstractmethod
-    def load_data(self) -> DJDataset:
+    def load_data(self, cfg: Namespace) -> DJDataset:
         pass
 
 
@@ -160,14 +221,41 @@ class LocalDataLoadStrategy(DataLoadStrategy):
 @DataLoadStrategyRegistry.register('ray', 'ondisk', 'json')
 class RayOndiskJsonDataLoadStrategy(RayDataLoadStrategy):
 
-    def load_data(self):
-        pass
+    VALIDATION_RULES = {
+        'required_fields': ['dataset_path'],
+        'field_types': {
+            'dataset_path': (str, list),  # Can be string or list
+            'cache_dir': str,
+            'shuffle': bool
+        },
+        'custom_validators': {
+            'dataset_path':
+            lambda x:
+            (isinstance(x, (str, list)) and
+             (isinstance(x, str) or all(isinstance(p, str) for p in x)))
+        }
+    }
+
+    def load_data(self, cfg: Namespace):
+        return rd.read_json(self.ds_config.path)
 
 
 @DataLoadStrategyRegistry.register('ray', 'remote', 'huggingface')
 class RayHuggingfaceDataLoadStrategy(RayDataLoadStrategy):
 
-    def load_data(self):
+    VALIDATION_RULES = {
+        'required_fields': ['dataset_name', 'split'],
+        'field_types': {
+            'dataset_name': str,
+            'split': str,
+            'streaming': bool
+        },
+        'custom_validators': {
+            'split': lambda x: x in ['train', 'test', 'validation']
+        }
+    }
+
+    def load_data(self, cfg: Namespace):
         pass
 
 
@@ -178,7 +266,7 @@ class LocalOndiskDataLoadStrategy(LocalDataLoadStrategy):
     rely on AutoFormatter for actual data loading
     """
 
-    def load_data(self):
+    def load_data(self, cfg: Namespace):
         pass
 
 
@@ -188,7 +276,7 @@ class LocalHuggingfaceDataLoadStrategy(LocalDataLoadStrategy):
     data load strategy for Huggingface dataset for LocalExecutor
     """
 
-    def load_data(self):
+    def load_data(self, cfg: Namespace):
         pass
 
 
@@ -198,7 +286,7 @@ class LocalModelScopeDataLoadStrategy(LocalDataLoadStrategy):
     data load strategy for ModelScope dataset for LocalExecutor
     """
 
-    def load_data(self):
+    def load_data(self, cfg: Namespace):
         pass
 
 
@@ -208,7 +296,7 @@ class LocalArxivDataLoadStrategy(LocalDataLoadStrategy):
     data load strategy for arxiv dataset for LocalExecutor
     """
 
-    def load_data(self):
+    def load_data(self, cfg: Namespace):
         pass
 
 
@@ -218,7 +306,7 @@ class LocalWikiDataLoadStrategy(LocalDataLoadStrategy):
     data load strategy for wiki dataset for LocalExecutor
     """
 
-    def load_data(self):
+    def load_data(self, cfg: Namespace):
         pass
 
 
@@ -228,5 +316,5 @@ class LocalCommonCrawlDataLoadStrategy(LocalDataLoadStrategy):
     data load strategy for commoncrawl dataset for LocalExecutor
     """
 
-    def load_data(self):
+    def load_data(self, cfg: Namespace):
         pass

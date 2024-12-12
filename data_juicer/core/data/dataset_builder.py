@@ -11,6 +11,7 @@ from data_juicer.utils.file_utils import is_absolute_path
 class DatasetBuilder(object):
 
     def __init__(self, cfg):
+        self.cfg = cfg
         # defaults to use dataset_path
         if cfg.dataset_path is not None:
             ds_configs = rewrite_cli_datapath(cfg.dataset_path)
@@ -26,7 +27,7 @@ class DatasetBuilder(object):
         self.load_strategies = []
         for ds_config in ds_configs:
             # initialize data loading strategy
-            executor_type = cfg.get('executor_type', None)
+            executor_type = ds_config.get('executor_type', None)
             data_type = ds_config.get('type', None)
             data_source = ds_config.get('source', None)
             self.load_strategies.append(
@@ -38,7 +39,7 @@ class DatasetBuilder(object):
         # handle sampling of mixture datasets
         _datasets = []
         for f in self.load_strategies:
-            _datasets.append(f.load_data())
+            _datasets.append(f.load_data(self.cfg))
         return _datasets[0]
 
 

@@ -110,10 +110,10 @@ class LocalExecutor(ExecutorBase):
             logger.info('Loading dataset from checkpoint...')
             dataset = self.ckpt_manager.load_ckpt()
         else:
-            logger.info('Loading dataset from data formatter...')
+            logger.info('Loading dataset from dataset builder...')
             if load_data_np is None:
                 load_data_np = self.cfg.np
-            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+            dataset = self.dataset_builder.load_dataset()
 
         # 2. extract processes and optimize their orders
         logger.info('Preparing process operators...')
