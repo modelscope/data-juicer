@@ -2,7 +2,7 @@ import re
 from typing import Dict, Optional
 
 from loguru import logger
-from pydantic import PositiveInt
+from pydantic import NonNegativeInt, PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.common_utils import nested_set
@@ -16,8 +16,8 @@ OP_NAME = 'dialog_sentiment_intensity_mapper'
 @OPERATORS.register_module(OP_NAME)
 class DialogSentimentIntensityMapper(Mapper):
     """
-    Mapper to predict user's sentiment intensity in dialog which is stored
-    in the history_key.
+    Mapper to predict user's sentiment intensity (from -5 to 5 in default
+    prompt) in dialog which is stored in the history_key.
     """
 
     DEFAULT_SYSTEM_PROMPT = ('请判断用户和LLM多轮对话中用户的情绪变化。\n'
@@ -60,7 +60,7 @@ class DialogSentimentIntensityMapper(Mapper):
 
     def __init__(self,
                  api_model: str = 'gpt-4o',
-                 max_round: PositiveInt = 10,
+                 max_round: NonNegativeInt = 10,
                  intensity_key: str = MetaKeys.sentiment_intensity,
                  analysis_key: str = MetaKeys.sentiment_analysis,
                  *,
@@ -140,7 +140,10 @@ class DialogSentimentIntensityMapper(Mapper):
         self.try_num = try_num
 
     def build_input(self, history, query):
-        input_prompt = ''.join(history[-self.max_round * 4:])
+        if self.max_round > 0:
+            input_prompt = ''.join(history[-self.max_round * 4:])
+        else:
+            input_prompt = ''
         input_prompt += self.query_template.format(query=query[0])
 
         return input_prompt
@@ -166,8 +169,16 @@ class DialogSentimentIntensityMapper(Mapper):
         intensities = []
         history = []
 
+        dialog = sample[self.history_key]
+        if sample[self.query_key]:
+            if sample[self.response_key]:
+                dialog.append(
+                    (sample[self.query_key], sample[self.response_key]))
+            else:
+                dialog.append((sample[self.query_key], ''))
+
         for qa in sample[self.history_key]:
-            input_prompt = self.build_input(history, qa[0])
+            input_prompt = self.build_input(history, qa)
             messages = [{
                 'role': 'system',
                 'content': self.system_prompt,
