@@ -33,7 +33,7 @@ class Analyzer:
 
         :param cfg: optional jsonargparse Namespace dict.
         """
-        self.cfg = init_configs() if cfg is None else cfg
+        self.cfg = init_configs(which_entry=self) if cfg is None else cfg
 
         self.work_dir = self.cfg.work_dir
 
