@@ -5,7 +5,7 @@ from loguru import logger
 
 from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
-from data_juicer.ops import Filter, Mapper
+from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.process_utils import calculate_np
@@ -123,6 +123,8 @@ class RayDataset(DJDataset):
                     self.data.write_json(op.stats_export_path,
                                          force_ascii=False)
                 self.data = self.data.filter(op.process)
+            elif isinstance(op, Deduplicator):
+                self.data = op.run(self.data)
             else:
                 logger.error(
                     'Ray executor only support Filter and Mapper OPs for now')
