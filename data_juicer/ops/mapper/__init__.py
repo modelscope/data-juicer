@@ -54,6 +54,7 @@ from .video_captioning_from_frames_mapper import \
 from .video_captioning_from_summarizer_mapper import \
     VideoCaptioningFromSummarizerMapper
 from .video_captioning_from_video_mapper import VideoCaptioningFromVideoMapper
+from .video_extract_frames_mapper import VideoExtractFramesMapper
 from .video_face_blur_mapper import VideoFaceBlurMapper
 from .video_ffmpeg_wrapped_mapper import VideoFFmpegWrappedMapper
 from .video_remove_watermark_mapper import VideoRemoveWatermarkMapper
@@ -88,10 +89,10 @@ __all__ = [
     'ReplaceContentMapper', 'SentenceSplitMapper', 'TextChunkMapper',
     'VideoCaptioningFromAudioMapper', 'VideoCaptioningFromFramesMapper',
     'VideoCaptioningFromSummarizerMapper', 'VideoCaptioningFromVideoMapper',
-    'VideoFFmpegWrappedMapper', 'VideoFaceBlurMapper',
-    'VideoRemoveWatermarkMapper', 'VideoResizeAspectRatioMapper',
-    'VideoResizeResolutionMapper', 'VideoSplitByDurationMapper',
-    'VideoSplitByKeyFrameMapper', 'VideoSplitBySceneMapper',
-    'VideoTaggingFromAudioMapper', 'VideoTaggingFromFramesMapper',
-    'WhitespaceNormalizationMapper'
+    'VideoExtractFramesMapper', 'VideoFFmpegWrappedMapper',
+    'VideoFaceBlurMapper', 'VideoRemoveWatermarkMapper',
+    'VideoResizeAspectRatioMapper', 'VideoResizeResolutionMapper',
+    'VideoSplitByDurationMapper', 'VideoSplitByKeyFrameMapper',
+    'VideoSplitBySceneMapper', 'VideoTaggingFromAudioMapper',
+    'VideoTaggingFromFramesMapper', 'WhitespaceNormalizationMapper'
 ]
