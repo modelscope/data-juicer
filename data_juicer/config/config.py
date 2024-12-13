@@ -50,6 +50,12 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
                                 'given by --config arg, this arg is '
                                 'disabled. Only available for Analyzer.')
 
+    parser.add_argument('--auto_num',
+                        type=PositiveInt,
+                        default=1000,
+                        help='The number of samples to be analyzed '
+                        'automatically. It\'s 1000 in default.')
+
     parser.add_argument(
         '--hpo_config',
         type=str,

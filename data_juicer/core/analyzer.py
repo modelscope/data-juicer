@@ -87,6 +87,10 @@ class Analyzer:
         if load_data_np is None:
             load_data_np = self.cfg.np
         dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+        if self.cfg.auto:
+            # if it's auto analysis, only analyze for a minor part of the input
+            # dataset to save time and computing resource
+            dataset = dataset.take(self.cfg.auto_num)
 
         # extract processes
         logger.info('Preparing process operators...')
