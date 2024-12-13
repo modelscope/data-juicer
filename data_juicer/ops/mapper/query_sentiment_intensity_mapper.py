@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from data_juicer.utils.common_utils import batch_nested_set
 from data_juicer.utils.constant import MetaKeys
@@ -29,7 +29,7 @@ class QuerySentimentLabelMapper(Mapper):
             self,
             hf_model:
         str = 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis',  # noqa: E501 E131
-            zh_to_en_hf_model: str = 'Helsinki-NLP/opus-mt-zh-en',
+            zh_to_en_hf_model: Optional[str] = 'Helsinki-NLP/opus-mt-zh-en',
             model_params: Dict = {},
             zh_to_en_model_params: Dict = {},
             *,

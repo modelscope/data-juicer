@@ -127,7 +127,7 @@ class TestDialogSentimentIntensityMapper(DataJuicerTestCaseBase):
                     '你自己说的呀，我现在说了，你又不高兴了。',
                     'or of of of of or or and or of of of of of of of,,, '
                 )
-            ]
+            ],
             'query': '你在说什么我听不懂。',
             'response': '「委屈」我也没说什么呀，就是觉得你有点冤枉我了'
         }]

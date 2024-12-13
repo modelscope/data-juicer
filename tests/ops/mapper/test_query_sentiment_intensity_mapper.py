@@ -30,7 +30,7 @@ class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
         },{
             'query': '嗯嗯'
         },{
-            'query': '太讨厌了！'
+            'query': '没有希望。'
         },
         ]
         targets = [1, 0, -1]
@@ -53,6 +53,7 @@ class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
 
         op = QuerySentimentLabelMapper(
             hf_model = self.hf_model,
+            zh_to_en_hf_model = None,
         )
         self._run_op(op, samples, MetaKeys.query_sentiment_intensity, targets)
     
@@ -63,12 +64,11 @@ class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
         },{
             'query': '嗯嗯'
         },{
-            'query': '太讨厌了！'
+            'query': '没有希望。'
         },
         ]
         targets = [2, 0, -2]
 
-        reset_key = 
         op = QuerySentimentLabelMapper(
             hf_model = self.hf_model,
             zh_to_en_hf_model = self.zh_to_en_hf_model,
@@ -87,7 +87,7 @@ class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
         },{
             'query': '嗯嗯'
         },{
-            'query': '太讨厌了！'
+            'query': '没有希望。'
         },
         ]
         targets = ['positive', 'neutral', 'negative']

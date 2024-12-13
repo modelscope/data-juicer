@@ -162,8 +162,8 @@ class DialogSentimentIntensityMapper(Mapper):
         history = []
 
         dialog = sample[self.history_key]
-        if sample[self.query_key]:
-            if sample[self.response_key]:
+        if self.query_key in sample and sample[self.query_key]:
+            if self.response_key in sample and sample[self.response_key]:
                 dialog.append(
                     (sample[self.query_key], sample[self.response_key]))
             else:
