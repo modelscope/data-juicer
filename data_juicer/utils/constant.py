@@ -16,6 +16,7 @@ class Fields(object):
     context = DEFAULT_PREFIX + 'context__'
     suffix = DEFAULT_PREFIX + 'suffix__'
 
+    video_frames = DEFAULT_PREFIX + 'video_frames__'
     # video_frame_tags
     video_frame_tags = DEFAULT_PREFIX + 'video_frame_tags__'
     video_audio_tags = DEFAULT_PREFIX + 'video_audio_tags__'
