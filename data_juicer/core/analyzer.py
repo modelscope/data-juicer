@@ -90,7 +90,7 @@ class Analyzer:
         if self.cfg.auto:
             # if it's auto analysis, only analyze for a minor part of the input
             # dataset to save time and computing resource
-            dataset = dataset.take(self.cfg.auto_num)
+            dataset = dataset.take(min(len(dataset), self.cfg.auto_num))
 
         # extract processes
         logger.info('Preparing process operators...')
