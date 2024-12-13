@@ -42,43 +42,53 @@ class ImageAspectRatioFilter(Filter):
                              f'Can only be one of ["any", "all"].')
         self.any = (any_or_all == 'any')
 
-    def compute_stats_single(self, sample, context=False):
-        # check if it's computed already
-        if StatsKeys.aspect_ratios in sample[Fields.stats]:
-            return sample
+    def compute_stats_batched(self, samples, context=False):
+        image_list = samples[self.image_key]
+        samples_stats = samples[Fields.stats]
 
-        # there is no image in this sample
-        if self.image_key not in sample or not sample[self.image_key]:
-            sample[Fields.stats][StatsKeys.aspect_ratios] = np.array(
-                [], dtype=np.float64)
-            return sample
+        for i, stat in enumerate(samples_stats):
+            # check if it's computed already
+            if StatsKeys.aspect_ratios in stat:
+                continue
 
-        # load images
-        loaded_image_keys = sample[self.image_key]
-        sample, images = load_data_with_context(sample, context,
-                                                loaded_image_keys, load_image)
+            # there is no image in this sample
+            loaded_image_keys = image_list[i]
+            if not loaded_image_keys:
+                stat[StatsKeys.aspect_ratios] = np.array([], dtype=np.float64)
+                continue
 
-        # compute aspect ratios for each image with W/H
-        aspect_ratios = {
-            key: (images[key].width / images[key].height)
-            for key in images
-        }
-        sample[Fields.stats][StatsKeys.aspect_ratios] = [
-            aspect_ratios[key] for key in loaded_image_keys
-        ]
-        return sample
+            # load images
+            samples, images = load_data_with_context(samples, context,
+                                                     loaded_image_keys,
+                                                     load_image)
 
-    def process_single(self, sample):
-        aspect_ratios = sample[Fields.stats][StatsKeys.aspect_ratios]
-        keep_bools = np.array([
-            self.min_ratio <= aspect_ratio <= self.max_ratio
-            for aspect_ratio in aspect_ratios
-        ])
-        if len(keep_bools) <= 0:
-            return True
+            # compute aspect ratios for each image with W/H
+            aspect_ratios = {
+                key: (images[key].width / images[key].height)
+                for key in images
+            }
+            stat[StatsKeys.aspect_ratios] = [
+                aspect_ratios[key] for key in loaded_image_keys
+            ]
 
-        # different strategies
-        if self.any:
-            return keep_bools.any()
-        else:
-            return keep_bools.all()
+        return samples
+
+    def process_batched(self, samples):
+
+        def process_single(values):
+            keep_bools = np.array([
+                self.min_ratio <= value <= self.max_ratio for value in values
+            ])
+            if len(keep_bools) <= 0:
+                return True
+
+            # different strategies
+            if self.any:
+                return keep_bools.any()
+            else:
+                return keep_bools.all()
+
+        return map(
+            lambda stat: process_single(stat[StatsKeys.aspect_ratios]),
+            samples[Fields.stats],
+        )
