@@ -217,6 +217,7 @@ class StatsKeys(object, metaclass=StatsKeysMeta):
 
 
 class HashKeys(object):
+    uid = DEFAULT_PREFIX + 'uid'
     hash = DEFAULT_PREFIX + 'hash'
     minhash = DEFAULT_PREFIX + 'minhash'
     simhash = DEFAULT_PREFIX + 'simhash'
