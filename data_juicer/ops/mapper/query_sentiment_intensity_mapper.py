@@ -46,9 +46,9 @@ class QuerySentimentLabelMapper(Mapper):
             If not None, translate the query from Chinese to English.
         :param model_params: model param for hf_model.
         :param zh_to_en_model_params: model param for zh_to_hf_model.
-        :param kwargs: Extra keyword arguments.
         :param label_to_intensity: Map the output labels to the intensities
-            instead of the default mapper.
+            instead of the default mapper if not None.
+        :param kwargs: Extra keyword arguments.
         """
         super().__init__(**kwargs)
 

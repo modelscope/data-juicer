@@ -81,4 +81,5 @@ OPS_TO_PKG = {
     'text_entity_dependency_filter': ['spacy-pkuseg'],
     'optimize_response_mapper': ['torch', 'transformers', 'vllm'],
     'dialog_sentiment_intensity_mapper': ['openai'],
+    'query_sentiment_intensity_mapper': ['transformers'],
 }
