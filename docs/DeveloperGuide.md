@@ -209,7 +209,9 @@ __all__ = [
 ]
 ```
 
-4. Now you can use this new OP with custom arguments in your own config files!
+4. When an operator has package dependencies listed in `environments/science_requires.txt`, you need to add the corresponding dependency packages to the `OPS_TO_PKG` dictionary in `data_juicer/utils/auto_install_mapping.py` to support dependency installation at the operator level.
+
+5. Now you can use this new OP with custom arguments in your own config files!
 
 ```yaml
 # other configs
@@ -222,7 +224,7 @@ process:
       max_len: 1000
 ```
 
-5. (Strongly Recommend) It's better to add corresponding tests for your own OPs. For `TextLengthFilter` above, you would like to add `test_text_length_filter.py` into `tests/ops/filter/` directory as below.
+6. (Strongly Recommend) It's better to add corresponding tests for your own OPs. For `TextLengthFilter` above, you would like to add `test_text_length_filter.py` into `tests/ops/filter/` directory as below.
 
 ```python
 import unittest
@@ -244,7 +246,7 @@ if __name__ == '__main__':
     unittest.main()
 ```
 
-6. (Strongly Recommend) In order to facilitate the use of other users, we also need to update this new OP information to
+7. (Strongly Recommend) In order to facilitate the use of other users, we also need to update this new OP information to
 the corresponding documents, including the following docs:
    1. `configs/config_all.yaml`: this complete config file contains a list of all OPs and their arguments, serving as an
    important document for users to refer to all available OPs. Therefore, after adding the new OP, we need to add it to the process
