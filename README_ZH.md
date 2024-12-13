@@ -295,6 +295,10 @@ python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # 使用命令行工具
 dj-analyze --config configs/demo/analyzer.yaml
+
+# 你也可以使用"自动"模式来避免写一个新的数据菜谱。它会使用全部可产出统计信息的 Filter 来分析
+# 你的数据集的一小部分（如1000条样本，可通过 `auto_num` 参数指定）
+dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 ```
 
 * **注意**：Analyzer 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
