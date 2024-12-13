@@ -12,8 +12,14 @@ DEFAULT_PREFIX = '__dj__'
 
 class MetaKeys(object):
 
-    sentiment_intensity = DEFAULT_PREFIX + 'meta.sentiment.intensity'
-    sentiment_analysis = DEFAULT_PREFIX + 'meta.sentiment.analysis'
+    dialog_sentiment_intensity = DEFAULT_PREFIX + \
+        'meta.sentiment.dialog_intensity'
+    dialog_sentiment_analysis = DEFAULT_PREFIX + \
+        'meta.sentiment.dialog_analysis'
+    query_sentiment_intensity = DEFAULT_PREFIX + \
+        'meta.sentiment.query_intensity'
+    query_sentiment_score = DEFAULT_PREFIX + \
+        'meta.sentiment.query_intensity_score'
 
 
 class Fields(object):

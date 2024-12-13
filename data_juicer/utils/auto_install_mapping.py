@@ -15,7 +15,7 @@ OPS_TO_PKG = {
     'video_aesthetics_filter':
     ['simple-aesthetics-predictor', 'torch', 'transformers'],
     'document_simhash_deduplicator': ['simhash-pybind'],
-    'nlpcda': ['nlpcda'],
+    'nlpcda_zh_mapper': ['nlpcda'],
     'image_aesthetics_filter':
     ['simple-aesthetics-predictor', 'torch', 'transformers'],
     'video_nsfw_filter': ['torch', 'transformers'],

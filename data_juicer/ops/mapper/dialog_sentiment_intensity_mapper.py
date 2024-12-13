@@ -17,7 +17,7 @@ OP_NAME = 'dialog_sentiment_intensity_mapper'
 class DialogSentimentIntensityMapper(Mapper):
     """
     Mapper to predict user's sentiment intensity (from -5 to 5 in default
-    prompt) in dialog which is stored in the history_key.
+    prompt) in dialog (history + query + response).
     """
 
     DEFAULT_SYSTEM_PROMPT = ('请判断用户和LLM多轮对话中用户的情绪变化。\n'
@@ -61,8 +61,6 @@ class DialogSentimentIntensityMapper(Mapper):
     def __init__(self,
                  api_model: str = 'gpt-4o',
                  max_round: NonNegativeInt = 10,
-                 intensity_key: str = MetaKeys.sentiment_intensity,
-                 analysis_key: str = MetaKeys.sentiment_analysis,
                  *,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
@@ -83,10 +81,6 @@ class DialogSentimentIntensityMapper(Mapper):
         :param api_model: API model name.
         :param max_round: The max num of round in the dialog to build the
             prompt.
-        :param intensity_key: The output (nested) key of the sentiment
-            intensity. Defaults to '__dj__meta.sentiment.intensity'.
-        :param analysis_key: The output (nested) key of the sentiment
-            analysis. Defaults to '__dj__meta.sentiment.analysis'.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -113,8 +107,6 @@ class DialogSentimentIntensityMapper(Mapper):
         super().__init__(**kwargs)
 
         self.max_round = max_round
-        self.intensity_key = intensity_key
-        self.analysis_key = analysis_key
 
         self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
         self.query_template = query_template or self.DEFAULT_QUERY_TEMPLATE
@@ -204,7 +196,9 @@ class DialogSentimentIntensityMapper(Mapper):
             history.append(self.intensity_template.format(intensity=intensity))
             history.append(self.response_template.format(response=qa[1]))
 
-        sample = nested_set(sample, self.analysis_key, analysis_list)
-        sample = nested_set(sample, self.intensity_key, intensities)
+        sample = nested_set(sample, MetaKeys.dialog_sentiment_analysis,
+                            analysis_list)
+        sample = nested_set(sample, MetaKeys.dialog_sentiment_intensity,
+                            intensities)
 
         return sample

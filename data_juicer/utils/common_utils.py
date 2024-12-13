@@ -69,18 +69,65 @@ def nested_set(data: dict, path: str, val):
 
         :param data: A dictionary with nested format.
         :param path: A dot-separated string representing the path to set.
-                    This can include numeric indices when setting list
-                    elements.
         :return: The nested data after the val set.
     """
     keys = path.split('.')
     cur = data
-    for key in keys[:-1]:
-        if key not in cur:
-            cur[key] = {}
-        cur = cur[key]
-    cur[keys[-1]] = val
+    try:
+        for key in keys[:-1]:
+            if key not in cur:
+                cur[key] = {}
+            cur = cur[key]
+        if keys[-1] in cur:
+            logger.warning(f'Overwrite value in {path}!')
+        cur[keys[-1]] = val
+    except Exception:
+        logger.warning(f'Unvalid dot-separated path: {path}!')
+        return data
     return data
+
+
+def batch_nested_set(batch_data: dict, path: str, vals):
+    """
+        Set the vals to the batched nested data in the dot-separated
+        path.
+
+        :param batch_data: A batched dictionary with nested format.
+        :param path: A dot-separated string representing the path to set.
+        :return: The nested data after the val set.
+    """
+    keys = path.split('.')
+
+    # not nested, set the vals.
+    if len(keys) == 1:
+        if keys[0] in batch_data:
+            logger.warning(f'Overwrite value in {path}!')
+        batch_data[keys[0]] = vals
+        return batch_data
+
+    # nested, transfer to list(dict()) format.
+    if keys[0] not in batch_data:
+        batch_data[keys[0]] = [{} for val in vals]
+
+    if not isinstance(batch_data[keys[0]],
+                      list) or len(batch_data[keys[0]]) != len(vals):
+        logger.warning('Batch size does not match between data and vals!')
+        return batch_data
+
+    try:
+        for head, val in zip(batch_data[keys[0]], vals):
+            cur = head
+            for key in keys[1:-1]:
+                if key not in cur:
+                    cur[key] = {}
+                cur = cur[key]
+            if keys[-1] in cur:
+                logger.warning(f'Overwrite value in {path}!')
+            cur[keys[-1]] = val
+    except Exception:
+        logger.warning(f'Unvalid dot-separated path: {path}!')
+        return batch_data
+    return batch_data
 
 
 def is_string_list(var):
