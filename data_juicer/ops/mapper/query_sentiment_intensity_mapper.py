@@ -1,7 +1,7 @@
 from typing import Dict, Optional
 
-from data_juicer.utils.common_utils import batch_nested_set
-from data_juicer.utils.constant import MetaKeys
+from data_juicer.utils.common_utils import nested_set
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
@@ -13,7 +13,10 @@ OP_NAME = 'query_sentiment_intensity_mapper'
 class QuerySentimentLabelMapper(Mapper):
     """
     Mapper to predict user's sentiment intensity label (-1 for 'negative',
-    0 for 'neutral' and 1 for 'positive') in query.
+    0 for 'neutral' and 1 for 'positive') in query. Input from query_key.
+    Output intensity label and corresponding score for the query, which is
+    store in 'sentiment.query_intensity' and
+    'sentiment.query_intensity_score' in Data-Juicer meta field.
     """
 
     _accelerator = 'cuda'
@@ -88,8 +91,14 @@ class QuerySentimentLabelMapper(Mapper):
         ]
         scores = [r['score'] for r in results]
 
-        batch_nested_set(samples, MetaKeys.query_sentiment_intensity,
-                         intensities)
-        batch_nested_set(samples, MetaKeys.query_sentiment_score, scores)
+        if Fields.meta not in samples:
+            samples[Fields.meta] = [{} for val in intensities]
+        for i in range(len(samples[Fields.meta])):
+            samples[Fields.meta][i] = nested_set(
+                samples[Fields.meta][i], MetaKeys.query_sentiment_intensity,
+                intensities[i])
+            samples[Fields.meta][i] = nested_set(
+                samples[Fields.meta][i], MetaKeys.query_sentiment_score,
+                scores[i])
 
         return samples

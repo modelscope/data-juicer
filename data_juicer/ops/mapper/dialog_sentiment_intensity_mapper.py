@@ -6,7 +6,7 @@ from pydantic import NonNegativeInt, PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.common_utils import nested_set
-from data_juicer.utils.constant import MetaKeys
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 OP_NAME = 'dialog_sentiment_intensity_mapper'
@@ -17,7 +17,10 @@ OP_NAME = 'dialog_sentiment_intensity_mapper'
 class DialogSentimentIntensityMapper(Mapper):
     """
     Mapper to predict user's sentiment intensity (from -5 to 5 in default
-    prompt) in dialog (history + query + response).
+    prompt) in dialog. Input from history_key, query_key and
+    response_key. Output lists of intensities and analysis for queries in
+    the dialog, which is store in 'sentiment.dialog_intensity' and
+    'sentiment.dialog_analysis' in Data-Juicer meta field.
     """
 
     DEFAULT_SYSTEM_PROMPT = ('请判断用户和LLM多轮对话中用户的情绪变化。\n'
@@ -196,9 +199,9 @@ class DialogSentimentIntensityMapper(Mapper):
             history.append(self.intensity_template.format(intensity=intensity))
             history.append(self.response_template.format(response=qa[1]))
 
-        sample = nested_set(sample, MetaKeys.dialog_sentiment_analysis,
-                            analysis_list)
-        sample = nested_set(sample, MetaKeys.dialog_sentiment_intensity,
-                            intensities)
+        analysis_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_analysis}'
+        sample = nested_set(sample, analysis_key, analysis_list)
+        intensity_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_intensity}'
+        sample = nested_set(sample, intensity_key, intensities)
 
         return sample

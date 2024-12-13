@@ -7,7 +7,7 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.dialog_sentiment_intensity_mapper import DialogSentimentIntensityMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
-from data_juicer.utils.constant import MetaKeys
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.common_utils import nested_access
 
 # Skip tests for this OP.
@@ -21,8 +21,8 @@ class TestDialogSentimentIntensityMapper(DataJuicerTestCaseBase):
     def _run_op(self, op, samples, target_len):
         dataset = Dataset.from_list(samples)
         dataset = dataset.map(op.process, batch_size=2)
-        analysis_list = nested_access(dataset[0], MetaKeys.dialog_sentiment_analysis)
-        intensity_list = nested_access(dataset[0], MetaKeys.dialog_sentiment_intensity)
+        analysis_list = nested_access(dataset[0][Fields.meta], MetaKeys.dialog_sentiment_analysis)
+        intensity_list = nested_access(dataset[0][Fields.meta], MetaKeys.dialog_sentiment_intensity)
 
         for analysis, intensity in zip(analysis_list, intensity_list):
             logger.info(f'分析：{analysis}')

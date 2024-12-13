@@ -10,18 +10,6 @@ from loguru import logger
 DEFAULT_PREFIX = '__dj__'
 
 
-class MetaKeys(object):
-
-    dialog_sentiment_intensity = DEFAULT_PREFIX + \
-        'meta.sentiment.dialog_intensity'
-    dialog_sentiment_analysis = DEFAULT_PREFIX + \
-        'meta.sentiment.dialog_analysis'
-    query_sentiment_intensity = DEFAULT_PREFIX + \
-        'meta.sentiment.query_intensity'
-    query_sentiment_score = DEFAULT_PREFIX + \
-        'meta.sentiment.query_intensity_score'
-
-
 class Fields(object):
     stats = DEFAULT_PREFIX + 'stats__'
     meta = DEFAULT_PREFIX + 'meta__'
@@ -78,6 +66,14 @@ class Fields(object):
     keyword = DEFAULT_PREFIX + 'keyword__'
     # # support text
     support_text = DEFAULT_PREFIX + 'support_text__'
+
+
+class MetaKeys(object):
+
+    dialog_sentiment_intensity = 'sentiment.dialog_intensity'
+    dialog_sentiment_analysis = 'sentiment.dialog_analysis'
+    query_sentiment_intensity = 'sentiment.query_intensity'
+    query_sentiment_score = 'sentiment.query_intensity_score'
 
 
 class StatsKeysMeta(type):

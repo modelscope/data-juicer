@@ -7,7 +7,7 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.query_sentiment_intensity_mapper import QuerySentimentLabelMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
-from data_juicer.utils.constant import MetaKeys
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.common_utils import nested_access
 
 class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
@@ -20,7 +20,7 @@ class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
         dataset = dataset.map(op.process, batch_size=2)
 
         for sample, target in zip(dataset, targets):
-            intensity = nested_access(sample, intensity_key)
+            intensity = nested_access(sample[Fields.meta], intensity_key)
             self.assertEqual(intensity, target)
         
     def test_default(self):
