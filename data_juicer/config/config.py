@@ -112,7 +112,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
     parser.add_argument(
         '--export_path',
         type=str,
-        default='./outputs/hello_world.jsonl',
+        default='./outputs/hello_world/hello_world.jsonl',
         help='Path to export and save the output processed dataset. The '
         'directory to store the processed dataset will be the work '
         'directory of this process.')
