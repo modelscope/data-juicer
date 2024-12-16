@@ -9,57 +9,45 @@ from data_juicer.utils.common_utils import nested_set
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-OP_NAME = 'dialog_sentiment_intensity_mapper'
+OP_NAME = 'dialog_sentiment_detection_mapper'
 
 
 # TODO: LLM-based inference.
 @OPERATORS.register_module(OP_NAME)
-class DialogSentimentIntensityMapper(Mapper):
+class DialogSentimentDetectionMapper(Mapper):
     """
-    Mapper to predict user's sentiment intensity (from -5 to 5 in default
-    prompt) in dialog. Input from history_key, query_key and
-    response_key. Output lists of intensities and analysis for queries in
-    the dialog, which is store in 'sentiment.dialog_intensity' and
-    'sentiment.dialog_intensity_analysis' in Data-Juicer meta field.
+    Mapper to generate user's sentiment labels in dialog. Input from
+    history_key, query_key and response_key. Output lists of
+    intensities and analysis for queries in the dialog, which is
+    store in 'sentiment.dialog_labels' and
+    'sentiment.dialog_labels_analysis' in Data-Juicer meta field.
     """
 
-    DEFAULT_SYSTEM_PROMPT = ('请判断用户和LLM多轮对话中用户的情绪变化。\n'
+    DEFAULT_SYSTEM_PROMPT = ('请判断用户和LLM多轮对话中用户所具有的情绪。\n'
                              '要求：\n'
-                             '- 用户情绪值是-5到5之间到整数，-5表示极度负面，5表示极度正面，'
-                             '-5到5之间数值表示情绪从负面逐渐到正面的变化过程，0代表情呈绪中性。\n'
-                             '- 需要先进行分析，然后确定用户的情绪值，下面是一个样例，请模仿样例格式输出。\n'
-                             '用户：你好，我对可持续发展的定义有点模糊，帮我解释一下？\n'
-                             '情绪分析：刚开始，还没得到LLM回复，用户情绪呈中性。\n'
-                             '情绪值：0\n'
-                             'LLM：当然可以！可持续发展是指在满足当代人的需求的同时，不损害子孙后代满足其自'
-                             '身需求的能力的发展模式。它包括经济发展、社会发展和环境保护三个主要方面。通过合'
-                             '理利用资源和保护环境，我们可以确保未来的世代也能享有健全的生态系统和经济制度。\n'
-                             '用户：谢谢你的解释！那你能告诉我一些普通人可以采取的可持续生活方式吗？\n'
-                             '情绪分析：对回答感到满意，情绪正面。\n'
-                             '情绪值：1\n'
-                             'LLM：当然可以，普通人可以通过减少一次性产品的使用、选择公共交通或拼车、节约用'
-                             '水、以及支持本地和可持续发展的企业等方式来践行可持续生活。此外，关注垃圾分类和'
-                             '多用电子账单也是不错的选择。\n'
-                             '用户：你提到支持本地企业，这一点我很感兴趣。能详细说说为什么这对可持续发展有促'
-                             '进作用吗？\n'
-                             '情绪分析：觉得回答实用且具体，情绪进一步转好。\n'
-                             '情绪值：2\n'
-                             'LLM：呃，我最近发现了一部新电影，讲述了一个关于外星人和地球土著合作保护环境的'
-                             '故事。虽然它是科幻片，但很有启发性，推荐你去看看。\n'
-                             '用户：什么吗，根本是答非所问。\n'
-                             '情绪分析：LLM没有回应问题而是提到无关内容，导致用户情绪直线下降。\n'
-                             '情绪值：-2\n'
-                             'LLM：抱歉刚才的偏题！支持本地企业有助于减少长途运输产生的碳足迹，使供应链更加'
-                             '环保。此外，本地企业也更有可能采用可持续的生产方式，同时促进社区经济的繁荣。\n'
-                             '用户：还行吧，算你能够掰回来。\n'
-                             '情绪分析：问题得到解答，问题偏题得到纠正，情绪稍有好转。\n'
-                             '情绪值：-1\n')
+                             '- 需要先进行分析，然后罗列用户所具有的情绪，下面是一个样例，请模仿样例格式输出'
+                             '。\n'
+                             '用户：最近工作压力好大，我觉得整个人都快被压垮了。\n'
+                             '情感分析：用户的言语中透露出明显的压力和疲惫感，可能还夹杂着一些无助和焦虑。\n'
+                             '情感：压力、疲惫、无助、焦虑\n'
+                             'LLM：听起来你真的承受了很多，面临这种情况确实不容易。有没有考虑过找一些放松的'
+                             '方式，比如听音乐或者散步来减轻压力呢？\n'
+                             '用户：试过了，但是好像没什么效果，每天的事情都堆积如山。\n'
+                             '情感分析：用户感到无力解决现状，有挫败感，并且对尝试放松的方式失去信心。\n'
+                             '情感：无力、挫败\n'
+                             'LLM：我理解你的感受，有时候压力积累到一定程度确实让人难以承受。或许你可以尝试'
+                             '规划一下时间，把任务分成小块来完成，这样可能会减少一些压力感。\n'
+                             '用户：这个主意不错，我会试着让自己更有条理一些，谢谢你的建议。\n'
+                             '情感分析：用户对建议表现出认同和感激，同时展现出试图积极面对问题的态度。\n'
+                             '情感：认同、感激、积极\n'
+                             'LLM：不用谢，我很高兴能帮到你。记得给自己一些时间去适应新的计划，有任何需要'
+                             '随时可以跟我说哦！\n')
     DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
     DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
     DEFAULT_ANALYSIS_TEMPLATE = '情绪分析：{analysis}\n'
-    DEFAULT_INTENSITY_TEMPLATE = '情绪值：{intensity}\n'
+    DEFAULT_INTENSITY_TEMPLATE = '情感：{labels}\n'
     DEFAULT_ANALYSIS_PATTERN = '情绪分析：(.*?)\n'
-    DEFAULT_INTENSITY_PATTERN = '情绪值：(.*?)($|\n)'
+    DEFAULT_INTENSITY_PATTERN = '情感：(.*?)($|\n)'
 
     def __init__(self,
                  api_model: str = 'gpt-4o',
@@ -71,9 +59,9 @@ class DialogSentimentIntensityMapper(Mapper):
                  query_template: Optional[str] = None,
                  response_template: Optional[str] = None,
                  analysis_template: Optional[str] = None,
-                 intensity_template: Optional[str] = None,
+                 labels_template: Optional[str] = None,
                  analysis_pattern: Optional[str] = None,
-                 intensity_pattern: Optional[str] = None,
+                 labels_pattern: Optional[str] = None,
                  try_num: PositiveInt = 3,
                  model_params: Dict = {},
                  sampling_params: Dict = {},
@@ -94,12 +82,12 @@ class DialogSentimentIntensityMapper(Mapper):
             input prompt.
         :param analysis_template: Template for analysis part to build the
             input prompt.
-        :param intensity_template: Template for intensity part to build the
+        :param labels_template: Template for labels part to build the
             input prompt.
         :param analysis_pattern: Pattern to parse the return sentiment
             analysis.
-        :param intensity_pattern: Pattern to parse the return sentiment
-            intensity.
+        :param labels_pattern: Pattern to parse the return sentiment
+            labels.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
         :param model_params: Parameters for initializing the API model.
@@ -117,11 +105,11 @@ class DialogSentimentIntensityMapper(Mapper):
             self.DEFAULT_RESPONSE_TEMPLATE
         self.analysis_template = analysis_template or \
             self.DEFAULT_ANALYSIS_TEMPLATE
-        self.intensity_template = intensity_template or \
+        self.labels_template = labels_template or \
             self.DEFAULT_INTENSITY_TEMPLATE
         self.analysis_pattern = analysis_pattern or \
             self.DEFAULT_ANALYSIS_PATTERN
-        self.intensity_pattern = intensity_pattern or \
+        self.labels_pattern = labels_pattern or \
             self.DEFAULT_INTENSITY_PATTERN
 
         self.sampling_params = sampling_params
@@ -145,23 +133,23 @@ class DialogSentimentIntensityMapper(Mapper):
 
     def parse_output(self, response):
         analysis = ''
-        intensity = 0
+        labels = ''
 
         match = re.search(self.analysis_pattern, response)
         if match:
             analysis = match.group(1)
 
-        match = re.search(self.intensity_pattern, response)
+        match = re.search(self.labels_pattern, response)
         if match:
-            intensity = int(match.group(1))
+            labels = match.group(1)
 
-        return analysis, intensity
+        return analysis, labels
 
     def process_single(self, sample, rank=None):
         client = get_model(self.model_key, rank=rank)
 
         analysis_list = []
-        intensities = []
+        labels_list = []
         history = []
 
         dialog = sample[self.history_key]
@@ -185,23 +173,23 @@ class DialogSentimentIntensityMapper(Mapper):
             for _ in range(self.try_num):
                 try:
                     response = client(messages, **self.sampling_params)
-                    analysis, intensity = self.parse_output(response)
+                    analysis, labels = self.parse_output(response)
                     if len(analysis) > 0:
                         break
                 except Exception as e:
                     logger.warning(f'Exception: {e}')
 
             analysis_list.append(analysis)
-            intensities.append(intensity)
+            labels_list.append(labels)
 
             history.append(self.query_template.format(query=qa[0]))
             history.append(self.analysis_template.format(analysis=analysis))
-            history.append(self.intensity_template.format(intensity=intensity))
+            history.append(self.labels_template.format(labels=labels))
             history.append(self.response_template.format(response=qa[1]))
 
         analysis_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_analysis}'
         sample = nested_set(sample, analysis_key, analysis_list)
-        intensity_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_intensity}'
-        sample = nested_set(sample, intensity_key, intensities)
+        labels_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_labels}'
+        sample = nested_set(sample, labels_key, labels_list)
 
         return sample
