@@ -44,9 +44,9 @@ class DialogSentimentDetectionMapper(Mapper):
                              '随时可以跟我说哦！\n')
     DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
     DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
-    DEFAULT_ANALYSIS_TEMPLATE = '情绪分析：{analysis}\n'
+    DEFAULT_ANALYSIS_TEMPLATE = '情感分析：{analysis}\n'
     DEFAULT_INTENSITY_TEMPLATE = '情感：{labels}\n'
-    DEFAULT_ANALYSIS_PATTERN = '情绪分析：(.*?)\n'
+    DEFAULT_ANALYSIS_PATTERN = '情感分析：(.*?)\n'
     DEFAULT_INTENSITY_PATTERN = '情感：(.*?)($|\n)'
 
     def __init__(self,

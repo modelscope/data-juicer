@@ -29,7 +29,7 @@ class TestDialogSentimentDetectionMapper(DataJuicerTestCaseBase):
             logger.info(f'情绪：{labels}')
         
         self.assertEqual(len(analysis_list), target_len)
-        self.assertEqual(len(intensity_list), target_len)
+        self.assertEqual(len(labels_list), target_len)
         
     def test_default(self):
         
