@@ -22,10 +22,13 @@ from .document_minhash_deduplicator import (MAX_HASH, MERSENNE_PRIME,
                                             optimal_param, sha1_hash32)
 
 
+BATCH_SIZE = 1000
+
+
 @ray.remote
 class IdGenerator:
-    def __init__(self):
-        self.next_id = 0
+    def __init__(self, start_id = 0):
+        self.next_id = start_id
 
     @ray.method(num_returns=2)
     def get_next_id(self, count):
@@ -52,14 +55,14 @@ class EdgeBuffer:
 @ray.remote(scheduling_strategy="SPREAD")
 class BTSUnionFind:
     def __init__(
-            self,
-            union_threshold,
-            parallel_num,
-            parallel_id,
-            remote_edge_buffers,
-            max_pending_edge_buffer_task,
-            num_edge_buffer_task_returns,
-        ):
+        self,
+        union_threshold,
+        parallel_num,
+        parallel_id,
+        remote_edge_buffers,
+        max_pending_edge_buffer_task,
+        num_edge_buffer_task_returns,
+    ):
         self.union_threshold = union_threshold
         self.parallel_num = parallel_num
         self.parallel_id = parallel_id
@@ -114,8 +117,8 @@ class BTSUnionFind:
         return self.old_parent != self.parent
 
     def distribute_edge(self, u, v):
-        hash_u = u % self.parallel_num
-        hash_v = v % self.parallel_num
+        hash_u = u // BATCH_SIZE % self.parallel_num
+        hash_v = v // BATCH_SIZE % self.parallel_num
         if hash_u not in self.edge_list_dict:
             self.edge_list_dict[hash_u] = []
         self.edge_list_dict[hash_u].append((u, v))
@@ -130,7 +133,11 @@ class BTSUnionFind:
             del self.edge_list_dict[self.parallel_id]
         else:
             self.edge_buffer = []
-        ray.get(self.remote_edge_buffers[self.parallel_id].set_edges.remote(self.edge_list_dict))
+        ray.get(
+            self.remote_edge_buffers[self.parallel_id].set_edges.remote(
+                self.edge_list_dict
+            )
+        )
         self.edge_list_dict = {}
 
     def edge_redistribution(self):
@@ -146,8 +153,9 @@ class BTSUnionFind:
         self.edge_list_dict = {}
         del_list = []
         for u, v in self.parent.items():
-            hash_u = u % self.parallel_num
-            if self.parent[u] != self.old_parent.get(u, u) or (hash_u != self.parallel_id and v not in self.parent):
+            hash_u = u // BATCH_SIZE % self.parallel_num
+            if self.parent[u] != self.old_parent.get(u, u) or \
+            (hash_u != self.parallel_id and v not in self.parent):
                 self.distribute_edge(u, v)
             if hash_u != self.parallel_id:
                 del_list.append(u)
@@ -183,7 +191,7 @@ class BTSUnionFind:
     def rebalancing(self):
         new_px_dict = {}
         for x in self.parent:
-            hash_x = x % self.parallel_num
+            hash_x = x // BATCH_SIZE % self.parallel_num
             px = self.find(x)
             key = (px, hash_x)
             if key not in new_px_dict:
@@ -192,7 +200,7 @@ class BTSUnionFind:
                 new_px_dict[key] = min(new_px_dict[key], x)
         px_set = set(px for px, _ in new_px_dict)
         for px in px_set:
-            hash_px = px % self.parallel_num
+            hash_px = px // BATCH_SIZE % self.parallel_num
             key = (px, hash_px)
             if key not in new_px_dict:
                 new_px_dict[key] = px
@@ -200,7 +208,7 @@ class BTSUnionFind:
                 new_px_dict[key] = min(new_px_dict[key], px)
 
         for x in self.parent:
-            hash_x = x % self.parallel_num
+            hash_x = x // BATCH_SIZE % self.parallel_num
             px = self.find(x)
             key = (px, hash_x)
             if x == new_px_dict[key]:
@@ -211,7 +219,7 @@ class BTSUnionFind:
         dup_keys = {
             x
             for x in self.parent
-            if x % self.parallel_num == self.parallel_id
+            if x // BATCH_SIZE % self.parallel_num == self.parallel_id
         }
         self.parent = dup_keys
         self.old_parent = {}
@@ -293,6 +301,22 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             params computation algorithm
         :param tokenizer_model: path for the sentencepiece model, used for
             sentencepiece tokenization.
+        :param union_find_parallel_num: number of parallel workers for
+            union-find algorithm. Default it's 'auto', and it will be
+            determined by half of the number of CPUs.
+        :param union_threshold: threshold for minhash values group to 
+            perform union-find algorightm. Default it's 256.
+        :param max_pending_edge_buffer_task: max number of pending edge buffer
+            ray tasks. Default it's 20.
+        :param num_edge_buffer_task_returns: number of edge buffer tasks for
+            `ray.wait` to return. Default it's 10.
+        :param max_pending_filter_tasks: max number of pending filter ray
+            tasks. Default it's 20.
+        :param num_filter_task_returns: number of filter tasks for `ray.wait`
+            to return. Default it's 10.
+        :param merge_batch_size: batch size for BTS operations. Default
+            it's 1000.
+        :param tmp_file_name: the temporary folder name for deduplication.
         """
         super().__init__(*args, **kwargs)
         # about minhash computation
@@ -380,7 +404,9 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         ).T
 
         if union_find_parallel_num == 'auto':
-            union_find_parallel_num = int(ray.cluster_resources().get('CPU', 32)) // 2
+            union_find_parallel_num = int(
+                ray.cluster_resources().get('CPU') / 2
+            )
         else:
             union_find_parallel_num = int(union_find_parallel_num)
 
@@ -409,11 +435,20 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             for i in range(self.union_find_parallel_num)
         ]
 
-        self.tmp_file_name = os.path.join(os.getcwd(), tmp_file_name, str(uuid.uuid4()))
+        self.tmp_file_name = os.path.join(
+            os.getcwd(), tmp_file_name, str(uuid.uuid4())
+        )
 
-        empty_hash_value = np.full((self.num_rows_per_band,), MAX_HASH, dtype=np.uint32)
-        self.empty_hash_value = b'\x00\x00\x00\x00' + empty_hash_value.tobytes()
-        self.empty_hash_table_id = int(MAX_HASH % self.union_find_parallel_num)
+        empty_hash_value = np.full(
+            (self.num_rows_per_band,),
+            MAX_HASH,
+            dtype=np.uint32
+        )
+        self.empty_hash_value = b'\x00\x00\x00\x00' \
+            + empty_hash_value.tobytes()
+        self.empty_hash_table_id = int(
+            MAX_HASH % self.union_find_parallel_num
+        )
 
     def calc_minhash(self, text_list: pa.Array, uid_list: List) -> pa.Table:
         pairs = {}
@@ -438,15 +473,19 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 ).astype(np.uint32)
                 hash_values = phv.min(axis=0)
                 for i, (start, end) in enumerate(self.hash_ranges):
-                    hash_value = i.to_bytes(4, 'big') + hash_values[start:end].tobytes()
-                    hash_table_id = hash_values[start] % self.union_find_parallel_num
+                    hash_value = i.to_bytes(4, 'big') \
+                        + hash_values[start:end].tobytes()
+                    hash_table_id = hash_values[start] \
+                        % self.union_find_parallel_num
                     if hash_table_id not in pairs:
                         pairs[hash_table_id] = []
                     pairs[hash_table_id].append((hash_value, uid))
             else:
                 if self.empty_hash_table_id not in pairs:
                     pairs[self.empty_hash_table_id] = []
-                pairs[self.empty_hash_table_id].append((self.empty_hash_value, uid))
+                pairs[self.empty_hash_table_id].append(
+                    (self.empty_hash_value, uid)
+                )
         result_refs = []
         for i, p in pairs.items():
             if len(result_refs) > self.max_pending_filter_tasks:
@@ -494,7 +533,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         query_dict = {}
         for idx, uid in enumerate(samples[HashKeys.uid]):
             uid = uid.as_py()
-            hash_id = uid % self.union_find_parallel_num
+            hash_id = uid // BATCH_SIZE % self.union_find_parallel_num
             if hash_id not in query_dict:
                 query_dict[hash_id] = []
             query_dict[hash_id].append((uid, idx))
@@ -529,10 +568,15 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         id_generator = IdGenerator.remote()
         def minhash_with_uid(table: pa.Table) -> pa.Table:
             num_rows = len(table)
-            min_id, max_id = ray.get(id_generator.get_next_id.remote(num_rows))
+            min_id, max_id = ray.get(
+                id_generator.get_next_id.remote(num_rows)
+            )
             uid_list = range(min_id, max_id)
             self.calc_minhash(table[self.text_key], uid_list)
-            new_table = table.append_column(HashKeys.uid, pa.array(list(uid_list)))
+            new_table = table.append_column(
+                HashKeys.uid,
+                pa.array(list(uid_list))
+            )
             return new_table
 
         dataset.map_batches(
@@ -543,7 +587,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             self.tmp_file_name,
             force_ascii=False
         ) # TODO: balance file size
-        dataset = ray.data.read_parquet(self.tmp_file_name, ray_remote_args=dict(scheduling_strategy="SPREAD"))
+        dataset = ray.data.read_parquet(self.tmp_file_name)
         end_time = time.time()
         print(f'MinHash time = {end_time - start_time}')
 
@@ -556,5 +600,4 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             batch_format='pyarrow',
             zero_copy_batch=True,
         )
-        # logger.info(f'origin count = {dataset.count()}, keep count = {result.count()}')
         return result
