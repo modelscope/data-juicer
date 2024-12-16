@@ -45,11 +45,6 @@ class ConfigValidationError(Exception):
     pass
 
 
-class DataValidationError(Exception):
-    """Custom exception for data validation errors"""
-    pass
-
-
 class ConfigValidator:
     """Mixin class for configuration validation"""
 
@@ -103,57 +98,6 @@ class ConfigValidator:
                 except Exception as e:
                     raise ConfigValidationError(
                         f"Validation failed for field '{field}': {str(e)}")
-
-
-class DataValidator:
-    """Mixin class for data content validation"""
-
-    # Define data validation rules
-    DATA_VALIDATION_RULES = {
-        'required_columns': [],  # Columns that must be present in the dataset
-        'column_types': {},  # Expected types for columns
-        'custom_validators': {}  # Custom validation functions for data content
-    }
-
-    def validate_data(self, dataset) -> None:
-        """
-        Validate the actual dataset content.
-
-        Args:
-            dataset: The loaded dataset to validate
-
-        Raises:
-            DataValidationError: If validation fails
-        """
-        # Check required columns
-        if hasattr(dataset, 'column_names'):
-            missing_columns = [
-                col for col in self.DATA_VALIDATION_RULES['required_columns']
-                if col not in dataset.column_names
-            ]
-            if missing_columns:
-                raise DataValidationError(
-                    f"Missing required columns: {', '.join(missing_columns)}")
-
-        # Check column types
-        for col, expected_type in self.DATA_VALIDATION_RULES[
-                'column_types'].items():
-            if col in dataset.column_names:
-                # Sample check for performance
-                sample = dataset.select(range(min(100, len(dataset))))
-                if not all(
-                        isinstance(val, expected_type) for val in sample[col]):
-                    raise DataValidationError(
-                        f"Column '{col}' contains values of incorrect type")
-
-        # Run custom validators
-        for validator_name, validator in self.DATA_VALIDATION_RULES[
-                'custom_validators'].items():
-            try:
-                validator(dataset)
-            except Exception as e:
-                raise DataValidationError(
-                    f"Data validation '{validator_name}' failed: {str(e)}")
 
 
 class DataLoadStrategy(ABC, ConfigValidator):

@@ -3,6 +3,7 @@ import shlex
 from typing import List, Tuple, Union
 
 from data_juicer.core.data import NestedDataset
+from data_juicer.core.data.data_validator import DataValidatorRegistry
 from data_juicer.core.data.load_strategy import DataLoadStrategyRegistry
 from data_juicer.core.data.ray_dataset import RayDataset
 from data_juicer.utils.file_utils import is_absolute_path
@@ -34,12 +35,26 @@ class DatasetBuilder(object):
                 DataLoadStrategyRegistry.get_strategy_class(
                     executor_type, data_type, data_source)(ds_config))
 
+        self.validators = []
+        if hasattr(cfg, 'validators'):
+            for validator_config in cfg.validators:
+                validator_type = validator_config['type']
+                validator_cls = DataValidatorRegistry.get_validator(
+                    validator_type)
+                if validator_cls:
+                    self.validators.append(validator_cls(validator_config))
+
     def load_dataset(self) -> Union[NestedDataset, RayDataset]:
-        # handle mixture dataset, nested dataset
-        # handle sampling of mixture datasets
+        # load dataset with its load strategy
+        # do data validation
         _datasets = []
         for f in self.load_strategies:
-            _datasets.append(f.load_data(self.cfg))
+            _dataset = f.load_data(self.cfg)
+            for validator in self.validators:
+                validator.validate(_dataset)
+            _datasets.append(_dataset)
+
+        # handle data mixture
         return _datasets[0]
 
 
