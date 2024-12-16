@@ -136,7 +136,10 @@ class RelatedTTestMeasure(Measure):
     name = 't-test'
 
     @staticmethod
-    def stats_to_hist(self, p, q):
+    def stats_to_hist(p, q):
+        p = np.array(p)
+        q = np.array(q)
+
         # get common maximum number of data samples, and max/min values
         max_data_num = max(len(p), len(q))
         min_val = min(min(p), min(q))
@@ -149,7 +152,7 @@ class RelatedTTestMeasure(Measure):
             rec_bins = None
 
         # get the common bin edges
-        common_p = p + [min_val, max_val]
+        common_p = np.append(p, [min_val, max_val])
         hist_p, bin_edges = np.histogram(common_p, bins=rec_bins)
         # restore the hist of the original p
         hist_p[0] -= 1
@@ -159,7 +162,7 @@ class RelatedTTestMeasure(Measure):
         return hist_p, hist_q, bin_edges
 
     @staticmethod
-    def category_to_hist(self, p, q):
+    def category_to_hist(p, q):
 
         def flatten_list(lst):
             res = []
@@ -193,7 +196,7 @@ class RelatedTTestMeasure(Measure):
         sorted_cat = [it[0] for it in sorted_cat]
         # get the value dist
         hist_p = [count_p[cat] for cat in sorted_cat]
-        hist_q = [count_p[cat] for cat in sorted_cat]
+        hist_q = [count_q[cat] for cat in sorted_cat]
 
         return hist_p, hist_q, count_p, count_q, sorted_cat
 
