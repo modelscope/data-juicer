@@ -7,6 +7,7 @@ from typing import List, Optional, Tuple, Union
 from urllib.parse import urljoin
 
 import pandas as pd
+import regex as re
 import requests
 from bs4 import BeautifulSoup
 from datasets import Dataset
@@ -222,3 +223,41 @@ def get_arxiv_urls():
     urls.sort()
 
     return urls
+
+
+def validate_snapshot_format(snapshot: Optional[str]) -> None:
+    """
+    Validate snapshot format 'YYYY-WW'.
+
+    Args:
+        snapshot: Snapshot string in format 'YYYY-WW' or None
+
+    Raises:
+        ValueError: If format is invalid
+    """
+    if snapshot is None:
+        return
+
+    # Check basic format with regex
+    pattern = r'^\d{4}-\d{2}$'
+    if not re.match(pattern, snapshot):
+        raise ValueError(f'Invalid snapshot format: {snapshot}. '
+                         "Expected format: 'YYYY-WW' (e.g., '2020-50')")
+
+    # Parse year and week
+    try:
+        year, week = map(int, snapshot.split('-'))
+
+        # Validate year
+        if not (2000 <= year <= 2100):  # Reasonable year range
+            raise ValueError(f'Year must be between 2000 and 2100, got {year}')
+
+        # Validate week number (1-53)
+        if not (1 <= week <= 53):
+            raise ValueError(f'Week must be between 1 and 53, got {week}')
+
+    except ValueError as e:
+        if str(e).startswith('Week') or str(e).startswith('Year'):
+            raise
+        raise ValueError(f'Invalid snapshot format: {snapshot}. '
+                         "Expected format: 'YYYY-WW' (e.g., '2020-50')")
