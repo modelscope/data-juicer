@@ -72,9 +72,11 @@ class Fields(object):
 class MetaKeys(object):
 
     dialog_sentiment_intensity = 'sentiment.dialog_intensity'
-    dialog_sentiment_analysis = 'sentiment.dialog_intensity_analysis'
+    dialog_sentiment_intensity_analysis = 'sentiment.dialog_intensity_analysis'
     query_sentiment_intensity = 'sentiment.query_intensity'
     query_sentiment_score = 'sentiment.query_intensity_score'
+    dialog_sentiment_labels = 'sentiment.dialog_labels'
+    dialog_sentiment_labels_analysis = 'sentiment.dialog_labels_analysis'
 
 
 class StatsKeysMeta(type):

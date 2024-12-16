@@ -21,7 +21,7 @@ class DialogSentimentDetectionMapper(DataJuicerTestCaseBase):
     def _run_op(self, op, samples, target_len):
         dataset = Dataset.from_list(samples)
         dataset = dataset.map(op.process, batch_size=2)
-        analysis_list = nested_access(dataset[0][Fields.meta], MetaKeys.dialog_sentiment_analysis)
+        analysis_list = nested_access(dataset[0][Fields.meta], MetaKeys.dialog_sentiment_labels_analysis)
         labels_list = nested_access(dataset[0][Fields.meta], MetaKeys.dialog_sentiment_labels)
 
         for analysis, labels in zip(analysis_list, labels_list):

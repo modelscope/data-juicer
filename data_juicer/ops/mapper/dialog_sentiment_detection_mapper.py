@@ -14,7 +14,7 @@ OP_NAME = 'dialog_sentiment_detection_mapper'
 
 # TODO: LLM-based inference.
 @OPERATORS.register_module(OP_NAME)
-class DialogSentimentDetectionMapper(Mapper):
+class TestDialogSentimentDetectionMapper(Mapper):
     """
     Mapper to generate user's sentiment labels in dialog. Input from
     history_key, query_key and response_key. Output lists of
@@ -187,7 +187,7 @@ class DialogSentimentDetectionMapper(Mapper):
             history.append(self.labels_template.format(labels=labels))
             history.append(self.response_template.format(response=qa[1]))
 
-        analysis_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_analysis}'
+        analysis_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_labels_analysis}'  # noqa: E501
         sample = nested_set(sample, analysis_key, analysis_list)
         labels_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_labels}'
         sample = nested_set(sample, labels_key, labels_list)

@@ -199,7 +199,7 @@ class DialogSentimentIntensityMapper(Mapper):
             history.append(self.intensity_template.format(intensity=intensity))
             history.append(self.response_template.format(response=qa[1]))
 
-        analysis_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_analysis}'
+        analysis_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_intensity_analysis}'  # noqa: E501
         sample = nested_set(sample, analysis_key, analysis_list)
         intensity_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_intensity}'
         sample = nested_set(sample, intensity_key, intensities)
