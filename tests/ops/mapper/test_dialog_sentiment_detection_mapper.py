@@ -13,7 +13,7 @@ from data_juicer.utils.common_utils import nested_access
 # Skip tests for this OP.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
-class DialogSentimentDetectionMapper(DataJuicerTestCaseBase):
+class TestDialogSentimentDetectionMapper(DataJuicerTestCaseBase):
     # before runing this test, set below environment variables:
     # export OPENAI_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
     # export OPENAI_API_KEY=your_key

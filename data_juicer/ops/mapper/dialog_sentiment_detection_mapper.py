@@ -14,7 +14,7 @@ OP_NAME = 'dialog_sentiment_detection_mapper'
 
 # TODO: LLM-based inference.
 @OPERATORS.register_module(OP_NAME)
-class TestDialogSentimentDetectionMapper(Mapper):
+class DialogSentimentDetectionMapper(Mapper):
     """
     Mapper to generate user's sentiment labels in dialog. Input from
     history_key, query_key and response_key. Output lists of
