@@ -40,7 +40,7 @@ class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
             hf_model = self.hf_model,
             zh_to_en_hf_model = self.zh_to_en_hf_model,
         )
-        self._run_op(op, samples, MetaKeys.query_sentiment_label, targets)
+        self._run_op(op, samples, MetaKeys.query_intent_label, targets)
     
     def test_no_zh_to_en(self):
         
@@ -56,7 +56,7 @@ class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
             hf_model = self.hf_model,
             zh_to_en_hf_model = None,
         )
-        self._run_op(op, samples, MetaKeys.query_sentiment_label, targets)
+        self._run_op(op, samples, MetaKeys.query_intent_label, targets)
 
 if __name__ == '__main__':
     unittest.main()
