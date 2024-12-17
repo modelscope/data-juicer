@@ -7,13 +7,14 @@ import os
 import ray
 import numpy as np
 import pyarrow as pa
+import pyarrow.parquet as pq
 import regex
 from loguru import logger
 from pydantic import Field, PositiveInt
 from typing_extensions import Annotated
 from typing import List, Union
 
-from data_juicer.utils.constant import HashKeys
+from data_juicer.utils.constant import HashKeys, Fields
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
 from ..base_op import OPERATORS, Deduplicator
@@ -54,6 +55,12 @@ class EdgeBuffer:
 
 @ray.remote(scheduling_strategy="SPREAD")
 class BTSUnionFind:
+    """
+    A distributed implementation of Union-Find with load balancing.
+
+    The original paper on BTS Union-Find is available at:
+    https://ieeexplore.ieee.org/document/10598116
+    """
     def __init__(
         self,
         union_threshold,
@@ -438,6 +445,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         self.tmp_file_name = os.path.join(
             os.getcwd(), tmp_file_name, str(uuid.uuid4())
         )
+        os.makedirs(self.tmp_file_name)
 
         empty_hash_value = np.full(
             (self.num_rows_per_band,),
@@ -577,16 +585,24 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 HashKeys.uid,
                 pa.array(list(uid_list))
             )
-            return new_table
+            if not new_table[Fields.stats][0].as_py():
+                columns_to_keep = [
+                    name
+                    for name in new_table.column_names
+                    if name != Fields.stats
+                ]
+                new_table = new_table.select(columns_to_keep)
+            pq.write_table(
+                new_table,
+                os.path.join(self.tmp_file_name, f'{min_id}.parquet')
+            )
+            return pa.Table.from_arrays([])
 
         dataset.map_batches(
             minhash_with_uid,
             batch_format='pyarrow',
             zero_copy_batch=True,
-        ).write_parquet(
-            self.tmp_file_name,
-            force_ascii=False
-        ) # TODO: balance file size
+        ).materialize()
         dataset = ray.data.read_parquet(self.tmp_file_name)
         end_time = time.time()
         print(f'MinHash time = {end_time - start_time}')
