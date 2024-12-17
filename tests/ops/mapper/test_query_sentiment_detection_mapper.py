@@ -12,16 +12,16 @@ from data_juicer.utils.common_utils import nested_access
 
 class TestQuerySentimentDetectionMapper(DataJuicerTestCaseBase):
 
-    hf_model = 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'
-    zh_to_en_hf_model = 'Helsinki-NLP/opus-mt-zh-en'
+    hf_model = '/mnt/workspace/shared/checkpoints/huggingface/mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'
+    zh_to_en_hf_model = '/mnt/workspace/shared/checkpoints/huggingface/Helsinki-NLP/opus-mt-zh-en'
 
-    def _run_op(self, op, samples, intensity_key, targets):
+    def _run_op(self, op, samples, label_key, targets):
         dataset = Dataset.from_list(samples)
         dataset = dataset.map(op.process, batch_size=2)
 
         for sample, target in zip(dataset, targets):
-            intensity = nested_access(sample[Fields.meta], intensity_key)
-            self.assertEqual(intensity, target)
+            label = nested_access(sample[Fields.meta], label_key)
+            self.assertEqual(label, target)
         
     def test_default(self):
         
@@ -33,7 +33,7 @@ class TestQuerySentimentDetectionMapper(DataJuicerTestCaseBase):
             'query': '没有希望。'
         },
         ]
-        targets = [1, 0, -1]
+        targets = ['positive', 'neutral', 'negative']
 
         op = QuerySentimentDetectionMapper(
             hf_model = self.hf_model,
@@ -49,55 +49,14 @@ class TestQuerySentimentDetectionMapper(DataJuicerTestCaseBase):
             'query': 'That is great!'
         }
         ]
-        targets = [0, 1]
+        targets = ['neutral', 'positive']
 
         op = QuerySentimentDetectionMapper(
             hf_model = self.hf_model,
             zh_to_en_hf_model = None,
         )
         self._run_op(op, samples, MetaKeys.query_sentiment_label, targets)
-    
-    def test_reset_map1(self):
-        
-        samples = [{
-            'query': '太棒了！'
-        },{
-            'query': '嗯嗯'
-        },{
-            'query': '没有希望。'
-        },
-        ]
-        targets = [2, 0, -2]
 
-        op = QuerySentimentDetectionMapper(
-            hf_model = self.hf_model,
-            zh_to_en_hf_model = self.zh_to_en_hf_model,
-            label_to_intensity = {
-                'negative': -2,
-                'neutral': 0,
-                'positive': 2,
-            }
-        )
-        self._run_op(op, samples, MetaKeys.query_sentiment_label, targets)
-
-    def test_reset_map2(self):
-        
-        samples = [{
-            'query': '太棒了！'
-        },{
-            'query': '嗯嗯'
-        },{
-            'query': '没有希望。'
-        },
-        ]
-        targets = ['positive', 'neutral', 'negative']
-
-        op = QuerySentimentDetectionMapper(
-            hf_model = self.hf_model,
-            zh_to_en_hf_model = self.zh_to_en_hf_model,
-            label_to_intensity = {}
-        )
-        self._run_op(op, samples, MetaKeys.query_sentiment_label, targets)
 
 if __name__ == '__main__':
     unittest.main()

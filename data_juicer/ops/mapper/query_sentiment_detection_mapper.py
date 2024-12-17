@@ -12,9 +12,9 @@ OP_NAME = 'query_sentiment_detection_mapper'
 @OPERATORS.register_module(OP_NAME)
 class QuerySentimentDetectionMapper(Mapper):
     """
-    Mapper to predict user's sentiment intensity label (-1 for 'negative',
-    0 for 'neutral' and 1 for 'positive') in query. Input from query_key.
-    Output intensity label and corresponding score for the query, which is
+    Mapper to predict user's sentiment label ('negative', 'neutral' and
+    'positive') in query. Input from query_key.
+    Output label and corresponding score for the query, which is
     store in 'sentiment.query_label' and
     'sentiment.query_label_score' in Data-Juicer meta field.
     """
@@ -35,19 +35,15 @@ class QuerySentimentDetectionMapper(Mapper):
             zh_to_en_hf_model: Optional[str] = 'Helsinki-NLP/opus-mt-zh-en',
             model_params: Dict = {},
             zh_to_en_model_params: Dict = {},
-            *,
-            label_to_intensity: Dict = None,
             **kwargs):
         """
         Initialization method.
 
-        :param hf_model: Hugginface model ID to predict sentiment intensity.
+        :param hf_model: Hugginface model ID to predict sentiment label.
         :param zh_to_en_hf_model: Translation model from Chinese to English.
             If not None, translate the query from Chinese to English.
         :param model_params: model param for hf_model.
         :param zh_to_en_model_params: model param for zh_to_hf_model.
-        :param label_to_intensity: Map the output labels to the intensities
-            instead of the default mapper if not None.
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(**kwargs)
@@ -68,11 +64,6 @@ class QuerySentimentDetectionMapper(Mapper):
         else:
             self.zh_to_en_model_key = None
 
-        if label_to_intensity is not None:
-            self.label_to_intensity = label_to_intensity
-        else:
-            self.label_to_intensity = self.DEFAULT_LABEL_TO_INTENSITY
-
     def process_batched(self, samples, rank=None):
         queries = samples[self.query_key]
 
@@ -84,19 +75,15 @@ class QuerySentimentDetectionMapper(Mapper):
 
         classifier, _ = get_model(self.model_key, rank, self.use_cuda())
         results = classifier(queries)
-        intensities = [
-            self.label_to_intensity[r['label']]
-            if r['label'] in self.label_to_intensity else r['label']
-            for r in results
-        ]
+        labels = [r['label'] for r in results]
         scores = [r['score'] for r in results]
 
         if Fields.meta not in samples:
-            samples[Fields.meta] = [{} for val in intensities]
+            samples[Fields.meta] = [{} for val in labels]
         for i in range(len(samples[Fields.meta])):
             samples[Fields.meta][i] = nested_set(
                 samples[Fields.meta][i], MetaKeys.query_sentiment_label,
-                intensities[i])
+                labels[i])
             samples[Fields.meta][i] = nested_set(
                 samples[Fields.meta][i], MetaKeys.query_sentiment_score,
                 scores[i])
