@@ -4,13 +4,13 @@ import json
 from loguru import logger
 
 from data_juicer.core.data import NestedDataset as Dataset
-from data_juicer.ops.mapper.query_sentiment_intensity_mapper import QuerySentimentLabelMapper
+from data_juicer.ops.mapper.query_sentiment_detection_mapper import QuerySentimentDetectionMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.common_utils import nested_access
 
-class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
+class TestQuerySentimentDetectionMapper(DataJuicerTestCaseBase):
 
     hf_model = 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'
     zh_to_en_hf_model = 'Helsinki-NLP/opus-mt-zh-en'
@@ -35,11 +35,11 @@ class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
         ]
         targets = [1, 0, -1]
 
-        op = QuerySentimentLabelMapper(
+        op = QuerySentimentDetectionMapper(
             hf_model = self.hf_model,
             zh_to_en_hf_model = self.zh_to_en_hf_model,
         )
-        self._run_op(op, samples, MetaKeys.query_sentiment_intensity, targets)
+        self._run_op(op, samples, MetaKeys.query_sentiment_label, targets)
     
     def test_no_zh_to_en(self):
         
@@ -51,11 +51,11 @@ class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
         ]
         targets = [0, 1]
 
-        op = QuerySentimentLabelMapper(
+        op = QuerySentimentDetectionMapper(
             hf_model = self.hf_model,
             zh_to_en_hf_model = None,
         )
-        self._run_op(op, samples, MetaKeys.query_sentiment_intensity, targets)
+        self._run_op(op, samples, MetaKeys.query_sentiment_label, targets)
     
     def test_reset_map1(self):
         
@@ -69,7 +69,7 @@ class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
         ]
         targets = [2, 0, -2]
 
-        op = QuerySentimentLabelMapper(
+        op = QuerySentimentDetectionMapper(
             hf_model = self.hf_model,
             zh_to_en_hf_model = self.zh_to_en_hf_model,
             label_to_intensity = {
@@ -78,7 +78,7 @@ class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
                 'positive': 2,
             }
         )
-        self._run_op(op, samples, MetaKeys.query_sentiment_intensity, targets)
+        self._run_op(op, samples, MetaKeys.query_sentiment_label, targets)
 
     def test_reset_map2(self):
         
@@ -92,12 +92,12 @@ class TestQuerySentimentLabelMapper(DataJuicerTestCaseBase):
         ]
         targets = ['positive', 'neutral', 'negative']
 
-        op = QuerySentimentLabelMapper(
+        op = QuerySentimentDetectionMapper(
             hf_model = self.hf_model,
             zh_to_en_hf_model = self.zh_to_en_hf_model,
             label_to_intensity = {}
         )
-        self._run_op(op, samples, MetaKeys.query_sentiment_intensity, targets)
+        self._run_op(op, samples, MetaKeys.query_sentiment_label, targets)
 
 if __name__ == '__main__':
     unittest.main()

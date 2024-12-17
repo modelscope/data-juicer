@@ -6,17 +6,17 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, Mapper
 
-OP_NAME = 'query_sentiment_intensity_mapper'
+OP_NAME = 'query_sentiment_detection_mapper'
 
 
 @OPERATORS.register_module(OP_NAME)
-class QuerySentimentLabelMapper(Mapper):
+class QuerySentimentDetectionMapper(Mapper):
     """
     Mapper to predict user's sentiment intensity label (-1 for 'negative',
     0 for 'neutral' and 1 for 'positive') in query. Input from query_key.
     Output intensity label and corresponding score for the query, which is
-    store in 'sentiment.query_intensity' and
-    'sentiment.query_intensity_score' in Data-Juicer meta field.
+    store in 'sentiment.query_label' and
+    'sentiment.query_label_score' in Data-Juicer meta field.
     """
 
     _accelerator = 'cuda'
@@ -95,7 +95,7 @@ class QuerySentimentLabelMapper(Mapper):
             samples[Fields.meta] = [{} for val in intensities]
         for i in range(len(samples[Fields.meta])):
             samples[Fields.meta][i] = nested_set(
-                samples[Fields.meta][i], MetaKeys.query_sentiment_intensity,
+                samples[Fields.meta][i], MetaKeys.query_sentiment_label,
                 intensities[i])
             samples[Fields.meta][i] = nested_set(
                 samples[Fields.meta][i], MetaKeys.query_sentiment_score,

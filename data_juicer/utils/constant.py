@@ -73,10 +73,15 @@ class MetaKeys(object):
 
     dialog_sentiment_intensity = 'sentiment.dialog_intensity'
     dialog_sentiment_intensity_analysis = 'sentiment.dialog_intensity_analysis'
-    query_sentiment_intensity = 'sentiment.query_intensity'
-    query_sentiment_score = 'sentiment.query_intensity_score'
+    query_sentiment_label = 'sentiment.query_label'
+    query_sentiment_score = 'sentiment.query_label_score'
     dialog_sentiment_labels = 'sentiment.dialog_labels'
     dialog_sentiment_labels_analysis = 'sentiment.dialog_labels_analysis'
+
+    dialog_intent_labels = 'intent.dialog_labels'
+    dialog_intent_labels_analysis = 'intent.dialog_labels_analysis'
+    query_intent_label = 'intent.query_label'
+    query_intent_score = 'intent.query_label_score'
 
 
 class StatsKeysMeta(type):

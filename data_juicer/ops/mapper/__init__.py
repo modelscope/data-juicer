@@ -8,6 +8,7 @@ from .clean_email_mapper import CleanEmailMapper
 from .clean_html_mapper import CleanHtmlMapper
 from .clean_ip_mapper import CleanIpMapper
 from .clean_links_mapper import CleanLinksMapper
+from .dialog_intent_detection_mapper import DialogIntentDetectionMapper
 from .dialog_sentiment_detection_mapper import DialogSentimentDetectionMapper
 from .dialog_sentiment_intensity_mapper import DialogSentimentIntensityMapper
 from .expand_macro_mapper import ExpandMacroMapper
@@ -35,7 +36,7 @@ from .pair_preference_mapper import PairPreferenceMapper
 from .punctuation_normalization_mapper import PunctuationNormalizationMapper
 from .python_file_mapper import PythonFileMapper
 from .python_lambda_mapper import PythonLambdaMapper
-from .query_sentiment_intensity_mapper import QuerySentimentLabelMapper
+from .query_sentiment_detection_mapper import QuerySentimentDetectionMapper
 from .relation_identity_mapper import RelationIdentityMapper
 from .remove_bibliography_mapper import RemoveBibliographyMapper
 from .remove_comments_mapper import RemoveCommentsMapper
@@ -74,10 +75,10 @@ __all__ = [
     'AudioFFmpegWrappedMapper', 'CalibrateQAMapper', 'CalibrateQueryMapper',
     'CalibrateResponseMapper', 'ChineseConvertMapper', 'CleanCopyrightMapper',
     'CleanEmailMapper', 'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
-    'DialogSentimentDetectionMapper', 'DialogSentimentIntensityMapper',
-    'ExpandMacroMapper', 'ExtractEntityAttributeMapper',
-    'ExtractEntityRelationMapper', 'ExtractEventMapper',
-    'ExtractKeywordMapper', 'ExtractNicknameMapper',
+    'DialogIntentDetectionMapper', 'DialogSentimentDetectionMapper',
+    'DialogSentimentIntensityMapper', 'ExpandMacroMapper',
+    'ExtractEntityAttributeMapper', 'ExtractEntityRelationMapper',
+    'ExtractEventMapper', 'ExtractKeywordMapper', 'ExtractNicknameMapper',
     'ExtractSupportTextMapper', 'FixUnicodeMapper',
     'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
     'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
@@ -85,7 +86,7 @@ __all__ = [
     'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
     'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
     'PairPreferenceMapper', 'PunctuationNormalizationMapper',
-    'PythonFileMapper', 'PythonLambdaMapper', 'QuerySentimentLabelMapper',
+    'PythonFileMapper', 'PythonLambdaMapper', 'QuerySentimentDetectionMapper',
     'RelationIdentityMapper', 'RemoveBibliographyMapper',
     'RemoveCommentsMapper', 'RemoveHeaderMapper', 'RemoveLongWordsMapper',
     'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',

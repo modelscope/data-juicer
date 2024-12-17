@@ -292,7 +292,7 @@ process:
   - python_lambda_mapper:                                   # executing Python lambda function on data samples.
       lambda_str: ''                                          # A string representation of the lambda function to be executed on data samples. If empty, the identity function is used.
       batched: False                                          # A boolean indicating whether to process input data in batches.
-  - query_sentiment_intensity_mapper:                       # Mapper to predict user's sentiment intensity label (-1 for 'negative', 0 for 'neutral' and 1 for 'positive') in query.
+  - query_sentiment_detection_mapper:                       # Mapper to predict user's sentiment intensity label (-1 for 'negative', 0 for 'neutral' and 1 for 'positive') in query.
       hf_model: 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'     # Hugginface model ID to predict sentiment intensity.
       zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
       model_params: {}                                        # model param for hf_model.
