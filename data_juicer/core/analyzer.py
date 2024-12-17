@@ -1,6 +1,7 @@
 import os
 from typing import Optional
 
+from datasets import Dataset
 from jsonargparse import Namespace
 from loguru import logger
 from pydantic import PositiveInt
@@ -13,6 +14,7 @@ from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils import cache_utils
 
 from .adapter import Adapter
+from .data import NestedDataset
 from .exporter import Exporter
 
 
@@ -71,12 +73,14 @@ class Analyzer:
         self.analysis_path = os.path.join(self.cfg.work_dir, 'analysis')
 
     def run(self,
+            dataset: Optional[Dataset, NestedDataset] = None,
             load_data_np: Optional[PositiveInt] = None,
             skip_export: bool = False,
             skip_return: bool = False):
         """
         Running the dataset analysis pipeline.
 
+        :param dataset: a Dataset object to be analyzed.
         :param load_data_np: number of workers when loading the dataset.
         :param skip_export: whether export the results into disk
         :param skip_return: skip return for API called.
@@ -86,7 +90,8 @@ class Analyzer:
         logger.info('Loading dataset from data formatter...')
         if load_data_np is None:
             load_data_np = self.cfg.np
-        dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+        if dataset is None:
+            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
         if self.cfg.auto:
             # if it's auto analysis, only analyze for a minor part of the input
             # dataset to save time and computing resource
