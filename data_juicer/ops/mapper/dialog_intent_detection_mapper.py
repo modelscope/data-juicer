@@ -79,6 +79,8 @@ class DialogIntentDetectionMapper(Mapper):
         Initialization method.
 
         :param api_model: API model name.
+        :param intent_candidates: The output intent candidates. Use the
+            intent labels of the open domain if it is None.
         :param max_round: The max num of round in the dialog to build the
             prompt.
         :param api_endpoint: URL endpoint for the API.
