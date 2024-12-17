@@ -29,9 +29,9 @@ class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
         samples = [{
             'query': '这样好吗？'
         },{
-            'query': '把那只笔递给我。'
+            'query': '站住！'
         },{
-            'query': '难道不是这样的吗？'
+            'query': '今天阳光灿烂。'
         }
         ]
         targets = [1, 0, -1]
