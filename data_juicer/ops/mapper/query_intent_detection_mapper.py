@@ -76,7 +76,6 @@ class QueryIntentDetectionMapper(Mapper):
                                       self.use_cuda())
             results = translater(queries)
             queries = [item['translation_text'] for item in results]
-        print(queries)
 
         classifier, _ = get_model(self.model_key, rank, self.use_cuda())
         results = classifier(queries)

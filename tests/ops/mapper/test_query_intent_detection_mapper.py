@@ -21,8 +21,7 @@ class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
 
         for sample, target in zip(dataset, targets):
             label = nested_access(sample[Fields.meta], label_key)
-            print(label)
-            # self.assertEqual(label, target)
+            self.assertEqual(label, target)
         
     def test_default(self):
         
@@ -34,7 +33,7 @@ class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
             'query': '今天阳光灿烂。'
         }
         ]
-        targets = [1, 0, -1]
+        targets = ['question', 'command', 'statement']
 
         op = QueryIntentDetectionMapper(
             hf_model = self.hf_model,
@@ -50,7 +49,7 @@ class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
             'query': 'Is this okay?'
         }
         ]
-        targets = [0, 1]
+        targets = ['question', 'rhetorical question']
 
         op = QueryIntentDetectionMapper(
             hf_model = self.hf_model,
