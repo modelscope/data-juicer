@@ -15,14 +15,14 @@ class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
     hf_model = '/mnt/workspace/shared/checkpoints/huggingface/bespin-global/klue-roberta-small-3i4k-intent-classification'
     zh_to_en_hf_model = '/mnt/workspace/shared/checkpoints/huggingface/Helsinki-NLP/opus-mt-zh-en'
 
-    def _run_op(self, op, samples, intensity_key, targets):
+    def _run_op(self, op, samples, label_key, targets):
         dataset = Dataset.from_list(samples)
         dataset = dataset.map(op.process, batch_size=2)
 
         for sample, target in zip(dataset, targets):
-            intensity = nested_access(sample[Fields.meta], intensity_key)
-            print(intensity)
-            # self.assertEqual(intensity, target)
+            label = nested_access(sample[Fields.meta], label_key)
+            print(label)
+            # self.assertEqual(label, target)
         
     def test_default(self):
         
