@@ -553,11 +553,12 @@ def init_setup_from_cfg(cfg: Namespace):
 def load_filters_with_stats():
     import pkgutil
 
-    import data_juicer.ops.filter as djfilters
+    import data_juicer.ops.filter as djfilter
+    from data_juicer.ops import NON_STATS_FILTERS
     return [{
         filter_name: {}
-    } for _, filter_name, _ in pkgutil.iter_modules(djfilters.__path__)
-            if filter_name not in djfilters.NON_STATS_FILTERS]
+    } for _, filter_name, _ in pkgutil.iter_modules(djfilter.__path__)
+            if filter_name not in NON_STATS_FILTERS]
 
 
 def update_op_attr(op_list: list, attr_dict: dict = None):
