@@ -22,12 +22,6 @@ class QuerySentimentDetectionMapper(Mapper):
     _accelerator = 'cuda'
     _batched_op = True
 
-    DEFAULT_LABEL_TO_INTENSITY = {
-        'negative': -1,
-        'neutral': 0,
-        'positive': 1,
-    }
-
     def __init__(
             self,
             hf_model:

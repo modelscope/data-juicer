@@ -13,15 +13,13 @@ OP_NAME = 'query_intent_detection_mapper'
 class QueryIntentDetectionMapper(Mapper):
     """
     Mapper to predict user's Intent label in query. Input from query_key.
-    Output intensity label and corresponding score for the query, which is
+    Output intent label and corresponding score for the query, which is
     store in 'intent.query_label' and 'intent.query_label_score' in
     Data-Juicer meta field.
     """
 
     _accelerator = 'cuda'
     _batched_op = True
-
-    DEFAULT_LABEL_TO_INTENSITY = {}
 
     def __init__(
             self,
@@ -30,19 +28,15 @@ class QueryIntentDetectionMapper(Mapper):
             zh_to_en_hf_model: Optional[str] = 'Helsinki-NLP/opus-mt-zh-en',
             model_params: Dict = {},
             zh_to_en_model_params: Dict = {},
-            *,
-            label_to_intensity: Dict = None,
             **kwargs):
         """
         Initialization method.
 
-        :param hf_model: Hugginface model ID to predict sentiment intensity.
+        :param hf_model: Hugginface model ID to predict intent label.
         :param zh_to_en_hf_model: Translation model from Chinese to English.
             If not None, translate the query from Chinese to English.
         :param model_params: model param for hf_model.
         :param zh_to_en_model_params: model param for zh_to_hf_model.
-        :param label_to_intensity: Map the output labels to the intensities
-            instead of the default mapper if not None.
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(**kwargs)
@@ -63,11 +57,6 @@ class QueryIntentDetectionMapper(Mapper):
         else:
             self.zh_to_en_model_key = None
 
-        if label_to_intensity is not None:
-            self.label_to_intensity = label_to_intensity
-        else:
-            self.label_to_intensity = self.DEFAULT_LABEL_TO_INTENSITY
-
     def process_batched(self, samples, rank=None):
         queries = samples[self.query_key]
 
@@ -79,11 +68,7 @@ class QueryIntentDetectionMapper(Mapper):
 
         classifier, _ = get_model(self.model_key, rank, self.use_cuda())
         results = classifier(queries)
-        intensities = [
-            self.label_to_intensity[r['label']]
-            if r['label'] in self.label_to_intensity else r['label']
-            for r in results
-        ]
+        intensities = [r['label'] for r in results]
         scores = [r['score'] for r in results]
 
         if Fields.meta not in samples:

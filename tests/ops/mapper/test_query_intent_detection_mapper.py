@@ -12,8 +12,8 @@ from data_juicer.utils.common_utils import nested_access
 
 class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
 
-    hf_model = '/mnt/workspace/shared/checkpoints/huggingface/bespin-global/klue-roberta-small-3i4k-intent-classification'
-    zh_to_en_hf_model = '/mnt/workspace/shared/checkpoints/huggingface/Helsinki-NLP/opus-mt-zh-en'
+    hf_model = 'bespin-global/klue-roberta-small-3i4k-intent-classification'
+    zh_to_en_hf_model = 'Helsinki-NLP/opus-mt-zh-en'
 
     def _run_op(self, op, samples, label_key, targets):
         dataset = Dataset.from_list(samples)

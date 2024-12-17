@@ -77,11 +77,43 @@ process:
   - clean_ip_mapper:                                        # remove ip addresses from text.
   - clean_links_mapper:                                     # remove web links from text.
   - clean_copyright_mapper:                                 # remove copyright comments.
+  - dialog_intent_detection_mapper:                         # Mapper to generate user's intent labels in dialog.
+      api_model: 'gpt-4o'                                     # API model name.
+      intent_candidates: null                                 # The output intent candidates. Use the intent labels of the open domain if it is None.
+      max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      query_template: null                                    # Template for query part to build the input prompt.
+      response_template: null                                 # Template for response part to build the input prompt.
+      candidate_template: null                                # Template for intent candidates to build the input prompt.
+      analysis_template: null                                 # Template for analysis part to build the input prompt.
+      labels_template: null                                   # Template for labels to build the input prompt.
+      analysis_pattern: null                                  # Pattern to parse the return intent analysis.
+      labels_pattern: null                                    # Pattern to parse the return intent labels.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - dialog_sentiment_detection_mapper:                      # Mapper to generate user's sentiment labels in dialog.
+      api_model: 'gpt-4o'                                     # API model name.
+      max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      query_template: null                                    # Template for query part to build the input prompt.
+      response_template: null                                 # Template for response part to build the input prompt.
+      analysis_template: null                                 # Template for analysis part to build the input prompt.
+      labels_template: null                                   # Template for labels part to build the input prompt.
+      analysis_pattern: null                                  # Pattern to parse the return sentiment analysis.
+      labels_pattern: null                                    # Pattern to parse the return sentiment labels.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - dialog_sentiment_intensity_mapper:                      # Mapper to predict user's sentiment intensity (from -5 to 5 in default prompt) in dialog.
       api_model: 'gpt-4o'                                     # API model name.
       max_round: 10                                           # The max num of round in the dialog to build the prompt.
       api_endpoint: null                                      # URL endpoint for the API.
-      esponse_path: null                                      # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the task.
       query_template: null                                    # Template for query part to build the input prompt.
       response_template: null                                 # Template for response part to build the input prompt.
@@ -292,12 +324,16 @@ process:
   - python_lambda_mapper:                                   # executing Python lambda function on data samples.
       lambda_str: ''                                          # A string representation of the lambda function to be executed on data samples. If empty, the identity function is used.
       batched: False                                          # A boolean indicating whether to process input data in batches.
-  - query_sentiment_detection_mapper:                       # Mapper to predict user's sentiment intensity label ('negative', 'neutral' and 'positive') in query.
-      hf_model: 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'     # Hugginface model ID to predict sentiment intensity.
+  - query_intent_detection_mapper:                          # Mapper to predict user's Intent label in query.
+      hf_model: 'bespin-global/klue-roberta-small-3i4k-intent-classification'     # Hugginface model ID to predict intent label.
       zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
       model_params: {}                                        # model param for hf_model.
       zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
-      label_to_intensity: null                                # Map the output labels to the intensities instead of the default mapper if not None.
+  - query_sentiment_detection_mapper:                       # Mapper to predict user's sentiment label ('negative', 'neutral' and 'positive') in query.
+      hf_model: 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'     # Hugginface model ID to predict sentiment label.
+      zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
+      model_params: {}                                        # model param for hf_model.
+      zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
   - relation_identity_mapper:                               # identify relation between two entity in the text.
       api_model: 'gpt-4o'                                     # API model name.
       source_entity: '孙悟空'                                  # The source entity of the relation to be dentified.
