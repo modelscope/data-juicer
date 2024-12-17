@@ -25,7 +25,8 @@ class QueryIntentDetectionMapper(Mapper):
 
     def __init__(
             self,
-            hf_model: str = 'Falconsai/intent_classification',
+            hf_model:
+        str = 'bespin-global/klue-roberta-small-3i4k-intent-classification',  # noqa: E501 E131
             zh_to_en_hf_model: Optional[str] = 'Helsinki-NLP/opus-mt-zh-en',
             model_params: Dict = {},
             zh_to_en_model_params: Dict = {},

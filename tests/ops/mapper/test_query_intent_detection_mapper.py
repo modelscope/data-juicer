@@ -12,7 +12,7 @@ from data_juicer.utils.common_utils import nested_access
 
 class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
 
-    hf_model = '/mnt/workspace/shared/checkpoints/huggingface/Falconsai/intent_classification'
+    hf_model = '/mnt/workspace/shared/checkpoints/huggingface/bespin-global/klue-roberta-small-3i4k-intent-classification'
     zh_to_en_hf_model = '/mnt/workspace/shared/checkpoints/huggingface/Helsinki-NLP/opus-mt-zh-en'
 
     def _run_op(self, op, samples, intensity_key, targets):
@@ -27,11 +27,11 @@ class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
     def test_default(self):
         
         samples = [{
-            'query': '我要一个汉堡。'
+            'query': '这样好吗？'
         },{
-            'query': '你最近过得怎么样？'
+            'query': '把那只笔递给我。'
         },{
-            'query': '它是正方形的。'
+            'query': '难道不是这样的吗？'
         }
         ]
         targets = [1, 0, -1]
@@ -45,9 +45,9 @@ class TestQueryIntentDetectionMapper(DataJuicerTestCaseBase):
     def test_no_zh_to_en(self):
         
         samples = [{
-            'query': '它是正方形的。'
+            'query': '这样好吗？'
         },{
-            'query': 'It is square.'
+            'query': 'Is this okay?'
         }
         ]
         targets = [0, 1]

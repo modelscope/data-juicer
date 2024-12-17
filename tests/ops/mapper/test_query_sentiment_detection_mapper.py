@@ -12,8 +12,8 @@ from data_juicer.utils.common_utils import nested_access
 
 class TestQuerySentimentDetectionMapper(DataJuicerTestCaseBase):
 
-    hf_model = '/mnt/workspace/shared/checkpoints/huggingface/mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'
-    zh_to_en_hf_model = '/mnt/workspace/shared/checkpoints/huggingface/Helsinki-NLP/opus-mt-zh-en'
+    hf_model = 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'
+    zh_to_en_hf_model = 'Helsinki-NLP/opus-mt-zh-en'
 
     def _run_op(self, op, samples, label_key, targets):
         dataset = Dataset.from_list(samples)
