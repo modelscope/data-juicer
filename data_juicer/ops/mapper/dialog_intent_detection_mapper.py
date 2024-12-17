@@ -141,6 +141,8 @@ class DialogIntentDetectionMapper(Mapper):
         if self.intent_candidates:
             input_prompt = self.candidate_template.format(
                 candidate_str=','.join(self.intent_candidates))
+        else:
+            input_prompt = ''
 
         if self.max_round > 0:
             input_prompt += ''.join(history[-self.max_round * 4:])
