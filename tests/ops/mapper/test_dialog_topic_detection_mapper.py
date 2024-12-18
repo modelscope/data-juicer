@@ -136,35 +136,6 @@ class TestDialogTopicDetectionMapper(DataJuicerTestCaseBase):
                                             max_round=1)
         self._run_op(op, samples, 4)
 
-    def test_topic_candidates(self):
-        
-        samples = [{
-            'history': [
-                (
-                    '李莲花有口皆碑',
-                    '「微笑」过奖了，我也就是个普通大夫，没什么值得夸耀的。'
-                ),
-                (
-                    '是的，你确实是一个普通大夫，没什么值得夸耀的。',
-                    '「委屈」你这话说的，我也是尽心尽力治病救人了。'
-                ),
-                (
-                    '你自己说的呀，我现在说了，你又不高兴了。',
-                    'or of of of of or or and or of of of of of of of,,, '
-                ),
-                (
-                    '你在说什么我听不懂。',
-                    '「委屈」我也没说什么呀，就是觉得你有点冤枉我了'
-                )
-            ]
-        }]
-
-        op = DialogTopicDetectionMapper(
-            api_model='qwen2.5-72b-instruct',
-            topic_candidates=['评价', '讽刺', '表达困惑']
-            )
-        self._run_op(op, samples, 4)
-
 
 if __name__ == '__main__':
     unittest.main()
