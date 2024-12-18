@@ -83,6 +83,9 @@ class MetaKeys(object):
     query_intent_label = 'intent.query_label'
     query_intent_score = 'intent.query_label_score'
 
+    dialog_topic_labels = 'topic.dialog_labels'
+    dialog_topic_labels_analysis = 'topic.dialog_labels_analysis'
+
 
 class StatsKeysMeta(type):
     """
