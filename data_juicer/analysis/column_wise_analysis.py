@@ -217,10 +217,7 @@ class ColumnWiseAnalysis:
         """
         # recommended number of bins
         data_num = len(data)
-        if data_num >= 100:
-            rec_bins = int(math.sqrt(len(data)))
-        else:
-            rec_bins = None
+        rec_bins = max(int(math.sqrt(data_num)), 10)
 
         # if ax is None, using plot method in pandas
         if ax is None:

@@ -1,8 +1,14 @@
-from datasets import concatenate_datasets
+import json
+import os
+from copy import deepcopy
+
+from datasets import Dataset, concatenate_datasets
 from datasets.config import DEFAULT_MAX_BATCH_SIZE
 
+from data_juicer.analysis.measure import RelatedTTestMeasure
 from data_juicer.core.monitor import Monitor
 from data_juicer.ops import UNFORKABLE
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.process_utils import setup_mp
 
 
@@ -12,6 +18,11 @@ class Adapter:
 
     def __init__(self, cfg: dict):
         self.cfg = cfg
+
+        # insight mining related
+        self.enable_insight_mining = self.cfg.open_insight_mining
+
+        # resource probe related
         self.idle_resources = Monitor.monitor_current_resources()
 
     @staticmethod
@@ -177,3 +188,75 @@ class Adapter:
             batch_size_per_op.append(bs_this_op)
 
         return batch_size_per_op
+
+    def analyze_small_batch(self, dataset, current_state):
+        # prepare analyzer config
+        new_cfg = deepcopy(self.cfg)
+        # check ops to mine
+        new_cfg.auto = True
+        new_cfg.config = None
+        if len(new_cfg.op_list_to_mine) > 0:
+            new_cfg.process = [{
+                op_name: {}
+            } for op_name in new_cfg.op_list_to_mine]
+        # update work dir
+        new_cfg.work_dir = os.path.join(new_cfg.work_dir, 'insight_mining',
+                                        current_state)
+        new_cfg.export_path = os.path.join(new_cfg.work_dir,
+                                           f'{current_state}.jsonl')
+        # close insight mining and monitor for inner analysis
+        new_cfg.open_insight_mining = False
+        new_cfg.open_monitor = False
+
+        # init the analyzer
+        from data_juicer.core.analyzer import Analyzer
+        analyzer = Analyzer(new_cfg)
+
+        # remove existing stats and meta in dataset
+        target_fields = {Fields.stats, Fields.meta}
+        target_fields = target_fields.intersection(set(dataset.features))
+        if len(target_fields) > 0:
+            dataset = dataset.remove_columns(list(target_fields))
+        analyzer.run(dataset, skip_return=True)
+
+    def insight_mining(self, pval_th=0.05):
+        work_dir = os.path.join(self.cfg.work_dir, 'insight_mining')
+        res_order = [
+            d for d in os.listdir(work_dir)
+            if os.path.isdir(os.path.join(work_dir, d))
+        ]
+        res_order.sort()
+
+        # collect analysis results
+        analysis_results = {}
+        for res_dir in res_order:
+            res = Dataset.from_json(
+                os.path.join(work_dir, res_dir,
+                             f'{res_dir}_stats.jsonl')).flatten()
+            analysis_results[res_dir] = res
+
+        # distribution change significance analysis
+        ttest_measure = RelatedTTestMeasure()
+
+        sig_res = {}
+        # i = 0 is the original dataset
+        for i in range(1, len(res_order)):
+            prev_res = analysis_results[res_order[i - 1]]
+            curr_res = analysis_results[res_order[i]]
+
+            # only consider common stats and meta
+            common_features = list(
+                set(prev_res.features).intersection(set(curr_res.features)))
+            curr_sig_res = {}
+            for feat in common_features:
+                ttest_res = ttest_measure(prev_res[feat], curr_res[feat])
+                curr_sig_res[feat] = {
+                    't-statistic': ttest_res.statistic,
+                    'p-value': ttest_res.pvalue,
+                    'significant':
+                    True if ttest_res.pvalue < pval_th else False,
+                }
+            sig_res[res_order[i]] = curr_sig_res
+
+        with open(os.path.join(work_dir, 'insight_mining.json'), 'w') as out:
+            json.dump(sig_res, out)

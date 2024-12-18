@@ -146,10 +146,7 @@ class RelatedTTestMeasure(Measure):
         max_val = max(max(p), max(q))
 
         # get a recommended number of bins
-        if max_data_num >= 100:
-            rec_bins = int(np.sqrt(max_data_num))
-        else:
-            rec_bins = None
+        rec_bins = max(int(np.sqrt(max_data_num)), 10)
 
         # get the common bin edges
         common_p = np.append(p, [min_val, max_val])
