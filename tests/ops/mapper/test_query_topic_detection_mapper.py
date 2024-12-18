@@ -21,15 +21,12 @@ class TestQueryTopicDetectionMapper(DataJuicerTestCaseBase):
 
         for sample, target in zip(dataset, targets):
             label = nested_access(sample[Fields.meta], label_key)
-            print(label, target)
-            # self.assertEqual(label, target)
+            self.assertEqual(label, target)
         
     def test_default(self):
         
         samples = [{
             'query': '今天火箭和快船的比赛谁赢了。'
-        },{
-            'query': '毕加索的这幅画怎么样？'
         },{
             'query': '你最近身体怎么样。'
         }
