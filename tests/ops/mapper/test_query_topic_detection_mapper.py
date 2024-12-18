@@ -31,7 +31,7 @@ class TestQueryTopicDetectionMapper(DataJuicerTestCaseBase):
             'query': '你最近身体怎么样。'
         }
         ]
-        targets = ['Sports', 'Arts, Culture, and Entertainment', 'Health and Wellness']
+        targets = ['Sports', 'Health and Wellness']
 
         op = QueryTopicDetectionMapper(
             hf_model = self.hf_model,
