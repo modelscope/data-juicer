@@ -29,12 +29,12 @@ class TestQueryTopicDetectionMapper(DataJuicerTestCaseBase):
         samples = [{
             'query': '今天火箭和快船的比赛谁赢了。'
         },{
-            'query': '这件衣服好看吗？'
+            'query': '毕加索的这幅画怎么样？'
         },{
             'query': '你最近身体怎么样。'
         }
         ]
-        targets = ['Sports', 'Lifestyle and Fashion', 'Health and Wellness']
+        targets = ['Sports', 'Arts, Culture, and Entertainment', 'Health and Wellness']
 
         op = QueryTopicDetectionMapper(
             hf_model = self.hf_model,
@@ -50,7 +50,7 @@ class TestQueryTopicDetectionMapper(DataJuicerTestCaseBase):
             'query': 'Is this okay?'
         }
         ]
-        targets = ['question', 'rhetorical question']
+        targets = ['Lifestyle and Fashion', 'Health and Wellness']
 
         op = QueryTopicDetectionMapper(
             hf_model = self.hf_model,
