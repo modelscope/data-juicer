@@ -18,7 +18,7 @@ class DialogSentimentDetectionMapper(Mapper):
     """
     Mapper to generate user's sentiment labels in dialog. Input from
     history_key, query_key and response_key. Output lists of
-    intensities and analysis for queries in the dialog, which is
+    labels and analysis for queries in the dialog, which is
     store in 'sentiment.dialog_labels' and
     'sentiment.dialog_labels_analysis' in Data-Juicer meta field.
     """

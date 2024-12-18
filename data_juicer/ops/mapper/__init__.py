@@ -11,6 +11,7 @@ from .clean_links_mapper import CleanLinksMapper
 from .dialog_intent_detection_mapper import DialogIntentDetectionMapper
 from .dialog_sentiment_detection_mapper import DialogSentimentDetectionMapper
 from .dialog_sentiment_intensity_mapper import DialogSentimentIntensityMapper
+from .dialog_topic_detection_mapper import DialogTopicDetectionMapper
 from .expand_macro_mapper import ExpandMacroMapper
 from .extract_entity_attribute_mapper import ExtractEntityAttributeMapper
 from .extract_entity_relation_mapper import ExtractEntityRelationMapper
@@ -77,9 +78,10 @@ __all__ = [
     'CalibrateResponseMapper', 'ChineseConvertMapper', 'CleanCopyrightMapper',
     'CleanEmailMapper', 'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
     'DialogIntentDetectionMapper', 'DialogSentimentDetectionMapper',
-    'DialogSentimentIntensityMapper', 'ExpandMacroMapper',
-    'ExtractEntityAttributeMapper', 'ExtractEntityRelationMapper',
-    'ExtractEventMapper', 'ExtractKeywordMapper', 'ExtractNicknameMapper',
+    'DialogSentimentIntensityMapper', 'DialogTopicDetectionMapper',
+    'ExpandMacroMapper', 'ExtractEntityAttributeMapper',
+    'ExtractEntityRelationMapper', 'ExtractEventMapper',
+    'ExtractKeywordMapper', 'ExtractNicknameMapper',
     'ExtractSupportTextMapper', 'FixUnicodeMapper',
     'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
     'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',

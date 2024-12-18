@@ -4,7 +4,7 @@ import json
 from loguru import logger
 
 from data_juicer.core.data import NestedDataset as Dataset
-from data_juicer.ops.mapper.dialog_intent_detection_mapper import DialogIntentDetectionMapper
+from data_juicer.ops.mapper.dialog_intent_detection_mapper import DialogTopicDetectionMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 from data_juicer.utils.constant import Fields, MetaKeys
@@ -13,7 +13,7 @@ from data_juicer.utils.common_utils import nested_access
 # Skip tests for this OP.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
-class TestDialogIntentDetectionMapper(DataJuicerTestCaseBase):
+class TestDialogTopicDetectionMapper(DataJuicerTestCaseBase):
     # before runing this test, set below environment variables:
     # export OPENAI_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
     # export OPENAI_API_KEY=your_key
@@ -26,7 +26,7 @@ class TestDialogIntentDetectionMapper(DataJuicerTestCaseBase):
 
         for analysis, labels in zip(analysis_list, labels_list):
             logger.info(f'分析：{analysis}')
-            logger.info(f'意图：{labels}')
+            logger.info(f'话题：{labels}')
         
         self.assertEqual(len(analysis_list), target_len)
         self.assertEqual(len(labels_list), target_len)
@@ -54,7 +54,7 @@ class TestDialogIntentDetectionMapper(DataJuicerTestCaseBase):
             ]
         }]
 
-        op = DialogIntentDetectionMapper(api_model='qwen2.5-72b-instruct')
+        op = DialogTopicDetectionMapper(api_model='qwen2.5-72b-instruct')
         self._run_op(op, samples, 4)
     
     def test_max_round(self):
@@ -80,7 +80,7 @@ class TestDialogIntentDetectionMapper(DataJuicerTestCaseBase):
             ]
         }]
 
-        op = DialogIntentDetectionMapper(api_model='qwen2.5-72b-instruct',
+        op = DialogTopicDetectionMapper(api_model='qwen2.5-72b-instruct',
                                             max_round=1)
         self._run_op(op, samples, 4)
 
@@ -107,7 +107,7 @@ class TestDialogIntentDetectionMapper(DataJuicerTestCaseBase):
             ]
         }]
 
-        op = DialogIntentDetectionMapper(api_model='qwen2.5-72b-instruct',
+        op = DialogTopicDetectionMapper(api_model='qwen2.5-72b-instruct',
                                             max_round=0)
         self._run_op(op, samples, 4)
 
@@ -132,11 +132,11 @@ class TestDialogIntentDetectionMapper(DataJuicerTestCaseBase):
             'response': '「委屈」我也没说什么呀，就是觉得你有点冤枉我了'
         }]
 
-        op = DialogIntentDetectionMapper(api_model='qwen2.5-72b-instruct',
+        op = DialogTopicDetectionMapper(api_model='qwen2.5-72b-instruct',
                                             max_round=1)
         self._run_op(op, samples, 4)
 
-    def test_intent_candidates(self):
+    def test_topic_candidates(self):
         
         samples = [{
             'history': [
@@ -159,9 +159,9 @@ class TestDialogIntentDetectionMapper(DataJuicerTestCaseBase):
             ]
         }]
 
-        op = DialogIntentDetectionMapper(
+        op = DialogTopicDetectionMapper(
             api_model='qwen2.5-72b-instruct',
-            intent_candidates=['评价', '讽刺', '表达困惑']
+            topic_candidates=['评价', '讽刺', '表达困惑']
             )
         self._run_op(op, samples, 4)
 

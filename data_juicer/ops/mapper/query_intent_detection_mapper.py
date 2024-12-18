@@ -68,15 +68,15 @@ class QueryIntentDetectionMapper(Mapper):
 
         classifier, _ = get_model(self.model_key, rank, self.use_cuda())
         results = classifier(queries)
-        intensities = [r['label'] for r in results]
+        labels = [r['label'] for r in results]
         scores = [r['score'] for r in results]
 
         if Fields.meta not in samples:
-            samples[Fields.meta] = [{} for val in intensities]
+            samples[Fields.meta] = [{} for val in labels]
         for i in range(len(samples[Fields.meta])):
             samples[Fields.meta][i] = nested_set(samples[Fields.meta][i],
                                                  MetaKeys.query_intent_label,
-                                                 intensities[i])
+                                                 labels[i])
             samples[Fields.meta][i] = nested_set(samples[Fields.meta][i],
                                                  MetaKeys.query_intent_score,
                                                  scores[i])
