@@ -85,6 +85,8 @@ class MetaKeys(object):
 
     dialog_topic_labels = 'topic.dialog_labels'
     dialog_topic_labels_analysis = 'topic.dialog_labels_analysis'
+    query_topic_label = 'topic.query_label'
+    query_topic_score = 'topic.query_label_score'
 
 
 class StatsKeysMeta(type):
