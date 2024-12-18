@@ -83,6 +83,8 @@ OPS_TO_PKG = {
     'dialog_intent_detection_mapper': ['openai'],
     'dialog_sentiment_detection_mapper': ['openai'],
     'dialog_sentiment_intensity_mapper': ['openai'],
+    'dialog_topic_intensity_mapper': ['openai'],
     'query_intent_detection_mapper': ['transformers'],
     'query_sentiment_detection_mapper': ['transformers'],
+    'query_topic_detection_mapper': ['transformers'],
 }

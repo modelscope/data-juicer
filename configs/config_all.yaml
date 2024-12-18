@@ -124,6 +124,21 @@ process:
       try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - dialog_topic_detection_mapper:                          # Mapper to generate user's topic labels in dialog.
+      api_model: 'gpt-4o'                                     # API model name.
+      max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      query_template: null                                    # Template for query part to build the input prompt.
+      response_template: null                                 # Template for response part to build the input prompt.
+      analysis_template: null                                 # Template for analysis part to build the input prompt.
+      labels_template: null                                   # Template for labels part to build the input prompt.
+      analysis_pattern: null                                  # Pattern to parse the return topic analysis.
+      labels_pattern: null                                    # Pattern to parse the return topic labels.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
   - extract_entity_attribute_mapper:                        # Extract attributes for given entities from the text.
       api_model: 'gpt-4o'                                     # API model name.
@@ -331,6 +346,11 @@ process:
       zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
   - query_sentiment_detection_mapper:                       # Mapper to predict user's sentiment label ('negative', 'neutral' and 'positive') in query.
       hf_model: 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'     # Hugginface model ID to predict sentiment label.
+      zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
+      model_params: {}                                        # model param for hf_model.
+      zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
+  - query_topic_detection_mapper:                           # Mapper to predict user's topic label in query.
+      hf_model: 'dstefa/roberta-base_topic_classification_nyt_news'     # Hugginface model ID to predict topic label.
       zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
       model_params: {}                                        # model param for hf_model.
       zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
