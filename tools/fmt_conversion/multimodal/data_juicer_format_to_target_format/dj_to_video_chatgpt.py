@@ -38,7 +38,7 @@ from loguru import logger
 from tqdm import tqdm
 
 from data_juicer.utils.mm_utils import SpecialTokens
-from tools.multimodal.utils import remove_dj_special_tokens
+from tools.fmt_conversion.multimodal.utils import remove_dj_special_tokens
 
 
 def main(
