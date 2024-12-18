@@ -298,13 +298,14 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
         'changes during process. It might take more time when opening '
         'insight mining.')
     parser.add_argument(
-        '--filter_list_to_mine',
+        '--op_list_to_mine',
         type=List[str],
         default=[],
-        help='Which Filters will be applied on the dataset to mine the '
-        'insights in their stats changes. If it\'s empty, all Filters '
-        'that produce stats will be involved. Only available when '
-        'filter_list_to_mine is true.')
+        help='Which OPs will be applied on the dataset to mine the insights '
+        'in their stats changes. Only those OPs that produce stats or '
+        'meta are valid. If it\'s empty, all OPs that produce stats and '
+        'meta will be involved. Only available when filter_list_to_mine '
+        'is true.')
     parser.add_argument(
         '--op_fusion',
         type=bool,
@@ -528,7 +529,7 @@ def init_setup_from_cfg(cfg: Namespace):
 
     # add all filters that produce stats
     if cfg.auto:
-        cfg.process = load_filters_with_stats()
+        cfg.process = load_ops_with_stats_meta()
 
     # Apply text_key modification during initializing configs
     # users can freely specify text_key for different ops using `text_key`
@@ -550,15 +551,17 @@ def init_setup_from_cfg(cfg: Namespace):
     return cfg
 
 
-def load_filters_with_stats():
+def load_ops_with_stats_meta():
     import pkgutil
 
     import data_juicer.ops.filter as djfilter
-    from data_juicer.ops import NON_STATS_FILTERS
-    return [{
+    from data_juicer.ops import NON_STATS_FILTERS, TAGGING_OPS
+    stats_filters = [{
         filter_name: {}
     } for _, filter_name, _ in pkgutil.iter_modules(djfilter.__path__)
-            if filter_name not in NON_STATS_FILTERS.modules]
+                     if filter_name not in NON_STATS_FILTERS.modules]
+    meta_ops = [{op_name: {}} for op_name in TAGGING_OPS.modules]
+    return stats_filters + meta_ops
 
 
 def update_op_attr(op_list: list, attr_dict: dict = None):

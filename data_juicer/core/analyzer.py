@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Union
 
 from datasets import Dataset
 from jsonargparse import Namespace
@@ -9,7 +9,7 @@ from pydantic import PositiveInt
 from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
 from data_juicer.format import load_formatter
-from data_juicer.ops import TAGGING_OPS, Filter, load_ops
+from data_juicer.ops import NON_STATS_FILTERS, TAGGING_OPS, Filter, load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils import cache_utils
 
@@ -73,7 +73,7 @@ class Analyzer:
         self.analysis_path = os.path.join(self.cfg.work_dir, 'analysis')
 
     def run(self,
-            dataset: Optional[Dataset, NestedDataset] = None,
+            dataset: Union[Dataset, NestedDataset] = None,
             load_data_np: Optional[PositiveInt] = None,
             skip_export: bool = False,
             skip_return: bool = False):
@@ -87,11 +87,13 @@ class Analyzer:
         :return: analyzed dataset.
         """
         # 1. format data
-        logger.info('Loading dataset from data formatter...')
         if load_data_np is None:
             load_data_np = self.cfg.np
         if dataset is None:
+            logger.info('Loading dataset from data formatter...')
             dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+        else:
+            logger.info(f'Using existing dataset {dataset}')
         if self.cfg.auto:
             # if it's auto analysis, only analyze for a minor part of the input
             # dataset to save time and computing resource
@@ -116,20 +118,26 @@ class Analyzer:
         logger.info('Computing the stats of dataset...')
         stats_collected = False
         for op in ops:
-            if isinstance(op, Filter):
+            if isinstance(op, Filter) \
+                    and op._name not in NON_STATS_FILTERS.modules:
                 original_process = op.process
                 op.process = None
-                dataset = dataset.process(op, work_dir=self.work_dir)
+                dataset = dataset.process(op,
+                                          work_dir=self.work_dir,
+                                          open_monitor=self.cfg.open_monitor)
                 op.process = original_process
                 stats_collected = True
             elif op._name in TAGGING_OPS.modules:
-                dataset = dataset.process(op, work_dir=self.work_dir)
+                dataset = dataset.process(op,
+                                          work_dir=self.work_dir,
+                                          open_monitor=self.cfg.open_monitor)
                 stats_collected = True
         if not stats_collected:
             logger.warning(
                 'No stats/meta collected. Please add some Filter OPs or '
                 'Tagging OPs to the process list in configs.')
-            return dataset
+            if not skip_return:
+                return dataset
 
         # 3. data export
         logger.info('Exporting dataset to disk...')

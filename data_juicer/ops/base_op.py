@@ -218,6 +218,7 @@ class OP:
         from data_juicer.core.data import NestedDataset
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
+        # add meta field for OPs that produce tags
         if self._name in TAGGING_OPS.modules \
                 and Fields.meta not in dataset.features:
             from data_juicer.core.data import add_same_content_to_new_column
@@ -394,7 +395,9 @@ class Filter(OP):
 
     def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         dataset = super(Filter, self).run(dataset)
-        if Fields.stats not in dataset.features:
+        # add stats field for Filters that produce stats
+        if self._name not in NON_STATS_FILTERS.modules \
+                and Fields.stats not in dataset.features:
             from data_juicer.core.data import add_same_content_to_new_column
             dataset = dataset.map(add_same_content_to_new_column,
                                   fn_kwargs={

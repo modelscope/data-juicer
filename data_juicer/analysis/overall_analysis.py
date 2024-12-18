@@ -29,8 +29,7 @@ class OverallAnalysis:
         # remove non-tag columns
         meta_columns = self.meta.columns
         for col_name in meta_columns:
-            if not col_name.startswith(DEFAULT_PREFIX) \
-                    and not col_name.endswith('_tags__'):
+            if not col_name.startswith(DEFAULT_PREFIX):
                 self.meta = self.meta.drop(col_name, axis=1)
         self.output_path = output_path
         if not os.path.exists(self.output_path):
