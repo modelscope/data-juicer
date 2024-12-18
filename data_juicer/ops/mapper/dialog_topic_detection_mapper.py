@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
 from loguru import logger
 from pydantic import NonNegativeInt, PositiveInt
@@ -54,7 +54,6 @@ class DialogTopicDetectionMapper(Mapper):
 
     def __init__(self,
                  api_model: str = 'gpt-4o',
-                 topic_candidates: Optional[List[str]] = None,
                  max_round: NonNegativeInt = 10,
                  *,
                  api_endpoint: Optional[str] = None,
@@ -74,8 +73,6 @@ class DialogTopicDetectionMapper(Mapper):
         Initialization method.
 
         :param api_model: API model name.
-        :param topic_candidates: The output intent candidates. Use the
-            intent labels of the open domain if it is None.
         :param max_round: The max num of round in the dialog to build the
             prompt.
         :param api_endpoint: URL endpoint for the API.
@@ -103,7 +100,6 @@ class DialogTopicDetectionMapper(Mapper):
         """
         super().__init__(**kwargs)
 
-        self.topic_candidates = topic_candidates
         self.max_round = max_round
 
         self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
@@ -131,14 +127,10 @@ class DialogTopicDetectionMapper(Mapper):
 
     def build_input(self, history, query):
 
-        if self.topic_candidates:
-            input_prompt = self.candidate_template.format(
-                candidate_str=','.join(self.topic_candidates))
-        else:
-            input_prompt = ''
-
         if self.max_round > 0:
             input_prompt = ''.join(history[-self.max_round * 4:])
+        else:
+            input_prompt = ''
 
         input_prompt += self.query_template.format(query=query[0])
 
