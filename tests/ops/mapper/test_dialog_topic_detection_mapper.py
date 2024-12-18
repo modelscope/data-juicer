@@ -21,8 +21,8 @@ class TestDialogTopicDetectionMapper(DataJuicerTestCaseBase):
     def _run_op(self, op, samples, target_len):
         dataset = Dataset.from_list(samples)
         dataset = dataset.map(op.process, batch_size=2)
-        analysis_list = nested_access(dataset[0][Fields.meta], MetaKeys.dialog_intent_labels_analysis)
-        labels_list = nested_access(dataset[0][Fields.meta], MetaKeys.dialog_intent_labels)
+        analysis_list = nested_access(dataset[0][Fields.meta], MetaKeys.dialog_topic_labels_analysis)
+        labels_list = nested_access(dataset[0][Fields.meta], MetaKeys.dialog_topic_labels)
 
         for analysis, labels in zip(analysis_list, labels_list):
             logger.info(f'分析：{analysis}')
