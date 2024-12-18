@@ -10,7 +10,7 @@ from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         load_data_with_context, load_video)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, UNFORKABLE, Mapper
+from ..base_op import OPERATORS, TAGGING_OPS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 ram = LazyLoader('ram', 'ram')
@@ -19,6 +19,7 @@ torch = LazyLoader('torch', 'torch')
 OP_NAME = 'video_tagging_from_frames_mapper'
 
 
+@TAGGING_OPS.register_module(OP_NAME)
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
@@ -73,12 +74,13 @@ class VideoTaggingFromFramesMapper(Mapper):
 
     def process_single(self, sample, rank=None, context=False):
         # check if it's generated already
-        if self.tag_field_name in sample:
+        if self.tag_field_name in sample[Fields.meta]:
             return sample
 
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
-            sample[self.tag_field_name] = np.array([[]], dtype=np.str_)
+            sample[Fields.meta][self.tag_field_name] = np.array([[]],
+                                                                dtype=np.str_)
             return sample
 
         # load videos
@@ -115,5 +117,5 @@ class VideoTaggingFromFramesMapper(Mapper):
             for vid_key in videos:
                 close_video(videos[vid_key])
 
-        sample[self.tag_field_name] = video_tags
+        sample[Fields.meta][self.tag_field_name] = video_tags
         return sample

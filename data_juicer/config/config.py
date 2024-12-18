@@ -558,7 +558,7 @@ def load_filters_with_stats():
     return [{
         filter_name: {}
     } for _, filter_name, _ in pkgutil.iter_modules(djfilter.__path__)
-            if filter_name not in NON_STATS_FILTERS]
+            if filter_name not in NON_STATS_FILTERS.modules]
 
 
 def update_op_attr(op_list: list, attr_dict: dict = None):

@@ -122,7 +122,7 @@ class Analyzer:
                 dataset = dataset.process(op, work_dir=self.work_dir)
                 op.process = original_process
                 stats_collected = True
-            elif op._name in TAGGING_OPS:
+            elif op._name in TAGGING_OPS.modules:
                 dataset = dataset.process(op, work_dir=self.work_dir)
                 stats_collected = True
         if not stats_collected:
