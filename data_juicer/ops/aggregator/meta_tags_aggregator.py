@@ -75,7 +75,7 @@ class MetaTagsAggregator(Aggregator):
                               '{tag_strs}')
     DEFAULT_TAG_TEMPLATE = '| {tag} | {cnt} |'
 
-    DEFAULT_OUTPUT_PATTERN = r'\n(.*?)归类为(.*?)(\Z|\n)'
+    DEFAULT_OUTPUT_PATTERN = r'\n(\w+)归类为(\w+)($|\n)'
 
     def __init__(self,
                  api_model: str = 'gpt-4o',
