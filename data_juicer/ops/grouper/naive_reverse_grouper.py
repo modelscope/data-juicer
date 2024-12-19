@@ -21,6 +21,6 @@ class NaiveReverseGrouper(Grouper):
 
         samples = []
         for sample in dataset:
-            samples.append(convert_dict_list_to_list_dict(sample))
+            samples.extend(convert_dict_list_to_list_dict(sample))
 
         return samples
