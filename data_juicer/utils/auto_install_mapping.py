@@ -79,5 +79,12 @@ OPS_TO_PKG = {
     ['rouge', 'torch', 'transformers', 'vllm'],
     'video_tagging_from_frames_mapper': ['ram', 'torch'],
     'text_entity_dependency_filter': ['spacy-pkuseg'],
-    'optimize_response_mapper': ['torch', 'transformers', 'vllm']
+    'optimize_response_mapper': ['torch', 'transformers', 'vllm'],
+    'dialog_intent_detection_mapper': ['openai'],
+    'dialog_sentiment_detection_mapper': ['openai'],
+    'dialog_sentiment_intensity_mapper': ['openai'],
+    'dialog_topic_intensity_mapper': ['openai'],
+    'query_intent_detection_mapper': ['transformers'],
+    'query_sentiment_detection_mapper': ['transformers'],
+    'query_topic_detection_mapper': ['transformers'],
 }
