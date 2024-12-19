@@ -14,7 +14,7 @@ class QueryIntentDetectionMapper(Mapper):
     """
     Mapper to predict user's Intent label in query. Input from query_key.
     Output intent label and corresponding score for the query, which is
-    store in 'intent.query_label' and 'intent.query_label_score' in
+    store in 'query_intent_label' and 'query_intent_label_score' in
     Data-Juicer meta field.
     """
 

@@ -71,22 +71,22 @@ class Fields(object):
 
 class MetaKeys(object):
 
-    dialog_sentiment_intensity = 'sentiment.dialog_intensity'
-    dialog_sentiment_intensity_analysis = 'sentiment.dialog_intensity_analysis'
-    query_sentiment_label = 'sentiment.query_label'
-    query_sentiment_score = 'sentiment.query_label_score'
-    dialog_sentiment_labels = 'sentiment.dialog_labels'
-    dialog_sentiment_labels_analysis = 'sentiment.dialog_labels_analysis'
+    dialog_sentiment_intensity = 'dialog_sentiment_intensity'
+    dialog_sentiment_intensity_analysis = 'dialog_sentiment_intensity_analysis'
+    query_sentiment_label = 'query_sentiment_label'
+    query_sentiment_score = 'query_sentiment_label_score'
+    dialog_sentiment_labels = 'dialog_sentiment_labels'
+    dialog_sentiment_labels_analysis = 'dialog_sentiment_labels_analysis'
 
-    dialog_intent_labels = 'intent.dialog_labels'
-    dialog_intent_labels_analysis = 'intent.dialog_labels_analysis'
-    query_intent_label = 'intent.query_label'
-    query_intent_score = 'intent.query_label_score'
+    dialog_intent_labels = 'dialog_intent_labels'
+    dialog_intent_labels_analysis = 'dialog_intent_labels_analysis'
+    query_intent_label = 'query_intent_label'
+    query_intent_score = 'query_intent_label_score'
 
-    dialog_topic_labels = 'topic.dialog_labels'
-    dialog_topic_labels_analysis = 'topic.dialog_labels_analysis'
-    query_topic_label = 'topic.query_label'
-    query_topic_score = 'topic.query_label_score'
+    dialog_topic_labels = 'dialog_topic_labels'
+    dialog_topic_labels_analysis = 'dialog_topic_labels_analysis'
+    query_topic_label = 'query_topic_label'
+    query_topic_score = 'query_topic_label_score'
 
 
 class StatsKeysMeta(type):

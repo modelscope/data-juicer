@@ -15,8 +15,8 @@ class QuerySentimentDetectionMapper(Mapper):
     Mapper to predict user's sentiment label ('negative', 'neutral' and
     'positive') in query. Input from query_key.
     Output label and corresponding score for the query, which is
-    store in 'sentiment.query_label' and
-    'sentiment.query_label_score' in Data-Juicer meta field.
+    store in 'query_sentiment_label' and
+    'query_sentiment_label_score' in Data-Juicer meta field.
     """
 
     _accelerator = 'cuda'

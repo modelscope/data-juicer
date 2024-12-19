@@ -19,8 +19,8 @@ class DialogIntentDetectionMapper(Mapper):
     Mapper to generate user's intent labels in dialog. Input from
     history_key, query_key and response_key. Output lists of
     labels and analysis for queries in the dialog, which is
-    store in 'intent.dialog_labels' and
-    'intent.dialog_labels_analysis' in Data-Juicer meta field.
+    store in 'dialog_intent_labels' and
+    'dialog_intent_labels_analysis' in Data-Juicer meta field.
     """
 
     DEFAULT_SYSTEM_PROMPT = (

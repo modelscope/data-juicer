@@ -19,8 +19,8 @@ class DialogSentimentDetectionMapper(Mapper):
     Mapper to generate user's sentiment labels in dialog. Input from
     history_key, query_key and response_key. Output lists of
     labels and analysis for queries in the dialog, which is
-    store in 'sentiment.dialog_labels' and
-    'sentiment.dialog_labels_analysis' in Data-Juicer meta field.
+    store in 'dialog_sentiment_labels' and
+    'dialog_sentiment_labels_analysis' in Data-Juicer meta field.
     """
 
     DEFAULT_SYSTEM_PROMPT = ('请判断用户和LLM多轮对话中用户所具有的情绪。\n'

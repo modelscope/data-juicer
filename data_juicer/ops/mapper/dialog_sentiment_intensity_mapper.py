@@ -19,8 +19,8 @@ class DialogSentimentIntensityMapper(Mapper):
     Mapper to predict user's sentiment intensity (from -5 to 5 in default
     prompt) in dialog. Input from history_key, query_key and
     response_key. Output lists of intensities and analysis for queries in
-    the dialog, which is store in 'sentiment.dialog_intensity' and
-    'sentiment.dialog_intensity_analysis' in Data-Juicer meta field.
+    the dialog, which is store in 'dialog_sentiment_intensity' and
+    'dialog_sentiment_intensity_analysis' in Data-Juicer meta field.
     """
 
     DEFAULT_SYSTEM_PROMPT = ('请判断用户和LLM多轮对话中用户的情绪变化。\n'

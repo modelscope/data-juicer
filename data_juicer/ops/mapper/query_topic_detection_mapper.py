@@ -14,7 +14,7 @@ class QueryTopicDetectionMapper(Mapper):
     """
     Mapper to predict user's topic label in query. Input from query_key.
     Output topic label and corresponding score for the query, which is
-    store in 'topic.query_label' and 'topic.query_label_score' in
+    store in 'query_topic_label' and 'query_topic_label_score' in
     Data-Juicer meta field.
     """
 
