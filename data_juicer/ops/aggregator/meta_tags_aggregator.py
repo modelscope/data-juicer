@@ -143,10 +143,8 @@ class MetaTagsAggregator(Aggregator):
         self.try_num = try_num
 
     def parse_output(self, response):
-        print(response)
         pattern = re.compile(self.output_pattern, re.VERBOSE | re.DOTALL)
         matches = pattern.findall(response)
-        print(matches)
         tag_map = {tag1: tag2 for tag1, tag2 in matches}
         return tag_map
 
