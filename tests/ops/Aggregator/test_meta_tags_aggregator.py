@@ -89,26 +89,26 @@ class MetaTagsAggregatorTest(DataJuicerTestCaseBase):
             {
                 Fields.meta: [
                     {
-                        MetaKeys.dialog_sentiment_label: ['开心', '平静']
+                        MetaKeys.dialog_sentiment_labels: ['开心', '平静']
                     },
                     {
-                        MetaKeys.dialog_sentiment_label: ['快乐', '开心', '幸福']
+                        MetaKeys.dialog_sentiment_labels: ['快乐', '开心', '幸福']
                     },
                     {
-                        MetaKeys.dialog_sentiment_label: ['难过']
+                        MetaKeys.dialog_sentiment_labels: ['难过']
                     },
                     {
-                        MetaKeys.dialog_sentiment_label: ['不开心', '没头脑', '不高兴']
+                        MetaKeys.dialog_sentiment_labels: ['不开心', '没头脑', '不高兴']
                     },
                     {
-                        MetaKeys.dialog_sentiment_label: ['愤怒', '愤慨']
+                        MetaKeys.dialog_sentiment_labels: ['愤怒', '愤慨']
                     }
                 ]
             },
         ]
         op = MetaTagsAggregator(
             api_model='qwen2.5-72b-instruct',
-            meta_tag_key=MetaKeys.dialog_sentiment_label,
+            meta_tag_key=MetaKeys.dialog_sentiment_labels,
             target_tags=['开心', '难过', '其他']
         )
         self._run_helper(op, samples)
