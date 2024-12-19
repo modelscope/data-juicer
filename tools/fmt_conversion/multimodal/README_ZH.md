@@ -10,7 +10,7 @@
 可以运行以下命令来了解绝对路径转化相对路径工具的详细用法：
 
 ```shell
-python tools/multimodal/absolute_path_to_relative_path.py --help
+python tools/fmt_conversion/multimodal/absolute_path_to_relative_path.py --help
 ```
 
 ## 数据集格式转换
@@ -86,7 +86,7 @@ python tools/multimodal/absolute_path_to_relative_path.py --help
 
 ```shell
 # 例如：llava_to_dj.py
-python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --help
+python tools/fmt_conversion/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --help
 ```
 在使用这些工具之前，您可能需要查看上表中每个格式的参考资料，以更好地了解详细的格式信息，并理解每个工具的参数含义。
 
