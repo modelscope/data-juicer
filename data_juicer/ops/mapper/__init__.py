@@ -14,6 +14,7 @@ from .extract_entity_relation_mapper import ExtractEntityRelationMapper
 from .extract_event_mapper import ExtractEventMapper
 from .extract_keyword_mapper import ExtractKeywordMapper
 from .extract_nickname_mapper import ExtractNicknameMapper
+from .extract_support_text_mapper import ExtractSupportTextMapper
 from .fix_unicode_mapper import FixUnicodeMapper
 from .generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
 from .generate_qa_from_text_mapper import GenerateQAFromTextMapper
@@ -32,6 +33,7 @@ from .pair_preference_mapper import PairPreferenceMapper
 from .punctuation_normalization_mapper import PunctuationNormalizationMapper
 from .python_file_mapper import PythonFileMapper
 from .python_lambda_mapper import PythonLambdaMapper
+from .relation_identity_mapper import RelationIdentityMapper
 from .remove_bibliography_mapper import RemoveBibliographyMapper
 from .remove_comments_mapper import RemoveCommentsMapper
 from .remove_header_mapper import RemoveHeaderMapper
@@ -71,25 +73,26 @@ __all__ = [
     'CleanEmailMapper', 'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
     'ExpandMacroMapper', 'ExtractEntityAttributeMapper',
     'ExtractEntityRelationMapper', 'ExtractEventMapper',
-    'ExtractKeywordMapper', 'ExtractNicknameMapper', 'FixUnicodeMapper',
+    'ExtractKeywordMapper', 'ExtractNicknameMapper',
+    'ExtractSupportTextMapper', 'FixUnicodeMapper',
     'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
     'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
     'ImageCaptioningMapper', 'ImageDiffusionMapper', 'ImageFaceBlurMapper',
     'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
     'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
     'PairPreferenceMapper', 'PunctuationNormalizationMapper',
-    'PythonFileMapper', 'PythonLambdaMapper', 'RemoveBibliographyMapper',
-    'RemoveCommentsMapper', 'RemoveHeaderMapper', 'RemoveLongWordsMapper',
-    'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',
-    'RemoveSpecificCharsMapper', 'RemoveTableTextMapper',
-    'RemoveWordsWithIncorrectSubstringsMapper', 'ReplaceContentMapper',
-    'SentenceSplitMapper', 'TextChunkMapper', 'VideoCaptioningFromAudioMapper',
-    'VideoCaptioningFromFramesMapper', 'VideoCaptioningFromSummarizerMapper',
-    'VideoCaptioningFromVideoMapper', 'VideoExtractFramesMapper',
-    'VideoFFmpegWrappedMapper', 'VideoFaceBlurMapper',
-    'VideoRemoveWatermarkMapper', 'VideoResizeAspectRatioMapper',
-    'VideoResizeResolutionMapper', 'VideoSplitByDurationMapper',
-    'VideoSplitByKeyFrameMapper', 'VideoSplitBySceneMapper',
-    'VideoTaggingFromAudioMapper', 'VideoTaggingFromFramesMapper',
-    'WhitespaceNormalizationMapper'
+    'PythonFileMapper', 'PythonLambdaMapper', 'RelationIdentityMapper',
+    'RemoveBibliographyMapper', 'RemoveCommentsMapper', 'RemoveHeaderMapper',
+    'RemoveLongWordsMapper', 'RemoveNonChineseCharacterlMapper',
+    'RemoveRepeatSentencesMapper', 'RemoveSpecificCharsMapper',
+    'RemoveTableTextMapper', 'RemoveWordsWithIncorrectSubstringsMapper',
+    'ReplaceContentMapper', 'SentenceSplitMapper', 'TextChunkMapper',
+    'VideoCaptioningFromAudioMapper', 'VideoCaptioningFromFramesMapper',
+    'VideoCaptioningFromSummarizerMapper', 'VideoCaptioningFromVideoMapper',
+    'VideoExtractFramesMapper', 'VideoFFmpegWrappedMapper',
+    'VideoFaceBlurMapper', 'VideoRemoveWatermarkMapper',
+    'VideoResizeAspectRatioMapper', 'VideoResizeResolutionMapper',
+    'VideoSplitByDurationMapper', 'VideoSplitByKeyFrameMapper',
+    'VideoSplitBySceneMapper', 'VideoTaggingFromAudioMapper',
+    'VideoTaggingFromFramesMapper', 'WhitespaceNormalizationMapper'
 ]
