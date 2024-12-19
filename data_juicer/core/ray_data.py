@@ -166,6 +166,13 @@ class RayDataset(DJDataset):
 
 
 class JSONStreamDatasource(ds.JSONDatasource):
+    """
+    A temp Datasource for reading json stream.
+
+    Note:
+
+        Depends on a customized `pyarrow` with `open_json` method.
+    """
 
     def _read_stream(self, f: 'pyarrow.NativeFile', path: str):
         from pyarrow.json import open_json
@@ -187,11 +194,7 @@ class JSONStreamDatasource(ds.JSONDatasource):
                 except StopIteration:
                     return
         except pyarrow.lib.ArrowInvalid as e:
-            raise ValueError(
-                f'Failed to read JSON file: {path}. '
-                'Please check the JSON file has correct format, or filter out '
-                "non-JSON file with 'partition_filter' field. See read_csv() "
-                'documentation for more details.') from e
+            raise ValueError(f'Failed to read JSON file: {path}.') from e
 
 
 def read_json_stream(
