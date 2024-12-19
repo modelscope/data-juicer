@@ -8,6 +8,7 @@ from datasets.config import DEFAULT_MAX_BATCH_SIZE
 from data_juicer.analysis.measure import RelatedTTestMeasure
 from data_juicer.core.monitor import Monitor
 from data_juicer.ops import UNFORKABLE
+from data_juicer.utils.cache_utils import dataset_cache_control
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.process_utils import setup_mp
 
@@ -119,25 +120,21 @@ class Adapter:
 
         return bs_per_op
 
+    @dataset_cache_control(on=True)
     def probe_small_batch(self, dataset, operators):
         """
         Perform small batch pre-execution to probe available resources,
         current load and estimated OP speed, returning load factors and speed
         ranks for each OP.
 
-        Notice: the probe should be run with cache enabled.
+        Notice: the probe should be run with cache enabled to avoid removing
+        the cache files of the input dataset.
 
         :param dataset: The dataset to pre-execute small batch on
         :param operators: The OP list to be pre-execution and probe
         :return: A list of probe results for each OP and the length of data
             batch to probe.
         """
-        # record the cache state and enable the cache
-        from datasets import (disable_caching, enable_caching,
-                              is_caching_enabled)
-        previous_state = is_caching_enabled()
-        if not previous_state:
-            enable_caching()
 
         # take a small batch
         data_batch = self.take_batch(dataset, self.cfg)
@@ -145,10 +142,6 @@ class Adapter:
         resource_util_list = self.execute_and_probe(data_batch, operators)
         # analyze resource utilization
         analysis_res = Monitor.analyze_resource_util_list(resource_util_list)
-
-        # if the cache is disabled before, disable it again
-        if not previous_state:
-            disable_caching()
 
         return analysis_res, len(data_batch)
 
@@ -189,7 +182,21 @@ class Adapter:
 
         return batch_size_per_op
 
+    @dataset_cache_control(on=True)
     def analyze_small_batch(self, dataset, current_state):
+        """
+        Perform small batch analysis to probe the current OP-wise stats/meta
+        distributions. The analyzed results will be stored in the directory
+        `{work_dir}/insight_mining`.
+
+        Notice: the probe should be run with cache enabled to avoid removing
+        the cache files of the input dataset.
+
+        :param dataset: The dataset to analyze small batch on
+        :param current_state: A string to indicate the current state of the
+            input dataset. It usually consists of a number of the index of the
+            OP processed just now and the OP name, e.g. "1_text_length_filter".
+        """
         # prepare analyzer config
         new_cfg = deepcopy(self.cfg)
         # check ops to mine
@@ -220,6 +227,16 @@ class Adapter:
         analyzer.run(dataset, skip_return=True)
 
     def insight_mining(self, pval_th=0.05):
+        """
+        Mining the insights from the OP-wise analysis results. For now, we use
+        T-Test to check the significance of stats/meta changes before and after
+        each OP processing. If the p-value is less than a given threshold
+        (usually 0.05), we think the stats/meta changes are significant. The
+        insight mining results will be stored in the file
+        `{work_dir}/insight_mining/insight_mining.json`.
+
+        :param pval_th: the threshold of p-value.
+        """
         work_dir = os.path.join(self.cfg.work_dir, 'insight_mining')
         res_order = [
             d for d in os.listdir(work_dir)
