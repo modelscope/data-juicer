@@ -55,6 +55,7 @@ class VideoTaggingFromFramesMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '9GB')
         super().__init__(*args, **kwargs)
         if frame_sampling_method not in ['all_keyframes', 'uniform']:
             raise ValueError(

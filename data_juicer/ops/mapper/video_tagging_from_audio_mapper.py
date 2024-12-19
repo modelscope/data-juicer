@@ -37,6 +37,7 @@ class VideoTaggingFromAudioMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '500MB')
         super().__init__(*args, **kwargs)
         AUTOINSTALL.check(['torchaudio'])
         self.model_key = prepare_model(model_type='huggingface',

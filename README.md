@@ -333,6 +333,11 @@ python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # use command line tool
 dj-analyze --config configs/demo/analyzer.yaml
+
+# you can also use auto mode to avoid writing a recipe. It will analyze a small
+# part (e.g. 1000 samples, specified by argument `auto_num`) of your dataset 
+# with all Filters that produce stats.
+dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 ```
 
 - **Note:** Analyzer only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.

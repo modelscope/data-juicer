@@ -108,6 +108,7 @@ class VideoCaptioningFromFramesMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '20GB')
         super().__init__(*args, **kwargs)
 
         if keep_candidate_mode not in [
