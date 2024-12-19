@@ -30,6 +30,7 @@ class ImageCaptioningMapper(Mapper):
 
     _accelerator = 'cuda'
     _batched_op = True
+    _ray_mode = 'actor'
 
     def __init__(self,
                  hf_img2seq: str = 'Salesforce/blip2-opt-2.7b',
@@ -82,6 +83,7 @@ class ImageCaptioningMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
 
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'
@@ -282,6 +284,11 @@ class ImageCaptioningMapper(Mapper):
         :param samples:
         :return:
         """
+        import pyarrow as pa
+
+        if isinstance(samples, pa.Table):
+            samples = samples.to_pydict()
+
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []
         for i in range(len(samples[self.text_key])):

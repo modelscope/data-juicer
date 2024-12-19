@@ -118,6 +118,7 @@ class OP:
 
     _accelerator = 'cpu'
     _batched_op = False
+    _ray_mode = 'task'
 
     def __init__(self, *args, **kwargs):
         """
@@ -150,6 +151,7 @@ class OP:
         self.index_key = kwargs.get('index_key', None)
 
         self.batch_size = kwargs.get('batch_size', 1000)
+        self.concurrency = kwargs.get('concurrency', 1)
 
         # whether the model can be accelerated using cuda
         _accelerator = kwargs.get('accelerator', None)
@@ -178,6 +180,9 @@ class OP:
 
     def is_batched_op(self):
         return self._batched_op
+
+    def use_ray_actor(self):
+        return self._ray_mode == 'actor'
 
     def process(self, *args, **kwargs):
         raise NotImplementedError
@@ -274,6 +279,9 @@ class Mapper(OP):
                     f'{cls.__name__}. Please implement {method_name}_single '
                     f'or {method_name}_batched.')
 
+    def __call__(self, *args, **kwargs):
+        return self.process(*args, **kwargs)
+
     def process_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
         first_key = next(iter(keys))
@@ -363,6 +371,9 @@ class Filter(OP):
                     f'Method {method_name} cannot be overridden by subclass '
                     f'{cls.__name__}. Please implement {method_name}_single '
                     f'or {method_name}_batched.')
+
+    def __call__(self, *args, **kwargs):
+        return self.compute_stats(*args, **kwargs)
 
     def compute_stats_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
