@@ -15,7 +15,13 @@ def resource_monitor(mdict, interval):
     while True:
         this_states.append(Monitor.monitor_current_resources())
         time.sleep(interval)
-        if mdict['stop']:
+        try:
+            stop_sign = mdict['stop']
+        except (BrokenPipeError, FileNotFoundError):
+            # mdict crushes due to the main process is terminated already,
+            # which is not the fault here
+            return
+        if stop_sign:
             break
     mdict['resource'] = this_states
 

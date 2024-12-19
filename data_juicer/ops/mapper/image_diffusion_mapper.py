@@ -91,6 +91,7 @@ class ImageDiffusionMapper(Mapper):
         :param hf_img2seq: model name on huggingface to generate caption if
             caption_key is None.
         """
+        kwargs.setdefault('mem_required', '8GB')
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
         self.strength = strength
