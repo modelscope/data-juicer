@@ -32,24 +32,16 @@ class MetaTagsAggregatorTest(DataJuicerTestCaseBase):
                 Fields.meta: [
                     {
                         MetaKeys.query_sentiment_label: '开心'
-                    }
-                ],
-                Fields.meta: [
+                    },
                     {
                         MetaKeys.query_sentiment_label: '快乐'
-                    }
-                ],
-                Fields.meta: [
+                    },
                     {
                         MetaKeys.query_sentiment_label: '难过'
-                    }
-                ],
-                Fields.meta: [
+                    },
                     {
                         MetaKeys.query_sentiment_label: '不开心'
-                    }
-                ],
-                Fields.meta: [
+                    },
                     {
                         MetaKeys.query_sentiment_label: '愤怒'
                     }
