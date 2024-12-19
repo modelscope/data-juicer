@@ -129,7 +129,7 @@ class MetaTagsAggregator(Aggregator):
 
         self.target_tag_str = ''
         if target_tags:
-            self.target_tag_str = target_tag_template(
+            self.target_tag_str = target_tag_template.format(
                 target_tags=', '.join(target_tags))
 
         self.sampling_params = sampling_params
