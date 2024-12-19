@@ -203,9 +203,9 @@ class MetaTagsAggregator(Aggregator):
         tag_map = self.meta_map(meta_cnts, rank=rank)
         for i in range(len(metas)):
             if isinstance(metas[i], str) and metas[i] in tag_map:
-                metas[i] = tag_map[metas[i]]
+                sample[Fields.meta][i] = tag_map[metas[i]]
             elif is_string_list(metas[i]):
-                metas[i] = [
+                sample[Fields.meta][i] = [
                     tag_map[t] if t in tag_map else t for t in metas[i]
                 ]
 
