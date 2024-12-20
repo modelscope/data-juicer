@@ -1,5 +1,6 @@
 import base64
 import datetime
+import io
 import os
 import re
 import shutil
@@ -321,14 +322,17 @@ def cut_video_by_seconds(
         container = input_video
 
     # create the output video
-    output_container = load_video(output_video, 'w')
+    if output_video:
+        output_container = load_video(output_video, 'w')
+    else:
+        output_buffer = io.BytesIO()
+        output_container = av.open(output_buffer, mode='w', format='mp4')
 
     # add the video stream into the output video according to input video
     input_video_stream = container.streams.video[0]
     codec_name = input_video_stream.codec_context.name
     fps = input_video_stream.base_rate
-    output_video_stream = output_container.add_stream(codec_name,
-                                                      rate=str(fps))
+    output_video_stream = output_container.add_stream(codec_name, rate=fps)
     output_video_stream.width = input_video_stream.codec_context.width
     output_video_stream.height = input_video_stream.codec_context.height
     output_video_stream.pix_fmt = input_video_stream.codec_context.pix_fmt
@@ -391,6 +395,11 @@ def cut_video_by_seconds(
     if isinstance(input_video, str):
         close_video(container)
     close_video(output_container)
+
+    if not output_video:
+        output_buffer.seek(0)
+        return output_buffer
+
     if not os.path.exists(output_video):
         logger.warning(f'This video could not be successfully cut in '
                        f'[{start_seconds}, {end_seconds}] seconds. '
@@ -431,8 +440,7 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
 
         codec_name = input_video_stream.codec_context.name
         fps = input_video_stream.base_rate
-        output_video_stream = output_container.add_stream(codec_name,
-                                                          rate=str(fps))
+        output_video_stream = output_container.add_stream(codec_name, rate=fps)
         output_video_stream.pix_fmt = input_video_stream.codec_context.pix_fmt
         output_video_stream.width = input_video_stream.codec_context.width
         output_video_stream.height = input_video_stream.codec_context.height
@@ -463,6 +471,39 @@ def process_each_frame(input_video: Union[str, av.container.InputContainer],
         shutil.rmtree(output_video, ignore_errors=True)
         return (input_video
                 if isinstance(input_video, str) else input_video.name)
+
+
+def extract_key_frames_by_seconds(
+        input_video: Union[str, av.container.InputContainer],
+        duration: float = 1):
+    """Extract key frames by seconds.
+        :param input_video: input video path or av.container.InputContainer.
+        :param duration: duration of each video split in seconds.
+    """
+    # load the input video
+    if isinstance(input_video, str):
+        container = load_video(input_video)
+    elif isinstance(input_video, av.container.InputContainer):
+        container = input_video
+    else:
+        raise ValueError(f'Unsupported type of input_video. Should be one of '
+                         f'[str, av.container.InputContainer], but given '
+                         f'[{type(input_video)}].')
+
+    video_duration = get_video_duration(container)
+    timestamps = np.arange(0, video_duration, duration).tolist()
+
+    all_key_frames = []
+    for i in range(1, len(timestamps)):
+        output_buffer = cut_video_by_seconds(container, None,
+                                             timestamps[i - 1], timestamps[i])
+        if output_buffer:
+            cut_inp_container = av.open(output_buffer, format='mp4', mode='r')
+            key_frames = extract_key_frames(cut_inp_container)
+            all_key_frames.extend(key_frames)
+            close_video(cut_inp_container)
+
+    return all_key_frames
 
 
 def extract_key_frames(input_video: Union[str, av.container.InputContainer]):
@@ -516,6 +557,43 @@ def get_key_frame_seconds(input_video: Union[str,
     ts = [float(f.pts * f.time_base) for f in key_frames]
     ts.sort()
     return ts
+
+
+def extract_video_frames_uniformly_by_seconds(
+        input_video: Union[str, av.container.InputContainer],
+        frame_num: PositiveInt,
+        duration: float = 1):
+    """Extract video frames uniformly by seconds.
+        :param input_video: input video path or av.container.InputContainer.
+        :param frame_num: the number of frames to be extracted uniformly from
+            each video split by duration.
+        :param duration: duration of each video split in seconds.
+    """
+    # load the input video
+    if isinstance(input_video, str):
+        container = load_video(input_video)
+    elif isinstance(input_video, av.container.InputContainer):
+        container = input_video
+    else:
+        raise ValueError(f'Unsupported type of input_video. Should be one of '
+                         f'[str, av.container.InputContainer], but given '
+                         f'[{type(input_video)}].')
+
+    video_duration = get_video_duration(container)
+    timestamps = np.arange(0, video_duration, duration).tolist()
+
+    all_frames = []
+    for i in range(1, len(timestamps)):
+        output_buffer = cut_video_by_seconds(container, None,
+                                             timestamps[i - 1], timestamps[i])
+        if output_buffer:
+            cut_inp_container = av.open(output_buffer, format='mp4', mode='r')
+            key_frames = extract_video_frames_uniformly(cut_inp_container,
+                                                        frame_num=frame_num)
+            all_frames.extend(key_frames)
+            close_video(cut_inp_container)
+
+    return all_frames
 
 
 def extract_video_frames_uniformly(

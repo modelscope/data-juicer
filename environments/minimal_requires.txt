@@ -1,10 +1,14 @@
-fsspec==2023.5.0
-pyarrow<=12.0.0
-pandas==2.0.3
 datasets>=2.19.0
-av
+fsspec==2023.5.0
+pandas
+numpy
+av==13.1.0
 soundfile
+# need to install two dependencies by librosa to avoid lazy_loader error
 librosa>=0.10
+samplerate
+resampy
+# need to install two dependencies by librosa to avoid lazy_loader error
 loguru
 tabulate
 tqdm
@@ -27,5 +31,6 @@ dill==0.3.4
 psutil
 pydantic>=2.0
 Pillow
-numpy<2
 fastapi[standard]>=0.100
+httpx
+wordcloud

@@ -114,6 +114,7 @@ class PhraseGroundingRecallFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '1GB')
         super().__init__(*args, **kwargs)
         self.min_recall = min_recall
         self.max_recall = max_recall

@@ -19,6 +19,7 @@ class ImageTextSimilarityFilter(Filter):
     within a specific range."""
 
     _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(self,
                  hf_clip: str = 'openai/clip-vit-base-patch32',
@@ -52,6 +53,7 @@ class ImageTextSimilarityFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '1500MB')
         super().__init__(*args, **kwargs)
         self.min_score = min_score
         self.max_score = max_score

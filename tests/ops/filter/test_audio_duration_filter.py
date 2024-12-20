@@ -7,7 +7,6 @@ from data_juicer.ops.filter.audio_duration_filter import AudioDurationFilter
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
-
 class AudioDurationFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',

@@ -4,7 +4,7 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, UNFORKABLE, Mapper
+from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -12,7 +12,6 @@ OP_NAME = 'extract_nickname_mapper'
 
 
 # TODO: LLM-based inference.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractNicknameMapper(Mapper):
     """
@@ -143,7 +142,7 @@ class ExtractNicknameMapper(Mapper):
             'content': input_prompt
         }]
         nickname_relations = []
-        for i in range(self.try_num):
+        for _ in range(self.try_num):
             try:
                 output = client(messages, **self.sampling_params)
                 nickname_relations = self.parse_output(output)

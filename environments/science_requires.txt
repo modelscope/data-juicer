@@ -11,7 +11,7 @@ selectolax
 nlpaug
 nlpcda
 nltk<3.9
-transformers>=4.37
+transformers>=4.47.0
 transformers_stream_generator
 einops
 accelerate
@@ -26,3 +26,5 @@ ffmpeg-python
 opencv-python
 vllm>=0.1.3
 rouge
+dashscope
+openai

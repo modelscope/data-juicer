@@ -15,6 +15,7 @@ from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS
+from data_juicer.ops.op_fusion import FUSION_STRATEGIES
 from data_juicer.utils.logger_utils import setup_logger
 from data_juicer.utils.mm_utils import SpecialTokens
 
@@ -22,7 +23,7 @@ global_cfg = None
 global_parser = None
 
 
-def init_configs(args: Optional[List[str]] = None):
+def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
     """
     initialize the jsonargparse parser and parse configs from one of:
         1. POSIX-style commands line args;
@@ -31,14 +32,29 @@ def init_configs(args: Optional[List[str]] = None):
         4. hard-coded defaults
 
     :param args: list of params, e.g., ['--conifg', 'cfg.yaml'], defaut None.
+    :param which_entry: which entry to init configs (executor/analyzer)
     :return: a global cfg object used by the Executor or Analyzer
     """
     parser = ArgumentParser(default_env=True, default_config_files=None)
 
-    parser.add_argument('--config',
-                        action=ActionConfigFile,
-                        help='Path to a dj basic configuration file.',
-                        required=True)
+    # required but mutually exclusive args group
+    required_group = parser.add_mutually_exclusive_group(required=True)
+    required_group.add_argument('--config',
+                                action=ActionConfigFile,
+                                help='Path to a dj basic configuration file.')
+    required_group.add_argument('--auto',
+                                action='store_true',
+                                help='Weather to use an auto analyzing '
+                                'strategy instead of a specific data '
+                                'recipe. If a specific config file is '
+                                'given by --config arg, this arg is '
+                                'disabled. Only available for Analyzer.')
+
+    parser.add_argument('--auto_num',
+                        type=PositiveInt,
+                        default=1000,
+                        help='The number of samples to be analyzed '
+                        'automatically. It\'s 1000 in default.')
 
     parser.add_argument(
         '--hpo_config',
@@ -96,7 +112,7 @@ def init_configs(args: Optional[List[str]] = None):
     parser.add_argument(
         '--export_path',
         type=str,
-        default='./outputs/hello_world.jsonl',
+        default='./outputs/hello_world/hello_world.jsonl',
         help='Path to export and save the output processed dataset. The '
         'directory to store the processed dataset will be the work '
         'directory of this process.')
@@ -230,6 +246,12 @@ def init_configs(args: Optional[List[str]] = None):
         'specified in ["gzip", "zstd", "lz4"]. If this parameter is'
         'None, the cache file will not be compressed.')
     parser.add_argument(
+        '--open_monitor',
+        type=bool,
+        default=True,
+        help='Whether to open the monitor to trace resource utilization for '
+        'each OP during data processing. It\'s True in default.')
+    parser.add_argument(
         '--use_checkpoint',
         type=bool,
         default=False,
@@ -276,6 +298,22 @@ def init_configs(args: Optional[List[str]] = None):
         'variables automatically. Op fusion might reduce the memory '
         'requirements slightly but speed up the whole process.')
     parser.add_argument(
+        '--fusion_strategy',
+        type=str,
+        default='probe',
+        help='OP fusion strategy. Support ["greedy", "probe"] now. "greedy" '
+        'means keep the basic OP order and put the fused OP to the last '
+        'of each fused OP group. "probe" means Data-Juicer will probe '
+        'the running speed for each OP at the beginning and reorder the '
+        'OPs and fused OPs according to their probed speed (fast to '
+        'slow). It\'s "probe" in default.')
+    parser.add_argument(
+        '--adaptive_batch_size',
+        type=bool,
+        default=False,
+        help='Whether to use adaptive batch sizes for each OP according to '
+        'the probed results. It\'s False in default.')
+    parser.add_argument(
         '--process',
         type=List[Dict],
         default=[],
@@ -316,6 +354,14 @@ def init_configs(args: Optional[List[str]] = None):
 
     try:
         cfg = parser.parse_args(args=args)
+
+        # check the entry
+        from data_juicer.core.analyzer import Analyzer
+        if not isinstance(which_entry, Analyzer) and cfg.auto:
+            err_msg = '--auto argument can only be used for analyzer!'
+            logger.error(err_msg)
+            raise NotImplementedError(err_msg)
+
         cfg = init_setup_from_cfg(cfg)
         cfg = update_op_process(cfg, parser)
 
@@ -436,6 +482,11 @@ def init_setup_from_cfg(cfg: Namespace):
     # The checkpoint mode is not compatible with op fusion for now.
     if cfg.op_fusion:
         cfg.use_checkpoint = False
+        cfg.fusion_strategy = cfg.fusion_strategy.lower()
+        if cfg.fusion_strategy not in FUSION_STRATEGIES:
+            raise NotImplementedError(
+                f'Unsupported OP fusion strategy [{cfg.fusion_strategy}]. '
+                f'Should be one of {FUSION_STRATEGIES}.')
 
     # update huggingface datasets cache directory only when ds_cache_dir is set
     from datasets import config
@@ -459,6 +510,16 @@ def init_setup_from_cfg(cfg: Namespace):
     # update special tokens
     SpecialTokens.image = cfg.image_special_token
     SpecialTokens.eoc = cfg.eoc_special_token
+
+    # add all filters that produce stats
+    if cfg.auto:
+        import pkgutil
+
+        import data_juicer.ops.filter as djfilters
+        cfg.process = [{
+            filter_name: {}
+        } for _, filter_name, _ in pkgutil.iter_modules(djfilters.__path__)
+                       if filter_name not in djfilters.NON_STATS_FILTERS]
 
     # Apply text_key modification during initializing configs
     # users can freely specify text_key for different ops using `text_key`
@@ -537,8 +598,13 @@ def sort_op_by_types_and_names(op_name_classes):
                         if 'deduplicator' in name]
     selector_ops = [(name, c) for (name, c) in op_name_classes
                     if 'selector' in name]
+    grouper_ops = [(name, c) for (name, c) in op_name_classes
+                   if 'grouper' in name]
+    aggregator_ops = [(name, c) for (name, c) in op_name_classes
+                      if 'aggregator' in name]
     ops_sorted_by_types = sorted(mapper_ops) + sorted(filter_ops) + sorted(
-        deduplicator_ops) + sorted(selector_ops)
+        deduplicator_ops) + sorted(selector_ops) + sorted(grouper_ops) + \
+        sorted(aggregator_ops)
     return ops_sorted_by_types
 
 
@@ -603,7 +669,10 @@ def update_op_process(cfg, parser):
     temp_args = namespace_to_arg_list(temp_cfg,
                                       includes=recognized_args,
                                       excludes=['config'])
-    temp_args = ['--config', temp_cfg.config[0].absolute] + temp_args
+    if temp_cfg.config:
+        temp_args = ['--config', temp_cfg.config[0].absolute] + temp_args
+    else:
+        temp_args = ['--auto'] + temp_args
     temp_parser.parse_args(temp_args)
     return cfg
 
@@ -629,6 +698,8 @@ def namespace_to_arg_list(namespace, prefix='', includes=None, excludes=None):
 
 
 def config_backup(cfg: Namespace):
+    if not cfg.config:
+        return
     cfg_path = cfg.config[0].absolute
     work_dir = cfg.work_dir
     target_path = os.path.join(work_dir, os.path.basename(cfg_path))

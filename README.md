@@ -163,7 +163,7 @@ Table of Contents
 
 ## Prerequisites
 
-- Recommend Python>=3.8,<=3.10
+- Recommend Python>=3.9,<=3.10
 - gcc >= 5 (at least C++14 support)
 
 ## Installation
@@ -196,6 +196,22 @@ The dependency options are listed below:
 | `.[dev]`         | Install dependencies for developing the package as contributors.                             |
 | `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers.                       |
 | `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
+
+- Install dependencies for specific OPs
+
+With the growth of the number of OPs, the dependencies of all OPs becomes very heavy. Instead of using the command `pip install -v -e .[sci]` to install all dependencies,
+we provide two alternative, lighter options:
+
+  - Automatic Minimal Dependency Installation: During the execution of Data-Juicer, minimal dependencies will be automatically installed. This allows for immediate execution, but may potentially lead to dependency conflicts.
+
+  - Manual Minimal Dependency Installation: To manually install minimal dependencies tailored to a specific execution configuration, run the following command:
+    ```shell
+    # only for installation from source
+    python tools/dj_install.py --config path_to_your_data-juicer_config_file
+
+    # use command line tool
+    dj-install --config path_to_your_data-juicer_config_file
+    ```
 
 ### Using pip
 
@@ -317,6 +333,11 @@ python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # use command line tool
 dj-analyze --config configs/demo/analyzer.yaml
+
+# you can also use auto mode to avoid writing a recipe. It will analyze a small
+# part (e.g. 1000 samples, specified by argument `auto_num`) of your dataset 
+# with all Filters that produce stats.
+dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 ```
 
 - **Note:** Analyzer only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
@@ -386,6 +407,10 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 ```shell
 # run the data processing directly
 docker run --rm \  # remove container after the processing
+  --privileged \
+  --shm-size 256g \
+  --network host \
+  --gpus all \
   --name dj \  # name of the container
   -v <host_data_path>:<image_data_path> \  # mount data or config directory into the container
   -v ~/.cache/:/root/.cache/ \  # mount the cache directory into the container to reuse caches and models (recommended)
@@ -398,6 +423,10 @@ docker run --rm \  # remove container after the processing
 ```shell
 # start the container
 docker run -dit \  # run the container in the background
+  --privileged \
+  --shm-size 256g \
+  --network host \
+  --gpus all \
   --rm \
   --name dj \
   -v <host_data_path>:<image_data_path> \

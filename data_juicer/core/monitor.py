@@ -1,3 +1,4 @@
+import os
 import time
 from functools import partial
 from multiprocessing import get_context
@@ -28,6 +29,7 @@ class Monitor:
     '''python
     {
         'time': 10,
+        'sampling interval': 0.5,
         'resource': [
             {
                 'timestamp': xxx,
@@ -50,6 +52,7 @@ class Monitor:
     '''python
     {
         'time': 10,
+        'sampling interval': 0.5,
         'resource': [...],
         'resource_analysis': {
             'GPU free mem.': {
@@ -119,6 +122,24 @@ class Monitor:
         return resource_dict
 
     @staticmethod
+    def draw_resource_util_graph(resource_util_list, store_dir):
+        import matplotlib.pyplot as plt
+        for idx, resource_util_dict in enumerate(resource_util_list):
+            resource_list = resource_util_dict['resource']
+            interval = resource_util_dict['sampling interval']
+            for focus_metric in Monitor.DYNAMIC_FIELDS:
+                fn = f'func_{idx}_{focus_metric.replace(" ", "_")}.jpg'
+                ylbl = '%' if focus_metric.endswith('util.') else 'MB'
+                metric_list = [item[focus_metric] for item in resource_list]
+                plt.plot([i * interval for i in range(len(metric_list))],
+                         metric_list)
+                plt.title(focus_metric)
+                plt.xlabel('Time (s)')
+                plt.ylabel(ylbl)
+                plt.savefig(os.path.join(store_dir, fn), bbox_inches='tight')
+                plt.clf()
+
+    @staticmethod
     def analyze_resource_util_list(resource_util_list):
         """
         Analyze the resource utilization for a given resource util list.
@@ -184,7 +205,10 @@ class Monitor:
         resource_util_dict = {}
 
         # start monitor
-        ctx = get_context('fork')
+        start_method = 'fork'
+        if os.name == 'nt':  # for Windows
+            start_method = 'spawn'
+        ctx = get_context(start_method)
         with ctx.Manager() as manager:
             mdict = manager.dict()
             mdict['stop'] = False
@@ -208,6 +232,9 @@ class Monitor:
             monitor_proc.join()
 
             resource_util_dict['resource'] = mdict['resource']
+
+            # record interval
+            resource_util_dict['sampling interval'] = sample_interval
 
             # calculate speed
             resource_util_dict['time'] = end - start

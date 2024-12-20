@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
+from wordcloud import WordCloud
 
 from data_juicer.utils.constant import Fields
 
@@ -145,32 +146,38 @@ class ColumnWiseAnalysis:
                 else:
                     axes = [None] * num_subcol
 
-                # draw histogram
-                self.draw_hist(axes[0],
-                               data,
-                               os.path.join(self.output_path,
-                                            f'{column_name}-hist.png'),
-                               percentiles=percentiles)
+                if not skip_export:
+                    # draw histogram
+                    self.draw_hist(axes[0],
+                                   data,
+                                   os.path.join(self.output_path,
+                                                f'{column_name}-hist.png'),
+                                   percentiles=percentiles)
 
-                # draw box
-                self.draw_box(axes[1],
-                              data,
-                              os.path.join(self.output_path,
-                                           f'{column_name}-box.png'),
-                              percentiles=percentiles)
+                    # draw box
+                    self.draw_box(axes[1],
+                                  data,
+                                  os.path.join(self.output_path,
+                                               f'{column_name}-box.png'),
+                                  percentiles=percentiles)
             else:
                 # object (string) or string list -- only draw histogram for
                 # this stat
                 if self.save_stats_in_one_file:
-                    axes = subfig.subplots(1, 1)
+                    axes = subfig.subplots(1, num_subcol)
                 else:
-                    axes = None
+                    axes = [None] * num_subcol
 
                 if not skip_export:
                     self.draw_hist(
-                        axes, data,
+                        axes[0], data,
                         os.path.join(self.output_path,
                                      f'{column_name}-hist.png'))
+
+                    self.draw_wordcloud(
+                        axes[1], data,
+                        os.path.join(self.output_path,
+                                     f'{column_name}-wordcloud.png'))
 
             # add a title to the figure of this stat
             if self.save_stats_in_one_file:
@@ -289,6 +296,36 @@ class ColumnWiseAnalysis:
         if not self.save_stats_in_one_file:
             # save into file
             plt.savefig(save_path)
+
+            if show:
+                plt.show()
+            else:
+                # if no showing, we need to clear this axes to avoid
+                # accumulated overlapped figures in different draw_xxx function
+                # calling
+                ax.clear()
+
+    def draw_wordcloud(self, ax, data, save_path, show=False):
+        word_list = data.tolist()
+        word_nums = {}
+        for w in word_list:
+            if w in word_nums:
+                word_nums[w] += 1
+            else:
+                word_nums[w] = 1
+
+        wc = WordCloud(width=400, height=320)
+        wc.generate_from_frequencies(word_nums)
+
+        if ax is None:
+            ax = plt.figure(figsize=(20, 16))
+        else:
+            ax.imshow(wc, interpolation='bilinear')
+            ax.axis('off')
+
+        if not self.save_stats_in_one_file:
+            # save into file
+            wc.to_file(save_path)
 
             if show:
                 plt.show()

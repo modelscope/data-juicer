@@ -61,6 +61,7 @@ class VideoTaggingFromFramesFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '9GB')
         super().__init__(*args, **kwargs)
         if contain not in ['any', 'all']:
             raise ValueError(f'the containing type [{contain}] is not '

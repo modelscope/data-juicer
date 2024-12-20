@@ -144,7 +144,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 ## 前置条件
 
-* 推荐 Python>=3.8,<=3.10
+* 推荐 Python>=3.9,<=3.10
 * gcc >= 5 (at least C++14 support)
 
 ## 安装
@@ -177,6 +177,21 @@ pip install -v -e .[tools] # 安装部分工具库的依赖
 | `.[dev]`         | 安装作为贡献者开发 Data-Juicer 所需的依赖项 |
 | `.[tools]`       | 安装专用工具库（如质量分类器）所需的依赖项        |
 | `.[sandbox]`     | 安装沙盒实验室的基础依赖                 |
+
+* 只安装部分算子依赖
+
+随着OP数量的增长，所有OP的依赖变得很重。为此，我们提供了两个替代的、更轻量的选项，作为使用命令`pip install -v -e .[sci]`安装所有依赖的替代：
+
+  * 自动最小依赖安装：在执行Data-Juicer的过程中，将自动安装最小依赖。也就是说你可以直接执行，但这种方式可能会导致一些依赖冲突。
+
+  * 手动最小依赖安装：可以通过如下指令手动安装适合特定执行配置的最小依赖：
+    ```shell
+    # 适用于从源码安装
+    python tools/dj_install.py --config path_to_your_data-juicer_config_file
+    
+    # 使用命令行工具
+    dj-install --config path_to_your_data-juicer_config_file
+    ```
 
 ### 使用 pip 安装
 
@@ -295,6 +310,10 @@ python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # 使用命令行工具
 dj-analyze --config configs/demo/analyzer.yaml
+
+# 你也可以使用"自动"模式来避免写一个新的数据菜谱。它会使用全部可产出统计信息的 Filter 来分析
+# 你的数据集的一小部分（如1000条样本，可通过 `auto_num` 参数指定）
+dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 ```
 
 * **注意**：Analyzer 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
@@ -363,6 +382,10 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 ```shell
 # 直接运行数据处理
 docker run --rm \  # 在处理结束后将容器移除
+  --privileged \
+  --shm-size 256g \
+  --network host \
+  --gpus all \
   --name dj \  # 容器名称
   -v <host_data_path>:<image_data_path> \  # 将本地的数据或者配置目录挂载到容器中
   -v ~/.cache/:/root/.cache/ \  # 将 cache 目录挂载到容器以复用 cache 和模型资源（推荐）
@@ -375,6 +398,10 @@ docker run --rm \  # 在处理结束后将容器移除
 ```shell
 # 启动容器
 docker run -dit \  # 在后台启动容器
+  --privileged \
+  --shm-size 256g \
+  --network host \
+  --gpus all \
   --rm \
   --name dj \
   -v <host_data_path>:<image_data_path> \
