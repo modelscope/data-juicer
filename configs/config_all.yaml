@@ -792,6 +792,9 @@ process:
       upper_percentile:                                       # the upper bound of the percentile to be sampled
       lower_rank:                                             # the lower rank of the percentile to be sampled
       upper_rank:                                             # the upper rank of the percentile to be sampled
+  - tags_specified_field_selector:                          # Selector to select samples based on the tags of specified field.
+      field_key: '__dj__meta__.query_sentiment_label'         # the target keys corresponding to multi-level field information need to be separated by '.'
+      target_tags: ['happy', 'sad']                           # Target tags to be select.
   - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
       field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
       top_ratio:                                              # ratio of selected top samples
@@ -800,6 +803,7 @@ process:
 
 # Grouper ops.
   - naive_grouper:                                          # Group all samples to one batched sample.
+  - naive_reverse_grouper:                                  # Split one batched sample to samples.
   - key_value_grouper:                                      # Group samples to batched samples according values in given keys.
       group_by_keys: null                                     # Group samples according values in the keys. Support for nested keys such as "__dj__stats__.text_len". It is [self.text_key] in default.
 
@@ -818,6 +822,20 @@ process:
       example_prompt: null                                    # The example part in the system prompt.
       input_template: null                                    # The input template.
       output_pattern_template: null                           # The output template.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - meta_tags_aggregator:                                   # Merge similar meta tags to one tag.
+      api_model: 'gpt-4o'                                     # API model name.
+      meta_tag_key: '__dj__meta__.query_sentiment_label'      # The key of the meta tag to be mapped.
+      target_tags: ['开心', '难过', '其他']                     # The tags that is supposed to be mapped to.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # The system prompt.
+      input_template: null                                    # The input template.
+      target_tag_template: null                               # The tap template for target tags.
+      tag_template: null                                      # The tap template for each tag and its frequency.
+      output_pattern: null                                    # The output pattern.
       try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}

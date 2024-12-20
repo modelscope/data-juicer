@@ -103,4 +103,5 @@ OPS_TO_PKG = {
     'query_intent_detection_mapper': ['transformers'],
     'query_sentiment_detection_mapper': ['transformers'],
     'query_topic_detection_mapper': ['transformers'],
+    'meta_tags_aggregator': ['openai'],
 }

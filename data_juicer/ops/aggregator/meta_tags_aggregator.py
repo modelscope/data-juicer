@@ -16,7 +16,7 @@ OP_NAME = 'meta_tags_aggregator'
 @OPERATORS.register_module(OP_NAME)
 class MetaTagsAggregator(Aggregator):
     """
-    Merge similar meta tags to one tags.
+    Merge similar meta tags to one tag.
     """
 
     DEFAULT_SYSTEM_PROMPT = ('给定一些标签以及这些标签出现的频次，合并意思相近的标签。\n'

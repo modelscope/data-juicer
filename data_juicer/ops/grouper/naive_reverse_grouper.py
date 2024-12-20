@@ -3,7 +3,7 @@ from ..base_op import OPERATORS, Grouper, convert_dict_list_to_list_dict
 
 @OPERATORS.register_module('naive_reverse_grouper')
 class NaiveReverseGrouper(Grouper):
-    """Split one batched sample to samples. """
+    """Split batched samples to samples. """
 
     def __init__(self, *args, **kwargs):
         """
