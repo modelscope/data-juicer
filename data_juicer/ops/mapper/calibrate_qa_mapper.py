@@ -55,6 +55,8 @@ class CalibrateQAMapper(Mapper):
         :param reference_template: Template for formatting the reference text.
         :param qa_pair_template: Template for formatting question-answer pairs.
         :param output_pattern: Regular expression for parsing model output.
+        :param try_num: The number of retry attempts when there is an API
+            call error or output parsing error.
         :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
