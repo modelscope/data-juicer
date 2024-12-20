@@ -31,6 +31,9 @@ class VideoTaggingFromAudioMapperTest(DataJuicerTestCaseBase):
                                              tag_field_name=Fields.video_audio_tags,
                                              num_proc=1):
         dataset = Dataset.from_list(source_list)
+        if Fields.meta not in dataset.features:
+            dataset = dataset.add_column(name=Fields.meta,
+                                         column=[{}] * dataset.num_rows)
         dataset = dataset.map(op.process, num_proc=num_proc)
         res_list = dataset.flatten().select_columns([f'{Fields.meta}.{tag_field_name}'])[f'{Fields.meta}.{tag_field_name}']
         self.assertEqual(res_list, target_list)

@@ -6,6 +6,7 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.filter.video_tagging_from_frames_filter import \
     VideoTaggingFromFramesFilter
 from data_juicer.utils.mm_utils import SpecialTokens
+from data_juicer.utils.constant import Fields
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
@@ -21,6 +22,9 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
                                               target_list,
                                               num_proc=1):
         dataset = Dataset.from_list(source_list)
+        if Fields.meta not in dataset.features:
+            dataset = dataset.add_column(name=Fields.meta,
+                                         column=[{}] * dataset.num_rows)
         dataset = dataset.map(op.compute_stats, num_proc=num_proc)
         dataset = dataset.filter(op.process, num_proc=num_proc)
         dataset = dataset.select_columns(column_names=['text', 'videos'])

@@ -25,6 +25,9 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
                                               target_list,
                                               num_proc=1):
         dataset = Dataset.from_list(source_list)
+        if Fields.meta not in dataset.features:
+            dataset = dataset.add_column(name=Fields.meta,
+                                         column=[{}] * dataset.num_rows)
         dataset = dataset.map(op.process, num_proc=num_proc)
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
