@@ -58,18 +58,8 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
 
 
 def preprocess_dataset(dataset: rd.Dataset, dataset_path, cfg) -> rd.Dataset:
-    columns = dataset.columns()
     if dataset_path:
         dataset = set_dataset_to_absolute_path(dataset, dataset_path, cfg)
-    if Fields.stats not in columns:
-
-        def process_batch_arrow(table: pa.Table) -> pa.Table:
-            new_column_data = [{} for _ in range(len(table))]
-            new_talbe = table.append_column(Fields.stats, [new_column_data])
-            return new_talbe
-
-        dataset = dataset.map_batches(process_batch_arrow,
-                                      batch_format='pyarrow')
     return dataset
 
 
@@ -123,6 +113,16 @@ class RayDataset(DJDataset):
                                                   batch_format='pyarrow',
                                                   num_gpus=num_gpus)
             elif isinstance(op, Filter):
+                columns = self.data.columns()
+                if Fields.stats not in columns:
+
+                    def process_batch_arrow(table: pa.Table) -> pa.Table:
+                        new_column_data = [{} for _ in range(len(table))]
+                        new_talbe = table.append_column(Fields.stats, [new_column_data])
+                        return new_talbe
+
+                    self.data = self.data.map_batches(process_batch_arrow,
+                                                      batch_format='pyarrow')
                 self.data = self.data.map_batches(op.compute_stats,
                                                   batch_size=batch_size,
                                                   batch_format='pyarrow',

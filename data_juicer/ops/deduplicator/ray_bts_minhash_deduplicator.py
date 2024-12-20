@@ -585,24 +585,16 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 HashKeys.uid,
                 pa.array(list(uid_list))
             )
-            if not new_table[Fields.stats][0].as_py():
-                columns_to_keep = [
-                    name
-                    for name in new_table.column_names
-                    if name != Fields.stats
-                ]
-                new_table = new_table.select(columns_to_keep)
-            pq.write_table(
-                new_table,
-                os.path.join(self.tmp_file_name, f'{min_id}.parquet')
-            )
-            return pa.Table.from_arrays([])
+            return new_table
 
         dataset.map_batches(
             minhash_with_uid,
             batch_format='pyarrow',
             zero_copy_batch=True,
-        ).materialize()
+        ).write_parquet(
+            self.tmp_file_name,
+            force_ascii=False
+        )
         dataset = ray.data.read_parquet(self.tmp_file_name)
         end_time = time.time()
         print(f'MinHash time = {end_time - start_time}')
