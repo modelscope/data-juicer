@@ -46,7 +46,7 @@ class ImageAestheticsFilter(Filter):
         :param args: Extra positional arguments.
         :param kwargs: Extra keyword arguments.
         """
-
+        kwargs.setdefault('mem_required', '1500MB')
         super().__init__(*args, **kwargs)
         if hf_scorer_model == '':
             hf_scorer_model = \

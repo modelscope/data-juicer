@@ -4,8 +4,9 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
+from wordcloud import WordCloud
 
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
 
 from .overall_analysis import OverallAnalysis
 
@@ -69,6 +70,12 @@ class ColumnWiseAnalysis:
             stats into one image file
         """
         self.stats = pd.DataFrame(dataset[Fields.stats])
+        self.meta = pd.DataFrame(dataset[Fields.meta])
+        # remove non-tag columns
+        meta_columns = self.meta.columns
+        for col_name in meta_columns:
+            if not col_name.startswith(DEFAULT_PREFIX):
+                self.meta = self.meta.drop(col_name, axis=1)
         self.output_path = output_path
         if not os.path.exists(self.output_path):
             os.makedirs(self.output_path)
@@ -100,8 +107,9 @@ class ColumnWiseAnalysis:
         width_unit = 4
         height_unit = 6
 
-        columns = self.stats.columns
-        num = len(columns)
+        stats_and_meta = pd.concat([self.stats, self.meta], axis=1)
+        all_columns = stats_and_meta.columns
+        num = len(all_columns)
 
         # get the recommended "best" number of columns and rows
         rec_row, rec_col, grid_indexes = get_row_col(num, num_subcol)
@@ -114,9 +122,9 @@ class ColumnWiseAnalysis:
             fig = plt.figure(figsize=(rec_width, rec_height),
                              layout='constrained')
             subfigs = fig.subfigures(rec_row, rec_col, wspace=0.01)
-        for i, column_name in enumerate(tqdm(columns.to_list(),
-                                             desc='Column')):
-            data = self.stats[column_name]
+        for i, column_name in enumerate(
+                tqdm(all_columns.to_list(), desc='Column')):
+            data = stats_and_meta[column_name]
             # explode data to flatten inner list
             data = data.explode().infer_objects()
             grid = grid_indexes[i]
@@ -145,32 +153,38 @@ class ColumnWiseAnalysis:
                 else:
                     axes = [None] * num_subcol
 
-                # draw histogram
-                self.draw_hist(axes[0],
-                               data,
-                               os.path.join(self.output_path,
-                                            f'{column_name}-hist.png'),
-                               percentiles=percentiles)
+                if not skip_export:
+                    # draw histogram
+                    self.draw_hist(axes[0],
+                                   data,
+                                   os.path.join(self.output_path,
+                                                f'{column_name}-hist.png'),
+                                   percentiles=percentiles)
 
-                # draw box
-                self.draw_box(axes[1],
-                              data,
-                              os.path.join(self.output_path,
-                                           f'{column_name}-box.png'),
-                              percentiles=percentiles)
+                    # draw box
+                    self.draw_box(axes[1],
+                                  data,
+                                  os.path.join(self.output_path,
+                                               f'{column_name}-box.png'),
+                                  percentiles=percentiles)
             else:
                 # object (string) or string list -- only draw histogram for
                 # this stat
                 if self.save_stats_in_one_file:
-                    axes = subfig.subplots(1, 1)
+                    axes = subfig.subplots(1, num_subcol)
                 else:
-                    axes = None
+                    axes = [None] * num_subcol
 
                 if not skip_export:
                     self.draw_hist(
-                        axes, data,
+                        axes[0], data,
                         os.path.join(self.output_path,
                                      f'{column_name}-hist.png'))
+
+                    self.draw_wordcloud(
+                        axes[1], data,
+                        os.path.join(self.output_path,
+                                     f'{column_name}-wordcloud.png'))
 
             # add a title to the figure of this stat
             if self.save_stats_in_one_file:
@@ -203,10 +217,7 @@ class ColumnWiseAnalysis:
         """
         # recommended number of bins
         data_num = len(data)
-        if data_num >= 100:
-            rec_bins = int(math.sqrt(len(data)))
-        else:
-            rec_bins = None
+        rec_bins = max(int(math.sqrt(data_num)), 10)
 
         # if ax is None, using plot method in pandas
         if ax is None:
@@ -289,6 +300,36 @@ class ColumnWiseAnalysis:
         if not self.save_stats_in_one_file:
             # save into file
             plt.savefig(save_path)
+
+            if show:
+                plt.show()
+            else:
+                # if no showing, we need to clear this axes to avoid
+                # accumulated overlapped figures in different draw_xxx function
+                # calling
+                ax.clear()
+
+    def draw_wordcloud(self, ax, data, save_path, show=False):
+        word_list = data.tolist()
+        word_nums = {}
+        for w in word_list:
+            if w in word_nums:
+                word_nums[w] += 1
+            else:
+                word_nums[w] = 1
+
+        wc = WordCloud(width=400, height=320)
+        wc.generate_from_frequencies(word_nums)
+
+        if ax is None:
+            ax = plt.figure(figsize=(20, 16))
+        else:
+            ax.imshow(wc, interpolation='bilinear')
+            ax.axis('off')
+
+        if not self.save_stats_in_one_file:
+            # save into file
+            wc.to_file(save_path)
 
             if show:
                 plt.show()

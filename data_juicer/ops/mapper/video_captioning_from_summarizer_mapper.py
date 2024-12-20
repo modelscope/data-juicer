@@ -81,6 +81,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '40GB')
         super().__init__(*args, **kwargs)
         AUTOINSTALL.check([
             'torch',

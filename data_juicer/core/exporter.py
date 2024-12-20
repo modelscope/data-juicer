@@ -106,10 +106,15 @@ class Exporter:
         :param export_stats: whether to export stats of dataset.
         :return:
         """
-        if Fields.stats in dataset.features and export_stats:
+        if export_stats:
             # export stats of datasets into a single file.
             logger.info('Exporting computed stats into a single file...')
-            ds_stats = dataset.select_columns(Fields.stats)
+            export_columns = []
+            if Fields.stats in dataset.features:
+                export_columns.append(Fields.stats)
+            if Fields.meta in dataset.features:
+                export_columns.append(Fields.meta)
+            ds_stats = dataset.select_columns(export_columns)
             stats_file = export_path.replace('.' + suffix, '_stats.jsonl')
             Exporter.to_jsonl(
                 ds_stats,
@@ -119,7 +124,7 @@ class Exporter:
         if self.export_ds:
             # fetch the corresponding export method according to the suffix
             if not self.keep_stats_in_res_ds:
-                extra_fields = {Fields.stats}
+                extra_fields = {Fields.stats, Fields.meta}
                 feature_fields = set(dataset.features.keys())
                 removed_fields = extra_fields.intersection(feature_fields)
                 dataset = dataset.remove_columns(removed_fields)

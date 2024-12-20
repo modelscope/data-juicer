@@ -53,6 +53,7 @@ class ImageTextSimilarityFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '1500MB')
         super().__init__(*args, **kwargs)
         self.min_score = min_score
         self.max_score = max_score

@@ -41,6 +41,7 @@ class ImageNSFWFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '1GB')
         super().__init__(*args, **kwargs)
         self.score_threshold = score_threshold
         if any_or_all not in ['any', 'all']:

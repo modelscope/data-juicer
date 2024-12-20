@@ -21,8 +21,8 @@ class VideoTaggingFromFramesFilterTest(DataJuicerTestCaseBase):
                                               target_list,
                                               num_proc=1):
         dataset = Dataset.from_list(source_list)
-        dataset = dataset.map(op.compute_stats)
-        dataset = dataset.filter(op.process)
+        dataset = dataset.map(op.compute_stats, num_proc=num_proc)
+        dataset = dataset.filter(op.process, num_proc=num_proc)
         dataset = dataset.select_columns(column_names=['text', 'videos'])
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)
