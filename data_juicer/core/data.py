@@ -172,6 +172,7 @@ class NestedDataset(Dataset, DJDataset):
         exporter=None,
         checkpointer=None,
         tracer=None,
+        adapter=None,
         open_monitor=True,
     ):
         if operators is None:
@@ -185,9 +186,19 @@ class NestedDataset(Dataset, DJDataset):
         if open_monitor:
             resource_util_list = []
 
+        # whether to enable insight mining
+        enable_insight_mining = adapter.enable_insight_mining \
+            if adapter else False
+        # record the analysis results of the original dataset
+        if enable_insight_mining:
+            logger.info('Analyze small batch for the original dataset for '
+                        'insight mining...')
+            adapter.analyze_small_batch(self, '0_original')
+
         dataset = self
+        op_num = len(operators)
         try:
-            for op in operators:
+            for idx, op in enumerate(operators, start=1):
                 mp_context = ['forkserver', 'spawn'] if (
                     op.use_cuda()
                     or op._name in unforkable_operators) else None
@@ -211,8 +222,16 @@ class NestedDataset(Dataset, DJDataset):
                 if open_monitor:
                     resource_util_list.append(resource_util_per_op)
                 end = time()
-                logger.info(f'OP [{op._name}] Done in {end - start:.3f}s. '
-                            f'Left {len(dataset)} samples.')
+                logger.info(
+                    f'[{idx}/{op_num}] OP [{op._name}] Done in '
+                    f'{end - start:.3f}s. Left {len(dataset)} samples.')
+
+                # record the analysis results of the current dataset
+                if enable_insight_mining:
+                    logger.info(
+                        f'Analyze small batch for the current dataset after '
+                        f'OP [{op._name}] for insight mining...')
+                    adapter.analyze_small_batch(dataset, f'{idx}_{op._name}')
         except:  # noqa: E722
             logger.error(f'An error occurred during Op [{op._name}].')
             traceback.print_exc()
@@ -223,6 +242,7 @@ class NestedDataset(Dataset, DJDataset):
                             'last op...')
                 dataset.cleanup_cache_files()
                 checkpointer.save_ckpt(dataset)
+            # make summarization on the monitor results
             if work_dir and open_monitor:
                 # get the analyzed version
                 resource_util_list = Monitor.analyze_resource_util_list(
@@ -234,6 +254,10 @@ class NestedDataset(Dataset, DJDataset):
                     json.dump(resource_util_list, out)
                 Monitor.draw_resource_util_graph(resource_util_list,
                                                  monitor_dir)
+            # make summarization on the insight mining results
+            if work_dir and enable_insight_mining:
+                logger.info('Insight mining for each OP...')
+                adapter.insight_mining()
         return dataset
 
     def update_args(self, args, kargs, is_filter=False):

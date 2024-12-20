@@ -7,7 +7,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, UNFORKABLE, Mapper
+from ..base_op import OPERATORS, TAGGING_OPS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 torch = LazyLoader('torch', 'torch')
@@ -16,6 +16,7 @@ ram = LazyLoader('ram', 'ram')
 OP_NAME = 'image_tagging_mapper'
 
 
+@TAGGING_OPS.register_module(OP_NAME)
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_IMAGES.register_module(OP_NAME)
@@ -47,12 +48,13 @@ class ImageTaggingMapper(Mapper):
 
     def process_single(self, sample, rank=None, context=False):
         # check if it's generated already
-        if self.tag_field_name in sample:
+        if self.tag_field_name in sample[Fields.meta]:
             return sample
 
         # there is no image in this sample
         if self.image_key not in sample or not sample[self.image_key]:
-            sample[self.tag_field_name] = np.array([[]], dtype=np.str_)
+            sample[Fields.meta][self.tag_field_name] = np.array([[]],
+                                                                dtype=np.str_)
             return sample
 
         # load images
@@ -75,5 +77,5 @@ class ImageTaggingMapper(Mapper):
             sorted_word_list = [item for item, _ in word_count.most_common()]
             image_tags.append(np.array(sorted_word_list, dtype=np.str_))
 
-        sample[self.tag_field_name] = image_tags
+        sample[Fields.meta][self.tag_field_name] = image_tags
         return sample

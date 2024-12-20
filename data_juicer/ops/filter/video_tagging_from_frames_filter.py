@@ -5,7 +5,8 @@ from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields
 
-from ..base_op import OPERATORS, UNFORKABLE, Filter
+from ..base_op import (NON_STATS_FILTERS, OPERATORS, TAGGING_OPS, UNFORKABLE,
+                       Filter)
 from ..mapper.video_tagging_from_frames_mapper import \
     VideoTaggingFromFramesMapper
 from ..op_fusion import LOADED_VIDEOS
@@ -13,6 +14,8 @@ from ..op_fusion import LOADED_VIDEOS
 OP_NAME = 'video_tagging_from_frames_filter'
 
 
+@NON_STATS_FILTERS.register_module(OP_NAME)
+@TAGGING_OPS.register_module(OP_NAME)
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
@@ -91,7 +94,7 @@ class VideoTaggingFromFramesFilter(Filter):
         return sample
 
     def process_single(self, sample, rank=None):
-        video_tags = sample[self.tag_field_name]
+        video_tags = sample[Fields.meta][self.tag_field_name]
         if len(video_tags) <= 0:
             return True
 
