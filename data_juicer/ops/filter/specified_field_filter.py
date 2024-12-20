@@ -1,9 +1,12 @@
 from typing import List
 
-from ..base_op import OPERATORS, Filter
+from ..base_op import NON_STATS_FILTERS, OPERATORS, Filter
+
+OP_NAME = 'specified_field_filter'
 
 
-@OPERATORS.register_module('specified_field_filter')
+@NON_STATS_FILTERS.register_module(OP_NAME)
+@OPERATORS.register_module(OP_NAME)
 class SpecifiedFieldFilter(Filter):
     """
     Filter based on specified field information.
