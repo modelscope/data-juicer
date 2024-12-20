@@ -11,7 +11,7 @@
 
   
       <script src="../../../_static/documentation_options.js?v=292eb321"></script>
-      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
 </ul>
 
         </div>
@@ -85,13 +85,11 @@
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">wordcloud</span> <span class="kn">import</span> <span class="n">WordCloud</span>
 
-<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">DEFAULT_PREFIX</span><span class="p">,</span> <span class="n">Fields</span>
 
 <span class="kn">from</span> <span class="nn">.overall_analysis</span> <span class="kn">import</span> <span class="n">OverallAnalysis</span>
 
 
-<div class="viewcode-block" id="get_row_col">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.get_row_col">[docs]</a>
 <span class="k">def</span> <span class="nf">get_row_col</span><span class="p">(</span><span class="n">total_num</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given the total number of stats figures, get the &quot;best&quot; number of rows and</span>
@@ -130,17 +128,16 @@
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">total_num</span><span class="p">):</span>
         <span class="n">grids</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span> <span class="o">//</span> <span class="n">now_col</span><span class="p">,</span> <span class="n">i</span> <span class="o">%</span> <span class="n">now_col</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">now_row</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">now_col</span><span class="p">),</span> <span class="n">grids</span></div>
-
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">now_row</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">now_col</span><span class="p">),</span> <span class="n">grids</span>
 
 
 <div class="viewcode-block" id="ColumnWiseAnalysis">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.ColumnWiseAnalysis">[docs]</a>
 <span class="k">class</span> <span class="nc">ColumnWiseAnalysis</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply analysis on each column of stats respectively.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ColumnWiseAnalysis.__init__">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.ColumnWiseAnalysis.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">dataset</span><span class="p">,</span>
                  <span class="n">output_path</span><span class="p">,</span>
@@ -156,6 +153,12 @@
 <span class="sd">            stats into one image file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stats</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">])</span>
+        <span class="c1"># remove non-tag columns</span>
+        <span class="n">meta_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">columns</span>
+        <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">meta_columns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">col_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">DEFAULT_PREFIX</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">col_name</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">output_path</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">)</span>
@@ -170,7 +173,7 @@
 
 
 <div class="viewcode-block" id="ColumnWiseAnalysis.analyze">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis.analyze">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.ColumnWiseAnalysis.analyze">[docs]</a>
     <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show_percentiles</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">skip_export</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply analysis and draw the analysis figure for stats.</span>
@@ -190,8 +193,9 @@
         <span class="n">width_unit</span> <span class="o">=</span> <span class="mi">4</span>
         <span class="n">height_unit</span> <span class="o">=</span> <span class="mi">6</span>
 
-        <span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">columns</span>
-        <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">stats_and_meta</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">all_columns</span> <span class="o">=</span> <span class="n">stats_and_meta</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_columns</span><span class="p">)</span>
 
         <span class="c1"># get the recommended &quot;best&quot; number of columns and rows</span>
         <span class="n">rec_row</span><span class="p">,</span> <span class="n">rec_col</span><span class="p">,</span> <span class="n">grid_indexes</span> <span class="o">=</span> <span class="n">get_row_col</span><span class="p">(</span><span class="n">num</span><span class="p">,</span> <span class="n">num_subcol</span><span class="p">)</span>
@@ -204,9 +208,9 @@
             <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">rec_width</span><span class="p">,</span> <span class="n">rec_height</span><span class="p">),</span>
                              <span class="n">layout</span><span class="o">=</span><span class="s1">&#39;constrained&#39;</span><span class="p">)</span>
             <span class="n">subfigs</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">subfigures</span><span class="p">(</span><span class="n">rec_row</span><span class="p">,</span> <span class="n">rec_col</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tqdm</span><span class="p">(</span><span class="n">columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span>
-                                             <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Column&#39;</span><span class="p">)):</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                <span class="n">tqdm</span><span class="p">(</span><span class="n">all_columns</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Column&#39;</span><span class="p">)):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">stats_and_meta</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span>
             <span class="c1"># explode data to flatten inner list</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">explode</span><span class="p">()</span><span class="o">.</span><span class="n">infer_objects</span><span class="p">()</span>
             <span class="n">grid</span> <span class="o">=</span> <span class="n">grid_indexes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
@@ -287,7 +291,7 @@
 
 
 <div class="viewcode-block" id="ColumnWiseAnalysis.draw_hist">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis.draw_hist">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.ColumnWiseAnalysis.draw_hist">[docs]</a>
     <span class="k">def</span> <span class="nf">draw_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">percentiles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Draw the histogram for the data.</span>
@@ -302,10 +306,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># recommended number of bins</span>
         <span class="n">data_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">data_num</span> <span class="o">&gt;=</span> <span class="mi">100</span><span class="p">:</span>
-            <span class="n">rec_bins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">rec_bins</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">rec_bins</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">data_num</span><span class="p">)),</span> <span class="mi">10</span><span class="p">)</span>
 
         <span class="c1"># if ax is None, using plot method in pandas</span>
         <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -351,7 +352,7 @@
 
 
 <div class="viewcode-block" id="ColumnWiseAnalysis.draw_box">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis.draw_box">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.ColumnWiseAnalysis.draw_box">[docs]</a>
     <span class="k">def</span> <span class="nf">draw_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">percentiles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Draw the box plot for the data.</span>
@@ -402,7 +403,7 @@
 
 
 <div class="viewcode-block" id="ColumnWiseAnalysis.draw_wordcloud">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis.draw_wordcloud">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.ColumnWiseAnalysis.draw_wordcloud">[docs]</a>
     <span class="k">def</span> <span class="nf">draw_wordcloud</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">word_list</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="n">word_nums</span> <span class="o">=</span> <span class="p">{}</span>
