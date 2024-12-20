@@ -32,7 +32,7 @@ class VideoTaggingFromAudioMapperTest(DataJuicerTestCaseBase):
                                              num_proc=1):
         dataset = Dataset.from_list(source_list)
         dataset = dataset.map(op.process, num_proc=num_proc)
-        res_list = dataset.select_columns([tag_field_name])[tag_field_name]
+        res_list = dataset.flatten().select_columns([f'{Fields.meta}.{tag_field_name}'])[f'{Fields.meta}.{tag_field_name}']
         self.assertEqual(res_list, target_list)
 
     def test(self):

@@ -94,7 +94,7 @@ class VideoTaggingFromFramesFilter(Filter):
         return sample
 
     def process_single(self, sample, rank=None):
-        video_tags = sample[self.tag_field_name]
+        video_tags = sample[Fields.meta][self.tag_field_name]
         if len(video_tags) <= 0:
             return True
 
