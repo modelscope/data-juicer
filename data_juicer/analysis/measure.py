@@ -128,6 +128,9 @@ class RelatedTTestMeasure(Measure):
     Measure T-Test for two related distributions on their histogram of the same
     bins.
 
+    Ref:
+    https://en.wikipedia.org/wiki/Student%27s_t-test
+
     For continuous features or distributions, the input could be dataset stats
     list.
     For discrete features or distributions, the input could be the tags or the
