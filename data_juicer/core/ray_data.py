@@ -118,10 +118,7 @@ class RayDataset(DJDataset):
             batch_size = getattr(op, 'batch_size',
                                  1) if op.is_batched_op() else 1
             if isinstance(op, Mapper):
-                if op.use_ray_actor():
-                    # TODO: auto calculate concurrency
-                    concurrency = getattr(op, 'concurrency', 1)
-
+                if op.use_cuda():
                     init_params = op._init_parameters
                     op_args = init_params.pop('args', ())
                     op_kwargs = init_params.pop('kwargs', {})
@@ -135,7 +132,7 @@ class RayDataset(DJDataset):
                         fn_constructor_kwargs=op_kwargs,
                         batch_size=batch_size,
                         num_gpus=num_gpus,
-                        concurrency=concurrency,
+                        concurrency=op_proc,
                         batch_format='pyarrow')
                 else:
                     self.data = self.data.map_batches(op.process,
@@ -143,10 +140,7 @@ class RayDataset(DJDataset):
                                                       batch_format='pyarrow',
                                                       num_gpus=num_gpus)
             elif isinstance(op, Filter):
-                if op.use_ray_actor():
-                    # TODO: auto calculate concurrency
-                    concurrency = getattr(op, 'concurrency', 1)
-
+                if op.use_cuda():
                     init_params = op._init_parameters
                     op_args = init_params.pop('args', ())
                     op_kwargs = init_params.pop('kwargs', {})
@@ -160,7 +154,7 @@ class RayDataset(DJDataset):
                         fn_constructor_kwargs=op_kwargs,
                         batch_size=batch_size,
                         num_gpus=num_gpus,
-                        concurrency=concurrency,
+                        concurrency=op_proc,
                         batch_format='pyarrow')
                 else:
                     self.data = self.data.map_batches(op.compute_stats,

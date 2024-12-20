@@ -30,7 +30,6 @@ class ImageCaptioningMapper(Mapper):
 
     _accelerator = 'cuda'
     _batched_op = True
-    _ray_mode = 'actor'
 
     def __init__(self,
                  hf_img2seq: str = 'Salesforce/blip2-opt-2.7b',

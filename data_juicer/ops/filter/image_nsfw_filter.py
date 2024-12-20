@@ -19,7 +19,6 @@ class ImageNSFWFilter(Filter):
     """Filter to keep samples whose images have low nsfw scores."""
 
     _accelerator = 'cuda'
-    _ray_mode = 'actor'
 
     def __init__(self,
                  hf_nsfw_model: str = 'Falconsai/nsfw_image_detection',
