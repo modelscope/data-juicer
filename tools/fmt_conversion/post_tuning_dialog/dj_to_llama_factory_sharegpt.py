@@ -1,5 +1,5 @@
 # This tool is used to convert dataset in Data-Juicer format to a
-# target dataset in ShareGPT-like format.
+# target dataset in LLaMA-Factory ShareGPT-like format.
 #
 # Data-Juicer format (query-response format):
 # [
@@ -21,7 +21,7 @@
 #   ...
 # ]
 #
-# Corresponding ShareGPT format:
+# Corresponding LLaMA-Factory ShareGPT format:
 #   - usually in json format
 # [
 #   {
@@ -57,8 +57,7 @@
 # ]
 #
 # Reference:
-# https://github.com/hiyouga/LLaMA-Factory/tree/main/data#sharegpt-format
-# https://github.com/modelscope/ms-swift/blob/main/docs/source_en/Customization/Custom-dataset.md
+# https://github.com/hiyouga/LLaMA-Factory/blob/v0.9.1/data/README.md#sharegpt-format
 
 import json
 import os
