@@ -1,6 +1,6 @@
-[submodule "Img-Diff/object_replacement/LLaVA"]
-	path = Img-Diff/object_replacement/LLaVA
+[submodule "Img-Diff-codes/object_replacement/LLaVA"]
+	path = Img-Diff-codes/object_replacement/LLaVA
 	url = https://github.com/haotian-liu/LLaVA.git
-[submodule "Img-Diff/pairs_generator/FastChat"]
-	path = Img-Diff/pairs_generator/FastChat
+[submodule "Img-Diff-codes/pairs_generator/FastChat"]
+	path = Img-Diff-codes/pairs_generator/FastChat
 	url = https://github.com/lm-sys/FastChat.git
