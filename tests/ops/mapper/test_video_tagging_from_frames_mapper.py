@@ -93,7 +93,8 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             'text':
             f'白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [],
-            Fields.video_frame_tags: [[]]
+            Fields.meta: {
+                Fields.video_frame_tags: [[]]}
         }, {
             'text':
             f'{SpecialTokens.video} 身穿白色上衣的男子，拿着一个东西，拍打自己的胃部。{SpecialTokens.eoc}',
