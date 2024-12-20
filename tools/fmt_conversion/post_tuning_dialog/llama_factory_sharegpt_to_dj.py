@@ -78,7 +78,9 @@ def sharegpt_to_dj(
     instruction_role: str = 'instruction',
     multimodal_keys: Union[str, List[str]] = None,
 ):
-    modified_keys = {conversations_key}.union(set(multimodal_keys))
+    modified_keys = {conversations_key}
+    if multimodal_keys:
+        modified_keys = modified_keys.union(set(multimodal_keys))
     new_sample = {
         key: sample[key]
         for key in sample if key not in modified_keys
@@ -140,11 +142,12 @@ def sharegpt_to_dj(
     })
 
     # update multimodal data
-    for mm_key in multimodal_keys:
-        if not isinstance(sample[mm_key], list):
-            new_sample[mm_key] = [sample[mm_key]]
-        else:
-            new_sample[mm_key] = sample[mm_key]
+    if multimodal_keys:
+        for mm_key in multimodal_keys:
+            if not isinstance(sample[mm_key], list):
+                new_sample[mm_key] = [sample[mm_key]]
+            else:
+                new_sample[mm_key] = sample[mm_key]
 
     return new_sample
 
