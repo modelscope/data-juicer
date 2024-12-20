@@ -143,7 +143,6 @@ class OP:
         self.history_key = kwargs.get('history_key', 'history')
 
         self.batch_size = kwargs.get('batch_size', 1000)
-        self.concurrency = kwargs.get('concurrency', 1)
 
         # whether the model can be accelerated using cuda
         _accelerator = kwargs.get('accelerator', None)

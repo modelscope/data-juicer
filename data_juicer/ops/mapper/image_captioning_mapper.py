@@ -283,11 +283,6 @@ class ImageCaptioningMapper(Mapper):
         :param samples:
         :return:
         """
-        import pyarrow as pa
-
-        if isinstance(samples, pa.Table):
-            samples = samples.to_pydict()
-
         # reconstruct samples from "dict of lists" to "list of dicts"
         reconstructed_samples = []
         for i in range(len(samples[self.text_key])):
