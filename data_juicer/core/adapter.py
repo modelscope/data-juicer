@@ -268,7 +268,8 @@ class Adapter:
             for feat in common_features:
                 ttest_res = ttest_measure(prev_res[feat], curr_res[feat])
                 curr_sig_res[feat] = {
-                    't-statistic': ttest_res.statistic,
+                    't-statistic (standardized mean difference)':
+                    ttest_res.statistic,
                     'p-value': ttest_res.pvalue,
                     'significant':
                     True if ttest_res.pvalue < pval_th else False,
