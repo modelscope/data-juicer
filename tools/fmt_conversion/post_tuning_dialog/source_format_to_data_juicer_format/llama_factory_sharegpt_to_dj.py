@@ -69,7 +69,7 @@ from loguru import logger
 from tqdm import tqdm
 
 
-def sharegpt_to_dj(
+def llama_factory_sharegpt_to_dj(
     sample,
     conversations_key: str = 'conversations',
     from_key: str = 'from',
@@ -199,7 +199,7 @@ def main(
 
     with jl.open(tgt_ds_path, 'w') as writer:
         for sample in tqdm(src_ds):
-            converted_sample = sharegpt_to_dj(
+            converted_sample = llama_factory_sharegpt_to_dj(
                 sample,
                 conversations_key=conversations_key,
                 from_key=from_key,

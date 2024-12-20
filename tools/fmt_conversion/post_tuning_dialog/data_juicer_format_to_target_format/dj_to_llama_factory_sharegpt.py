@@ -68,7 +68,7 @@ from loguru import logger
 from tqdm import tqdm
 
 
-def dj_to_sharegpt(
+def dj_to_llama_factory_sharegpt(
     sample,
     conversations_key: str = 'conversations',
     from_key: str = 'from',
@@ -166,7 +166,7 @@ def main(
     samples = []
     with jl.open(src_ds_path, 'r') as reader:
         for sample in tqdm(reader):
-            converted_sample = dj_to_sharegpt(
+            converted_sample = dj_to_llama_factory_sharegpt(
                 sample,
                 conversations_key=conversations_key,
                 from_key=from_key,
