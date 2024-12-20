@@ -33,7 +33,7 @@ class Analyzer:
 
         :param cfg: optional jsonargparse Namespace dict.
         """
-        self.cfg = init_configs() if cfg is None else cfg
+        self.cfg = init_configs(which_entry=self) if cfg is None else cfg
 
         self.work_dir = self.cfg.work_dir
 
@@ -87,6 +87,10 @@ class Analyzer:
         if load_data_np is None:
             load_data_np = self.cfg.np
         dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+        if self.cfg.auto:
+            # if it's auto analysis, only analyze for a minor part of the input
+            # dataset to save time and computing resource
+            dataset = dataset.take(min(len(dataset), self.cfg.auto_num))
 
         # extract processes
         logger.info('Preparing process operators...')
