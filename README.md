@@ -340,7 +340,9 @@ dj-analyze --config configs/demo/analyzer.yaml
 dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 ```
 
-- **Note:** Analyzer only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
+- **Note:** Analyzer only compute stats for Filters that produce stats or other OPs that produce tags/categories in meta. So other OPs will be ignored in the analysis process. We use the following registries to decorate OPs:
+  - `NON_STATS_FILTERS`: decorate Filters that **DO NOT** produce any stats.
+  - `TAGGING_OPS`: decorate OPs that **DO** produce tags/categories in meta field.
 
 ### Data Visualization
 
