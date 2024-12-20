@@ -1,20 +1,17 @@
+import os
 import time
 import uuid
-from collections import defaultdict
-from typing import Optional
+from typing import List, Optional, Union
 
-import os
-import ray
 import numpy as np
 import pyarrow as pa
-import pyarrow.parquet as pq
+import ray
 import regex
 from loguru import logger
 from pydantic import Field, PositiveInt
 from typing_extensions import Annotated
-from typing import List, Union
 
-from data_juicer.utils.constant import HashKeys, Fields
+from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
 from ..base_op import OPERATORS, Deduplicator
@@ -22,13 +19,12 @@ from ..common.helper_func import split_on_whitespace
 from .document_minhash_deduplicator import (MAX_HASH, MERSENNE_PRIME,
                                             optimal_param, sha1_hash32)
 
-
 BATCH_SIZE = 1000
 
 
 @ray.remote
 class IdGenerator:
-    def __init__(self, start_id = 0):
+    def __init__(self, start_id=0):
         self.next_id = start_id
 
     @ray.method(num_returns=2)
@@ -38,7 +34,7 @@ class IdGenerator:
         return (current_id, self.next_id)
 
 
-@ray.remote(scheduling_strategy="SPREAD")
+@ray.remote(scheduling_strategy='SPREAD')
 class EdgeBuffer:
     def __init__(self):
         self.edge_dict = {}
@@ -53,7 +49,7 @@ class EdgeBuffer:
         return self.edge_dict.pop(key, [])
 
 
-@ray.remote(scheduling_strategy="SPREAD")
+@ray.remote(scheduling_strategy='SPREAD')
 class BTSUnionFind:
     """
     A distributed implementation of Union-Find with load balancing.
@@ -161,8 +157,9 @@ class BTSUnionFind:
         del_list = []
         for u, v in self.parent.items():
             hash_u = u // BATCH_SIZE % self.parallel_num
-            if self.parent[u] != self.old_parent.get(u, u) or \
-            (hash_u != self.parallel_id and v not in self.parent):
+            if self.parent[u] != self.old_parent.get(u, u) or (
+                hash_u != self.parallel_id and v not in self.parent
+            ):
                 self.distribute_edge(u, v)
             if hash_u != self.parallel_id:
                 del_list.append(u)
@@ -311,7 +308,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         :param union_find_parallel_num: number of parallel workers for
             union-find algorithm. Default it's 'auto', and it will be
             determined by half of the number of CPUs.
-        :param union_threshold: threshold for minhash values group to 
+        :param union_threshold: threshold for minhash values group to
             perform union-find algorightm. Default it's 256.
         :param max_pending_edge_buffer_task: max number of pending edge buffer
             ray tasks. Default it's 20.
@@ -476,7 +473,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                     dtype=np.uint64
                 )
                 phv = (
-                    (hv[:, None] * self.perm_a[None, :] 
+                    (hv[:, None] * self.perm_a[None, :]
                      + self.perm_b) % MERSENNE_PRIME
                 ).astype(np.uint32)
                 hash_values = phv.min(axis=0)
@@ -574,6 +571,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
     def run(self, dataset):
         start_time = time.time()
         id_generator = IdGenerator.remote()
+
         def minhash_with_uid(table: pa.Table) -> pa.Table:
             num_rows = len(table)
             min_id, max_id = ray.get(

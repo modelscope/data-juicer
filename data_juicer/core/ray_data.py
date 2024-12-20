@@ -1,6 +1,4 @@
 from __future__ import annotations
-import os
-from functools import partial
 
 import os
 from functools import partial
