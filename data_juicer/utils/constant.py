@@ -16,14 +16,6 @@ class Fields(object):
     context = DEFAULT_PREFIX + 'context__'
     suffix = DEFAULT_PREFIX + 'suffix__'
 
-    # tags in meta
-    # video_frame_tags
-    video_frame_tags = DEFAULT_PREFIX + 'video_frame_tags__'
-    # video_audio_tags
-    video_audio_tags = DEFAULT_PREFIX + 'video_audio_tags__'
-    # image_tags
-    image_tags = DEFAULT_PREFIX + 'image_tags__'
-
     # video_frames
     video_frames = DEFAULT_PREFIX + 'video_frames__'
 
@@ -75,22 +67,32 @@ class Fields(object):
 
 class MetaKeys(object):
 
+    # text tags
+    # # sentiment
     dialog_sentiment_intensity = 'dialog_sentiment_intensity'
     dialog_sentiment_intensity_analysis = 'dialog_sentiment_intensity_analysis'
     query_sentiment_label = 'query_sentiment_label'
     query_sentiment_score = 'query_sentiment_label_score'
     dialog_sentiment_labels = 'dialog_sentiment_labels'
     dialog_sentiment_labels_analysis = 'dialog_sentiment_labels_analysis'
-
+    # # intent
     dialog_intent_labels = 'dialog_intent_labels'
     dialog_intent_labels_analysis = 'dialog_intent_labels_analysis'
     query_intent_label = 'query_intent_label'
     query_intent_score = 'query_intent_label_score'
-
+    # # topic
     dialog_topic_labels = 'dialog_topic_labels'
     dialog_topic_labels_analysis = 'dialog_topic_labels_analysis'
     query_topic_label = 'query_topic_label'
     query_topic_score = 'query_topic_label_score'
+
+    # multi-module tags
+    # # video-frame tags
+    video_frame_tags = 'video_frame_tags__'
+    # # video-audio tags
+    video_audio_tags = 'video_audio_tags__'
+    # # image tags
+    image_tags = 'image_tags__'
 
 
 class StatsKeysMeta(type):

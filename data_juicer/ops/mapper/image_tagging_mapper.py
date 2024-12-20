@@ -33,7 +33,7 @@ class ImageTaggingMapper(Mapper):
         """
         Initialization method.
         :param tag_field_name: the field name to store the tags. It's
-            "__dj__image_tags__" in default.
+            "image_tags__" in default.
         :param args: extra args
         :param kwargs: extra args
         """

@@ -34,7 +34,7 @@ class VideoTaggingFromAudioMapper(Mapper):
         :param hf_ast: path to the HF model to tag from audios.
         :param trust_remote_code: whether to trust the remote code of HF models
         :param tag_field_name: the field name to store the tags. It's
-            "__dj__video_audio_tags__" in default.
+            "video_audio_tags__" in default.
         :param args: extra args
         :param kwargs: extra args
         """

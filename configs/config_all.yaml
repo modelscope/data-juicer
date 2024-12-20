@@ -285,7 +285,7 @@ process:
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
   - image_tagging_mapper:                                   # Mapper to generate image tags.
-      tag_field_name: '__dj__image_tags__'                    # the field name to store the tags. It's "__dj__image_tags__" in default.
+      tag_field_name: 'image_tags__'                          # the field name to store the tags. It's "image_tags__" in default.
       mem_required: '9GB'
   - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library
       sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
@@ -486,12 +486,12 @@ process:
       show_progress: false                                    # whether to show progress from scenedetect
   - video_tagging_from_audio_mapper:                        # Mapper to generate video tags from audio streams extracted from the video.
       hf_ast: 'MIT/ast-finetuned-audioset-10-10-0.4593'       # Huggingface model name for the audio classification model.
-      tag_field_name: '__dj__video_audio_tags__'              # the field name to store the tags. It's "__dj__video_audio_tags__" in default.
+      tag_field_name: 'video_audio_tags__'                    # the field name to store the tags. It's "video_audio_tags__" in default.
       mem_required: '500MB'                                   # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_tagging_from_frames_mapper:                       # Mapper to generate video tags from frames extracted from the video.
       frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
-      tag_field_name: '__dj__video_frame_tags__'              # the field name to store the tags. It's "__dj__video_frame_tags__" in default.
+      tag_field_name: 'video_frame_tags__'                    # the field name to store the tags. It's "video_frame_tags__" in default.
       mem_required: '9GB'
   - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
 
@@ -723,7 +723,7 @@ process:
       contain: any                                            # require the videos containing 'any' or 'all' given tags. When tags equal to [], 'all' keeps all samples, 'any' keeps no sample.
       frame_sampling_method: all_keyframes                    # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
-      tag_field_name: '__dj__video_frame_tags__'              # the field name to store the tags. It's "__dj__video_frame_tags__" in default.
+      tag_field_name: 'video_frame_tags__'                    # the field name to store the tags. It's "video_frame_tags__" in default.
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
       mem_required: '9GB'
   - words_num_filter:                                       # filter text with number of words out of specific range
