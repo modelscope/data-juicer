@@ -17,7 +17,6 @@ We release **Img-Diff**,  A high-quality synthesis dataset focusing on describin
 ## Codes and Data Recipes
 
 - The original codes are organized and presented in [Img-Diff](https://github.com/modelscope/data-juicer/tree/ImgDiff/Img-Diff).
-
 - The codes and data recipes in data-juicer format will be released soon.
 
 
