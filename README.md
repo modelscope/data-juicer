@@ -16,7 +16,10 @@ We release **Img-Diff**,  A high-quality synthesis dataset focusing on describin
 
 ## Codes and Data Recipes
 
-Our codes and data recipes are still being organized and restructured. We will release them in a few days!
+- The original codes are organized and presented in [Img-Diff](https://github.com/modelscope/data-juicer/tree/ImgDiff/Img-Diff).
+
+- The codes and data recipes in data-juicer format will be released soon.
+
 
 
 
@@ -29,7 +32,7 @@ If you find our work useful for your research, please consider citing our paper.
 ```
 @misc{jiao2024imgdiffcontrastivedatasynthesis,
       title={Img-Diff: Contrastive Data Synthesis for Multimodal Large Language Models}, 
-      author={Qirui Jiao and Daoyuan Chen and Yilun Huang and Yaliang Li and Ying Shen},
+      author={Qirui Jiao and Daoyuan Chen and Yilun Huang and Bolin Ding and Yaliang Li and Ying Shen},
       year={2024},
       eprint={2408.04594},
       archivePrefix={arXiv},
