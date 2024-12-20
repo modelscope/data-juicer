@@ -1,5 +1,35 @@
-data_juicer.ops.aggregator
-==========================
+data\_juicer.ops.aggregator package
+===================================
+
+Submodules
+----------
+
+data\_juicer.ops.aggregator.entity\_attribute\_aggregator module
+----------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.aggregator.entity_attribute_aggregator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.aggregator.most\_relavant\_entities\_aggregator module
+-----------------------------------------------------------------------
+
+.. automodule:: data_juicer.ops.aggregator.most_relavant_entities_aggregator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.ops.aggregator.nested\_aggregator module
+-----------------------------------------------------
+
+.. automodule:: data_juicer.ops.aggregator.nested_aggregator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
 
 .. automodule:: data_juicer.ops.aggregator
    :members:
