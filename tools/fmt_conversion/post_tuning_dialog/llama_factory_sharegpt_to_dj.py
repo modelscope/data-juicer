@@ -190,7 +190,7 @@ def main(
         multimodal_keys = [multimodal_keys]
 
     # load ShareGPT dataset
-    logger.info('Loading original ShareGPT dataset.')
+    logger.info('Loading original dataset.')
     src_ds = json.load(open(src_ds_path, 'r', encoding='utf-8'))
     logger.info(f'Load [{len(src_ds)}] samples.')
 
