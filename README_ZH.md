@@ -47,7 +47,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 - [2024-02-05] 我们的论文被SIGMOD'24 industrial track接收！
 - [2024-01-10] 开启“数据混合”新视界——第二届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532174)，了解赛事详情。
 - [2024-01-05] **Data-Juicer v0.1.3** 版本发布了。 
-在这个新版本中，我们支持了**更多Python版本**（3.8-3.10），同时支持了**多模态**数据集的[转换](tools/multimodal/README_ZH.md)和[处理](docs/Operators_ZH.md)（包括文本、图像和音频。更多模态也将会在之后支持）！
+在这个新版本中，我们支持了**更多Python版本**（3.8-3.10），同时支持了**多模态**数据集的[转换](tools/fmt_conversion/multimodal/README_ZH.md)和[处理](docs/Operators_ZH.md)（包括文本、图像和音频。更多模态也将会在之后支持）！
 此外，我们的论文也更新到了[第三版](https://arxiv.org/abs/2309.02033) 。
 - [2023-10-13] 我们的第一届以数据为中心的 LLM 竞赛开始了！
   请访问大赛官网，FT-Data Ranker（[1B赛道](https://tianchi.aliyun.com/competition/entrance/532157) 、[7B赛道](https://tianchi.aliyun.com/competition/entrance/532158) ) ，了解更多信息。
