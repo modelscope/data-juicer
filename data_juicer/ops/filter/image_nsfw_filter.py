@@ -43,6 +43,8 @@ class ImageNSFWFilter(Filter):
         """
         kwargs.setdefault('mem_required', '1GB')
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
+
         self.score_threshold = score_threshold
         if any_or_all not in ['any', 'all']:
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
