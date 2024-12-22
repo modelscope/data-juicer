@@ -69,7 +69,6 @@ def compare_output_answer(outputs, proper_option ,answer_dict):
         return False
 
 def parse_options(input_text):
-    # 按行分割字符串
     lines = input_text.split("\n\n")
     options_dict = {}
 
