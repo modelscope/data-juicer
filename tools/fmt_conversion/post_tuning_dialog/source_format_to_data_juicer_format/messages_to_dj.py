@@ -83,7 +83,7 @@ def main(
     """
     Convert a Messages-like dataset to the Data-Juicer query-response format.
 
-    :param src_ds_path: the path to the source ShareGPT-like dataset.
+    :param src_ds_path: the path to the source dataset.
     :param tgt_ds_path: the path to store the converted target dataset.
     :param messages_key: the field key to store messages.
     :param role_key: the field key to store the sentence from.
