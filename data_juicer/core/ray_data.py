@@ -119,7 +119,14 @@ class RayDataset(DJDataset):
                                  1) if op.is_batched_op() else 1
             if isinstance(op, Mapper):
                 if op.use_cuda():
-                    init_params = op._init_parameters
+                    try:
+                        init_params = op._init_parameters
+                    except AttributeError:
+                        raise ValueError(
+                            f'This Op[{op._name}] enables CUDA, you should add'
+                            ' `_init_parameters` attribute to the Op class by '
+                            'add `self._init_parameters = self.remove_extra_parameters(locals())`'  # noqa: E501
+                            ' after super().__init__().')
                     op_args = init_params.pop('args', ())
                     op_kwargs = init_params.pop('kwargs', {})
                     op_kwargs.update(init_params)
@@ -141,7 +148,14 @@ class RayDataset(DJDataset):
                                                       num_gpus=num_gpus)
             elif isinstance(op, Filter):
                 if op.use_cuda():
-                    init_params = op._init_parameters
+                    try:
+                        init_params = op._init_parameters
+                    except AttributeError:
+                        raise ValueError(
+                            f'This Op[{op._name}] enables CUDA, you should add'
+                            ' `_init_parameters` attribute to the Op class by '
+                            'add `self._init_parameters = self.remove_extra_parameters(locals())`'  # noqa: E501
+                            ' after super().__init__().')
                     op_args = init_params.pop('args', ())
                     op_kwargs = init_params.pop('kwargs', {})
                     op_kwargs.update(init_params)

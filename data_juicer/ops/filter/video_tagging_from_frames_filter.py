@@ -62,6 +62,7 @@ class VideoTaggingFromFramesFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
         if contain not in ['any', 'all']:
             raise ValueError(f'the containing type [{contain}] is not '
                              f'supported. Can only be one of ["any", "all"].')

@@ -82,6 +82,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
         AUTOINSTALL.check([
             'torch',
             'transformers',

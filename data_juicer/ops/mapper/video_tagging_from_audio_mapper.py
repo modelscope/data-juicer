@@ -38,6 +38,7 @@ class VideoTaggingFromAudioMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
         AUTOINSTALL.check(['torchaudio'])
         self.model_key = prepare_model(model_type='huggingface',
                                        pretrained_model_name_or_path=hf_ast,

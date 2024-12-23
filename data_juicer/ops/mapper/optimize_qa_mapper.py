@@ -66,7 +66,7 @@ class OptimizeQAMapper(Mapper):
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(**kwargs)
-
+        self._init_parameters = self.remove_extra_parameters(locals())
         self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
         self.input_template = input_template or self.DEFAULT_INPUT_TEMPLATE
         self.qa_pair_template = qa_pair_template or \

@@ -75,6 +75,7 @@ class VideoAestheticsFilter(Filter):
         """
 
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
         if hf_scorer_model == '':
             hf_scorer_model = \
                 'shunk031/aesthetics-predictor-v2-sac-logos-ava1-l14-linearMSE'

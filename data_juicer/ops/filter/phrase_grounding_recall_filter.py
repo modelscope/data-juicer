@@ -115,6 +115,7 @@ class PhraseGroundingRecallFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
         self.min_recall = min_recall
         self.max_recall = max_recall
         if reduce_mode not in ['avg', 'max', 'min']:

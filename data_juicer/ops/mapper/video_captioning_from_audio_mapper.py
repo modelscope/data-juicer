@@ -33,6 +33,7 @@ class VideoCaptioningFromAudioMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
         AUTOINSTALL.check([
             'transformers', 'transformers_stream_generator', 'einops',
             'accelerate', 'tiktoken'

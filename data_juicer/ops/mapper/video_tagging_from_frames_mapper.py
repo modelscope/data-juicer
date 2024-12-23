@@ -56,6 +56,8 @@ class VideoTaggingFromFramesMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
+
         if frame_sampling_method not in ['all_keyframes', 'uniform']:
             raise ValueError(
                 f'Frame sampling method [{frame_sampling_method}] is not '

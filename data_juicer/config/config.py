@@ -425,6 +425,11 @@ def init_setup_from_cfg(cfg: Namespace):
 
     # check number of processes np
     sys_cpu_count = os.cpu_count()
+    if not cfg.np:
+        cfg.np = sys_cpu_count
+        logger.warning(
+            f'Number of processes `np` is not set, '
+            f'Set it to cpu count [{sys_cpu_count}] as default value.')
     if cfg.np > sys_cpu_count:
         logger.warning(f'Number of processes `np` is set as [{cfg.np}], which '
                        f'is larger than the cpu count [{sys_cpu_count}]. Due '

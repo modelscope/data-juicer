@@ -69,6 +69,7 @@ class GenerateQAFromTextMapper(Mapper):
         """
 
         super().__init__(**kwargs)
+        self._init_parameters = self.remove_extra_parameters(locals())
 
         if output_pattern is None:
             self.output_pattern = r'Human:(.*?)Assistant:(.*?)(?=Human|$)'  # noqa: E501
