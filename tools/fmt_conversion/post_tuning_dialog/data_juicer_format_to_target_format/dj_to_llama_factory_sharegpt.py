@@ -137,7 +137,7 @@ def main(
     instruction_role: str = 'instruction',
 ):
     """
-    Convert a ShareGPT-like dataset to the Data-Juicer query-response format.
+    Convert a Data-Juicer dataset to the LLaMA-Factory ShareGPT-like format.
 
     :param src_ds_path: the path to the source dataset.
     :param tgt_ds_path: the path to store the converted target dataset.
