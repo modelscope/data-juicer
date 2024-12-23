@@ -69,17 +69,21 @@ def nested_set(data: dict, path: str, val):
 
         :param data: A dictionary with nested format.
         :param path: A dot-separated string representing the path to set.
-                    This can include numeric indices when setting list
-                    elements.
         :return: The nested data after the val set.
     """
     keys = path.split('.')
     cur = data
-    for key in keys[:-1]:
-        if key not in cur:
-            cur[key] = {}
-        cur = cur[key]
-    cur[keys[-1]] = val
+    try:
+        for key in keys[:-1]:
+            if key not in cur:
+                cur[key] = {}
+            cur = cur[key]
+        if keys[-1] in cur:
+            logger.warning(f'Overwrite value in {path}!')
+        cur[keys[-1]] = val
+    except Exception:
+        logger.warning(f'Unvalid dot-separated path: {path}!')
+        return data
     return data
 
 

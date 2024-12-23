@@ -6,11 +6,7 @@ from pydantic import PositiveInt
 from data_juicer.ops.base_op import OPERATORS, Aggregator
 from data_juicer.utils.common_utils import (avg_split_string_list_under_limit,
                                             is_string_list, nested_access)
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
-
-torch = LazyLoader('torch', 'torch')
-vllm = LazyLoader('vllm', 'vllm')
 
 OP_NAME = 'nested_aggregator'
 

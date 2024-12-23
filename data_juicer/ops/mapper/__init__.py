@@ -8,6 +8,10 @@ from .clean_email_mapper import CleanEmailMapper
 from .clean_html_mapper import CleanHtmlMapper
 from .clean_ip_mapper import CleanIpMapper
 from .clean_links_mapper import CleanLinksMapper
+from .dialog_intent_detection_mapper import DialogIntentDetectionMapper
+from .dialog_sentiment_detection_mapper import DialogSentimentDetectionMapper
+from .dialog_sentiment_intensity_mapper import DialogSentimentIntensityMapper
+from .dialog_topic_detection_mapper import DialogTopicDetectionMapper
 from .expand_macro_mapper import ExpandMacroMapper
 from .extract_entity_attribute_mapper import ExtractEntityAttributeMapper
 from .extract_entity_relation_mapper import ExtractEntityRelationMapper
@@ -33,6 +37,9 @@ from .pair_preference_mapper import PairPreferenceMapper
 from .punctuation_normalization_mapper import PunctuationNormalizationMapper
 from .python_file_mapper import PythonFileMapper
 from .python_lambda_mapper import PythonLambdaMapper
+from .query_intent_detection_mapper import QueryIntentDetectionMapper
+from .query_sentiment_detection_mapper import QuerySentimentDetectionMapper
+from .query_topic_detection_mapper import QueryTopicDetectionMapper
 from .relation_identity_mapper import RelationIdentityMapper
 from .remove_bibliography_mapper import RemoveBibliographyMapper
 from .remove_comments_mapper import RemoveCommentsMapper
@@ -71,6 +78,8 @@ __all__ = [
     'AudioFFmpegWrappedMapper', 'CalibrateQAMapper', 'CalibrateQueryMapper',
     'CalibrateResponseMapper', 'ChineseConvertMapper', 'CleanCopyrightMapper',
     'CleanEmailMapper', 'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
+    'DialogIntentDetectionMapper', 'DialogSentimentDetectionMapper',
+    'DialogSentimentIntensityMapper', 'DialogTopicDetectionMapper',
     'ExpandMacroMapper', 'ExtractEntityAttributeMapper',
     'ExtractEntityRelationMapper', 'ExtractEventMapper',
     'ExtractKeywordMapper', 'ExtractNicknameMapper',
@@ -81,18 +90,20 @@ __all__ = [
     'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
     'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
     'PairPreferenceMapper', 'PunctuationNormalizationMapper',
-    'PythonFileMapper', 'PythonLambdaMapper', 'RelationIdentityMapper',
-    'RemoveBibliographyMapper', 'RemoveCommentsMapper', 'RemoveHeaderMapper',
-    'RemoveLongWordsMapper', 'RemoveNonChineseCharacterlMapper',
-    'RemoveRepeatSentencesMapper', 'RemoveSpecificCharsMapper',
-    'RemoveTableTextMapper', 'RemoveWordsWithIncorrectSubstringsMapper',
-    'ReplaceContentMapper', 'SentenceSplitMapper', 'TextChunkMapper',
-    'VideoCaptioningFromAudioMapper', 'VideoCaptioningFromFramesMapper',
-    'VideoCaptioningFromSummarizerMapper', 'VideoCaptioningFromVideoMapper',
-    'VideoExtractFramesMapper', 'VideoFFmpegWrappedMapper',
-    'VideoFaceBlurMapper', 'VideoRemoveWatermarkMapper',
-    'VideoResizeAspectRatioMapper', 'VideoResizeResolutionMapper',
-    'VideoSplitByDurationMapper', 'VideoSplitByKeyFrameMapper',
-    'VideoSplitBySceneMapper', 'VideoTaggingFromAudioMapper',
-    'VideoTaggingFromFramesMapper', 'WhitespaceNormalizationMapper'
+    'PythonFileMapper', 'PythonLambdaMapper', 'QuerySentimentDetectionMapper',
+    'QueryIntentDetectionMapper', 'QueryTopicDetectionMapper',
+    'RelationIdentityMapper', 'RemoveBibliographyMapper',
+    'RemoveCommentsMapper', 'RemoveHeaderMapper', 'RemoveLongWordsMapper',
+    'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',
+    'RemoveSpecificCharsMapper', 'RemoveTableTextMapper',
+    'RemoveWordsWithIncorrectSubstringsMapper', 'ReplaceContentMapper',
+    'SentenceSplitMapper', 'TextChunkMapper', 'VideoCaptioningFromAudioMapper',
+    'VideoCaptioningFromFramesMapper', 'VideoCaptioningFromSummarizerMapper',
+    'VideoCaptioningFromVideoMapper', 'VideoExtractFramesMapper',
+    'VideoFFmpegWrappedMapper', 'VideoFaceBlurMapper',
+    'VideoRemoveWatermarkMapper', 'VideoResizeAspectRatioMapper',
+    'VideoResizeResolutionMapper', 'VideoSplitByDurationMapper',
+    'VideoSplitByKeyFrameMapper', 'VideoSplitBySceneMapper',
+    'VideoTaggingFromAudioMapper', 'VideoTaggingFromFramesMapper',
+    'WhitespaceNormalizationMapper'
 ]

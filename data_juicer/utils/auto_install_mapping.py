@@ -96,4 +96,12 @@ OPS_TO_PKG = {
     'extract_support_text_mapper': ['openai'],
     'pair_preference_mapper': ['openai'],
     'relation_identity_mapper': ['openai'],
+    'dialog_intent_detection_mapper': ['openai'],
+    'dialog_sentiment_detection_mapper': ['openai'],
+    'dialog_sentiment_intensity_mapper': ['openai'],
+    'dialog_topic_intensity_mapper': ['openai'],
+    'query_intent_detection_mapper': ['transformers'],
+    'query_sentiment_detection_mapper': ['transformers'],
+    'query_topic_detection_mapper': ['transformers'],
+    'meta_tags_aggregator': ['openai'],
 }

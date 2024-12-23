@@ -7,13 +7,9 @@ from pydantic import PositiveInt
 from data_juicer.ops.base_op import OPERATORS, Aggregator
 from data_juicer.utils.common_utils import (is_string_list, nested_access,
                                             nested_set)
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..common import split_text_by_punctuation
-
-torch = LazyLoader('torch', 'torch')
-vllm = LazyLoader('vllm', 'vllm')
 
 OP_NAME = 'most_relavant_entities_aggregator'
 
