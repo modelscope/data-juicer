@@ -1,22 +1,4 @@
 # HumanVBench
-
-## Prerequisites
-Follow the environment setup instructions from datajuicer (https://github.com/modelscope/data-juicer).  
-
-## Data Annotation Pipeline
-Store the collected raw videos in the folder `path/raw_videos/`. Create a JSONL file that can be read by data_juicer. Each line should have the following format:  
-
-{"videos":["path/raw_videos/video1.mp4"],"text":""}
-
-Then you can start filtering and annotating process. The executed yaml is in /HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml. Note that dataset_path should be changed to the above generated initial jsonl file.
-
-### Execution
-python tools/process_data.py --config /HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml
-
-
-With the help of the annotated results, most tasks in HumanVBench can be constructed. Details about the construction process are provided in the paper's appendix. We will release the code for constructing all 17 tasks as soon as possible.
-
-
 ## HumanVBench Download and Evaluation
 To evaluate a model on HumanVBench, use the Evaluation.py script. You can modify the eval_goal parameter to specify the evaluation type. Options include:
 
@@ -46,3 +28,21 @@ One of 'Emotion Perception', 'Person Recognition', 'Human Behavior Analysis', 'C
 3. Implement the model inference logic (in the eval_on_one_task function under "add your inference code") to generate the output text (outputs).
 
 If using an API, directly modify the inference section (removing references to model, processor, and tokenizer). Ensure the API can produce the output text (outputs).
+
+
+## Data Annotation Pipeline
+### Prerequisites
+Follow the environment setup instructions from datajuicer (https://github.com/modelscope/data-juicer).  
+
+### Data preparation
+Store the collected raw videos in the folder `path/raw_videos/`. Create a JSONL file that can be read by data_juicer. Each line should have the following format:  
+
+{"videos":["path/raw_videos/video1.mp4"],"text":""}
+
+Then you can start filtering and annotating process. The executed yaml is in /HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml. Note that dataset_path should be changed to the above generated initial jsonl file.
+
+### Execution
+python tools/process_data.py --config /HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml
+
+
+With the help of the annotated results, most tasks in HumanVBench can be constructed. Details about the construction process are provided in the paper's appendix. We will release the code for constructing all 17 tasks as soon as possible.
