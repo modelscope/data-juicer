@@ -202,7 +202,9 @@ __all__ = [
 ]
 ```
 
-4. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
+4. 算子有`environments/science_requires.txt`中列举的包依赖时，需要在`data_juicer/utils/auto_install_mapping.py`里的`OPS_TO_PKG`中添加对应的依赖包，以支持算子粒度的依赖安装。
+
+5. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
 
 ```yaml
 # other configs
@@ -215,7 +217,7 @@ process:
       max_len: 1000
 ```
 
-5. （强烈推荐）最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，建议在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
+6. （强烈推荐）最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，建议在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
 
 ```python
 import unittest
@@ -238,7 +240,7 @@ if __name__ == '__main__':
     unittest.main()
 ```
 
-6. （强烈推荐）为了方便其他用户使用，我们还需要将新增的算子信息更新到相应的文档中，具体包括如下文档：
+7. （强烈推荐）为了方便其他用户使用，我们还需要将新增的算子信息更新到相应的文档中，具体包括如下文档：
    1. `configs/config_all.yaml`：该全集配置文件保存了所有算子及参数的一个列表，作为用户参考可用算子的一个重要文档。因此，在新增算子后，需要将其添加到该文档process列表里（按算子类型分组并按字母序排序）：
    
    ```yaml

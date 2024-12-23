@@ -18,7 +18,8 @@ class ExtractEventMapperTest(DataJuicerTestCaseBase):
     def _run_op(self, api_model, response_path=None):
 
         op = ExtractEventMapper(api_model=api_model,
-                               response_path=response_path)
+                               response_path=response_path,
+                               index_key='chunk_id')
 
         raw_text = """△芩婆走到中间，看着众人。
 芩婆：当年，我那老鬼漆木山与李相夷之父乃是挚交。原本李家隐世而居，一日为了救人，得罪附近山匪，夜里便遭了山匪所袭，唯有二子生还，流落街头。
@@ -57,9 +58,11 @@ class ExtractEventMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=2)
+        dataset = op.run(dataset)
         self.assertNotEqual(len(dataset), 0)
         for sample in dataset:
+            logger.info(f"chunk_id: {sample['chunk_id']}")
+            self.assertEqual(sample['chunk_id'], 0)
             logger.info(f"event: {sample[Fields.event_description]}")
             self.assertNotEqual(sample[Fields.event_description], '')
             logger.info(f"characters: {sample[Fields.relevant_characters]}")

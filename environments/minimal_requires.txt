@@ -33,3 +33,4 @@ pydantic>=2.0
 Pillow
 fastapi[standard]>=0.100
 httpx
+wordcloud

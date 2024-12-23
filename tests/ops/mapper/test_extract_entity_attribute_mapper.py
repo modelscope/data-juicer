@@ -21,9 +21,9 @@ class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
         query_attributes = ["语言风格", "角色性格"]
         
         op = ExtractEntityAttributeMapper(
+            api_model=api_model, 
             query_entities=query_entities,
-            query_attributes=query_attributes,
-            api_model=api_model,                  
+            query_attributes=query_attributes,                 
             response_path=response_path)
 
         raw_text = """△笛飞声独自坐在莲花楼屋顶上。李莲花边走边悠闲地给马喂草。方多病则走在一侧，却总不时带着怀疑地盯向楼顶的笛飞声。
@@ -49,9 +49,14 @@ class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(samples)
         dataset = dataset.map(op.process, batch_size=1)
         for sample in dataset:
-            logger.info(f'{sample[Fields.main_entity]} {sample[Fields.attribute]}: {sample[Fields.attribute_description]}')
-            self.assertNotEqual(sample[Fields.attribute_description], '')
-            self.assertNotEqual(len(sample[Fields.attribute_support_text]), 0)
+            ents = sample[Fields.main_entities]
+            attrs = sample[Fields.attributes]
+            descs = sample[Fields.attribute_descriptions]
+            sups = sample[Fields.attribute_support_texts]
+            for ent, attr, desc, sup in zip(ents, attrs, descs, sups):
+                logger.info(f'{ent} {attr}: {desc}')
+                self.assertNotEqual(desc, '')
+                self.assertNotEqual(len(sup), 0)
 
     def test(self):
         # before runing this test, set below environment variables:

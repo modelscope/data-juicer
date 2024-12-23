@@ -197,6 +197,22 @@ The dependency options are listed below:
 | `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers.                       |
 | `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
 
+- Install dependencies for specific OPs
+
+With the growth of the number of OPs, the dependencies of all OPs becomes very heavy. Instead of using the command `pip install -v -e .[sci]` to install all dependencies,
+we provide two alternative, lighter options:
+
+  - Automatic Minimal Dependency Installation: During the execution of Data-Juicer, minimal dependencies will be automatically installed. This allows for immediate execution, but may potentially lead to dependency conflicts.
+
+  - Manual Minimal Dependency Installation: To manually install minimal dependencies tailored to a specific execution configuration, run the following command:
+    ```shell
+    # only for installation from source
+    python tools/dj_install.py --config path_to_your_data-juicer_config_file
+
+    # use command line tool
+    dj-install --config path_to_your_data-juicer_config_file
+    ```
+
 ### Using pip
 
 - Run the following command to install the latest released `data_juicer` using `pip`:
@@ -317,9 +333,16 @@ python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # use command line tool
 dj-analyze --config configs/demo/analyzer.yaml
+
+# you can also use auto mode to avoid writing a recipe. It will analyze a small
+# part (e.g. 1000 samples, specified by argument `auto_num`) of your dataset 
+# with all Filters that produce stats.
+dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 ```
 
-- **Note:** Analyzer only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
+- **Note:** Analyzer only compute stats for Filters that produce stats or other OPs that produce tags/categories in meta. So other OPs will be ignored in the analysis process. We use the following registries to decorate OPs:
+  - `NON_STATS_FILTERS`: decorate Filters that **DO NOT** produce any stats.
+  - `TAGGING_OPS`: decorate OPs that **DO** produce tags/categories in meta field.
 
 ### Data Visualization
 
