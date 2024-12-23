@@ -194,10 +194,10 @@ class GenerateQAFromExamplesMapper(Mapper):
             ])
 
         formatted_examples = ''.join([
-            self.example_template.format(qa_pairs=format_qa_pairs(qa_example))
+            self.example_template.format(format_qa_pairs(qa_example))
             for qa_example in qa_examples
         ])
-        input_prompt = self.input_template.format(examples=formatted_examples)
+        input_prompt = self.input_template.format(formatted_examples)
         return input_prompt
 
     def parse_output(self, raw_output):
