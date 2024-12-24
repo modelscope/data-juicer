@@ -10,20 +10,33 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
 def run_in_subprocess(cmd):
-    result = subprocess.run(
-        cmd,
-        shell=True,
-        capture_output=True,
-        text=True
-    )
+    try:
+        with subprocess.Popen(
+                cmd, shell=True, stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE) as return_info:
+            while True:
+                next_line = return_info.stdout.readline()
+                return_line = next_line.decode('utf-8', 'ignore').strip()
+                if return_line == '' and return_info.poll() != None:
+                    break
+                if return_line != '':
+                    print(return_line)
 
-    if result.returncode != 0:
-        print(f"Command failed with return code {result.returncode}")
-        print(f"Standard Output: {result.stdout}")
-        print(f"Standard Error: {result.stderr}")
-        raise subprocess.CalledProcessError(result, cmd)
+            err_lines = ''
+            while True:
+                next_line = return_info.stderr.readline()
+                return_line = next_line.decode('utf-8', 'ignore').strip()
+                if return_line == '' and return_info.poll() != None:
+                    break
+                if return_line != '':
+                    print(return_line)
+                    err_lines += return_line + '\n'
 
-    return result
+            return_code = return_info.wait()
+            if return_code:
+                raise RuntimeError(err_lines)
+    except Exception as e:
+        raise e
 
 
 class ProcessDataTest(DataJuicerTestCaseBase):
