@@ -66,7 +66,6 @@ class VideoNSFWFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._init_parameters = self.remove_extra_parameters(locals())
         self.score_threshold = score_threshold
         if frame_sampling_method not in ['all_keyframes', 'uniform']:
             raise ValueError(

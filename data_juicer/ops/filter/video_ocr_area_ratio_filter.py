@@ -72,7 +72,6 @@ class VideoOcrAreaRatioFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._init_parameters = self.remove_extra_parameters(locals())
         self.min_area_ratio = min_area_ratio
         self.max_area_ratio = max_area_ratio
         self.frame_sample_num = frame_sample_num

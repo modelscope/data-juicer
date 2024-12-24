@@ -75,7 +75,6 @@ class VideoFramesTextSimilarityFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._init_parameters = self.remove_extra_parameters(locals())
         self.min_score = min_score
         self.max_score = max_score
         if frame_sampling_method not in ['all_keyframes', 'uniform']:

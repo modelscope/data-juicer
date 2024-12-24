@@ -82,7 +82,6 @@ class ImageCaptioningMapper(Mapper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._init_parameters = self.remove_extra_parameters(locals())
 
         if keep_candidate_mode not in [
                 'random_any', 'similar_one_simhash', 'all'

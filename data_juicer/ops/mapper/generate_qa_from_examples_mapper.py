@@ -96,7 +96,6 @@ class GenerateQAFromExamplesMapper(Mapper):
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(**kwargs)
-        self._init_parameters = self.remove_extra_parameters(locals())
 
         if not seed_file:
             raise ValueError(

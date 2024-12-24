@@ -82,8 +82,6 @@ class VideoMotionScoreFilter(Filter):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self._init_parameters = self.remove_extra_parameters(locals())
-
         self.min_score = min_score
         self.max_score = max_score
         self.sampling_fps = sampling_fps
