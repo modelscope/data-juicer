@@ -85,10 +85,9 @@ def main(
     multimodal_keys: Union[str, List[str]] = None,
 ):
     """
-    Convert a ModelScope-Swift ShareGPT-like dataset to the Data-Juicer
-    query-response format.
+    Convert an Alpaca-like dataset to the Data-Juicer query-response format.
 
-    :param src_ds_path: the path to the source ShareGPT-like dataset.
+    :param src_ds_path: the path to the source dataset.
     :param tgt_ds_path: the path to store the converted target dataset.
     :param input_key: the field key to store the query sentence from human.
     :param output_key: the field key to store the response sentence from

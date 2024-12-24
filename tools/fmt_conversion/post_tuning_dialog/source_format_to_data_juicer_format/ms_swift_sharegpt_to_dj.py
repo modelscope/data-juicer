@@ -119,7 +119,7 @@ def main(
     Convert a ModelScope-Swift ShareGPT-like dataset to the Data-Juicer
     query-response format.
 
-    :param src_ds_path: the path to the source ShareGPT-like dataset.
+    :param src_ds_path: the path to the source dataset.
     :param tgt_ds_path: the path to store the converted target dataset.
     :param conversation_key: the field key to store conversions.
     :param human_key: the field key to store the sentence from human.

@@ -164,7 +164,8 @@ def main(
     multimodal_keys: Union[str, List[str]] = None,
 ):
     """
-    Convert a ShareGPT-like dataset to the Data-Juicer query-response format.
+    Convert a LLaMA-Factory ShareGPT-like dataset to the Data-Juicer
+    query-response format.
 
     :param src_ds_path: the path to the source dataset.
     :param tgt_ds_path: the path to store the converted target dataset.
@@ -192,7 +193,7 @@ def main(
     if isinstance(multimodal_keys, str):
         multimodal_keys = [multimodal_keys]
 
-    # load ShareGPT dataset
+    # load dataset
     logger.info('Loading original dataset.')
     src_ds = json.load(open(src_ds_path, 'r', encoding='utf-8'))
     logger.info(f'Load [{len(src_ds)}] samples.')

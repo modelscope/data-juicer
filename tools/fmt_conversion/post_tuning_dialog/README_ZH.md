@@ -78,4 +78,4 @@
 ```
 
 在 Data-Juicer 中，我们使用 Query-Response 格式作为我们 后微调对话 数据集的中间格式。
-因此，Data-Juicer 提供了若干工具讲其他格式的数据集转换为 Query-Response 格式以及反向转换。
+因此，Data-Juicer 提供了若干工具将其他格式的数据集转换为 Query-Response 格式以及反向转换。
