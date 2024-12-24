@@ -288,6 +288,9 @@ class Mapper(OP):
                     f'{cls.__name__}. Please implement {method_name}_single '
                     f'or {method_name}_batched.')
 
+    def __call__(self, *args, **kwargs):
+        return self.process(*args, **kwargs)
+
     def process_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
         first_key = next(iter(keys))
@@ -377,6 +380,9 @@ class Filter(OP):
                     f'Method {method_name} cannot be overridden by subclass '
                     f'{cls.__name__}. Please implement {method_name}_single '
                     f'or {method_name}_batched.')
+
+    def __call__(self, *args, **kwargs):
+        return self.compute_stats(*args, **kwargs)
 
     def compute_stats_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
