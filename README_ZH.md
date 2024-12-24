@@ -1,6 +1,8 @@
 # HumanVBench
 
 ## HumanVBench下载和测评方法
+你可以在HuggingFace(https://huggingface.co/datasets/datajuicer/HumanVBench)或是ModelScope(https://www.modelscope.cn/datasets/Data-Juicer/HumanVBench)上下载HumanVBench。
+
 如需在HumanVBench上对模型进行测评，可以通过Evaluation.py实现。您可以修改eval_goal指定测评类型，可选包括：
 'all'--对所有任务进行测评；你将获得每个问题的模型输出结果记录，每个任务的accuracy，每个任务的随机准确率，四类测评维度下分别的平均准确率。
 
@@ -29,10 +31,12 @@ One of 'Emotion Perception', 'Person Recognition', 'Human Behavior Analysis', 'C
 
 若调用API, 直接修改推理部分（删除关于model,processor,tokenizer的传递即可），能够获得回答文本输出outputs即可。
 
-## 前置条件
-参照datajuicer （https://github.com/modelscope/data-juicer） 的环境配置方法
 
 ## 数据Annotation Pipeline
+### 前置条件
+参照datajuicer （https://github.com/modelscope/data-juicer） 的环境配置方法
+
+### 数据准备
 将收集到原始视频存放于文件夹path/raw_videos/, 首先直接构建data_juicer能够读取的jsonl文件，每行内容如下：
 
 {"videos":["path/raw_videos/video1.mp4"],"text":""}
