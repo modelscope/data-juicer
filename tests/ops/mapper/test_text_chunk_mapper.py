@@ -101,7 +101,7 @@ class TextChunkMapperTest(DataJuicerTestCaseBase):
         op = TextChunkMapper(max_len=20, split_pattern=None)
         self._run_helper(op, source, target)
     
-    def test_max_len_text_chunk(self):
+    def test_max_len_text_chunk_overlap_len(self):
         source = [
             {
                 'text': "Today is Sunday and it's a happy day!"
