@@ -10,7 +10,7 @@ Both input and output of this utility conform to Data-Juicer's data format. If y
 To learn more about the usage of the absolute to relative path conversion tool, you can execute the following command:
 
 ```shell
-python tools/multimodal/absolute_path_to_relative_path.py --help
+python tools/fmt_conversion/multimodal/absolute_path_to_relative_path.py --help
 ```
 
 ## Dataset Format Conversion
@@ -94,7 +94,7 @@ For all tools, you can run the following command to find out the usage of them:
 
 ```shell
 # e.g. llava_to_dj.py
-python tools/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --help
+python tools/fmt_conversion/multimodal/source_format_to_data_juicer_format/llava_to_dj.py --help
 ```
 
 Before using these tools, you might need to take a glance at the reference
