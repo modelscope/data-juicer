@@ -25,45 +25,6 @@ class Fields(object):
     # the name of directory to store the produced multimodal data
     multimodal_data_output_dir = DEFAULT_PREFIX + 'produced_data__'
 
-    # field names for info extraction
-    event_description = DEFAULT_PREFIX + 'event_description__'
-    # # a list of characters relevant to the event
-    relevant_characters = DEFAULT_PREFIX + 'relevant_characters__'
-    # # the given main entities for attribute extraction
-    main_entities = DEFAULT_PREFIX + 'main_entities__'
-    # # the given attributes to be extracted
-    attributes = DEFAULT_PREFIX + 'attributes__'
-    # # the extracted attribute descriptions
-    attribute_descriptions = DEFAULT_PREFIX + 'attribute_descriptions__'
-    # # extract from raw datas for support the attribute
-    attribute_support_texts = DEFAULT_PREFIX + 'attribute_support_texts__'
-    # # the nickname relationship
-    nickname = DEFAULT_PREFIX + 'nickname__'
-    # # the entity for knowledge graph
-    entity = DEFAULT_PREFIX + 'entity__'
-    # # # the name of entity
-    entity_name = DEFAULT_PREFIX + 'entity_name__'
-    # # # the type of entity
-    entity_type = DEFAULT_PREFIX + 'entity_type__'
-    # # # the description of entity
-    entity_description = DEFAULT_PREFIX + 'entity_entity_description__'
-    # # the relationship for knowledge graph
-    relation = DEFAULT_PREFIX + 'relation__'
-    # # # the source entity of the relation
-    source_entity = DEFAULT_PREFIX + 'relation_source_entity__'
-    # # # the target entity of the relation
-    target_entity = DEFAULT_PREFIX + 'relation_target_entity__'
-    # # # the description of the relation
-    relation_description = DEFAULT_PREFIX + 'relation_description__'
-    # # # the keywords of the relation
-    relation_keywords = DEFAULT_PREFIX + 'relation_keywords__'
-    # # # the strength of the relation
-    relation_strength = DEFAULT_PREFIX + 'relation_strength__'
-    # # the keyword in a text
-    keyword = DEFAULT_PREFIX + 'keyword__'
-    # # support text
-    support_text = DEFAULT_PREFIX + 'support_text__'
-
 
 class MetaKeys(object):
 
@@ -88,11 +49,51 @@ class MetaKeys(object):
 
     # multi-module tags
     # # video-frame tags
-    video_frame_tags = 'video_frame_tags__'
+    video_frame_tags = 'video_frame_tags'
     # # video-audio tags
-    video_audio_tags = 'video_audio_tags__'
+    video_audio_tags = 'video_audio_tags'
     # # image tags
-    image_tags = 'image_tags__'
+    image_tags = 'image_tags'
+
+    # info extraction
+    # # for event extraction
+    event_description = 'event_description'
+    # # a list of characters relevant to the event
+    relevant_characters = 'relevant_characters'
+    # # the given main entities for attribute extraction
+    main_entities = 'main_entities'
+    # # the given attributes to be extracted
+    attributes = 'attributes'
+    # # the extracted attribute descriptions
+    attribute_descriptions = 'attribute_descriptions'
+    # # extract from raw datas for support the attribute
+    attribute_support_texts = 'attribute_support_texts'
+    # # the nickname relationship
+    nickname = 'nickname'
+    # # the entity for knowledge graph
+    entity = 'entity'
+    # # # the name of entity
+    entity_name = 'entity_name'
+    # # # the type of entity
+    entity_type = 'entity_type'
+    # # # the description of entity
+    entity_description = 'entity_entity_description'
+    # # the relationship for knowledge graph
+    relation = 'relation'
+    # # # the source entity of the relation
+    source_entity = 'relation_source_entity'
+    # # # the target entity of the relation
+    target_entity = 'relation_target_entity'
+    # # # the description of the relation
+    relation_description = 'relation_description'
+    # # # the keywords of the relation
+    relation_keywords = 'relation_keywords'
+    # # # the strength of the relation
+    relation_strength = 'relation_strength'
+    # # the keyword in a text
+    keyword = 'keyword'
+    # # support text
+    support_text = 'support_text'
 
 
 class StatsKeysMeta(type):

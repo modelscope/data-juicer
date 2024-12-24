@@ -114,8 +114,8 @@ def get_system_prompt(sample):
             api_model=api_model,
             entity=role_name,
             attribute='身份背景',
-            input_key='__dj__event_description__',
-            output_key='__dj__role_background__',
+            input_key='event_description',
+            output_key='role_background__',
             word_limit=30
         )
         sample = op.process_single(sample)
@@ -126,12 +126,12 @@ def get_system_prompt(sample):
             api_model=api_model,
             entity=role_name,
             attribute='主要经历',
-            input_key='__dj__event_description__',
-            output_key='__dj__role_experience__',
+            input_key='event_description',
+            output_key='role_experience__',
             word_limit=100
         )
         sample = op.process_single(sample)
-        role_experience = sample['__dj__role_experience__'].replace('\n', '')
+        role_experience = sample['role_experience__'].replace('\n', '')
 
         # get relation identity with main role
         role_info = role_info_template.format(
@@ -143,7 +143,7 @@ def get_system_prompt(sample):
             api_model=api_model,
             source_entity=main_entity,
             target_entity=role_name,
-            output_key='__dj__relation_identity__'
+            output_key='relation_identity__'
         )
         if role_name in nicknames:
             cur_nicknames = '、'.join(nicknames[role_name])
@@ -158,7 +158,7 @@ def get_system_prompt(sample):
         )
         tmp_sample = {'text': text}
         tmp_sample = op.process_single(tmp_sample)
-        relation = tmp_sample['__dj__relation_identity__']
+        relation = tmp_sample['relation_identity__']
 
         relation_detail += f"\n{role_name} (称呼:{cur_nicknames})"
         if relation:

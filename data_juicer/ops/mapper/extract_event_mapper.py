@@ -1,12 +1,11 @@
 import re
-from itertools import chain
 from typing import Dict, Optional
 
 from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..common import split_text_by_punctuation
@@ -52,8 +51,8 @@ class ExtractEventMapper(Mapper):
     def __init__(self,
                  api_model: str = 'gpt-4o',
                  *,
-                 event_desc_key: str = Fields.event_description,
-                 relevant_char_key: str = Fields.relevant_characters,
+                 event_desc_key: str = MetaKeys.event_description,
+                 relevant_char_key: str = MetaKeys.relevant_characters,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt: Optional[str] = None,
@@ -67,11 +66,11 @@ class ExtractEventMapper(Mapper):
         """
         Initialization method.
         :param api_model: API model name.
-        :param event_desc_key: The field name to store the event descriptions.
-            It's "__dj__event_description__" in default.
+        :param event_desc_key: The key name to store the event descriptions
+            in the meta field. It's "event_description" in default.
         :param relevant_char_key: The field name to store the relevant
-            characters to the events. It's "__dj__relevant_characters__" in
-            default.
+            characters to the events in the meta field. It's
+            "relevant_characters" in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -146,8 +145,6 @@ class ExtractEventMapper(Mapper):
 
     def process_batched(self, samples, rank=None):
 
-        sample_num = len(samples[self.text_key])
-
         events, characters = [], []
         for text in samples[self.text_key]:
             cur_events, cur_characters = self._process_single_sample(text,
@@ -158,13 +155,21 @@ class ExtractEventMapper(Mapper):
         if self.drop_text:
             samples.pop(self.text_key)
 
-        for key in samples:
-            samples[key] = [[samples[key][i]] * len(events[i])
-                            for i in range(sample_num)]
-        samples[self.event_desc_key] = events
-        samples[self.relevant_char_key] = characters
+        new_samples = []
+        for i in range(len(events)):
+            for event, character in zip(events[i], characters[i]):
+                cur_sample = {key: samples[key][i] for key in samples}
+                cur_sample[Fields.meta][self.event_desc_key] = event
+                cur_sample[Fields.meta][self.relevant_char_key] = character
+                new_samples.append(cur_sample)
 
-        for key in samples:
-            samples[key] = list(chain(*samples[key]))
+        if len(new_samples) == 0:
+            logger.warning('Extract Not event in the batch of samples!')
+            return samples
 
-        return samples
+        res_samples = {}
+        keys = new_samples[0].keys()
+        for key in keys:
+            res_samples[key] = [s[key] for s in new_samples]
+
+        return res_samples

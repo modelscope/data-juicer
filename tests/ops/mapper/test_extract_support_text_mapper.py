@@ -18,8 +18,8 @@ class ExtractSupportTextMapperTest(DataJuicerTestCaseBase):
 
     def _run_op(self, api_model):
 
-        summary_key = 'data.event'
-        support_text_key = 'data.support_text'
+        summary_key = 'event'
+        support_text_key = 'support_text'
         op = ExtractSupportTextMapper(api_model=api_model,
                                summary_key=summary_key,
                                support_text_key=support_text_key)
@@ -59,7 +59,7 @@ class ExtractSupportTextMapperTest(DataJuicerTestCaseBase):
         event = "李相显托付单孤刀。"
         samples = [{
             'text': raw_text,
-            'data':{
+            Fields.meta:{
                 'event': event
             }
         }]

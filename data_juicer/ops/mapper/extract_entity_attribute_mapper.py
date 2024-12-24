@@ -5,7 +5,7 @@ from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 OP_NAME = 'extract_entity_attribute_mapper'
@@ -45,10 +45,10 @@ class ExtractEntityAttributeMapper(Mapper):
                  query_entities: List[str] = [],
                  query_attributes: List[str] = [],
                  *,
-                 entity_key: str = Fields.main_entities,
-                 attribute_key: str = Fields.attributes,
-                 attribute_desc_key: str = Fields.attribute_descriptions,
-                 support_text_key: str = Fields.attribute_support_texts,
+                 entity_key: str = MetaKeys.main_entities,
+                 attribute_key: str = MetaKeys.attributes,
+                 attribute_desc_key: str = MetaKeys.attribute_descriptions,
+                 support_text_key: str = MetaKeys.attribute_support_texts,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt_template: Optional[str] = None,
@@ -65,16 +65,18 @@ class ExtractEntityAttributeMapper(Mapper):
         :param api_model: API model name.
         :param query_entities: Entity list to be queried.
         :param query_attributes: Attribute list to be queried.
-        :param entity_key: The field name to store the given main entity for
-            attribute extraction. It's "__dj__entity__" in default.
-        :param entity_attribute_key: The field name to store the given
-            attribute to be extracted. It's "__dj__attribute__" in default.
-        :param attribute_desc_key: The field name to store the extracted
-            attribute description. It's "__dj__attribute_description__" in
+        :param entity_key: The key name in the meta field to store the
+            given main entity for attribute extraction. It's "entity" in
             default.
-        :param support_text_key: The field name to store the attribute
-            support text extracted from the raw text. It's
-            "__dj__support_text__" in default.
+        :param entity_attribute_key: The key name in the meta field to
+            store the given attribute to be extracted. It's "attribute"
+            in default.
+        :param attribute_desc_key: The key name in the meta field to store
+            the extracted attribute description. It's
+            "attribute_description" in default.
+        :param support_text_key: The key name in the meta field to store
+            the attribute support text extracted from the raw text.
+            It's "support_text" in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -178,9 +180,9 @@ class ExtractEntityAttributeMapper(Mapper):
         if self.drop_text:
             sample.pop(self.text_key)
 
-        sample[self.entity_key] = entities
-        sample[self.attribute_key] = attributes
-        sample[self.attribute_desc_key] = descs
-        sample[self.support_text_key] = demo_lists
+        sample[Fields.meta][self.entity_key] = entities
+        sample[Fields.meta][self.attribute_key] = attributes
+        sample[Fields.meta][self.attribute_desc_key] = descs
+        sample[Fields.meta][self.support_text_key] = demo_lists
 
         return sample

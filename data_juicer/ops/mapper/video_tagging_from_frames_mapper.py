@@ -3,7 +3,7 @@ from collections import Counter
 import numpy as np
 from pydantic import PositiveInt
 
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
@@ -32,7 +32,7 @@ class VideoTaggingFromFramesMapper(Mapper):
     def __init__(self,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
-                 tag_field_name: str = Fields.video_frame_tags,
+                 tag_field_name: str = MetaKeys.video_frame_tags,
                  *args,
                  **kwargs):
         """
@@ -52,7 +52,7 @@ class VideoTaggingFromFramesMapper(Mapper):
             than 2, in addition to the first and the last frames, other frames
             will be extracted uniformly within the video duration.
         :param tag_field_name: the field name to store the tags. It's
-            "video_frame_tags__" in default.
+            "video_frame_tags" in default.
         :param args: extra args
         :param kwargs: extra args
         """

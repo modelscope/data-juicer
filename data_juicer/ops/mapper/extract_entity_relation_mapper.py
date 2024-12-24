@@ -11,7 +11,7 @@ from pydantic import NonNegativeInt, PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.common_utils import is_float
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..common import split_text_by_punctuation
@@ -149,8 +149,8 @@ Output:
                  api_model: str = 'gpt-4o',
                  entity_types: List[str] = None,
                  *,
-                 entity_key: str = Fields.entity,
-                 relation_key: str = Fields.relation,
+                 entity_key: str = MetaKeys.entity,
+                 relation_key: str = MetaKeys.relation,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  prompt_template: Optional[str] = None,
@@ -171,10 +171,10 @@ Output:
         Initialization method.
         :param api_model: API model name.
         :param entity_types: Pre-defined entity types for knowledge graph.
-        :param entity_key: The field name to store the entities. It's
-            "__dj__entity__" in default.
+        :param entity_key: The key name to store the entities in the meta
+            field. It's "entity" in default.
         :param relation_key: The field name to store the relations between
-            entities. It's "__dj__relation__" in default.
+            entities. It's "relation" in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -327,6 +327,6 @@ Output:
             except Exception as e:
                 logger.warning(f'Exception: {e}')
 
-        sample[self.entity_key] = entities
-        sample[self.relation_key] = relations
+        sample[Fields.meta][self.entity_key] = entities
+        sample[Fields.meta][self.relation_key] = relations
         return sample

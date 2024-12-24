@@ -1,7 +1,7 @@
 import librosa
 import numpy as np
 
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
 from data_juicer.utils.mm_utils import extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -25,7 +25,7 @@ class VideoTaggingFromAudioMapper(Mapper):
     def __init__(self,
                  hf_ast: str = 'MIT/ast-finetuned-audioset-10-10-0.4593',
                  trust_remote_code: bool = False,
-                 tag_field_name: str = Fields.video_audio_tags,
+                 tag_field_name: str = MetaKeys.video_audio_tags,
                  *args,
                  **kwargs):
         """
@@ -34,7 +34,7 @@ class VideoTaggingFromAudioMapper(Mapper):
         :param hf_ast: path to the HF model to tag from audios.
         :param trust_remote_code: whether to trust the remote code of HF models
         :param tag_field_name: the field name to store the tags. It's
-            "video_audio_tags__" in default.
+            "video_audio_tags" in default.
         :param args: extra args
         :param kwargs: extra args
         """
