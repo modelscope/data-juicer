@@ -9,6 +9,23 @@ import yaml
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
+def run_in_subprocess(cmd):
+    result = subprocess.run(
+        cmd,
+        shell=True,
+        capture_output=True,
+        text=True
+    )
+
+    if result.returncode != 0:
+        print(f"Command failed with return code {result.returncode}")
+        print(f"Standard Output: {result.stdout}")
+        print(f"Standard Error: {result.stderr}")
+        raise subprocess.CalledProcessError(result, cmd)
+
+    return result
+
+
 class ProcessDataTest(DataJuicerTestCaseBase):
 
     def setUp(self):
@@ -78,10 +95,13 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
             os.makedirs(self.tmp_dir)
 
     def _auto_create_ray_cluster(self):
-        if not subprocess.call('ray status', shell=True):
+        try:
             # ray cluster already exists, return
+            run_in_subprocess('ray status')
             self.tmp_ray_cluster = False
             return
+        except:
+            pass
 
         self.tmp_ray_cluster = True
         head_port = '6379'
@@ -95,12 +115,10 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
 
         print(f"current rank: {rank}; execute cmd: {cmd}")
 
-        result = subprocess.call(cmd, shell=True)
-        if result != 0:
-            raise subprocess.CalledProcessError(result, cmd)
+        run_in_subprocess(cmd)
         
     def _close_ray_cluster(self):
-        subprocess.call('ray stop', shell=True)
+        run_in_subprocess('ray stop')
 
     def tearDown(self):
         super().tearDown()
@@ -148,10 +166,8 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         with open(tmp_yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
 
-        status_code = subprocess.call(
-            f'python tools/process_data.py --config {tmp_yaml_file}', shell=True)
+        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
 
-        self.assertEqual(status_code, 0)
         self.assertTrue(osp.exists(tmp_out_path))
 
         import ray
