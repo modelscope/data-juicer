@@ -91,7 +91,7 @@ def calculate_np(name,
             op_proc = cuda_device_count()
             logger.warning(
                 f'Both mem_required and num_proc of Op[{name}] are not set.'
-                f'Set the `num_proc` to {op_proc}.')
+                f'Set the `num_proc` to number of GPUs {op_proc}.')
         else:
             op_proc = auto_num_proc if auto_num_proc else num_proc
 
