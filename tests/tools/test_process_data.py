@@ -88,9 +88,8 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
     def setUp(self):
         super().setUp()
 
-        self._auto_create_ray_cluster()
-
-        self.tmp_dir = tempfile.TemporaryDirectory().name
+        # self._auto_create_ray_cluster()
+        self.tmp_dir = f'/workspace/tmp/{self.__class__.__name__}'
         if not osp.exists(self.tmp_dir):
             os.makedirs(self.tmp_dir)
 
@@ -129,8 +128,8 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         import ray
         ray.shutdown()
 
-        if self.tmp_ray_cluster:
-            self._close_ray_cluster()
+        # if self.tmp_ray_cluster:
+        #     self._close_ray_cluster()
 
     def test_ray_image(self):
         tmp_yaml_file = osp.join(self.tmp_dir, 'config_0.yaml')
