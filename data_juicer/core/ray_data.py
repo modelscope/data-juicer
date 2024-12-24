@@ -119,12 +119,11 @@ class RayDataset(DJDataset):
             elif isinstance(op, Filter):
                 columns = self.data.columns()
                 if Fields.stats not in columns:
+
                     def process_batch_arrow(table: pyarrow.Table):
                         new_column_data = [{} for _ in range(len(table))]
                         new_talbe = table.append_column(
-                            Fields.stats,
-                            [new_column_data]
-                        )
+                            Fields.stats, [new_column_data])
                         return new_talbe
 
                     self.data = self.data.map_batches(process_batch_arrow,
