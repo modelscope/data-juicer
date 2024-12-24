@@ -79,5 +79,21 @@ OPS_TO_PKG = {
     ['rouge', 'torch', 'transformers', 'vllm'],
     'video_tagging_from_frames_mapper': ['ram', 'torch'],
     'text_entity_dependency_filter': ['spacy-pkuseg'],
-    'optimize_response_mapper': ['torch', 'transformers', 'vllm']
+    'optimize_response_mapper': ['torch', 'transformers', 'vllm'],
+    'text_chunk_mapper': ['transformers', 'dashscope', 'openai'],
+    'entity_attribute_aggregator': ['transformers', 'dashscope', 'openai'],
+    'most_relavant_entities_aggregator':
+    ['transformers', 'dashscope', 'openai'],
+    'nested_aggregator': ['transformers', 'dashscope', 'openai'],
+    'calibrate_qa_mapper': ['openai'],
+    'calibrate_query_mapper': ['openai'],
+    'calibrate_response_mapper': ['openai'],
+    'extract_entity_attribute_mapper': ['openai'],
+    'extract_entity_relation_mapper': ['openai'],
+    'extract_event_mapper': ['openai'],
+    'extract_keyword_mapper': ['openai'],
+    'extract_nickname_mapper': ['openai'],
+    'extract_support_text_mapper': ['openai'],
+    'pair_preference_mapper': ['openai'],
+    'relation_identity_mapper': ['openai'],
 }

@@ -310,9 +310,15 @@ python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # 使用命令行工具
 dj-analyze --config configs/demo/analyzer.yaml
+
+# 你也可以使用"自动"模式来避免写一个新的数据菜谱。它会使用全部可产出统计信息的 Filter 来分析
+# 你的数据集的一小部分（如1000条样本，可通过 `auto_num` 参数指定）
+dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 ```
 
-* **注意**：Analyzer 只计算 Filter 算子的状态，其他的算子（例如 Mapper 和 Deduplicator）会在分析过程中被忽略。
+* **注意**：Analyzer 只用于能在 stats 字段里产出统计信息的 Filter 算子和能在 meta 字段里产出 tags 或类别标签的其他算子。除此之外的其他的算子会在分析过程中被忽略。我们使用以下两种注册器来装饰相关的算子：
+  * `NON_STATS_FILTERS`：装饰那些**不能**产出任何统计信息的 Filter 算子。
+  * `TAGGING_OPS`：装饰那些能在 meta 字段中产出 tags 或类别标签的算子。
 
 ### 数据可视化
 
