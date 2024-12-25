@@ -57,16 +57,10 @@ def calculate_np(name,
     """Calculate the optimum number of processes for the given OP"""
     eps = 1e-9  # about 1 byte
 
-    if num_proc is None:
-        num_proc = psutil.cpu_count()
-
     if use_cuda:
+        auto_num_proc = None
         cuda_mem_available = get_min_cuda_memory() / 1024
-        op_proc = min(
-            num_proc,
-            math.floor(cuda_mem_available / (mem_required + eps)) *
-            cuda_device_count())
-        if use_cuda and mem_required == 0:
+        if mem_required == 0:
             logger.warning(f'The required cuda memory of Op[{name}] '
                            f'has not been specified. '
                            f'Please specify the mem_required field in the '
@@ -74,15 +68,39 @@ def calculate_np(name,
                            f'out of memory error. You can reference '
                            f'the mem_required field in the '
                            f'config_all.yaml file.')
-        if op_proc < 1.0:
-            logger.warning(f'The required cuda memory:{mem_required}GB might '
-                           f'be more than the available cuda memory:'
-                           f'{cuda_mem_available}GB.'
-                           f'This Op[{name}] might '
-                           f'require more resource to run.')
+        else:
+            auto_num_proc = math.floor(
+                cuda_mem_available / mem_required) * cuda_device_count()
+            if cuda_mem_available / mem_required < 1.0:
+                logger.warning(
+                    f'The required cuda memory:{mem_required}GB might '
+                    f'be more than the available cuda memory:'
+                    f'{cuda_mem_available}GB.'
+                    f'This Op[{name}] might '
+                    f'require more resource to run.')
+
+        if auto_num_proc and num_proc:
+            op_proc = min(auto_num_proc, num_proc)
+            if num_proc > auto_num_proc:
+                logger.warning(
+                    f'The given num_proc: {num_proc} is greater than '
+                    f'the value {auto_num_proc} auto calculated based '
+                    f'on the mem_required of Op[{name}]. '
+                    f'Set the `num_proc` to {auto_num_proc}.')
+        elif not auto_num_proc and not num_proc:
+            op_proc = cuda_device_count()
+            logger.warning(
+                f'Both mem_required and num_proc of Op[{name}] are not set.'
+                f'Set the `num_proc` to number of GPUs {op_proc}.')
+        else:
+            op_proc = auto_num_proc if auto_num_proc else num_proc
+
         op_proc = max(op_proc, 1)
         return op_proc
     else:
+        if num_proc is None:
+            num_proc = psutil.cpu_count()
+
         op_proc = num_proc
         cpu_available = psutil.cpu_count()
         mem_available = psutil.virtual_memory().available
