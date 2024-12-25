@@ -8,6 +8,9 @@ from data_juicer.core.data.ray_dataset import RayDataset
 class DataValidator(ABC):
     """Base class for data validation"""
 
+    def __init__(self, config: Dict):
+        self.config = config
+
     @abstractmethod
     def validate(self, dataset) -> None:
         """
@@ -52,7 +55,8 @@ class ConversationDataValidator(DataValidator):
     """Validator for conversation data"""
 
     def __init__(self, config: Dict):
-        self.config = config
+        super().__init__(config)
+
         # Validation rules specific to conversation data
         self.required_columns = ['text']
         self.min_turns = config.get('min_turns', 2)
@@ -81,7 +85,8 @@ class CodeDataValidator(DataValidator):
     """Validator for code data"""
 
     def __init__(self, config: Dict):
-        self.config = config
+        super().__init__(config)
+
         self.required_columns = ['code', 'language']
         self.supported_languages = config.get('supported_languages', [])
 
@@ -102,10 +107,14 @@ class RequiredFieldsValidator(DataValidator):
             config: Dict containing:
                 - required_fields: List of field names that must exist
                 - field_types: Optional map of field names to expected types
+                - allow_missing: Optional float for max ratio missing allowed
         """
-        self.config = config
+        super().__init__(config)
+
         self.required_fields = config['required_fields']
         self.field_types = config.get('field_types', {})
+        # Default no missing allowed
+        self.allow_missing = config.get('allow_missing', 0.0)
 
     def validate(self, dataset: Union[NestedDataset, RayDataset]) -> None:
         """
@@ -130,3 +139,42 @@ class RequiredFieldsValidator(DataValidator):
         if missing_fields:
             raise DataValidationError(
                 f'Dataset missing required fields: {missing_fields}')
+
+        # Check field types and missing values
+        for field in self.required_fields:
+            # Get expected type if specified
+            expected_type = self.field_types.get(field)
+
+            # Sample data for validation
+            # For large datasets, we check a sample for performance
+            MAX_SAMPLE_SIZE = 1000
+            if isinstance(dataset, NestedDataset):
+                sample_size = min(MAX_SAMPLE_SIZE, len(dataset))
+                sample = dataset.select(range(sample_size))
+                values = sample[field]
+            elif isinstance(dataset, RayDataset):  # RayDataset
+                sample_size = min(MAX_SAMPLE_SIZE, dataset.data.count())
+                sample = dataset.data.take(sample_size)
+                values = [row[field] for row in sample]
+            else:
+                raise NotImplementedError
+
+            # Check for missing values
+            missing_count = sum(1 for v in values if v is None)
+            missing_ratio = missing_count / len(values)
+            if missing_ratio > self.allow_missing:
+                raise DataValidationError(
+                    f"Field '{field}' has {missing_ratio:.1%} missing values, "
+                    f'exceeding allowed {self.allow_missing:.1%}')
+
+            # Check types if specified
+            if expected_type:
+                invalid_types = [
+                    type(v) for v in values
+                    if v is not None and not isinstance(v, expected_type)
+                ]
+                if invalid_types:
+                    raise DataValidationError(
+                        f"Field '{field}' contains values of incorrect type. "
+                        f'Expected {expected_type.__name__}, '
+                        f'got {set(t.__name__ for t in invalid_types)}')

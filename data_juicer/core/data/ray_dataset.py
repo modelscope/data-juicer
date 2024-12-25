@@ -24,6 +24,9 @@ class RayDataset(DJDataset):
         if cfg:
             self.num_proc = cfg.np
 
+    def schema(self):
+        return self.data.schema()
+
     def process(self,
                 operators,
                 *,

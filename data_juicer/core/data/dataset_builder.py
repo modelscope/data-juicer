@@ -13,6 +13,7 @@ class DatasetBuilder(object):
 
     def __init__(self, cfg):
         self.cfg = cfg
+
         # defaults to use dataset_path
         if cfg.dataset_path is not None:
             ds_configs = rewrite_cli_datapath(cfg.dataset_path)
@@ -22,6 +23,7 @@ class DatasetBuilder(object):
             raise ValueError(
                 'Unable to initialize dataset; should have one of '
                 'dataset_path or dataset in configurations')
+
         # dataset config could be a list or a single entry; retrofit
         if not isinstance(ds_configs, list):
             ds_configs = [ds_configs]
@@ -35,6 +37,7 @@ class DatasetBuilder(object):
                 DataLoadStrategyRegistry.get_strategy_class(
                     executor_type, data_type, data_source)(ds_config))
 
+        # initialize data validators
         self.validators = []
         if hasattr(cfg, 'validators'):
             for validator_config in cfg.validators:
@@ -45,17 +48,33 @@ class DatasetBuilder(object):
                     self.validators.append(validator_cls(validator_config))
 
     def load_dataset(self) -> Union[NestedDataset, RayDataset]:
-        # load dataset with its load strategy
-        # do data validation
         _datasets = []
         for f in self.load_strategies:
+            # load dataset with its load strategy
             _dataset = f.load_data(self.cfg)
+
+            # do data validation
             for validator in self.validators:
                 validator.validate(_dataset)
             _datasets.append(_dataset)
 
         # handle data mixture
         return _datasets[0]
+
+    @classmethod
+    def load_dataset_by_generated_config(cls, generated_dataset_config):
+        """
+        load dataset by generated config
+        """
+        assert isinstance(generated_dataset_config,
+                          dict) and 'type' in generated_dataset_config
+        args = generated_dataset_config.copy()
+
+        # TODO finish the auto local dataset part
+        obj_name = args.pop('type')
+        from data_juicer.format.formatter import FORMATTERS
+        dataset = FORMATTERS.modules[obj_name](**args).load_dataset()
+        return dataset
 
 
 def rewrite_cli_datapath(dataset_path) -> List:

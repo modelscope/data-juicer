@@ -1,7 +1,7 @@
 import os
 
-from data_juicer.format.formatter import (FORMATTERS, BaseFormatter,
-                                          MixtureFormatter, RemoteFormatter)
+from data_juicer.format import MixtureFormatter, RemoteFormatter
+from data_juicer.format.formatter import FORMATTERS, BaseFormatter
 from data_juicer.utils.file_utils import (find_files_with_suffix,
                                           is_absolute_path)
 

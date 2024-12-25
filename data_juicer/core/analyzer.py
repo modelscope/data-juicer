@@ -7,7 +7,7 @@ from pydantic import PositiveInt
 
 from data_juicer.analysis import ColumnWiseAnalysis, OverallAnalysis
 from data_juicer.config import init_configs
-from data_juicer.format import load_formatter
+from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.ops import Filter, load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils import cache_utils
@@ -42,14 +42,9 @@ class Analyzer:
                         f'[{self.cfg.cache_compress}]')
             cache_utils.CACHE_COMPRESS = self.cfg.cache_compress
 
-        # setup formatter
+        # setup dataset builder
         logger.info('Setting up data formatter...')
-        self.formatter = load_formatter(
-            dataset_path=self.cfg.dataset_path,
-            generated_dataset_config=self.cfg.generated_dataset_config,
-            text_keys=self.cfg.text_keys,
-            suffixes=self.cfg.suffixes,
-            add_suffix=self.cfg.add_suffix)
+        self.dataset_builder = DatasetBuilder(self.cfg)
 
         # prepare exporter and check export path suffix
         # NOTICE: no need to export dataset texts for analyzer
@@ -84,9 +79,9 @@ class Analyzer:
         """
         # 1. format data
         logger.info('Loading dataset from data formatter...')
-        if load_data_np is None:
-            load_data_np = self.cfg.np
-        dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+        if load_data_np is not None:
+            self.dataset_builder.set_dataset_path(load_data_np)
+        dataset = self.dataset_builder.load_dataset()
 
         # extract processes
         logger.info('Preparing process operators...')
