@@ -11,7 +11,7 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 
 # Skip tests for this OP in the GitHub actions due to OOM on the current runner
 # These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
+# @SKIPPED_TESTS.register_module()
 class VideoCaptioningFromFramesMapperTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
@@ -149,7 +149,7 @@ class VideoCaptioningFromFramesMapperTest(DataJuicerTestCaseBase):
             'videos': [self.vid1_path]
         }] * 10
         op = VideoCaptioningFromFramesMapper(hf_img2seq=self.hf_img2seq)
-        self._run_mapper(ds_list, op, num_proc=4, caption_num=len(ds_list) * 2)
+        self._run_mapper(ds_list, op, num_proc=2, caption_num=len(ds_list) * 2)
 
     def test_multi_process_remove_original_sample(self):
         ds_list = [{
@@ -159,7 +159,7 @@ class VideoCaptioningFromFramesMapperTest(DataJuicerTestCaseBase):
 
         op = VideoCaptioningFromFramesMapper(hf_img2seq=self.hf_img2seq,
                                              keep_original_sample=False)
-        self._run_mapper(ds_list, op, num_proc=4, caption_num=len(ds_list))
+        self._run_mapper(ds_list, op, num_proc=2, caption_num=len(ds_list))
 
     def test_frame_sampling_method(self):
 
