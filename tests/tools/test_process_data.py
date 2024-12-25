@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+import uuid
 import yaml
 
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
@@ -45,8 +46,7 @@ class ProcessDataTest(DataJuicerTestCaseBase):
         super().setUp()
 
         self.tmp_dir = tempfile.TemporaryDirectory().name
-        if not osp.exists(self.tmp_dir):
-            os.makedirs(self.tmp_dir)
+        os.makedirs(self.tmp_dir, exist_ok=True)
 
     def tearDown(self):
         super().tearDown()
@@ -101,36 +101,9 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
     def setUp(self):
         super().setUp()
 
-        # self._auto_create_ray_cluster()
-        self.tmp_dir = f'/workspace/tmp/{self.__class__.__name__}'
-        if not osp.exists(self.tmp_dir):
-            os.makedirs(self.tmp_dir)
-
-    def _auto_create_ray_cluster(self):
-        try:
-            # ray cluster already exists, return
-            run_in_subprocess('ray status')
-            self.tmp_ray_cluster = False
-            return
-        except:
-            pass
-
-        self.tmp_ray_cluster = True
-        head_port = '6379'
-        head_addr = '127.0.0.1'
-        rank = int(os.environ.get('RANK', 0))
-
-        if rank == 0:
-            cmd = f"ray start --head --port={head_port} --node-ip-address={head_addr}"
-        else:
-            cmd = f"ray start --address={head_addr}:{head_port}"
-
-        print(f"current rank: {rank}; execute cmd: {cmd}")
-
-        run_in_subprocess(cmd)
-        
-    def _close_ray_cluster(self):
-        run_in_subprocess('ray stop')
+        cur_dir = osp.dirname(osp.abspath(__file__))
+        self.tmp_dir = osp.join(cur_dir, f'tmp_{uuid.uuid4().hex}')
+        os.makedirs(self.tmp_dir, exist_ok=True)
 
     def tearDown(self):
         super().tearDown()
@@ -140,9 +113,6 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
 
         import ray
         ray.shutdown()
-
-        # if self.tmp_ray_cluster:
-        #     self._close_ray_cluster()
 
     def test_ray_image(self):
         tmp_yaml_file = osp.join(self.tmp_dir, 'config_0.yaml')
