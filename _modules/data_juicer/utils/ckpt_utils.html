@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.utils.ckpt_utils &mdash; data_juicer 1.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.utils.ckpt_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.utils.ckpt_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="CheckpointManager">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager">[docs]</a>
+<span class="k">class</span> <span class="nc">CheckpointManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is used to save the latest version of dataset to checkpoint</span>
+<span class="sd">    directory or load it from checkpoint directory, a bit like cache management</span>
+<span class="sd">    Rerun the same config will reload the checkpoint and skip ops before it.</span>
+
+<span class="sd">    If any args of operator in process list is changed, all ops will be</span>
+<span class="sd">    rerun from the beginning.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CheckpointManager.__init__">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ckpt_dir</span><span class="p">,</span> <span class="n">original_process_list</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param ckpt_dir: path to save and load checkpoint</span>
+<span class="sd">        :param original_process_list: process list in config</span>
+<span class="sd">        :param num_proc: number of process workers when saving dataset</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_dir</span> <span class="o">=</span> <span class="n">ckpt_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_ds_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_dir</span><span class="p">,</span> <span class="s1">&#39;latest&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_op_record</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_dir</span><span class="p">,</span> <span class="s1">&#39;ckpt_op.json&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span> <span class="o">=</span> <span class="n">original_process_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="n">num_proc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op_record</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ckpt_available</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_ckpt</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CheckpointManager.get_left_process_list">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.get_left_process_list">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_left_process_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get left process list of ops for processing dataset, when checkpoint is</span>
+<span class="sd">        available, remove some ops from process list, otherwise keep it</span>
+<span class="sd">        unchanged.</span>
+
+<span class="sd">        :return: process list of left ops</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span></div>
+
+
+<div class="viewcode-block" id="CheckpointManager.check_ckpt">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.check_ckpt">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_ckpt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if checkpoint is available.</span>
+
+<span class="sd">        :return: True when checkpoint is available, else False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_ds_dir</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_ds_dir</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_op_record</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_op_record</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_ops_to_skip</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="CheckpointManager.record">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.record">[docs]</a>
+    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_cfg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save op name and args to op record, which is used to compare with</span>
+<span class="sd">        the process list from config to decide if a checkpoint is available.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">op_record</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op_cfg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CheckpointManager.check_ops_to_skip">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.check_ops_to_skip">[docs]</a>
+    <span class="k">def</span> <span class="nf">check_ops_to_skip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check which ops need to be skipped in the process list.</span>
+
+<span class="sd">        If op record list from checkpoint are the same as the prefix</span>
+<span class="sd">        part of process list, then skip these ops and start processing</span>
+<span class="sd">        from the checkpoint. Otherwise, process the original dataset</span>
+<span class="sd">        from scratch.</span>
+
+<span class="sd">        :return: whether to skip some ops or not</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># load op records</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_op_record</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fin</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">op_record</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fin</span><span class="p">)</span>
+
+        <span class="c1"># check whether the op records are exactly the same</span>
+        <span class="c1"># with prefix of process list</span>
+        <span class="c1"># 1. same: remove these ops from process list</span>
+        <span class="c1"># 2. different: cleanup op record, and keep process list unchanged</span>
+        <span class="n">recorded_op_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op_record</span><span class="p">)</span>
+        <span class="n">process_op_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">process_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">process_op_num</span> <span class="o">&lt;</span> <span class="n">recorded_op_num</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Current config ops (</span><span class="si">{</span><span class="n">process_op_num</span><span class="si">}</span><span class="s1">) are fewer than &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;checkpoint ops (</span><span class="si">{</span><span class="n">recorded_op_num</span><span class="si">}</span><span class="s1">). Cannot reuse checkpoint;&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39; all ops will be processed from the beginning.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">op_record</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">prefix_process</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span><span class="p">[:</span><span class="n">recorded_op_num</span><span class="p">]</span>
+        <span class="n">all_the_same</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">dif1</span><span class="p">,</span> <span class="n">dif2</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="n">record_op</span><span class="p">,</span> <span class="n">config_op</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op_record</span><span class="p">,</span> <span class="n">prefix_process</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">record_op</span> <span class="o">!=</span> <span class="n">config_op</span><span class="p">:</span>
+                <span class="n">all_the_same</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">dif1</span><span class="p">,</span> <span class="n">dif2</span> <span class="o">=</span> <span class="n">record_op</span><span class="p">,</span> <span class="n">config_op</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">all_the_same</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">op_record</span><span class="p">:</span>
+                <span class="n">op_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Skip op [</span><span class="si">{</span><span class="n">op_name</span><span class="si">}</span><span class="s1">].&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_list</span><span class="p">[</span><span class="n">recorded_op_num</span><span class="p">:]</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Processed ops of checkpoint are different from &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;current configs: checkpoint-</span><span class="si">{</span><span class="n">dif1</span><span class="si">}</span><span class="s1"> vs. config-&#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">dif2</span><span class="si">}</span><span class="s1">. All ops will be processed from the &#39;</span>
+                           <span class="sa">f</span><span class="s1">&#39;beginning.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">op_record</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="CheckpointManager.save_ckpt">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.save_ckpt">[docs]</a>
+    <span class="k">def</span> <span class="nf">save_ckpt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save dataset to checkpoint directory and dump processed ops list.</span>
+
+<span class="sd">        :param ds: input dataset to save</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">save_to_disk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_ds_dir</span><span class="p">,</span> <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_op_record</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fout</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op_record</span><span class="p">,</span> <span class="n">fout</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CheckpointManager.load_ckpt">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.ckpt_utils.CheckpointManager.load_ckpt">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_ckpt</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load dataset from a checkpoint file.</span>
+
+<span class="sd">        :return: a dataset stored in checkpoint file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">data_juicer.core.data</span> <span class="kn">import</span> <span class="n">NestedDataset</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">NestedDataset</span><span class="o">.</span><span class="n">load_from_disk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ckpt_ds_dir</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ds</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

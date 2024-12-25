@@ -11,7 +11,7 @@
 
   
       <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -103,7 +103,7 @@
 
 
 <div class="viewcode-block" id="init_configs">
-<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.init_configs">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.init_configs">[docs]</a>
 <span class="k">def</span> <span class="nf">init_configs</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">which_entry</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    initialize the jsonargparse parser and parse configs from one of:</span>
@@ -481,6 +481,8 @@
 
 
 
+<div class="viewcode-block" id="update_ds_cache_dir_and_related_vars">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.update_ds_cache_dir_and_related_vars">[docs]</a>
 <span class="k">def</span> <span class="nf">update_ds_cache_dir_and_related_vars</span><span class="p">(</span><span class="n">new_ds_cache_path</span><span class="p">):</span>
     <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
@@ -498,9 +500,12 @@
     <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_EXTRACTED_DATASETS_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
         <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_DOWNLOADED_DATASETS_PATH</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">EXTRACTED_DATASETS_DIR</span><span class="p">)</span>
     <span class="n">config</span><span class="o">.</span><span class="n">EXTRACTED_DATASETS_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
-        <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_EXTRACTED_DATASETS_PATH</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">DEFAULT_EXTRACTED_DATASETS_PATH</span><span class="p">)</span></div>
 
 
+
+<div class="viewcode-block" id="init_setup_from_cfg">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.init_setup_from_cfg">[docs]</a>
 <span class="k">def</span> <span class="nf">init_setup_from_cfg</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Do some extra setup tasks after parsing config file or command line.</span>
@@ -635,9 +640,12 @@
     <span class="p">}</span>
     <span class="n">cfg</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">update_op_attr</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">,</span> <span class="n">op_attrs</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">cfg</span>
+    <span class="k">return</span> <span class="n">cfg</span></div>
 
 
+
+<div class="viewcode-block" id="load_ops_with_stats_meta">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.load_ops_with_stats_meta">[docs]</a>
 <span class="k">def</span> <span class="nf">load_ops_with_stats_meta</span><span class="p">():</span>
     <span class="kn">import</span> <span class="nn">pkgutil</span>
 
@@ -648,9 +656,12 @@
     <span class="p">}</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">filter_name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">iter_modules</span><span class="p">(</span><span class="n">djfilter</span><span class="o">.</span><span class="n">__path__</span><span class="p">)</span>
                      <span class="k">if</span> <span class="n">filter_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">NON_STATS_FILTERS</span><span class="o">.</span><span class="n">modules</span><span class="p">]</span>
     <span class="n">meta_ops</span> <span class="o">=</span> <span class="p">[{</span><span class="n">op_name</span><span class="p">:</span> <span class="p">{}}</span> <span class="k">for</span> <span class="n">op_name</span> <span class="ow">in</span> <span class="n">TAGGING_OPS</span><span class="o">.</span><span class="n">modules</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">stats_filters</span> <span class="o">+</span> <span class="n">meta_ops</span>
+    <span class="k">return</span> <span class="n">stats_filters</span> <span class="o">+</span> <span class="n">meta_ops</span></div>
 
 
+
+<div class="viewcode-block" id="update_op_attr">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.update_op_attr">[docs]</a>
 <span class="k">def</span> <span class="nf">update_op_attr</span><span class="p">(</span><span class="n">op_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">attr_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">attr_dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">op_list</span>
@@ -666,7 +677,8 @@
                         <span class="n">args</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="n">op</span><span class="p">[</span><span class="n">op_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">args</span>
         <span class="n">updated_op_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">updated_op_list</span>
+    <span class="k">return</span> <span class="n">updated_op_list</span></div>
+
 
 
 <span class="k">def</span> <span class="nf">_collect_config_info_from_class_docs</span><span class="p">(</span><span class="n">configurable_ops</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
@@ -691,6 +703,8 @@
     <span class="k">return</span> <span class="n">op_params</span>
 
 
+<div class="viewcode-block" id="sort_op_by_types_and_names">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.sort_op_by_types_and_names">[docs]</a>
 <span class="k">def</span> <span class="nf">sort_op_by_types_and_names</span><span class="p">(</span><span class="n">op_name_classes</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Split ops items by op type and sort them to sub-ops by name, then concat</span>
@@ -716,9 +730,12 @@
     <span class="n">ops_sorted_by_types</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">mapper_ops</span><span class="p">)</span> <span class="o">+</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">filter_ops</span><span class="p">)</span> <span class="o">+</span> <span class="nb">sorted</span><span class="p">(</span>
         <span class="n">deduplicator_ops</span><span class="p">)</span> <span class="o">+</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">selector_ops</span><span class="p">)</span> <span class="o">+</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">grouper_ops</span><span class="p">)</span> <span class="o">+</span> \
         <span class="nb">sorted</span><span class="p">(</span><span class="n">aggregator_ops</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ops_sorted_by_types</span>
+    <span class="k">return</span> <span class="n">ops_sorted_by_types</span></div>
 
 
+
+<div class="viewcode-block" id="update_op_process">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.update_op_process">[docs]</a>
 <span class="k">def</span> <span class="nf">update_op_process</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
     <span class="n">op_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">OPERATORS</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
@@ -785,9 +802,12 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">temp_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--auto&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">temp_args</span>
     <span class="n">temp_parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">temp_args</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">cfg</span>
+    <span class="k">return</span> <span class="n">cfg</span></div>
 
 
+
+<div class="viewcode-block" id="namespace_to_arg_list">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.namespace_to_arg_list">[docs]</a>
 <span class="k">def</span> <span class="nf">namespace_to_arg_list</span><span class="p">(</span><span class="n">namespace</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">includes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">excludes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">arg_list</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -805,9 +825,12 @@
             <span class="n">arg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;--</span><span class="si">{</span><span class="n">concat_key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">arg_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">arg_list</span>
+    <span class="k">return</span> <span class="n">arg_list</span></div>
 
 
+
+<div class="viewcode-block" id="config_backup">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.config_backup">[docs]</a>
 <span class="k">def</span> <span class="nf">config_backup</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">cfg</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
         <span class="k">return</span>
@@ -817,9 +840,12 @@
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Back up the input config file [</span><span class="si">{</span><span class="n">cfg_path</span><span class="si">}</span><span class="s1">] into the &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;work_dir [</span><span class="si">{</span><span class="n">work_dir</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">target_path</span><span class="p">):</span>
-        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">,</span> <span class="n">target_path</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">cfg_path</span><span class="p">,</span> <span class="n">target_path</span><span class="p">)</span></div>
 
 
+
+<div class="viewcode-block" id="display_config">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.display_config">[docs]</a>
 <span class="k">def</span> <span class="nf">display_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">pprint</span>
 
@@ -837,11 +863,12 @@
     <span class="n">table</span> <span class="o">=</span> <span class="n">tabulate</span><span class="p">(</span><span class="n">config_table</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">table_header</span><span class="p">,</span> <span class="n">tablefmt</span><span class="o">=</span><span class="s1">&#39;fancy_grid&#39;</span><span class="p">)</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Configuration table: &#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="export_config">
-<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.export_config">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.export_config">[docs]</a>
 <span class="k">def</span> <span class="nf">export_config</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span>
                   <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                   <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;yaml&#39;</span><span class="p">,</span>
@@ -886,7 +913,7 @@
 
 
 <div class="viewcode-block" id="merge_config">
-<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.merge_config">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.merge_config">[docs]</a>
 <span class="k">def</span> <span class="nf">merge_config</span><span class="p">(</span><span class="n">ori_cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">new_cfg</span><span class="p">:</span> <span class="n">Namespace</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Merge configuration from new_cfg into ori_cfg</span>
@@ -947,7 +974,7 @@
 
 
 <div class="viewcode-block" id="prepare_side_configs">
-<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.prepare_side_configs">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.prepare_side_configs">[docs]</a>
 <span class="k">def</span> <span class="nf">prepare_side_configs</span><span class="p">(</span><span class="n">ori_config</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Namespace</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    parse the config if ori_config is a string of a config file path with</span>
@@ -982,7 +1009,7 @@
 
 
 <div class="viewcode-block" id="get_init_configs">
-<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.get_init_configs">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.config.get_init_configs">[docs]</a>
 <span class="k">def</span> <span class="nf">get_init_configs</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Namespace</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    set init configs of datajucer for cfg</span>
