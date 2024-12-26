@@ -76,5 +76,23 @@
 }
 ```
 
-在 Data-Juicer 中，我们预设了一些字段来对齐最后一种 Query-Response 格式，它作为 后微调对话 数据集的统一中间表示。
-相应地，我们提供了若干内置工具将其他格式的数据集转换为 Query-Response 格式以及反向转换。
+在 Data-Juicer 中，我们预设了一些字段来对齐最后两种格式（Alpaca和Query-Response），并将如下格式作为 后微调对话 数据集的统一中间表示。
+相应地，我们提供了若干内置工具将其他格式的数据集转换为 DJ 格式以及反向转换。
+
+
+- DJ的多轮对话缺省格式（DJ post-tuning算子实现时假设基于该格式进行字段解析和处理）:
+
+```python
+{
+  "system": "<system>",
+  "instruction": "<query-inst>",
+  "query": "<query2>",
+  "response": "<response2>",
+  "history": [
+    [
+      "<query1>",
+      "<response1>"
+    ]
+  ]
+}
+```
