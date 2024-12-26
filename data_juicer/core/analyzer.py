@@ -114,7 +114,7 @@ class Analyzer:
                         f'[{self.cfg.fusion_strategy}]...')
             ops = fuse_operators(ops, probe_res)
 
-        # 2. stats precompute only for filter ops
+        # 2. stats precompute only for filter or tagging ops
         logger.info('Computing the stats of dataset...')
         stats_collected = False
         for op in ops:
@@ -147,7 +147,7 @@ class Analyzer:
             compress(dataset)
 
         # 4. analysis and output result to the export path
-        # 4.1. Only consider fields in Fields.stats
+        # 4.1. Only consider fields in Fields.stats and Fields.meta
         # 4.2. For string fields, only consider its histogram
         # 4.3. For numeric fields, consider its histogram and box
         # 4.4. Otherwise, DO NOT analyze
