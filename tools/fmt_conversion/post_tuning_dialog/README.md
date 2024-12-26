@@ -76,4 +76,21 @@ For post tuning formats, we mainly consider 4 formats to support [ModelScope-Swi
 }
 ```
 
-In Data-Juicer, we pre-set fields to align with the last Query-Response format, which serves as our intermediate format for post-tuning dialog datasets. Correspondingly, we provide several tools to convert datasets in other formats to Query-Response format and vice versa.
+In Data-Juicer, we pre-set fields to align with the last two formats (Alpaca and Query-Response), which serves as our intermediate format for post-tuning dialog datasets. Correspondingly, we provide several tools to convert datasets in other formats to Query-Response format and vice versa.
+
+- DJ default format for post-tuning OPs:
+
+```python
+{
+  "system": "<system>",
+  "instruction": "<query-inst>",
+  "query": "<query2>",
+  "response": "<response2>",
+  "history": [
+    [
+      "<query1>",
+      "<response1>"
+    ]
+  ]
+}
+```
