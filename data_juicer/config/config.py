@@ -291,6 +291,22 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
         'difference before and after a op. Only available when '
         'open_tracer is true.')
     parser.add_argument(
+        '--open_insight_mining',
+        type=bool,
+        default=False,
+        help='Whether to open insight mining to trace the OP-wise stats/tags '
+        'changes during process. It might take more time when opening '
+        'insight mining.')
+    parser.add_argument(
+        '--op_list_to_mine',
+        type=List[str],
+        default=[],
+        help='Which OPs will be applied on the dataset to mine the insights '
+        'in their stats changes. Only those OPs that produce stats or '
+        'meta are valid. If it\'s empty, all OPs that produce stats and '
+        'meta will be involved. Only available when filter_list_to_mine '
+        'is true.')
+    parser.add_argument(
         '--op_fusion',
         type=bool,
         default=False,
@@ -448,6 +464,11 @@ def init_setup_from_cfg(cfg: Namespace):
 
     # check number of processes np
     sys_cpu_count = os.cpu_count()
+    if not cfg.np:
+        cfg.np = sys_cpu_count
+        logger.warning(
+            f'Number of processes `np` is not set, '
+            f'set it to cpu count [{sys_cpu_count}] as default value.')
     if cfg.np > sys_cpu_count:
         logger.warning(f'Number of processes `np` is set as [{cfg.np}], which '
                        f'is larger than the cpu count [{sys_cpu_count}]. Due '
@@ -513,13 +534,7 @@ def init_setup_from_cfg(cfg: Namespace):
 
     # add all filters that produce stats
     if cfg.auto:
-        import pkgutil
-
-        import data_juicer.ops.filter as djfilters
-        cfg.process = [{
-            filter_name: {}
-        } for _, filter_name, _ in pkgutil.iter_modules(djfilters.__path__)
-                       if filter_name not in djfilters.NON_STATS_FILTERS]
+        cfg.process = load_ops_with_stats_meta()
 
     # Apply text_key modification during initializing configs
     # users can freely specify text_key for different ops using `text_key`
@@ -528,37 +543,49 @@ def init_setup_from_cfg(cfg: Namespace):
         text_key = cfg.text_keys[0]
     else:
         text_key = cfg.text_keys
-    for op in cfg.process:
+    op_attrs = {
+        'text_key': text_key,
+        'image_key': cfg.image_key,
+        'audio_key': cfg.audio_key,
+        'video_key': cfg.video_key,
+        'num_proc': cfg.np,
+        'turbo': cfg.turbo,
+        'work_dir': cfg.work_dir,
+    }
+    cfg.process = update_op_attr(cfg.process, op_attrs)
+
+    return cfg
+
+
+def load_ops_with_stats_meta():
+    import pkgutil
+
+    import data_juicer.ops.filter as djfilter
+    from data_juicer.ops import NON_STATS_FILTERS, TAGGING_OPS
+    stats_filters = [{
+        filter_name: {}
+    } for _, filter_name, _ in pkgutil.iter_modules(djfilter.__path__)
+                     if filter_name not in NON_STATS_FILTERS.modules]
+    meta_ops = [{op_name: {}} for op_name in TAGGING_OPS.modules]
+    return stats_filters + meta_ops
+
+
+def update_op_attr(op_list: list, attr_dict: dict = None):
+    if not attr_dict:
+        return op_list
+    updated_op_list = []
+    for op in op_list:
         for op_name in op:
             args = op[op_name]
             if args is None:
-                args = {
-                    'text_key': text_key,
-                    'image_key': cfg.image_key,
-                    'audio_key': cfg.audio_key,
-                    'video_key': cfg.video_key,
-                    'num_proc': cfg.np,
-                    'turbo': cfg.turbo,
-                    'work_dir': cfg.work_dir,
-                }
+                args = attr_dict
             else:
-                if 'text_key' not in args or args['text_key'] is None:
-                    args['text_key'] = text_key
-                if 'image_key' not in args or args['image_key'] is None:
-                    args['image_key'] = cfg.image_key
-                if 'audio_key' not in args or args['audio_key'] is None:
-                    args['audio_key'] = cfg.audio_key
-                if 'video_key' not in args or args['video_key'] is None:
-                    args['video_key'] = cfg.video_key
-                if 'num_proc' not in args or args['num_proc'] is None:
-                    args['num_proc'] = cfg.np
-                if 'turbo' not in args or args['turbo'] is None:
-                    args['turbo'] = cfg.turbo
-                if 'work_dir' not in args or args['work_dir'] is None:
-                    args['work_dir'] = cfg.work_dir
+                for key in attr_dict:
+                    if key not in args or args[key] is None:
+                        args[key] = attr_dict[key]
             op[op_name] = args
-
-    return cfg
+        updated_op_list.append(op)
+    return updated_op_list
 
 
 def _collect_config_info_from_class_docs(configurable_ops, parser):

@@ -17,6 +17,7 @@ rd = LazyLoader('rd', 'ray.data')
 
 
 class TempDirManager:
+
     def __init__(self, tmp_dir):
         self.tmp_dir = tmp_dir
 
