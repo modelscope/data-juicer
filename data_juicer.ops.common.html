@@ -6,19 +6,19 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.common &mdash; data_juicer 1.0.2 documentation</title>
+  <title>data_juicer.ops.common package &mdash; data_juicer 1.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="data_juicer.analysis" href="data_juicer.analysis.html" />
-    <link rel="prev" title="data_juicer.ops.selector" href="data_juicer.ops.selector.html" /> 
+    <link rel="next" title="data_juicer.ops.deduplicator package" href="data_juicer.ops.deduplicator.html" />
+    <link rel="prev" title="data_juicer.ops.aggregator package" href="data_juicer.ops.aggregator.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,27 +42,22 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">data_juicer.ops.common</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.common.get_sentences_from_document"><code class="docutils literal notranslate"><span class="pre">get_sentences_from_document()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.common.get_words_from_document"><code class="docutils literal notranslate"><span class="pre">get_words_from_document()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.common.merge_on_whitespace_tab_newline"><code class="docutils literal notranslate"><span class="pre">merge_on_whitespace_tab_newline()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.common.split_on_newline_tab_whitespace"><code class="docutils literal notranslate"><span class="pre">split_on_newline_tab_whitespace()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.common.split_on_whitespace"><code class="docutils literal notranslate"><span class="pre">split_on_whitespace()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.common.strip"><code class="docutils literal notranslate"><span class="pre">strip()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.common.words_augmentation"><code class="docutils literal notranslate"><span class="pre">words_augmentation()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.common.words_refinement"><code class="docutils literal notranslate"><span class="pre">words_refinement()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.common.split_text_by_punctuation"><code class="docutils literal notranslate"><span class="pre">split_text_by_punctuation()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">data_juicer.ops.common package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-data_juicer.ops.common.helper_func">data_juicer.ops.common.helper_func module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-data_juicer.ops.common.special_characters">data_juicer.ops.common.special_characters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-data_juicer.ops.common">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -79,7 +74,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">data_juicer.ops.common</li>
+          <li class="breadcrumb-item"><a href="data_juicer.ops.html">data_juicer.ops package</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.common package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/data_juicer.ops.common.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -89,8 +85,202 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-data_juicer.ops.common">
-<span id="data-juicer-ops-common"></span><h1>data_juicer.ops.common<a class="headerlink" href="#module-data_juicer.ops.common" title="Link to this heading">¶</a></h1>
+  <section id="data-juicer-ops-common-package">
+<h1>data_juicer.ops.common package<a class="headerlink" href="#data-juicer-ops-common-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-data_juicer.ops.common.helper_func">
+<span id="data-juicer-ops-common-helper-func-module"></span><h2>data_juicer.ops.common.helper_func module<a class="headerlink" href="#module-data_juicer.ops.common.helper_func" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.UnionFind">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.helper_func.</span></span><span class="sig-name descname"><span class="pre">UnionFind</span></span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#UnionFind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.UnionFind" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.UnionFind.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#UnionFind.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.UnionFind.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.UnionFind.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#UnionFind.find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.UnionFind.find" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.UnionFind.union">
+<span class="sig-name descname"><span class="pre">union</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#UnionFind.union"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.UnionFind.union" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.strip">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.helper_func.</span></span><span class="sig-name descname"><span class="pre">strip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_characters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#strip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.strip" title="Link to this definition">¶</a></dt>
+<dd><p>Way faster than document.strip(strip_characters) since strip_characters is
+now a set instead of a str, and it contains a lot of elements (all the
+emojis).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>document</strong> – document to be processed</p></li>
+<li><p><strong>strip_characters</strong> – characters used for stripping document</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>stripped document</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.split_on_whitespace">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.helper_func.</span></span><span class="sig-name descname"><span class="pre">split_on_whitespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#split_on_whitespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.split_on_whitespace" title="Link to this definition">¶</a></dt>
+<dd><p>This method also removes concatenated spaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>document</strong> – document to be splited</p></li>
+<li><p><strong>new_line</strong> – whether to split document with ‘\n’</p></li>
+<li><p><strong>tag</strong> – whether to split document with ‘\t’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>word list obtained after splitting document</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.split_on_newline_tab_whitespace">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.helper_func.</span></span><span class="sig-name descname"><span class="pre">split_on_newline_tab_whitespace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#split_on_newline_tab_whitespace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.split_on_newline_tab_whitespace" title="Link to this definition">¶</a></dt>
+<dd><p>This method is used to split the document into different levels of sub-
+sentences.</p>
+<p>First split on “\n”, then on “\t”, then on “ “.
+:param document: document to be splited
+:return: sentence list obtained after splitting document</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.merge_on_whitespace_tab_newline">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.helper_func.</span></span><span class="sig-name descname"><span class="pre">merge_on_whitespace_tab_newline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sentences</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#merge_on_whitespace_tab_newline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.merge_on_whitespace_tab_newline" title="Link to this definition">¶</a></dt>
+<dd><p>This method is used to merge different levels of sub-sentences into one
+document. Invert the method split_on_newline_tab_whitespace. Removes
+concatenated separators.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sentences</strong> – sentence list to be merged</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>document obtained after merging sub-sentences</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.words_augmentation">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.helper_func.</span></span><span class="sig-name descname"><span class="pre">words_augmentation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">words</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">join_char</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#words_augmentation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.words_augmentation" title="Link to this definition">¶</a></dt>
+<dd><p>Augment words, especially for Chinese (without a space between words) and
+Vietnamese (with a space between syllables).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>word</strong> – word list to be augmented</p></li>
+<li><p><strong>group_size</strong> – the size of word groups that need to be merged</p></li>
+<li><p><strong>join_char</strong> – characters to be added between word group</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>word list after augment</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.get_words_from_document">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.helper_func.</span></span><span class="sig-name descname"><span class="pre">get_words_from_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_line</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#get_words_from_document"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.get_words_from_document" title="Link to this definition">¶</a></dt>
+<dd><p>Get words from a document. Useful to compute ratios, like the
+stopwords ratio.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>document</strong> – document that need to split words.</p></li>
+<li><p><strong>token_func</strong> – function of tokenizer, if specified, the function
+will be used for split document into different tokens.</p></li>
+<li><p><strong>new_line</strong> – whether to use ‘\n’ to split words.</p></li>
+<li><p><strong>tab</strong> – whether to use ‘\t’ to split words.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>word list obtained from document</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.words_refinement">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.helper_func.</span></span><span class="sig-name descname"><span class="pre">words_refinement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">words</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_case</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_words_aug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words_aug_group_sizes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[2]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">words_aug_join_char</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#words_refinement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.words_refinement" title="Link to this definition">¶</a></dt>
+<dd><p>Refine split words. Non reversible since the document is split on
+multiple characters, words are stripped of special characters and
+characters are converted to lower case.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>words</strong> – the word list to be augmented</p></li>
+<li><p><strong>lower_case</strong> – whether to convert word to lowercase</p></li>
+<li><p><strong>strip_chars</strong> – chars that need to be stripped in words</p></li>
+<li><p><strong>use_words_aug</strong> – whether to use word augmentation</p></li>
+<li><p><strong>words_aug_group_sizes</strong> – the size of word groups that need to
+be merged</p></li>
+<li><p><strong>words_aug_join_char</strong> – characters to be added between word
+group</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>refined words or word list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.get_sentences_from_document">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.helper_func.</span></span><span class="sig-name descname"><span class="pre">get_sentences_from_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#get_sentences_from_document"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.get_sentences_from_document" title="Link to this definition">¶</a></dt>
+<dd><p>Get sentences from a document.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>document</strong> – document that need to split sentences</p></li>
+<li><p><strong>model_func</strong> – function of sentence model, if specified, the
+function will be used for spliting document into different
+sentences.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>document with the sentences separated by ‘\n’</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.ops.common.helper_func.split_text_by_punctuation">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.helper_func.</span></span><span class="sig-name descname"><span class="pre">split_text_by_punctuation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#split_text_by_punctuation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.helper_func.split_text_by_punctuation" title="Link to this definition">¶</a></dt>
+<dd><p>Split text by any zh and en punctuation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> – text to be splitted.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sub texts splitted by any zh and en punctuation</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.ops.common.special_characters">
+<span id="data-juicer-ops-common-special-characters-module"></span><h2>data_juicer.ops.common.special_characters module<a class="headerlink" href="#module-data_juicer.ops.common.special_characters" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-data_juicer.ops.common">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-data_juicer.ops.common" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.ops.common.get_sentences_from_document">
 <span class="sig-prename descclassname"><span class="pre">data_juicer.ops.common.</span></span><span class="sig-name descname"><span class="pre">get_sentences_from_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">document</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_func</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/common/helper_func.html#get_sentences_from_document"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.common.get_sentences_from_document" title="Link to this definition">¶</a></dt>
@@ -253,13 +443,14 @@ group</p></li>
 </dd></dl>
 
 </section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="data_juicer.ops.selector.html" class="btn btn-neutral float-left" title="data_juicer.ops.selector" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="data_juicer.analysis.html" class="btn btn-neutral float-right" title="data_juicer.analysis" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="data_juicer.ops.aggregator.html" class="btn btn-neutral float-left" title="data_juicer.ops.aggregator package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_juicer.ops.deduplicator.html" class="btn btn-neutral float-right" title="data_juicer.ops.deduplicator package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

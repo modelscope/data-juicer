@@ -11,7 +11,7 @@
 
   
       <script src="../_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -76,8 +76,11 @@
              
   <h1>All modules for which code is available</h1>
 <ul><li><a href="data_juicer.html">data_juicer</a></li>
-<ul><li><a href="data_juicer/analysis/column_wise_analysis.html">data_juicer.analysis.column_wise_analysis</a></li>
+<ul><li><a href="data_juicer/analysis/collector.html">data_juicer.analysis.collector</a></li>
+<li><a href="data_juicer/analysis/column_wise_analysis.html">data_juicer.analysis.column_wise_analysis</a></li>
 <li><a href="data_juicer/analysis/diversity_analysis.html">data_juicer.analysis.diversity_analysis</a></li>
+<li><a href="data_juicer/analysis/draw.html">data_juicer.analysis.draw</a></li>
+<li><a href="data_juicer/analysis/measure.html">data_juicer.analysis.measure</a></li>
 <li><a href="data_juicer/analysis/overall_analysis.html">data_juicer.analysis.overall_analysis</a></li>
 <li><a href="data_juicer/config/config.html">data_juicer.config.config</a></li>
 <li><a href="data_juicer/core/adapter.html">data_juicer.core.adapter</a></li>
@@ -86,6 +89,8 @@
 <li><a href="data_juicer/core/executor.html">data_juicer.core.executor</a></li>
 <li><a href="data_juicer/core/exporter.html">data_juicer.core.exporter</a></li>
 <li><a href="data_juicer/core/monitor.html">data_juicer.core.monitor</a></li>
+<li><a href="data_juicer/core/ray_data.html">data_juicer.core.ray_data</a></li>
+<li><a href="data_juicer/core/ray_executor.html">data_juicer.core.ray_executor</a></li>
 <li><a href="data_juicer/core/tracer.html">data_juicer.core.tracer</a></li>
 <li><a href="data_juicer/format/csv_formatter.html">data_juicer.format.csv_formatter</a></li>
 <li><a href="data_juicer/format/empty_formatter.html">data_juicer.format.empty_formatter</a></li>
@@ -221,10 +226,28 @@
 <li><a href="data_juicer/ops/mapper/video_tagging_from_audio_mapper.html">data_juicer.ops.mapper.video_tagging_from_audio_mapper</a></li>
 <li><a href="data_juicer/ops/mapper/video_tagging_from_frames_mapper.html">data_juicer.ops.mapper.video_tagging_from_frames_mapper</a></li>
 <li><a href="data_juicer/ops/mapper/whitespace_normalization_mapper.html">data_juicer.ops.mapper.whitespace_normalization_mapper</a></li>
+<li><a href="data_juicer/ops/op_fusion.html">data_juicer.ops.op_fusion</a></li>
 <li><a href="data_juicer/ops/selector/frequency_specified_field_selector.html">data_juicer.ops.selector.frequency_specified_field_selector</a></li>
 <li><a href="data_juicer/ops/selector/random_selector.html">data_juicer.ops.selector.random_selector</a></li>
 <li><a href="data_juicer/ops/selector/range_specified_field_selector.html">data_juicer.ops.selector.range_specified_field_selector</a></li>
 <li><a href="data_juicer/ops/selector/topk_specified_field_selector.html">data_juicer.ops.selector.topk_specified_field_selector</a></li>
+<li><a href="data_juicer/utils/asset_utils.html">data_juicer.utils.asset_utils</a></li>
+<li><a href="data_juicer/utils/auto_install_utils.html">data_juicer.utils.auto_install_utils</a></li>
+<li><a href="data_juicer/utils/cache_utils.html">data_juicer.utils.cache_utils</a></li>
+<li><a href="data_juicer/utils/ckpt_utils.html">data_juicer.utils.ckpt_utils</a></li>
+<li><a href="data_juicer/utils/common_utils.html">data_juicer.utils.common_utils</a></li>
+<li><a href="data_juicer/utils/compress.html">data_juicer.utils.compress</a></li>
+<li><a href="data_juicer/utils/constant.html">data_juicer.utils.constant</a></li>
+<li><a href="data_juicer/utils/file_utils.html">data_juicer.utils.file_utils</a></li>
+<li><a href="data_juicer/utils/fingerprint_utils.html">data_juicer.utils.fingerprint_utils</a></li>
+<li><a href="data_juicer/utils/lazy_loader.html">data_juicer.utils.lazy_loader</a></li>
+<li><a href="data_juicer/utils/logger_utils.html">data_juicer.utils.logger_utils</a></li>
+<li><a href="data_juicer/utils/mm_utils.html">data_juicer.utils.mm_utils</a></li>
+<li><a href="data_juicer/utils/model_utils.html">data_juicer.utils.model_utils</a></li>
+<li><a href="data_juicer/utils/process_utils.html">data_juicer.utils.process_utils</a></li>
+<li><a href="data_juicer/utils/registry.html">data_juicer.utils.registry</a></li>
+<li><a href="data_juicer/utils/resource_utils.html">data_juicer.utils.resource_utils</a></li>
+<li><a href="data_juicer/utils/unittest_utils.html">data_juicer.utils.unittest_utils</a></li>
 </ul></ul>
 
            </div>

@@ -11,7 +11,7 @@
 
   
       <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -91,6 +91,8 @@
 <span class="kn">from</span> <span class="nn">.formatter</span> <span class="kn">import</span> <span class="n">FORMATTERS</span><span class="p">,</span> <span class="n">LocalFormatter</span><span class="p">,</span> <span class="n">add_suffixes</span><span class="p">,</span> <span class="n">unify_format</span>
 
 
+<div class="viewcode-block" id="extract_txt_from_docx">
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.text_formatter.extract_txt_from_docx">[docs]</a>
 <span class="k">def</span> <span class="nf">extract_txt_from_docx</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">tgt_path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract text from a docx file and save to target path.</span>
@@ -102,9 +104,12 @@
     <span class="n">text</span> <span class="o">=</span> <span class="p">[</span><span class="n">para</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">para</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">paragraphs</span> <span class="k">if</span> <span class="n">para</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
     <span class="n">base_fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.docx&#39;</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tgt_path</span><span class="p">,</span> <span class="n">base_fn</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">))</span></div>
 
 
+
+<div class="viewcode-block" id="extract_txt_from_pdf">
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.text_formatter.extract_txt_from_pdf">[docs]</a>
 <span class="k">def</span> <span class="nf">extract_txt_from_pdf</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">tgt_path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract text from a pdf file and save to target path.</span>
@@ -128,11 +133,12 @@
                 <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">page_text</span><span class="p">)</span>
         <span class="n">base_fn</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.pdf&#39;</span><span class="p">,</span> <span class="s1">&#39;.txt&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tgt_path</span><span class="p">,</span> <span class="n">base_fn</span><span class="p">),</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="p">))</span></div>
+
 
 
 <div class="viewcode-block" id="TextFormatter">
-<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.TextFormatter">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.text_formatter.TextFormatter">[docs]</a>
 <span class="nd">@FORMATTERS</span><span class="o">.</span><span class="n">register_module</span><span class="p">()</span>
 <span class="k">class</span> <span class="nc">TextFormatter</span><span class="p">(</span><span class="n">LocalFormatter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -154,7 +160,7 @@
     <span class="p">]</span>
 
 <div class="viewcode-block" id="TextFormatter.__init__">
-<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.TextFormatter.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.text_formatter.TextFormatter.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">dataset_path</span><span class="p">,</span>
                  <span class="n">suffixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -181,7 +187,7 @@
 
 
 <div class="viewcode-block" id="TextFormatter.load_dataset">
-<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.TextFormatter.load_dataset">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.text_formatter.TextFormatter.load_dataset">[docs]</a>
     <span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_proc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">global_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load a dataset from local text-type files.</span>

@@ -1,0 +1,399 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.utils.constant &mdash; data_juicer 1.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.utils.constant</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.utils.constant</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+<span class="kn">import</span> <span class="nn">zstandard</span> <span class="k">as</span> <span class="nn">zstd</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="n">DEFAULT_PREFIX</span> <span class="o">=</span> <span class="s1">&#39;__dj__&#39;</span>
+
+
+<div class="viewcode-block" id="Fields">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.Fields">[docs]</a>
+<span class="k">class</span> <span class="nc">Fields</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;stats__&#39;</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;meta__&#39;</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;context__&#39;</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;suffix__&#39;</span>
+
+    <span class="c1"># tags in meta</span>
+    <span class="c1"># video_frame_tags</span>
+    <span class="n">video_frame_tags</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;video_frame_tags__&#39;</span>
+    <span class="c1"># video_audio_tags</span>
+    <span class="n">video_audio_tags</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;video_audio_tags__&#39;</span>
+    <span class="c1"># image_tags</span>
+    <span class="n">image_tags</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;image_tags__&#39;</span>
+
+    <span class="c1"># video_frames</span>
+    <span class="n">video_frames</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;video_frames__&#39;</span>
+
+    <span class="c1"># the name of the original file from which this sample was derived.</span>
+    <span class="n">source_file</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;source_file__&#39;</span>
+
+    <span class="c1"># the name of directory to store the produced multimodal data</span>
+    <span class="n">multimodal_data_output_dir</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;produced_data__&#39;</span>
+
+    <span class="c1"># field names for info extraction</span>
+    <span class="n">event_description</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;event_description__&#39;</span>
+    <span class="c1"># # a list of characters relevant to the event</span>
+    <span class="n">relevant_characters</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;relevant_characters__&#39;</span>
+    <span class="c1"># # the given main entities for attribute extraction</span>
+    <span class="n">main_entities</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;main_entities__&#39;</span>
+    <span class="c1"># # the given attributes to be extracted</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;attributes__&#39;</span>
+    <span class="c1"># # the extracted attribute descriptions</span>
+    <span class="n">attribute_descriptions</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;attribute_descriptions__&#39;</span>
+    <span class="c1"># # extract from raw datas for support the attribute</span>
+    <span class="n">attribute_support_texts</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;attribute_support_texts__&#39;</span>
+    <span class="c1"># # the nickname relationship</span>
+    <span class="n">nickname</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;nickname__&#39;</span>
+    <span class="c1"># # the entity for knowledge graph</span>
+    <span class="n">entity</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;entity__&#39;</span>
+    <span class="c1"># # # the name of entity</span>
+    <span class="n">entity_name</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;entity_name__&#39;</span>
+    <span class="c1"># # # the type of entity</span>
+    <span class="n">entity_type</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;entity_type__&#39;</span>
+    <span class="c1"># # # the description of entity</span>
+    <span class="n">entity_description</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;entity_entity_description__&#39;</span>
+    <span class="c1"># # the relationship for knowledge graph</span>
+    <span class="n">relation</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;relation__&#39;</span>
+    <span class="c1"># # # the source entity of the relation</span>
+    <span class="n">source_entity</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;relation_source_entity__&#39;</span>
+    <span class="c1"># # # the target entity of the relation</span>
+    <span class="n">target_entity</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;relation_target_entity__&#39;</span>
+    <span class="c1"># # # the description of the relation</span>
+    <span class="n">relation_description</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;relation_description__&#39;</span>
+    <span class="c1"># # # the keywords of the relation</span>
+    <span class="n">relation_keywords</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;relation_keywords__&#39;</span>
+    <span class="c1"># # # the strength of the relation</span>
+    <span class="n">relation_strength</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;relation_strength__&#39;</span>
+    <span class="c1"># # the keyword in a text</span>
+    <span class="n">keyword</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;keyword__&#39;</span>
+    <span class="c1"># # support text</span>
+    <span class="n">support_text</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;support_text__&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="StatsKeysMeta">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeysMeta">[docs]</a>
+<span class="k">class</span> <span class="nc">StatsKeysMeta</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    a helper class to track the mapping from OP&#39;s name to its used stats_keys</span>
+
+<span class="sd">    e.g., # once the AlphanumericFilter&#39;s compute_stats method has been called</span>
+<span class="sd">    res = TrackingDescriptor.get_access_log()</span>
+<span class="sd">    print(res) # {&quot;AlphanumericFilter&quot;: [&quot;alnum_ratio&quot;, &quot;alpha_token_ratio&quot;]}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_accessed_by</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="n">caller_class</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_back</span><span class="o">.</span><span class="n">f_globals</span><span class="p">[</span><span class="s1">&#39;__name__&#39;</span><span class="p">]</span>
+        <span class="c1"># no need to track the parent classes</span>
+        <span class="n">caller_class</span> <span class="o">=</span> <span class="n">caller_class</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">stat_key</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_constants_class</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">caller_class</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span><span class="p">[</span><span class="n">caller_class</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">stat_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span><span class="p">[</span><span class="n">caller_class</span><span class="p">]:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span><span class="p">[</span><span class="n">caller_class</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">stat_key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">stat_key</span>
+
+<div class="viewcode-block" id="StatsKeysMeta.get_access_log">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeysMeta.get_access_log">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_access_log</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dj_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span>
+        <span class="k">elif</span> <span class="n">dj_cfg</span><span class="p">:</span>
+            <span class="n">tmp_dj_cfg</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dj_cfg</span><span class="p">)</span>
+            <span class="c1"># the access has been skipped due to the use of cache</span>
+            <span class="c1"># we will using a temp data sample to get the access log</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="p">(</span><span class="s1">&#39;jsonl&#39;</span> <span class="ow">in</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="ow">or</span>
+                     <span class="s1">&#39;jsonl.zst&#39;</span> <span class="ow">in</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s1">&#39;Begin to track the usage of ops with a dummy data sample&#39;</span><span class="p">)</span>
+
+                <span class="c1"># load the first line as tmp_data</span>
+                <span class="n">tmp_f_name</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">first_line</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s1">&#39;jsonl.zst&#39;</span> <span class="ow">in</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">:</span>
+                    <span class="n">tmp_f_name</span> <span class="o">=</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="o">.</span> \
+                        <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.jsonl.zst&#39;</span><span class="p">,</span> <span class="s1">&#39;.tmp.jsonl&#39;</span><span class="p">)</span>
+                    <span class="c1"># Open the file in binary mode and</span>
+                    <span class="c1"># create a Zstandard decompression context</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">compressed_file</span><span class="p">:</span>
+                        <span class="n">dctx</span> <span class="o">=</span> <span class="n">zstd</span><span class="o">.</span><span class="n">ZstdDecompressor</span><span class="p">()</span>
+                        <span class="c1"># Create a stream reader for the file and decode the</span>
+                        <span class="c1"># first line</span>
+                        <span class="k">with</span> <span class="n">dctx</span><span class="o">.</span><span class="n">stream_reader</span><span class="p">(</span><span class="n">compressed_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+                            <span class="n">text_stream</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">TextIOWrapper</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span>
+                                                           <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+                            <span class="n">first_line</span> <span class="o">=</span> <span class="n">text_stream</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="s1">&#39;jsonl&#39;</span> <span class="ow">in</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">:</span>
+                    <span class="n">tmp_f_name</span> <span class="o">=</span> <span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="o">.</span> \
+                        <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.jsonl&#39;</span><span class="p">,</span> <span class="s1">&#39;.tmp.jsonl&#39;</span><span class="p">)</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">orig_file</span><span class="p">:</span>
+                        <span class="n">first_line</span> <span class="o">=</span> <span class="n">orig_file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+                <span class="k">assert</span> <span class="n">tmp_f_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">first_line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
+                    <span class="s1">&#39;error when loading the first line, when &#39;</span> \
+                    <span class="sa">f</span><span class="s1">&#39;dj_cfg.dataset_path=</span><span class="si">{</span><span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="si">}</span><span class="s1">&#39;</span>
+
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp_f_name</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_file</span><span class="p">:</span>
+                    <span class="n">tmp_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">first_line</span><span class="p">)</span>
+
+                <span class="n">tmp_dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="o">=</span> <span class="n">tmp_f_name</span>
+                <span class="n">tmp_dj_cfg</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">tmp_dj_cfg</span><span class="o">.</span><span class="n">use_checkpoint</span> <span class="o">=</span> <span class="kc">False</span>
+
+                <span class="kn">from</span> <span class="nn">data_juicer.config</span> <span class="kn">import</span> <span class="n">get_init_configs</span>
+                <span class="n">tmp_dj_cfg</span> <span class="o">=</span> <span class="n">get_init_configs</span><span class="p">(</span><span class="n">tmp_dj_cfg</span><span class="p">)</span>
+
+                <span class="kn">from</span> <span class="nn">data_juicer.core</span> <span class="kn">import</span> <span class="n">Analyzer</span>
+                <span class="n">tmp_analyzer</span> <span class="o">=</span> <span class="n">Analyzer</span><span class="p">(</span><span class="n">tmp_dj_cfg</span><span class="p">)</span>
+                <span class="c1"># do not overwrite the true analysis results</span>
+                <span class="n">tmp_analyzer</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">skip_export</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tmp_f_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;For now, the dummy data is supported for only jsonl type&#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;. Please check your config as </span><span class="si">{</span><span class="n">dj_cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="si">}</span><span class="s1"> is &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;either not existed or in jsonl type.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_accessed_by</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StatsKeysConstant">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeysConstant">[docs]</a>
+<span class="k">class</span> <span class="nc">StatsKeysConstant</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c1"># text</span>
+    <span class="n">alpha_token_ratio</span> <span class="o">=</span> <span class="s1">&#39;alpha_token_ratio&#39;</span>
+    <span class="n">alnum_ratio</span> <span class="o">=</span> <span class="s1">&#39;alnum_ratio&#39;</span>
+    <span class="n">avg_line_length</span> <span class="o">=</span> <span class="s1">&#39;avg_line_length&#39;</span>
+    <span class="n">char_rep_ratio</span> <span class="o">=</span> <span class="s1">&#39;char_rep_ratio&#39;</span>
+    <span class="n">flagged_words_ratio</span> <span class="o">=</span> <span class="s1">&#39;flagged_words_ratio&#39;</span>
+    <span class="n">lang</span> <span class="o">=</span> <span class="s1">&#39;lang&#39;</span>
+    <span class="n">lang_score</span> <span class="o">=</span> <span class="s1">&#39;lang_score&#39;</span>
+    <span class="n">max_line_length</span> <span class="o">=</span> <span class="s1">&#39;max_line_length&#39;</span>
+    <span class="n">perplexity</span> <span class="o">=</span> <span class="s1">&#39;perplexity&#39;</span>
+    <span class="n">special_char_ratio</span> <span class="o">=</span> <span class="s1">&#39;special_char_ratio&#39;</span>
+    <span class="n">stopwords_ratio</span> <span class="o">=</span> <span class="s1">&#39;stopwords_ratio&#39;</span>
+    <span class="n">text_len</span> <span class="o">=</span> <span class="s1">&#39;text_len&#39;</span>
+    <span class="n">num_action</span> <span class="o">=</span> <span class="s1">&#39;num_action&#39;</span>
+    <span class="n">num_dependency_edges</span> <span class="o">=</span> <span class="s1">&#39;num_dependency_edges&#39;</span>
+    <span class="n">num_token</span> <span class="o">=</span> <span class="s1">&#39;num_token&#39;</span>
+    <span class="n">num_words</span> <span class="o">=</span> <span class="s1">&#39;num_words&#39;</span>
+    <span class="n">word_rep_ratio</span> <span class="o">=</span> <span class="s1">&#39;word_rep_ratio&#39;</span>
+
+    <span class="c1"># image</span>
+    <span class="n">aspect_ratios</span> <span class="o">=</span> <span class="s1">&#39;aspect_ratios&#39;</span>
+    <span class="n">image_width</span> <span class="o">=</span> <span class="s1">&#39;image_width&#39;</span>
+    <span class="n">image_height</span> <span class="o">=</span> <span class="s1">&#39;image_height&#39;</span>
+    <span class="n">image_sizes</span> <span class="o">=</span> <span class="s1">&#39;image_sizes&#39;</span>
+    <span class="n">face_ratios</span> <span class="o">=</span> <span class="s1">&#39;face_ratios&#39;</span>
+    <span class="n">face_detections</span> <span class="o">=</span> <span class="s1">&#39;face_detections&#39;</span>
+    <span class="n">face_counts</span> <span class="o">=</span> <span class="s1">&#39;face_counts&#39;</span>
+    <span class="n">image_aesthetics_scores</span> <span class="o">=</span> <span class="s1">&#39;image_aesthetics_scores&#39;</span>
+    <span class="n">image_nsfw_score</span> <span class="o">=</span> <span class="s1">&#39;image_nsfw_score&#39;</span>
+    <span class="n">image_watermark_prob</span> <span class="o">=</span> <span class="s1">&#39;image_watermark_prob&#39;</span>
+    <span class="n">image_pair_similarity</span> <span class="o">=</span> <span class="s1">&#39;image_pair_similarity&#39;</span>
+
+    <span class="c1"># audios</span>
+    <span class="n">audio_duration</span> <span class="o">=</span> <span class="s1">&#39;audio_duration&#39;</span>
+    <span class="n">audio_nmf_snr</span> <span class="o">=</span> <span class="s1">&#39;audio_nmf_snr&#39;</span>
+    <span class="n">audio_sizes</span> <span class="o">=</span> <span class="s1">&#39;audio_sizes&#39;</span>
+
+    <span class="c1"># videos</span>
+    <span class="n">video_duration</span> <span class="o">=</span> <span class="s1">&#39;video_duration&#39;</span>
+    <span class="n">video_aspect_ratios</span> <span class="o">=</span> <span class="s1">&#39;video_aspect_ratios&#39;</span>
+    <span class="n">video_width</span> <span class="o">=</span> <span class="s1">&#39;video_width&#39;</span>
+    <span class="n">video_height</span> <span class="o">=</span> <span class="s1">&#39;video_height&#39;</span>
+    <span class="n">video_ocr_area_ratio</span> <span class="o">=</span> <span class="s1">&#39;video_ocr_area_ratio&#39;</span>
+    <span class="n">video_aesthetic_score</span> <span class="o">=</span> <span class="s1">&#39;video_aesthetic_score&#39;</span>
+    <span class="n">video_frames_aesthetics_score</span> <span class="o">=</span> <span class="s1">&#39;video_frames_aesthetics_score&#39;</span>
+    <span class="n">video_motion_score</span> <span class="o">=</span> <span class="s1">&#39;video_motion_score&#39;</span>
+    <span class="n">video_nsfw_score</span> <span class="o">=</span> <span class="s1">&#39;video_nsfw_score&#39;</span>
+    <span class="n">video_watermark_prob</span> <span class="o">=</span> <span class="s1">&#39;video_watermark_prob&#39;</span>
+
+    <span class="c1"># multimodal</span>
+    <span class="c1"># image-text</span>
+    <span class="n">image_text_similarity</span> <span class="o">=</span> <span class="s1">&#39;image_text_similarity&#39;</span>
+    <span class="n">image_text_matching_score</span> <span class="o">=</span> <span class="s1">&#39;image_text_matching_score&#39;</span>
+    <span class="n">phrase_grounding_recall</span> <span class="o">=</span> <span class="s1">&#39;phrase_grounding_recall&#39;</span>
+
+    <span class="c1"># video-text</span>
+    <span class="n">video_frames_text_similarity</span> <span class="o">=</span> <span class="s1">&#39;video_frames_text_similarity&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="StatsKeys">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.StatsKeys">[docs]</a>
+<span class="k">class</span> <span class="nc">StatsKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">StatsKeysMeta</span><span class="p">):</span>
+    <span class="n">_constants_class</span> <span class="o">=</span> <span class="n">StatsKeysConstant</span></div>
+
+
+
+<div class="viewcode-block" id="HashKeys">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.HashKeys">[docs]</a>
+<span class="k">class</span> <span class="nc">HashKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="nb">hash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;hash&#39;</span>
+    <span class="n">minhash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;minhash&#39;</span>
+    <span class="n">simhash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;simhash&#39;</span>
+
+    <span class="c1"># image</span>
+    <span class="n">imagehash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;imagehash&#39;</span>
+
+    <span class="c1"># video</span>
+    <span class="n">videohash</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;videohash&#39;</span>
+
+    <span class="c1"># duplicate flag</span>
+    <span class="n">is_duplicate</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;is_duplicate&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="InterVars">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.InterVars">[docs]</a>
+<span class="k">class</span> <span class="nc">InterVars</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c1"># text</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;lines&#39;</span>
+    <span class="n">words</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;words&#39;</span>
+    <span class="n">refined_words</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;refined_words&#39;</span>
+
+    <span class="c1"># image</span>
+    <span class="n">loaded_images</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;loaded_images&#39;</span>  <span class="c1"># Image</span>
+
+    <span class="c1"># audios</span>
+    <span class="n">loaded_audios</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;loaded_audios&#39;</span>  <span class="c1"># (data, sampling_rate)</span>
+
+    <span class="c1"># videos</span>
+    <span class="c1"># InputContainer from av.</span>
+    <span class="c1"># Key: {video_path}</span>
+    <span class="n">loaded_videos</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;loaded_videos&#39;</span>
+    <span class="c1"># sampled frames.</span>
+    <span class="c1"># Key: {video_path}-{frame_sampling_method}[-{frame_num}]</span>
+    <span class="c1">#   {frame_num} is only used when {frame_sampling_method} is &quot;uniform&quot;</span>
+    <span class="n">sampled_frames</span> <span class="o">=</span> <span class="n">DEFAULT_PREFIX</span> <span class="o">+</span> <span class="s1">&#39;sampled_frames&#39;</span></div>
+
+
+
+<div class="viewcode-block" id="JobRequiredKeys">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.constant.JobRequiredKeys">[docs]</a>
+<span class="k">class</span> <span class="nc">JobRequiredKeys</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">hook</span> <span class="o">=</span> <span class="s1">&#39;hook&#39;</span>
+    <span class="n">dj_configs</span> <span class="o">=</span> <span class="s1">&#39;dj_configs&#39;</span>
+    <span class="n">meta_name</span> <span class="o">=</span> <span class="s1">&#39;meta_name&#39;</span>
+    <span class="n">extra_configs</span> <span class="o">=</span> <span class="s1">&#39;extra_configs&#39;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

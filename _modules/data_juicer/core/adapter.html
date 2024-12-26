@@ -11,7 +11,7 @@
 
   
       <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -93,13 +93,13 @@
 
 
 <div class="viewcode-block" id="Adapter">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter">[docs]</a>
 <span class="k">class</span> <span class="nc">Adapter</span><span class="p">:</span>
 
     <span class="n">MAX_BATCH_SIZE</span> <span class="o">=</span> <span class="mi">10000</span>
 
 <div class="viewcode-block" id="Adapter.__init__">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">cfg</span>
 
@@ -111,7 +111,7 @@
 
 
 <div class="viewcode-block" id="Adapter.execute_and_probe">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.execute_and_probe">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.execute_and_probe">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">execute_and_probe</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">,</span> <span class="n">sample_interval</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -170,7 +170,7 @@
 
 
 <div class="viewcode-block" id="Adapter.take_batch">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.take_batch">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.take_batch">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">take_batch</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -194,7 +194,7 @@
 
 
 <div class="viewcode-block" id="Adapter.adapt_workloads">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.adapt_workloads">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.adapt_workloads">[docs]</a>
     <span class="k">def</span> <span class="nf">adapt_workloads</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Manage the scheduling and load balancing for the dataset processing.</span>
@@ -214,7 +214,7 @@
 
 
 <div class="viewcode-block" id="Adapter.probe_small_batch">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.probe_small_batch">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.probe_small_batch">[docs]</a>
     <span class="nd">@dataset_cache_control</span><span class="p">(</span><span class="n">on</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">probe_small_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">operators</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -242,7 +242,7 @@
 
 
 <div class="viewcode-block" id="Adapter.batch_size_strategy">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.batch_size_strategy">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.batch_size_strategy">[docs]</a>
     <span class="k">def</span> <span class="nf">batch_size_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_analysis_res</span><span class="p">,</span> <span class="n">base_bs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">util_th</span><span class="o">=</span><span class="mf">0.9</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Decide the batch size for each op according to their workload analysis</span>
@@ -282,7 +282,7 @@
 
 
 <div class="viewcode-block" id="Adapter.analyze_small_batch">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.analyze_small_batch">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.analyze_small_batch">[docs]</a>
     <span class="nd">@dataset_cache_control</span><span class="p">(</span><span class="n">on</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">analyze_small_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">current_state</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -329,7 +329,7 @@
 
 
 <div class="viewcode-block" id="Adapter.insight_mining">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.Adapter.insight_mining">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.adapter.Adapter.insight_mining">[docs]</a>
     <span class="k">def</span> <span class="nf">insight_mining</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pval_th</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Mining the insights from the OP-wise analysis results. For now, we use</span>

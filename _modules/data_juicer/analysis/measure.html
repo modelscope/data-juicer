@@ -1,0 +1,372 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.analysis.measure &mdash; data_juicer 1.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.analysis.measure</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.analysis.measure</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.utils.lazy_loader</span> <span class="kn">import</span> <span class="n">LazyLoader</span>
+
+<span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;torch&#39;</span><span class="p">,</span> <span class="s1">&#39;torch&#39;</span><span class="p">)</span>
+<span class="n">td</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;td&#39;</span><span class="p">,</span> <span class="s1">&#39;torch.distributions&#39;</span><span class="p">)</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;F&#39;</span><span class="p">,</span> <span class="s1">&#39;torch.nn.functional&#39;</span><span class="p">)</span>
+
+<span class="n">stats</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;stats&#39;</span><span class="p">,</span> <span class="s1">&#39;scipy.stats&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Measure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.Measure">[docs]</a>
+<span class="k">class</span> <span class="nc">Measure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for Measure distribution.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;base&#39;</span>
+
+<div class="viewcode-block" id="Measure.measure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.Measure.measure">[docs]</a>
+    <span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">measure</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_convert_to_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert input data to torch tensor.</span>
+<span class="sd">        :param p: input data, now support</span>
+<span class="sd">            [`scalar`,`list`, `tuple`, `torch binary file`, and `Categorical`].</span>
+<span class="sd">        :return: torch tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">p</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">td</span><span class="o">.</span><span class="n">Categorical</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">probs</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_convert_to_categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert input data to torch Categorical.</span>
+<span class="sd">        :param p: input data, now support</span>
+<span class="sd">            [`scalar`,`list`, `tuple`, `torch binary file`, and `Categorical`].</span>
+<span class="sd">        :return: torch Categorical</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">td</span><span class="o">.</span><span class="n">Categorical</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">p</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">td</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">td</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">td</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_convert_to_ndarray</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert input data to torch tensor.</span>
+<span class="sd">        :param p: input data, now support</span>
+<span class="sd">            [`scalar`,`list`, `tuple`, `torch binary file`, and `Categorical`].</span>
+<span class="sd">        :return: torch tensor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_tensor</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="KLDivMeasure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.KLDivMeasure">[docs]</a>
+<span class="k">class</span> <span class="nc">KLDivMeasure</span><span class="p">(</span><span class="n">Measure</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measure Kullback-Leibler divergence.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;kl_divergence&#39;</span>
+
+<div class="viewcode-block" id="KLDivMeasure.measure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.KLDivMeasure.measure">[docs]</a>
+    <span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_categorical</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_categorical</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">probs</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">q</span><span class="o">.</span><span class="n">probs</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> \
+            <span class="s1">&#39;The two inputs have different shape:&#39;</span> \
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">probs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> != </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">probs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">kl_div</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">logits</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">probs</span><span class="p">,</span> <span class="n">log_target</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="JSDivMeasure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.JSDivMeasure">[docs]</a>
+<span class="k">class</span> <span class="nc">JSDivMeasure</span><span class="p">(</span><span class="n">Measure</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measure Jensen-Shannon divergence.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;js_divergence&#39;</span>
+
+<div class="viewcode-block" id="JSDivMeasure.measure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.JSDivMeasure.measure">[docs]</a>
+    <span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_tensor</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_tensor</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>  \
+            <span class="s1">&#39;The two inputs have different shape:&#39;</span> \
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> != </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">p</span> <span class="o">+</span> <span class="n">q</span><span class="p">)</span>
+        <span class="n">kl_p</span> <span class="o">=</span> <span class="n">KLDivMeasure</span><span class="p">()(</span><span class="n">p</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">kl_q</span> <span class="o">=</span> <span class="n">KLDivMeasure</span><span class="p">()(</span><span class="n">q</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">js</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">kl_p</span> <span class="o">+</span> <span class="n">kl_q</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">js</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CrossEntropyMeasure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.CrossEntropyMeasure">[docs]</a>
+<span class="k">class</span> <span class="nc">CrossEntropyMeasure</span><span class="p">(</span><span class="n">Measure</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measure Cross-Entropy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;cross_entropy&#39;</span>
+
+<div class="viewcode-block" id="CrossEntropyMeasure.measure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.CrossEntropyMeasure.measure">[docs]</a>
+    <span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_categorical</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_categorical</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">p</span><span class="o">.</span><span class="n">probs</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">q</span><span class="o">.</span><span class="n">probs</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> \
+            <span class="s1">&#39;The two inputs have different shape: &#39;</span>\
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">p</span><span class="o">.</span><span class="n">probs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> != </span><span class="si">{</span><span class="n">q</span><span class="o">.</span><span class="n">probs</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">logits</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">probs</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EntropyMeasure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.EntropyMeasure">[docs]</a>
+<span class="k">class</span> <span class="nc">EntropyMeasure</span><span class="p">(</span><span class="n">Measure</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measure Entropy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;entropy&#39;</span>
+
+<div class="viewcode-block" id="EntropyMeasure.measure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.EntropyMeasure.measure">[docs]</a>
+    <span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_categorical</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">entropy</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RelatedTTestMeasure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.RelatedTTestMeasure">[docs]</a>
+<span class="k">class</span> <span class="nc">RelatedTTestMeasure</span><span class="p">(</span><span class="n">Measure</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measure T-Test for two related distributions on their histogram of the same</span>
+<span class="sd">    bins.</span>
+
+<span class="sd">    Ref:</span>
+<span class="sd">    https://en.wikipedia.org/wiki/Student%27s_t-test</span>
+
+<span class="sd">    For continuous features or distributions, the input could be dataset stats</span>
+<span class="sd">    list.</span>
+<span class="sd">    For discrete features or distributions, the input could be the tags or the</span>
+<span class="sd">    categories list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;t-test&#39;</span>
+
+<div class="viewcode-block" id="RelatedTTestMeasure.stats_to_hist">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.RelatedTTestMeasure.stats_to_hist">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">stats_to_hist</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+
+        <span class="c1"># get common maximum number of data samples, and max/min values</span>
+        <span class="n">max_data_num</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+        <span class="n">min_val</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+        <span class="n">max_val</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">p</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+
+        <span class="c1"># get a recommended number of bins</span>
+        <span class="n">rec_bins</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">max_data_num</span><span class="p">)),</span> <span class="mi">10</span><span class="p">)</span>
+
+        <span class="c1"># get the common bin edges</span>
+        <span class="n">common_p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="p">[</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">])</span>
+        <span class="n">hist_p</span><span class="p">,</span> <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">common_p</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">rec_bins</span><span class="p">)</span>
+        <span class="c1"># restore the hist of the original p</span>
+        <span class="n">hist_p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">hist_p</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="c1"># get the hist of the original q using the common bin edges</span>
+        <span class="n">hist_q</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bin_edges</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hist_p</span><span class="p">,</span> <span class="n">hist_q</span><span class="p">,</span> <span class="n">bin_edges</span></div>
+
+
+<div class="viewcode-block" id="RelatedTTestMeasure.category_to_hist">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.RelatedTTestMeasure.category_to_hist">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">category_to_hist</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">flatten_list</span><span class="p">(</span><span class="n">lst</span><span class="p">):</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">lst</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flatten_list</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">res</span>
+
+        <span class="c1"># flatten the list</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">flatten_list</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">flatten_list</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+
+        <span class="c1"># get the common categories</span>
+        <span class="n">cat_p</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">cat_q</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="n">cat_common</span> <span class="o">=</span> <span class="n">cat_p</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">cat_q</span><span class="p">)</span>
+
+        <span class="c1"># get category distributions</span>
+        <span class="n">count_p</span> <span class="o">=</span> <span class="p">{</span><span class="n">cat</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">cat_common</span><span class="p">}</span>
+        <span class="n">count_q</span> <span class="o">=</span> <span class="p">{</span><span class="n">cat</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">cat_common</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
+            <span class="n">count_p</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">q</span><span class="p">:</span>
+            <span class="n">count_q</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># only keep distribution values sorted by counts</span>
+        <span class="n">sorted_cat</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">count_p</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">sorted_cat</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">it</span><span class="p">:</span> <span class="n">it</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">sorted_cat</span> <span class="o">=</span> <span class="p">[</span><span class="n">it</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">sorted_cat</span><span class="p">]</span>
+        <span class="c1"># get the value dist</span>
+        <span class="n">hist_p</span> <span class="o">=</span> <span class="p">[</span><span class="n">count_p</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">sorted_cat</span><span class="p">]</span>
+        <span class="n">hist_q</span> <span class="o">=</span> <span class="p">[</span><span class="n">count_q</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">sorted_cat</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">hist_p</span><span class="p">,</span> <span class="n">hist_q</span><span class="p">,</span> <span class="n">count_p</span><span class="p">,</span> <span class="n">count_q</span><span class="p">,</span> <span class="n">sorted_cat</span></div>
+
+
+<div class="viewcode-block" id="RelatedTTestMeasure.measure">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.measure.RelatedTTestMeasure.measure">[docs]</a>
+    <span class="k">def</span> <span class="nf">measure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param p: the first feature or distribution. (stats/tags/categories)</span>
+<span class="sd">        :param q: the second feature or distribution. (stats/tags/categories)</span>
+<span class="sd">        :return: the T-Test results object -- ([ref](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats._result_classes.TtestResult.html#scipy.stats._result_classes.TtestResult))  # noqa: E501</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ele</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">while</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ele</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">ele</span> <span class="o">=</span> <span class="n">ele</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ele</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="c1"># discrete tags or categories</span>
+            <span class="n">hist_p</span><span class="p">,</span> <span class="n">hist_q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">category_to_hist</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># continuous stats</span>
+            <span class="n">hist_p</span><span class="p">,</span> <span class="n">hist_q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats_to_hist</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="c1"># compute the t-test and pval for hist_p and hist_q</span>
+        <span class="n">ttest_res</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">ttest_rel</span><span class="p">(</span><span class="n">hist_p</span><span class="p">,</span> <span class="n">hist_q</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ttest_res</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
