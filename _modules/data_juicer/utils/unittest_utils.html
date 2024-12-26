@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.utils.unittest_utils &mdash; data_juicer 1.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.utils.unittest_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.utils.unittest_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer</span> <span class="kn">import</span> <span class="n">is_cuda_available</span>
+<span class="kn">from</span> <span class="nn">data_juicer.core.data</span> <span class="kn">import</span> <span class="n">DJDataset</span><span class="p">,</span> <span class="n">NestedDataset</span>
+<span class="kn">from</span> <span class="nn">data_juicer.core.ray_data</span> <span class="kn">import</span> <span class="n">RayDataset</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.lazy_loader</span> <span class="kn">import</span> <span class="n">LazyLoader</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">free_models</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.registry</span> <span class="kn">import</span> <span class="n">Registry</span>
+
+<span class="n">rd</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;rd&#39;</span><span class="p">,</span> <span class="s1">&#39;ray.data&#39;</span><span class="p">)</span>
+<span class="n">transformers</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;transformers&#39;</span><span class="p">,</span> <span class="s1">&#39;transformers&#39;</span><span class="p">)</span>
+
+<span class="n">SKIPPED_TESTS</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="s1">&#39;SkippedTests&#39;</span><span class="p">)</span>
+
+<span class="n">CLEAR_MODEL</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="TEST_TAG">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.unittest_utils.TEST_TAG">[docs]</a>
+<span class="k">def</span> <span class="nf">TEST_TAG</span><span class="p">(</span><span class="o">*</span><span class="n">tags</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tags for test case.</span>
+<span class="sd">    Currently, `standalone`, `ray` are supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="s1">&#39;__test_tags__&#39;</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
+
+
+
+<div class="viewcode-block" id="set_clear_model_flag">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.unittest_utils.set_clear_model_flag">[docs]</a>
+<span class="k">def</span> <span class="nf">set_clear_model_flag</span><span class="p">(</span><span class="n">flag</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">CLEAR_MODEL</span>
+    <span class="n">CLEAR_MODEL</span> <span class="o">=</span> <span class="n">flag</span>
+    <span class="k">if</span> <span class="n">CLEAR_MODEL</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CLEAR DOWNLOADED MODELS AFTER UNITTESTS.&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;KEEP DOWNLOADED MODELS AFTER UNITTESTS.&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DataJuicerTestCaseBase">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase">[docs]</a>
+<span class="k">class</span> <span class="nc">DataJuicerTestCaseBase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="DataJuicerTestCaseBase.setUpClass">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.setUpClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">setUpClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="c1"># Set maxDiff for all test cases based on an environment variable</span>
+        <span class="n">max_diff</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;TEST_MAX_DIFF&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">maxDiff</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">max_diff</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_diff</span><span class="p">)</span>
+
+        <span class="kn">import</span> <span class="nn">multiprocess</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">original_mp_method</span> <span class="o">=</span> <span class="n">multiprocess</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">is_cuda_available</span><span class="p">():</span>
+            <span class="n">multiprocess</span><span class="o">.</span><span class="n">set_start_method</span><span class="p">(</span><span class="s1">&#39;spawn&#39;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataJuicerTestCaseBase.tearDownClass">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.tearDownClass">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">tearDownClass</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">hf_model_name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">multiprocess</span>
+        <span class="n">multiprocess</span><span class="o">.</span><span class="n">set_start_method</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">original_mp_method</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># clean the huggingface model cache files</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">CLEAR_MODEL</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="n">hf_model_name</span><span class="p">:</span>
+            <span class="c1"># given the hf model name, remove this model only</span>
+            <span class="n">model_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">transformers</span><span class="o">.</span><span class="n">TRANSFORMERS_CACHE</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s1">&#39;models--</span><span class="si">{</span><span class="n">hf_model_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">model_dir</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;CLEAN model cache files for </span><span class="si">{</span><span class="n">hf_model_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">model_dir</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># not given the hf model name, remove the whole TRANSFORMERS_CACHE</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">transformers</span><span class="o">.</span><span class="n">TRANSFORMERS_CACHE</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CLEAN all TRANSFORMERS_CACHE&#39;</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">transformers</span><span class="o">.</span><span class="n">TRANSFORMERS_CACHE</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataJuicerTestCaseBase.tearDown">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.tearDown">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">free_models</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DataJuicerTestCaseBase.generate_dataset">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.generate_dataset">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DJDataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate dataset for a specific executor.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            type (str, optional): &quot;standalone&quot; or &quot;ray&quot;.</span>
+<span class="sd">            Defaults to &quot;standalone&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">current_tag</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;current_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;standalone&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current_tag</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;standalone&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">NestedDataset</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">current_tag</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ray&#39;</span><span class="p">):</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">rd</span><span class="o">.</span><span class="n">from_items</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RayDataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported type&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataJuicerTestCaseBase.run_single_op">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.run_single_op">[docs]</a>
+    <span class="k">def</span> <span class="nf">run_single_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">DJDataset</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">column_names</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run operator in the specific executor.&quot;&quot;&quot;</span>
+        <span class="n">current_tag</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;current_tag&#39;</span><span class="p">,</span> <span class="s1">&#39;standalone&#39;</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">current_tag</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;standalone&#39;</span><span class="p">):</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select_columns</span><span class="p">(</span><span class="n">column_names</span><span class="o">=</span><span class="n">column_names</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">current_tag</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;ray&#39;</span><span class="p">):</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">column_names</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unsupported type&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataJuicerTestCaseBase.assertDatasetEqual">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.unittest_utils.DataJuicerTestCaseBase.assertDatasetEqual">[docs]</a>
+    <span class="k">def</span> <span class="nf">assertDatasetEqual</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">convert_record</span><span class="p">(</span><span class="n">rec</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">rec</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="c1"># Convert incomparable `list` to comparable `tuple`</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                        <span class="n">rec</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">rec</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">rec</span>
+
+        <span class="n">first</span> <span class="o">=</span> <span class="p">[</span><span class="n">convert_record</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">first</span><span class="p">]</span>
+        <span class="n">second</span> <span class="o">=</span> <span class="p">[</span><span class="n">convert_record</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">second</span><span class="p">]</span>
+        <span class="n">first</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
+        <span class="n">second</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">second</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">())))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

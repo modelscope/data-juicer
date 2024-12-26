@@ -11,7 +11,7 @@
 
   
       <script src="../../../../_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -94,6 +94,8 @@
 <span class="n">HASH_METHOD</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;phash&#39;</span><span class="p">,</span> <span class="s1">&#39;dhash&#39;</span><span class="p">,</span> <span class="s1">&#39;whash&#39;</span><span class="p">,</span> <span class="s1">&#39;ahash&#39;</span><span class="p">}</span>
 
 
+<div class="viewcode-block" id="get_hash_method">
+<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_image_deduplicator.get_hash_method">[docs]</a>
 <span class="k">def</span> <span class="nf">get_hash_method</span><span class="p">(</span><span class="n">method_name</span><span class="p">):</span>
 
     <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span>
@@ -103,11 +105,12 @@
         <span class="s1">&#39;ahash&#39;</span><span class="p">:</span> <span class="n">imgdedup_methods</span><span class="o">.</span><span class="n">AHash</span>
     <span class="p">}</span>
 
-    <span class="k">return</span> <span class="n">mapping</span><span class="p">[</span><span class="n">method_name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">mapping</span><span class="p">[</span><span class="n">method_name</span><span class="p">]</span></div>
+
 
 
 <div class="viewcode-block" id="RayImageDeduplicator">
-<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayImageDeduplicator">[docs]</a>
+<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_image_deduplicator.RayImageDeduplicator">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_IMAGES</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">RayImageDeduplicator</span><span class="p">(</span><span class="n">RayBasicDeduplicator</span><span class="p">):</span>
@@ -117,7 +120,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="RayImageDeduplicator.__init__">
-<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayImageDeduplicator.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_image_deduplicator.RayImageDeduplicator.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">redis_host</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
                  <span class="n">redis_port</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">6380</span><span class="p">,</span>
@@ -142,7 +145,7 @@
 
 
 <div class="viewcode-block" id="RayImageDeduplicator.calculate_hash">
-<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayImageDeduplicator.calculate_hash">[docs]</a>
+<a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ray_image_deduplicator.RayImageDeduplicator.calculate_hash">[docs]</a>
     <span class="k">def</span> <span class="nf">calculate_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">RayBasicDeduplicator</span><span class="o">.</span><span class="n">EMPTY_HASH_VALUE</span>

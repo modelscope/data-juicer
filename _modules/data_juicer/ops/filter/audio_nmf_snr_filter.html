@@ -11,7 +11,7 @@
 
   
       <script src="../../../../_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -94,6 +94,8 @@
 
 
 <span class="c1"># run NMF to decompose the signal and noise from the input audio</span>
+<div class="viewcode-block" id="separate_signal_noise">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.separate_signal_noise">[docs]</a>
 <span class="k">def</span> <span class="nf">separate_signal_noise</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nmf_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
     <span class="c1"># convert spectral domain using Short-time Fourier transform</span>
     <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">librosa</span><span class="o">.</span><span class="n">stft</span><span class="p">(</span><span class="n">audio</span><span class="p">))</span>
@@ -113,10 +115,13 @@
     <span class="n">signal_audio</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">signal</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">S</span><span class="p">)))</span>
     <span class="n">noise_audio</span> <span class="o">=</span> <span class="n">librosa</span><span class="o">.</span><span class="n">istft</span><span class="p">(</span><span class="n">noise</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">S</span><span class="p">)))</span>
 
-    <span class="k">return</span> <span class="n">signal_audio</span><span class="p">,</span> <span class="n">noise_audio</span>
+    <span class="k">return</span> <span class="n">signal_audio</span><span class="p">,</span> <span class="n">noise_audio</span></div>
+
 
 
 <span class="c1"># compute the SNR of an audio with NMF algorithm</span>
+<div class="viewcode-block" id="compute_nmf_snr">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.compute_nmf_snr">[docs]</a>
 <span class="k">def</span> <span class="nf">compute_nmf_snr</span><span class="p">(</span><span class="n">audio_data</span><span class="p">,</span> <span class="n">nmf_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
     <span class="c1"># separate the signal and noise parts from the original audio</span>
     <span class="n">signal</span><span class="p">,</span> <span class="n">noise</span> <span class="o">=</span> <span class="n">separate_signal_noise</span><span class="p">(</span><span class="n">audio_data</span><span class="p">,</span>
@@ -133,11 +138,12 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">snr</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">power_signal</span> <span class="o">/</span> <span class="n">power_noise</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">snr</span>
+    <span class="k">return</span> <span class="n">snr</span></div>
+
 
 
 <div class="viewcode-block" id="AudioNMFSNRFilter">
-<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.AudioNMFSNRFilter">[docs]</a>
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="nd">@LOADED_AUDIOS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">AudioNMFSNRFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
@@ -146,7 +152,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AudioNMFSNRFilter.__init__">
-<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.AudioNMFSNRFilter.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">min_snr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
                  <span class="n">max_snr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">,</span>
@@ -181,7 +187,7 @@
 
 
 <div class="viewcode-block" id="AudioNMFSNRFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.AudioNMFSNRFilter.compute_stats_single">[docs]</a>
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter.compute_stats_single">[docs]</a>
     <span class="k">def</span> <span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">audio_nmf_snr</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
@@ -212,7 +218,7 @@
 
 
 <div class="viewcode-block" id="AudioNMFSNRFilter.process_single">
-<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.AudioNMFSNRFilter.process_single">[docs]</a>
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.audio_nmf_snr_filter.AudioNMFSNRFilter.process_single">[docs]</a>
     <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="n">audio_snrs</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">audio_nmf_snr</span><span class="p">]</span>
         <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
