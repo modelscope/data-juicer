@@ -1,0 +1,346 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.aggregator.meta_tags_aggregator &mdash; data_juicer 1.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/documentation_options.js?v=1ed6394b"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.aggregator.meta_tags_aggregator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.aggregator.meta_tags_aggregator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.ops.base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Aggregator</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.common_utils</span> <span class="kn">import</span> <span class="n">is_string_list</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">MetaKeys</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;meta_tags_aggregator&#39;</span>
+
+
+<span class="c1"># TODO: LLM-based inference.</span>
+<div class="viewcode-block" id="MetaTagsAggregator">
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MetaTagsAggregator">[docs]</a>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">MetaTagsAggregator</span><span class="p">(</span><span class="n">Aggregator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Merge similar meta tags to one tag.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;给定一些标签以及这些标签出现的频次，合并意思相近的标签。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;要求：</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;- 任务分为两种情况，一种是给定合并后的标签，需要将合并前的标签映射到&#39;</span>
+                             <span class="s1">&#39;这些标签。如果给定的合并后的标签中有类似“其他”这种标签，将无法归类的&#39;</span>
+                             <span class="s1">&#39;标签合并到“其他”。以下是这种情况的一个样例：</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;合并后的标签应限定在[科技, 健康, 其他]中。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 合并前标签 | 频次 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| ------ | ------ |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 医疗 | 20 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 信息技术 | 16 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 学习 | 19 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 气候变化 | 22 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 人工智能 | 11 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 养生 | 17 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 科学创新 | 10 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;## 分析：“信息技术”、“人工智能”、“科学创新”都属于“科技”类别，“医疗&#39;</span>
+                             <span class="s1">&#39;”和“养生”跟“健康”有关联，“学习”、“气候变化”和“科技”还有“健康”关&#39;</span>
+                             <span class="s1">&#39;联不强，应该被归为“其他”。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;## 标签合并：</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 医疗归类为健康 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 信息技术归类为科技 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 学习归类为其他 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 气候变化归类为其他 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 人工智能归类为科技 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 养生归类为健康 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 科学创新归类为科技 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;- 另外一种情况没有事先给定合并后的标签，需要生成合理的标签类别：&#39;</span>
+                             <span class="s1">&#39;| 合并前标签 | 频次 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| ------ | ------ |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 医疗 | 20 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 信息技术 | 16 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 学习 | 2 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 气候变化 | 1 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 人工智能 | 11 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 养生 | 17 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;| 科学创新 | 10 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;## 分析：“信息技术”、“人工智能”、“科学创新”这三个标签比较相近，归为&#39;</span>
+                             <span class="s1">&#39;同一类，都属于“科技”类别，“医疗”和“养生”都跟“健康”有关系，可以归&#39;</span>
+                             <span class="s1">&#39;类为“健康”，“学习”和“气候变化”跟其他标签关联度不强，且频次较低，&#39;</span>
+                             <span class="s1">&#39;统一归类为“其他”。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;## 标签合并：</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 医疗归类为健康 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 信息技术归类为科技 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 学习归类为其他 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 气候变化归类为其他 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 人工智能归类为科技 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 养生归类为健康 **</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;** 科学创新归类为科技 **</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">{target_tag_str}</span><span class="s1">&#39;</span>
+                              <span class="s1">&#39;| 合并前标签 | 频次 |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                              <span class="s1">&#39;| ------ | ------ |</span><span class="se">\n</span><span class="s1">&#39;</span>
+                              <span class="s1">&#39;</span><span class="si">{tag_strs}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">DEFAULT_TARGET_TAG_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;合并后的标签应限定在[</span><span class="si">{target_tags}</span><span class="s1">]中。</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_TAG_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;| </span><span class="si">{tag}</span><span class="s1"> | </span><span class="si">{cnt}</span><span class="s1"> |&#39;</span>
+
+    <span class="n">DEFAULT_OUTPUT_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\*\*\s*(\w+)归类为(\w+)\s*\*\*&#39;</span>
+
+<div class="viewcode-block" id="MetaTagsAggregator.__init__">
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MetaTagsAggregator.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
+                 <span class="n">meta_tag_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">dialog_sentiment_labels</span><span class="p">,</span>
+                 <span class="n">target_tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="o">*</span><span class="p">,</span>
+                 <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">system_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">target_tag_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">tag_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">output_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                 <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+                 <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+<span class="sd">        :param api_model: API model name.</span>
+<span class="sd">        :param meta_tag_key: The key of the meta tag to be mapped.</span>
+<span class="sd">        :param target_tags: The tags that is supposed to be mapped to.</span>
+<span class="sd">        :param api_endpoint: URL endpoint for the API.</span>
+<span class="sd">        :param response_path: Path to extract content from the API response.</span>
+<span class="sd">            Defaults to &#39;choices.0.message.content&#39;.</span>
+<span class="sd">        :param system_prompt: The system prompt.</span>
+<span class="sd">        :param input_template: The input template.</span>
+<span class="sd">        :param target_tag_template: The tap template for target tags.</span>
+<span class="sd">        :param tag_template: The tap template for each tag and its</span>
+<span class="sd">            frequency.</span>
+<span class="sd">        :param output_pattern: The output pattern.</span>
+<span class="sd">        :param try_num: The number of retry attempts when there is an API</span>
+<span class="sd">            call error or output parsing error.</span>
+<span class="sd">        :param model_params: Parameters for initializing the API model.</span>
+<span class="sd">        :param sampling_params: Extra parameters passed to the API call.</span>
+<span class="sd">            e.g {&#39;temperature&#39;: 0.9, &#39;top_p&#39;: 0.95}</span>
+<span class="sd">        :param kwargs: Extra keyword arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">meta_tag_key</span> <span class="o">=</span> <span class="n">meta_tag_key</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span> <span class="o">=</span> <span class="n">system_prompt</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SYSTEM_PROMPT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_template</span> <span class="o">=</span> <span class="n">input_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_INPUT_TEMPLATE</span>
+        <span class="n">target_tag_template</span> <span class="o">=</span> <span class="n">target_tag_template</span> <span class="ow">or</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TARGET_TAG_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tag_template</span> <span class="o">=</span> <span class="n">tag_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TAG_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span> <span class="o">=</span> <span class="n">output_pattern</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_OUTPUT_PATTERN</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_tag_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">target_tags</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_tag_str</span> <span class="o">=</span> <span class="n">target_tag_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">target_tags</span><span class="o">=</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target_tags</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">,</span>
+                                       <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span>
+                                       <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
+                                       <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
+                                       <span class="n">return_processor</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                       <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span></div>
+
+
+<div class="viewcode-block" id="MetaTagsAggregator.parse_output">
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MetaTagsAggregator.parse_output">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="n">tag_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">tag1</span><span class="p">:</span> <span class="n">tag2</span> <span class="k">for</span> <span class="n">tag1</span><span class="p">,</span> <span class="n">tag2</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">tag_map</span></div>
+
+
+<div class="viewcode-block" id="MetaTagsAggregator.meta_map">
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MetaTagsAggregator.meta_map">[docs]</a>
+    <span class="k">def</span> <span class="nf">meta_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta_cnts</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">model</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
+
+        <span class="n">tag_strs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tag_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">cnt</span><span class="o">=</span><span class="n">meta_cnts</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">meta_cnts</span>
+        <span class="p">]</span>
+        <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">target_tag_str</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_tag_str</span><span class="p">,</span> <span class="n">tag_strs</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tag_strs</span><span class="p">))</span>
+
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span>
+            <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span>
+        <span class="p">},</span> <span class="p">{</span>
+            <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">input_prompt</span>
+        <span class="p">}]</span>
+        <span class="n">tag_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">try_num</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
+                <span class="n">tag_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_output</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tag_map</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tag_map</span></div>
+
+
+<div class="viewcode-block" id="MetaTagsAggregator.process_single">
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MetaTagsAggregator.process_single">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Not any meta in the sample!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sample</span>
+
+        <span class="n">metas</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">]</span>
+        <span class="c1"># if not batched sample</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metas</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Not a batched sample!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">sample</span>
+
+        <span class="n">meta_cnts</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">def</span> <span class="nf">update_dict</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">meta_cnts</span><span class="p">:</span>
+                <span class="n">meta_cnts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">meta_cnts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">metas</span><span class="p">:</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_tag_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">update_dict</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">is_string_list</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tag</span><span class="p">:</span>
+                    <span class="n">update_dict</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Meta tag must be string or list of string!&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">sample</span>
+
+        <span class="n">tag_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta_map</span><span class="p">(</span><span class="n">meta_cnts</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">metas</span><span class="p">)):</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="n">metas</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_tag_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tag_map</span><span class="p">:</span>
+                <span class="n">metas</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_tag_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_map</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">is_string_list</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+                <span class="n">metas</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">meta_tag_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">tag_map</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tag_map</span> <span class="k">else</span> <span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tag</span>
+                <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">sample</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

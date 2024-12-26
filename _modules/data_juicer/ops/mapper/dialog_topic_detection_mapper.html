@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.ops.mapper.dialog_topic_detection_mapper &mdash; data_juicer 1.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/documentation_options.js?v=1ed6394b"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.mapper.dialog_topic_detection_mapper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.ops.mapper.dialog_topic_detection_mapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">NonNegativeInt</span><span class="p">,</span> <span class="n">PositiveInt</span>
+
+<span class="kn">from</span> <span class="nn">data_juicer.ops.base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.common_utils</span> <span class="kn">import</span> <span class="n">nested_set</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">MetaKeys</span>
+<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;dialog_topic_detection_mapper&#39;</span>
+
+
+<span class="c1"># TODO: LLM-based inference.</span>
+<div class="viewcode-block" id="DialogTopicDetectionMapper">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogTopicDetectionMapper">[docs]</a>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">DialogTopicDetectionMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mapper to generate user&#39;s topic labels in dialog. Input from</span>
+<span class="sd">    history_key, query_key and response_key. Output lists of</span>
+<span class="sd">    labels and analysis for queries in the dialog, which is</span>
+<span class="sd">    store in &#39;dialog_sentiment_labels&#39; and</span>
+<span class="sd">    &#39;dialog_sentiment_labels_analysis&#39; in Data-Juicer meta field.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;请判断用户和LLM多轮对话中用户所讨论的话题。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;要求：</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;- 针对用户的每个query，需要先进行分析，然后列出用户正在讨论的话题，下面是&#39;</span>
+                             <span class="s1">&#39;一个样例，请模仿样例格式输出。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;用户：你好，今天我们来聊聊秦始皇吧。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;话题分析：用户提到秦始皇，这是中国历史上第一位皇帝。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;话题类别：历史</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;LLM：当然可以，秦始皇是中国历史上第一个统一全国的皇帝，他在公元前221年建&#39;</span>
+                             <span class="s1">&#39;立了秦朝，并采取了一系列重要的改革措施，如统一文字、度量衡和货币等。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;用户：秦始皇修建的长城和现在的长城有什么区别？</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;话题分析：用户提到秦始皇修建的长城，并将其与现代长城进行比较，涉及建筑历史&#39;</span>
+                             <span class="s1">&#39;和地理位置。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;话题类别：历史&#39;</span>
+                             <span class="s1">&#39;LLM：秦始皇时期修建的长城主要是为了抵御北方游牧民族的入侵，它的规模和修建&#39;</span>
+                             <span class="s1">&#39;技术相对较为简陋。现代人所看到的长城大部分是明朝时期修建和扩建的，明长城不&#39;</span>
+                             <span class="s1">&#39;仅规模更大、结构更坚固，而且保存得比较完好。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;用户：有意思，那么长城的具体位置在哪些省份呢？</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;话题分析：用户询问长城的具体位置，涉及到地理知识。</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;话题类别：地理</span><span class="se">\n</span><span class="s1">&#39;</span>
+                             <span class="s1">&#39;LLM：长城横跨中国北方多个省份，主要包括河北、山西、内蒙古、宁夏、陕西、甘&#39;</span>
+                             <span class="s1">&#39;肃和北京等。每一段长城都建在关键的战略位置，以便最大限度地发挥其防御作用&#39;</span>
+                             <span class="s1">&#39;。</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">DEFAULT_QUERY_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;用户：</span><span class="si">{query}</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_RESPONSE_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;LLM：</span><span class="si">{response}</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_ANALYSIS_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;话题分析：</span><span class="si">{analysis}</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_LABELS_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;话题类别：</span><span class="si">{labels}</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_ANALYSIS_PATTERN</span> <span class="o">=</span> <span class="s1">&#39;话题分析：(.*?)</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">DEFAULT_LABELS_PATTERN</span> <span class="o">=</span> <span class="s1">&#39;话题类别：(.*?)($|</span><span class="se">\n</span><span class="s1">)&#39;</span>
+
+<div class="viewcode-block" id="DialogTopicDetectionMapper.__init__">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogTopicDetectionMapper.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
+                 <span class="n">max_round</span><span class="p">:</span> <span class="n">NonNegativeInt</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+                 <span class="o">*</span><span class="p">,</span>
+                 <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">system_prompt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">query_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">response_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">analysis_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">labels_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">analysis_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">labels_pattern</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                 <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+                 <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialization method.</span>
+
+<span class="sd">        :param api_model: API model name.</span>
+<span class="sd">        :param max_round: The max num of round in the dialog to build the</span>
+<span class="sd">            prompt.</span>
+<span class="sd">        :param api_endpoint: URL endpoint for the API.</span>
+<span class="sd">        :param response_path: Path to extract content from the API response.</span>
+<span class="sd">            Defaults to &#39;choices.0.message.content&#39;.</span>
+<span class="sd">        :param system_prompt: System prompt for the task.</span>
+<span class="sd">        :param query_template: Template for query part to build the input</span>
+<span class="sd">            prompt.</span>
+<span class="sd">        :param response_template: Template for response part to build the</span>
+<span class="sd">            input prompt.</span>
+<span class="sd">        :param analysis_template: Template for analysis part to build the</span>
+<span class="sd">            input prompt.</span>
+<span class="sd">        :param labels_template: Template for labels part to build the</span>
+<span class="sd">            input prompt.</span>
+<span class="sd">        :param analysis_pattern: Pattern to parse the return sentiment</span>
+<span class="sd">            analysis.</span>
+<span class="sd">        :param labels_pattern: Pattern to parse the return sentiment</span>
+<span class="sd">            labels.</span>
+<span class="sd">        :param try_num: The number of retry attempts when there is an API</span>
+<span class="sd">            call error or output parsing error.</span>
+<span class="sd">        :param model_params: Parameters for initializing the API model.</span>
+<span class="sd">        :param sampling_params: Extra parameters passed to the API call.</span>
+<span class="sd">            e.g {&#39;temperature&#39;: 0.9, &#39;top_p&#39;: 0.95}</span>
+<span class="sd">        :param kwargs: Extra keyword arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_round</span> <span class="o">=</span> <span class="n">max_round</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span> <span class="o">=</span> <span class="n">system_prompt</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SYSTEM_PROMPT</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">query_template</span> <span class="o">=</span> <span class="n">query_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_QUERY_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response_template</span> <span class="o">=</span> <span class="n">response_template</span> <span class="ow">or</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_RESPONSE_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_template</span> <span class="o">=</span> <span class="n">analysis_template</span> <span class="ow">or</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_ANALYSIS_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_template</span> <span class="o">=</span> <span class="n">labels_template</span> <span class="ow">or</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_LABELS_TEMPLATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_pattern</span> <span class="o">=</span> <span class="n">analysis_pattern</span> <span class="ow">or</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_ANALYSIS_PATTERN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_pattern</span> <span class="o">=</span> <span class="n">labels_pattern</span> <span class="ow">or</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_LABELS_PATTERN</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">,</span>
+                                       <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span>
+                                       <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
+                                       <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
+                                       <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span></div>
+
+
+<div class="viewcode-block" id="DialogTopicDetectionMapper.build_input">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogTopicDetectionMapper.build_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">query</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_round</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">input_prompt</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">max_round</span> <span class="o">*</span> <span class="mi">4</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">input_prompt</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="n">input_prompt</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">input_prompt</span></div>
+
+
+<div class="viewcode-block" id="DialogTopicDetectionMapper.parse_output">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogTopicDetectionMapper.parse_output">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+        <span class="n">analysis</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis_pattern</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">analysis</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels_pattern</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">analysis</span><span class="p">,</span> <span class="n">labels</span></div>
+
+
+<div class="viewcode-block" id="DialogTopicDetectionMapper.process_single">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.DialogTopicDetectionMapper.process_single">[docs]</a>
+    <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+
+        <span class="n">analysis_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">labels_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">history</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">dialog</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">history_key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_key</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">and</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_key</span> <span class="ow">in</span> <span class="n">sample</span> <span class="ow">and</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">response_key</span><span class="p">]:</span>
+                <span class="n">dialog</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">response_key</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dialog</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">query_key</span><span class="p">],</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">qa</span> <span class="ow">in</span> <span class="n">dialog</span><span class="p">:</span>
+            <span class="n">input_prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_input</span><span class="p">(</span><span class="n">history</span><span class="p">,</span> <span class="n">qa</span><span class="p">)</span>
+            <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_prompt</span><span class="p">,</span>
+            <span class="p">},</span> <span class="p">{</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">input_prompt</span><span class="p">,</span>
+            <span class="p">}]</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">try_num</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
+                    <span class="n">analysis</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_output</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">break</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="n">analysis_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
+            <span class="n">labels_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+
+            <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">query_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">qa</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">analysis</span><span class="o">=</span><span class="n">analysis</span><span class="p">))</span>
+            <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">))</span>
+            <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">response_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">qa</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="n">analysis_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">MetaKeys</span><span class="o">.</span><span class="n">dialog_topic_labels_analysis</span><span class="si">}</span><span class="s1">&#39;</span>  <span class="c1"># noqa: E501</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">nested_set</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">analysis_key</span><span class="p">,</span> <span class="n">analysis_list</span><span class="p">)</span>
+        <span class="n">labels_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">MetaKeys</span><span class="o">.</span><span class="n">dialog_topic_labels</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">nested_set</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">labels_key</span><span class="p">,</span> <span class="n">labels_list</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">sample</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
