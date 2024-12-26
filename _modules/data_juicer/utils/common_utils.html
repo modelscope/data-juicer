@@ -1,0 +1,277 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.utils.common_utils &mdash; data_juicer 1.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.utils.common_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.utils.common_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="stats_to_number">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.stats_to_number">[docs]</a>
+<span class="k">def</span> <span class="nf">stats_to_number</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        convert a stats value which can be string</span>
+<span class="sd">        of list to a float.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">s</span> <span class="o">==</span> <span class="p">[]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;empty value&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">reverse</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span></div>
+
+
+
+<div class="viewcode-block" id="dict_to_hash">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.dict_to_hash">[docs]</a>
+<span class="k">def</span> <span class="nf">dict_to_hash</span><span class="p">(</span><span class="n">input_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">hash_length</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        hash a dict to a string with length hash_length</span>
+
+<span class="sd">        :param input_dict: the given dict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sorted_items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">input_dict</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="n">dict_string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sorted_items</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span>
+    <span class="n">hasher</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
+    <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dict_string</span><span class="p">)</span>
+    <span class="n">hash_value</span> <span class="o">=</span> <span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">hash_length</span><span class="p">:</span>
+        <span class="n">hash_value</span> <span class="o">=</span> <span class="n">hash_value</span><span class="p">[:</span><span class="n">hash_length</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">hash_value</span></div>
+
+
+
+<div class="viewcode-block" id="nested_access">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.nested_access">[docs]</a>
+<span class="k">def</span> <span class="nf">nested_access</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">digit_allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Access nested data using a dot-separated path.</span>
+
+<span class="sd">    :param data: A dictionary or a list to access the nested data from.</span>
+<span class="sd">    :param path: A dot-separated string representing the path to access.</span>
+<span class="sd">                    This can include numeric indices when accessing list</span>
+<span class="sd">                    elements.</span>
+<span class="sd">    :param digit_allowed: Allow transfering string to digit.</span>
+<span class="sd">    :return: The value located at the specified path, or raises a KeyError</span>
+<span class="sd">                or IndexError if the path does not exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="c1"># Convert string keys to integers if they are numeric</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">and</span> <span class="n">digit_allowed</span> <span class="k">else</span> <span class="n">key</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unaccessible dot-separated path: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="nested_set">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.nested_set">[docs]</a>
+<span class="k">def</span> <span class="nf">nested_set</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the val to the nested data in the dot-separated path.</span>
+
+<span class="sd">        :param data: A dictionary with nested format.</span>
+<span class="sd">        :param path: A dot-separated string representing the path to set.</span>
+<span class="sd">                    This can include numeric indices when setting list</span>
+<span class="sd">                    elements.</span>
+<span class="sd">        :return: The nested data after the val set.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cur</span><span class="p">:</span>
+            <span class="n">cur</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">cur</span> <span class="o">=</span> <span class="n">cur</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">cur</span><span class="p">[</span><span class="n">keys</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">val</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+
+<div class="viewcode-block" id="is_string_list">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.is_string_list">[docs]</a>
+<span class="k">def</span> <span class="nf">is_string_list</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return if the var is list of string.</span>
+
+<span class="sd">        :param var: input variance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span class="n">var</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="avg_split_string_list_under_limit">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.avg_split_string_list_under_limit">[docs]</a>
+<span class="k">def</span> <span class="nf">avg_split_string_list_under_limit</span><span class="p">(</span><span class="n">str_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                                      <span class="n">token_nums</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+                                      <span class="n">max_token_num</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Split the string list to several sub str_list, such that the total</span>
+<span class="sd">        token num of each sub string list is less than max_token_num, keeping</span>
+<span class="sd">        the total token nums of sub string lists are similar.</span>
+
+<span class="sd">        :param str_list: input string list.</span>
+<span class="sd">        :param token_nums: token num of each string list.</span>
+<span class="sd">        :param max_token_num: max token num of each sub string list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">max_token_num</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">str_list</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">str_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">token_nums</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;The length of str_list and token_nums must be equal!&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">str_list</span><span class="p">]</span>
+
+    <span class="n">total_num</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">token_nums</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">total_num</span> <span class="o">&lt;=</span> <span class="n">max_token_num</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">str_list</span><span class="p">]</span>
+
+    <span class="n">group_num</span> <span class="o">=</span> <span class="n">total_num</span> <span class="o">//</span> <span class="n">max_token_num</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">avg_num</span> <span class="o">=</span> <span class="n">total_num</span> <span class="o">/</span> <span class="n">group_num</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cur_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cur_sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">text</span><span class="p">,</span> <span class="n">token_num</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">str_list</span><span class="p">,</span> <span class="n">token_nums</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">token_num</span> <span class="o">&gt;</span> <span class="n">max_token_num</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s1">&#39;Token num is greater than max_token_num in one sample!&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cur_sum</span> <span class="o">+</span> <span class="n">token_num</span> <span class="o">&gt;</span> <span class="n">max_token_num</span> <span class="ow">and</span> <span class="n">cur_list</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_list</span><span class="p">)</span>
+            <span class="n">cur_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">cur_sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cur_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">cur_sum</span> <span class="o">+=</span> <span class="n">token_num</span>
+        <span class="k">if</span> <span class="n">cur_sum</span> <span class="o">&gt;</span> <span class="n">avg_num</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_list</span><span class="p">)</span>
+            <span class="n">cur_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">cur_sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">cur_list</span><span class="p">:</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="is_float">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.common_utils.is_float">[docs]</a>
+<span class="k">def</span> <span class="nf">is_float</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

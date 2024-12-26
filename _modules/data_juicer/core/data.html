@@ -11,7 +11,7 @@
 
   
       <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -103,9 +103,13 @@
 <span class="kn">from</span> <span class="nn">data_juicer.utils.process_utils</span> <span class="kn">import</span> <span class="n">setup_mp</span>
 
 
+<div class="viewcode-block" id="DJDataset">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.DJDataset">[docs]</a>
 <span class="k">class</span> <span class="nc">DJDataset</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base dataset of DJ&quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="DJDataset.process">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.DJDataset.process">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span>
@@ -115,9 +119,13 @@
             <span class="n">checkpointer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">tracer</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DJDataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;process a list of operators on the dataset.&quot;&quot;&quot;</span>
-        <span class="k">pass</span>
+        <span class="k">pass</span></div>
+</div>
 
 
+
+<div class="viewcode-block" id="wrap_func_with_nested_access">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.wrap_func_with_nested_access">[docs]</a>
 <span class="k">def</span> <span class="nf">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Before conducting actual function `f`, wrap its args and kargs into nested</span>
@@ -150,9 +158,12 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">wrapped_f</span>
+    <span class="k">return</span> <span class="n">wrapped_f</span></div>
 
 
+
+<div class="viewcode-block" id="nested_obj_factory">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.nested_obj_factory">[docs]</a>
 <span class="k">def</span> <span class="nf">nested_obj_factory</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Use nested classes to wrap the input object.</span>
@@ -172,12 +183,17 @@
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">obj</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
 
 
+
+<div class="viewcode-block" id="NestedQueryDict">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedQueryDict">[docs]</a>
 <span class="k">class</span> <span class="nc">NestedQueryDict</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced dict for better usability.&quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="NestedQueryDict.__init__">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedQueryDict.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Dataset</span><span class="p">):</span>
             <span class="c1"># init from another DatasetDict instance</span>
@@ -189,26 +205,35 @@
         <span class="c1"># batched sample, (k &amp; v) are organized by list manner</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">NestedQueryDict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">NestedQueryDict</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span></div>
+
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">nested_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nested_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span></div>
 
 
+
+<div class="viewcode-block" id="NestedDatasetDict">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDatasetDict">[docs]</a>
 <span class="k">class</span> <span class="nc">NestedDatasetDict</span><span class="p">(</span><span class="n">DatasetDict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced HuggingFace-DatasetDict for better usability and efficiency.&quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="NestedDatasetDict.__init__">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDatasetDict.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Dataset</span><span class="p">):</span>
             <span class="c1"># init from another DatasetDict instance</span>
             <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># init from scratch</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">nested_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
 
+<div class="viewcode-block" id="NestedDatasetDict.map">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDatasetDict.map">[docs]</a>
     <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the map func, which is called by most common operations,</span>
 <span class="sd">        such that the processed samples can be accessed by nested manner.&quot;&quot;&quot;</span>
@@ -217,16 +242,18 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wrap_func_with_nested_access</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="s1">&#39;function&#39;</span><span class="p">])</span>
 
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="NestedDataset">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset">[docs]</a>
 <span class="k">class</span> <span class="nc">NestedDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">DJDataset</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced HuggingFace-Dataset for better usability and efficiency.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="NestedDataset.__init__">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Dataset</span><span class="p">):</span>
             <span class="c1"># init from another Dataset instance</span>
@@ -249,7 +276,7 @@
         <span class="k">return</span> <span class="n">nested_obj_factory</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 
 <div class="viewcode-block" id="NestedDataset.process">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.process">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.process">[docs]</a>
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">operators</span><span class="p">,</span>
@@ -348,7 +375,7 @@
 
 
 <div class="viewcode-block" id="NestedDataset.update_args">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.update_args">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.update_args">[docs]</a>
     <span class="k">def</span> <span class="nf">update_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kargs</span><span class="p">,</span> <span class="n">is_filter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
             <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
@@ -398,7 +425,7 @@
 
 
 <div class="viewcode-block" id="NestedDataset.map">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.map">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.map">[docs]</a>
     <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the map func, which is called by most common operations,</span>
 <span class="sd">        such that the processed samples can be accessed by nested manner.&quot;&quot;&quot;</span>
@@ -422,7 +449,7 @@
 
 
 <div class="viewcode-block" id="NestedDataset.filter">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.filter">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.filter">[docs]</a>
     <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the filter func, which is called by most common operations,</span>
 <span class="sd">        such that the processed samples can be accessed by nested manner.&quot;&quot;&quot;</span>
@@ -458,7 +485,7 @@
 
 
 <div class="viewcode-block" id="NestedDataset.select">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.select">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.select">[docs]</a>
     <span class="k">def</span> <span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the select func, such that selected samples can be accessed</span>
 <span class="sd">        by nested manner.&quot;&quot;&quot;</span>
@@ -466,7 +493,7 @@
 
 
 <div class="viewcode-block" id="NestedDataset.from_dict">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.from_dict">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.from_dict">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the from_dict func, which is called by most from_xx</span>
@@ -476,7 +503,7 @@
 
 
 <div class="viewcode-block" id="NestedDataset.add_column">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.add_column">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.add_column">[docs]</a>
     <span class="k">def</span> <span class="nf">add_column</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the add column func, such that the processed samples</span>
 <span class="sd">        can be accessed by nested manner.&quot;&quot;&quot;</span>
@@ -484,7 +511,7 @@
 
 
 <div class="viewcode-block" id="NestedDataset.select_columns">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.select_columns">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.select_columns">[docs]</a>
     <span class="k">def</span> <span class="nf">select_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the select columns func, such that the processed samples</span>
 <span class="sd">        can be accessed by nested manner.&quot;&quot;&quot;</span>
@@ -492,7 +519,7 @@
 
 
 <div class="viewcode-block" id="NestedDataset.remove_columns">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.remove_columns">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.remove_columns">[docs]</a>
     <span class="k">def</span> <span class="nf">remove_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the remove columns func, such that the processed samples</span>
 <span class="sd">        can be accessed by nested manner.&quot;&quot;&quot;</span>
@@ -500,7 +527,7 @@
 
 
 <div class="viewcode-block" id="NestedDataset.cleanup_cache_files">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.cleanup_cache_files">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.cleanup_cache_files">[docs]</a>
     <span class="k">def</span> <span class="nf">cleanup_cache_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Override the cleanup_cache_files func, clear raw and compressed</span>
 <span class="sd">        cache files.&quot;&quot;&quot;</span>
@@ -509,7 +536,7 @@
 
 
 <div class="viewcode-block" id="NestedDataset.load_from_disk">
-<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.NestedDataset.load_from_disk">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.NestedDataset.load_from_disk">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">load_from_disk</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">load_from_disk</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kargs</span><span class="p">))</span></div>
@@ -517,6 +544,8 @@
 
 
 
+<div class="viewcode-block" id="nested_query">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.nested_query">[docs]</a>
 <span class="k">def</span> <span class="nf">nested_query</span><span class="p">(</span><span class="n">root_obj</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">NestedDatasetDict</span><span class="p">,</span> <span class="n">NestedDataset</span><span class="p">,</span>
                                  <span class="n">NestedQueryDict</span><span class="p">],</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -562,9 +591,12 @@
                     <span class="sa">f</span><span class="s1">&#39;info is: </span><span class="si">{</span><span class="n">outer_get_error</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
 
 
+
+<div class="viewcode-block" id="add_same_content_to_new_column">
+<a class="viewcode-back" href="../../../data_juicer.core.html#data_juicer.core.data.add_same_content_to_new_column">[docs]</a>
 <span class="k">def</span> <span class="nf">add_same_content_to_new_column</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span>
                                    <span class="n">new_column_name</span><span class="p">,</span>
                                    <span class="n">initial_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -576,7 +608,8 @@
 <span class="sd">    :param initial_value: the initial value of this new column/field.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sample</span><span class="p">[</span><span class="n">new_column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">initial_value</span>
-    <span class="k">return</span> <span class="n">sample</span>
+    <span class="k">return</span> <span class="n">sample</span></div>
+
 </pre></div>
 
            </div>

@@ -11,7 +11,7 @@
 
   
       <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -88,6 +88,8 @@
 
 <span class="c1"># Modify from self_instruct, please refer to</span>
 <span class="c1"># https://github.com/yizhongw/self-instruct/blob/main/self_instruct/instruction_visualize.ipynb</span>
+<div class="viewcode-block" id="find_root_verb_and_its_dobj">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj">[docs]</a>
 <span class="k">def</span> <span class="nf">find_root_verb_and_its_dobj</span><span class="p">(</span><span class="n">tree_root</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the verb and its object closest to the root.</span>
@@ -108,11 +110,14 @@
     <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">tree_root</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">find_root_verb_and_its_dobj</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
     <span class="c1"># if no children satisfy the condition, return None</span>
-    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+
 
 
 <span class="c1"># Modify from self_instruct, please refer to</span>
 <span class="c1"># https://github.com/yizhongw/self-instruct/blob/main/self_instruct/instruction_visualize.ipynb</span>
+<div class="viewcode-block" id="find_root_verb_and_its_dobj_in_string">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.find_root_verb_and_its_dobj_in_string">[docs]</a>
 <span class="k">def</span> <span class="nf">find_root_verb_and_its_dobj_in_string</span><span class="p">(</span><span class="n">nlp</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">first_sent</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the verb and its object closest to the root of lexical tree of input</span>
@@ -131,9 +136,12 @@
         <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span> <span class="o">=</span> <span class="n">find_root_verb_and_its_dobj</span><span class="p">(</span><span class="n">sent</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">first_sent</span> <span class="ow">or</span> <span class="p">(</span><span class="n">verb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">noun</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">verb</span><span class="p">,</span> <span class="n">noun</span>
-    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
 
 
+
+<div class="viewcode-block" id="get_diversity">
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.get_diversity">[docs]</a>
 <span class="k">def</span> <span class="nf">get_diversity</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">top_k_verbs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">top_k_nouns</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given the lexical tree analysis result, return the diversity results.</span>
@@ -158,17 +166,18 @@
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;verb&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
         <span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">top_k_nouns</span><span class="p">))</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span>
+    <span class="k">return</span> <span class="n">df</span></div>
+
 
 
 <div class="viewcode-block" id="DiversityAnalysis">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.DiversityAnalysis">[docs]</a>
 <span class="k">class</span> <span class="nc">DiversityAnalysis</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply diversity analysis for each sample and get an overall analysis</span>
 <span class="sd">    result.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="DiversityAnalysis.__init__">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.DiversityAnalysis.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">output_path</span><span class="p">,</span> <span class="n">lang_or_model</span><span class="o">=</span><span class="s1">&#39;en&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialization method :param dataset: the dataset to be analyzed</span>
 <span class="sd">        :param output_path: path to store the analysis results :param</span>
@@ -183,7 +192,7 @@
 
 
 <div class="viewcode-block" id="DiversityAnalysis.compute">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis.compute">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.DiversityAnalysis.compute">[docs]</a>
     <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang_or_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply lexical tree analysis on each sample.</span>
@@ -217,7 +226,7 @@
 
 
 <div class="viewcode-block" id="DiversityAnalysis.analyze">
-<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.DiversityAnalysis.analyze">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.analysis.html#data_juicer.analysis.diversity_analysis.DiversityAnalysis.analyze">[docs]</a>
     <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                 <span class="n">lang_or_model</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">column_name</span><span class="o">=</span><span class="s1">&#39;text&#39;</span><span class="p">,</span>
