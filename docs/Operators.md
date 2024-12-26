@@ -6,7 +6,7 @@ This page offers a basic description of the operators (OPs) in Data-Juicer. User
 
 ## Overview
 
-The operators in Data-Juicer are categorized into 5 types.
+The operators in Data-Juicer are categorized into 7 types.
 
 | Type                              | Number | Description                                     |
 |-----------------------------------|:------:|-------------------------------------------------|
