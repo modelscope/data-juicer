@@ -73,6 +73,26 @@ class Fields(object):
     support_text = DEFAULT_PREFIX + 'support_text__'
 
 
+class MetaKeys(object):
+
+    dialog_sentiment_intensity = 'dialog_sentiment_intensity'
+    dialog_sentiment_intensity_analysis = 'dialog_sentiment_intensity_analysis'
+    query_sentiment_label = 'query_sentiment_label'
+    query_sentiment_score = 'query_sentiment_label_score'
+    dialog_sentiment_labels = 'dialog_sentiment_labels'
+    dialog_sentiment_labels_analysis = 'dialog_sentiment_labels_analysis'
+
+    dialog_intent_labels = 'dialog_intent_labels'
+    dialog_intent_labels_analysis = 'dialog_intent_labels_analysis'
+    query_intent_label = 'query_intent_label'
+    query_intent_score = 'query_intent_label_score'
+
+    dialog_topic_labels = 'dialog_topic_labels'
+    dialog_topic_labels_analysis = 'dialog_topic_labels_analysis'
+    query_topic_label = 'query_topic_label'
+    query_topic_score = 'query_topic_label_score'
+
+
 class StatsKeysMeta(type):
     """
     a helper class to track the mapping from OP's name to its used stats_keys
