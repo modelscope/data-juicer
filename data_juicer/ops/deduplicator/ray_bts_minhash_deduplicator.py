@@ -1,6 +1,5 @@
 import os
 import time
-import uuid
 from typing import List, Optional, Union
 
 import numpy as np
@@ -236,9 +235,7 @@ OP_NAME = 'ray_bts_minhash_deduplicator'
 @OPERATORS.register_module(OP_NAME)
 class RayBTSMinhashDeduplicator(Deduplicator):
     """
-    A basic exact matching deduplicator for RAY.
-    Although its functionality is deduplication,
-    it is implemented as Filter sub-class.
+    A MinhashLSH deduplicator based on RAY.
     """
 
     # TODO: Set a more reasonable value
@@ -263,7 +260,6 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         max_pending_filter_tasks: Optional[int] = 20,
         num_filter_task_returns: Optional[int] = 10,
         merge_batch_size: Optional[int] = 1000,
-        tmp_file_name: Optional[str] = './outputs/ray-dedup-tmp/',
         *args,
         **kwargs,
     ):
@@ -426,15 +422,11 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 self.union_threshold,
                 self.union_find_parallel_num,
                 i,
-                self.remote_edge_buffers,
+                self.remote_edge_buffers,  # TODO: fix this
                 self.max_pending_edge_buffer_task,
                 self.num_edge_buffer_task_returns,
             ) for i in range(self.union_find_parallel_num)
         ]
-
-        self.tmp_file_name = os.path.join(os.getcwd(), tmp_file_name,
-                                          str(uuid.uuid4()))
-        os.makedirs(self.tmp_file_name)
 
         empty_hash_value = np.full((self.num_rows_per_band, ),
                                    MAX_HASH,
@@ -554,19 +546,21 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                                             pa.array(list(uid_list)))
             return new_table
 
+        tmp_dir = os.path.join(self.work_dir, '.tmp',
+                               ray.get_runtime_context().get_job_id())
         dataset.map_batches(
             minhash_with_uid,
             batch_format='pyarrow',
             zero_copy_batch=True,
-        ).write_parquet(self.tmp_file_name, force_ascii=False)
-        dataset = ray.data.read_parquet(self.tmp_file_name)
+        ).write_parquet(tmp_dir)
+        dataset = ray.data.read_parquet(tmp_dir)
         end_time = time.time()
-        print(f'MinHash time = {end_time - start_time}')
+        logger.info(f'MinHash time = {end_time - start_time}')
 
         start_time = time.time()
         self.merge()
         end_time = time.time()
-        print(f'merge time = {end_time - start_time}')
+        logger.info(f'merge time = {end_time - start_time}')
         result = dataset.map_batches(
             self.filter_with_union_find,
             batch_format='pyarrow',

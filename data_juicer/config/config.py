@@ -539,6 +539,7 @@ def init_setup_from_cfg(cfg: Namespace):
                     'video_key': cfg.video_key,
                     'num_proc': cfg.np,
                     'turbo': cfg.turbo,
+                    'work_dir': cfg.work_dir,
                 }
             else:
                 if 'text_key' not in args or args['text_key'] is None:
@@ -553,6 +554,8 @@ def init_setup_from_cfg(cfg: Namespace):
                     args['num_proc'] = cfg.np
                 if 'turbo' not in args or args['turbo'] is None:
                     args['turbo'] = cfg.turbo
+                if 'work_dir' not in args or args['work_dir'] is None:
+                    args['work_dir'] = cfg.work_dir
             op[op_name] = args
 
     return cfg
