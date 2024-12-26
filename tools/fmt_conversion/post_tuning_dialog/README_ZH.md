@@ -1,9 +1,8 @@
 # 后微调工具
 
-对于 后微调 数据格式，我们主要考虑 4 种格式来覆盖支持 [ModelScope-Swift](https://github.com/modelscope/ms-swift/blob/main/docs/source_en/Customization/Custom-dataset.md) 和 [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory/blob/main/data/README.md) 。
-它们的**核心内容**区域分别为：
+对于 后微调 数据格式，我们主要考虑 4 种格式来覆盖支持 [ModelScope-Swift](https://github.com/modelscope/ms-swift/blob/main/docs/source_en/Customization/Custom-dataset.md) 和 [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory/blob/main/data/README.md) :
 
-- Messages 格式（在 LLaMA-Factory 中其实为 ShareGPT 格式）：
+- Swift的 Messages 格式（与LLaMA-Factory的 ShareGPT 格式几乎一致，采用了略微不同的key字段命名）：
 
 ```python
 {
@@ -32,7 +31,7 @@
 }
 ```
 
-- ShareGPT 格式：
+- Swift的 ShareGPT 格式：
 
 ```python
 {
@@ -50,7 +49,7 @@
 }
 ```
 
-- Alpaca 格式：
+- Alpaca 格式 （在Swift和LLaMA-Factory中定义一致）：
 
 ```python
 {
@@ -61,7 +60,7 @@
 }
 ```
 
-- Query-Response 格式：
+- Swift的Query-Response 格式：
 
 ```python
 {
@@ -77,5 +76,5 @@
 }
 ```
 
-在 Data-Juicer 中，我们使用 Query-Response 格式作为我们 后微调对话 数据集的中间格式。
-因此，Data-Juicer 提供了若干工具将其他格式的数据集转换为 Query-Response 格式以及反向转换。
+在 Data-Juicer 中，我们预设了一些字段来对齐最后一种 Query-Response 格式，它作为 后微调对话 数据集的统一中间表示。
+相应地，我们提供了若干内置工具将其他格式的数据集转换为 Query-Response 格式以及反向转换。
