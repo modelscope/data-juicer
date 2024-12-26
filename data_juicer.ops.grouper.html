@@ -6,17 +6,19 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.grouper &mdash; data_juicer 1.0.2 documentation</title>
+  <title>data_juicer.ops.grouper package &mdash; data_juicer 1.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="data_juicer.ops.mapper package" href="data_juicer.ops.mapper.html" />
+    <link rel="prev" title="data_juicer.ops.filter package" href="data_juicer.ops.filter.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -39,17 +41,25 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="data_juicer.ops.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#module-data_juicer.ops.base_op">data_juicer.ops.base_op module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#module-data_juicer.ops.load">data_juicer.ops.load module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#module-data_juicer.ops.op_fusion">data_juicer.ops.op_fusion module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#module-data_juicer.ops">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -66,7 +76,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">data_juicer.ops.grouper</li>
+          <li class="breadcrumb-item"><a href="data_juicer.ops.html">data_juicer.ops package</a></li>
+      <li class="breadcrumb-item active">data_juicer.ops.grouper package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/data_juicer.ops.grouper.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -76,12 +87,96 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-data_juicer.ops.grouper">
-<span id="data-juicer-ops-grouper"></span><h1>data_juicer.ops.grouper<a class="headerlink" href="#module-data_juicer.ops.grouper" title="Link to this heading">¶</a></h1>
+  <section id="data-juicer-ops-grouper-package">
+<h1>data_juicer.ops.grouper package<a class="headerlink" href="#data-juicer-ops-grouper-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-data_juicer.ops.grouper.key_value_grouper">
+<span id="data-juicer-ops-grouper-key-value-grouper-module"></span><h2>data_juicer.ops.grouper.key_value_grouper module<a class="headerlink" href="#module-data_juicer.ops.grouper.key_value_grouper" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.grouper.key_value_grouper.KeyValueGrouper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.grouper.key_value_grouper.</span></span><span class="sig-name descname"><span class="pre">KeyValueGrouper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_by_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/grouper/key_value_grouper.html#KeyValueGrouper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.grouper.key_value_grouper.KeyValueGrouper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Grouper" title="data_juicer.ops.base_op.Grouper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grouper</span></code></a></p>
+<p>Group samples to batched samples according values in given keys.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.grouper.key_value_grouper.KeyValueGrouper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_by_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/grouper/key_value_grouper.html#KeyValueGrouper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.grouper.key_value_grouper.KeyValueGrouper.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>group_by_keys</strong> – group samples according values in the keys.
+Support for nested keys such as “__dj__stats__.text_len”.
+It is [self.text_key] in default.</p></li>
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.grouper.key_value_grouper.KeyValueGrouper.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/grouper/key_value_grouper.html#KeyValueGrouper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.grouper.key_value_grouper.KeyValueGrouper.process" title="Link to this definition">¶</a></dt>
+<dd><p>Dataset –&gt; dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataset</strong> – input dataset</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dataset of batched samples.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.ops.grouper.naive_grouper">
+<span id="data-juicer-ops-grouper-naive-grouper-module"></span><h2>data_juicer.ops.grouper.naive_grouper module<a class="headerlink" href="#module-data_juicer.ops.grouper.naive_grouper" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.grouper.naive_grouper.NaiveGrouper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.grouper.naive_grouper.</span></span><span class="sig-name descname"><span class="pre">NaiveGrouper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/grouper/naive_grouper.html#NaiveGrouper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.grouper.naive_grouper.NaiveGrouper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Grouper" title="data_juicer.ops.base_op.Grouper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grouper</span></code></a></p>
+<p>Group all samples to one batched sample.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.grouper.naive_grouper.NaiveGrouper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/grouper/naive_grouper.html#NaiveGrouper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.grouper.naive_grouper.NaiveGrouper.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – extra args</p></li>
+<li><p><strong>kwargs</strong> – extra args</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.grouper.naive_grouper.NaiveGrouper.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/grouper/naive_grouper.html#NaiveGrouper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.grouper.naive_grouper.NaiveGrouper.process" title="Link to this definition">¶</a></dt>
+<dd><p>Dataset –&gt; dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataset</strong> – input dataset</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dataset of batched samples.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.ops.grouper">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-data_juicer.ops.grouper" title="Link to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.ops.grouper.NaiveGrouper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.grouper.</span></span><span class="sig-name descname"><span class="pre">NaiveGrouper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/grouper/naive_grouper.html#NaiveGrouper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.grouper.NaiveGrouper" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Grouper" title="data_juicer.ops.base_op.Grouper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grouper</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Grouper" title="data_juicer.ops.base_op.Grouper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grouper</span></code></a></p>
 <p>Group all samples to one batched sample.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.grouper.NaiveGrouper.__init__">
@@ -116,7 +211,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.ops.grouper.KeyValueGrouper">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.grouper.</span></span><span class="sig-name descname"><span class="pre">KeyValueGrouper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_by_keys</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/grouper/key_value_grouper.html#KeyValueGrouper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.grouper.KeyValueGrouper" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Grouper" title="data_juicer.ops.base_op.Grouper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grouper</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.base_op.Grouper" title="data_juicer.ops.base_op.Grouper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Grouper</span></code></a></p>
 <p>Group samples to batched samples according values in given keys.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.grouper.KeyValueGrouper.__init__">
@@ -152,11 +247,15 @@ It is [self.text_key] in default.</p></li>
 </dd></dl>
 
 </section>
+</section>
 
 
            </div>
           </div>
-          <footer>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data_juicer.ops.filter.html" class="btn btn-neutral float-left" title="data_juicer.ops.filter package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_juicer.ops.mapper.html" class="btn btn-neutral float-right" title="data_juicer.ops.mapper package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
 
   <hr/>
 
