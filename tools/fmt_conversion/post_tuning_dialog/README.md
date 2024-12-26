@@ -2,7 +2,7 @@
 
 For post tuning formats, we mainly consider 4 formats to support [ModelScope-Swift](https://github.com/modelscope/ms-swift/blob/main/docs/source_en/Customization/Custom-dataset.md) and [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory/blob/main/data/README.md).
 
-- Messages format (Also as ShareGPT format in LLaMA-Factory):
+- Swift's Messages format (Very similar to the LLaMA-Factory's ShareGPT format, with different key names):
 
 ```python
 {
@@ -31,7 +31,7 @@ For post tuning formats, we mainly consider 4 formats to support [ModelScope-Swi
 }
 ```
 
-- ShareGPT format:
+- Swift's ShareGPT format:
 
 ```python
 {
@@ -49,7 +49,7 @@ For post tuning formats, we mainly consider 4 formats to support [ModelScope-Swi
 }
 ```
 
-- Alpaca format:
+- Alpaca format (used in the same definition in Swift and LLaMA-Factory):
 
 ```python
 {
@@ -60,7 +60,7 @@ For post tuning formats, we mainly consider 4 formats to support [ModelScope-Swi
 }
 ```
 
-- Query-Response format:
+- Swift's Query-Response format:
 
 ```python
 {
@@ -76,4 +76,4 @@ For post tuning formats, we mainly consider 4 formats to support [ModelScope-Swi
 }
 ```
 
-In Data-Juicer, we use the Query-Response format as our intermediate format for post tuning dialog datasets. Thus, Data-Juicer provides several tools to convert datasets in other formats to Query-Response format and vice versa.
+In Data-Juicer, we pre-set fields to align with the last Query-Response format, which serves as our intermediate format for post-tuning dialog datasets. Correspondingly, we provide several tools to convert datasets in other formats to Query-Response format and vice versa.
