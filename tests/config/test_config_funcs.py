@@ -15,6 +15,7 @@ test_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
 test_bad_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                               'demo_4_test_bad_val.yaml')
 
+WORKDIR = os.path.join(os.getcwd(), 'outputs/demo')
 
 class ConfigTest(DataJuicerTestCaseBase):
 
@@ -55,7 +56,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
-                        'work_dir': './outputs/demo/',
+                        'work_dir': WORKDIR,
                     }
                 }, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
@@ -78,7 +79,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
-                        'work_dir': './outputs/demo/',
+                        'work_dir': WORKDIR,
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
@@ -129,6 +130,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                 args=f'--config {test_yaml_path} '
                 '--language_id_score_filter.lang=en '
                 '--language_id_score_filter.min_score=0.5'.split())
+            print(f'ori_cfg.process[1] = {ori_cfg.process[1]}')
             self.assertDictEqual(
                 ori_cfg.process[1], {
                     'language_id_score_filter': {
@@ -149,7 +151,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
-                        'work_dir': './outputs/demo/',
+                        'work_dir': WORKDIR,
                     }
                 })
             self.assertDictEqual(
@@ -172,7 +174,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
-                        'work_dir': './outputs/demo/',
+                        'work_dir': WORKDIR,
                     }
                 })
             self.assertDictEqual(
@@ -195,7 +197,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
-                        'work_dir': './outputs/demo/',
+                        'work_dir': WORKDIR,
                     }
                 })
             self.assertDictEqual(
@@ -218,7 +220,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
-                        'work_dir': './outputs/demo/',
+                        'work_dir': WORKDIR,
                     }
                 })
             self.assertDictEqual(
@@ -241,7 +243,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
-                        'work_dir': './outputs/demo/',
+                        'work_dir': WORKDIR,
                     }
                 })
 
