@@ -197,17 +197,19 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
             temp_sample = {
                 self.text_key: chunk,
                 self.video_key: loaded_video_keys[offset:offset + vid_count],
+                Fields.meta: {}
             }
 
             captioned_text_list = []
             # tag ops
             for op in self.tag_op_list:
                 temp_sample = op.process(temp_sample, rank=rank)
-            if Fields.video_audio_tags in temp_sample:
+            if Fields.video_audio_tags in temp_sample[Fields.meta]:
                 captioned_text_list.extend(
-                    temp_sample[Fields.video_audio_tags])
-            if Fields.video_frame_tags in temp_sample:
-                for tag_list in temp_sample[Fields.video_frame_tags]:
+                    temp_sample[Fields.meta][Fields.video_audio_tags])
+            if Fields.video_frame_tags in temp_sample[Fields.meta]:
+                for tag_list in temp_sample[Fields.meta][
+                        Fields.video_frame_tags]:
                     captioned_text_list.extend(tag_list[self.keep_tag_num])
             # cap ops
             for op in self.cap_op_list:
