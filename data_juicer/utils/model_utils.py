@@ -59,6 +59,12 @@ BACKUP_MODEL_LINKS = {
     'ram_plus_swin_large_14m.pth',
 }
 
+TORCH_DTYPE_MAPPING = {
+    'fp32': torch.float32,
+    'fp16': torch.float16,
+    'bf16': torch.bfloat16,
+}
+
 
 def get_backup_model_link(model_name):
     for pattern, url in BACKUP_MODEL_LINKS.items():
@@ -282,8 +288,12 @@ def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
     """
     AUTOINSTALL.check(['torch', 'transformers'])
 
-    if 'device' in model_params:
-        model_params['device_map'] = model_params.pop('device')
+    device = model_params.pop('device', None)
+    if not device:
+        model_params['device_map'] = 'balanced'
+    if 'torch_dtype' in model_params:
+        model_params['torch_dtype'] = TORCH_DTYPE_MAPPING[
+            model_params['torch_dtype']]
 
     diffusion_type_to_pipeline = {
         'image2image': diffusers.AutoPipelineForImage2Image,
@@ -300,6 +310,8 @@ def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
     pipeline = diffusion_type_to_pipeline[diffusion_type]
     model = pipeline.from_pretrained(pretrained_model_name_or_path,
                                      **model_params)
+    if device:
+        model = model.to(device)
 
     return model
 

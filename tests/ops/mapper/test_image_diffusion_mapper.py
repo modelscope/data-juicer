@@ -6,13 +6,8 @@ from data_juicer import _cuda_device_count
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.image_diffusion_mapper import ImageDiffusionMapper
 from data_juicer.utils.mm_utils import SpecialTokens
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-
-# Skip tests for this OP in the GitHub actions due to OOM on the current runner
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
 class ImageDiffusionMapperTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
