@@ -55,6 +55,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'work_dir': './outputs/demo/',
                     }
                 }, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
@@ -77,6 +78,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'work_dir': './outputs/demo/',
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
@@ -147,6 +149,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'work_dir': './outputs/demo/',
                     }
                 })
             self.assertDictEqual(
@@ -169,6 +172,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'work_dir': './outputs/demo/',
                     }
                 })
             self.assertDictEqual(
@@ -191,6 +195,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'work_dir': './outputs/demo/',
                     }
                 })
             self.assertDictEqual(
@@ -213,6 +218,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'work_dir': './outputs/demo/',
                     }
                 })
             self.assertDictEqual(
@@ -235,6 +241,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'work_dir': './outputs/demo/',
                     }
                 })
 
@@ -245,7 +252,7 @@ class ConfigTest(DataJuicerTestCaseBase):
 
         base_class_params = {
             'text_key', 'image_key', 'audio_key', 'video_key', 'query_key', 'response_key', 'history_key',
-            'accelerator', 'turbo', 'batch_size', 'num_proc', 'cpu_required', 'mem_required',
+            'accelerator', 'turbo', 'batch_size', 'num_proc', 'cpu_required', 'mem_required', 'work_dir',
         }
 
         parser = ArgumentParser(default_env=True, default_config_files=None)
