@@ -10,7 +10,7 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TES
 
 # skip due to conflicts when run lazy_load in multiprocessing in librosa
 # tests passed locally.
-@SKIPPED_TESTS.register_module()
+# @SKIPPED_TESTS.register_module()
 class VideoMotionScoreRaftFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
@@ -26,6 +26,7 @@ class VideoMotionScoreRaftFilterTest(DataJuicerTestCaseBase):
                                          column=[{}] * dataset.num_rows)
         dataset = dataset.map(op.compute_stats, num_proc=np)
         dataset = dataset.filter(op.process, num_proc=np)
+        print(dataset[Fields.stats])
         dataset = dataset.select_columns(column_names=[op.video_key])
         res_list = dataset.to_list()
         self.assertEqual(res_list, target_list)

@@ -9,13 +9,10 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TES
 
 # Skip tests for this OP in the GitHub actions due to unknown UnicodeEncodeError
 # These tests have been tested locally.
-# @SKIPPED_TESTS.register_module()
+@SKIPPED_TESTS.register_module()
 class NlpaugEnMapperTest(DataJuicerTestCaseBase):
 
     def setUp(self):
-        import sys
-        # set the default encoding to utf-8 explicitly
-        sys.stdout.reconfigure(encoding='utf-8')
         self.samples = Dataset.from_dict({
             'text': ['这里一共有5种不同的数据增强方法', '这是不带数字的测试样例'],
             'meta': ['meta information', 'meta information without numbers'],
