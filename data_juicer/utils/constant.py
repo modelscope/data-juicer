@@ -20,9 +20,6 @@ class Fields(object):
     context = DEFAULT_PREFIX + 'context__'
     suffix = DEFAULT_PREFIX + 'suffix__'
 
-    # video_frames
-    video_frames = DEFAULT_PREFIX + 'video_frames__'
-
     # the name of the original file from which this sample was derived.
     source_file = DEFAULT_PREFIX + 'source_file__'
 
