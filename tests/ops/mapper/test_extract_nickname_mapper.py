@@ -37,7 +37,7 @@ class ExtractNicknameMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=2)
+        dataset = op.run(dataset)
         result = dataset[0][Fields.meta][MetaKeys.nickname]
         result = [(
             d[MetaKeys.source_entity],

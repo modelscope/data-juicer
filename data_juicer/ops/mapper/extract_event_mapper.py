@@ -1,10 +1,11 @@
+import copy
 import re
 from typing import Dict, Optional
 
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -14,6 +15,7 @@ OP_NAME = 'extract_event_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractEventMapper(Mapper):
     """
@@ -145,6 +147,11 @@ class ExtractEventMapper(Mapper):
 
     def process_batched(self, samples, rank=None):
 
+        # check if it's generated already
+        if self.event_desc_key in samples[Fields.meta][
+                0] and self.relevant_char_key in samples[Fields.meta][0]:
+            return samples
+
         events, characters = [], []
         for text in samples[self.text_key]:
             cur_events, cur_characters = self._process_single_sample(text,
@@ -158,7 +165,10 @@ class ExtractEventMapper(Mapper):
         new_samples = []
         for i in range(len(events)):
             for event, character in zip(events[i], characters[i]):
-                cur_sample = {key: samples[key][i] for key in samples}
+                cur_sample = {
+                    key: copy.deepcopy(samples[key][i])
+                    for key in samples
+                }
                 cur_sample[Fields.meta][self.event_desc_key] = event
                 cur_sample[Fields.meta][self.relevant_char_key] = character
                 new_samples.append(cur_sample)

@@ -54,7 +54,7 @@ class ExtractEntityRelationMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=2)
+        dataset = op.run(dataset)
         sample = dataset[0]
         logger.info(f"entitis: {sample[Fields.meta][MetaKeys.entity]}")
         logger.info(f"relations: {sample[Fields.meta][MetaKeys.relation]}")

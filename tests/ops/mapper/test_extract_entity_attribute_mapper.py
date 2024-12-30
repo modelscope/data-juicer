@@ -47,7 +47,7 @@ class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=1)
+        dataset = op.run(dataset)
         for sample in dataset:
             ents = sample[Fields.meta][MetaKeys.main_entities]
             attrs = sample[Fields.meta][MetaKeys.attributes]

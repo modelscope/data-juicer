@@ -6,7 +6,7 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -16,6 +16,7 @@ OP_NAME = 'extract_keyword_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractKeywordMapper(Mapper):
     """
@@ -164,6 +165,11 @@ Output:
         return keywords
 
     def process_single(self, sample, rank=None):
+
+        # check if it's generated already
+        if self.keyword_key in sample[Fields.meta]:
+            return sample
+
         client = get_model(self.model_key, rank=rank)
 
         input_prompt = self.prompt_template.format(

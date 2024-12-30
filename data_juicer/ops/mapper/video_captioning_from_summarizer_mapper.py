@@ -197,6 +197,7 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
             temp_sample = {
                 self.text_key: chunk,
                 self.video_key: loaded_video_keys[offset:offset + vid_count],
+                Fields.meta: {},
             }
 
             captioned_text_list = []

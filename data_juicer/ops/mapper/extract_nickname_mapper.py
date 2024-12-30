@@ -4,7 +4,7 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -12,6 +12,7 @@ OP_NAME = 'extract_nickname_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractNicknameMapper(Mapper):
     """
@@ -131,6 +132,11 @@ class ExtractNicknameMapper(Mapper):
         return nickname_relations
 
     def process_single(self, sample, rank=None):
+
+        # check if it's generated already
+        if self.nickname_key in sample[Fields.meta]:
+            return sample
+
         client = get_model(self.model_key, rank=rank)
 
         input_prompt = self.input_template.format(text=sample[self.text_key])

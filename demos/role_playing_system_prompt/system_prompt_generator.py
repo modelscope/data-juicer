@@ -7,13 +7,15 @@ from collections import Counter
 from data_juicer.ops.aggregator import NestedAggregator
 from data_juicer.ops.aggregator import EntityAttributeAggregator
 from data_juicer.ops.mapper import RelationIdentityMapper
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, AggKeys, MetaKeys
+from data_juicer.core.data import NestedDataset as Dataset
+
 
 api_model = 'qwen2.5-72b-instruct'
 
 main_entity = "李莲花"
 query_attributes = ["语言风格", "角色性格", "角色武艺和能力"]
-system_prompt_key = '__dj__system_prompt__'
+system_prompt_key = 'system_prompt'
 example_num_limit = 5
 max_relavant_roles_num = 5
 
@@ -30,9 +32,9 @@ nested_sum = NestedAggregator(
     api_model=api_model,
     try_num=3)
 
-def dedup_sort_val_by_chunk_id(sample, id_key, val_key):
+def dedup_sort_val_by_chunk_id(sample, id_key, meta_key):
     chunk_ids = sample[id_key]
-    vals = sample[val_key]
+    vals = [d[meta_key] for d in sample[Fields.meta]]
     id_to_val = {}
     for id, val in zip(chunk_ids, vals):
         id_to_val[id] = val
@@ -42,10 +44,10 @@ def dedup_sort_val_by_chunk_id(sample, id_key, val_key):
     return list(chain(*sorted_vals))
 
 def get_attributes(sample):
-    main_entities = dedup_sort_val_by_chunk_id(sample, 'chunk_id', Fields.main_entities)
-    attribute_names = dedup_sort_val_by_chunk_id(sample, 'chunk_id', Fields.attributes)
-    attribute_descs = dedup_sort_val_by_chunk_id(sample, 'chunk_id', Fields.attribute_descriptions)
-    attribute_support_texts = dedup_sort_val_by_chunk_id(sample, 'chunk_id', Fields.attribute_support_texts)
+    main_entities = dedup_sort_val_by_chunk_id(sample, 'chunk_id', MetaKeys.main_entities)
+    attribute_names = dedup_sort_val_by_chunk_id(sample, 'chunk_id', MetaKeys.attributes)
+    attribute_descs = dedup_sort_val_by_chunk_id(sample, 'chunk_id', MetaKeys.attribute_descriptions)
+    attribute_support_texts = dedup_sort_val_by_chunk_id(sample, 'chunk_id', MetaKeys.attribute_support_texts)
     attributes = {}
     support_texts = {}
     for attr in query_attributes:
@@ -59,7 +61,7 @@ def get_attributes(sample):
     return attributes, support_texts
 
 def get_nicknames(sample):
-    nicknames = dedup_sort_val_by_chunk_id(sample, 'chunk_id', Fields.nickname)
+    nicknames = dedup_sort_val_by_chunk_id(sample, 'chunk_id', MetaKeys.nickname)
     nickname_map = {}
     for nr in nicknames:
         if nr[Fields.source_entity] == main_entity:
@@ -85,8 +87,8 @@ def get_nicknames(sample):
 
 def get_system_prompt(sample):
 
-    main_role_identity = sample['__dj__role_background__']
-    main_role_experience = sample['__dj__role_experience__']
+    main_role_identity = sample[Fields.agg]['role_background']
+    main_role_experience = sample[Fields.agg]['role_experience']
     attributes, support_texts = get_attributes(sample)
     main_role_character = nested_sum.recursive_summary(attributes['角色性格'])
     main_role_skill = nested_sum.recursive_summary(attributes['角色武艺和能力'])
@@ -104,22 +106,25 @@ def get_system_prompt(sample):
     nicknames = get_nicknames(sample)
 
     relation_detail = ""
-    relavant_roles = sample['__dj__important_relavant_roles__']
+    relavant_roles = sample[Fields.agg]['important_relavant_roles']
     for role_name in relavant_roles[:max_relavant_roles_num]:
         if role_name == main_entity:
             continue
-        
+
+        cur_sample = {k: sample[k] for k in sample if k != Fields.agg}
+
+        dataset = Dataset.from_list([cur_sample])
         # get sub role identity
         op = EntityAttributeAggregator(
             api_model=api_model,
             entity=role_name,
             attribute='身份背景',
             input_key='event_description',
-            output_key='role_background__',
+            output_key='role_background',
             word_limit=30
         )
-        sample = op.process_single(sample)
-        role_identity = sample['__dj__role_background__'].replace('\n', '')
+        dataset = op.run(dataset)
+        role_identity = dataset[0][Fields.agg]['role_background'].replace('\n', '')
 
         # get sub role experience
         op = EntityAttributeAggregator(
@@ -127,11 +132,11 @@ def get_system_prompt(sample):
             entity=role_name,
             attribute='主要经历',
             input_key='event_description',
-            output_key='role_experience__',
+            output_key='role_experience',
             word_limit=100
         )
-        sample = op.process_single(sample)
-        role_experience = sample['role_experience__'].replace('\n', '')
+        dataset = op.run(dataset)
+        role_experience = dataset[0][Fields.agg]['role_experience'].replace('\n', '')
 
         # get relation identity with main role
         role_info = role_info_template.format(
@@ -143,7 +148,7 @@ def get_system_prompt(sample):
             api_model=api_model,
             source_entity=main_entity,
             target_entity=role_name,
-            output_key='relation_identity__'
+            output_key='relation_identity'
         )
         if role_name in nicknames:
             cur_nicknames = '、'.join(nicknames[role_name])
@@ -157,8 +162,9 @@ def get_system_prompt(sample):
             nicknames = cur_nicknames
         )
         tmp_sample = {'text': text}
-        tmp_sample = op.process_single(tmp_sample)
-        relation = tmp_sample['relation_identity__']
+        dataset = Dataset.from_list([tmp_sample])
+        dataset = op.run(dataset)
+        relation = dataset[0][Fields.meta]['relation_identity']
 
         relation_detail += f"\n{role_name} (称呼:{cur_nicknames})"
         if relation:

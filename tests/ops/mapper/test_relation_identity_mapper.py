@@ -7,20 +7,23 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.relation_identity_mapper import RelationIdentityMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 
 # Skip tests for this OP.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class RelationIdentityMapperTest(DataJuicerTestCaseBase):
 
+    # before runing this test, set below environment variables:
+    # export OPENAI_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
+    # export OPENAI_API_KEY=your_key
 
-    def _run_op(self, api_model, response_path=None):
+    def _run_op(self, api_model, output_key=MetaKeys.role_relation):
 
         op = RelationIdentityMapper(api_model=api_model,
                                     source_entity="李莲花",
                                     target_entity="方多病",
-                                    response_path=response_path)
+                                    output_key=output_key)
 
         raw_text = """李莲花原名李相夷，十五岁战胜西域天魔，十七岁建立四顾门，二十岁问鼎武林盟主，成为传奇人物。
 在与金鸳盟盟主笛飞声的对决中，李相夷中毒重伤，沉入大海，十年后在莲花楼醒来，过起了市井生活。他帮助肉铺掌柜解决家庭矛盾，表现出敏锐的洞察力。
@@ -42,16 +45,16 @@ class RelationIdentityMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=2)
+        dataset = op.run(dataset)
         for data in dataset:
             for k in data:
                 logger.info(f"{k}: {data[k]}")
 
-    def test(self):
-        # before runing this test, set below environment variables:
-        # export OPENAI_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
-        # export OPENAI_API_KEY=your_key
+    def test_default(self):
         self._run_op('qwen2.5-72b-instruct')
+
+    def test_rename_key(self):
+        self._run_op('qwen2.5-72b-instruct', output_key='output')
 
 
 if __name__ == '__main__':

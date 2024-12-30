@@ -79,8 +79,10 @@ process:
   - clean_copyright_mapper:                                 # remove copyright comments.
   - dialog_intent_detection_mapper:                         # Mapper to generate user's intent labels in dialog.
       api_model: 'gpt-4o'                                     # API model name.
-      intent_candidates: null                                 # The output intent candidates. Use the intent labels of the open domain if it is None.
+      intent_candidates: null                                 # The output intent candidates. Use open-domai intent labels n if it is None.
       max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      labels_key: 'dialog_intent_labels'                      # The key name in the meta field to store the output labels. It is 'dialog_intent_labels' in default.
+      analysis_key: 'dialog_intent_labels_analysis'           # The key name in the meta field to store the corresponding analysis. It is 'dialog_intent_labels_analysis' in default.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the task.
@@ -96,12 +98,16 @@ process:
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - dialog_sentiment_detection_mapper:                      # Mapper to generate user's sentiment labels in dialog.
       api_model: 'gpt-4o'                                     # API model name.
+      sentiment_candidates: null                              # The output sentiment candidates. Use open-domai sentiment labels n if it is None.
       max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      labels_key: 'dialog_sentiment_labels'                   # The key name in the meta field to store the output labels. It is 'dialog_sentiment_labels' in default.
+      analysis_key: 'dialog_sentiment_labels_analysis'        # The key name in the meta field to store the corresponding analysis. It is 'dialog_sentiment_labels_analysis' in default.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the task.
       query_template: null                                    # Template for query part to build the input prompt.
       response_template: null                                 # Template for response part to build the input prompt.
+      candidate_template: null                                # Template for sentiment candidates to build the input prompt.
       analysis_template: null                                 # Template for analysis part to build the input prompt.
       labels_template: null                                   # Template for labels part to build the input prompt.
       analysis_pattern: null                                  # Pattern to parse the return sentiment analysis.
@@ -112,6 +118,8 @@ process:
   - dialog_sentiment_intensity_mapper:                      # Mapper to predict user's sentiment intensity (from -5 to 5 in default prompt) in dialog.
       api_model: 'gpt-4o'                                     # API model name.
       max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      intensities_key: null                                   # The key name in the meta field to store the output sentiment intensities. It is 'dialog_sentiment_intensity' in default.
+      analysis_key: null                                      # The key name in the meta field to store the corresponding analysis. It is 'dialog_sentiment_intensity_analysis' in default.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the task.
@@ -126,12 +134,16 @@ process:
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - dialog_topic_detection_mapper:                          # Mapper to generate user's topic labels in dialog.
       api_model: 'gpt-4o'                                     # API model name.
+      topic_candidates: null                                  # The output topic candidates. Use open-domai topic labels n if it is None.
       max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      labels_key: 'dialog_topic_labels'                       # The key name in the meta field to store the output labels. It is 'dialog_topic_labels' in default.
+      analysis_key: 'dialog_topic_labels_analysis'            # The key name in the meta field to store the corresponding analysis. It is 'dialog_topic_labels_analysis' in default.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the task.
       query_template: null                                    # Template for query part to build the input prompt.
       response_template: null                                 # Template for response part to build the input prompt.
+      candidate_template: null                                # Template for topic candidates to build the input prompt.
       analysis_template: null                                 # Template for analysis part to build the input prompt.
       labels_template: null                                   # Template for labels part to build the input prompt.
       analysis_pattern: null                                  # Pattern to parse the return topic analysis.
@@ -344,22 +356,27 @@ process:
       zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
       model_params: {}                                        # model param for hf_model.
       zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
+      label_key: 'query_intent_label'                         # The key name in the meta field to store the output label. It is 'query_intent_label' in default.
+      score_key: 'query_intent_label_score'                   # The key name in the meta field to store the corresponding label score. It is 'query_intent_label_score' in default.
   - query_sentiment_detection_mapper:                       # Mapper to predict user's sentiment label ('negative', 'neutral' and 'positive') in query.
       hf_model: 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'     # Hugginface model ID to predict sentiment label.
       zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
       model_params: {}                                        # model param for hf_model.
       zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
+      label_key: 'query_sentiment_label'                      # The key name in the meta field to store the output label. It is 'query_sentiment_label' in default.
+      score_key: 'query_sentiment_label_score'                # The key name in the meta field to store the corresponding label score. It is 'query_sentiment_label_score' in default.
   - query_topic_detection_mapper:                           # Mapper to predict user's topic label in query.
       hf_model: 'dstefa/roberta-base_topic_classification_nyt_news'     # Hugginface model ID to predict topic label.
       zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
       model_params: {}                                        # model param for hf_model.
       zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
+      label_key: 'query_topic_label'                          # The key name in the meta field to store the output label. It is 'query_topic_label' in default.
+      score_key: 'query_topic_label_score'                    # The key name in the meta field to store the corresponding label score. It is 'query_topic_label_score' in default.
   - relation_identity_mapper:                               # identify relation between two entity in the text.
       api_model: 'gpt-4o'                                     # API model name.
       source_entity: '孙悟空'                                  # The source entity of the relation to be dentified.
       target_entity: '猪八戒'                                  # The target entity of the relation to be identified.
-      input_key: null                                         # The input field key in the samples. Support for nested keys such as "__dj__stats__.text_len". It is text_key in default.
-      output_key: null                                        # The output field key in the samples. Support for nested keys such as "__dj__stats__.text_len". It is input_key in default.
+      output_key: 'role_relation'                             # The output key in the meta field in the samples. It is 'role_relation' in default.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt_template: null                            # System prompt template for the task. Need to specify by entity1 and entity2.
@@ -812,8 +829,8 @@ process:
       api_model: 'gpt-4o'                                     # API model name.
       entity: '孙悟空'                                         # The given entity.
       attribute: '人物经历'                                    # The given attribute.
-      input_key: null                                         # The input field key in the samples. Support for nested keys such as "__dj__stats__.text_len". It is text_key in default.
-      output_key: null                                        # The output field key in the samples. Support for nested keys such as "__dj__stats__.text_len". It is same as the input_key in default.
+      input_key: 'event_description'                          # The input key in the meta field of the samples. It is "event_description" in default.
+      output_key: 'entity_attribute'                          # The output key in the aggregation field of the samples. It is "entity_attribute" in default.
       word_limit: 100                                         # Prompt the output length.
       max_token_num: null                                     # The max token num of the total tokens of the sub documents. Without limitation if it is None.
       api_endpoint: null                                      # URL endpoint for the API.
@@ -827,7 +844,7 @@ process:
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - meta_tags_aggregator:                                   # Merge similar meta tags to one tag.
       api_model: 'gpt-4o'                                     # API model name.
-      meta_tag_key: '__dj__meta__.query_sentiment_label'      # The key of the meta tag to be mapped.
+      meta_tag_key: 'query_sentiment_label'                   # The key of the meta tag to be mapped. It is "query_sentiment_label" in default.
       target_tags: ['开心', '难过', '其他']                     # The tags that is supposed to be mapped to.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
@@ -843,8 +860,8 @@ process:
       api_model: 'gpt-4o'                                     # API model name.
       entity: '孙悟空'                                         # The given entity.
       query_entity_type: '人物'                                # The type of queried relavant entities.
-      input_key: null                                         # The input field key in the samples. Support for nested keys such as "__dj__stats__.text_len". It is text_key in default.
-      output_key: null                                        # The output field key in the samples. Support for nested keys such as "__dj__stats__.text_len". It is same as the input_key in default.
+      input_key: 'event_description'                          # The input key in the meta field of the samples. It is "event_description" in default.
+      output_key: 'most_relavant_entities'                    # The output key in the aggregation field of the samples. It is "most_relavant_entities" in default.
       max_token_num: null                                     # The max token num of the total tokens of the sub documents. Without limitation if it is None.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
@@ -856,8 +873,8 @@ process:
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - nested_aggregator:                                      # Considering the limitation of input length, nested aggregate contents for each given number of samples.
       api_model: 'gpt-4o'                                     # API model name.
-      input_key: null                                         # The input field key in the samples. Support for nested keys such as "__dj__stats__.text_len". It is text_key in default.
-      output_key: null                                        # The output field key in the samples. Support for nested keys such as "__dj__stats__.text_len". It is same as the input_key in default.
+      input_key: 'event_description'                          # The input key in the meta field of the samples. It is "event_description" in default.
+      output_key: null                                        # The output key in the aggregation field in the samples. It is same as the input_key in default.
       max_token_num: null                                     # The max token num of the total tokens of the sub documents. Without limitation if it is None.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.

@@ -4,7 +4,7 @@ from typing import Dict, List, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -12,6 +12,7 @@ OP_NAME = 'extract_entity_attribute_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractEntityAttributeMapper(Mapper):
     """
@@ -173,6 +174,13 @@ class ExtractEntityAttributeMapper(Mapper):
         return entities, attributes, descs, demo_lists
 
     def process_single(self, sample, rank=None):
+
+        # check if it's generated already
+        if set([
+                self.entity_key, self.attribute_key, self.attribute_desc_key,
+                self.support_text_key
+        ]) <= set(sample[Fields.meta].keys()):
+            return sample
 
         res = self._process_single_text(sample[self.text_key], rank=rank)
         entities, attributes, descs, demo_lists = res

@@ -57,7 +57,7 @@ class ExtractKeywordMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=2)
+        dataset = op.run(dataset)
         sample = dataset[0]
         logger.info(f"keywords: {sample[Fields.meta][MetaKeys.keyword]}")
 
