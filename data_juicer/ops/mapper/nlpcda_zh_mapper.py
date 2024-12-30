@@ -1,3 +1,4 @@
+import sys
 from copy import deepcopy
 
 from loguru import logger
@@ -7,6 +8,9 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.logger_utils import HiddenPrints
 
 from ..base_op import OPERATORS, Mapper
+
+# set the default encoding to utf-8 explicitly
+sys.stdout.reconfigure(encoding='utf-8')
 
 nlpcda = LazyLoader('nlpcda', 'nlpcda')
 
