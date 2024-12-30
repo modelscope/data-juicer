@@ -10,6 +10,9 @@ from PIL import ImageFile
 
 from data_juicer.utils.availability_utils import _is_package_available
 
+# set the default encoding to utf-8 explicitly
+sys.stdout.reconfigure(encoding='utf-8')
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # For now, only INFO will be shown. Later the severity level will be changed
