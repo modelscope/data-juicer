@@ -58,6 +58,8 @@ class MetaKeys(object):
     video_frame_tags = 'video_frame_tags'
     # # video-audio tags
     video_audio_tags = 'video_audio_tags'
+    # # video frames
+    video_frames = 'video_frames'
     # # image tags
     image_tags = 'image_tags'
 

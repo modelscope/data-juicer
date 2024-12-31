@@ -3,6 +3,7 @@ import unittest
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.grouper.naive_reverse_grouper import NaiveReverseGrouper
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.constant import Fields
 
 
 class NaiveReverseGrouperTest(DataJuicerTestCaseBase):
@@ -87,7 +88,7 @@ class NaiveReverseGrouperTest(DataJuicerTestCaseBase):
                     "Sur la plateforme MT4, plusieurs manières d'accéder à \n"
                     'ces fonctionnalités sont conçues simultanément.'
                 ],
-                'batch_size': 2,
+                Fields.agg: {'batch_size': 2},
             }
         ]
 
@@ -114,11 +115,13 @@ class NaiveReverseGrouperTest(DataJuicerTestCaseBase):
                 'query':[
                     'Can I help you?'
                 ],
-                'reponse':[
-                    'No',
-                    'Yes'
-                ],
-                'batch_size': 1,
+                Fields.agg: {
+                    'reponse':[
+                        'No',
+                        'Yes'
+                    ],
+                    'batch_size': 1,
+                }
             }
         ]
 
