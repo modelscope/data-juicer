@@ -72,6 +72,11 @@ class DataLoadStrategyRegistry:
         1. Exact match
         2. Wildcard matches from most specific to most general
         """
+        # default to wildcard if not provided
+        executor_type = executor_type or '*'
+        data_type = data_type or '*'
+        data_source = data_source or '*'
+
         # Create the lookup key
         lookup_key = StrategyKey(executor_type, data_type, data_source)
 

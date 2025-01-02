@@ -12,6 +12,7 @@ class ExecutorBase(ABC):
     @abstractmethod
     def __init__(self, cfg: Optional[Namespace] = None):
         self.cfg = init_configs() if cfg is None else cfg
+        self.executor_type = 'base'
 
     @abstractmethod
     def run(self,

@@ -34,7 +34,7 @@ class RayExecutor(ExecutorBase):
         :param cfg: optional config dict.
         """
         super().__init__(cfg)
-
+        self.executor_type = 'ray'
         self.work_dir = self.cfg.work_dir
         self.adapter = Adapter(self.cfg)
 

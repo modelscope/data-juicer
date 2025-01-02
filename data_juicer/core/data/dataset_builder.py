@@ -3,6 +3,7 @@ import shlex
 from typing import List, Tuple, Union
 
 from data_juicer.core.data import NestedDataset
+from data_juicer.core.data.config_validator import ConfigValidationError
 from data_juicer.core.data.data_validator import DataValidatorRegistry
 from data_juicer.core.data.load_strategy import DataLoadStrategyRegistry
 from data_juicer.core.data.ray_dataset import RayDataset
@@ -11,31 +12,50 @@ from data_juicer.utils.file_utils import is_absolute_path
 
 class DatasetBuilder(object):
 
-    def __init__(self, cfg):
+    def __init__(self, cfg, executor_type):
         self.cfg = cfg
+        self.executor_type = executor_type
 
         # defaults to use dataset_path
         if cfg.dataset_path is not None:
             ds_configs = rewrite_cli_datapath(cfg.dataset_path)
-        elif cfg.dataset is not None:
+        elif cfg.dataset not in (None, []):
             ds_configs = cfg.dataset
         else:
-            raise ValueError(
+            raise ConfigValidationError(
                 'Unable to initialize dataset; should have one of '
                 'dataset_path or dataset in configurations')
 
         # dataset config could be a list or a single entry; retrofit
         if not isinstance(ds_configs, list):
             ds_configs = [ds_configs]
+
+        # validate dataset config for type constraints
+        # 1. ds_config should be a dictionary
+        # 2. ds_configs should only have one type
+        # 3. if type is REMOTE, there should only one ds_config
+        # TODO other constraints; ray dataset only supports ondisk, etc.
+        for ds_config in ds_configs:
+            if type(ds_config) != dict:
+                raise ConfigValidationError(
+                    'Dataset config should be a dictionary')
+        types = [ds_config.get('type', None) for ds_config in ds_configs]
+        if len(set(types)) > 1:
+            raise ConfigValidationError(
+                'Mixture of diff types (ONDISK/REMOTE/...) are not supported')
+        if types[0] == 'remote' and len(ds_configs) > 1:
+            raise ConfigValidationError(
+                'Multiple remote datasets are not supported')
+
+        # initialize the data load strategies
         self.load_strategies = []
         for ds_config in ds_configs:
             # initialize data loading strategy
-            executor_type = ds_config.get('executor_type', None)
             data_type = ds_config.get('type', None)
             data_source = ds_config.get('source', None)
             self.load_strategies.append(
                 DataLoadStrategyRegistry.get_strategy_class(
-                    executor_type, data_type, data_source)(ds_config))
+                    self.executor_type, data_type, data_source)(ds_config))
 
         # initialize data validators
         self.validators = []
@@ -49,6 +69,7 @@ class DatasetBuilder(object):
 
     def load_dataset(self) -> Union[NestedDataset, RayDataset]:
         _datasets = []
+
         for f in self.load_strategies:
             # load dataset with its load strategy
             _dataset = f.load_data(self.cfg)
@@ -58,7 +79,8 @@ class DatasetBuilder(object):
                 validator.validate(_dataset)
             _datasets.append(_dataset)
 
-        # handle data mixture
+        # handle data mixture; only supports ONDISK
+
         return _datasets[0]
 
     @classmethod

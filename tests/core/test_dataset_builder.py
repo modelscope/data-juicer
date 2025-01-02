@@ -5,16 +5,27 @@ from argparse import Namespace
 from contextlib import redirect_stdout
 from io import StringIO
 from data_juicer.config import init_configs
-from data_juicer.core.data.dataset_builder import rewrite_cli_datapath, parse_cli_datapath
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
+from data_juicer.core.data.dataset_builder import (rewrite_cli_datapath, 
+                                                   parse_cli_datapath,
+                                                   DatasetBuilder)
+from data_juicer.core.data.config_validator import ConfigValidationError
+from data_juicer.utils.unittest_utils import (DataJuicerTestCaseBase, 
+                                              SKIPPED_TESTS)
+
 
 @SKIPPED_TESTS.register_module()
 class DatasetBuilderTest(DataJuicerTestCaseBase):
 
     def setUp(self):
+        """Setup basic configuration for tests"""
+        self.base_cfg = Namespace()
+        self.base_cfg.dataset_path = None
+        self.executor_type = 'local'
+
         # Get the directory where this test file is located
         test_file_dir = os.path.dirname(os.path.abspath(__file__))
         os.chdir(test_file_dir)
+
 
     def test_rewrite_cli_datapath_local_single_file(self):
         dataset_path = "./data/sample.txt"
@@ -214,6 +225,111 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertEqual(weights, expected_weights, 
                             f"Failed weights for input: {input_path}")
         
+    def test_builder_single_dataset_config(self):
+        """Test handling of single dataset configuration"""
+        # Setup single dataset config
+        self.base_cfg.dataset = {
+            'type': 'ondisk',
+            'path': 'test.jsonl'
+        }
+        
+        builder = DatasetBuilder(self.base_cfg, self.executor_type)
+        
+        # Verify config was converted to list
+        self.assertIsInstance(builder.load_strategies, list)
+        self.assertEqual(len(builder.load_strategies), 1)
+        
+        # Verify config content preserved
+        strategy = builder.load_strategies[0]
+        self.assertEqual(strategy.ds_config['type'], 'ondisk')
+        self.assertEqual(strategy.ds_config['path'], 'test.jsonl')
+
+    def test_builder_multiple_dataset_config(self):
+        """Test handling of multiple dataset configurations"""
+        # Setup multiple dataset config
+        self.base_cfg.dataset = [
+            {
+                'type': 'ondisk',
+                'path': 'test1.jsonl'
+            },
+            {
+                'type': 'ondisk',
+                'path': 'test2.jsonl'
+            }
+        ]
+        
+        builder = DatasetBuilder(self.base_cfg, self.executor_type)
+        
+        # Verify list handling
+        self.assertEqual(len(builder.load_strategies), 2)
+        
+        # Verify each config
+        self.assertEqual(builder.load_strategies[0].ds_config['path'], 'test1.jsonl')
+        self.assertEqual(builder.load_strategies[1].ds_config['path'], 'test2.jsonl')
+
+    def test_builder_none_dataset_config(self):
+        """Test handling when both dataset and dataset_path are None"""
+        self.base_cfg.dataset = None
+        
+        with self.assertRaises(ConfigValidationError) as context:
+            DatasetBuilder(self.base_cfg, self.executor_type)
+        
+        self.assertIn('dataset_path or dataset', str(context.exception))
+
+    def test_builder_mixed_dataset_types(self):
+        """Test validation of mixed dataset types"""
+        self.base_cfg.dataset = [
+            {
+                'type': 'ondisk',
+                'path': 'test1.jsonl'
+            },
+            {
+                'type': 'remote',
+                'source': 'some_source'
+            }
+        ]
+        
+        with self.assertRaises(ConfigValidationError) as context:
+            DatasetBuilder(self.base_cfg, self.executor_type)
+        
+        self.assertIn('Mixture of diff types', str(context.exception))
+
+    def test_builder_multiple_remote_datasets(self):
+        """Test validation of multiple remote datasets"""
+        self.base_cfg.dataset = [
+            {
+                'type': 'remote',
+                'source': 'source1'
+            },
+            {
+                'type': 'remote',
+                'source': 'source2'
+            }
+        ]
+        
+        with self.assertRaises(ConfigValidationError) as context:
+            DatasetBuilder(self.base_cfg, self.executor_type)
+        
+        self.assertIn('Multiple remote datasets', str(context.exception))
+
+    def test_builder_empty_dataset_config(self):
+        """Test handling of empty dataset configuration"""
+        self.base_cfg.dataset = []
+        
+        with self.assertRaises(ConfigValidationError) as context:
+            DatasetBuilder(self.base_cfg, self.executor_type)
+        
+        self.assertIn('dataset_path or dataset', str(context.exception))
+
+    def test_builder_invalid_dataset_config_type(self):
+        """Test handling of invalid dataset configuration type"""
+        self.base_cfg.dataset = "invalid_string_config"
+        
+        with self.assertRaises(ConfigValidationError) as context:
+            DatasetBuilder(self.base_cfg, self.executor_type)
+        
+        self.assertIn('Dataset config should be a dictionary', 
+                      str(context.exception))
 
 if __name__ == '__main__':
     unittest.main()
