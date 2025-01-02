@@ -11,7 +11,7 @@ from data_juicer.core.data.data_validator import (DataValidationError,
 
 
 # Test RequiredFieldsValidator
-class TestRequiredFieldsValidator(TestCase):
+class RequiredFieldsValidatorTest(TestCase):
     
     def setUp(self):
         # Create sample DataFrame
