@@ -60,29 +60,6 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
              {'path': ['./data/sample.txt'], 'type': 'ondisk', 'weight': 1.0}],
             ans)
 
-    def test_dataset_builder_ondisk_config(self):
-        test_config_file = './data/test_config.yaml'
-        out = StringIO()
-        with redirect_stdout(out):
-            cfg = init_configs(args=f'--config {test_config_file}'.split())
-            self.assertIsInstance(cfg, Namespace)
-            self.assertEqual(cfg.project_name, 'dataset-ondisk-json')
-            self.assertEqual(cfg.dataset,
-                             {'path': ['sample.json'], 'type': 'ondisk'})
-            self.assertEqual(not cfg.dataset_path, True)
-
-    def test_dataset_builder_ondisk_config_list(self):
-        test_config_file = './data/test_config_list.yaml'
-        out = StringIO()
-        with redirect_stdout(out):
-            cfg = init_configs(args=f'--config {test_config_file}'.split())
-            self.assertIsInstance(cfg, Namespace)
-            self.assertEqual(cfg.project_name, 'dataset-ondisk-list')
-            self.assertEqual(cfg.dataset,[
-                {'path': ['sample.json'], 'type': 'ondisk'},
-                {'path': ['sample.txt'], 'type': 'ondisk'}])
-            self.assertEqual(not cfg.dataset_path, True)
-
     @patch('os.path.isdir')
     @patch('os.path.isfile')
     def test_rewrite_cli_datapath_local_files(self, mock_isfile, mock_isdir):
@@ -330,6 +307,29 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         
         self.assertIn('Dataset config should be a dictionary', 
                       str(context.exception))
+
+    def test_builder_ondisk_config(self):
+        test_config_file = './data/test_config.yaml'
+        out = StringIO()
+        with redirect_stdout(out):
+            cfg = init_configs(args=f'--config {test_config_file}'.split())
+            self.assertIsInstance(cfg, Namespace)
+            self.assertEqual(cfg.project_name, 'dataset-ondisk-json')
+            self.assertEqual(cfg.dataset,
+                             {'path': ['sample.json'], 'type': 'ondisk'})
+            self.assertEqual(not cfg.dataset_path, True)
+
+    def test_builder_ondisk_config_list(self):
+        test_config_file = './data/test_config_list.yaml'
+        out = StringIO()
+        with redirect_stdout(out):
+            cfg = init_configs(args=f'--config {test_config_file}'.split())
+            self.assertIsInstance(cfg, Namespace)
+            self.assertEqual(cfg.project_name, 'dataset-ondisk-list')
+            self.assertEqual(cfg.dataset,[
+                {'path': ['sample.json'], 'type': 'ondisk'},
+                {'path': ['sample.txt'], 'type': 'ondisk'}])
+            self.assertEqual(not cfg.dataset_path, True)
 
 if __name__ == '__main__':
     unittest.main()
