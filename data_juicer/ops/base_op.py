@@ -48,7 +48,7 @@ def convert_arrow_to_python(method):
     return wrapper
 
 
-def catch_map_batches_exception(method):
+def catch_map_batches_exception(method, skip_op_error=False):
     """
     For batched-map sample-level fault tolerance.
     """
@@ -59,6 +59,8 @@ def catch_map_batches_exception(method):
         try:
             return method(samples, *args, **kwargs)
         except Exception as e:
+            if not skip_op_error:
+                raise
             from loguru import logger
             logger.error(
                 f'An error occurred in mapper operation when processing '
@@ -72,7 +74,9 @@ def catch_map_batches_exception(method):
     return wrapper
 
 
-def catch_map_single_exception(method, return_sample=True):
+def catch_map_single_exception(method,
+                               return_sample=True,
+                               skip_op_error=False):
     """
     For single-map sample-level fault tolerance.
     The input sample is expected batch_size = 1.
@@ -100,6 +104,8 @@ def catch_map_single_exception(method, return_sample=True):
                 else:
                     return [res]
             except Exception as e:
+                if skip_op_error:
+                    raise
                 from loguru import logger
                 logger.error(
                     f'An error occurred in mapper operation when processing '
@@ -152,6 +158,10 @@ class OP:
         self.index_key = kwargs.get('index_key', None)
 
         self.batch_size = kwargs.get('batch_size', 1000)
+
+        # for unittest, do not skip the error.
+        # It would be set to be True in config init.
+        self.skip_op_error = kwargs.get('skip_op_error', False)
 
         # whether the model can be accelerated using cuda
         _accelerator = kwargs.get('accelerator', None)
@@ -274,9 +284,11 @@ class Mapper(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.process = catch_map_batches_exception(self.process_batched)
+            self.process = catch_map_batches_exception(
+                self.process_batched, skip_op_error=self.skip_op_error)
         else:
-            self.process = catch_map_single_exception(self.process_single)
+            self.process = catch_map_single_exception(
+                self.process_single, skip_op_error=self.skip_op_error)
 
     # set the process method is not allowed to be overridden
     def __init_subclass__(cls, **kwargs):
@@ -363,13 +375,16 @@ class Filter(OP):
         # runtime wrappers
         if self.is_batched_op():
             self.compute_stats = catch_map_batches_exception(
-                self.compute_stats_batched)
-            self.process = catch_map_batches_exception(self.process_batched)
+                self.compute_stats_batched, skip_op_error=self.skip_op_error)
+            self.process = catch_map_batches_exception(
+                self.process_batched, skip_op_error=self.skip_op_error)
         else:
             self.compute_stats = catch_map_single_exception(
-                self.compute_stats_single)
-            self.process = catch_map_single_exception(self.process_single,
-                                                      return_sample=False)
+                self.compute_stats_single, skip_op_error=self.skip_op_error)
+            self.process = catch_map_single_exception(
+                self.process_single,
+                return_sample=False,
+                skip_op_error=self.skip_op_error)
 
     # set the process method is not allowed to be overridden
     def __init_subclass__(cls, **kwargs):
@@ -478,9 +493,11 @@ class Deduplicator(OP):
 
         # runtime wrappers
         if self.is_batched_op():
-            self.compute_hash = catch_map_batches_exception(self.compute_hash)
+            self.compute_hash = catch_map_batches_exception(
+                self.compute_hash, skip_op_error=self.skip_op_error)
         else:
-            self.compute_hash = catch_map_single_exception(self.compute_hash)
+            self.compute_hash = catch_map_single_exception(
+                self.compute_hash, skip_op_error=self.skip_op_error)
 
     def compute_hash(self, sample):
         """
@@ -616,7 +633,8 @@ class Aggregator(OP):
             queries and responses
         """
         super(Aggregator, self).__init__(*args, **kwargs)
-        self.process = catch_map_single_exception(self.process_single)
+        self.process = catch_map_single_exception(
+            self.process_single, skip_op_error=self.skip_op_error)
 
     def process_single(self, sample):
         """

@@ -55,6 +55,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                     }
                 }, 'nested dict load fail, for nonparametric op')
             self.assertDictEqual(
@@ -77,6 +78,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                     }
                 }, 'nested dict load fail, un-expected internal value')
 
@@ -147,6 +149,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                     }
                 })
             self.assertDictEqual(
@@ -169,6 +172,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                     }
                 })
             self.assertDictEqual(
@@ -191,6 +195,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                     }
                 })
             self.assertDictEqual(
@@ -213,6 +218,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                     }
                 })
             self.assertDictEqual(
@@ -235,6 +241,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                     }
                 })
 

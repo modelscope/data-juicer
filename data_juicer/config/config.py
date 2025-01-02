@@ -550,6 +550,7 @@ def init_setup_from_cfg(cfg: Namespace):
         'video_key': cfg.video_key,
         'num_proc': cfg.np,
         'turbo': cfg.turbo,
+        'skip_op_error': True,  # skip the sample that raises error
     }
     cfg.process = update_op_attr(cfg.process, op_attrs)
 
