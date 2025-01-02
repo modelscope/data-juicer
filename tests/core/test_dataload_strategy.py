@@ -7,7 +7,7 @@ class MockStrategy(DataLoadStrategy):
     def load_data(self):
         pass
 
-class TestDataLoadStrategyRegistry(unittest.TestCase):
+class DataLoadStrategyRegistryTest(unittest.TestCase):
     def setUp(self):
         # Clear existing strategies before each test
         DataLoadStrategyRegistry._strategies = {}
