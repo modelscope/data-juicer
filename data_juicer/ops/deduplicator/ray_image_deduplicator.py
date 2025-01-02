@@ -1,5 +1,4 @@
 import numpy as np
-from pydantic import PositiveInt
 
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
@@ -36,20 +35,20 @@ class RayImageDeduplicator(RayBasicDeduplicator):
     """
 
     def __init__(self,
-                 redis_host: str = 'localhost',
-                 redis_port: PositiveInt = 6380,
+                 backend: str = 'ray_actor',
+                 redis_address: str = 'redis://localhost:6379',
                  method: str = 'phash',
                  *args,
                  **kwargs):
         """
         Initialization.
-        :param redis_host: the hostname of redis server
-        :param redis_port: the port of redis server
+        :param redis_address: the address of redis server
+        :param backend: the backend for dedup, either 'ray_actor' or 'redis'
         :param args: extra args
         :param kwargs: extra args
         """
-        super().__init__(redis_host=redis_host,
-                         redis_port=redis_port,
+        super().__init__(backend=backend,
+                         redis_address=redis_address,
                          *args,
                          **kwargs)
         if method not in HASH_METHOD:
