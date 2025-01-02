@@ -793,6 +793,24 @@ process:
       redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
       lowercase: false                                        # whether to convert text to lower case
       ignore_non_character: false                             # whether to ignore non-alphabet characters, including whitespaces, digits, and punctuations
+  - ray_bts_minhash_deduplicator:                            # the document deduplicator that can run on multi-nodes using minhashLSH algorithm
+      tokenization: space                                     # tokenization method for text. One of [space, punctuation, character, sentencepiece]
+      window_size: 5                                          # window size of shingling
+      num_permutations: 256                                   # number of permutations in minhash computing
+      jaccard_threshold: 0.7                                  # the min jaccard similarity threshold in near-duplicate detection. When the jaccard similarity of two sample texts is >= this threshold, they are regarded as similar samples and this op will only keep one of them after deduplication
+      num_bands: null                                         # number of bands in LSH. Default it's None, and it will be determined by an optimal params computation algorithm by minimize the weighted sum of probs of False Positives and False Negatives
+      num_rows_per_band: null                                 # number of rows in each band in LSH. Default it's None, and it will be determined by an optimal params computation algorithm
+      lowercase: true                                         # whether to convert text to lower case
+      ignore_pattern: null                                    # whether to ignore sub-strings with specific pattern when computing simhash.
+      tokenizer_model: null                                   # path for the sentencepiece model, used for sentencepiece tokenization.
+      union_find_parallel_num: 'auto'                         # number of parallel workers for union-find algorithm. Default it's 'auto', and it will be determined by half of the number of CPUs.
+      union_threshold: 256                                    # threshold for minhash values group to perform union-find algorightm.
+      max_pending_edge_buffer_task: 20                        # max number of pending edge buffer ray tasks.
+      num_edge_buffer_task_returns: 10                        # number of edge buffer tasks for `ray.wait` to return.
+      max_pending_filter_tasks: 20                            # max number of pending filter ray tasks.
+      num_filter_task_returns: 10                             # number of filter tasks for `ray.wait` to return.
+      merge_batch_size: 1000                                  # batch size for BTS operations.
+      tmp_file_name: './outputs/ray-dedup-tmp/'               # the temporary folder name for deduplication.
 
   # Selector ops
   - frequency_specified_field_selector:                     # selector to select samples based on the sorted frequency of specified field value

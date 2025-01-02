@@ -144,6 +144,8 @@ class OP:
         :param history_key: the key name of field that stores history of
             queries and responses
         :param index_key: index the samples before process if not None
+        :param batch_size: the batch size for processing
+        :param work_dir: the working directory for this operator
         """
         # init data keys
         self.text_key = kwargs.get('text_key', 'text')
@@ -158,6 +160,7 @@ class OP:
         self.index_key = kwargs.get('index_key', None)
 
         self.batch_size = kwargs.get('batch_size', 1000)
+        self.work_dir = kwargs.get('work_dir', None)
 
         # for unittest, do not skip the error.
         # It would be set to be True in config init.
