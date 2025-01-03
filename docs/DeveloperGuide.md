@@ -40,6 +40,10 @@ and ② execute `pre-commit run --all-files` before push.
 
 - Data-Juicer allows everybody to build their own OPs.
 - Before implementing a new OP, please refer to [Operators](Operators.md) to avoid unnecessary duplication.
+- According to the implementation progress, OP will be categorized into 3 types of versions:
+  - ![alpha](https://img.shields.io/badge/alpha-red?style=plastic) version: Only the basic OP implementations are finished.
+  - ![beta](https://img.shields.io/badge/beta-yellow?style=plastic) version: Based on the alpha version, unittests for this OP are added as well.
+  - ![stable](https://img.shields.io/badge/stable-green?style=plastic) version: Based on the beta version, OP optimizations (e.g. model management, batched processing, OP fusion, ...)
 - Assuming we want to add a new Filter operator called "TextLengthFilter" to get corpus of expected text length, we can follow these steps to build it.
 
 1. (Optional) Add a new StatsKeys in `data_juicer/utils/constant.py` to store the statistical variable of the new OP.
@@ -50,7 +54,7 @@ class StatsKeys(object):
     text_len = 'text_len'
 ```
 
-2. Create a new OP file `text_length_filter.py` in the corresponding `data_juicer/ops/filter/` directory as follows.
+2. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) Create a new OP file `text_length_filter.py` in the corresponding `data_juicer/ops/filter/` directory as follows.
    - It's a Filter OP, so the new OP needs to inherit from the basic `Filter` class in the `base_op.py`, and be decorated with `OPERATORS` to register itself automatically.
    - For convenience, we can implement the core functions `compute_stats_single` and `process_single` in a single-sample way, whose input and output are a single sample dictionary. If you are very familiar with batched processing in Data-Juicer, you can also implement the batched version directly by overwriting the `compute_stats_batched` and `process_batched` functions, which will be slightly faster than single-sample version. Their input and output are a column-wise dict with multiple samples.
 
@@ -105,7 +109,7 @@ class StatsKeys(object):
                 return False
     ```
 
-    - If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare `_accelerator = 'cuda'` in the constructor, and ensure that `compute_stats_single/batched` and `process_single/batched` methods accept an additional positional argument `rank`.
+    - (![stable](https://img.shields.io/badge/stable-green?style=plastic)) If Hugging Face models are used within an operator, you might want to leverage GPU acceleration. To achieve this, declare `_accelerator = 'cuda'` in the constructor, and ensure that `compute_stats_single/batched` and `process_single/batched` methods accept an additional positional argument `rank`.
 
     ```python
     # ... (same as above)
@@ -129,7 +133,7 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
-    - If the operator processes data in batches rather than a single sample, or you want to enable batched processing, it is necessary to declare `_batched_op = True`.
+    - (![stable](https://img.shields.io/badge/stable-green?style=plastic)) If the operator processes data in batches rather than a single sample, or you want to enable batched processing, it is necessary to declare `_batched_op = True`.
       - For the original `compute_stats_single` and `process_single` functions, you can keep it still and Data-Juicer will call the default batched version to call the single version to support batched processing. Or you can implement your batched version in a more efficient way.
     ```python
     # ... (import some other libraries)
@@ -149,7 +153,7 @@ class StatsKeys(object):
             # ... (some codes)
     ```
 
-    - In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra datas. The format of the saving path is `{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`, where the `HASH_VALUE` is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. For convenience, we can call `self.remove_extra_parameters(locals())` at the beginning of the initiation to get the init parameters. At the same time, we can call `self.add_parameters` to add related parameters with the produced extra datas from each sample. Take the operator which enhances the images with diffusion models as example:
+    - (![stable](https://img.shields.io/badge/stable-green?style=plastic)) In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra datas. The format of the saving path is `{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`, where the `HASH_VALUE` is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. For convenience, we can call `self.remove_extra_parameters(locals())` at the beginning of the initiation to get the init parameters. At the same time, we can call `self.add_parameters` to add related parameters with the produced extra datas from each sample. Take the operator which enhances the images with diffusion models as example:
     ```python
     from data_juicer.utils.file_utils import transfer_filename
     # ... (import some other libraries)
@@ -196,7 +200,7 @@ class StatsKeys(object):
             # ... (some codes)
     ```
 
-3. After implemention, add it to the OP dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
+3. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) After implemention, add it to the OP dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
 
 ```python
 from . import (...,              # other OPs
@@ -209,7 +213,7 @@ __all__ = [
 ]
 ```
 
-4. When an operator has package dependencies listed in `environments/science_requires.txt`, you need to add the corresponding dependency packages to the `OPS_TO_PKG` dictionary in `data_juicer/utils/auto_install_mapping.py` to support dependency installation at the operator level.
+4. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) When an operator has package dependencies listed in `environments/science_requires.txt`, you need to add the corresponding dependency packages to the `OPS_TO_PKG` dictionary in `data_juicer/utils/auto_install_mapping.py` to support dependency installation at the operator level.
 
 5. Now you can use this new OP with custom arguments in your own config files!
 
@@ -224,7 +228,7 @@ process:
       max_len: 1000
 ```
 
-6. (Strongly Recommend) It's better to add corresponding tests for your own OPs. For `TextLengthFilter` above, you would like to add `test_text_length_filter.py` into `tests/ops/filter/` directory as below.
+6. (![beta](https://img.shields.io/badge/beta-yellow?style=plastic) Strongly Recommend) It's better to add corresponding tests for your own OPs. For `TextLengthFilter` above, you would like to add `test_text_length_filter.py` into `tests/ops/filter/` directory as below.
 
 ```python
 import unittest
@@ -246,7 +250,7 @@ if __name__ == '__main__':
     unittest.main()
 ```
 
-7. (Strongly Recommend) In order to facilitate the use of other users, we also need to update this new OP information to
+7. (![stable](https://img.shields.io/badge/stable-green?style=plastic) Strongly Recommend) In order to facilitate the use of other users, we also need to update this new OP information to
 the corresponding documents, including the following docs:
    1. `configs/config_all.yaml`: this complete config file contains a list of all OPs and their arguments, serving as an
    important document for users to refer to all available OPs. Therefore, after adding the new OP, we need to add it to the process
@@ -271,29 +275,9 @@ the corresponding documents, including the following docs:
        max_num: 10000                                          # the max number of filter range
    ...
    ```
-   
-   2. `docs/Operators.md`: this doc maintains categorized lists of available OPs. We can add the information of new OP to the list
-   of corresponding type of OPs (sorted in alphabetical order). At the same time, in the Overview section at the top of this doc,
-   we also need to update the number of OPs for the corresponding OP type:
-
-   ```markdown
-   ## Overview
-   ...
-   | [ Filter ]( #filter )             |   43 (+1 HERE)   | Filters out low-quality samples                 |
-   ...
-   ## Filter <a name="filter"/>
-   ...
-   | text_entity_dependency_filter | ![General](https://img.shields.io/badge/General-5FBF50?style=plastic) ![Text](https://img.shields.io/badge/Text-010326?style=plastic) ![en](https://img.shields.io/badge/en-A60D1A?style=plastic) ![zh](https://img.shields.io/badge/zh-F2D6A2?style=plastic)                                                               | Keeps samples containing dependency edges for an entity in the dependency tree of the texts | [code](../data_juicer/ops/filter/text_entity_dependency_filter.py) | [tests](../tests/ops/filter/test_text_entity_dependency_filter.py) |
-   | text_length_filter            | ![General](https://img.shields.io/badge/General-5FBF50?style=plastic) ![Text](https://img.shields.io/badge/Text-010326?style=plastic) ![en](https://img.shields.io/badge/en-A60D1A?style=plastic) ![zh](https://img.shields.io/badge/zh-F2D6A2?style=plastic)                                                               | Keeps samples with total text length within the specified range                             | [code](../data_juicer/ops/filter/text_length_filter.py)            | [tests](../tests/ops/filter/test_text_length_filter.py)            |
-   | token_num_filter              | ![General](https://img.shields.io/badge/General-5FBF50?style=plastic) ![Text](https://img.shields.io/badge/Text-010326?style=plastic) ![en](https://img.shields.io/badge/en-A60D1A?style=plastic) ![zh](https://img.shields.io/badge/zh-F2D6A2?style=plastic) ![GPU](https://img.shields.io/badge/GPU-F27649?style=plastic) | Keeps samples with token count within the specified range                                   | [code](../data_juicer/ops/filter/token_num_filter.py)              | [tests](../tests/ops/filter/test_token_num_filter.py)              |
-   ...
-   ```
-
-   3. `docs/Operators_ZH.md`: this doc is the Chinese version of the doc in 6.ii, so we need to update the Chinese content at
-   the same positions.
 
 
-### (Optional) Make your OP fusible
+### (![stable](https://img.shields.io/badge/stable-green?style=plastic) Optional) Make your OP fusible
 
 - If the calculation process of some intermediate variables in the new OP is reused in other existing OPs, this new OP can be
 added to the fusible OPs to accelerate the whole data processing with OP fusion technology. (e.g. both the `words_num_filter`

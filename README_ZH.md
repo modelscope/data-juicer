@@ -47,7 +47,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 - [2024-02-05] 我们的论文被SIGMOD'24 industrial track接收！
 - [2024-01-10] 开启“数据混合”新视界——第二届Data-Juicer大模型数据挑战赛已经正式启动！立即访问[竞赛官网](https://tianchi.aliyun.com/competition/entrance/532174)，了解赛事详情。
 - [2024-01-05] **Data-Juicer v0.1.3** 版本发布了。 
-在这个新版本中，我们支持了**更多Python版本**（3.8-3.10），同时支持了**多模态**数据集的[转换](tools/fmt_conversion/multimodal/README_ZH.md)和[处理](docs/Operators_ZH.md)（包括文本、图像和音频。更多模态也将会在之后支持）！
+在这个新版本中，我们支持了**更多Python版本**（3.8-3.10），同时支持了**多模态**数据集的[转换](tools/fmt_conversion/multimodal/README_ZH.md)和[处理](docs/Operators.md)（包括文本、图像和音频。更多模态也将会在之后支持）！
 此外，我们的论文也更新到了[第三版](https://arxiv.org/abs/2309.02033) 。
 - [2023-10-13] 我们的第一届以数据为中心的 LLM 竞赛开始了！
   请访问大赛官网，FT-Data Ranker（[1B赛道](https://tianchi.aliyun.com/competition/entrance/532157) 、[7B赛道](https://tianchi.aliyun.com/competition/entrance/532158) ) ，了解更多信息。
@@ -90,7 +90,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 ![Overview](https://img.alicdn.com/imgextra/i4/O1CN01WYQP3Z1JHsaXaQDK6_!!6000000001004-0-tps-3640-1812.jpg)
 
-* **系统化 & 可复用**：为用户提供系统化且可复用的80+核心[算子](docs/Operators_ZH.md)，20+[配置菜谱](configs/README_ZH.md)和20+专用[工具池](#documentation)，旨在让多模态数据处理独立于特定的大语言模型数据集和处理流水线。
+* **系统化 & 可复用**：为用户提供系统化且可复用的80+核心[算子](docs/Operators.md)，20+[配置菜谱](configs/README_ZH.md)和20+专用[工具池](#documentation)，旨在让多模态数据处理独立于特定的大语言模型数据集和处理流水线。
 
 * **数据反馈回路 & 沙盒实验室**：支持一站式数据-模型协同开发，通过[沙盒实验室](docs/Sandbox-ZH.md)快速迭代，基于数据和模型反馈回路、可视化和多维度自动评估等功能，使您更了解和改进您的数据和模型。  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
 
@@ -106,7 +106,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 ## 文档索引 <a name="documents"/>
 
 * [概览](README_ZH.md)
-* [算子库](docs/Operators_ZH.md)
+* [算子库](docs/Operators.md)
 * [配置系统](configs/README_ZH.md)
 * [开发者指南](docs/DeveloperGuide_ZH.md)
 * [API 参考](https://modelscope.github.io/data-juicer/)
@@ -339,7 +339,7 @@ streamlit run app.py
   * 算子列表：列出用于处理数据集的算子及其参数。
 * 您可以通过如下方式构建自己的配置文件:
   * ➖：修改我们的样例配置文件 [`config_all.yaml`](configs/config_all.yaml)。该文件包含了**所有**算子以及算子对应的默认参数。您只需要**移除**不需要的算子并重新设置部分算子的参数即可。
-  * ➕：从头开始构建自己的配置文件。您可以参考我们提供的样例配置文件 [`config_all.yaml`](configs/config_all.yaml)，[算子文档](docs/Operators_ZH.md)，以及 [开发者指南](docs/DeveloperGuide_ZH.md#构建自己的算子).
+  * ➕：从头开始构建自己的配置文件。您可以参考我们提供的样例配置文件 [`config_all.yaml`](configs/config_all.yaml)，[算子文档](docs/Operators.md)，以及 [开发者指南](docs/DeveloperGuide_ZH.md#构建自己的算子).
   * 除了使用 yaml 文件外，您还可以在命令行上指定一个或多个参数，这些参数将覆盖 yaml 文件中的值。
 
 ```shell
