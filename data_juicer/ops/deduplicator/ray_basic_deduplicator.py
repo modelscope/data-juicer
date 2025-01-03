@@ -12,6 +12,7 @@ MERSENNE_PRIME = (1 << 61) - 1
 
 @ray.remote(scheduling_strategy='SPREAD')
 class DedupSet:
+
     def __init__(self):
         self.hash_record = set()
 
@@ -71,8 +72,7 @@ class RayBasicDeduplicator(Filter):
             md5_value = self.calculate_hash(sample, context)
             dedup_set_id = int.from_bytes(
                 md5_value.encode(),
-                byteorder='little'
-            ) % MERSENNE_PRIME % self.dedup_set_num
+                byteorder='little') % MERSENNE_PRIME % self.dedup_set_num
             # check existing
             sample[HashKeys.is_unique] = \
                 ray.get(self.dedup_sets[dedup_set_id].setnx.remote(md5_value))
