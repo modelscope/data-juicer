@@ -88,7 +88,7 @@ class NaiveReverseGrouperTest(DataJuicerTestCaseBase):
                     "Sur la plateforme MT4, plusieurs manières d'accéder à \n"
                     'ces fonctionnalités sont conçues simultanément.'
                 ],
-                Fields.agg: {'batch_size': 2},
+                Fields.batch_meta: {'batch_size': 2},
             }
         ]
 
@@ -115,7 +115,7 @@ class NaiveReverseGrouperTest(DataJuicerTestCaseBase):
                 'query':[
                     'Can I help you?'
                 ],
-                Fields.agg: {
+                Fields.batch_meta: {
                     'reponse':[
                         'No',
                         'Yes'

@@ -23,8 +23,11 @@ class NaiveReverseGrouper(Grouper):
 
         samples = []
         for sample in dataset:
-            if Fields.agg in sample:
-                sample = {k: sample[k] for k in sample if k != Fields.agg}
+            if Fields.batch_meta in sample:
+                sample = {
+                    k: sample[k]
+                    for k in sample if k != Fields.batch_meta
+                }
             samples.extend(convert_dict_list_to_list_dict(sample))
 
         return samples

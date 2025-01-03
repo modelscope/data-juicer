@@ -6,7 +6,7 @@ from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Aggregator
 from data_juicer.utils.common_utils import is_string_list
-from data_juicer.utils.constant import AggKeys, Fields, MetaKeys
+from data_juicer.utils.constant import BatchMetaKeys, Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..common import split_text_by_punctuation
@@ -45,7 +45,7 @@ class MostRelavantEntitiesAggregator(Aggregator):
                  entity: str = None,
                  query_entity_type: str = None,
                  input_key: str = MetaKeys.event_description,
-                 output_key: str = AggKeys.most_relavant_entities,
+                 output_key: str = BatchMetaKeys.most_relavant_entities,
                  max_token_num: Optional[PositiveInt] = None,
                  *,
                  api_endpoint: Optional[str] = None,
@@ -165,7 +165,7 @@ class MostRelavantEntitiesAggregator(Aggregator):
 
     def process_single(self, sample=None, rank=None):
 
-        if self.output_key in sample[Fields.agg]:
+        if self.output_key in sample[Fields.batch_meta]:
             return sample
 
         if Fields.meta not in sample or self.input_key not in sample[
@@ -179,7 +179,7 @@ class MostRelavantEntitiesAggregator(Aggregator):
         if not is_string_list(sub_docs):
             return sample
 
-        sample[Fields.agg][
+        sample[Fields.batch_meta][
             self.output_key] = self.query_most_relavant_entities(sub_docs,
                                                                  rank=rank)
 
