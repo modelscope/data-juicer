@@ -24,8 +24,8 @@ class RayDocumentDeduplicator(RayBasicDeduplicator):
                  **kwargs):
         """
         Initialization method.
-        :param redis_address: the address of redis server
         :param backend: the backend for dedup, either 'ray_actor' or 'redis'
+        :param redis_address: the address of redis server
         :param lowercase: Whether to convert sample text to lower case
         :param ignore_non_character: Whether to ignore non-alphabet
         characters, including whitespaces, digits, and punctuations

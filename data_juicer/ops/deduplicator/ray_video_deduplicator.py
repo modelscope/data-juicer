@@ -25,8 +25,8 @@ class RayVideoDeduplicator(RayBasicDeduplicator):
                  **kwargs):
         """
         Initialization.
-        :param redis_address: the address of redis server
         :param backend: the backend for dedup, either 'ray_actor' or 'redis'
+        :param redis_address: the address of redis server
         :param args: extra args
         :param kwargs: extra args
         """
