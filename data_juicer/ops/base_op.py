@@ -633,6 +633,17 @@ class Aggregator(OP):
 
     def run(self, dataset, *, exporter=None, tracer=None):
         dataset = super(Aggregator, self).run(dataset)
+        # add batched meta field for OPs that produce aggregations
+        if Fields.batch_meta not in dataset.features:
+            from data_juicer.core.data import add_same_content_to_new_column
+            dataset = dataset.map(add_same_content_to_new_column,
+                                  fn_kwargs={
+                                      'new_column_name': Fields.batch_meta,
+                                      'initial_value': {}
+                                  },
+                                  num_proc=self.runtime_np(),
+                                  batch_size=self.batch_size,
+                                  desc='Adding new column for aggregation')
         new_dataset = dataset.map(
             self.process,
             num_proc=self.runtime_np(),

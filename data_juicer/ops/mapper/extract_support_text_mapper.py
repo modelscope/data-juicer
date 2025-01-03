@@ -3,15 +3,15 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
-from data_juicer.utils.common_utils import nested_access, nested_set
-from data_juicer.utils.constant import Fields
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 OP_NAME = 'extract_support_text_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractSupportTextMapper(Mapper):
     """
@@ -46,8 +46,8 @@ class ExtractSupportTextMapper(Mapper):
     def __init__(self,
                  api_model: str = 'gpt-4o',
                  *,
-                 summary_key: str = Fields.event_description,
-                 support_text_key: str = Fields.support_text,
+                 summary_key: str = MetaKeys.event_description,
+                 support_text_key: str = MetaKeys.support_text,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt: Optional[str] = None,
@@ -60,12 +60,11 @@ class ExtractSupportTextMapper(Mapper):
         """
         Initialization method.
         :param api_model: API model name.
-        :param summary_key: The field name to store the input summary.
-            Support for nested keys such as "__dj__stats__.text_len".
-            It's "__dj__event_description__" in default.
-        :param support_text_key: The field name to store the output
-            support text for the summary. It's "__dj__support_text__" in
-            default.
+        :param summary_key: The key name to store the input summary in the
+            meta field. It's "event_description" in default.
+        :param support_text_key: The key name to store the output
+            support text for the summary in the meta field. It's
+            "support_text" in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -98,9 +97,18 @@ class ExtractSupportTextMapper(Mapper):
         self.drop_text = drop_text
 
     def process_single(self, sample, rank=None):
+
+        # check if it's generated already
+        if self.support_text_key in sample[Fields.meta]:
+            return sample
+
         client = get_model(self.model_key, rank=rank)
 
-        summary = nested_access(sample, self.summary_key)
+        if self.summary_key not in sample[Fields.meta]:
+            logger.warning(
+                f'{self.summary_key} does not exist in the meta field!')
+            return sample
+        summary = sample[Fields.meta][self.summary_key]
         if not isinstance(summary, str):
             logger.warning('Unvalid input summary!')
             return sample
@@ -128,5 +136,5 @@ class ExtractSupportTextMapper(Mapper):
         if not support_text:
             support_text = summary
 
-        sample = nested_set(sample, self.support_text_key, support_text)
+        sample[Fields.meta][self.support_text_key] = support_text
         return sample

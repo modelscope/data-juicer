@@ -9,7 +9,7 @@ import shutil
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.video_extract_frames_mapper import \
     VideoExtractFramesMapper
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
@@ -70,18 +70,20 @@ class VideoExtractFramesMapperTest(DataJuicerTestCaseBase):
         vid3_frame_dir =  self._get_frames_dir(self.vid3_path, frame_dir)
 
         tgt_list = copy.deepcopy(ds_list)
-        tgt_list[0].update({Fields.video_frames: json.dumps({self.vid1_path: vid1_frame_dir})})
-        tgt_list[1].update({Fields.video_frames: json.dumps({self.vid2_path: vid2_frame_dir})})
-        tgt_list[2].update({Fields.video_frames: json.dumps({self.vid3_path: vid3_frame_dir})})
+        tgt_list[0].update({Fields.meta: {MetaKeys.video_frames: json.dumps({self.vid1_path: vid1_frame_dir})}})
+        tgt_list[1].update({Fields.meta: {MetaKeys.video_frames: json.dumps({self.vid2_path: vid2_frame_dir})}})
+        tgt_list[2].update({Fields.meta: {MetaKeys.video_frames: json.dumps({self.vid3_path: vid3_frame_dir})}})
 
         op = VideoExtractFramesMapper(
             frame_sampling_method='uniform',
             frame_num=frame_num,
             duration=0,
-            frame_dir=frame_dir)
+            frame_dir=frame_dir,
+            batch_size=2,
+            num_proc=1)
 
         dataset = Dataset.from_list(ds_list)
-        dataset = dataset.map(op.process, batch_size=2, num_proc=1)
+        dataset = op.run(dataset)
         res_list = dataset.to_list()
         self.assertEqual(res_list, tgt_list)
         self.assertListEqual(
@@ -114,18 +116,20 @@ class VideoExtractFramesMapperTest(DataJuicerTestCaseBase):
         vid3_frame_dir =  self._get_frames_dir(self.vid3_path, frame_dir)
 
         tgt_list = copy.deepcopy(ds_list)
-        tgt_list[0].update({Fields.video_frames: json.dumps({self.vid1_path: vid1_frame_dir})})
-        tgt_list[1].update({Fields.video_frames: json.dumps({self.vid2_path: vid2_frame_dir})})
-        tgt_list[2].update({Fields.video_frames: json.dumps({self.vid3_path: vid3_frame_dir})})
+        tgt_list[0].update({Fields.meta: {MetaKeys.video_frames: json.dumps({self.vid1_path: vid1_frame_dir})}})
+        tgt_list[1].update({Fields.meta: {MetaKeys.video_frames: json.dumps({self.vid2_path: vid2_frame_dir})}})
+        tgt_list[2].update({Fields.meta: {MetaKeys.video_frames: json.dumps({self.vid3_path: vid3_frame_dir})}})
 
         op = VideoExtractFramesMapper(
             frame_sampling_method='uniform',
             frame_num=frame_num,
             duration=10,
-            frame_dir=frame_dir)
+            frame_dir=frame_dir,
+            batch_size=2,
+            num_proc=1)
 
         dataset = Dataset.from_list(ds_list)
-        dataset = dataset.map(op.process, batch_size=2, num_proc=1)
+        dataset = op.run(dataset)
         res_list = dataset.to_list()
         self.assertEqual(res_list, tgt_list)
         self.assertListEqual(
@@ -158,22 +162,24 @@ class VideoExtractFramesMapperTest(DataJuicerTestCaseBase):
         vid3_frame_dir =  self._get_frames_dir(self.vid3_path, frame_dir)
 
         tgt_list = copy.deepcopy(ds_list)
-        tgt_list[0].update({Fields.video_frames: 
-            json.dumps({self.vid1_path: vid1_frame_dir})})
-        tgt_list[1].update({Fields.video_frames: json.dumps({
+        tgt_list[0].update({Fields.meta: {MetaKeys.video_frames: 
+            json.dumps({self.vid1_path: vid1_frame_dir})}})
+        tgt_list[1].update({Fields.meta: {MetaKeys.video_frames: json.dumps({
             self.vid2_path: vid2_frame_dir,
             self.vid3_path: vid3_frame_dir
-            })})
-        tgt_list[2].update({Fields.video_frames: 
-            json.dumps({self.vid3_path: vid3_frame_dir})})
+            })}})
+        tgt_list[2].update({Fields.meta: {MetaKeys.video_frames: 
+            json.dumps({self.vid3_path: vid3_frame_dir})}})
         
         op = VideoExtractFramesMapper(
             frame_sampling_method='all_keyframes',
             frame_dir=frame_dir,
-            duration=5)
+            duration=5,
+            batch_size=2,
+            num_proc=2)
 
         dataset = Dataset.from_list(ds_list)
-        dataset = dataset.map(op.process, batch_size=2, num_proc=2)
+        dataset = op.run(dataset)
         res_list = dataset.to_list()
         self.assertEqual(res_list, tgt_list)
         self.assertListEqual(
@@ -205,6 +211,8 @@ class VideoExtractFramesMapperTest(DataJuicerTestCaseBase):
             frame_sampling_method='uniform',
             frame_num=frame_num,
             duration=5,
+            batch_size=2,
+            num_proc=1
             )
 
         vid1_frame_dir =  op._get_default_frame_dir(self.vid1_path)
@@ -212,12 +220,12 @@ class VideoExtractFramesMapperTest(DataJuicerTestCaseBase):
         vid3_frame_dir =  op._get_default_frame_dir(self.vid3_path)
 
         tgt_list = copy.deepcopy(ds_list)
-        tgt_list[0].update({Fields.video_frames: json.dumps({self.vid1_path: vid1_frame_dir})})
-        tgt_list[1].update({Fields.video_frames: json.dumps({self.vid2_path: vid2_frame_dir})})
-        tgt_list[2].update({Fields.video_frames: json.dumps({self.vid3_path: vid3_frame_dir})})
+        tgt_list[0].update({Fields.meta: {MetaKeys.video_frames: json.dumps({self.vid1_path: vid1_frame_dir})}})
+        tgt_list[1].update({Fields.meta: {MetaKeys.video_frames: json.dumps({self.vid2_path: vid2_frame_dir})}})
+        tgt_list[2].update({Fields.meta: {MetaKeys.video_frames: json.dumps({self.vid3_path: vid3_frame_dir})}})
 
         dataset = Dataset.from_list(ds_list)
-        dataset = dataset.map(op.process, batch_size=2, num_proc=1)
+        dataset = op.run(dataset)
         res_list = dataset.to_list()
 
         frame_dir_prefix = self._get_default_frame_dir_prefix()

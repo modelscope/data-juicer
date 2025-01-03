@@ -6,8 +6,8 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
-from data_juicer.utils.constant import Fields
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..common import split_text_by_punctuation
@@ -16,6 +16,7 @@ OP_NAME = 'extract_keyword_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractKeywordMapper(Mapper):
     """
@@ -102,7 +103,7 @@ Output:
     def __init__(self,
                  api_model: str = 'gpt-4o',
                  *,
-                 keyword_key: str = Fields.keyword,
+                 keyword_key: str = MetaKeys.keyword,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  prompt_template: Optional[str] = None,
@@ -116,8 +117,8 @@ Output:
         """
         Initialization method.
         :param api_model: API model name.
-        :param keyword_key: The field name to store the keywords. It's
-            "__dj__keyword__" in default.
+        :param keyword_key: The key name to store the keywords in the meta
+            field. It's "keyword" in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -164,6 +165,11 @@ Output:
         return keywords
 
     def process_single(self, sample, rank=None):
+
+        # check if it's generated already
+        if self.keyword_key in sample[Fields.meta]:
+            return sample
+
         client = get_model(self.model_key, rank=rank)
 
         input_prompt = self.prompt_template.format(
@@ -181,7 +187,7 @@ Output:
             except Exception as e:
                 logger.warning(f'Exception: {e}')
 
-        sample[self.keyword_key] = keywords
+        sample[Fields.meta][self.keyword_key] = keywords
         if self.drop_text:
             sample.pop(self.text_key)
 

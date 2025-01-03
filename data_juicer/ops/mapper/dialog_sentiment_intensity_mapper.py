@@ -4,8 +4,7 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import NonNegativeInt, PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
-from data_juicer.utils.common_utils import nested_set
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -13,20 +12,21 @@ OP_NAME = 'dialog_sentiment_intensity_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class DialogSentimentIntensityMapper(Mapper):
     """
     Mapper to predict user's sentiment intensity (from -5 to 5 in default
     prompt) in dialog. Input from history_key, query_key and
     response_key. Output lists of intensities and analysis for queries in
-    the dialog, which is store in 'dialog_sentiment_intensity' and
-    'dialog_sentiment_intensity_analysis' in Data-Juicer meta field.
+    the dialog.
     """
 
     DEFAULT_SYSTEM_PROMPT = ('请判断用户和LLM多轮对话中用户的情绪变化。\n'
                              '要求：\n'
                              '- 用户情绪值是-5到5之间到整数，-5表示极度负面，5表示极度正面，'
                              '-5到5之间数值表示情绪从负面逐渐到正面的变化过程，0代表情呈绪中性。\n'
+                             '- 只输出当轮对话的分析，不要继续构造对话。\n'
                              '- 需要先进行分析，然后确定用户的情绪值，下面是一个样例，请模仿样例格式输出。\n'
                              '用户：你好，我对可持续发展的定义有点模糊，帮我解释一下？\n'
                              '情绪分析：刚开始，还没得到LLM回复，用户情绪呈中性。\n'
@@ -61,29 +61,38 @@ class DialogSentimentIntensityMapper(Mapper):
     DEFAULT_ANALYSIS_PATTERN = '情绪分析：(.*?)\n'
     DEFAULT_INTENSITY_PATTERN = '情绪值：(.*?)($|\n)'
 
-    def __init__(self,
-                 api_model: str = 'gpt-4o',
-                 max_round: NonNegativeInt = 10,
-                 *,
-                 api_endpoint: Optional[str] = None,
-                 response_path: Optional[str] = None,
-                 system_prompt: Optional[str] = None,
-                 query_template: Optional[str] = None,
-                 response_template: Optional[str] = None,
-                 analysis_template: Optional[str] = None,
-                 intensity_template: Optional[str] = None,
-                 analysis_pattern: Optional[str] = None,
-                 intensity_pattern: Optional[str] = None,
-                 try_num: PositiveInt = 3,
-                 model_params: Dict = {},
-                 sampling_params: Dict = {},
-                 **kwargs):
+    def __init__(
+            self,
+            api_model: str = 'gpt-4o',
+            max_round: NonNegativeInt = 10,
+            *,
+            intensities_key: str = MetaKeys.dialog_sentiment_intensity,
+            analysis_key: str = MetaKeys.dialog_sentiment_intensity_analysis,
+            api_endpoint: Optional[str] = None,
+            response_path: Optional[str] = None,
+            system_prompt: Optional[str] = None,
+            query_template: Optional[str] = None,
+            response_template: Optional[str] = None,
+            analysis_template: Optional[str] = None,
+            intensity_template: Optional[str] = None,
+            analysis_pattern: Optional[str] = None,
+            intensity_pattern: Optional[str] = None,
+            try_num: PositiveInt = 3,
+            model_params: Dict = {},
+            sampling_params: Dict = {},
+            **kwargs):
         """
         Initialization method.
 
         :param api_model: API model name.
         :param max_round: The max num of round in the dialog to build the
             prompt.
+        :param intensities_key: The key name in the meta field to store
+            the output sentiment intensities. It is
+            'dialog_sentiment_intensity' in default.
+        :param analysis_key: The key name in the meta field to store the
+            corresponding analysis. It is
+            'dialog_sentiment_intensity_analysis' in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -110,6 +119,8 @@ class DialogSentimentIntensityMapper(Mapper):
         super().__init__(**kwargs)
 
         self.max_round = max_round
+        self.intensities_key = intensities_key
+        self.analysis_key = analysis_key
 
         self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
         self.query_template = query_template or self.DEFAULT_QUERY_TEMPLATE
@@ -158,6 +169,11 @@ class DialogSentimentIntensityMapper(Mapper):
         return analysis, intensity
 
     def process_single(self, sample, rank=None):
+
+        meta = sample[Fields.meta]
+        if self.intensities_key in meta and self.analysis_key in meta:
+            return sample
+
         client = get_model(self.model_key, rank=rank)
 
         analysis_list = []
@@ -199,9 +215,7 @@ class DialogSentimentIntensityMapper(Mapper):
             history.append(self.intensity_template.format(intensity=intensity))
             history.append(self.response_template.format(response=qa[1]))
 
-        analysis_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_intensity_analysis}'  # noqa: E501
-        sample = nested_set(sample, analysis_key, analysis_list)
-        intensity_key = f'{Fields.meta}.{MetaKeys.dialog_sentiment_intensity}'
-        sample = nested_set(sample, intensity_key, intensities)
+        meta[self.intensities_key] = intensities
+        meta[self.analysis_key] = analysis_list
 
         return sample

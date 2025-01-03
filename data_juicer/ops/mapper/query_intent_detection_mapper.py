@@ -1,21 +1,19 @@
 from typing import Dict, Optional
 
-from data_juicer.utils.common_utils import nested_set
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, TAGGING_OPS, Mapper
 
 OP_NAME = 'query_intent_detection_mapper'
 
 
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class QueryIntentDetectionMapper(Mapper):
     """
     Mapper to predict user's Intent label in query. Input from query_key.
-    Output intent label and corresponding score for the query, which is
-    store in 'query_intent_label' and 'query_intent_label_score' in
-    Data-Juicer meta field.
+    Output intent label and corresponding score for the query.
     """
 
     _accelerator = 'cuda'
@@ -28,6 +26,9 @@ class QueryIntentDetectionMapper(Mapper):
             zh_to_en_hf_model: Optional[str] = 'Helsinki-NLP/opus-mt-zh-en',
             model_params: Dict = {},
             zh_to_en_model_params: Dict = {},
+            *,
+            label_key: str = MetaKeys.query_intent_label,
+            score_key: str = MetaKeys.query_intent_score,
             **kwargs):
         """
         Initialization method.
@@ -37,9 +38,17 @@ class QueryIntentDetectionMapper(Mapper):
             If not None, translate the query from Chinese to English.
         :param model_params: model param for hf_model.
         :param zh_to_en_model_params: model param for zh_to_hf_model.
+        :param label_key: The key name in the meta field to store the
+            output label. It is 'query_intent_label' in default.
+        :param score_key: The key name in the meta field to store the
+            corresponding label score. It is 'query_intent_label_score'
+            in default.
         :param kwargs: Extra keyword arguments.
         """
         super().__init__(**kwargs)
+
+        self.label_key = label_key
+        self.score_key = score_key
 
         self.model_key = prepare_model(model_type='huggingface',
                                        pretrained_model_name_or_path=hf_model,
@@ -58,6 +67,11 @@ class QueryIntentDetectionMapper(Mapper):
             self.zh_to_en_model_key = None
 
     def process_batched(self, samples, rank=None):
+
+        metas = samples[Fields.meta]
+        if self.label_key in metas[0] and self.score_key in metas[0]:
+            return samples
+
         queries = samples[self.query_key]
 
         if self.zh_to_en_model_key is not None:
@@ -71,14 +85,8 @@ class QueryIntentDetectionMapper(Mapper):
         labels = [r['label'] for r in results]
         scores = [r['score'] for r in results]
 
-        if Fields.meta not in samples:
-            samples[Fields.meta] = [{} for val in labels]
-        for i in range(len(samples[Fields.meta])):
-            samples[Fields.meta][i] = nested_set(samples[Fields.meta][i],
-                                                 MetaKeys.query_intent_label,
-                                                 labels[i])
-            samples[Fields.meta][i] = nested_set(samples[Fields.meta][i],
-                                                 MetaKeys.query_intent_score,
-                                                 scores[i])
+        for i in range(len(metas)):
+            metas[i][self.label_key] = labels[i]
+            metas[i][self.score_key] = scores[i]
 
         return samples

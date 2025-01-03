@@ -7,7 +7,7 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.extract_event_mapper import ExtractEventMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 
 # Skip tests for this OP.
 # These tests have been tested locally.
@@ -63,10 +63,10 @@ class ExtractEventMapperTest(DataJuicerTestCaseBase):
         for sample in dataset:
             logger.info(f"chunk_id: {sample['chunk_id']}")
             self.assertEqual(sample['chunk_id'], 0)
-            logger.info(f"event: {sample[Fields.event_description]}")
-            self.assertNotEqual(sample[Fields.event_description], '')
-            logger.info(f"characters: {sample[Fields.relevant_characters]}")
-            self.assertNotEqual(sample[Fields.relevant_characters], [])
+            logger.info(f"event: {sample[Fields.meta][MetaKeys.event_description]}")
+            self.assertNotEqual(sample[Fields.meta][MetaKeys.event_description], '')
+            logger.info(f"characters: {sample[Fields.meta][MetaKeys.relevant_characters]}")
+            self.assertNotEqual(sample[Fields.meta][MetaKeys.relevant_characters], [])
 
     def test(self):
         # before runing this test, set below environment variables:
