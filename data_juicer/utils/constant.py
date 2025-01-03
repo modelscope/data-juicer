@@ -34,7 +34,7 @@ class BatchMetaKeys(object):
 
 class MetaKeys(object):
 
-    # text tags
+    # === text related tags === 
     # # sentiment
     dialog_sentiment_intensity = 'dialog_sentiment_intensity'
     dialog_sentiment_intensity_analysis = 'dialog_sentiment_intensity_analysis'
@@ -53,7 +53,7 @@ class MetaKeys(object):
     query_topic_label = 'query_topic_label'
     query_topic_score = 'query_topic_label_score'
 
-    # multi-module tags
+    # === multi-modal related tags === 
     # # video-frame tags
     video_frame_tags = 'video_frame_tags'
     # # video-audio tags
@@ -63,7 +63,7 @@ class MetaKeys(object):
     # # image tags
     image_tags = 'image_tags'
 
-    # info extraction
+    # === info extraction related tags ===
     # # for event extraction
     event_description = 'event_description'
     # # a list of characters relevant to the event
@@ -192,7 +192,7 @@ class StatsKeysMeta(type):
 
 
 class StatsKeysConstant(object):
-    # text
+    #  === text === 
     alpha_token_ratio = 'alpha_token_ratio'
     alnum_ratio = 'alnum_ratio'
     avg_line_length = 'avg_line_length'
@@ -211,7 +211,7 @@ class StatsKeysConstant(object):
     num_words = 'num_words'
     word_rep_ratio = 'word_rep_ratio'
 
-    # image
+    #  === image === 
     aspect_ratios = 'aspect_ratios'
     image_width = 'image_width'
     image_height = 'image_height'
@@ -224,12 +224,12 @@ class StatsKeysConstant(object):
     image_watermark_prob = 'image_watermark_prob'
     image_pair_similarity = 'image_pair_similarity'
 
-    # audios
+    #  === audios === 
     audio_duration = 'audio_duration'
     audio_nmf_snr = 'audio_nmf_snr'
     audio_sizes = 'audio_sizes'
 
-    # videos
+    #  === videos === 
     video_duration = 'video_duration'
     video_aspect_ratios = 'video_aspect_ratios'
     video_width = 'video_width'
@@ -241,7 +241,7 @@ class StatsKeysConstant(object):
     video_nsfw_score = 'video_nsfw_score'
     video_watermark_prob = 'video_watermark_prob'
 
-    # multimodal
+    #  === multimodal === 
     # image-text
     image_text_similarity = 'image_text_similarity'
     image_text_matching_score = 'image_text_matching_score'
@@ -271,24 +271,24 @@ class HashKeys(object):
 
 
 class InterVars(object):
-    # text
+    #  === text === 
     lines = DEFAULT_PREFIX + 'lines'
     words = DEFAULT_PREFIX + 'words'
     refined_words = DEFAULT_PREFIX + 'refined_words'
 
-    # image
+    #  === image === 
     loaded_images = DEFAULT_PREFIX + 'loaded_images'  # Image
 
-    # audios
+    #  === audios === 
     loaded_audios = DEFAULT_PREFIX + 'loaded_audios'  # (data, sampling_rate)
 
-    # videos
-    # InputContainer from av.
-    # Key: {video_path}
+    #  === videos === 
+    # # InputContainer from av.
+    # # Key: {video_path}
     loaded_videos = DEFAULT_PREFIX + 'loaded_videos'
     # sampled frames.
-    # Key: {video_path}-{frame_sampling_method}[-{frame_num}]
-    #   {frame_num} is only used when {frame_sampling_method} is "uniform"
+    # # Key: {video_path}-{frame_sampling_method}[-{frame_num}]
+    # #   {frame_num} is only used when {frame_sampling_method} is "uniform"
     sampled_frames = DEFAULT_PREFIX + 'sampled_frames'
 
 
