@@ -21,7 +21,7 @@ class NaiveReverseGrouper(Grouper):
         :param kwargs: extra args
         """
         super().__init__(*args, **kwargs)
-        self.batch_meta_export_path = os.path.abspath(batch_meta_export_path)
+        self.batch_meta_export_path = batch_meta_export_path
 
     def process(self, dataset):
 
