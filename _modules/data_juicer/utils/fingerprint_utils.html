@@ -1,0 +1,281 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>data_juicer.utils.fingerprint_utils &mdash; data_juicer 1.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            data_juicer
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">data_juicer</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../data_juicer.html">data_juicer</a></li>
+      <li class="breadcrumb-item active">data_juicer.utils.fingerprint_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for data_juicer.utils.fingerprint_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">dill</span>
+<span class="kn">import</span> <span class="nn">xxhash</span>
+<span class="kn">from</span> <span class="nn">datasets.fingerprint</span> <span class="kn">import</span> <span class="p">(</span><span class="n">_CACHING_ENABLED</span><span class="p">,</span> <span class="n">fingerprint_warnings</span><span class="p">,</span>
+                                  <span class="n">format_kwargs_for_fingerprint</span><span class="p">,</span>
+                                  <span class="n">format_transform_for_fingerprint</span><span class="p">,</span>
+                                  <span class="n">generate_random_fingerprint</span><span class="p">,</span>
+                                  <span class="n">validate_fingerprint</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+
+<div class="viewcode-block" id="Hasher">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.Hasher">[docs]</a>
+<span class="k">class</span> <span class="nc">Hasher</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hasher that accepts python objects as inputs.&quot;&quot;&quot;</span>
+
+    <span class="n">dispatch</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="Hasher.__init__">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.Hasher.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">xxhash</span><span class="o">.</span><span class="n">xxh64</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Hasher.hash_bytes">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.Hasher.hash_bytes">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">hash_bytes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">bytes</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">xxhash</span><span class="o">.</span><span class="n">xxh64</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Hasher.hash_default">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.Hasher.hash_default">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">hash_default</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Use dill to serialize objects to avoid serialization failures.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">hash_bytes</span><span class="p">(</span><span class="n">dill</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Hasher.hash">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.Hasher.hash">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">hash</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">dispatch</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">dispatch</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)](</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">hash_default</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Hasher.update">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.Hasher.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">header_for_update</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;==</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s1">==&#39;</span>
+        <span class="n">value_for_update</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">header_for_update</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">value_for_update</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Hasher.hexdigest">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.Hasher.hexdigest">[docs]</a>
+    <span class="k">def</span> <span class="nf">hexdigest</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="update_fingerprint">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.update_fingerprint">[docs]</a>
+<span class="k">def</span> <span class="nf">update_fingerprint</span><span class="p">(</span><span class="n">fingerprint</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">transform_args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Combining various objects to update the fingerprint.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">hasher</span> <span class="o">=</span> <span class="n">Hasher</span><span class="p">()</span>
+    <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">fingerprint</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa various errors might raise here from pickle or dill</span>
+        <span class="k">if</span> <span class="n">_CACHING_ENABLED</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fingerprint_warnings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s1">&#39;update_fingerprint_transform_hash_failed&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s2"> couldn&#39;t be hashed properly, </span><span class="se">\</span>
+<span class="s2">                     a random hash was used instead. Make sure your </span><span class="se">\</span>
+<span class="s2">                     transforms and parameters are serializable with </span><span class="se">\</span>
+<span class="s2">                     pickle or dill for the dataset fingerprinting and </span><span class="se">\</span>
+<span class="s2">                     caching to work. If you reuse this transform, the </span><span class="se">\</span>
+<span class="s2">                     caching mechanism will consider it to be different </span><span class="se">\</span>
+<span class="s2">                     from the previous calls and recompute everything. </span><span class="se">\</span>
+<span class="s2">                     This warning is only showed once. Subsequent hashing </span><span class="se">\</span>
+<span class="s2">                     failures won&#39;t be showed.&quot;</span><span class="p">)</span>
+                <span class="n">fingerprint_warnings</span><span class="p">[</span>
+                    <span class="s1">&#39;update_fingerprint_transform_hash_failed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s2"> couldn&#39;t be hashed properly, </span><span class="se">\</span>
+<span class="s2">                     a random hash was used instead.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s2"> couldn&#39;t be hashed properly, a </span><span class="se">\</span>
+<span class="s2">                 random hash was used instead. This doesn&#39;t affect caching </span><span class="se">\</span>
+<span class="s2">                 since it&#39;s disabled.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">generate_random_fingerprint</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">transform_args</span><span class="p">):</span>
+        <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hasher</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">transform_args</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa various errors might raise here from pickle or dill</span>
+            <span class="k">if</span> <span class="n">_CACHING_ENABLED</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">fingerprint_warnings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="s1">&#39;update_fingerprint_transform_hash_failed&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;=</span><span class="si">{</span><span class="n">transform_args</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2"> of the </span><span class="se">\</span>
+<span class="s2">                         transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s2"> couldn&#39;t be hashed properly, </span><span class="se">\</span>
+<span class="s2">                         a random hash was used instead. Make sure your </span><span class="se">\</span>
+<span class="s2">                         transforms and parameters are serializable with </span><span class="se">\</span>
+<span class="s2">                         pickle or dill for the dataset fingerprinting and </span><span class="se">\</span>
+<span class="s2">                         caching to work. If you reuse this transform, the </span><span class="se">\</span>
+<span class="s2">                         caching mechanism will consider it to be different </span><span class="se">\</span>
+<span class="s2">                         from the previous calls and recompute everything. </span><span class="se">\</span>
+<span class="s2">                         This warning is only showed once. Subsequent hashing </span><span class="se">\</span>
+<span class="s2">                         failures won&#39;t be showed.&quot;</span><span class="p">)</span>
+                    <span class="n">fingerprint_warnings</span><span class="p">[</span>
+                        <span class="s1">&#39;update_fingerprint_transform_hash_failed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;=</span><span class="si">{</span><span class="n">transform_args</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2"> of the </span><span class="se">\</span>
+<span class="s2">                         transform </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s2"> couldn&#39;t be hashed properly, </span><span class="se">\</span>
+<span class="s2">                         a random hash was used instead.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Parameter &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;=</span><span class="si">{</span><span class="n">transform_args</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2"> of the transform </span><span class="se">\</span>
+<span class="s2">                     </span><span class="si">{</span><span class="n">transform</span><span class="si">}</span><span class="s2"> couldn&#39;t be hashed properly, a random hash </span><span class="se">\</span>
+<span class="s2">                     was used instead. This doesn&#39;t affect caching since it&#39;s </span><span class="se">\</span>
+<span class="s2">                     disabled.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">generate_random_fingerprint</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">hasher</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="generate_fingerprint">
+<a class="viewcode-back" href="../../../data_juicer.utils.html#data_juicer.utils.fingerprint_utils.generate_fingerprint">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_fingerprint</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate new fingerprints by using various kwargs of the dataset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">dataset_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;shard&#39;</span><span class="p">:</span> <span class="n">ds</span><span class="p">,</span> <span class="s1">&#39;function&#39;</span><span class="p">:</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dataset_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;shard&#39;</span><span class="p">:</span> <span class="n">ds</span><span class="p">}</span>
+    <span class="n">dataset_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># we create a unique hash from the function,</span>
+    <span class="c1"># current dataset file and the mapping args</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">format_transform_for_fingerprint</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">_map_single</span><span class="p">)</span>
+    <span class="n">kwargs_for_fingerprint</span> <span class="o">=</span> <span class="n">format_kwargs_for_fingerprint</span><span class="p">(</span>
+        <span class="n">ds</span><span class="o">.</span><span class="n">_map_single</span><span class="p">,</span> <span class="p">(),</span> <span class="n">dataset_kwargs</span><span class="p">)</span>
+    <span class="n">kwargs_for_fingerprint</span><span class="p">[</span><span class="s1">&#39;fingerprint_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;new_fingerprint&#39;</span>
+    <span class="n">new_fingerprint</span> <span class="o">=</span> <span class="n">update_fingerprint</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">_fingerprint</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span>
+                                         <span class="n">kwargs_for_fingerprint</span><span class="p">)</span>
+    <span class="n">validate_fingerprint</span><span class="p">(</span><span class="n">new_fingerprint</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new_fingerprint</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Data-Juicer Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

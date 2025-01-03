@@ -6,19 +6,19 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.config &mdash; data_juicer 1.0.2 documentation</title>
+  <title>data_juicer.config package &mdash; data_juicer 1.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="data_juicer.format" href="data_juicer.format.html" />
-    <link rel="prev" title="data_juicer.analysis" href="data_juicer.analysis.html" /> 
+    <link rel="next" title="data_juicer.format package" href="data_juicer.format.html" />
+    <link rel="prev" title="data_juicer.analysis package" href="data_juicer.analysis.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,23 +42,21 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">data_juicer.config</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.config.init_configs"><code class="docutils literal notranslate"><span class="pre">init_configs()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.config.get_init_configs"><code class="docutils literal notranslate"><span class="pre">get_init_configs()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.config.export_config"><code class="docutils literal notranslate"><span class="pre">export_config()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.config.merge_config"><code class="docutils literal notranslate"><span class="pre">merge_config()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data_juicer.config.prepare_side_configs"><code class="docutils literal notranslate"><span class="pre">prepare_side_configs()</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">data_juicer.config package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-data_juicer.config.config">data_juicer.config.config module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-data_juicer.config">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -75,7 +73,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">data_juicer.config</li>
+      <li class="breadcrumb-item active">data_juicer.config package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/data_juicer.config.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -85,8 +83,177 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-data_juicer.config">
-<span id="data-juicer-config"></span><h1>data_juicer.config<a class="headerlink" href="#module-data_juicer.config" title="Link to this heading">¶</a></h1>
+  <section id="data-juicer-config-package">
+<h1>data_juicer.config package<a class="headerlink" href="#data-juicer-config-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-data_juicer.config.config">
+<span id="data-juicer-config-config-module"></span><h2>data_juicer.config.config module<a class="headerlink" href="#module-data_juicer.config.config" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.init_configs">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">init_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#init_configs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.init_configs" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>initialize the jsonargparse parser and parse configs from one of:</dt><dd><ol class="arabic simple">
+<li><p>POSIX-style commands line args;</p></li>
+<li><p>config files in yaml (json and jsonnet supersets);</p></li>
+<li><p>environment variables</p></li>
+<li><p>hard-coded defaults</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – list of params, e.g., [’–conifg’, ‘cfg.yaml’], defaut None.</p></li>
+<li><p><strong>which_entry</strong> – which entry to init configs (executor/analyzer)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a global cfg object used by the Executor or Analyzer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.update_ds_cache_dir_and_related_vars">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">update_ds_cache_dir_and_related_vars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_ds_cache_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#update_ds_cache_dir_and_related_vars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.update_ds_cache_dir_and_related_vars" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.init_setup_from_cfg">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">init_setup_from_cfg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#init_setup_from_cfg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.init_setup_from_cfg" title="Link to this definition">¶</a></dt>
+<dd><p>Do some extra setup tasks after parsing config file or command line.</p>
+<ol class="arabic simple">
+<li><p>create working directory and a log directory</p></li>
+<li><p>update cache directory</p></li>
+<li><p>update checkpoint and <cite>temp_dir</cite> of tempfile</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cfg</strong> – an original cfg</p></li>
+<li><p><strong>cfg</strong> – an updated cfg</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.load_ops_with_stats_meta">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">load_ops_with_stats_meta</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#load_ops_with_stats_meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.load_ops_with_stats_meta" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.update_op_attr">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">update_op_attr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#update_op_attr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.update_op_attr" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.sort_op_by_types_and_names">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">sort_op_by_types_and_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">op_name_classes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#sort_op_by_types_and_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.sort_op_by_types_and_names" title="Link to this definition">¶</a></dt>
+<dd><p>Split ops items by op type and sort them to sub-ops by name, then concat
+together.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>op_name_classes</strong> – a list of op modules</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>sorted op list , each item is a pair of op_name and
+op_class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.update_op_process">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">update_op_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#update_op_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.update_op_process" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.namespace_to_arg_list">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">namespace_to_arg_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">includes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excludes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#namespace_to_arg_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.namespace_to_arg_list" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.config_backup">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">config_backup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#config_backup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.config_backup" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.display_config">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">display_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#display_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.display_config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.export_config">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">export_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'yaml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_none</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_check</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multifile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#export_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.export_config" title="Link to this definition">¶</a></dt>
+<dd><p>Save the config object, some params are from jsonargparse</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cfg</strong> – cfg object to save (Namespace type)</p></li>
+<li><p><strong>path</strong> – the save path</p></li>
+<li><p><strong>format</strong> – ‘yaml’, ‘json’, ‘json_indented’, ‘parser_mode’</p></li>
+<li><p><strong>skip_none</strong> – Whether to exclude entries whose value is None.</p></li>
+<li><p><strong>skip_check</strong> – Whether to skip parser checking.</p></li>
+<li><p><strong>overwrite</strong> – Whether to overwrite existing files.</p></li>
+<li><p><strong>multifile</strong> – Whether to save multiple config files
+by using the __path__ metas.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.merge_config">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">merge_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ori_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#merge_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.merge_config" title="Link to this definition">¶</a></dt>
+<dd><p>Merge configuration from new_cfg into ori_cfg</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ori_cfg</strong> – the original configuration object, whose type is
+expected as namespace from jsonargparse</p></li>
+<li><p><strong>new_cfg</strong> – the configuration object to be merged, whose type is
+expected as dict or namespace from jsonargparse</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>cfg_after_merge</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.prepare_side_configs">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">prepare_side_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ori_config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Namespace</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#prepare_side_configs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.prepare_side_configs" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>parse the config if ori_config is a string of a config file path with</dt><dd><p>yaml, yml or json format</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ori_config</strong> – a config dict or a string of a config file path with
+yaml, yml or json format</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a config dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_juicer.config.config.get_init_configs">
+<span class="sig-prename descclassname"><span class="pre">data_juicer.config.config.</span></span><span class="sig-name descname"><span class="pre">get_init_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Namespace</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#get_init_configs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.config.get_init_configs" title="Link to this definition">¶</a></dt>
+<dd><p>set init configs of datajucer for cfg</p>
+</dd></dl>
+
+</section>
+<section id="module-data_juicer.config">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-data_juicer.config" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="data_juicer.config.init_configs">
 <span class="sig-prename descclassname"><span class="pre">data_juicer.config.</span></span><span class="sig-name descname"><span class="pre">init_configs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">which_entry</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">object</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/config/config.html#init_configs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.config.init_configs" title="Link to this definition">¶</a></dt>
@@ -179,13 +346,14 @@ yaml, yml or json format</p>
 </dd></dl>
 
 </section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="data_juicer.analysis.html" class="btn btn-neutral float-left" title="data_juicer.analysis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="data_juicer.format.html" class="btn btn-neutral float-right" title="data_juicer.format" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="data_juicer.analysis.html" class="btn btn-neutral float-left" title="data_juicer.analysis package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data_juicer.format.html" class="btn btn-neutral float-right" title="data_juicer.format package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

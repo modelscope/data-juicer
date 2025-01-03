@@ -11,7 +11,7 @@
 
   
       <script src="../../../_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
       <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.core.html">data_juicer.core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.html">data_juicer.ops package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.config.html">data_juicer.config package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_juicer.format.html">data_juicer.format package</a></li>
 </ul>
 
         </div>
@@ -91,21 +91,27 @@
 <span class="n">FORMATTERS</span> <span class="o">=</span> <span class="n">Registry</span><span class="p">(</span><span class="s1">&#39;Formatters&#39;</span><span class="p">)</span>
 
 
+<div class="viewcode-block" id="BaseFormatter">
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.BaseFormatter">[docs]</a>
 <span class="k">class</span> <span class="nc">BaseFormatter</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class to load dataset.&quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="BaseFormatter.load_dataset">
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.BaseFormatter.load_dataset">[docs]</a>
     <span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="LocalFormatter">
-<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.LocalFormatter">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.LocalFormatter">[docs]</a>
 <span class="k">class</span> <span class="nc">LocalFormatter</span><span class="p">(</span><span class="n">BaseFormatter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The class is used to load a dataset from local files or local</span>
 <span class="sd">    directory.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="LocalFormatter.__init__">
-<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.LocalFormatter.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.LocalFormatter.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dataset_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -136,7 +142,7 @@
 
 
 <div class="viewcode-block" id="LocalFormatter.load_dataset">
-<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.LocalFormatter.load_dataset">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.LocalFormatter.load_dataset">[docs]</a>
     <span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_proc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">global_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load a dataset from dataset file or dataset directory, and unify its</span>
@@ -170,13 +176,13 @@
 
 
 <div class="viewcode-block" id="RemoteFormatter">
-<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.RemoteFormatter">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.RemoteFormatter">[docs]</a>
 <span class="k">class</span> <span class="nc">RemoteFormatter</span><span class="p">(</span><span class="n">BaseFormatter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The class is used to load a dataset from repository of huggingface</span>
 <span class="sd">    hub.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="RemoteFormatter.__init__">
-<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.RemoteFormatter.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.RemoteFormatter.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">dataset_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                  <span class="n">text_keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -195,7 +201,7 @@
 
 
 <div class="viewcode-block" id="RemoteFormatter.load_dataset">
-<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.RemoteFormatter.load_dataset">[docs]</a>
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.RemoteFormatter.load_dataset">[docs]</a>
     <span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_proc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">global_cfg</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Load a dataset from HuggingFace, and unify its format.</span>
@@ -217,6 +223,8 @@
 
 
 
+<div class="viewcode-block" id="add_suffixes">
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.add_suffixes">[docs]</a>
 <span class="k">def</span> <span class="nf">add_suffixes</span><span class="p">(</span><span class="n">datasets</span><span class="p">:</span> <span class="n">DatasetDict</span><span class="p">,</span> <span class="n">num_proc</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Add suffix filed to datasets.</span>
@@ -238,9 +246,12 @@
                                    <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Adding new column for suffix&#39;</span><span class="p">)</span>
     <span class="n">datasets</span> <span class="o">=</span> <span class="n">concatenate_datasets</span><span class="p">([</span><span class="n">ds</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">ds</span> <span class="ow">in</span> <span class="n">datasets</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
     <span class="kn">from</span> <span class="nn">data_juicer.core.data</span> <span class="kn">import</span> <span class="n">NestedDataset</span>
-    <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span></div>
 
 
+
+<div class="viewcode-block" id="unify_format">
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.unify_format">[docs]</a>
 <span class="k">def</span> <span class="nf">unify_format</span><span class="p">(</span>
     <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
     <span class="n">text_keys</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
@@ -362,9 +373,12 @@
                        <span class="s1">&#39;to their absolute versions. Data of other modalities &#39;</span>
                        <span class="s1">&#39;might not be able to find by Data-Juicer.&#39;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">dataset</span>
+    <span class="k">return</span> <span class="n">dataset</span></div>
 
 
+
+<div class="viewcode-block" id="load_formatter">
+<a class="viewcode-back" href="../../../data_juicer.format.html#data_juicer.format.formatter.load_formatter">[docs]</a>
 <span class="k">def</span> <span class="nf">load_formatter</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">,</span>
                    <span class="n">text_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">suffixes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -420,7 +434,8 @@
                          <span class="sa">f</span><span class="s1">&#39;It might be because Data-Juicer doesn</span><span class="se">\&#39;</span><span class="s1">t support &#39;</span>
                          <span class="sa">f</span><span class="s1">&#39;the format of this dataset, or the path of this &#39;</span>
                          <span class="sa">f</span><span class="s1">&#39;dataset is incorrect.Please check if it</span><span class="se">\&#39;</span><span class="s1">s a valid &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;dataset path and retry.&#39;</span><span class="p">)</span>
+                         <span class="sa">f</span><span class="s1">&#39;dataset path and retry.&#39;</span><span class="p">)</span></div>
+
 </pre></div>
 
            </div>
