@@ -133,6 +133,7 @@ def create_directory_if_not_exists(directory_path):
 
         :param directory_path: directory path to be create
     """
+    directory_path = os.path.abspath(directory_path)
     try:
         os.makedirs(directory_path, exist_ok=True)
     except FileExistsError:

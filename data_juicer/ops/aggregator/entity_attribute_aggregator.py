@@ -7,7 +7,7 @@ from pydantic import PositiveInt
 from data_juicer.ops.base_op import OPERATORS, Aggregator
 from data_juicer.utils.common_utils import (avg_split_string_list_under_limit,
                                             is_string_list)
-from data_juicer.utils.constant import AggKeys, Fields, MetaKeys
+from data_juicer.utils.constant import BatchMetaKeys, Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from .nested_aggregator import NestedAggregator
@@ -54,7 +54,7 @@ class EntityAttributeAggregator(Aggregator):
                  entity: str = None,
                  attribute: str = None,
                  input_key: str = MetaKeys.event_description,
-                 output_key: str = AggKeys.entity_attribute,
+                 output_key: str = BatchMetaKeys.entity_attribute,
                  word_limit: PositiveInt = 100,
                  max_token_num: Optional[PositiveInt] = None,
                  *,
@@ -183,7 +183,7 @@ class EntityAttributeAggregator(Aggregator):
 
     def process_single(self, sample=None, rank=None):
 
-        if self.output_key in sample[Fields.agg]:
+        if self.output_key in sample[Fields.batch_meta]:
             return sample
 
         if Fields.meta not in sample or self.input_key not in sample[
@@ -197,7 +197,7 @@ class EntityAttributeAggregator(Aggregator):
             logger.warning('Require string meta as input!')
             return sample
 
-        sample[Fields.agg][self.output_key] = self.attribute_summary(sub_docs,
-                                                                     rank=rank)
+        sample[Fields.batch_meta][self.output_key] = self.attribute_summary(
+            sub_docs, rank=rank)
 
         return sample

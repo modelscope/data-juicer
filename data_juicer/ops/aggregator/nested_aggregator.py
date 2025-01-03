@@ -164,7 +164,7 @@ class NestedAggregator(Aggregator):
 
     def process_single(self, sample=None, rank=None):
 
-        if self.output_key in sample[Fields.agg]:
+        if self.output_key in sample[Fields.batch_meta]:
             return sample
 
         if Fields.meta not in sample or self.input_key not in sample[
@@ -178,7 +178,7 @@ class NestedAggregator(Aggregator):
         if not is_string_list(sub_docs):
             return sample
 
-        sample[Fields.agg][self.output_key] = self.recursive_summary(sub_docs,
-                                                                     rank=rank)
+        sample[Fields.batch_meta][self.output_key] = self.recursive_summary(
+            sub_docs, rank=rank)
 
         return sample

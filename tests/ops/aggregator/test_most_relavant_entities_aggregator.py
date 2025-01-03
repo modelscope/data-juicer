@@ -6,13 +6,13 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.aggregator import MostRelavantEntitiesAggregator
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
-from data_juicer.utils.constant import Fields, MetaKeys, AggKeys
+from data_juicer.utils.constant import Fields, BatchMetaKeys, MetaKeys
 
 
 @SKIPPED_TESTS.register_module()
 class MostRelavantEntitiesAggregatorTest(DataJuicerTestCaseBase):
 
-    def _run_helper(self, op, samples, output_key=AggKeys.most_relavant_entities):
+    def _run_helper(self, op, samples, output_key=BatchMetaKeys.most_relavant_entities):
 
         # before runing this test, set below environment variables:
         # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
@@ -24,8 +24,8 @@ class MostRelavantEntitiesAggregatorTest(DataJuicerTestCaseBase):
         for data in new_dataset:
             for k in data:
                 logger.info(f"{k}: {data[k]}")
-            self.assertIn(output_key, data[Fields.agg])
-            self.assertNotEqual(data[Fields.agg][output_key], '')
+            self.assertIn(output_key, data[Fields.batch_meta])
+            self.assertNotEqual(data[Fields.batch_meta][output_key], '')
 
         self.assertEqual(len(new_dataset), len(samples))
 

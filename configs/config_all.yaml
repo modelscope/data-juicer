@@ -839,6 +839,7 @@ process:
 # Grouper ops.
   - naive_grouper:                                          # Group all samples to one batched sample.
   - naive_reverse_grouper:                                  # Split one batched sample to samples.
+      batch_meta_export_path: null                            # the path to export the batch meta. Just drop the batch meta if it is None.
   - key_value_grouper:                                      # Group samples to batched samples according values in given keys.
       group_by_keys: null                                     # Group samples according values in the keys. Support for nested keys such as "__dj__stats__.text_len". It is [self.text_key] in default.
 

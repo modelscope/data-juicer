@@ -7,7 +7,7 @@ from collections import Counter
 from data_juicer.ops.aggregator import NestedAggregator
 from data_juicer.ops.aggregator import EntityAttributeAggregator
 from data_juicer.ops.mapper import RelationIdentityMapper
-from data_juicer.utils.constant import Fields, AggKeys, MetaKeys
+from data_juicer.utils.constant import BatchMetaKeys, Fields, MetaKeys
 from data_juicer.core.data import NestedDataset as Dataset
 
 
@@ -87,8 +87,8 @@ def get_nicknames(sample):
 
 def get_system_prompt(sample):
 
-    main_role_identity = sample[Fields.agg]['role_background']
-    main_role_experience = sample[Fields.agg]['role_experience']
+    main_role_identity = sample[Fields.batch_meta]['role_background']
+    main_role_experience = sample[Fields.batch_meta]['role_experience']
     attributes, support_texts = get_attributes(sample)
     main_role_character = nested_sum.recursive_summary(attributes['角色性格'])
     main_role_skill = nested_sum.recursive_summary(attributes['角色武艺和能力'])
@@ -106,12 +106,12 @@ def get_system_prompt(sample):
     nicknames = get_nicknames(sample)
 
     relation_detail = ""
-    relavant_roles = sample[Fields.agg]['important_relavant_roles']
+    relavant_roles = sample[Fields.batch_meta]['important_relavant_roles']
     for role_name in relavant_roles[:max_relavant_roles_num]:
         if role_name == main_entity:
             continue
 
-        cur_sample = {k: sample[k] for k in sample if k != Fields.agg}
+        cur_sample = {k: sample[k] for k in sample if k != Fields.batch_meta}
 
         dataset = Dataset.from_list([cur_sample])
         # get sub role identity
@@ -124,7 +124,7 @@ def get_system_prompt(sample):
             word_limit=30
         )
         dataset = op.run(dataset)
-        role_identity = dataset[0][Fields.agg]['role_background'].replace('\n', '')
+        role_identity = dataset[0][Fields.batch_meta]['role_background'].replace('\n', '')
 
         # get sub role experience
         op = EntityAttributeAggregator(
@@ -136,7 +136,7 @@ def get_system_prompt(sample):
             word_limit=100
         )
         dataset = op.run(dataset)
-        role_experience = dataset[0][Fields.agg]['role_experience'].replace('\n', '')
+        role_experience = dataset[0][Fields.batch_meta]['role_experience'].replace('\n', '')
 
         # get relation identity with main role
         role_info = role_info_template.format(
