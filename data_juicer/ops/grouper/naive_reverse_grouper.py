@@ -32,11 +32,11 @@ class NaiveReverseGrouper(Grouper):
         batch_metas = []
         for sample in dataset:
             if Fields.batch_meta in sample:
+                batch_metas.append(sample[Fields.batch_meta])
                 sample = {
                     k: sample[k]
                     for k in sample if k != Fields.batch_meta
                 }
-                batch_metas.append(sample[Fields.batch_meta])
             samples.extend(convert_dict_list_to_list_dict(sample))
         if self.batch_meta_export_path is not None:
             create_directory_if_not_exists(
