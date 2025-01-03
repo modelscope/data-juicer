@@ -505,11 +505,11 @@ def main():
     new_op_record_list = get_op_list_from_code()
     updated_op_record_list = check_and_update_op_record(
         old_op_record_list, new_op_record_list)
-    generate_new_doc(updated_op_record_list)
     # if the doc is changed, exit with non-zero value
     if old_op_record_list == updated_op_record_list:
         exit(0)
     else:
+        generate_new_doc(updated_op_record_list)
         print('Operator document is updated.')
         exit(1)
 
