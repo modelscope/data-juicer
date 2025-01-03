@@ -6,18 +6,18 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.core package &mdash; data_juicer 1.0.2 documentation</title>
+  <title>data_juicer.core &mdash; data_juicer 1.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/documentation_options.js?v=1ed6394b"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="data_juicer.ops package" href="data_juicer.ops.html" />
+    <link rel="next" title="data_juicer.ops" href="data_juicer.ops.html" />
     <link rel="prev" title="Welcome to data-juicer’s documentation!" href="index.html" /> 
 </head>
 
@@ -42,29 +42,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">data_juicer.core package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data-juicer-core-adapter-module">data_juicer.core.adapter module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data-juicer-core-analyzer-module">data_juicer.core.analyzer module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data-juicer-core-data-module">data_juicer.core.data module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data-juicer-core-executor-module">data_juicer.core.executor module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data-juicer-core-exporter-module">data_juicer.core.exporter module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-data_juicer.core.monitor">data_juicer.core.monitor module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data-juicer-core-ray-data-module">data_juicer.core.ray_data module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data-juicer-core-ray-executor-module">data_juicer.core.ray_executor module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#data-juicer-core-tracer-module">data_juicer.core.tracer module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-contents">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.config.html">data_juicer.config package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
 </ul>
 
         </div>
@@ -81,7 +68,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">data_juicer.core package</li>
+      <li class="breadcrumb-item active">data_juicer.core</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/data_juicer.core.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -91,162 +78,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="data-juicer-core-package">
-<h1>data_juicer.core package<a class="headerlink" href="#data-juicer-core-package" title="Link to this heading">¶</a></h1>
-<section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
-</section>
-<section id="data-juicer-core-adapter-module">
-<h2>data_juicer.core.adapter module<a class="headerlink" href="#data-juicer-core-adapter-module" title="Link to this heading">¶</a></h2>
-</section>
-<section id="data-juicer-core-analyzer-module">
-<h2>data_juicer.core.analyzer module<a class="headerlink" href="#data-juicer-core-analyzer-module" title="Link to this heading">¶</a></h2>
-</section>
-<section id="data-juicer-core-data-module">
-<h2>data_juicer.core.data module<a class="headerlink" href="#data-juicer-core-data-module" title="Link to this heading">¶</a></h2>
-</section>
-<section id="data-juicer-core-executor-module">
-<h2>data_juicer.core.executor module<a class="headerlink" href="#data-juicer-core-executor-module" title="Link to this heading">¶</a></h2>
-</section>
-<section id="data-juicer-core-exporter-module">
-<h2>data_juicer.core.exporter module<a class="headerlink" href="#data-juicer-core-exporter-module" title="Link to this heading">¶</a></h2>
-</section>
-<section id="module-data_juicer.core.monitor">
-<span id="data-juicer-core-monitor-module"></span><h2>data_juicer.core.monitor module<a class="headerlink" href="#module-data_juicer.core.monitor" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.resource_monitor">
-<span class="sig-prename descclassname"><span class="pre">data_juicer.core.monitor.</span></span><span class="sig-name descname"><span class="pre">resource_monitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mdict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#resource_monitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.resource_monitor" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.core.monitor.</span></span><span class="sig-name descname"><span class="pre">Monitor</span></span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Monitor resource utilization and other information during the data
-processing.</p>
-<p>Resource utilization dict: (for each func)
-‘’’python
-{</p>
-<blockquote>
-<div><p>‘time’: 10,
-‘sampling interval’: 0.5,
-‘resource’: [</p>
-<blockquote>
-<div><dl class="simple">
-<dt>{</dt><dd><p>‘timestamp’: xxx,
-‘CPU count’: xxx,
-‘GPU free mem.’: xxx.
-…</p>
-</dd>
-</dl>
-<p>},
-{</p>
-<blockquote>
-<div><p>‘timestamp’: xxx,
-‘CPU count’: xxx,
-‘GPU free mem.’: xxx,
-…</p>
-</div></blockquote>
-<p>},</p>
-</div></blockquote>
-<p>]</p>
-</div></blockquote>
-<section id="id1">
-<h3>}<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
-<p>Based on the structure above, the resource utilization analysis result will
-add several extra fields on the first level:
-‘’’python
-{</p>
-<blockquote>
-<div><p>‘time’: 10,
-‘sampling interval’: 0.5,
-‘resource’: […],
-‘resource_analysis’: {</p>
-<blockquote>
-<div><dl class="simple">
-<dt>‘GPU free mem.’: {</dt><dd><p>‘max’: xxx,
-‘min’: xxx,
-‘avg’: xxx,</p>
-</dd>
-</dl>
-</div></blockquote>
-<p>}</p>
-</div></blockquote>
-</section>
-<section id="id2">
-<h3>}<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
-<p>Only those fields in DYNAMIC_FIELDS will be analyzed.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.DYNAMIC_FIELDS">
-<span class="sig-name descname"><span class="pre">DYNAMIC_FIELDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Available</span> <span class="pre">mem.',</span> <span class="pre">'CPU</span> <span class="pre">util.',</span> <span class="pre">'Free</span> <span class="pre">mem.',</span> <span class="pre">'GPU</span> <span class="pre">free</span> <span class="pre">mem.',</span> <span class="pre">'GPU</span> <span class="pre">used</span> <span class="pre">mem.',</span> <span class="pre">'GPU</span> <span class="pre">util.',</span> <span class="pre">'Mem.</span> <span class="pre">util.',</span> <span class="pre">'Used</span> <span class="pre">mem.'}</span></em><a class="headerlink" href="#data_juicer.core.monitor.Monitor.DYNAMIC_FIELDS" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor.__init__" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.monitor_all_resources">
-<span class="sig-name descname"><span class="pre">monitor_all_resources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.monitor_all_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor.monitor_all_resources" title="Link to this definition">¶</a></dt>
-<dd><p>Detect the resource utilization of all distributed nodes.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.monitor_current_resources">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">monitor_current_resources</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.monitor_current_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor.monitor_current_resources" title="Link to this definition">¶</a></dt>
-<dd><p>Detect the resource utilization of the current environment/machine.
-All data of “util.” is ratios in the range of [0.0, 1.0]. All data of
-“mem.” is in MB.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.draw_resource_util_graph">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">draw_resource_util_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_util_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.draw_resource_util_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor.draw_resource_util_graph" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.analyze_resource_util_list">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">analyze_resource_util_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_util_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.analyze_resource_util_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor.analyze_resource_util_list" title="Link to this definition">¶</a></dt>
-<dd><p>Analyze the resource utilization for a given resource util list.
-Compute {‘max’, ‘min’, ‘avg’} of resource metrics for each dict item.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.analyze_single_resource_util">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">analyze_single_resource_util</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_util_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.analyze_single_resource_util"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor.analyze_single_resource_util" title="Link to this definition">¶</a></dt>
-<dd><p>Analyze the resource utilization for a single resource util dict.
-Compute {‘max’, ‘min’, ‘avg’} of each resource metrics.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_juicer.core.monitor.Monitor.monitor_func">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">monitor_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/core/monitor.html#Monitor.monitor_func"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.core.monitor.Monitor.monitor_func" title="Link to this definition">¶</a></dt>
-<dd><p>Process the input dataset and probe related information for each OP in
-the specified operator list.</p>
-<p>For now, we support the following targets to probe:
-“resource”: resource utilization for each OP.
-“speed”: average processing speed for each OP.</p>
-<p>The probe result is a list and each item in the list is the probe
-result for each OP.</p>
-</dd></dl>
-
-</section>
-</dd></dl>
-
-</section>
-<section id="data-juicer-core-ray-data-module">
-<h2>data_juicer.core.ray_data module<a class="headerlink" href="#data-juicer-core-ray-data-module" title="Link to this heading">¶</a></h2>
-</section>
-<section id="data-juicer-core-ray-executor-module">
-<h2>data_juicer.core.ray_executor module<a class="headerlink" href="#data-juicer-core-ray-executor-module" title="Link to this heading">¶</a></h2>
-</section>
-<section id="data-juicer-core-tracer-module">
-<h2>data_juicer.core.tracer module<a class="headerlink" href="#data-juicer-core-tracer-module" title="Link to this heading">¶</a></h2>
-</section>
-<section id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
-</section>
+  <section id="data-juicer-core">
+<h1>data_juicer.core<a class="headerlink" href="#data-juicer-core" title="Link to this heading">¶</a></h1>
 </section>
 
 
@@ -254,7 +87,7 @@ result for each OP.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Welcome to data-juicer’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="data_juicer.ops.html" class="btn btn-neutral float-right" title="data_juicer.ops package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="data_juicer.ops.html" class="btn btn-neutral float-right" title="data_juicer.ops" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
