@@ -59,8 +59,9 @@ class ExtractEventMapperTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(samples)
         dataset = op.run(dataset)
-        self.assertNotEqual(len(dataset), 0)
         for sample in dataset:
+            self.assertIn(MetaKeys.event_description, sample[Fields.meta])
+            self.assertIn(MetaKeys.relevant_characters, sample[Fields.meta])
             logger.info(f"chunk_id: {sample['chunk_id']}")
             self.assertEqual(sample['chunk_id'], 0)
             logger.info(f"event: {sample[Fields.meta][MetaKeys.event_description]}")

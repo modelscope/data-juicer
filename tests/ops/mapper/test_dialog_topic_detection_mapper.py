@@ -29,6 +29,8 @@ class TestDialogTopicDetectionMapper(DataJuicerTestCaseBase):
         for analysis, labels in zip(analysis_list, labels_list):
             logger.info(f'分析：{analysis}')
             logger.info(f'话题：{labels}')
+            self.assertNotEqual(analysis, '')
+            self.assertNotEqual(labels, '')
         
         self.assertEqual(len(analysis_list), target_len)
         self.assertEqual(len(labels_list), target_len)

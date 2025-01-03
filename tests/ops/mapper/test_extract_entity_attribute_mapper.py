@@ -49,6 +49,10 @@ class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(samples)
         dataset = op.run(dataset)
         for sample in dataset:
+            self.assertIn(MetaKeys.main_entities, sample[Fields.meta])
+            self.assertIn(MetaKeys.attributes, sample[Fields.meta])
+            self.assertIn(MetaKeys.attribute_descriptions, sample[Fields.meta])
+            self.assertIn(MetaKeys.attribute_support_texts, sample[Fields.meta])
             ents = sample[Fields.meta][MetaKeys.main_entities]
             attrs = sample[Fields.meta][MetaKeys.attributes]
             descs = sample[Fields.meta][MetaKeys.attribute_descriptions]
