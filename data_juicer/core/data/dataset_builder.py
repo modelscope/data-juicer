@@ -11,6 +11,9 @@ from data_juicer.utils.file_utils import is_absolute_path
 
 
 class DatasetBuilder(object):
+    """
+    DatasetBuilder is a class that builds a dataset from a configuration.
+    """
 
     def __init__(self, cfg, executor_type):
         self.cfg = cfg
@@ -19,7 +22,7 @@ class DatasetBuilder(object):
         # defaults to use dataset_path
         if cfg.dataset_path is not None:
             ds_configs = rewrite_cli_datapath(cfg.dataset_path)
-        elif cfg.dataset not in (None, []):
+        elif cfg.dataset is not None:
             ds_configs = cfg.dataset
         else:
             raise ConfigValidationError(
@@ -27,32 +30,41 @@ class DatasetBuilder(object):
                 'dataset_path or dataset in configurations')
 
         # validate dataset config for type constraints
-        # 1. ds_config should have a 'configs' key
-        # 2. ds_config['configs'] should be a list
-        # 3. ds_configs should only have one type
-        # 4. if type is REMOTE, there should only one ds_config
         # TODO other constraints; ray dataset only supports ondisk, etc.
+        if type(ds_configs) != dict:
+            raise ConfigValidationError(
+                'Dataset config should be a dictionary')
         if 'configs' not in ds_configs:
             raise ConfigValidationError(
                 'Dataset config should have a "configs" key')
-        if not isinstance(ds_configs['configs'], list):
+        if (not isinstance(ds_configs['configs'], list)
+                or len(ds_configs['configs']) == 0):
             raise ConfigValidationError(
-                'Dataset config "configs" should be a list')
+                'Dataset config "configs" should be a non-empty list')
+        if ('max_sample_num' in ds_configs
+                and (type(ds_configs['max_sample_num']) != int
+                     or ds_configs['max_sample_num'] <= 0)):
+            raise ConfigValidationError(
+                'Dataset config "max_sample_num" should be a positive integer')
         for ds_config in ds_configs['configs']:
             if type(ds_config) != dict:
                 raise ConfigValidationError(
-                    'Dataset config should be a dictionary')
-        types = [ds_config.get('type', None) for ds_config in ds_configs]
+                    'Dataset configs should be dictionaries')
+        types = [
+            ds_config.get('type', None) for ds_config in ds_configs['configs']
+        ]
         if len(set(types)) > 1:
             raise ConfigValidationError(
                 'Mixture of diff types (ONDISK/REMOTE/...) are not supported')
-        if types[0] == 'remote' and len(ds_configs) > 1:
+        if types[0] == 'remote' and len(ds_configs['configs']) > 1:
             raise ConfigValidationError(
                 'Multiple remote datasets are not supported')
 
+        self.max_sample_num = ds_configs.get('max_sample_num', None)
+
         # initialize the data load strategies
         self.load_strategies = []
-        for ds_config in ds_configs:
+        for ds_config in ds_configs['configs']:
             # initialize data loading strategy
             data_type = ds_config.get('type', None)
             data_source = ds_config.get('source', None)

@@ -329,10 +329,10 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
                 {
                     'type': 'remote',
                     'source': 'source1'
-            },
-            {
-                'type': 'remote',
-                'source': 'source2'
+                },
+                {
+                    'type': 'remote',
+                    'source': 'source2'
                 }
             ]
         }
@@ -351,7 +351,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         with self.assertRaises(ConfigValidationError) as context:
             DatasetBuilder(self.base_cfg, self.executor_type)
         
-        self.assertIn('dataset_path or dataset', str(context.exception))
+        self.assertIn('non-empty list', str(context.exception))
 
     def test_builder_invalid_dataset_config_type(self):
         """Test handling of invalid dataset configuration type"""
@@ -464,16 +464,10 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
                 'max_sample_num': value
             }
             
-            if value is not None and value <= 0:
-                with self.assertRaises(ConfigValidationError):
-                    DatasetBuilder(self.base_cfg, self.executor_type)
-            elif value == "100":
-                with self.assertRaises(ConfigValidationError):
-                    DatasetBuilder(self.base_cfg, self.executor_type)
-            else:
-                builder = DatasetBuilder(self.base_cfg, self.executor_type)
-                if value is None:
-                    self.assertIsNone(builder.max_sample_num)
+            with self.assertRaises(ConfigValidationError) as context:
+                DatasetBuilder(self.base_cfg, self.executor_type)
+            self.assertIn('should be a positive integer', 
+                          str(context.exception))
 
 if __name__ == '__main__':
     unittest.main()
