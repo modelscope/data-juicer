@@ -6,12 +6,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>data_juicer.ops.aggregator.entity_attribute_aggregator &mdash; data_juicer 1.0.3 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../../../_static/documentation_options.js?v=baaebd52"></script>
-      <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -39,16 +39,16 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.core.html">data_juicer.core</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.filter.html">data_juicer.ops.filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.mapper.html">data_juicer.ops.mapper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.deduplicator.html">data_juicer.ops.deduplicator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.ops.common.html">data_juicer.ops.common</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.analysis.html">data_juicer.analysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.config.html">data_juicer.config</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../data_juicer.format.html">data_juicer.format</a></li>
 </ul>
 
         </div>
@@ -77,28 +77,28 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.ops.aggregator.entity_attribute_aggregator</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
-<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">PositiveInt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">PositiveInt</span>
 
-<span class="kn">from</span> <span class="nn">data_juicer.ops.base_op</span> <span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Aggregator</span>
-<span class="kn">from</span> <span class="nn">data_juicer.utils.common_utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">avg_split_string_list_under_limit</span><span class="p">,</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Aggregator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.common_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">avg_split_string_list_under_limit</span><span class="p">,</span>
                                             <span class="n">is_string_list</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">data_juicer.utils.constant</span> <span class="kn">import</span> <span class="n">BatchMetaKeys</span><span class="p">,</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">MetaKeys</span>
-<span class="kn">from</span> <span class="nn">data_juicer.utils.model_utils</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchMetaKeys</span><span class="p">,</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">MetaKeys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
 
-<span class="kn">from</span> <span class="nn">.nested_aggregator</span> <span class="kn">import</span> <span class="n">NestedAggregator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.nested_aggregator</span><span class="w"> </span><span class="kn">import</span> <span class="n">NestedAggregator</span>
 
 <span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;entity_attribute_aggregator&#39;</span>
 
 
 <span class="c1"># TODO: LLM-based inference.</span>
 <div class="viewcode-block" id="EntityAttributeAggregator">
-<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.entity_attribute_aggregator.EntityAttributeAggregator">[docs]</a>
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.EntityAttributeAggregator">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">EntityAttributeAggregator</span><span class="p">(</span><span class="n">Aggregator</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EntityAttributeAggregator</span><span class="p">(</span><span class="n">Aggregator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return conclusion of the given entity&#39;s attribute from some docs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -131,8 +131,8 @@
     <span class="n">DEFAULT_OUTPUT_PATTERN_TEMPLATE</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\#\s*</span><span class="si">{entity}</span><span class="s1">\s*\#\#\s*</span><span class="si">{attribute}</span><span class="s1">\s*(.*?)\Z&#39;</span>  <span class="c1"># noqa: E501</span>
 
 <div class="viewcode-block" id="EntityAttributeAggregator.__init__">
-<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.entity_attribute_aggregator.EntityAttributeAggregator.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.EntityAttributeAggregator.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
                  <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">attribute</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -222,8 +222,8 @@
 
 
 <div class="viewcode-block" id="EntityAttributeAggregator.parse_output">
-<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.entity_attribute_aggregator.EntityAttributeAggregator.parse_output">[docs]</a>
-    <span class="k">def</span> <span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.EntityAttributeAggregator.parse_output">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
         <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">matches</span><span class="p">:</span>
@@ -235,8 +235,8 @@
 
 
 <div class="viewcode-block" id="EntityAttributeAggregator.attribute_summary">
-<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.entity_attribute_aggregator.EntityAttributeAggregator.attribute_summary">[docs]</a>
-    <span class="k">def</span> <span class="nf">attribute_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_docs</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.EntityAttributeAggregator.attribute_summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">attribute_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_docs</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sub_docs</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;&#39;</span>
 
@@ -272,8 +272,8 @@
 
 
 <div class="viewcode-block" id="EntityAttributeAggregator.process_single">
-<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.entity_attribute_aggregator.EntityAttributeAggregator.process_single">[docs]</a>
-    <span class="k">def</span> <span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.EntityAttributeAggregator.process_single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">batch_meta</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">sample</span>
