@@ -79,7 +79,7 @@ def check_model(model_name, force=False):
         download again forcefully.
     """
     # check for local model
-    if os.path.exists(model_name):
+    if not force and os.path.exists(model_name):
         return model_name
 
     if not os.path.exists(DJMC):
