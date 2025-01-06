@@ -9,7 +9,7 @@ from pydantic import PositiveInt
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, UNFORKABLE, Mapper
+from ..base_op import OPERATORS, Mapper
 
 torch = LazyLoader('torch', 'torch')
 vllm = LazyLoader('vllm', 'vllm')
@@ -19,7 +19,6 @@ OP_NAME = 'generate_qa_from_examples_mapper'
 
 
 # TODO: Extend LLM-based OPs into API-based implementation.
-@UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class GenerateQAFromExamplesMapper(Mapper):
     """
@@ -195,10 +194,10 @@ class GenerateQAFromExamplesMapper(Mapper):
             ])
 
         formatted_examples = ''.join([
-            self.example_template.format(qa_pairs=format_qa_pairs(qa_example))
+            self.example_template.format(format_qa_pairs(qa_example))
             for qa_example in qa_examples
         ])
-        input_prompt = self.input_template.format(examples=formatted_examples)
+        input_prompt = self.input_template.format(formatted_examples)
         return input_prompt
 
     def parse_output(self, raw_output):

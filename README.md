@@ -34,7 +34,7 @@ We provide a [playground](http://8.138.149.181/) with a managed JupyterLab. [Try
 [Platform for AI of Alibaba Cloud (PAI)](https://www.aliyun.com/product/bigdata/learn) has cited our work and integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: [PAI-Data Processing for Large Models](https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX).
 
 Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets. 
-We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw)  channel, [DingDing](https://qr.dingtalk.com/action/joingroup?spm=a2c22.12281976.0.0.7a8253f30mgpjw&code=v1,k1,C0DI7CwRFrg7gJP5aMC95FUmsNuwuKJboT62BqP5DAk=&_dt_no_comment=1&origin=11) group, ...), in promoting data-model co-development along with research and applications of (multimodal) LLMs!
+We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw)  channel, [DingDing](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11) group, ...), in promoting data-model co-development along with research and applications of (multimodal) LLMs!
 
 ----
 
@@ -55,7 +55,7 @@ In this new version, we support more features for **multimodal data (including v
 - [2024-02-05] Our paper has been accepted by SIGMOD'24 industrial track!
 - [2024-01-10] Discover new horizons in "Data Mixture"—Our second data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532174) for more information.
 - [2024-01-05] We release **Data-Juicer v0.1.3** now!
-In this new version, we support **more Python versions** (3.8-3.10), and support **multimodal** dataset [converting](tools/multimodal/README.md)/[processing](docs/Operators.md) (Including texts, images, and audios. More modalities will be supported in the future).
+In this new version, we support **more Python versions** (3.8-3.10), and support **multimodal** dataset [converting](tools/fmt_conversion/multimodal/README.md)/[processing](docs/Operators.md) (Including texts, images, and audios. More modalities will be supported in the future).
 Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 - [2023-10-13] Our first data-centric LLM competition begins! Please
   visit the competition's official websites, FT-Data Ranker ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), for more information.
@@ -197,6 +197,22 @@ The dependency options are listed below:
 | `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers.                       |
 | `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
 
+- Install dependencies for specific OPs
+
+With the growth of the number of OPs, the dependencies of all OPs becomes very heavy. Instead of using the command `pip install -v -e .[sci]` to install all dependencies,
+we provide two alternative, lighter options:
+
+  - Automatic Minimal Dependency Installation: During the execution of Data-Juicer, minimal dependencies will be automatically installed. This allows for immediate execution, but may potentially lead to dependency conflicts.
+
+  - Manual Minimal Dependency Installation: To manually install minimal dependencies tailored to a specific execution configuration, run the following command:
+    ```shell
+    # only for installation from source
+    python tools/dj_install.py --config path_to_your_data-juicer_config_file
+
+    # use command line tool
+    dj-install --config path_to_your_data-juicer_config_file
+    ```
+
 ### Using pip
 
 - Run the following command to install the latest released `data_juicer` using `pip`:
@@ -317,9 +333,16 @@ python tools/analyze_data.py --config configs/demo/analyzer.yaml
 
 # use command line tool
 dj-analyze --config configs/demo/analyzer.yaml
+
+# you can also use auto mode to avoid writing a recipe. It will analyze a small
+# part (e.g. 1000 samples, specified by argument `auto_num`) of your dataset 
+# with all Filters that produce stats.
+dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 ```
 
-- **Note:** Analyzer only compute stats of Filter ops. So extra Mapper or Deduplicator ops will be ignored in the analysis process.
+- **Note:** Analyzer only compute stats for Filters that produce stats or other OPs that produce tags/categories in meta. So other OPs will be ignored in the analysis process. We use the following registries to decorate OPs:
+  - `NON_STATS_FILTERS`: decorate Filters that **DO NOT** produce any stats.
+  - `TAGGING_OPS`: decorate OPs that **DO** produce tags/categories in meta field.
 
 ### Data Visualization
 

@@ -14,6 +14,8 @@ from data_juicer.utils.registry import Registry
 
 OPERATORS = Registry('Operators')
 UNFORKABLE = Registry('Unforkable')
+NON_STATS_FILTERS = Registry('Non-stats Filters')
+TAGGING_OPS = Registry('Tagging Operators')
 
 
 def convert_list_dict_to_dict_list(samples):
@@ -131,6 +133,13 @@ class OP:
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
+        :param index_key: index the samples before process if not None
+        :param batch_size: the batch size for processing
+        :param work_dir: the working directory for this operator
         """
         # init data keys
         self.text_key = kwargs.get('text_key', 'text')
@@ -142,7 +151,10 @@ class OP:
         self.response_key = kwargs.get('response_key', 'response')
         self.history_key = kwargs.get('history_key', 'history')
 
+        self.index_key = kwargs.get('index_key', None)
+
         self.batch_size = kwargs.get('batch_size', 1000)
+        self.work_dir = kwargs.get('work_dir', None)
 
         # whether the model can be accelerated using cuda
         _accelerator = kwargs.get('accelerator', None)
@@ -216,6 +228,26 @@ class OP:
         from data_juicer.core.data import NestedDataset
         if not isinstance(dataset, NestedDataset):
             dataset = NestedDataset(dataset)
+        # add meta field for OPs that produce tags
+        if self._name in TAGGING_OPS.modules \
+                and Fields.meta not in dataset.features:
+            from data_juicer.core.data import add_same_content_to_new_column
+            dataset = dataset.map(add_same_content_to_new_column,
+                                  fn_kwargs={
+                                      'new_column_name': Fields.meta,
+                                      'initial_value': {}
+                                  },
+                                  num_proc=self.runtime_np(),
+                                  batch_size=self.batch_size,
+                                  desc='Adding new column for meta')
+        if self.index_key is not None:
+
+            def add_index(sample, idx):
+                sample[self.index_key] = idx
+                return sample
+
+            dataset = dataset.map(add_index, with_indices=True)
+
         return dataset
 
     def empty_history(self):
@@ -236,6 +268,10 @@ class Mapper(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
         """
         super(Mapper, self).__init__(*args, **kwargs)
 
@@ -255,15 +291,29 @@ class Mapper(OP):
                     f'{cls.__name__}. Please implement {method_name}_single '
                     f'or {method_name}_batched.')
 
+    def __call__(self, *args, **kwargs):
+        return self.process(*args, **kwargs)
+
     def process_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
         first_key = next(iter(keys))
         num_samples = len(samples[first_key])
+
+        new_keys = {}
         for i in range(num_samples):
             this_sample = {key: samples[key][i] for key in keys}
             res_sample = self.process_single(this_sample, *args, **kwargs)
-            for key in keys:
-                samples[key][i] = res_sample[key]
+            res_keys = res_sample.keys()
+            for key in res_keys:
+                if key not in keys:
+                    if key not in new_keys:
+                        new_keys.update({key: []})
+                    new_keys[key].append(res_sample[key])
+                else:
+                    samples[key][i] = res_sample[key]
+
+        for k, v in new_keys.items():
+            samples[k] = v
 
         return samples
 
@@ -305,6 +355,10 @@ class Filter(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
         """
         super(Filter, self).__init__(*args, **kwargs)
         self.stats_export_path = kwargs.get('stats_export_path', None)
@@ -329,6 +383,9 @@ class Filter(OP):
                     f'Method {method_name} cannot be overridden by subclass '
                     f'{cls.__name__}. Please implement {method_name}_single '
                     f'or {method_name}_batched.')
+
+    def __call__(self, *args, **kwargs):
+        return self.compute_stats(*args, **kwargs)
 
     def compute_stats_batched(self, samples, *args, **kwargs):
         keys = samples.keys()
@@ -370,7 +427,9 @@ class Filter(OP):
 
     def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         dataset = super(Filter, self).run(dataset)
-        if Fields.stats not in dataset.features:
+        # add stats field for Filters that produce stats
+        if self._name not in NON_STATS_FILTERS.modules \
+                and Fields.stats not in dataset.features:
             from data_juicer.core.data import add_same_content_to_new_column
             dataset = dataset.map(add_same_content_to_new_column,
                                   fn_kwargs={
@@ -413,6 +472,10 @@ class Deduplicator(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
         """
         super(Deduplicator, self).__init__(*args, **kwargs)
 
@@ -472,6 +535,10 @@ class Selector(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
         """
         super(Selector, self).__init__(*args, **kwargs)
 
@@ -489,4 +556,102 @@ class Selector(OP):
         new_dataset = self.process(dataset)
         if tracer:
             tracer.trace_filter(self._name, dataset, new_dataset)
+        return new_dataset
+
+
+class Grouper(OP):
+
+    def __init__(self, *args, **kwargs):
+        """
+        Base class that group samples.
+
+        :param text_key: the key name of field that stores sample texts
+            to be processed
+        :param image_key: the key name of field that stores sample image list
+            to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
+        """
+        super(Grouper, self).__init__(*args, **kwargs)
+
+    def process(self, dataset):
+        """
+        Dataset --> dataset.
+
+        :param dataset: input dataset
+        :return: dataset of batched samples.
+        """
+        raise NotImplementedError
+
+    def run(self, dataset, *, exporter=None, tracer=None):
+        dataset = super(Grouper, self).run(dataset)
+        batched_samples = self.process(dataset)
+        from data_juicer.core.data import NestedDataset
+        new_dataset = NestedDataset.from_list(batched_samples)
+        if tracer:
+            tracer.trace_filter(self._name, dataset, new_dataset)
+        return new_dataset
+
+
+class Aggregator(OP):
+
+    def __init__(self, *args, **kwargs):
+        """
+        Base class that group samples.
+
+        :param text_key: the key name of field that stores sample texts
+            to be processed
+        :param image_key: the key name of field that stores sample image list
+            to be processed
+        :param audio_key: the key name of field that stores sample audio list
+            to be processed
+        :param video_key: the key name of field that stores sample video list
+            to be processed
+        :param query_key: the key name of field that stores sample queris
+        :param response_key: the key name of field that stores responses
+        :param history_key: the key name of field that stores history of
+            queries and responses
+        """
+        super(Aggregator, self).__init__(*args, **kwargs)
+        self.process = catch_map_single_exception(self.process_single)
+
+    def process_single(self, sample):
+        """
+        For sample level, batched sample --> sample,
+        the input must be the output of some Grouper OP.
+
+        :param sample: batched sample to aggregate
+        :return: aggregated sample
+        """
+        raise NotImplementedError
+
+    def run(self, dataset, *, exporter=None, tracer=None):
+        dataset = super(Aggregator, self).run(dataset)
+        # add batched meta field for OPs that produce aggregations
+        if Fields.batch_meta not in dataset.features:
+            from data_juicer.core.data import add_same_content_to_new_column
+            dataset = dataset.map(add_same_content_to_new_column,
+                                  fn_kwargs={
+                                      'new_column_name': Fields.batch_meta,
+                                      'initial_value': {}
+                                  },
+                                  num_proc=self.runtime_np(),
+                                  batch_size=self.batch_size,
+                                  desc='Adding new column for aggregation')
+        new_dataset = dataset.map(
+            self.process,
+            num_proc=self.runtime_np(),
+            with_rank=self.use_cuda(),
+            batch_size=self.batch_size,
+            desc=self._name + '_process',
+        )
+        if tracer:
+            tracer.trace_mapper(self._name, dataset, new_dataset,
+                                self.text_key)
         return new_dataset

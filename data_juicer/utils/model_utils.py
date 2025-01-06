@@ -11,6 +11,7 @@ import wget
 from loguru import logger
 
 from data_juicer import cuda_device_count
+from data_juicer.utils.common_utils import nested_access
 from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
@@ -78,7 +79,7 @@ def check_model(model_name, force=False):
         download again forcefully.
     """
     # check for local model
-    if os.path.exists(model_name):
+    if not force and os.path.exists(model_name):
         return model_name
 
     if not os.path.exists(DJMC):
@@ -167,29 +168,10 @@ class APIModel:
                                          stream=stream,
                                          stream_cls=stream_cls)
             result = response.json()
-            return self._nested_access(result, self.response_path)
+            return nested_access(result, self.response_path)
         except Exception as e:
             logger.exception(e)
             return ''
-
-    @staticmethod
-    def _nested_access(data, path):
-        """
-        Access nested data using a dot-separated path.
-
-        :param data: A dictionary or a list to access the nested data from.
-        :param path: A dot-separated string representing the path to access.
-                     This can include numeric indices when accessing list
-                     elements.
-        :return: The value located at the specified path, or raises a KeyError
-                 or IndexError if the path does not exist.
-        """
-        keys = path.split('.')
-        for key in keys:
-            # Convert string keys to integers if they are numeric
-            key = int(key) if key.isdigit() else key
-            data = data[key]
-        return data
 
     @staticmethod
     def _filter_arguments(func, args_dict):
@@ -221,19 +203,18 @@ def prepare_api_model(model,
                       return_processor=False,
                       processor_config=None,
                       **model_params):
-    """
-    Creates an instance of the APIModel for interacting with OpenAI-like APIs.
+    """Creates a callable API model for interacting with OpenAI-compatible API.
+    The callable supports custom response parsing and works with proxy servers
+    that may be incompatible.
 
-    :param model: The name of the model to be used for making API calls.
+    :param model: The name of the model to interact with.
     :param endpoint: The URL endpoint for the API. If provided as a relative
         path, it will be appended to the base URL (defined by the
         `OPENAI_BASE_URL` environment variable or through an additional
         `base_url` parameter). By default, it is set to
         '/chat/completions' for OpenAI compatibility.
-    :param response_path: A dot-separated string specifying the path to
-        extract desired content from the API response. The default value is
-        'choices.0.message.content', which corresponds to the typical
-        structure of an OpenAI API response.
+    :param response_path: The dot-separated  path to extract desired content
+        from the API response. Defaults to 'choices.0.message.content'.
     :param return_processor: A boolean flag indicating whether to return a
         processor along with the model. The processor can be used for tasks
         like tokenization or encoding. Defaults to False.
@@ -279,8 +260,8 @@ def prepare_api_model(model,
             "- For custom models: Use the 'processor_config' parameter to configure a Hugging Face processor."  # noqa: E501
         )
 
-    if processor_config is not None \
-            and 'pretrained_model_name_or_path' in processor_config:
+    if processor_config is not None and \
+            'pretrained_model_name_or_path' in processor_config:
         processor = transformers.AutoProcessor.from_pretrained(
             **processor_config)
     else:
@@ -632,6 +613,7 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
             output_attentions: Optional[bool] = None,
             output_hidden_states: Optional[bool] = None,
             return_dict: Optional[bool] = None,
+            interpolate_pos_encoding: bool = False,
         ) -> Union[tuple,
                    transformers.modeling_outputs.BaseModelOutputWithPooling]:
             """Flatten `pixel_values` along the batch and time dimension,
@@ -673,6 +655,7 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
                 output_attentions=output_attentions,
                 output_hidden_states=output_hidden_states,
                 return_dict=True,
+                interpolate_pos_encoding=interpolate_pos_encoding,
             )
 
             # now restore the original dimensions

@@ -1,3 +1,5 @@
+import os
+import shutil
 import time
 from typing import Optional
 
@@ -6,7 +8,6 @@ from pydantic import PositiveInt
 
 from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.ray_dataset import RayDataset
-from data_juicer.core.executor import ExecutorBase
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -15,7 +16,22 @@ ray = LazyLoader('ray', 'ray')
 rd = LazyLoader('rd', 'ray.data')
 
 
-class RayExecutor(ExecutorBase):
+class TempDirManager:
+
+    def __init__(self, tmp_dir):
+        self.tmp_dir = tmp_dir
+
+    def __enter__(self):
+        os.makedirs(self.tmp_dir, exist_ok=True)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if os.path.exists(self.tmp_dir):
+            logger.info(f'Removing tmp dir {self.tmp_dir} ...')
+            shutil.rmtree(self.tmp_dir)
+
+
+class RayExecutor:
     """
     Executor based on Ray.
 
@@ -41,6 +57,8 @@ class RayExecutor(ExecutorBase):
         # init ray
         logger.info('Initializing Ray ...')
         ray.init(self.cfg.ray_address)
+        self.tmp_dir = os.path.join(self.work_dir, '.tmp',
+                                    ray.get_runtime_context().get_job_id())
 
     def run(self,
             load_data_np: Optional[PositiveInt] = None,
@@ -64,7 +82,7 @@ class RayExecutor(ExecutorBase):
             from data_juicer.format.formatter import FORMATTERS
             dataset = FORMATTERS.modules[obj_name](**args).load_dataset()
         else:
-            dataset = rd.read_json(self.cfg.dataset_path)
+            dataset = RayDataset.read_json(self.cfg.dataset_path)
 
         # convert all the path in dataset to absolute path
         dataset = RayDataset(dataset, self.cfg.dataset_path, self.cfg)
@@ -82,15 +100,15 @@ class RayExecutor(ExecutorBase):
                         f'[{self.cfg.fusion_strategy}]...')
             ops = fuse_operators(ops, probe_res)
 
-        # 3. data process
-        logger.info('Processing data...')
-        tstart = time.time()
-        dataset.process(ops)
-        tend = time.time()
-        logger.info(f'All Ops are done in {tend - tstart:.3f}s.')
+        with TempDirManager(self.tmp_dir):
+            # 3. data process
+            logger.info('Processing data...')
+            tstart = time.time()
+            dataset.process(ops)
 
-        # 4. data export
-        logger.info('Exporting dataset to disk...')
-        dataset.data.write_json(self.cfg.export_path, force_ascii=False)
-        if not skip_return:
-            return dataset
+            # 4. data export
+            logger.info('Exporting dataset to disk...')
+            dataset.data.write_json(self.cfg.export_path, force_ascii=False)
+            tend = time.time()
+            logger.info(f'All Ops are done in {tend - tstart:.3f}s.')
+        return dataset

@@ -45,6 +45,7 @@ class ImageWatermarkFilter(Filter):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '500MB')
         super().__init__(*args, **kwargs)
         self.prob_threshold = prob_threshold
         if any_or_all not in ['any', 'all']:

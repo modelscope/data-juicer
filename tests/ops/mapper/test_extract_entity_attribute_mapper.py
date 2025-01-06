@@ -7,9 +7,9 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.extract_entity_attribute_mapper import ExtractEntityAttributeMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 
-# Skip tests for this OP in the GitHub actions due to unknown DistNetworkError.
+# Skip tests for this OP.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
@@ -21,9 +21,9 @@ class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
         query_attributes = ["语言风格", "角色性格"]
         
         op = ExtractEntityAttributeMapper(
+            api_model=api_model, 
             query_entities=query_entities,
-            query_attributes=query_attributes,
-            api_model=api_model,                  
+            query_attributes=query_attributes,                 
             response_path=response_path)
 
         raw_text = """△笛飞声独自坐在莲花楼屋顶上。李莲花边走边悠闲地给马喂草。方多病则走在一侧，却总不时带着怀疑地盯向楼顶的笛飞声。
@@ -47,11 +47,16 @@ class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=1)
+        dataset = op.run(dataset)
         for sample in dataset:
-            logger.info(f'{sample[Fields.main_entity]} {sample[Fields.attribute]}: {sample[Fields.attribute_description]}')
-            self.assertNotEqual(sample[Fields.attribute_description], '')
-            self.assertNotEqual(len(sample[Fields.attribute_support_text]), 0)
+            ents = sample[Fields.meta][MetaKeys.main_entities]
+            attrs = sample[Fields.meta][MetaKeys.attributes]
+            descs = sample[Fields.meta][MetaKeys.attribute_descriptions]
+            sups = sample[Fields.meta][MetaKeys.attribute_support_texts]
+            for ent, attr, desc, sup in zip(ents, attrs, descs, sups):
+                logger.info(f'{ent} {attr}: {desc}')
+                self.assertNotEqual(desc, '')
+                self.assertNotEqual(len(sup), 0)
 
     def test(self):
         # before runing this test, set below environment variables:

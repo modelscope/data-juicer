@@ -42,8 +42,8 @@ from tqdm import tqdm
 from data_juicer.utils.file_utils import add_suffix_to_filename
 from data_juicer.utils.mm_utils import (SpecialTokens, cut_video_by_seconds,
                                         timecode_string_to_seconds)
-from tools.multimodal.utils import (check_args_load_to_dj_data,
-                                    convert_text_to_dj)
+from tools.fmt_conversion.multimodal.utils import (check_args_load_to_dj_data,
+                                                   convert_text_to_dj)
 
 
 def main(

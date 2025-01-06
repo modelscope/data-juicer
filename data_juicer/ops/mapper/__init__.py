@@ -8,12 +8,17 @@ from .clean_email_mapper import CleanEmailMapper
 from .clean_html_mapper import CleanHtmlMapper
 from .clean_ip_mapper import CleanIpMapper
 from .clean_links_mapper import CleanLinksMapper
+from .dialog_intent_detection_mapper import DialogIntentDetectionMapper
+from .dialog_sentiment_detection_mapper import DialogSentimentDetectionMapper
+from .dialog_sentiment_intensity_mapper import DialogSentimentIntensityMapper
+from .dialog_topic_detection_mapper import DialogTopicDetectionMapper
 from .expand_macro_mapper import ExpandMacroMapper
 from .extract_entity_attribute_mapper import ExtractEntityAttributeMapper
 from .extract_entity_relation_mapper import ExtractEntityRelationMapper
 from .extract_event_mapper import ExtractEventMapper
 from .extract_keyword_mapper import ExtractKeywordMapper
 from .extract_nickname_mapper import ExtractNicknameMapper
+from .extract_support_text_mapper import ExtractSupportTextMapper
 from .fix_unicode_mapper import FixUnicodeMapper
 from .generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
 from .generate_qa_from_text_mapper import GenerateQAFromTextMapper
@@ -32,6 +37,10 @@ from .pair_preference_mapper import PairPreferenceMapper
 from .punctuation_normalization_mapper import PunctuationNormalizationMapper
 from .python_file_mapper import PythonFileMapper
 from .python_lambda_mapper import PythonLambdaMapper
+from .query_intent_detection_mapper import QueryIntentDetectionMapper
+from .query_sentiment_detection_mapper import QuerySentimentDetectionMapper
+from .query_topic_detection_mapper import QueryTopicDetectionMapper
+from .relation_identity_mapper import RelationIdentityMapper
 from .remove_bibliography_mapper import RemoveBibliographyMapper
 from .remove_comments_mapper import RemoveCommentsMapper
 from .remove_header_mapper import RemoveHeaderMapper
@@ -52,6 +61,7 @@ from .video_captioning_from_frames_mapper import \
 from .video_captioning_from_summarizer_mapper import \
     VideoCaptioningFromSummarizerMapper
 from .video_captioning_from_video_mapper import VideoCaptioningFromVideoMapper
+from .video_extract_frames_mapper import VideoExtractFramesMapper
 from .video_face_blur_mapper import VideoFaceBlurMapper
 from .video_ffmpeg_wrapped_mapper import VideoFFmpegWrappedMapper
 from .video_remove_watermark_mapper import VideoRemoveWatermarkMapper
@@ -68,26 +78,32 @@ __all__ = [
     'AudioFFmpegWrappedMapper', 'CalibrateQAMapper', 'CalibrateQueryMapper',
     'CalibrateResponseMapper', 'ChineseConvertMapper', 'CleanCopyrightMapper',
     'CleanEmailMapper', 'CleanHtmlMapper', 'CleanIpMapper', 'CleanLinksMapper',
+    'DialogIntentDetectionMapper', 'DialogSentimentDetectionMapper',
+    'DialogSentimentIntensityMapper', 'DialogTopicDetectionMapper',
     'ExpandMacroMapper', 'ExtractEntityAttributeMapper',
     'ExtractEntityRelationMapper', 'ExtractEventMapper',
-    'ExtractKeywordMapper', 'ExtractNicknameMapper', 'FixUnicodeMapper',
+    'ExtractKeywordMapper', 'ExtractNicknameMapper',
+    'ExtractSupportTextMapper', 'FixUnicodeMapper',
     'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
     'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
     'ImageCaptioningMapper', 'ImageDiffusionMapper', 'ImageFaceBlurMapper',
     'ImageTaggingMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper',
     'OptimizeQAMapper', 'OptimizeQueryMapper', 'OptimizeResponseMapper',
     'PairPreferenceMapper', 'PunctuationNormalizationMapper',
-    'PythonFileMapper', 'PythonLambdaMapper', 'RemoveBibliographyMapper',
+    'PythonFileMapper', 'PythonLambdaMapper', 'QuerySentimentDetectionMapper',
+    'QueryIntentDetectionMapper', 'QueryTopicDetectionMapper',
+    'RelationIdentityMapper', 'RemoveBibliographyMapper',
     'RemoveCommentsMapper', 'RemoveHeaderMapper', 'RemoveLongWordsMapper',
     'RemoveNonChineseCharacterlMapper', 'RemoveRepeatSentencesMapper',
     'RemoveSpecificCharsMapper', 'RemoveTableTextMapper',
     'RemoveWordsWithIncorrectSubstringsMapper', 'ReplaceContentMapper',
     'SentenceSplitMapper', 'TextChunkMapper', 'VideoCaptioningFromAudioMapper',
     'VideoCaptioningFromFramesMapper', 'VideoCaptioningFromSummarizerMapper',
-    'VideoCaptioningFromVideoMapper', 'VideoFFmpegWrappedMapper',
-    'VideoFaceBlurMapper', 'VideoRemoveWatermarkMapper',
-    'VideoResizeAspectRatioMapper', 'VideoResizeResolutionMapper',
-    'VideoSplitByDurationMapper', 'VideoSplitByKeyFrameMapper',
-    'VideoSplitBySceneMapper', 'VideoTaggingFromAudioMapper',
-    'VideoTaggingFromFramesMapper', 'WhitespaceNormalizationMapper'
+    'VideoCaptioningFromVideoMapper', 'VideoExtractFramesMapper',
+    'VideoFFmpegWrappedMapper', 'VideoFaceBlurMapper',
+    'VideoRemoveWatermarkMapper', 'VideoResizeAspectRatioMapper',
+    'VideoResizeResolutionMapper', 'VideoSplitByDurationMapper',
+    'VideoSplitByKeyFrameMapper', 'VideoSplitBySceneMapper',
+    'VideoTaggingFromAudioMapper', 'VideoTaggingFromFramesMapper',
+    'WhitespaceNormalizationMapper'
 ]

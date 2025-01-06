@@ -3,14 +3,14 @@ from collections import Counter
 import numpy as np
 from pydantic import PositiveInt
 
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
 from data_juicer.utils.model_utils import get_model, prepare_model
 
-from ..base_op import OPERATORS, UNFORKABLE, Mapper
+from ..base_op import OPERATORS, TAGGING_OPS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 ram = LazyLoader('ram', 'ram')
@@ -19,6 +19,7 @@ torch = LazyLoader('torch', 'torch')
 OP_NAME = 'video_tagging_from_frames_mapper'
 
 
+@TAGGING_OPS.register_module(OP_NAME)
 @UNFORKABLE.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
@@ -31,7 +32,7 @@ class VideoTaggingFromFramesMapper(Mapper):
     def __init__(self,
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
-                 tag_field_name: str = Fields.video_frame_tags,
+                 tag_field_name: str = MetaKeys.video_frame_tags,
                  *args,
                  **kwargs):
         """
@@ -51,10 +52,11 @@ class VideoTaggingFromFramesMapper(Mapper):
             than 2, in addition to the first and the last frames, other frames
             will be extracted uniformly within the video duration.
         :param tag_field_name: the field name to store the tags. It's
-            "__dj__video_frame_tags__" in default.
+            "video_frame_tags" in default.
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '9GB')
         super().__init__(*args, **kwargs)
         if frame_sampling_method not in ['all_keyframes', 'uniform']:
             raise ValueError(
@@ -72,12 +74,13 @@ class VideoTaggingFromFramesMapper(Mapper):
 
     def process_single(self, sample, rank=None, context=False):
         # check if it's generated already
-        if self.tag_field_name in sample:
+        if self.tag_field_name in sample[Fields.meta]:
             return sample
 
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
-            sample[self.tag_field_name] = np.array([[]], dtype=np.str_)
+            sample[Fields.meta][self.tag_field_name] = np.array([[]],
+                                                                dtype=np.str_)
             return sample
 
         # load videos
@@ -114,5 +117,5 @@ class VideoTaggingFromFramesMapper(Mapper):
             for vid_key in videos:
                 close_video(videos[vid_key])
 
-        sample[self.tag_field_name] = video_tags
+        sample[Fields.meta][self.tag_field_name] = video_tags
         return sample

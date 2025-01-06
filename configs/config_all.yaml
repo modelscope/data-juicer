@@ -77,15 +77,89 @@ process:
   - clean_ip_mapper:                                        # remove ip addresses from text.
   - clean_links_mapper:                                     # remove web links from text.
   - clean_copyright_mapper:                                 # remove copyright comments.
+  - dialog_intent_detection_mapper:                         # Mapper to generate user's intent labels in dialog.
+      api_model: 'gpt-4o'                                     # API model name.
+      intent_candidates: null                                 # The output intent candidates. Use open-domai intent labels n if it is None.
+      max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      labels_key: 'dialog_intent_labels'                      # The key name in the meta field to store the output labels. It is 'dialog_intent_labels' in default.
+      analysis_key: 'dialog_intent_labels_analysis'           # The key name in the meta field to store the corresponding analysis. It is 'dialog_intent_labels_analysis' in default.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      query_template: null                                    # Template for query part to build the input prompt.
+      response_template: null                                 # Template for response part to build the input prompt.
+      candidate_template: null                                # Template for intent candidates to build the input prompt.
+      analysis_template: null                                 # Template for analysis part to build the input prompt.
+      labels_template: null                                   # Template for labels to build the input prompt.
+      analysis_pattern: null                                  # Pattern to parse the return intent analysis.
+      labels_pattern: null                                    # Pattern to parse the return intent labels.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - dialog_sentiment_detection_mapper:                      # Mapper to generate user's sentiment labels in dialog.
+      api_model: 'gpt-4o'                                     # API model name.
+      sentiment_candidates: null                              # The output sentiment candidates. Use open-domai sentiment labels n if it is None.
+      max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      labels_key: 'dialog_sentiment_labels'                   # The key name in the meta field to store the output labels. It is 'dialog_sentiment_labels' in default.
+      analysis_key: 'dialog_sentiment_labels_analysis'        # The key name in the meta field to store the corresponding analysis. It is 'dialog_sentiment_labels_analysis' in default.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      query_template: null                                    # Template for query part to build the input prompt.
+      response_template: null                                 # Template for response part to build the input prompt.
+      candidate_template: null                                # Template for sentiment candidates to build the input prompt.
+      analysis_template: null                                 # Template for analysis part to build the input prompt.
+      labels_template: null                                   # Template for labels part to build the input prompt.
+      analysis_pattern: null                                  # Pattern to parse the return sentiment analysis.
+      labels_pattern: null                                    # Pattern to parse the return sentiment labels.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - dialog_sentiment_intensity_mapper:                      # Mapper to predict user's sentiment intensity (from -5 to 5 in default prompt) in dialog.
+      api_model: 'gpt-4o'                                     # API model name.
+      max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      intensities_key: null                                   # The key name in the meta field to store the output sentiment intensities. It is 'dialog_sentiment_intensity' in default.
+      analysis_key: null                                      # The key name in the meta field to store the corresponding analysis. It is 'dialog_sentiment_intensity_analysis' in default.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      query_template: null                                    # Template for query part to build the input prompt.
+      response_template: null                                 # Template for response part to build the input prompt.
+      analysis_template: null                                 # Template for analysis part to build the input prompt.
+      intensity_template: null                                # Template for intensity part to build the input prompt.
+      analysis_pattern: null                                  # Pattern to parse the return sentiment analysis.
+      intensity_pattern: null                                 # Pattern to parse the return sentiment intensity.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - dialog_topic_detection_mapper:                          # Mapper to generate user's topic labels in dialog.
+      api_model: 'gpt-4o'                                     # API model name.
+      topic_candidates: null                                  # The output topic candidates. Use open-domai topic labels n if it is None.
+      max_round: 10                                           # The max num of round in the dialog to build the prompt.
+      labels_key: 'dialog_topic_labels'                       # The key name in the meta field to store the output labels. It is 'dialog_topic_labels' in default.
+      analysis_key: 'dialog_topic_labels_analysis'            # The key name in the meta field to store the corresponding analysis. It is 'dialog_topic_labels_analysis' in default.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      query_template: null                                    # Template for query part to build the input prompt.
+      response_template: null                                 # Template for response part to build the input prompt.
+      candidate_template: null                                # Template for topic candidates to build the input prompt.
+      analysis_template: null                                 # Template for analysis part to build the input prompt.
+      labels_template: null                                   # Template for labels part to build the input prompt.
+      analysis_pattern: null                                  # Pattern to parse the return topic analysis.
+      labels_pattern: null                                    # Pattern to parse the return topic labels.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - expand_macro_mapper:                                    # expand macro definitions in Latex text.
   - extract_entity_attribute_mapper:                        # Extract attributes for given entities from the text.
+      api_model: 'gpt-4o'                                     # API model name.
       query_entities: ["孙悟空", "猪八戒"]                      # Entity list to be queried.
       query_attributes: ["人物性格"]                            # Attribute list to be queried.
-      api_model: 'gpt-4o'                                     # API model name.
-      entity_key: '__dj__entity__'                            # The field name to store the given main entity for attribute extraction.
-      entity_attribute_key: '__dj__attribute__'               # The field name to store the given attribute to be extracted.
-      attribute_desc_key: '__dj__attribute_description__'     # The field name to store the extracted attribute description.
-      support_text_key: '__dj__support_text__'                # The field name to store the attribute support text extracted from the raw text.
+      entity_key: 'entity'                                    # The key name in the meta field to store the given main entity for attribute extraction.
+      entity_attribute_key: 'attribute'                       # The key name in the meta field to store the given attribute to be extracted.
+      attribute_desc_key: 'attribute_description'             # The key name in the meta field to store the extracted attribute description.
+      support_text_key: 'support_text'                        # The key name in the meta field to store the attribute support text extracted from the raw text.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt_template: null                            # System prompt template for the task. Need to be specified by given entity and attribute.
@@ -99,8 +173,8 @@ process:
   - extract_entity_relation_mapper:                         # Extract entities and relations in the text for knowledge graph.
       api_model: 'gpt-4o'                                     # API model name.
       entity_types: ['person', 'organization', 'location']    # Pre-defined entity types for knowledge graph.
-      entity_key: '__dj__entity__'                            # The field name to store the entities.
-      relation_key: '__dj__relation__'                        # The field name to store the relations between entities.
+      entity_key: 'entity'                                    # The key name in the meta field to store the entities.
+      relation_key: 'relation'                                # The key name in the meta field to store the relations between entities.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       prompt_template: null                                   # The template of input prompt.
@@ -118,8 +192,8 @@ process:
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - extract_event_mapper:                                   # Extract events and relevant characters in the text
       api_model: 'gpt-4o'                                     # API model name.
-      event_desc_key: '__dj__event_description__'             # The field name to store the event descriptions.
-      relevant_char_key: '__dj__relevant_characters__'        # The field name to store the relevant characters to the events.
+      event_desc_key: 'event_description'                     # The key name in the meta field to store the event descriptions.
+      relevant_char_key: 'relevant_characters'                # The key name in the meta field to store the relevant characters to the events.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the task.
@@ -131,7 +205,7 @@ process:
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - extract_keyword_mapper:                                 # Generate keywords for the text.
       api_model: 'gpt-4o'                                     # API model name.
-      keyword_key: '__dj__keyword__'                          # The field name to store the keywords.
+      keyword_key: 'keyword'                                  # The key name in the meta field to store the keywords.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       prompt_template: null                                   # The template of input prompt.
@@ -143,12 +217,24 @@ process:
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - extract_nickname_mapper:                                # Extract nickname relationship in the text.
       api_model: 'gpt-4o'                                     # API model name.
-      nickname_key: '__dj__nickname__'                        # The field name to store the nickname relationship.
+      nickname_key: 'nickname'                                # The key name in the meta field to store the nickname relationship.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
       system_prompt: null                                     # System prompt for the task.
       input_template: null                                    # Template for building the model input.
       output_pattern: null                                    # Regular expression for parsing model output.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      drop_text: false                                        # If drop the text in the output.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - extract_support_text_mapper:                            # extract support sub text for a summary.
+      api_model: 'gpt-4o'                                     # API model name.
+      summary_key: 'event_description'                        # The key name in the meta field to store the input summary. It's "event_description" in default.
+      support_text_key: 'support_text'                        # The key name in the meta field to store the output support text for the summary. It's "support_text" in default.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # System prompt for the task.
+      input_template: null                                    # Template for building the model input.
       try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
       drop_text: false                                        # If drop the text in the output.
       model_params: {}                                        # Parameters for initializing the API model.
@@ -205,13 +291,13 @@ process:
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only generated images in the final datasets and the original images will be removed. It's True in default.
       caption_key: null                                       # the key name of fields in samples to store captions for each images, the caption guide the diffusion model to produce what the image is
       hf_img2seq: 'Salesforce/blip2-opt-2.7b'                 # model name on huggingface to generate caption if caption_key is null
-      mem_required: '8GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
+      mem_required: '8GB'                                     # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - image_face_blur_mapper:                                 # blur faces detected in images
       cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
   - image_tagging_mapper:                                   # Mapper to generate image tags.
-      tag_field_name: '__dj__image_tags__'                    # the field name to store the tags. It's "__dj__image_tags__" in default.
+      tag_field_name: 'image_tags'                          # the field name to store the tags. It's "image_tags" in default.
       mem_required: '9GB'
   - nlpaug_en_mapper:                                       # simply augment texts in English based on the nlpaug library
       sequential: false                                       # whether combine all augmentation methods to a sequence. If it's True, a sample will be augmented by all opened augmentation methods sequentially. If it's False, each opened augmentation method would generate its augmented samples independently.
@@ -259,12 +345,47 @@ process:
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call.
   - punctuation_normalization_mapper:                       # normalize unicode punctuations to English punctuations.
-  - python_python_mapper:                                   # executing Python lambda function defined in a file.
+  - python_file_mapper:                                     # executing Python lambda function defined in a file.
       file_path: ''                                           # The path to the Python file containing the function to be executed.
       function_name: 'process_single'                         # The name of the function defined in the file to be executed.
   - python_lambda_mapper:                                   # executing Python lambda function on data samples.
       lambda_str: ''                                          # A string representation of the lambda function to be executed on data samples. If empty, the identity function is used.
       batched: False                                          # A boolean indicating whether to process input data in batches.
+  - query_intent_detection_mapper:                          # Mapper to predict user's Intent label in query.
+      hf_model: 'bespin-global/klue-roberta-small-3i4k-intent-classification'     # Hugginface model ID to predict intent label.
+      zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
+      model_params: {}                                        # model param for hf_model.
+      zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
+      label_key: 'query_intent_label'                         # The key name in the meta field to store the output label. It is 'query_intent_label' in default.
+      score_key: 'query_intent_label_score'                   # The key name in the meta field to store the corresponding label score. It is 'query_intent_label_score' in default.
+  - query_sentiment_detection_mapper:                       # Mapper to predict user's sentiment label ('negative', 'neutral' and 'positive') in query.
+      hf_model: 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'     # Hugginface model ID to predict sentiment label.
+      zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
+      model_params: {}                                        # model param for hf_model.
+      zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
+      label_key: 'query_sentiment_label'                      # The key name in the meta field to store the output label. It is 'query_sentiment_label' in default.
+      score_key: 'query_sentiment_label_score'                # The key name in the meta field to store the corresponding label score. It is 'query_sentiment_label_score' in default.
+  - query_topic_detection_mapper:                           # Mapper to predict user's topic label in query.
+      hf_model: 'dstefa/roberta-base_topic_classification_nyt_news'     # Hugginface model ID to predict topic label.
+      zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
+      model_params: {}                                        # model param for hf_model.
+      zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
+      label_key: 'query_topic_label'                          # The key name in the meta field to store the output label. It is 'query_topic_label' in default.
+      score_key: 'query_topic_label_score'                    # The key name in the meta field to store the corresponding label score. It is 'query_topic_label_score' in default.
+  - relation_identity_mapper:                               # identify relation between two entity in the text.
+      api_model: 'gpt-4o'                                     # API model name.
+      source_entity: '孙悟空'                                  # The source entity of the relation to be dentified.
+      target_entity: '猪八戒'                                  # The target entity of the relation to be identified.
+      output_key: 'role_relation'                             # The output key in the meta field in the samples. It is 'role_relation' in default.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt_template: null                            # System prompt template for the task. Need to specify by entity1 and entity2.
+      input_template: null                                    # Template for building the model input.
+      output_pattern_template: null                           # Regular expression template for parsing model output.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      drop_text: false                                        # If drop the text in the output.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - remove_bibliography_mapper:                             # remove bibliography from Latex text.
   - remove_comments_mapper:                                 # remove comments from Latex text, code, etc.
       doc_type: tex                                           # comment type you want to remove. Only support 'tex' for now.
@@ -341,6 +462,11 @@ process:
       horizontal_flip: false                                  # flip frame image horizontally (left to right).
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
       mem_required: '20GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
+  - video_extract_frames_mapper:                            # extract frames from video files according to specified methods
+      frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
+      frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
+      duration: 0                                             # The duration of each segment in seconds. If 0, frames are extracted from the entire video. If duration > 0, the video is segmented into multiple segments based on duration, and frames are extracted from each segment.
+      frame_dir: None                                         # Output directory to save extracted frames. If None, a default directory based on the video file path is used.
   - video_face_blur_mapper:                                 # blur faces detected in videos
       cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
@@ -377,12 +503,12 @@ process:
       show_progress: false                                    # whether to show progress from scenedetect
   - video_tagging_from_audio_mapper:                        # Mapper to generate video tags from audio streams extracted from the video.
       hf_ast: 'MIT/ast-finetuned-audioset-10-10-0.4593'       # Huggingface model name for the audio classification model.
-      tag_field_name: '__dj__video_audio_tags__'              # the field name to store the tags. It's "__dj__video_audio_tags__" in default.
+      tag_field_name: 'video_audio_tags'                    # the field name to store the tags. It's "video_audio_tags" in default.
       mem_required: '500MB'                                   # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_tagging_from_frames_mapper:                       # Mapper to generate video tags from frames extracted from the video.
       frame_sampling_method: 'all_keyframes'                  # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
-      tag_field_name: '__dj__video_frame_tags__'              # the field name to store the tags. It's "__dj__video_frame_tags__" in default.
+      tag_field_name: 'video_frame_tags'                    # the key name in the meta field to store the tags. It's "video_frame_tags" in default.
       mem_required: '9GB'
   - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
 
@@ -562,7 +688,7 @@ process:
       vertical_flip: false                                    # flip frame image vertically (top to bottom).
       reduce_mode: avg                                        # reduce mode when one text corresponds to multiple videos in a chunk,  must be one of ['avg','max', 'min'].
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
-      mem_required: '1GB'                                     # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
+      mem_required: '1500MB'                                  # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrains the maximum number of processes that can be launched
   - video_motion_score_filter:                              # Keep samples with video motion scores within a specific range.
       min_score: 0.25                                         # the minimum motion score to keep samples
       max_score: 10000.0                                      # the maximum motion score to keep samples
@@ -614,7 +740,7 @@ process:
       contain: any                                            # require the videos containing 'any' or 'all' given tags. When tags equal to [], 'all' keeps all samples, 'any' keeps no sample.
       frame_sampling_method: all_keyframes                    # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
-      tag_field_name: '__dj__video_frame_tags__'              # the field name to store the tags. It's "__dj__video_frame_tags__" in default.
+      tag_field_name: 'video_frame_tags'                    # the key name in the meta field to store the tags. It's "video_frame_tags" in default.
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
       mem_required: '9GB'
   - words_num_filter:                                       # filter text with number of words out of specific range
@@ -667,6 +793,24 @@ process:
       redis_port: 6380                                      # the port of redis instance, please note that the default port of redis is 6379 which is the same as default port for ray, so we need to modify the default redis config to use it in other port
       lowercase: false                                        # whether to convert text to lower case
       ignore_non_character: false                             # whether to ignore non-alphabet characters, including whitespaces, digits, and punctuations
+  - ray_bts_minhash_deduplicator:                            # the document deduplicator that can run on multi-nodes using minhashLSH algorithm
+      tokenization: space                                     # tokenization method for text. One of [space, punctuation, character, sentencepiece]
+      window_size: 5                                          # window size of shingling
+      num_permutations: 256                                   # number of permutations in minhash computing
+      jaccard_threshold: 0.7                                  # the min jaccard similarity threshold in near-duplicate detection. When the jaccard similarity of two sample texts is >= this threshold, they are regarded as similar samples and this op will only keep one of them after deduplication
+      num_bands: null                                         # number of bands in LSH. Default it's None, and it will be determined by an optimal params computation algorithm by minimize the weighted sum of probs of False Positives and False Negatives
+      num_rows_per_band: null                                 # number of rows in each band in LSH. Default it's None, and it will be determined by an optimal params computation algorithm
+      lowercase: true                                         # whether to convert text to lower case
+      ignore_pattern: null                                    # whether to ignore sub-strings with specific pattern when computing simhash.
+      tokenizer_model: null                                   # path for the sentencepiece model, used for sentencepiece tokenization.
+      union_find_parallel_num: 'auto'                         # number of parallel workers for union-find algorithm. Default it's 'auto', and it will be determined by half of the number of CPUs.
+      union_threshold: 256                                    # threshold for minhash values group to perform union-find algorightm.
+      max_pending_edge_buffer_task: 20                        # max number of pending edge buffer ray tasks.
+      num_edge_buffer_task_returns: 10                        # number of edge buffer tasks for `ray.wait` to return.
+      max_pending_filter_tasks: 20                            # max number of pending filter ray tasks.
+      num_filter_task_returns: 10                             # number of filter tasks for `ray.wait` to return.
+      merge_batch_size: 1000                                  # batch size for BTS operations.
+      tmp_file_name: './outputs/ray-dedup-tmp/'               # the temporary folder name for deduplication.
 
   # Selector ops
   - frequency_specified_field_selector:                     # selector to select samples based on the sorted frequency of specified field value
@@ -683,8 +827,79 @@ process:
       upper_percentile:                                       # the upper bound of the percentile to be sampled
       lower_rank:                                             # the lower rank of the percentile to be sampled
       upper_rank:                                             # the upper rank of the percentile to be sampled
+  - tags_specified_field_selector:                          # Selector to select samples based on the tags of specified field.
+      field_key: '__dj__meta__.query_sentiment_label'         # the target keys corresponding to multi-level field information need to be separated by '.'
+      target_tags: ['happy', 'sad']                           # Target tags to be select.
   - topk_specified_field_selector:                          # selector to select top samples based on the sorted specified field
       field_key: ''                                           # the target keys corresponding to multi-level field information need to be separated by '.'
       top_ratio:                                              # ratio of selected top samples
       topk:                                                   # number of selected top sample
       reverse: True                                           # determine the sorting rule, if reverse=True, then sort in descending order
+
+# Grouper ops.
+  - naive_grouper:                                          # Group all samples to one batched sample.
+  - naive_reverse_grouper:                                  # Split one batched sample to samples.
+      batch_meta_export_path: null                            # the path to export the batch meta. Just drop the batch meta if it is None.
+  - key_value_grouper:                                      # Group samples to batched samples according values in given keys.
+      group_by_keys: null                                     # Group samples according values in the keys. Support for nested keys such as "__dj__stats__.text_len". It is [self.text_key] in default.
+
+# aggregator ops.
+  - entity_attribute_aggregator:                            # Return conclusion of the given entity's attribute from some docs.
+      api_model: 'gpt-4o'                                     # API model name.
+      entity: '孙悟空'                                         # The given entity.
+      attribute: '人物经历'                                    # The given attribute.
+      input_key: 'event_description'                          # The input key in the meta field of the samples. It is "event_description" in default.
+      output_key: 'entity_attribute'                          # The output key in the aggregation field of the samples. It is "entity_attribute" in default.
+      word_limit: 100                                         # Prompt the output length.
+      max_token_num: null                                     # The max token num of the total tokens of the sub documents. Without limitation if it is None.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt_template: null                            # System prompt template for the task. Need to be specified by given entity and attribute.
+      example_prompt: null                                    # The example part in the system prompt.
+      input_template: null                                    # The input template.
+      output_pattern_template: null                           # The output template.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - meta_tags_aggregator:                                   # Merge similar meta tags to one tag.
+      api_model: 'gpt-4o'                                     # API model name.
+      meta_tag_key: 'query_sentiment_label'                   # The key of the meta tag to be mapped. It is "query_sentiment_label" in default.
+      target_tags: ['开心', '难过', '其他']                     # The tags that is supposed to be mapped to.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # The system prompt.
+      input_template: null                                    # The input template.
+      target_tag_template: null                               # The tap template for target tags.
+      tag_template: null                                      # The tap template for each tag and its frequency.
+      output_pattern: null                                    # The output pattern.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - most_relavant_entities_aggregator:                      # Extract entities closely related to a given entity from some texts, and sort them in descending order of importance.
+      api_model: 'gpt-4o'                                     # API model name.
+      entity: '孙悟空'                                         # The given entity.
+      query_entity_type: '人物'                                # The type of queried relavant entities.
+      input_key: 'event_description'                          # The input key in the meta field of the samples. It is "event_description" in default.
+      output_key: 'most_relavant_entities'                    # The output key in the aggregation field of the samples. It is "most_relavant_entities" in default.
+      max_token_num: null                                     # The max token num of the total tokens of the sub documents. Without limitation if it is None.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt_template: null                            # System prompt template for the task. Need to be specified by given entity and entity_type.
+      input_template: null                                    # The input template.
+      output_pattern: null                                    # The output pattern.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - nested_aggregator:                                      # Considering the limitation of input length, nested aggregate contents for each given number of samples.
+      api_model: 'gpt-4o'                                     # API model name.
+      input_key: 'event_description'                          # The input key in the meta field of the samples. It is "event_description" in default.
+      output_key: null                                        # The output key in the aggregation field in the samples. It is same as the input_key in default.
+      max_token_num: null                                     # The max token num of the total tokens of the sub documents. Without limitation if it is None.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      system_prompt: null                                     # The system prompt.
+      sub_doc_template: null                                  # The template for input text in each sample.
+      input_template: null                                    # The input template.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}

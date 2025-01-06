@@ -152,6 +152,7 @@ class LocalExecutor(ExecutorBase):
             exporter=self.exporter,
             checkpointer=self.ckpt_manager,
             tracer=self.tracer,
+            adapter=self.adapter,
             open_monitor=self.cfg.open_monitor,
         )
         tend = time()
