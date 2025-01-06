@@ -1,10 +1,12 @@
 project_name: 'dataset-mixture'
 dataset:
-  - type: 'local'
-    weight: 1.0
-    path:
-      - 'path/to/json/file'
-  - type: 'local'
-    weight: 1.0
-    files:
-      - 'path/to/csv/file'
+  max_sample_num: 10000
+  configs:
+    - type: 'local'
+      weight: 1.0
+      path:
+        - 'path/to/json/file'
+    - type: 'local'
+      weight: 1.0
+      files:
+        - 'path/to/csv/file'

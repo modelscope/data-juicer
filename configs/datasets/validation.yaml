@@ -1,6 +1,7 @@
 dataset:
-  type: ondisk
-  path: path/to/data.json
+  configs:
+    - type: ondisk
+      path: path/to/data.json
 
 validators:
   - type: conversation

@@ -49,6 +49,7 @@ class DataLoadStrategy(ABC, ConfigValidator):
     def __init__(self, ds_config: Dict):
         self.validate_config(ds_config)
         self.ds_config = ds_config
+        self.weight = ds_config.get('weight', 1.0)  # default weight is 1.0
 
     @abstractmethod
     def load_data(self, cfg: Namespace) -> Union[DJDataset, RayDataset]:
@@ -197,7 +198,8 @@ class RayHuggingfaceDataLoadStrategy(RayDataLoadStrategy):
     }
 
     def load_data(self, cfg: Namespace):
-        pass
+        raise NotImplementedError(
+            'Huggingface data load strategy is not implemented')
 
 
 @DataLoadStrategyRegistry.register('local', 'ondisk', '*')
@@ -234,7 +236,8 @@ class LocalHuggingfaceDataLoadStrategy(LocalDataLoadStrategy):
     }
 
     def load_data(self, cfg: Namespace):
-        pass
+        raise NotImplementedError(
+            'Huggingface data load strategy is not implemented')
 
 
 @DataLoadStrategyRegistry.register('local', 'remote', 'modelscope')
@@ -244,7 +247,8 @@ class LocalModelScopeDataLoadStrategy(LocalDataLoadStrategy):
     """
 
     def load_data(self, cfg: Namespace):
-        pass
+        raise NotImplementedError(
+            'ModelScope data load strategy is not implemented')
 
 
 @DataLoadStrategyRegistry.register('local', 'remote', 'arxiv')
@@ -262,7 +266,8 @@ class LocalArxivDataLoadStrategy(LocalDataLoadStrategy):
     }
 
     def load_data(self, cfg: Namespace):
-        pass
+        raise NotImplementedError(
+            'Arxiv data load strategy is not implemented')
 
 
 @DataLoadStrategyRegistry.register('local', 'remote', 'wiki')
@@ -280,7 +285,7 @@ class LocalWikiDataLoadStrategy(LocalDataLoadStrategy):
     }
 
     def load_data(self, cfg: Namespace):
-        pass
+        raise NotImplementedError('Wiki data load strategy is not implemented')
 
 
 @DataLoadStrategyRegistry.register('local', 'remote', 'commoncrawl')
@@ -304,4 +309,5 @@ class LocalCommonCrawlDataLoadStrategy(LocalDataLoadStrategy):
     }
 
     def load_data(self, cfg: Namespace):
-        pass
+        raise NotImplementedError(
+            'CommonCrawl data load strategy is not implemented')

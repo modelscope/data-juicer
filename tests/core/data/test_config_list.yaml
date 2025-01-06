@@ -1,8 +1,9 @@
 project_name: 'dataset-ondisk-list'
 dataset:
-  - type: 'ondisk'
-    path:
-      - 'sample.json'
-  - type: 'ondisk'
-    path:
-      - 'sample.txt'
+  configs:
+    - type: 'ondisk'
+      path:
+        - 'sample.json'
+    - type: 'ondisk'
+      path:
+        - 'sample.txt' 

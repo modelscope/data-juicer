@@ -1,9 +1,10 @@
 # global parameters
 project_name: 'dataset-remote-arxiv'
 dataset:
-  - type: 'remote'
-    source: 'arxiv'
-    lang: 'en'
-    dump_date: 'latest'
-    force_download: false
-    url_limit: 2
+  configs:
+    - type: 'remote'
+      source: 'arxiv'
+      lang: 'en'
+      dump_date: 'latest'
+      force_download: false
+      url_limit: 2

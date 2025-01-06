@@ -31,21 +31,27 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         dataset_path = "./data/sample.txt"
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
-            [{'path': [dataset_path], 'type': 'ondisk', 'weight': 1.0}], ans)
+            {'configs': [
+                {'path': [dataset_path], 'type': 'ondisk', 'weight': 1.0}]},
+             ans)
 
     def test_rewrite_cli_datapath_local_directory(self):
         dataset_path = "./data"
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
-            [{'path': [dataset_path], 'type': 'ondisk', 'weight': 1.0}], ans)
+            {'configs': [
+                {'path': [dataset_path], 'type': 'ondisk', 'weight': 1.0}]},
+             ans)
 
     def test_rewrite_cli_datapath_hf(self):
         dataset_path = "hf-internal-testing/librispeech_asr_dummy"
         ans = rewrite_cli_datapath(dataset_path)
-        self.assertEqual([{'path': 'hf-internal-testing/librispeech_asr_dummy',
-                           'split': 'train',
-                           'type': 'huggingface'}],
-                         ans)
+        self.assertEqual(
+            {'configs': [
+                {'path': 'hf-internal-testing/librispeech_asr_dummy',
+                'split': 'train',
+                'type': 'huggingface'}]},
+             ans)
 
     def test_rewrite_cli_datapath_local_wrong_files(self):
         dataset_path = "./missingDir"
@@ -56,8 +62,9 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         dataset_path = "0.5 ./data/sample.json ./data/sample.txt"
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
-            [{'path': ['./data/sample.json'], 'type': 'ondisk', 'weight': 0.5},
-             {'path': ['./data/sample.txt'], 'type': 'ondisk', 'weight': 1.0}],
+            {'configs': [
+                {'path': ['./data/sample.json'], 'type': 'ondisk', 'weight': 0.5},
+                {'path': ['./data/sample.txt'], 'type': 'ondisk', 'weight': 1.0}]},
             ans)
 
     @patch('os.path.isdir')
@@ -68,19 +75,23 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         mock_isdir.side_effect = lambda x: x.endswith('_dir')
 
         dataset_path = "1.0 ds1.jsonl 2.0 ds2_dir 3.0 ds3.jsonl"
-        expected = [
-            {'type': 'ondisk', 'path': ['ds1.jsonl'], 'weight': 1.0},
-            {'type': 'ondisk', 'path': ['ds2_dir'], 'weight': 2.0},
-            {'type': 'ondisk', 'path': ['ds3.jsonl'], 'weight': 3.0}
-        ]
+        expected = {
+            'configs': [
+                {'type': 'ondisk', 'path': ['ds1.jsonl'], 'weight': 1.0},
+                {'type': 'ondisk', 'path': ['ds2_dir'], 'weight': 2.0},
+                {'type': 'ondisk', 'path': ['ds3.jsonl'], 'weight': 3.0}
+            ]
+        }
         result = rewrite_cli_datapath(dataset_path)
         self.assertEqual(result, expected)
 
     def test_rewrite_cli_datapath_huggingface(self):
         dataset_path = "1.0 huggingface/dataset"
-        expected = [
-            {'type': 'huggingface', 'path': 'huggingface/dataset', 'split': 'train'}
-        ]
+        expected = {
+            'configs': [
+                {'type': 'huggingface', 'path': 'huggingface/dataset', 'split': 'train'}
+            ]
+        }
         result = rewrite_cli_datapath(dataset_path)
         self.assertEqual(result, expected)
 
@@ -88,6 +99,38 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         dataset_path = "1.0 ./invalid_path"
         with self.assertRaises(ValueError):
             rewrite_cli_datapath(dataset_path)
+
+    def test_rewrite_cli_datapath_with_max_samples(self):
+        """Test rewriting CLI datapath with max_sample_num"""
+        dataset_path = "./data/sample.txt"
+        max_sample_num = 1000
+        
+        result = rewrite_cli_datapath(dataset_path, max_sample_num)
+        
+        expected = {
+            'configs': [{
+                'type': 'ondisk',
+                'path': ['./data/sample.txt'],
+                'weight': 1.0
+            }],
+            'max_sample_num': 1000
+        }
+        self.assertEqual(result, expected)
+
+    def test_rewrite_cli_datapath_without_max_samples(self):
+        """Test rewriting CLI datapath without max_sample_num"""
+        dataset_path = "./data/sample.txt"
+        
+        result = rewrite_cli_datapath(dataset_path)
+        
+        expected = {
+            'configs': [{
+                'type': 'ondisk',
+                'path': ['./data/sample.txt'],
+                'weight': 1.0
+            }]
+        }
+        self.assertEqual(result, expected)
 
     def test_parse_cli_datapath(self):
         dataset_path = "1.0 ds1.jsonl 2.0 ds2_dir 3.0 ds3.jsonl"
@@ -206,8 +249,12 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         """Test handling of single dataset configuration"""
         # Setup single dataset config
         self.base_cfg.dataset = {
-            'type': 'ondisk',
-            'path': 'test.jsonl'
+            'configs': [
+                {
+                    'type': 'ondisk',
+                    'path': 'test.jsonl'
+                }
+            ]
         }
         
         builder = DatasetBuilder(self.base_cfg, self.executor_type)
@@ -224,16 +271,18 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
     def test_builder_multiple_dataset_config(self):
         """Test handling of multiple dataset configurations"""
         # Setup multiple dataset config
-        self.base_cfg.dataset = [
-            {
-                'type': 'ondisk',
-                'path': 'test1.jsonl'
-            },
-            {
-                'type': 'ondisk',
-                'path': 'test2.jsonl'
-            }
-        ]
+        self.base_cfg.dataset = {
+            'configs': [
+                {
+                    'type': 'ondisk',
+                    'path': 'test1.jsonl'
+                },
+                {
+                    'type': 'ondisk',
+                    'path': 'test2.jsonl'
+                }
+            ]
+        }
         
         builder = DatasetBuilder(self.base_cfg, self.executor_type)
         
@@ -255,16 +304,18 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
 
     def test_builder_mixed_dataset_types(self):
         """Test validation of mixed dataset types"""
-        self.base_cfg.dataset = [
-            {
-                'type': 'ondisk',
-                'path': 'test1.jsonl'
-            },
-            {
-                'type': 'remote',
-                'source': 'some_source'
-            }
-        ]
+        self.base_cfg.dataset = {
+            'configs': [
+                {
+                    'type': 'ondisk',
+                    'path': 'test1.jsonl'
+                },
+                {
+                    'type': 'remote',
+                    'source': 'some_source'
+                }
+            ]
+        }
         
         with self.assertRaises(ConfigValidationError) as context:
             DatasetBuilder(self.base_cfg, self.executor_type)
@@ -273,16 +324,18 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
 
     def test_builder_multiple_remote_datasets(self):
         """Test validation of multiple remote datasets"""
-        self.base_cfg.dataset = [
-            {
-                'type': 'remote',
-                'source': 'source1'
+        self.base_cfg.dataset = {
+            'configs': [
+                {
+                    'type': 'remote',
+                    'source': 'source1'
             },
             {
                 'type': 'remote',
                 'source': 'source2'
-            }
-        ]
+                }
+            ]
+        }
         
         with self.assertRaises(ConfigValidationError) as context:
             DatasetBuilder(self.base_cfg, self.executor_type)
@@ -291,7 +344,9 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
 
     def test_builder_empty_dataset_config(self):
         """Test handling of empty dataset configuration"""
-        self.base_cfg.dataset = []
+        self.base_cfg.dataset = {
+            'configs': []
+        }
         
         with self.assertRaises(ConfigValidationError) as context:
             DatasetBuilder(self.base_cfg, self.executor_type)
@@ -316,7 +371,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertIsInstance(cfg, Namespace)
             self.assertEqual(cfg.project_name, 'dataset-ondisk-json')
             self.assertEqual(cfg.dataset,
-                             {'path': ['sample.json'], 'type': 'ondisk'})
+                             {'configs': [{'path': ['sample.json'], 'type': 'ondisk'}]})
             self.assertEqual(not cfg.dataset_path, True)
 
     def test_builder_ondisk_config_list(self):
@@ -326,10 +381,99 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             cfg = init_configs(args=f'--config {test_config_file}'.split())
             self.assertIsInstance(cfg, Namespace)
             self.assertEqual(cfg.project_name, 'dataset-ondisk-list')
-            self.assertEqual(cfg.dataset,[
-                {'path': ['sample.json'], 'type': 'ondisk'},
-                {'path': ['sample.txt'], 'type': 'ondisk'}])
+            self.assertEqual(cfg.dataset,
+                             {'configs': [
+                                {'path': ['sample.json'], 'type': 'ondisk'},
+                                {'path': ['sample.txt'], 'type': 'ondisk'}
+                                ]})
             self.assertEqual(not cfg.dataset_path, True)
+
+    def test_builder_with_max_samples(self):
+        """Test DatasetBuilder with max_sample_num"""
+        self.base_cfg.dataset = {
+            'configs': [{
+                'type': 'ondisk',
+                'path': ['test.jsonl'],
+                'weight': 1.0
+            }],
+            'max_sample_num': 1000
+        }
+        
+        builder = DatasetBuilder(self.base_cfg, self.executor_type)
+        
+        self.assertEqual(len(builder.load_strategies), 1)
+        self.assertEqual(builder.max_sample_num, 1000)
+
+    def test_builder_without_max_samples(self):
+        """Test DatasetBuilder without max_sample_num"""
+        self.base_cfg.dataset = {
+            'configs': [{
+                'type': 'ondisk',
+                'path': ['test.jsonl'],
+                'weight': 1.0
+            }]
+        }
+        
+        builder = DatasetBuilder(self.base_cfg, self.executor_type)
+        
+        self.assertEqual(len(builder.load_strategies), 1)
+        self.assertIsNone(builder.max_sample_num)
+
+    def test_mixed_dataset_configs(self):
+        """Test handling of mixed dataset configurations"""
+        self.base_cfg.dataset = {
+            'configs': [
+                {
+                    'type': 'ondisk',
+                    'path': ['test1.jsonl'],
+                    'weight': 1.0
+                },
+                {
+                    'type': 'ondisk',
+                    'path': ['test2.jsonl'],
+                    'weight': 2.0
+                }
+            ],
+            'max_sample_num': 500
+        }
+        
+        builder = DatasetBuilder(self.base_cfg, self.executor_type)
+        
+        self.assertEqual(len(builder.load_strategies), 2)
+        self.assertEqual(builder.max_sample_num, 500)
+        self.assertEqual(
+            builder.load_strategies[0].ds_config['weight'],
+            1.0
+        )
+        self.assertEqual(
+            builder.load_strategies[1].ds_config['weight'],
+            2.0
+        )
+
+    def test_invalid_max_sample_num(self):
+        """Test handling of invalid max_sample_num"""
+        invalid_values = [-1, 0, "100", None]
+        
+        for value in invalid_values:
+            self.base_cfg.dataset = {
+                'configs': [{
+                    'type': 'ondisk',
+                    'path': ['test.jsonl'],
+                    'weight': 1.0
+                }],
+                'max_sample_num': value
+            }
+            
+            if value is not None and value <= 0:
+                with self.assertRaises(ConfigValidationError):
+                    DatasetBuilder(self.base_cfg, self.executor_type)
+            elif value == "100":
+                with self.assertRaises(ConfigValidationError):
+                    DatasetBuilder(self.base_cfg, self.executor_type)
+            else:
+                builder = DatasetBuilder(self.base_cfg, self.executor_type)
+                if value is None:
+                    self.assertIsNone(builder.max_sample_num)
 
 if __name__ == '__main__':
     unittest.main()

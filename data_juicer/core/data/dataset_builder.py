@@ -26,16 +26,19 @@ class DatasetBuilder(object):
                 'Unable to initialize dataset; should have one of '
                 'dataset_path or dataset in configurations')
 
-        # dataset config could be a list or a single entry; retrofit
-        if not isinstance(ds_configs, list):
-            ds_configs = [ds_configs]
-
         # validate dataset config for type constraints
-        # 1. ds_config should be a dictionary
-        # 2. ds_configs should only have one type
-        # 3. if type is REMOTE, there should only one ds_config
+        # 1. ds_config should have a 'configs' key
+        # 2. ds_config['configs'] should be a list
+        # 3. ds_configs should only have one type
+        # 4. if type is REMOTE, there should only one ds_config
         # TODO other constraints; ray dataset only supports ondisk, etc.
-        for ds_config in ds_configs:
+        if 'configs' not in ds_configs:
+            raise ConfigValidationError(
+                'Dataset config should have a "configs" key')
+        if not isinstance(ds_configs['configs'], list):
+            raise ConfigValidationError(
+                'Dataset config "configs" should be a list')
+        for ds_config in ds_configs['configs']:
             if type(ds_config) != dict:
                 raise ConfigValidationError(
                     'Dataset config should be a dictionary')
@@ -70,16 +73,19 @@ class DatasetBuilder(object):
     def load_dataset(self) -> Union[NestedDataset, RayDataset]:
         _datasets = []
 
-        for f in self.load_strategies:
+        for stra in self.load_strategies:
             # load dataset with its load strategy
-            _dataset = f.load_data(self.cfg)
+            dataset = stra.load_data(self.cfg)
+            sampled = self.random_sample(dataset, stra.weight)
+
+            # deal with sampling
+            if stra.sampling_strategy:
+                None
 
             # do data validation
             for validator in self.validators:
-                validator.validate(_dataset)
-            _datasets.append(_dataset)
-
-        # handle data mixture; only supports ONDISK
+                validator.validate(sampled)
+            _datasets.append(sampled)
 
         return _datasets[0]
 
@@ -99,7 +105,7 @@ class DatasetBuilder(object):
         return dataset
 
 
-def rewrite_cli_datapath(dataset_path) -> List:
+def rewrite_cli_datapath(dataset_path, max_sample_num=None) -> List:
     """
     rewrite the dataset_path from CLI into proper dataset config format
     that is compatible with YAML config style; retrofitting CLI input
@@ -107,18 +113,28 @@ def rewrite_cli_datapath(dataset_path) -> List:
 
     :param dataset_path: a dataset file or a dataset dir or a list of
         them, e.g. `<w1> ds1.jsonl <w2> ds2_dir <w3> ds3_file.json`
+    :param max_sample_num: the maximum number of samples to load
     :return: list of dataset configs
     """
     paths, weights = parse_cli_datapath(dataset_path)
-    ret = []
+    ret = ({
+        'configs': [],
+        'max_sample_num': max_sample_num
+    } if max_sample_num else {
+        'configs': []
+    })
     for p, w in zip(paths, weights):
         if os.path.isdir(p) or os.path.isfile(p):
             # local files
-            ret.append({'type': 'ondisk', 'path': [p], 'weight': w})
+            ret['configs'].append({'type': 'ondisk', 'path': [p], 'weight': w})
         elif (not is_absolute_path(p) and not p.startswith('.')
               and p.count('/') <= 1):
             # remote huggingface
-            ret.append({'type': 'huggingface', 'path': p, 'split': 'train'})
+            ret['configs'].append({
+                'type': 'huggingface',
+                'path': p,
+                'split': 'train'
+            })
         else:
             #
             raise ValueError(

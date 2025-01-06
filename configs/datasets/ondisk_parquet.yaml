@@ -1,6 +1,7 @@
 # global parameters
 project_name: 'dataset-ondisk-parquet'
 dataset:
-  - type: 'ondisk'
-    path:
-      - 'path/to/parquet/file'
+  configs:
+    - type: 'ondisk'
+      path:
+        - 'path/to/parquet/file'
