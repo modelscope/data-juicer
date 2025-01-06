@@ -23,6 +23,8 @@ from io import StringIO
 from loguru import logger
 from loguru._file_sink import FileSink
 
+from data_juicer.utils.file_utils import add_suffix_to_filename
+
 LOGGER_SETUP = False
 
 
@@ -141,6 +143,32 @@ def setup_logger(save_dir,
             enqueue=True,
         )
         logger.add(save_file)
+
+    # for interest of levels: debug, error, warning
+    logger.add(
+        add_suffix_to_filename(save_file, '_DEBUG'),
+        level='DEBUG',
+        filter=lambda x: 'DEBUG' == x['level'].name,
+        format=loguru_format,
+        enqueue=True,
+        serialize=True,
+    )
+    logger.add(
+        add_suffix_to_filename(save_file, '_ERROR'),
+        level='ERROR',
+        filter=lambda x: 'ERROR' == x['level'].name,
+        format=loguru_format,
+        enqueue=True,
+        serialize=True,
+    )
+    logger.add(
+        add_suffix_to_filename(save_file, '_WARNING'),
+        level='WARNING',
+        filter=lambda x: 'WARNING' == x['level'].name,
+        format=loguru_format,
+        enqueue=True,
+        serialize=True,
+    )
 
     # redirect stdout/stderr to loguru
     if redirect:

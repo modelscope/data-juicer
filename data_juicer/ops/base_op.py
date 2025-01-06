@@ -1,5 +1,4 @@
 import copy
-import traceback
 from functools import wraps
 
 import numpy as np
@@ -62,8 +61,7 @@ def catch_map_batches_exception(method):
             from loguru import logger
             logger.error(
                 f'An error occurred in mapper operation when processing '
-                f'samples {samples}, {type(e)}: {e}')
-            traceback.print_exc()
+                f'samples "{samples}" -- {type(e)}: {e}')
             ret = {key: [] for key in samples.keys()}
             ret[Fields.stats] = []
             ret[Fields.source_file] = []
@@ -103,8 +101,7 @@ def catch_map_single_exception(method, return_sample=True):
                 from loguru import logger
                 logger.error(
                     f'An error occurred in mapper operation when processing '
-                    f'sample {sample}, {type(e)}: {e}')
-                traceback.print_exc()
+                    f'sample "{sample}" -- {type(e)}: {e}')
                 ret = {key: [] for key in sample.keys()}
                 ret[Fields.stats] = []
                 ret[Fields.source_file] = []
