@@ -32,7 +32,7 @@ To address the lack of native support in the Arrow framework underlying Ray Data
 
 ### Deduplication
 
-An optimized MinHash-LSH-based Deduplicator is provided in Ray mode. We implement a multi-process Union-Find set in Ray Actors and a load-balanced distributed algorithm, [BTS](https://ieeexplore.ieee.org/document/10598116), to complete equivalence class merging. This operator can deduplicate terabyte-sized datasets on 1280 CPU cores in 3 hours. Our ablation study shows 2x to 3x speedups with our dedicated optimizations for Ray mode compared to the vanilla version of this deduplication operator.
+An optimized MinHash-LSH-based Deduplicator is provided in Ray mode. We implement a multiprocess Union-Find set in Ray Actors and a load-balanced distributed algorithm, [BTS](https://ieeexplore.ieee.org/document/10598116), to complete equivalence class merging. This operator can deduplicate terabyte-sized datasets on 1280 CPU cores in 3 hours. Our ablation study shows 2x to 3x speedups with our dedicated optimizations for Ray mode compared to the vanilla version of this deduplication operator.
 
 ## Performance Results
 
@@ -60,17 +60,17 @@ pip install -v -e .  # Install the minimal requirements of Data-Juicer
 pip install -v -e ".[dist]"  # Include dependencies on Ray and other distributed libraries
 ```
 
-Then start a Ray cluster (ref to the [Ray doc](https://docs.ray.io/en/master/cluster/cli.html) for more details):
+Then start a Ray cluster (ref to the [Ray doc](https://docs.ray.io/en/latest/ray-core/starting-ray.html) for more details):
 
 ```shell
 # Start a cluster as the head node
 ray start --head
 
-# (Optional) On other nodes/machines.
+# (Optional) Connect to the cluster on other nodes/machines.
 ray start --address='{head_ip}:6379'
 ```
 
-We provide a simple demo in the directory `demos/process_on_ray/`, which includes two config files and two test datasets.
+We provide simple demos in the directory `demos/process_on_ray/`, which includes two config files and two test datasets.
 
 ```text
 demos/process_on_ray
@@ -111,10 +111,10 @@ dj-process --config demos/process_on_ray/configs/demo.yaml
 
 Data-Juicer will process the demo dataset with the demo config file and export the result datasets to the directory specified by the `export_path` argument in the config file.
 
-# Running Distributed Deduplication
+# Running Example of Distributed Deduplication
 
 In the `dedup.yaml` config file, we set the executor type to "ray" and specify an automatic Ray address.
-And we use a dedicated distributed version of MinHashLSH Deduplicator to deduplicate the dataset.
+And we use a dedicated distributed version of MinHash Deduplicator to deduplicate the dataset.
 
 ```yaml
 project_name: 'demo-dedup'
