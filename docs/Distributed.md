@@ -36,7 +36,7 @@ An optimized MinHash-LSH-based Deduplicator is provided in Ray mode. We implemen
 
 ## Performance Results
 
-### Processing with Varied Scales
+### Data Processing with Varied Scales
 
 We conducted experiments on datasets with billions of samples. We prepared a 560k-sample multimodal dataset and expanded it by different factors (1x to 125000x) to create datasets of varying sizes. The experimental results, shown in the figure below, demonstrate good scalability.
 
@@ -53,20 +53,41 @@ We tested the MinHash-based RayDeduplicator on datasets sized at 200GB, 1TB, and
 
 ## Quick Start
 
-### Running Example of Ray Mode
+Before starting, you should install Data-Juicer and its `dist` requirements:
 
-We provide a simple demo in the directory `demos/process_on_ray/`, which includes a config file and two test datasets.
+```shell
+pip install -v -e .  # Install the minimal requirements of Data-Juicer
+pip install -v -e ".[dist]"  # Include dependencies on Ray and other distributed libraries
+```
+
+Then start a Ray cluster (ref to the [Ray doc](https://docs.ray.io/en/master/cluster/cli.html) for more details):
+
+```shell
+# Start a cluster as the head node
+ray start --head
+
+# (Optional) On other nodes/machines.
+ray start --address='{head_ip}:6379'
+```
+
+We provide a simple demo in the directory `demos/process_on_ray/`, which includes two config files and two test datasets.
 
 ```text
-demos/process_on_ray/
+demos/process_on_ray
 ├── configs
-│   └── demo.yaml
+│   ├── demo.yaml
+│   └── dedup.yaml
 └── data
     ├── demo-dataset.json
     └── demo-dataset.jsonl
 ```
 
-In the config file, set the executor type to "ray" and specify an automatic Ray address.
+> [!Important]
+> If you run these demos on multiple nodes, you need to put the demo dataset to a shared disk (e.g. NAS) and export the result dataset to it as well by modifying the `dataset_path` and `export_path` in the config files.
+
+### Running Example of Ray Mode
+
+In the `demo.yaml` config file, we set the executor type to "ray" and specify an automatic Ray address.
 
 ```yaml
 ...
@@ -78,20 +99,7 @@ ray_address: 'auto'  # Set an automatic Ray address
 ...
 ```
 
-Before running, install Data-Juicer and its `dist` requirements:
-
-```shell
-pip install -v -e .  # Install the minimal requirements of Data-Juicer
-pip install -v -e ".[dist]"  # Include dependencies on Ray and other distributed libraries
-```
-
-Start a Ray cluster:
-
-```shell
-ray start --head  # Start a local cluster as the head node
-```
-
-Run the demo using the `dj-process` tool:
+Run the demo to process the dataset with 12 regular OPs:
 
 ```shell
 # Run the tool from source
@@ -102,3 +110,35 @@ dj-process --config demos/process_on_ray/configs/demo.yaml
 ```
 
 Data-Juicer will process the demo dataset with the demo config file and export the result datasets to the directory specified by the `export_path` argument in the config file.
+
+# Running Distributed Deduplication
+
+In the `dedup.yaml` config file, we set the executor type to "ray" and specify an automatic Ray address.
+And we use a dedicated distributed version of MinHashLSH Deduplicator to deduplicate the dataset.
+
+```yaml
+project_name: 'demo-dedup'
+dataset_path: './demos/process_on_ray/data/'
+export_path: './outputs/demo-dedup/demo-ray-bts-dedup-processed'
+
+executor_type: 'ray'  # Set the executor type to "ray"
+ray_address: 'auto'  # Set an automatic Ray address
+
+# process schedule
+# a list of several process operators with their arguments
+process:
+  - ray_bts_minhash_deduplicator:  # a distributed version of minhash deduplicator
+      tokenization: 'character'
+```
+
+Run the demo to deduplicate the dataset:
+
+```shell
+# Run the tool from source
+python tools/process_data.py --config demos/process_on_ray/configs/dedup.yaml
+
+# Use the command-line tool
+dj-process --config demos/process_on_ray/configs/dedup.yaml
+```
+
+Data-Juicer will dedup the demo dataset with the demo config file and export the result datasets to the directory specified by the `export_path` argument in the config file.
