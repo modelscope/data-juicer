@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 import ray
 
 from data_juicer.utils.constant import HashKeys
@@ -16,12 +18,59 @@ class DedupSet:
     def __init__(self):
         self.hash_record = set()
 
-    def setnx(self, key):
+    def is_unique(self, key):
         if key not in self.hash_record:
             self.hash_record.add(key)
             return True
         else:
             return False
+
+
+class Backend(ABC):
+    """
+    Backend for deduplicator.
+    """
+
+    @abstractmethod
+    def __init__(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def is_unique(self, md5_value: str):
+        pass
+
+
+class ActorBackend(Backend):
+    """
+    Ray actor backend for deduplicator.
+    """
+
+    def __init__(self, dedup_set_num: int):
+        self.dedup_set_num = dedup_set_num
+        self.dedup_sets = [
+            DedupSet.remote() for _ in range(self.dedup_set_num)
+        ]
+
+    def is_unique(self, md5_value: str):
+        dedup_set_id = int.from_bytes(
+            md5_value.encode(),
+            byteorder='little') % MERSENNE_PRIME % self.dedup_set_num
+        return ray.get(
+            self.dedup_sets[dedup_set_id].is_unique.remote(md5_value))
+
+
+class RedisBackend(Backend):
+    """
+    Redis backend for deduplicator.
+    """
+
+    def __init__(self, redis_address: str):
+        self.redis_address = redis_address
+        self.redis_client = redis.from_url(url=self.redis_address)
+        self.redis_client.flushdb(0)
+
+    def is_unique(self, md5_value: str):
+        return self.redis_client.setnx(md5_value, 1)
 
 
 class RayBasicDeduplicator(Filter):
@@ -50,15 +99,12 @@ class RayBasicDeduplicator(Filter):
         self.redis_address = redis_address
         self.backend = backend
         if backend == 'ray_actor':
-            self.dedup_set_num = int(ray.cluster_resources().get('CPU') / 2)
-            self.dedup_sets = [
-                DedupSet.remote() for _ in range(self.dedup_set_num)
-            ]
+            dedup_set_num = int(ray.cluster_resources().get('CPU') / 2)
+            self.backend = ActorBackend(dedup_set_num)
         elif backend == 'redis':
             # TODO: add a barrier to ensure that flushdb is performed before
             # the operator is called
-            r = redis.from_url(url=self.redis_address)
-            r.flushdb(0)
+            self.backend = RedisBackend(redis_address)
         else:
             raise ValueError(f'Unknown backend: {backend}')
 
@@ -67,24 +113,11 @@ class RayBasicDeduplicator(Filter):
         raise NotImplementedError
 
     def compute_stats_single(self, sample, context=False):
-        if self.backend == 'ray_actor':
-            # compute hash
-            md5_value = self.calculate_hash(sample, context)
-            dedup_set_id = int.from_bytes(
-                md5_value.encode(),
-                byteorder='little') % MERSENNE_PRIME % self.dedup_set_num
-            # check existing
-            sample[HashKeys.is_unique] = \
-                ray.get(self.dedup_sets[dedup_set_id].setnx.remote(md5_value))
-            return sample
-        else:  # redis
-            # init redis client
-            r = redis.from_url(url=self.redis_address)
-            # compute hash
-            md5_value = self.calculate_hash(sample, context)
-            # check existing
-            sample[HashKeys.is_unique] = r.setnx(md5_value, 1)
-            return sample
+        # compute hash
+        md5_value = self.calculate_hash(sample, context)
+        # check existing
+        sample[HashKeys.is_unique] = self.backend.is_unique(md5_value)
+        return sample
 
     def process_single(self, sample):
         return sample[HashKeys.is_unique]
