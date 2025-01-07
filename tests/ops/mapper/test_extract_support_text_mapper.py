@@ -7,10 +7,9 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.extract_support_text_mapper import ExtractSupportTextMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
-from data_juicer.utils.constant import Fields
-from data_juicer.utils.common_utils import nested_access
+from data_juicer.utils.constant import Fields, MetaKeys
 
-# Skip tests for this OP in the GitHub actions due to unknown DistNetworkError.
+# Skip tests for this OP.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class ExtractSupportTextMapperTest(DataJuicerTestCaseBase):
@@ -18,11 +17,7 @@ class ExtractSupportTextMapperTest(DataJuicerTestCaseBase):
 
     def _run_op(self, api_model):
 
-        summary_key = 'data.event'
-        support_text_key = 'data.support_text'
-        op = ExtractSupportTextMapper(api_model=api_model,
-                               summary_key=summary_key,
-                               support_text_key=support_text_key)
+        op = ExtractSupportTextMapper(api_model=api_model)
 
         raw_text = """△芩婆走到中间，看着众人。
 芩婆：当年，我那老鬼漆木山与李相夷之父乃是挚交。原本李家隐世而居，一日为了救人，得罪附近山匪，夜里便遭了山匪所袭，唯有二子生还，流落街头。
@@ -59,15 +54,15 @@ class ExtractSupportTextMapperTest(DataJuicerTestCaseBase):
         event = "李相显托付单孤刀。"
         samples = [{
             'text': raw_text,
-            'data':{
-                'event': event
+            Fields.meta:{
+                MetaKeys.event_description: event
             }
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=2)
+        dataset = op.run(dataset)
         sample = dataset[0]
-        logger.info(f"support_text: \n{nested_access(sample, support_text_key)}")
+        logger.info(f"support_text: \n{sample[Fields.meta][MetaKeys.support_text]}")
 
     def test(self):
         # before runing this test, set below environment variables:

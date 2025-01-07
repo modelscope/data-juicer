@@ -4,14 +4,15 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
-from data_juicer.utils.common_utils import nested_access, nested_set
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 OP_NAME = 'relation_identity_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class RelationIdentityMapper(Mapper):
     """
@@ -40,9 +41,8 @@ class RelationIdentityMapper(Mapper):
                  api_model: str = 'gpt-4o',
                  source_entity: str = None,
                  target_entity: str = None,
-                 input_key: str = None,
-                 output_key: str = None,
                  *,
+                 output_key: str = MetaKeys.role_relation,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt_template: Optional[str] = None,
@@ -60,12 +60,8 @@ class RelationIdentityMapper(Mapper):
             identified.
         :param target_entity: The target entity of the relation to be
             identified.
-        :param input_key: The input field key in the samples. Support for
-            nested keys such as "__dj__stats__.text_len". It is text_key
-            in default.
-        :param output_key: The output field key in the samples. Support
-            for nested keys such as "__dj__stats__.text_len". It is
-            input_key in default.
+        :param output_key: The output key in the meta field in the
+            samples. It is 'role_relation' in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -89,8 +85,7 @@ class RelationIdentityMapper(Mapper):
         self.source_entity = source_entity
         self.target_entity = target_entity
 
-        self.input_key = input_key or self.text_key
-        self.output_key = output_key or self.input_key
+        self.output_key = output_key
 
         system_prompt_template = system_prompt_template or \
             self.DEFAULT_SYSTEM_PROMPT_TEMPLATE
@@ -125,9 +120,14 @@ class RelationIdentityMapper(Mapper):
         return relation
 
     def process_single(self, sample, rank=None):
+
+        meta = sample[Fields.meta]
+        if self.output_key in meta:
+            return sample
+
         client = get_model(self.model_key, rank=rank)
 
-        text = nested_access(sample, self.input_key)
+        text = sample[self.text_key]
         input_prompt = self.input_template.format(entity1=self.source_entity,
                                                   entity2=self.target_entity,
                                                   text=text)
@@ -148,7 +148,8 @@ class RelationIdentityMapper(Mapper):
             except Exception as e:
                 logger.warning(f'Exception: {e}')
 
-        sample = nested_set(sample, self.output_key, relation)
+        meta[self.output_key] = relation
+
         if self.drop_text:
             sample.pop(self.text_key)
 

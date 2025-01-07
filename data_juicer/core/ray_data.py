@@ -9,7 +9,7 @@ from loguru import logger
 
 from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
-from data_juicer.ops import Filter, Mapper
+from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.process_utils import calculate_np
@@ -62,18 +62,8 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
 
 
 def preprocess_dataset(dataset: rd.Dataset, dataset_path, cfg) -> rd.Dataset:
-    columns = dataset.columns()
     if dataset_path:
         dataset = set_dataset_to_absolute_path(dataset, dataset_path, cfg)
-    if Fields.stats not in columns:
-
-        def process_batch_arrow(table: pyarrow.Table) -> pyarrow.Table:
-            new_column_data = [{} for _ in range(len(table))]
-            new_talbe = table.append_column(Fields.stats, [new_column_data])
-            return new_talbe
-
-        dataset = dataset.map_batches(process_batch_arrow,
-                                      batch_format='pyarrow')
     return dataset
 
 
@@ -140,6 +130,17 @@ class RayDataset(DJDataset):
                                                       batch_format='pyarrow',
                                                       num_gpus=num_gpus)
             elif isinstance(op, Filter):
+                columns = self.data.columns()
+                if Fields.stats not in columns:
+
+                    def process_batch_arrow(table: pyarrow.Table):
+                        new_column_data = [{} for _ in range(len(table))]
+                        new_talbe = table.append_column(
+                            Fields.stats, [new_column_data])
+                        return new_talbe
+
+                    self.data = self.data.map_batches(process_batch_arrow,
+                                                      batch_format='pyarrow')
                 if op.use_cuda():
                     op_kwargs = op._op_cfg[op._name]
                     self.data = self.data.map_batches(
@@ -169,6 +170,8 @@ class RayDataset(DJDataset):
                                                       zero_copy_batch=True)
                 else:
                     self.data = self.data.filter(op.process)
+            elif isinstance(op, Deduplicator):
+                self.data = op.run(self.data)
             else:
                 logger.error(
                     'Ray executor only support Filter and Mapper OPs for now')

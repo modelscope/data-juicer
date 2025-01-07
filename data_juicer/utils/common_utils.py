@@ -63,26 +63,6 @@ def nested_access(data, path, digit_allowed=True):
     return data
 
 
-def nested_set(data: dict, path: str, val):
-    """
-        Set the val to the nested data in the dot-separated path.
-
-        :param data: A dictionary with nested format.
-        :param path: A dot-separated string representing the path to set.
-                    This can include numeric indices when setting list
-                    elements.
-        :return: The nested data after the val set.
-    """
-    keys = path.split('.')
-    cur = data
-    for key in keys[:-1]:
-        if key not in cur:
-            cur[key] = {}
-        cur = cur[key]
-    cur[keys[-1]] = val
-    return data
-
-
 def is_string_list(var):
     """
         return if the var is list of string.

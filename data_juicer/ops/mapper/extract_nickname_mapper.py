@@ -4,14 +4,15 @@ from typing import Dict, Optional
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
-from data_juicer.utils.constant import Fields
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 OP_NAME = 'extract_nickname_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractNicknameMapper(Mapper):
     """
@@ -50,7 +51,7 @@ class ExtractNicknameMapper(Mapper):
     def __init__(self,
                  api_model: str = 'gpt-4o',
                  *,
-                 nickname_key: str = Fields.nickname,
+                 nickname_key: str = MetaKeys.nickname,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt: Optional[str] = None,
@@ -64,8 +65,8 @@ class ExtractNicknameMapper(Mapper):
         """
         Initialization method.
         :param api_model: API model name.
-        :param nickname_key: The field name to store the nickname
-            relationship. It's "__dj__nickname__" in default.
+        :param nickname_key: The key name to store the nickname
+            relationship in the meta field. It's "nickname" in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -121,16 +122,21 @@ class ExtractNicknameMapper(Mapper):
         nickname_relations = list(set(nickname_relations))
 
         nickname_relations = [{
-            Fields.source_entity: nr[0],
-            Fields.target_entity: nr[1],
-            Fields.relation_description: nr[2],
-            Fields.relation_keywords: ['nickname'],
-            Fields.relation_strength: None
+            MetaKeys.source_entity: nr[0],
+            MetaKeys.target_entity: nr[1],
+            MetaKeys.relation_description: nr[2],
+            MetaKeys.relation_keywords: ['nickname'],
+            MetaKeys.relation_strength: None
         } for nr in nickname_relations]
 
         return nickname_relations
 
     def process_single(self, sample, rank=None):
+
+        # check if it's generated already
+        if self.nickname_key in sample[Fields.meta]:
+            return sample
+
         client = get_model(self.model_key, rank=rank)
 
         input_prompt = self.input_template.format(text=sample[self.text_key])
@@ -151,7 +157,7 @@ class ExtractNicknameMapper(Mapper):
             except Exception as e:
                 logger.warning(f'Exception: {e}')
 
-        sample[self.nickname_key] = nickname_relations
+        sample[Fields.meta][self.nickname_key] = nickname_relations
         if self.drop_text:
             sample.pop(self.text_key)
 

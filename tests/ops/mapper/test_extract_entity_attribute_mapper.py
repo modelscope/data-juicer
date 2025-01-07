@@ -7,9 +7,9 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.extract_entity_attribute_mapper import ExtractEntityAttributeMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 
-# Skip tests for this OP in the GitHub actions due to unknown DistNetworkError.
+# Skip tests for this OP.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
@@ -47,12 +47,12 @@ class ExtractEntityAttributeMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=1)
+        dataset = op.run(dataset)
         for sample in dataset:
-            ents = sample[Fields.main_entities]
-            attrs = sample[Fields.attributes]
-            descs = sample[Fields.attribute_descriptions]
-            sups = sample[Fields.attribute_support_texts]
+            ents = sample[Fields.meta][MetaKeys.main_entities]
+            attrs = sample[Fields.meta][MetaKeys.attributes]
+            descs = sample[Fields.meta][MetaKeys.attribute_descriptions]
+            sups = sample[Fields.meta][MetaKeys.attribute_support_texts]
             for ent, attr, desc, sup in zip(ents, attrs, descs, sups):
                 logger.info(f'{ent} {attr}: {desc}')
                 self.assertNotEqual(desc, '')
