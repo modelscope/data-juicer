@@ -111,7 +111,7 @@ dj-process --config demos/process_on_ray/configs/demo.yaml
 
 Data-Juicer will process the demo dataset with the demo config file and export the result datasets to the directory specified by the `export_path` argument in the config file.
 
-# Running Example of Distributed Deduplication
+### Running Example of Distributed Deduplication
 
 In the `dedup.yaml` config file, we set the executor type to "ray" and specify an automatic Ray address.
 And we use a dedicated distributed version of MinHash Deduplicator to deduplicate the dataset.
