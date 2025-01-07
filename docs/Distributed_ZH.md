@@ -6,7 +6,7 @@ Data-Juicer 支持基于 [Ray](https://github.com/ray-project/ray) 和阿里巴�
 
 经过专门的设计后，几乎所有在单机模式下实现的 Data-Juicer 算子都可以无缝地运行在 Ray 的分布式模式下。对于大规模场景，我们继续进行了针对计算引擎的特定优化，例如用于平衡文件和进程数目的数据子集分割策略，针对 Ray 和 Apache Arrow的 JSON 文件流式 I/O 补丁等。
 
-作为对比参考，我们在 25 到 100 个阿里云节点上进行实验，使用 Ray 模式下的 Data-Juicer 处理不同的数据集。在 6,400 个 CPU 核上处理包含 700 亿条样本的数据集只需要花费 2 小时，在 3,200 个 CPU 核上处理包含 70 亿条样本的数据集只需要花费 0.45 小时。此外，在 Ray 模式下，Data-Juicer 的一个基于 MinHash-LSH 的去重算子在有 1,280 个 CPU 核的 8 节点集群上对 TB 大小级别的数据集进行去重只需要 3 小时。 
+作为参考，我们在 25 到 100 个阿里云节点上进行了实验，使用 Ray 模式下的 Data-Juicer 处理不同的数据集。在 6,400 个 CPU 核上处理包含 700 亿条样本的数据集只需要花费 2 小时，在 3,200 个 CPU 核上处理包含 70 亿条样本的数据集只需要花费 0.45 小时。此外，在 Ray 模式下，对 TB 大小级别的数据集，Data-Juicer 的 MinHash-LSH 去重算子在 1,280 个 CPU 核的 8 节点集群上进行去重只需 3 小时。 
 
 更多细节请参考我们的论文：[Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](arXiv_link_coming_soon) 。
 
@@ -15,24 +15,31 @@ https://img.alicdn.com/imgextra/i4/O1CN01uawwRu1JMSdafy5lF_!!6000000001014-2-tps
 
 ## 实现与优化
 
-### Data-Juicer 中的 Ray 模式
+### Data-Juicer 的 Ray 处理模式
 
-- 对于 Data-Juicer [算子](Operators.md)的大部分实现，核心处理函数是引擎无关的。[RayDataset](../data_juicer/core/ray_data.py) 和 [RayExecutor](../data_juicer/core/ray_executor.py) 保证了互通性，它们分别是基类 `DJDataset` 和 `BaseExecutor` 的子类，并且都支持 Ray [Tasks](https://docs.ray.io/en/latest/ray-core/tasks.html) 和 [Actors](https://docs.ray.io/en/latest/ray-core/actors.html) 。
-- 其中，去重算子是例外。它们在单机模式下很难规模化。因此我们提供了针对它们的 Ray 版本算子，它们都已独特的前缀开头：[`ray_xx_deduplication`](../data_juicer/ops/deduplicator/) 。
+- 对于 Data-Juicer 的大部分[算子](Operators.md)实现，其核心处理函数是引擎无关的。[RayDataset](../data_juicer/core/ray_data.py) 和 [RayExecutor](../data_juicer/core/ray_executor.py) 封装了与Ray引擎的具体互操作，它们分别是基类 `DJDataset` 和 `BaseExecutor` 的子类，并且都支持 Ray [Tasks](https://docs.ray.io/en/latest/ray-core/tasks.html) 和 [Actors](https://docs.ray.io/en/latest/ray-core/actors.html) 。
+- 其中，去重算子是例外。它们在单机模式下很难规模化。因此我们提供了针对它们的 Ray 优化版本算子，并以特殊前缀开头：[`ray_xx_deduplicator`](../data_juicer/ops/deduplicator/) 。
 
-### 子集分割
+### 数据子集分割
 
-当在上万个节点中处理仅有若干个文件的数据集时， Ray 会根据可用资源分割数据集文件，并将它们分发到所有节点上，带来了极大的网络通信开销并减少了 CPU 利用率。更多细节可以参考文档 [Ray's autodetect_parallelism](https://github.com/ray-project/ray/blob/2dbd08a46f7f08ea614d8dd20fd0bca5682a3078/python/ray/data/_internal/util.py#L201-L205) 和 [tuning output blocks for Ray](https://docs.ray.io/en/latest/data/performance-tips.html#tuning-output-blocks-for-read) 。
+当在上万个节点中处理仅有若干个文件的数据集时， Ray 会根据可用资源分割数据集文件，并将它们分发到所有节点上，这可能带来极大的网络通信开销并减少 CPU 利用率。更多细节可以参考文档 [Ray's autodetect_parallelism](https://github.com/ray-project/ray/blob/2dbd08a46f7f08ea614d8dd20fd0bca5682a3078/python/ray/data/_internal/util.py#L201-L205) 和 [tuning output blocks for Ray](https://docs.ray.io/en/latest/data/performance-tips.html#tuning-output-blocks-for-read) 。
 
-为了优化性能，考虑到 Arrow 和 Ray 的特性，我们提前并自动地将原始数据集分割为小文件。默认情况下，如果子文件的数目超过了集群中 CPU 核的总数的 5 倍，则单个自文件的大小被设置为了 128MB 。
+这种默认执行计划可能非常低效，尤其是在节点数量较多的情况下。为了优化此类情况的性能，我们考虑到 Ray 和 Arrow 的特性，提前将原始数据集自动拆分为较小的文件。当用户遇到此类性能问题时，他们可以利用此功能或根据偏好自己拆分数据集。在我们的自动拆分策略中，单个文件大小设置为 128MB，且结果应确保 拆分后的子文件数量 至少是 集群中可用CPU核心总数 的两倍。
+
 
 ### JSON 文件的流式读取
 
 为了解决 Ray Dataset 类底层框架 Arrow 对流式读取 JSON 数据的原生支持的缺失，我们开发了一个流式载入的接口并贡献到了一个针对 Apache Arrow 的内部 [补丁](https://github.com/modelscope/data-juicer/pull/515)（ [相关 PR](https://github.com/apache/arrow/pull/45084) ） 。这个补丁可以缓解内存不够的问题。
 
+
+流式读取 JSON 文件是基础模型数据处理中的常见要求，因为许多数据集都以 JSONL 格式存储，并且尺寸巨大。
+但是，Ray Datasets 中当前的实现不支持流式读取 JSON 文件，根因来源于其底层 Arrow 库（截至 Ray 版本 2.40 和 Arrow 版本 18.1.0）。
+
+为了解决不支持流式 JSON 数据的原生读取问题，我们开发了一个流式加载接口，并为 Apache Arrow 贡献了一个第三方 [补丁](https://github.com/modelscope/data-juicer/pull/515)（[PR 到 repo](https://github.com/apache/arrow/pull/45084)）。这将有助于缓解内存不足问题。使用此补丁后， Data-Juicer 的Ray模式将默认使用流式加载接口加载 JSON 文件。此外，如果输入变为 CSV 和 Parquet 文件，Ray模式下流式读取已经会自动开启。
+
 ### 去重
 
-在 Ray 模式下，我们提供了一个优化过的基于 MinHash-LSH 的去重算子。我们使用 Ray Actors 实现了一个多进程的并查集和一个负载均衡的分布式算法 [BTS](https://ieeexplore.ieee.org/document/10598116) 来完成等价类合并操作。这个算子可以在 1,280 个CPU核上对 TB 大小级别的数据集去重只需要 3 个小时。我们的消融实验还表明相比于这个去重算子的初始版本，这些专门的优化项可以带来 2-3 倍的提速。
+在 Ray 模式下，我们提供了一个优化过的基于 MinHash-LSH 的去重算子。我们使用 Ray Actors 实现了一个多进程的并查集和一个负载均衡的分布式算法 [BTS](https://ieeexplore.ieee.org/document/10598116) 来完成等价类合并操作。这个算子在 1,280 个CPU核上对 TB 大小级别的数据集去重只需要 3 个小时。我们的消融实验还表明相比于这个去重算子的初始实现版本，这些专门的优化项可以带来 2-3 倍的提速。
 
 ## 性能结果
 
