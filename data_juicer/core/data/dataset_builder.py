@@ -2,12 +2,16 @@ import os
 import shlex
 from typing import List, Tuple, Union
 
+import numpy as np
+from datasets import concatenate_datasets
+
 from data_juicer.core.data import NestedDataset
 from data_juicer.core.data.config_validator import ConfigValidationError
 from data_juicer.core.data.data_validator import DataValidatorRegistry
 from data_juicer.core.data.load_strategy import DataLoadStrategyRegistry
 from data_juicer.core.data.ray_dataset import RayDataset
 from data_juicer.utils.file_utils import is_absolute_path
+from data_juicer.utils.sample import random_sample
 
 
 class DatasetBuilder(object):
@@ -60,8 +64,6 @@ class DatasetBuilder(object):
             raise ConfigValidationError(
                 'Multiple remote datasets are not supported')
 
-        self.max_sample_num = ds_configs.get('max_sample_num', None)
-
         # initialize the data load strategies
         self.load_strategies = []
         for ds_config in ds_configs['configs']:
@@ -70,7 +72,16 @@ class DatasetBuilder(object):
             data_source = ds_config.get('source', None)
             self.load_strategies.append(
                 DataLoadStrategyRegistry.get_strategy_class(
-                    self.executor_type, data_type, data_source)(ds_config))
+                    self.executor_type, data_type, data_source)(ds_config,
+                                                                cfg=self.cfg))
+
+        # initialzie the sample numbers
+        self.max_sample_num = ds_configs.get('max_sample_num', None)
+        # get weights and sample numbers
+        if self.max_sample_num is not None:
+            self.weights = [stra.weight for stra in self.load_strategies]
+            self.sample_numbers = get_sample_numbers(self.weights,
+                                                     self.max_sample_num)
 
         # initialize data validators
         self.validators = []
@@ -82,24 +93,30 @@ class DatasetBuilder(object):
                 if validator_cls:
                     self.validators.append(validator_cls(validator_config))
 
-    def load_dataset(self) -> Union[NestedDataset, RayDataset]:
+    def load_dataset(self, **kwargs) -> Union[NestedDataset, RayDataset]:
         _datasets = []
 
-        for stra in self.load_strategies:
+        # load datasets with sample numbers
+        for stra, weight, sample_num in zip(self.load_strategies, self.weights,
+                                            self.sample_numbers):
             # load dataset with its load strategy
-            dataset = stra.load_data(self.cfg)
-            sampled = self.random_sample(dataset, stra.weight)
-
-            # deal with sampling
-            if stra.sampling_strategy:
-                None
+            dataset = stra.load_data(**kwargs)
 
             # do data validation
             for validator in self.validators:
-                validator.validate(sampled)
-            _datasets.append(sampled)
+                validator.validate(dataset)
 
-        return _datasets[0]
+            # do data sampling, if necessary
+            if self.max_sample_num is not None:
+                dataset = random_sample(dataset, weight, sample_num)
+
+            _datasets.append(dataset)
+
+        # handle data mixture
+        if self.executor_type == 'local':
+            return NestedDataset(concatenate_datasets(_datasets))
+        elif self.executor_type == 'ray':
+            return RayDataset(_datasets[0], )
 
     @classmethod
     def load_dataset_by_generated_config(cls, generated_dataset_config):
@@ -189,3 +206,25 @@ def parse_cli_datapath(dataset_path) -> Tuple[List[str], List[float]]:
             prefixes.append(value)
 
     return prefixes, weights
+
+
+def get_sample_numbers(weights, max_sample_num):
+    sample_numbers = [0] * len(weights)
+
+    # Normalize weights
+    weights = np.array(weights, dtype=np.float64)
+    sum_weights = np.sum(weights)
+    assert sum_weights > 0.0
+    weights /= sum_weights
+    sample_num_per_dataset = [
+        int(np.ceil(max_sample_num * weight)) for weight in weights
+    ]
+
+    # Adjust
+    acc_sample_numbers = 0
+    for i in range(len(sample_num_per_dataset)):
+        sample_numbers[i] = min(sample_num_per_dataset[i],
+                                max_sample_num - acc_sample_numbers)
+        acc_sample_numbers += sample_numbers[i]
+
+    return sample_numbers

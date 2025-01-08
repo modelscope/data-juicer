@@ -4,9 +4,13 @@ from argparse import Namespace
 from dataclasses import dataclass
 from typing import Dict, Optional, Type, Union
 
+import datasets
+
 from data_juicer.core.data import DJDataset, RayDataset
 from data_juicer.core.data.config_validator import ConfigValidator
 from data_juicer.download.downloader import validate_snapshot_format
+from data_juicer.format.formatter import unify_format
+from data_juicer.format.load import load_formatter
 from data_juicer.utils.lazy_loader import LazyLoader
 
 ray = LazyLoader('ray', 'ray')
@@ -46,13 +50,14 @@ class DataLoadStrategy(ABC, ConfigValidator):
     abstract class for data load strategy
     """
 
-    def __init__(self, ds_config: Dict):
+    def __init__(self, ds_config: Dict, cfg: Namespace):
         self.validate_config(ds_config)
         self.ds_config = ds_config
+        self.cfg = cfg
         self.weight = ds_config.get('weight', 1.0)  # default weight is 1.0
 
     @abstractmethod
-    def load_data(self, cfg: Namespace) -> Union[DJDataset, RayDataset]:
+    def load_data(self, **kwargs) -> Union[DJDataset, RayDataset]:
         pass
 
 
@@ -144,7 +149,7 @@ class RayDataLoadStrategy(DataLoadStrategy):
     """
 
     @abstractmethod
-    def load_data(self) -> RayDataset:
+    def load_data(self, **kwargs) -> RayDataset:
         pass
 
 
@@ -154,7 +159,7 @@ class LocalDataLoadStrategy(DataLoadStrategy):
     """
 
     @abstractmethod
-    def load_data(self, cfg: Namespace) -> DJDataset:
+    def load_data(self, **kwargs) -> DJDataset:
         pass
 
 
@@ -177,12 +182,12 @@ class RayOndiskJsonDataLoadStrategy(RayDataLoadStrategy):
     CONFIG_VALIDATION_RULES = {
         'required_fields': ['path'],
         'field_types': {
-            'path': (str, list)  # Can be string or list
+            'path': str
         },
         'custom_validators': {}
     }
 
-    def load_data(self, cfg: Namespace):
+    def load_data(self, **kwargs):
         return rd.read_json(self.ds_config.path)
 
 
@@ -192,12 +197,12 @@ class RayHuggingfaceDataLoadStrategy(RayDataLoadStrategy):
     CONFIG_VALIDATION_RULES = {
         'required_fields': ['path'],
         'field_types': {
-            'path': (str, list)  # Can be string or list
+            'path': str
         },
         'custom_validators': {}
     }
 
-    def load_data(self, cfg: Namespace):
+    def load_data(self, **kwargs):
         raise NotImplementedError(
             'Huggingface data load strategy is not implemented')
 
@@ -212,13 +217,18 @@ class LocalOndiskDataLoadStrategy(LocalDataLoadStrategy):
     CONFIG_VALIDATION_RULES = {
         'required_fields': ['path'],
         'field_types': {
-            'path': (str, list)  # Can be string or list
+            'path': str
         },
         'custom_validators': {}
     }
 
-    def load_data(self, cfg: Namespace):
-        pass
+    def load_data(self, **kwargs):
+        # use proper formatter to load data; kwargs are ignored
+        formatter = load_formatter(dataset_path=self.ds_config.path,
+                                   suffixes=self.cfg.suffixes,
+                                   text_keys=self.cfg.text_keys,
+                                   add_suffix=self.cfg.add_suffix)
+        return formatter.load_data()
 
 
 @DataLoadStrategyRegistry.register('local', 'remote', 'huggingface')
@@ -229,15 +239,22 @@ class LocalHuggingfaceDataLoadStrategy(LocalDataLoadStrategy):
 
     CONFIG_VALIDATION_RULES = {
         'required_fields': ['path'],
+        'optional_fields': ['split', 'limit', 'name'],
         'field_types': {
-            'path': (str, list)  # Can be string or list
+            'path': str
         },
         'custom_validators': {}
     }
 
-    def load_data(self, cfg: Namespace):
-        raise NotImplementedError(
-            'Huggingface data load strategy is not implemented')
+    def load_data(self, **kwargs):
+        num_proc = kwargs.get('num_proc', 1)
+        ds = datasets.load_dataset(self.ds_config.path,
+                                   split=self.ds_config.split,
+                                   name=self.ds_config.name,
+                                   limit=self.ds_config.limit,
+                                   num_proc=num_proc,
+                                   **kwargs)
+        ds = unify_format(ds, text_keys=self.text_keys, num_proc=num_proc)
 
 
 @DataLoadStrategyRegistry.register('local', 'remote', 'modelscope')
@@ -246,7 +263,7 @@ class LocalModelScopeDataLoadStrategy(LocalDataLoadStrategy):
     data load strategy for ModelScope dataset for LocalExecutor
     """
 
-    def load_data(self, cfg: Namespace):
+    def load_data(self):
         raise NotImplementedError(
             'ModelScope data load strategy is not implemented')
 
@@ -260,12 +277,12 @@ class LocalArxivDataLoadStrategy(LocalDataLoadStrategy):
     CONFIG_VALIDATION_RULES = {
         'required_fields': ['path'],
         'field_types': {
-            'path': (str, list)  # Can be string or list
+            'path': (str)  # has to be a string
         },
         'custom_validators': {}
     }
 
-    def load_data(self, cfg: Namespace):
+    def load_data(self):
         raise NotImplementedError(
             'Arxiv data load strategy is not implemented')
 
@@ -279,12 +296,12 @@ class LocalWikiDataLoadStrategy(LocalDataLoadStrategy):
     CONFIG_VALIDATION_RULES = {
         'required_fields': ['path'],
         'field_types': {
-            'path': (str, list)  # Can be string or list
+            'path': str
         },
         'custom_validators': {}
     }
 
-    def load_data(self, cfg: Namespace):
+    def load_data(self):
         raise NotImplementedError('Wiki data load strategy is not implemented')
 
 
@@ -308,6 +325,6 @@ class LocalCommonCrawlDataLoadStrategy(LocalDataLoadStrategy):
         }
     }
 
-    def load_data(self, cfg: Namespace):
+    def load_data(self):
         raise NotImplementedError(
             'CommonCrawl data load strategy is not implemented')

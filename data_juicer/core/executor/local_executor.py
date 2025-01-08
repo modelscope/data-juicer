@@ -113,7 +113,7 @@ class LocalExecutor(ExecutorBase):
             logger.info('Loading dataset from dataset builder...')
             if load_data_np is None:
                 load_data_np = self.cfg.np
-            dataset = self.dataset_builder.load_dataset()
+            dataset = self.dataset_builder.load_dataset(num_proc=load_data_np)
 
         # 2. extract processes and optimize their orders
         logger.info('Preparing process operators...')

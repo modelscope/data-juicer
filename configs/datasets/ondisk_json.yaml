@@ -3,5 +3,4 @@ project_name: 'dataset-ondisk-json'
 dataset:
   configs:
     - type: 'ondisk'
-      path:
-        - 'path/to/json/file'
+      path: 'path/to/json/file'

@@ -4,9 +4,7 @@ dataset:
   configs:
     - type: 'local'
       weight: 1.0
-      path:
-        - 'path/to/json/file'
+      path: 'path/to/json/file'
     - type: 'local'
       weight: 1.0
-      files:
-        - 'path/to/csv/file'
+      files: 'path/to/csv/file'

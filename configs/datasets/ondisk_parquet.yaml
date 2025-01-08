@@ -3,5 +3,4 @@ project_name: 'dataset-ondisk-parquet'
 dataset:
   configs:
     - type: 'ondisk'
-      path:
-        - 'path/to/parquet/file'
+      path: 'path/to/parquet/file'
