@@ -15,7 +15,7 @@ from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.process_utils import calculate_np
 
 rd = LazyLoader('rd', 'ray.data')
-ds = LazyLoader('ds', 'ray.data.datasource')
+ds = LazyLoader('ds', 'ray.data.read_api')
 
 
 def get_abs_path(path, dataset_dir):
@@ -235,7 +235,7 @@ def read_json_stream(
     arrow_open_stream_args: Optional[Dict[str, Any]] = None,
     meta_provider=None,
     partition_filter=None,
-    partitioning=ds.partitioning.Partitioning('hive'),
+    partitioning=ds.Partitioning('hive'),
     include_paths: bool = False,
     ignore_missing_paths: bool = False,
     shuffle: Union[Literal['files'], None] = None,
@@ -245,7 +245,7 @@ def read_json_stream(
     **arrow_json_args,
 ) -> rd.Dataset:
     if meta_provider is None:
-        meta_provider = ds.file_meta_provider.DefaultFileMetadataProvider()
+        meta_provider = ds.DefaultFileMetadataProvider()
 
     datasource = JSONStreamDatasource(
         paths,
