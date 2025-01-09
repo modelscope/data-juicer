@@ -1,0 +1,6 @@
+project_name: 'dataset-ondisk-json'
+dataset:
+  configs:
+    - type: 'ondisk'
+      path:
+        - 'sample.json'

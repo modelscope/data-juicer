@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from data_juicer.format import load_formatter
+from data_juicer.core.data.dataset_builder import DatasetBuilder
 
 if st.__version__ >= '1.23.0':
     data_editor = st.data_editor
@@ -96,8 +96,7 @@ class Visualize:
                     ' '.join([str(weight), ds_file])
                     for ds_file, weight in zip(ds_files, weights)
                 ])
-                formatter = load_formatter(data_path)
-                df = pd.DataFrame(formatter.load_dataset())
+                df = pd.DataFrame(DatasetBuilder(data_path).load_dataset())
 
                 st.session_state.dataset = df
             else:
