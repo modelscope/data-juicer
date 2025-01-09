@@ -3,12 +3,13 @@ import shutil
 import time
 from typing import Optional
 
+from jsonargparse import Namespace
 from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
-from data_juicer.core.executor import ExecutorType
+from data_juicer.core.executor import ExecutorBase, ExecutorType
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -32,7 +33,7 @@ class TempDirManager:
             shutil.rmtree(self.tmp_dir)
 
 
-class RayExecutor:
+class RayExecutor(ExecutorBase):
     """
     Executor based on Ray.
 
@@ -44,7 +45,7 @@ class RayExecutor:
 
     """
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: Optional[Namespace] = None):
         """
         Initialization method.
 
