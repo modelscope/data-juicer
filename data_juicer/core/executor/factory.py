@@ -1,16 +1,15 @@
 from typing import Union
 
-from .local_executor import LocalExecutor
+from .local_executor import Executor
 from .ray_executor import RayExecutor
 
 
 class ExecutorFactory:
 
     @staticmethod
-    def create_executor(
-            executor_type: str) -> Union[LocalExecutor, RayExecutor]:
-        if executor_type == 'local':
-            return LocalExecutor()
+    def create_executor(executor_type: str) -> Union[Executor, RayExecutor]:
+        if executor_type in ('local', 'default'):
+            return Executor()
         elif executor_type == 'ray':
             return RayExecutor()
         # TODO: add nemo support

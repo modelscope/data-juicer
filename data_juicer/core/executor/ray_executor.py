@@ -7,7 +7,8 @@ from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.core.adapter import Adapter
-from data_juicer.core.data.ray_dataset import RayDataset
+from data_juicer.core.data.dataset_builder import DatasetBuilder
+from data_juicer.core.executor import ExecutorType
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -60,6 +61,10 @@ class RayExecutor:
         self.tmp_dir = os.path.join(self.work_dir, '.tmp',
                                     ray.get_runtime_context().get_job_id())
 
+        # init dataset builder
+        self.datasetbuilder = DatasetBuilder(self.cfg,
+                                             executor_type=ExecutorType.RAY)
+
     def run(self,
             load_data_np: Optional[PositiveInt] = None,
             skip_return=False):
@@ -72,20 +77,8 @@ class RayExecutor:
         """
         # 1. load data
         logger.info('Loading dataset with Ray...')
+        dataset = self.datasetbuilder.load_dataset()
 
-        if self.cfg.get('generated_dataset_config', None):
-            generated_dataset_config = self.cfg.generated_dataset_config
-            assert isinstance(generated_dataset_config,
-                              dict) and 'type' in generated_dataset_config
-            args = generated_dataset_config.copy()
-            obj_name = args.pop('type')
-            from data_juicer.format.formatter import FORMATTERS
-            dataset = FORMATTERS.modules[obj_name](**args).load_dataset()
-        else:
-            dataset = RayDataset.read_json(self.cfg.dataset_path)
-
-        # convert all the path in dataset to absolute path
-        dataset = RayDataset(dataset, self.cfg.dataset_path, self.cfg)
         # 2. extract processes
         logger.info('Preparing process operators...')
         ops = load_ops(self.cfg.process)

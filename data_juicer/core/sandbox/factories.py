@@ -1,5 +1,5 @@
 from data_juicer.core import Analyzer as DJAnalyzer
-from data_juicer.core.executor import LocalExecutor as DJExecutor
+from data_juicer.core.executor import Executor as DJExecutor
 from data_juicer.core.sandbox.evaluators import (Gpt3QualityEvaluator,
                                                  InceptionEvaluator,
                                                  VBenchEvaluator)

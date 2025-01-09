@@ -7,12 +7,12 @@ from jsonargparse import Namespace
 from loguru import logger
 from pydantic import PositiveInt
 
+from data_juicer.core import ExecutorType
 from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.exporter import Exporter
 from data_juicer.core.tracer import Tracer
-from data_juicer.format.load import load_formatter
 from data_juicer.ops import OPERATORS, load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.ops.selector import (FrequencySpecifiedFieldSelector,
@@ -22,7 +22,7 @@ from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.sample import random_sample
 
 
-class LocalExecutor(ExecutorBase):
+class Executor(ExecutorBase):
     """
     This Executor class is used to process a specific dataset.
 
@@ -53,13 +53,8 @@ class LocalExecutor(ExecutorBase):
 
         # setup dataset builder
         logger.info('Setting up dataset builder...')
-        self.formatter = load_formatter(
-            dataset_path=self.cfg.dataset_path,
-            generated_dataset_config=self.cfg.generated_dataset_config,
-            text_keys=self.cfg.text_keys,
-            suffixes=self.cfg.suffixes,
-            add_suffix=self.cfg.add_suffix)
-        self.dataset_builder = DatasetBuilder(cfg)
+        self.dataset_builder = DatasetBuilder(cfg,
+                                              executor_type=ExecutorType.LOCAL)
 
         # whether to use checkpoint mechanism. If it's true, Executor will
         # check if there are existing checkpoints first and try to load the

@@ -1,7 +1,8 @@
 from .adapter import Adapter
 from .analyzer import Analyzer
 from .data import NestedDataset
-from .executor import ExecutorBase, ExecutorFactory, LocalExecutor, RayExecutor
+from .executor import (Executor, ExecutorBase, ExecutorFactory, ExecutorType,
+                       RayExecutor)
 from .exporter import Exporter
 from .monitor import Monitor
 from .tracer import Tracer
@@ -11,9 +12,10 @@ __all__ = [
     'Analyzer',
     'NestedDataset',
     'ExecutorFactory',
-    'LocalExecutor',
+    'Executor',
     'RayExecutor',
     'ExecutorBase',
+    'ExecutorType',
     'Exporter',
     'Monitor',
     'Tracer',

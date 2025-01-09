@@ -21,7 +21,7 @@ class DatasetBuilder(object):
     DatasetBuilder is a class that builds a dataset from a configuration.
     """
 
-    def __init__(self, cfg: Namespace, executor_type: str):
+    def __init__(self, cfg: Namespace, executor_type: str = 'local'):
         # if generated_dataset_config present, prioritize
         if cfg.generated_dataset_config:
             self.use_generated_dataset_config = True
