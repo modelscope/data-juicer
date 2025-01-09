@@ -56,6 +56,10 @@ class ExtractEntityRelationMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(samples)
         dataset = op.run(dataset)
         sample = dataset[0]
+        self.assertIn(MetaKeys.entity, sample[Fields.meta])
+        self.assertIn(MetaKeys.relation, sample[Fields.meta])
+        self.assertNotEqual(len(sample[Fields.meta][MetaKeys.entity]), 0)
+        self.assertNotEqual(len(sample[Fields.meta][MetaKeys.relation]), 0)
         logger.info(f"entitis: {sample[Fields.meta][MetaKeys.entity]}")
         logger.info(f"relations: {sample[Fields.meta][MetaKeys.relation]}")
 
