@@ -6,8 +6,8 @@ from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Aggregator
 from data_juicer.utils.common_utils import (avg_split_string_list_under_limit,
-                                            is_string_list, nested_access,
-                                            nested_set)
+                                            is_string_list)
+from data_juicer.utils.constant import BatchMetaKeys, Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from .nested_aggregator import NestedAggregator
@@ -53,8 +53,8 @@ class EntityAttributeAggregator(Aggregator):
                  api_model: str = 'gpt-4o',
                  entity: str = None,
                  attribute: str = None,
-                 input_key: str = None,
-                 output_key: str = None,
+                 input_key: str = MetaKeys.event_description,
+                 output_key: str = BatchMetaKeys.entity_attribute,
                  word_limit: PositiveInt = 100,
                  max_token_num: Optional[PositiveInt] = None,
                  *,
@@ -73,12 +73,10 @@ class EntityAttributeAggregator(Aggregator):
         :param api_model: API model name.
         :param entity: The given entity.
         :param attribute: The given attribute.
-        :param input_key: The input field key in the samples. Support for
-            nested keys such as "__dj__stats__.text_len". It is text_key
-            in default.
-        :param output_key: The output field key in the samples. Support for
-            nested keys such as "__dj__stats__.text_len". It is same as the
-            input_key in default.
+        :param input_key: The input key in the meta field of the samples.
+            It is "event_description" in default.
+        :param output_key: The output key in the aggregation field of the
+            samples. It is "entity_attribute" in default.
         :param word_limit: Prompt the output length.
         :param max_token_num: The max token num of the total tokens of the
             sub documents. Without limitation if it is None.
@@ -103,8 +101,8 @@ class EntityAttributeAggregator(Aggregator):
 
         self.entity = entity
         self.attribute = attribute
-        self.input_key = input_key or self.text_key
-        self.output_key = output_key or self.input_key
+        self.input_key = input_key
+        self.output_key = output_key
         self.word_limit = word_limit
         self.max_token_num = max_token_num
 
@@ -131,7 +129,7 @@ class EntityAttributeAggregator(Aggregator):
                                        **model_params)
 
         self.try_num = try_num
-        self.nested_sum = NestedAggregator(model=api_model,
+        self.nested_sum = NestedAggregator(api_model=api_model,
                                            max_token_num=max_token_num,
                                            api_endpoint=api_endpoint,
                                            response_path=response_path,
@@ -185,12 +183,21 @@ class EntityAttributeAggregator(Aggregator):
 
     def process_single(self, sample=None, rank=None):
 
-        # if not batched sample
-        sub_docs = nested_access(sample, self.input_key)
-        if not is_string_list(sub_docs):
+        if self.output_key in sample[Fields.batch_meta]:
             return sample
 
-        sample = nested_set(sample, self.output_key,
-                            self.attribute_summary(sub_docs, rank=rank))
+        if Fields.meta not in sample or self.input_key not in sample[
+                Fields.meta][0]:
+            logger.warning('The input key does not exist in the sample!')
+            return sample
+
+        sub_docs = [d[self.input_key] for d in sample[Fields.meta]]
+        # if not batched sample
+        if not is_string_list(sub_docs):
+            logger.warning('Require string meta as input!')
+            return sample
+
+        sample[Fields.batch_meta][self.output_key] = self.attribute_summary(
+            sub_docs, rank=rank)
 
         return sample

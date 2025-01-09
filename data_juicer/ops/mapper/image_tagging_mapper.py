@@ -2,7 +2,7 @@ from collections import Counter
 
 import numpy as np
 
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import load_data_with_context, load_image
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -27,13 +27,13 @@ class ImageTaggingMapper(Mapper):
     _accelerator = 'cuda'
 
     def __init__(self,
-                 tag_field_name: str = Fields.image_tags,
+                 tag_field_name: str = MetaKeys.image_tags,
                  *args,
                  **kwargs):
         """
         Initialization method.
         :param tag_field_name: the field name to store the tags. It's
-            "__dj__image_tags__" in default.
+            "image_tags" in default.
         :param args: extra args
         :param kwargs: extra args
         """

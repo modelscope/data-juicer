@@ -79,7 +79,7 @@ def check_model(model_name, force=False):
         download again forcefully.
     """
     # check for local model
-    if os.path.exists(model_name):
+    if not force and os.path.exists(model_name):
         return model_name
 
     if not os.path.exists(DJMC):
@@ -613,6 +613,7 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
             output_attentions: Optional[bool] = None,
             output_hidden_states: Optional[bool] = None,
             return_dict: Optional[bool] = None,
+            interpolate_pos_encoding: bool = False,
         ) -> Union[tuple,
                    transformers.modeling_outputs.BaseModelOutputWithPooling]:
             """Flatten `pixel_values` along the batch and time dimension,
@@ -654,6 +655,7 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
                 output_attentions=output_attentions,
                 output_hidden_states=output_hidden_states,
                 return_dict=True,
+                interpolate_pos_encoding=interpolate_pos_encoding,
             )
 
             # now restore the original dimensions

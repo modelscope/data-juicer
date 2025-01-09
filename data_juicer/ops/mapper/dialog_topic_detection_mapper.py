@@ -1,11 +1,10 @@
 import re
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from loguru import logger
 from pydantic import NonNegativeInt, PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
-from data_juicer.utils.common_utils import nested_set
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -13,14 +12,13 @@ OP_NAME = 'dialog_topic_detection_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class DialogTopicDetectionMapper(Mapper):
     """
     Mapper to generate user's topic labels in dialog. Input from
     history_key, query_key and response_key. Output lists of
-    labels and analysis for queries in the dialog, which is
-    store in 'dialog_sentiment_labels' and
-    'dialog_sentiment_labels_analysis' in Data-Juicer meta field.
+    labels and analysis for queries in the dialog.
     """
 
     DEFAULT_SYSTEM_PROMPT = ('请判断用户和LLM多轮对话中用户所讨论的话题。\n'
@@ -47,6 +45,7 @@ class DialogTopicDetectionMapper(Mapper):
                              '。\n')
     DEFAULT_QUERY_TEMPLATE = '用户：{query}\n'
     DEFAULT_RESPONSE_TEMPLATE = 'LLM：{response}\n'
+    DEFAULT_CANDIDATES_TEMPLATE = '备选话题类别：[{candidate_str}]'
     DEFAULT_ANALYSIS_TEMPLATE = '话题分析：{analysis}\n'
     DEFAULT_LABELS_TEMPLATE = '话题类别：{labels}\n'
     DEFAULT_ANALYSIS_PATTERN = '话题分析：(.*?)\n'
@@ -54,13 +53,17 @@ class DialogTopicDetectionMapper(Mapper):
 
     def __init__(self,
                  api_model: str = 'gpt-4o',
+                 topic_candidates: Optional[List[str]] = None,
                  max_round: NonNegativeInt = 10,
                  *,
+                 labels_key: str = MetaKeys.dialog_topic_labels,
+                 analysis_key: str = MetaKeys.dialog_topic_labels_analysis,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt: Optional[str] = None,
                  query_template: Optional[str] = None,
                  response_template: Optional[str] = None,
+                 candidate_template: Optional[str] = None,
                  analysis_template: Optional[str] = None,
                  labels_template: Optional[str] = None,
                  analysis_pattern: Optional[str] = None,
@@ -73,8 +76,15 @@ class DialogTopicDetectionMapper(Mapper):
         Initialization method.
 
         :param api_model: API model name.
+        :param topic_candidates: The output topic candidates. Use
+            open-domain topic labels if it is None.
         :param max_round: The max num of round in the dialog to build the
             prompt.
+        :param labels_key: The key name in the meta field to store the
+            output labels. It is 'dialog_topic_labels' in default.
+        :param analysis_key: The key name in the meta field to store the
+            corresponding analysis. It is 'dialog_topic_labels_analysis'
+            in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -83,13 +93,15 @@ class DialogTopicDetectionMapper(Mapper):
             prompt.
         :param response_template: Template for response part to build the
             input prompt.
+        :param candidate_template: Template for topic candidates to
+            build the input prompt.
         :param analysis_template: Template for analysis part to build the
             input prompt.
         :param labels_template: Template for labels part to build the
             input prompt.
-        :param analysis_pattern: Pattern to parse the return sentiment
+        :param analysis_pattern: Pattern to parse the return topic
             analysis.
-        :param labels_pattern: Pattern to parse the return sentiment
+        :param labels_pattern: Pattern to parse the return topic
             labels.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
@@ -100,12 +112,17 @@ class DialogTopicDetectionMapper(Mapper):
         """
         super().__init__(**kwargs)
 
+        self.topic_candidates = topic_candidates
         self.max_round = max_round
+        self.labels_key = labels_key
+        self.analysis_key = analysis_key
 
         self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
         self.query_template = query_template or self.DEFAULT_QUERY_TEMPLATE
         self.response_template = response_template or \
             self.DEFAULT_RESPONSE_TEMPLATE
+        self.candidate_template = candidate_template or \
+            self.DEFAULT_CANDIDATES_TEMPLATE
         self.analysis_template = analysis_template or \
             self.DEFAULT_ANALYSIS_TEMPLATE
         self.labels_template = labels_template or \
@@ -127,10 +144,14 @@ class DialogTopicDetectionMapper(Mapper):
 
     def build_input(self, history, query):
 
-        if self.max_round > 0:
-            input_prompt = ''.join(history[-self.max_round * 4:])
+        if self.topic_candidates:
+            input_prompt = self.candidate_template.format(
+                candidate_str=','.join(self.topic_candidates))
         else:
             input_prompt = ''
+
+        if self.max_round > 0:
+            input_prompt += ''.join(history[-self.max_round * 4:])
 
         input_prompt += self.query_template.format(query=query[0])
 
@@ -151,6 +172,11 @@ class DialogTopicDetectionMapper(Mapper):
         return analysis, labels
 
     def process_single(self, sample, rank=None):
+
+        meta = sample[Fields.meta]
+        if self.labels_key in meta and self.analysis_key in meta:
+            return sample
+
         client = get_model(self.model_key, rank=rank)
 
         analysis_list = []
@@ -192,9 +218,7 @@ class DialogTopicDetectionMapper(Mapper):
             history.append(self.labels_template.format(labels=labels))
             history.append(self.response_template.format(response=qa[1]))
 
-        analysis_key = f'{Fields.meta}.{MetaKeys.dialog_topic_labels_analysis}'  # noqa: E501
-        sample = nested_set(sample, analysis_key, analysis_list)
-        labels_key = f'{Fields.meta}.{MetaKeys.dialog_topic_labels}'
-        sample = nested_set(sample, labels_key, labels_list)
+        meta[self.labels_key] = labels_list
+        meta[self.analysis_key] = analysis_list
 
         return sample

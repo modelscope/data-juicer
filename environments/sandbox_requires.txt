@@ -18,5 +18,5 @@ imageio[ffmpeg]
 imageio[pyav]
 tensorboard
 diffusers==0.27.0
-transformers==4.37.2
+transformers>=4.37.2
 func_timeout

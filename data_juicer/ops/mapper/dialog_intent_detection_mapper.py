@@ -4,8 +4,7 @@ from typing import Dict, List, Optional
 from loguru import logger
 from pydantic import NonNegativeInt, PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
-from data_juicer.utils.common_utils import nested_set
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
@@ -13,14 +12,13 @@ OP_NAME = 'dialog_intent_detection_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class DialogIntentDetectionMapper(Mapper):
     """
     Mapper to generate user's intent labels in dialog. Input from
     history_key, query_key and response_key. Output lists of
-    labels and analysis for queries in the dialog, which is
-    store in 'dialog_intent_labels' and
-    'dialog_intent_labels_analysis' in Data-Juicer meta field.
+    labels and analysis for queries in the dialog.
     """
 
     DEFAULT_SYSTEM_PROMPT = (
@@ -60,6 +58,8 @@ class DialogIntentDetectionMapper(Mapper):
                  intent_candidates: Optional[List[str]] = None,
                  max_round: NonNegativeInt = 10,
                  *,
+                 labels_key: str = MetaKeys.dialog_intent_labels,
+                 analysis_key: str = MetaKeys.dialog_intent_labels_analysis,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  system_prompt: Optional[str] = None,
@@ -82,6 +82,11 @@ class DialogIntentDetectionMapper(Mapper):
             intent labels of the open domain if it is None.
         :param max_round: The max num of round in the dialog to build the
             prompt.
+        :param labels_key: The key name in the meta field to store the
+            output labels. It is 'dialog_intent_labels' in default.
+        :param analysis_key: The key name in the meta field to store the
+            corresponding analysis. It is 'dialog_intent_labels_analysis'
+            in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -111,6 +116,8 @@ class DialogIntentDetectionMapper(Mapper):
 
         self.intent_candidates = intent_candidates
         self.max_round = max_round
+        self.labels_key = labels_key
+        self.analysis_key = analysis_key
 
         self.system_prompt = system_prompt or self.DEFAULT_SYSTEM_PROMPT
         self.query_template = query_template or self.DEFAULT_QUERY_TEMPLATE
@@ -167,6 +174,11 @@ class DialogIntentDetectionMapper(Mapper):
         return analysis, labels
 
     def process_single(self, sample, rank=None):
+
+        meta = sample[Fields.meta]
+        if self.labels_key in meta and self.analysis_key in meta:
+            return sample
+
         client = get_model(self.model_key, rank=rank)
 
         analysis_list = []
@@ -208,9 +220,7 @@ class DialogIntentDetectionMapper(Mapper):
             history.append(self.labels_template.format(labels=labels))
             history.append(self.response_template.format(response=qa[1]))
 
-        analysis_key = f'{Fields.meta}.{MetaKeys.dialog_intent_labels_analysis}'  # noqa: E501
-        sample = nested_set(sample, analysis_key, analysis_list)
-        labels_key = f'{Fields.meta}.{MetaKeys.dialog_intent_labels}'
-        sample = nested_set(sample, labels_key, labels_list)
+        meta[self.labels_key] = labels_list
+        meta[self.analysis_key] = analysis_list
 
         return sample
