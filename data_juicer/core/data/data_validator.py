@@ -157,7 +157,8 @@ class RequiredFieldsValidator(DataValidator):
                 sample = dataset.data.take(sample_size)
                 values = [row[field] for row in sample]
             else:
-                raise NotImplementedError
+                raise NotImplementedError(
+                    f'Unsupported dataset type: {type(dataset)}')
 
             # Check for missing values
             missing_count = sum(1 for v in values if v is None)

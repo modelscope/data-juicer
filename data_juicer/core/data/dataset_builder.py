@@ -1,5 +1,6 @@
 import os
 import shlex
+from argparse import Namespace
 from typing import List, Tuple, Union
 
 import numpy as np
@@ -10,6 +11,7 @@ from data_juicer.core.data.config_validator import ConfigValidationError
 from data_juicer.core.data.data_validator import DataValidatorRegistry
 from data_juicer.core.data.load_strategy import DataLoadStrategyRegistry
 from data_juicer.core.data.ray_dataset import RayDataset
+from data_juicer.core.executor.base import ExecutorType
 from data_juicer.utils.file_utils import is_absolute_path
 from data_juicer.utils.sample import random_sample
 
@@ -19,11 +21,16 @@ class DatasetBuilder(object):
     DatasetBuilder is a class that builds a dataset from a configuration.
     """
 
-    def __init__(self, cfg, executor_type):
-        self.cfg = cfg
-        self.executor_type = executor_type
+    def __init__(self, cfg: Namespace, executor_type: str):
+        # if generated_dataset_config present, prioritize
+        if cfg.generated_dataset_config:
+            self.use_generated_dataset_config = True
+            self.generated_dataset_config = cfg.generated_dataset_config
+            return
 
-        # defaults to use dataset_path
+        self.cfg = cfg
+        self.executor_type = ExecutorType(executor_type)
+
         if cfg.dataset_path is not None:
             ds_configs = rewrite_cli_datapath(cfg.dataset_path)
         elif cfg.dataset is not None:
@@ -31,7 +38,8 @@ class DatasetBuilder(object):
         else:
             raise ConfigValidationError(
                 'Unable to initialize dataset; should have one of '
-                'dataset_path or dataset in configurations')
+                'generated_dataset_configdataset_path or dataset '
+                'in configurations')
 
         # validate dataset config for type constraints
         # TODO other constraints; ray dataset only supports ondisk, etc.
@@ -72,13 +80,13 @@ class DatasetBuilder(object):
             data_source = ds_config.get('source', None)
             self.load_strategies.append(
                 DataLoadStrategyRegistry.get_strategy_class(
-                    self.executor_type, data_type, data_source)(ds_config,
-                                                                cfg=self.cfg))
+                    self.executor_type.value, data_type,
+                    data_source)(ds_config, cfg=self.cfg))
 
         # initialzie the sample numbers
         self.max_sample_num = ds_configs.get('max_sample_num', None)
         # get weights and sample numbers
-        if self.max_sample_num is not None:
+        if self.max_sample_num:
             self.weights = [stra.weight for stra in self.load_strategies]
             self.sample_numbers = get_sample_numbers(self.weights,
                                                      self.max_sample_num)
@@ -94,8 +102,12 @@ class DatasetBuilder(object):
                     self.validators.append(validator_cls(validator_config))
 
     def load_dataset(self, **kwargs) -> Union[NestedDataset, RayDataset]:
-        _datasets = []
+        # if generated_dataset_config present, prioritize
+        if self.use_generated_dataset_config:
+            return DatasetBuilder.load_dataset_by_generated_config(
+                self.generated_dataset_config)
 
+        _datasets = []
         # load datasets with sample numbers
         for stra, weight, sample_num in zip(self.load_strategies, self.weights,
                                             self.sample_numbers):
@@ -107,16 +119,18 @@ class DatasetBuilder(object):
                 validator.validate(dataset)
 
             # do data sampling, if necessary
-            if self.max_sample_num is not None:
+            if self.max_sample_num:
                 dataset = random_sample(dataset, weight, sample_num)
 
             _datasets.append(dataset)
 
         # handle data mixture
-        if self.executor_type == 'local':
+        if self.executor_type == ExecutorType.LOCAL:
             return NestedDataset(concatenate_datasets(_datasets))
-        elif self.executor_type == 'ray':
-            return RayDataset(_datasets[0], )
+        elif self.executor_type == ExecutorType.RAY:
+            # TODO: support multiple datasets and mixing for ray
+            assert len(_datasets) == 1, 'Ray setup supports one dataset now'
+            return _datasets[0]
 
     @classmethod
     def load_dataset_by_generated_config(cls, generated_dataset_config):
