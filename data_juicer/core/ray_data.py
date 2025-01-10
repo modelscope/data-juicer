@@ -110,8 +110,8 @@ class RayDataset(DJDataset):
                                self.num_proc, op.use_cuda())
         num_gpus = get_num_gpus(op, op_proc)
 
-        if op._name in TAGGING_OPS.modules and Fields.meta not in self.data.columns(
-        ):
+        if (op._name in TAGGING_OPS.modules
+                and Fields.meta not in self.data.columns()):
 
             def process_batch_arrow(table: pyarrow.Table):
                 new_column_data = [{} for _ in range(len(table))]
