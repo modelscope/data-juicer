@@ -10,6 +10,7 @@ from loguru import logger
 from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
 from data_juicer.ops import Deduplicator, Filter, Mapper
+from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.process_utils import calculate_np
@@ -108,6 +109,18 @@ class RayDataset(DJDataset):
         op_proc = calculate_np(op._name, op.mem_required, op.cpu_required,
                                self.num_proc, op.use_cuda())
         num_gpus = get_num_gpus(op, op_proc)
+
+        if (op._name in TAGGING_OPS.modules
+                and Fields.meta not in self.data.columns()):
+
+            def process_batch_arrow(table: pyarrow.Table):
+                new_column_data = [{} for _ in range(len(table))]
+                new_talbe = table.append_column(Fields.meta, [new_column_data])
+                return new_talbe
+
+            self.data = self.data.map_batches(process_batch_arrow,
+                                              batch_format='pyarrow')
+
         try:
             batch_size = getattr(op, 'batch_size',
                                  1) if op.is_batched_op() else 1
