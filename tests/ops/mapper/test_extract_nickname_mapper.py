@@ -7,9 +7,9 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.extract_nickname_mapper import ExtractNicknameMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 
-# Skip tests for this OP in the GitHub actions due to unknown DistNetworkError.
+# Skip tests for this OP.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class ExtractNicknameMapperTest(DataJuicerTestCaseBase):
@@ -37,12 +37,12 @@ class ExtractNicknameMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=2)
-        result = dataset[0][Fields.nickname]
+        dataset = op.run(dataset)
+        result = dataset[0][Fields.meta][MetaKeys.nickname]
         result = [(
-            d[Fields.source_entity],
-            d[Fields.target_entity],
-            d[Fields.relation_description])
+            d[MetaKeys.source_entity],
+            d[MetaKeys.target_entity],
+            d[MetaKeys.relation_description])
             for d in result]
         logger.info(f'result: {result}')
         self.assertIn(("李莲花","方多病","方小宝"), result)

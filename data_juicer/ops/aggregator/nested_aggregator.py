@@ -5,12 +5,9 @@ from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Aggregator
 from data_juicer.utils.common_utils import (avg_split_string_list_under_limit,
-                                            is_string_list, nested_access)
-from data_juicer.utils.lazy_loader import LazyLoader
+                                            is_string_list)
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
-
-torch = LazyLoader('torch', 'torch')
-vllm = LazyLoader('vllm', 'vllm')
 
 OP_NAME = 'nested_aggregator'
 
@@ -51,7 +48,7 @@ class NestedAggregator(Aggregator):
 
     def __init__(self,
                  api_model: str = 'gpt-4o',
-                 input_key: str = None,
+                 input_key: str = MetaKeys.event_description,
                  output_key: str = None,
                  max_token_num: Optional[PositiveInt] = None,
                  *,
@@ -67,12 +64,10 @@ class NestedAggregator(Aggregator):
         """
         Initialization method.
         :param api_model: API model name.
-        :param input_key: The input field key in the samples. Support for
-            nested keys such as "__dj__stats__.text_len". It is text_key
-            in default.
-        :param output_key: The output field key in the samples. Support for
-            nested keys such as "__dj__stats__.text_len". It is same as the
-            input_key in default.
+        :param input_key: The input key in the meta field of the samples.
+            It is "event_description" in default.
+        :param output_key: The output key in the aggregation field in the
+            samples. It is same as the input_key in default.
         :param max_token_num: The max token num of the total tokens of the
             sub documents. Without limitation if it is None.
         :param api_endpoint: URL endpoint for the API.
@@ -169,11 +164,21 @@ class NestedAggregator(Aggregator):
 
     def process_single(self, sample=None, rank=None):
 
+        if self.output_key in sample[Fields.batch_meta]:
+            return sample
+
+        if Fields.meta not in sample or self.input_key not in sample[
+                Fields.meta][0]:
+            logger.warning('The input key does not exist in the sample!')
+            return sample
+
+        sub_docs = [d[self.input_key] for d in sample[Fields.meta]]
+
         # if not batched sample
-        sub_docs = nested_access(sample, self.input_key)
         if not is_string_list(sub_docs):
             return sample
 
-        sample[self.output_key] = self.recursive_summary(sub_docs, rank=rank)
+        sample[Fields.batch_meta][self.output_key] = self.recursive_summary(
+            sub_docs, rank=rank)
 
         return sample

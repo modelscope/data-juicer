@@ -5,15 +5,11 @@ from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Aggregator
-from data_juicer.utils.common_utils import (is_string_list, nested_access,
-                                            nested_set)
-from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.common_utils import is_string_list
+from data_juicer.utils.constant import BatchMetaKeys, Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..common import split_text_by_punctuation
-
-torch = LazyLoader('torch', 'torch')
-vllm = LazyLoader('vllm', 'vllm')
 
 OP_NAME = 'most_relavant_entities_aggregator'
 
@@ -48,8 +44,8 @@ class MostRelavantEntitiesAggregator(Aggregator):
                  api_model: str = 'gpt-4o',
                  entity: str = None,
                  query_entity_type: str = None,
-                 input_key: str = None,
-                 output_key: str = None,
+                 input_key: str = MetaKeys.event_description,
+                 output_key: str = BatchMetaKeys.most_relavant_entities,
                  max_token_num: Optional[PositiveInt] = None,
                  *,
                  api_endpoint: Optional[str] = None,
@@ -66,12 +62,10 @@ class MostRelavantEntitiesAggregator(Aggregator):
         :param api_model: API model name.
         :param entity: The given entity.
         :param query_entity_type: The type of queried relavant entities.
-        :param input_key: The input field key in the samples. Support for
-            nested keys such as "__dj__stats__.text_len". It is text_key
-            in default.
-        :param output_key: The output field key in the samples. Support for
-            nested keys such as "__dj__stats__.text_len". It is same as the
-            input_key in default.
+        :param input_key: The input key in the meta field of the samples.
+            It is "event_description" in default.
+        :param output_key: The output key in the aggregation field of the
+            samples. It is "most_relavant_entities" in default.
         :param max_token_num: The max token num of the total tokens of the
             sub documents. Without limitation if it is None.
         :param api_endpoint: URL endpoint for the API.
@@ -95,8 +89,8 @@ class MostRelavantEntitiesAggregator(Aggregator):
 
         self.entity = entity
         self.query_entity_type = query_entity_type
-        self.input_key = input_key or self.text_key
-        self.output_key = output_key or self.input_key
+        self.input_key = input_key
+        self.output_key = output_key
         self.max_token_num = max_token_num
 
         system_prompt_template = system_prompt_template or \
@@ -171,13 +165,22 @@ class MostRelavantEntitiesAggregator(Aggregator):
 
     def process_single(self, sample=None, rank=None):
 
+        if self.output_key in sample[Fields.batch_meta]:
+            return sample
+
+        if Fields.meta not in sample or self.input_key not in sample[
+                Fields.meta][0]:
+            logger.warning('The input key does not exist in the sample!')
+            return sample
+
+        sub_docs = [d[self.input_key] for d in sample[Fields.meta]]
+
         # if not batched sample
-        sub_docs = nested_access(sample, self.input_key)
         if not is_string_list(sub_docs):
             return sample
 
-        sample = nested_set(
-            sample, self.output_key,
-            self.query_most_relavant_entities(sub_docs, rank=rank))
+        sample[Fields.batch_meta][
+            self.output_key] = self.query_most_relavant_entities(sub_docs,
+                                                                 rank=rank)
 
         return sample
