@@ -1,4 +1,4 @@
-[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[OperatorZoo]](docs/Operators.md) | [[API]](https://modelscope.github.io/data-juicer) | [[Awesome LLM Data]](docs/awesome_llm_data.md)
+[[中文主页]](README_ZH.md) | [[DJ-Cookbook]](#dj-cookbook) | [[OperatorZoo]](docs/Operators.md) | [[API]](https://modelscope.github.io/data-juicer) | [[Awesome LLM Data]](docs/awesome_llm_data.md)
 
 
 # Data Processing for and with Foundation Models
@@ -10,17 +10,17 @@
 [![pypi version](https://img.shields.io/pypi/v/py-data-juicer?logo=pypi&color=026cad)](https://pypi.org/project/py-data-juicer)
 [![Docker version](https://img.shields.io/docker/v/datajuicer/data-juicer?logo=docker&label=Docker&color=498bdf)](https://hub.docker.com/r/datajuicer/data-juicer)
 
-[![DataModality](https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg)](docs/DeveloperGuide_ZH.md)
-[![Usage](https://img.shields.io/badge/Usage-Cleaning,Synthesis,Analysis-FFD21E.svg)](docs/DeveloperGuide_ZH.md)
+[![DataModality](https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg)](#dj-cookbook)
+[![Usage](https://img.shields.io/badge/Usage-Cleaning,Synthesis,Analysis-FFD21E.svg)](#dj-cookbook)
 [![ModelScope- Demos](https://img.shields.io/badge/ModelScope-Demos-4e29ff.svg?logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjI0IDEyMS4zMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im0wIDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtOTkuMTQgNzMuNDloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xNzYuMDkgOTkuMTRoLTI1LjY1djIyLjE5aDQ3Ljg0di00Ny44NGgtMjIuMTl6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTEyNC43OSA0Ny44NGgyNS42NXYyNS42NWgtMjUuNjV6IiBmaWxsPSIjMzZjZmQxIiAvPgoJPHBhdGggZD0ibTAgMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xOTguMjggNDcuODRoMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xOTguMjggMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xNTAuNDQgMHYyMi4xOWgyNS42NXYyNS42NWgyMi4xOXYtNDcuODR6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTczLjQ5IDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiMzNmNmZDEiIC8+Cgk8cGF0aCBkPSJtNDcuODQgMjIuMTloMjUuNjV2LTIyLjE5aC00Ny44NHY0Ny44NGgyMi4xOXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtNDcuODQgNzMuNDloLTIyLjE5djQ3Ljg0aDQ3Ljg0di0yMi4xOWgtMjUuNjV6IiBmaWxsPSIjNjI0YWZmIiAvPgo8L3N2Zz4K)](https://modelscope.cn/studios?name=Data-Jiucer&page=1&sort=latest&type=1)
 [![HuggingFace- Demos](https://img.shields.io/badge/🤗HuggingFace-Demos-4e29ff.svg)](https://huggingface.co/spaces?&search=datajuicer)
 
 
 
-[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documents)
-[![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documents)
-[![OpZoo](https://img.shields.io/badge/Doc-OperatorZoo-blue?logo=Markdown)](https://modelscope.github.io/data-juicer/)
-[![算子池](https://img.shields.io/badge/文档-算子池-blue?logo=Markdown)](https://modelscope.github.io/data-juicer/)
+[![Document_List](https://img.shields.io/badge/Doc-DJ_Cookbook-blue?logo=Markdown)](#dj-cookbook)
+[![文档列表](https://img.shields.io/badge/文档-DJ指南-blue?logo=Markdown)](README_ZH.md#dj-cookbook)
+[![OpZoo](https://img.shields.io/badge/Doc-OperatorZoo-blue?logo=Markdown)](docs/Operators.md)
+[![算子池](https://img.shields.io/badge/文档-算子池-blue?logo=Markdown)](docs/Operators_ZH.md)
 [![Paper](http://img.shields.io/badge/cs.LG-1.0Paper(SIGMOD'24)-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 [![Paper](http://img.shields.io/badge/cs.AI-2.0Paper-B31B1B?logo=arxiv&logoColor=red)](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/DJ2.0_arXiv_preview.pdf)
 
@@ -34,7 +34,7 @@ We provide a [playground](http://8.138.149.181/) with a managed JupyterLab. [Try
 [Platform for AI of Alibaba Cloud (PAI)](https://www.aliyun.com/product/bigdata/learn) has cited our work and integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: [PAI-Data Processing for Large Models](https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX).
 
 Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw)  channel, [DingDing](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11) group, ...), in promoting data-model co-development along with research and applications of foundation models!
-----
+
 
 ## News
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-11] We release our 2.0 paper, [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/DJ2.0_arXiv_preview.pdf). It now can process 70B data samples within 2.1h, using 6400 CPU cores on 50 Ray nodes from Alibaba Cloud cluster, and deduplicate 5TB data within 2.8h using 1280 CPU cores on 8 Ray nodes.
@@ -71,12 +71,11 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 Table of Contents
 =================
 
-- [Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to join us (via issues, PRs, Slack  channel, DingDing group, ...), in promoting data-model co-development along with research and applications of foundation models!](#data-juicer-is-being-actively-updated-and-maintained-we-will-periodically-enhance-and-add-more-features-data-recipes-and-datasets--we-welcome-you-to-join-us-via-issues-prs-slack--channel-dingding-group--in-promoting-data-model-co-development-along-with-research-and-applications-of-foundation-models)
 - [News](#news)
 - [Why Data-Juicer?](#why-data-juicer)
 - [DJ-Cookbook](#dj-cookbook)
   - [Curated Resources](#curated-resources)
-  - [Coding with DJ](#coding-with-dj)
+  - [Coding with Data-Juicer (DJ)](#coding-with-data-juicer-dj)
   - [Use Cases \& Data Recipes](#use-cases--data-recipes)
   - [Interactive Examples](#interactive-examples)
 - [Installation](#installation)
@@ -113,7 +112,7 @@ Table of Contents
 - **User-Friendly & Extensible**: 
   Designed for simplicity and flexibility, with easy-start [guides](#quick-start), and [DJ-Cookbook](#dj-cookbook) containing fruitful demo usages. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
 
-- **Efficient & Robust**: Providing performance-optimized [parallel data processing](docs/distributed) (Aliyun-PAI\Ray\CUDA\OP Fusion),
+- **Efficient & Robust**: Providing performance-optimized [parallel data processing](docs) (Aliyun-PAI\Ray\CUDA\OP Fusion),
   faster with less resource usage, verified in large-scale production environments.
 
 
@@ -128,7 +127,7 @@ Table of Contents
 - [Awesome LLM-Data](docs/awesome_llm_data.md)
 - ["Bad" Data Exhibition](docs/BadDataExhibition.md)
 
-### Coding with DJ
+### Coding with Data-Juicer (DJ)
 - [Overview of DJ](README.md)
 - [Operator Zoo](docs/Operators.md)
 - [Quick Start](docs/QuickStart.md)
@@ -329,7 +328,7 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 
 - To run data processing across multiple machines, it is necessary to ensure that all distributed nodes can access the corresponding data paths (for example, by mounting the respective data paths on a file-sharing system such as NAS).
 - The deduplication operators for RAY mode are different from the single-machine version, and all those operators are prefixed with `ray`, e.g. `ray_video_deduplicator` and `ray_document_deduplicator`.
-- More details can be found in the doc for [distributed processing](./docs/distributed_processing.md).
+- More details can be found in the doc for [distributed processing](docs/Distributed.md).
 
 > Users can also opt not to use RAY and instead split the dataset to run on a cluster with [Slurm](https://slurm.schedmd.com/). In this case, please use the default Data-Juicer without RAY.
 > [Aliyun PAI-DLC](https://www.aliyun.com/activity/bigdata/pai-dlc) supports the RAY framework, Slurm framework, etc. Users can directly create RAY jobs and Slurm jobs on the DLC cluster.
