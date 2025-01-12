@@ -105,14 +105,14 @@ Table of Contents
 ![Overview](https://img.alicdn.com/imgextra/i4/O1CN01uawwRu1JMSdafy5lF_!!6000000001014-2-tps-4034-4146.png)
 
 - **Systematic & Reusable**:
-  Empowering users with a systematic library of 100+ core [OPs](docs/Operators.md), and 50+ reusable [config recipes](configs) and 
-  dedicated [toolkits](#documentation), designed to
+  Empowering users with a systematic library of 100+ core [OPs](docs/Operators.md), and 50+ reusable config recipes and 
+  dedicated toolkits, designed to
   function independently of specific multimodal LLM datasets and processing pipelines. Supporting data analysis, cleaning, and synthesis in pre-training, post-tuning, en, zh, and more scenarios.
 
 - **User-Friendly & Extensible**: 
   Designed for simplicity and flexibility, with easy-start [guides](#quick-start), and [DJ-Cookbook](#dj-cookbook) containing fruitful demo usages. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
 
-- **Efficient & Robust**: Providing performance-optimized [parallel data processing](docs) (Aliyun-PAI\Ray\CUDA\OP Fusion),
+- **Efficient & Robust**: Providing performance-optimized [parallel data processing](docs/Distributed.md) (Aliyun-PAI\Ray\CUDA\OP Fusion),
   faster with less resource usage, verified in large-scale production environments.
 
 
@@ -130,7 +130,7 @@ Table of Contents
 ### Coding with Data-Juicer (DJ)
 - [Overview of DJ](README.md)
 - [Operator Zoo](docs/Operators.md)
-- [Quick Start](docs/QuickStart.md)
+- [Quick Start](#quick-start)
 - [Configuration](configs/README.md)
 - [Developer Guide](docs/DeveloperGuide.md)
 - [API references](https://modelscope.github.io/data-juicer/)
@@ -140,7 +140,7 @@ Table of Contents
 - [Sandbox](docs/Sandbox.md)
 - [Quality Classifier](tools/quality_classifier/README.md)
 - [Auto Evaluation](tools/evaluator/README.md)
-- [Third-parties Integration](thirdparty/README.md)
+- [Third-parties Integration](thirdparty/LLM_ecosystems/README.md)
 
 ### Use Cases & Data Recipes
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
