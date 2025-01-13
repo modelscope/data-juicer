@@ -38,6 +38,9 @@ class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(samples)
         results = dataset.map(op.process, num_proc=num_proc, with_rank=True)
 
+        if max_num is not None:
+            self.assertLessEqual(len(results), len(samples)*max_num)
+
         for row in results:
             logger.info(row)
             self.assertIn(op.query_key, row)
