@@ -1,6 +1,7 @@
 import re
 from typing import Dict, Optional
 
+import numpy as np
 from loguru import logger
 from pydantic import PositiveInt
 
@@ -122,11 +123,16 @@ class ExtractNicknameMapper(Mapper):
         nickname_relations = list(set(nickname_relations))
 
         nickname_relations = [{
-            MetaKeys.source_entity: nr[0],
-            MetaKeys.target_entity: nr[1],
-            MetaKeys.relation_description: nr[2],
-            MetaKeys.relation_keywords: ['nickname'],
-            MetaKeys.relation_strength: None
+            MetaKeys.source_entity:
+            nr[0],
+            MetaKeys.target_entity:
+            nr[1],
+            MetaKeys.relation_description:
+            nr[2],
+            MetaKeys.relation_keywords:
+            np.array([], dtype=str),
+            MetaKeys.relation_strength:
+            None
         } for nr in nickname_relations]
 
         return nickname_relations
@@ -147,12 +153,19 @@ class ExtractNicknameMapper(Mapper):
             'role': 'user',
             'content': input_prompt
         }]
-        nickname_relations = []
+        nickname_relations = [{
+            MetaKeys.source_entity: '',
+            MetaKeys.target_entity: '',
+            MetaKeys.relation_description: '',
+            MetaKeys.relation_keywords: ['null'],
+            MetaKeys.relation_strength: None
+        }]
         for _ in range(self.try_num):
             try:
                 output = client(messages, **self.sampling_params)
-                nickname_relations = self.parse_output(output)
-                if len(nickname_relations) > 0:
+                results = self.parse_output(output)
+                if len(results) > 0:
+                    nickname_relations = results
                     break
             except Exception as e:
                 logger.warning(f'Exception: {e}')

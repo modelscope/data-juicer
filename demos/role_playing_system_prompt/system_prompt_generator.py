@@ -64,11 +64,11 @@ def get_nicknames(sample):
     nicknames = dedup_sort_val_by_chunk_id(sample, 'chunk_id', MetaKeys.nickname)
     nickname_map = {}
     for nr in nicknames:
-        if nr[Fields.source_entity] == main_entity:
-            role_name = nr[Fields.target_entity]
+        if nr[MetaKeys.source_entity] == main_entity:
+            role_name = nr[MetaKeys.target_entity]
             if role_name not in nickname_map:
                 nickname_map[role_name] = []
-            nickname_map[role_name].append(nr[Fields.relation_description])
+            nickname_map[role_name].append(nr[MetaKeys.relation_description])
     
     max_nums = 3
     for role_name, nickname_list in nickname_map.items():

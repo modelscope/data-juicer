@@ -213,4 +213,7 @@ def split_text_by_punctuation(text):
     result = re.split(punctuation_pattern, text)
     result = [s.strip() for s in result if s.strip()]
 
+    if not result:
+        return [text]
+
     return result

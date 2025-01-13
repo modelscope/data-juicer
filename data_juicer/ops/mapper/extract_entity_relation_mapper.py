@@ -6,6 +6,7 @@
 import re
 from typing import Dict, List, Optional
 
+import numpy as np
 from loguru import logger
 from pydantic import NonNegativeInt, PositiveInt
 
@@ -328,12 +329,26 @@ Output:
             input_text=sample[self.text_key])
         messages = [{'role': 'user', 'content': input_prompt}]
 
-        entities, relations = [], []
+        entities = [{
+            MetaKeys.entity_name: '',
+            MetaKeys.entity_type: '',
+            MetaKeys.entity_description: ''
+        }]
+        relations = [{
+            MetaKeys.source_entity: '',
+            MetaKeys.target_entity: '',
+            MetaKeys.relation_description: '',
+            MetaKeys.relation_keywords: np.array([], dtype=str),
+            MetaKeys.relation_strength: .0
+        }]
         for _ in range(self.try_num):
             try:
                 result = self.light_rag_extraction(messages, rank=rank)
-                entities, relations = self.parse_output(result)
-                if len(entities) > 0:
+                cur_entities, cur_relations = self.parse_output(result)
+                if len(cur_entities) > 0:
+                    entities = cur_entities
+                    if len(cur_relations) > 0:
+                        relations = cur_relations
                     break
             except Exception as e:
                 logger.warning(f'Exception: {e}')
