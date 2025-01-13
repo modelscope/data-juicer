@@ -179,6 +179,7 @@ process:
       enable_vllm: false                                      # Whether to use vllm for inference acceleration.
       model_params: {}                                        # Parameters for initializing the model.
       sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
+      mem_required: '31GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrain the maximum number of processes that can be launched
   - generate_qa_from_text_mapper:                           # mapper to generate question and answer pairs from text.
       hf_model: 'alibaba-pai/pai-qwen1_5-7b-doc2qa'           # Model name on huggingface to generate question and answer pairs.
       output_pattern: null                                    # Regular expression pattern to extract questions and answers from model response.
@@ -257,6 +258,7 @@ process:
       enable_vllm: false                                      # whether to use vllm for inference acceleration.
       model_params: {}                                        # Parameters for initializing the model.
       sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
+      mem_required: '31GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrain the maximum number of processes that can be launched
   - optimize_query_mapper:                                  # optimize query in question-answer pairs.
   - optimize_response_mapper:                               # optimize response in question-answer pairs.
   - pair_preference_mapper:                                 # construct paired preference samples.
