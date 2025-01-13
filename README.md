@@ -144,7 +144,7 @@ Table of Contents
 
 ### Use Cases & Data Recipes
 - [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
-- [Recipes for data process in RedPajama](configs/redpajama/README.md)
+- [Recipes for data process in RedPajama](configs/reproduced_redpajama/README.md)
 - [Refined recipes for pre-training text data](configs/data_juicer_recipes/README.md)
 - [Refined recipes for fine-tuning text data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
 - [Refined recipes for pre-training multi-modal data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-multimodal-dataset)
