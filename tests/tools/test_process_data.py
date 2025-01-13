@@ -7,7 +7,7 @@ import unittest
 import uuid
 import yaml
 
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
 
 def run_in_subprocess(cmd):
@@ -114,6 +114,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         import ray
         ray.shutdown()
 
+    @TEST_TAG("ray")
     def test_ray_image(self):
         tmp_yaml_file = osp.join(self.tmp_dir, 'config_0.yaml')
         tmp_out_path = osp.join(self.tmp_dir, 'output_0.json')
@@ -164,6 +165,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         for item in dataset['jsonl']:
             self.assertIn('aspect_ratios', item['__dj__stats__'])
 
+    @TEST_TAG("ray")
     def test_ray_precise_dedup(self):
         tmp_yaml_file = osp.join(self.tmp_dir, 'config_1.yaml')
         tmp_out_path = osp.join(self.tmp_dir, 'output_dedup')
