@@ -102,7 +102,7 @@ Table of Contents
 
 ## Why Data-Juicer?
 
-![Overview](https://img.alicdn.com/imgextra/i4/O1CN01uawwRu1JMSdafy5lF_!!6000000001014-2-tps-4034-4146.png)
+![Overview](https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png)
 
 - **Systematic & Reusable**:
   Empowering users with a systematic library of 100+ core [OPs](docs/Operators.md), and 50+ reusable config recipes and 
