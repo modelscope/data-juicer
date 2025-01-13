@@ -1,12 +1,11 @@
 # How-to Guide for Developers
 
-- [How-to Guide for Developers](#how-to-guide-for-developers)
-  - [Coding Style](#coding-style)
-  - [Build your own OPs](#build-your-own-ops)
-    - [(Optional) Make your OP fusible](#optional-make-your-op-fusible)
-  - [Build your own configs](#build-your-own-configs)
-    - [Fruitful config sources \& Type hints](#fruitful-config-sources--type-hints)
-    - [Hierarchical configs and helps](#hierarchical-configs-and-helps)
+- [Coding Style](#coding-style)
+- [Build your own OPs](#build-your-own-ops)
+  - [(Optional) Make your OP fusible](#optional-make-your-op-fusible)
+- [Build your own configs](#build-your-own-configs)
+  - [Fruitful config sources \& Type hints](#fruitful-config-sources--type-hints)
+  - [Hierarchical configs and helps](#hierarchical-configs-and-helps)
 
 ## Coding Style
 
