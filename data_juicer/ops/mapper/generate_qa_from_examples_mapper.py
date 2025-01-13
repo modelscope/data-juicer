@@ -7,7 +7,8 @@ from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.model_utils import (get_model, prepare_model,
+                                           update_sampling_params)
 
 from ..base_op import OPERATORS, Mapper
 
@@ -138,6 +139,10 @@ class GenerateQAFromExamplesMapper(Mapper):
                 return_pipe=True,
                 **model_params)
             self.sampling_params = sampling_params
+
+        self.sampling_params = update_sampling_params(sampling_params,
+                                                      hf_model,
+                                                      self.enable_vllm)
 
         self.seed_qa_samples = self._load_seed_qa_samples()
         if len(self.seed_qa_samples) == 0:

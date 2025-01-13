@@ -6,7 +6,8 @@ from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.model_utils import (get_model, prepare_model,
+                                           update_sampling_params)
 
 torch = LazyLoader('torch', 'torch')
 vllm = LazyLoader('vllm', 'vllm')
@@ -105,6 +106,10 @@ class GenerateQAFromTextMapper(Mapper):
                 return_pipe=True,
                 **model_params)
             self.sampling_params = sampling_params
+
+        self.sampling_params = update_sampling_params(sampling_params,
+                                                      hf_model,
+                                                      self.enable_vllm)
 
     def parse_output(self, raw_output):
         logger.debug(raw_output)

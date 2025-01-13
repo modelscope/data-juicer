@@ -744,10 +744,64 @@ def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     if model_params.get('device', '').startswith('cuda:'):
         model_params['device'] = 'cuda'
 
-    model = vllm.LLM(model=pretrained_model_name_or_path, **model_params)
+    model = vllm.LLM(model=pretrained_model_name_or_path,
+                     generation_config='auto',
+                     **model_params)
     tokenizer = model.get_tokenizer()
 
     return (model, tokenizer)
+
+
+def update_sampling_params(sampling_params,
+                           pretrained_model_name_or_path,
+                           enable_vllm=False):
+    if enable_vllm:
+        update_keys = {'max_tokens'}
+    else:
+        update_keys = {'max_new_tokens'}
+    generation_config_keys = {
+        'max_tokens': ['max_tokens', 'max_new_tokens'],
+        'max_new_tokens': ['max_tokens', 'max_new_tokens'],
+    }
+    generation_config_thresholds = {
+        'max_tokens': (max, 512),
+        'max_new_tokens': (max, 512),
+    }
+
+    # try to get the generation configs
+    from vllm.transformers_utils.config import try_get_generation_config
+    model_generation_config = try_get_generation_config(
+        pretrained_model_name_or_path, True).to_dict()
+
+    for key in update_keys:
+        # if there is this param in the sampling_prams, compare it with the
+        # thresholds and apply the specified updating function
+        if key in sampling_params:
+            func, th = generation_config_thresholds[key]
+            ori_val = sampling_params[key]
+            sampling_params[key] = func(sampling_params[key], th)
+            if sampling_params[key] != ori_val:
+                logger.warning(
+                    f'Use a more appropriate param for [{key}]: {th}, instead '
+                    f'of {ori_val}.')
+            continue
+        # if not, try to find it in the generation_config of the model
+        found = False
+        for config_key in generation_config_keys[key]:
+            if config_key in model_generation_config \
+                    and model_generation_config[config_key]:
+                sampling_params[key] = model_generation_config[config_key]
+                found = True
+                break
+        if found:
+            logger.debug(f'Found param {key} in the generation config as '
+                         f'{sampling_params[key]}.')
+            continue
+        # if not again, use the threshold directly
+        _, th = generation_config_thresholds[key]
+        sampling_params[key] = th
+        logger.debug(f'Use the threshold {th} as the sampling param {key}.')
+    return sampling_params
 
 
 MODEL_FUNCTION_MAPPING = {
