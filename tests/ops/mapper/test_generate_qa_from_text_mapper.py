@@ -19,11 +19,13 @@ class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
                 enable_vllm=False,
                 model_params=None,
                 sampling_params=None,
-                num_proc=1):
+                num_proc=1,
+                max_num=None):
 
         op = GenerateQAFromTextMapper(enable_vllm=enable_vllm,
                                       model_params=model_params,
-                                      sampling_params=sampling_params)
+                                      sampling_params=sampling_params,
+                                      max_num=max_num)
 
         samples = [{
             self.text_key:
@@ -36,6 +38,9 @@ class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(samples)
         results = dataset.map(op.process, num_proc=num_proc, with_rank=True)
 
+        if max_num is not None:
+            self.assertLessEqual(len(results), len(samples)*max_num)
+
         for row in results:
             logger.info(row)
             self.assertIn(op.query_key, row)
@@ -44,6 +49,10 @@ class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
     def test(self):
         sampling_params = {'max_new_tokens': 200}
         self._run_op(sampling_params=sampling_params)
+
+    def test_max_num(self):
+        sampling_params = {'max_new_tokens': 200}
+        self._run_op(sampling_params=sampling_params, max_num=1)
 
     def test_multi_process(self):
         sampling_params = {'max_new_tokens': 200}
