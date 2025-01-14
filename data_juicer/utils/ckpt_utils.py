@@ -121,7 +121,9 @@ class CheckpointManager:
 
         :param ds: input dataset to save
         """
-        ds.save_to_disk(self.ckpt_ds_dir, num_proc=self.num_proc)
+        left_sample_num = len(ds)
+        ds.save_to_disk(self.ckpt_ds_dir,
+                        num_proc=min(self.num_proc, left_sample_num))
 
         with open(self.ckpt_op_record, 'w') as fout:
             json.dump(self.op_record, fout)
