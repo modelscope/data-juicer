@@ -769,21 +769,20 @@ def update_sampling_params(sampling_params,
     }
 
     # try to get the generation configs
-    from vllm.transformers_utils.config import try_get_generation_config
-    model_generation_config = try_get_generation_config(
-        pretrained_model_name_or_path, True).to_dict()
+    from transformers import GenerationConfig
+    try:
+        model_generation_config = GenerationConfig.from_pretrained(
+            pretrained_model_name_or_path).to_dict()
+    except:  # noqa: E722
+        logger.warning(f'No generation config found for the model '
+                       f'[{pretrained_model_name_or_path}]')
+        model_generation_config = {}
 
     for key in update_keys:
         # if there is this param in the sampling_prams, compare it with the
         # thresholds and apply the specified updating function
         if key in sampling_params:
-            func, th = generation_config_thresholds[key]
-            ori_val = sampling_params[key]
-            sampling_params[key] = func(sampling_params[key], th)
-            if sampling_params[key] != ori_val:
-                logger.warning(
-                    f'Use a more appropriate param for [{key}]: {th}, instead '
-                    f'of {ori_val}.')
+            logger.debug(f'Found param {key} in the input `sampling_params`.')
             continue
         # if not, try to find it in the generation_config of the model
         found = False
