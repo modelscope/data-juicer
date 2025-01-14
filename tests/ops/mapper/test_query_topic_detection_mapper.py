@@ -8,19 +8,23 @@ from data_juicer.ops.mapper.query_topic_detection_mapper import QueryTopicDetect
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
 from data_juicer.utils.constant import Fields, MetaKeys
-from data_juicer.utils.common_utils import nested_access
 
 class TestQueryTopicDetectionMapper(DataJuicerTestCaseBase):
 
     hf_model = 'dstefa/roberta-base_topic_classification_nyt_news'
     zh_to_en_hf_model = 'Helsinki-NLP/opus-mt-zh-en'
 
-    def _run_op(self, op, samples, label_key, targets):
+    def _run_op(self, op, samples, targets, label_key=None, score_key=None):
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=2)
+        dataset = op.run(dataset)
+
+        label_key = label_key or MetaKeys.query_topic_label
+        score_key = score_key or MetaKeys.query_topic_score
 
         for sample, target in zip(dataset, targets):
-            label = nested_access(sample[Fields.meta], label_key)
+            label = sample[Fields.meta][label_key]
+            score = sample[Fields.meta][score_key]
+            logger.info(f'{label}: {score}')
             self.assertEqual(label, target)
         
     def test_default(self):
@@ -37,7 +41,7 @@ class TestQueryTopicDetectionMapper(DataJuicerTestCaseBase):
             hf_model = self.hf_model,
             zh_to_en_hf_model = self.zh_to_en_hf_model,
         )
-        self._run_op(op, samples, MetaKeys.query_topic_label, targets)
+        self._run_op(op, samples, targets)
     
     def test_no_zh_to_en(self):
         
@@ -53,7 +57,27 @@ class TestQueryTopicDetectionMapper(DataJuicerTestCaseBase):
             hf_model = self.hf_model,
             zh_to_en_hf_model = None,
         )
-        self._run_op(op, samples, MetaKeys.query_topic_label, targets)
+        self._run_op(op, samples, targets)
+
+    def test_rename_keys(self):
+        
+        samples = [{
+            'query': '今天火箭和快船的比赛谁赢了。'
+        },{
+            'query': '你最近身体怎么样。'
+        }
+        ]
+        targets = ['Sports', 'Health and Wellness']
+
+        label_key = 'my_label'
+        score_key = 'my_score'
+        op = QueryTopicDetectionMapper(
+            hf_model = self.hf_model,
+            zh_to_en_hf_model = self.zh_to_en_hf_model,
+            label_key = label_key,
+            score_key = score_key,
+        )
+        self._run_op(op, samples, targets, label_key, score_key)
 
 if __name__ == '__main__':
     unittest.main()

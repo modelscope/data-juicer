@@ -5,7 +5,7 @@ import unittest
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.video_tagging_from_frames_mapper import \
     VideoTaggingFromFramesMapper
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.mm_utils import SpecialTokens
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
 
@@ -50,7 +50,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [self.vid1_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'animal', 'ray', 'text', 'writing', 'yellow', 'game',
                     'screenshot', 'cartoon', 'cartoon character', 'person', 'robe',
                     'sky'
@@ -60,7 +60,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 身穿白色上衣的男子，拿着一个东西，拍打自己的胃部。{SpecialTokens.eoc}',
             'videos': [self.vid2_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'man', 'shirt', 't shirt', 't-shirt', 'wear', 'white', 'boy',
                     'catch', 'hand', 'blind', 'cotton candy', 'tennis racket',
                     'ball', 'person'
@@ -70,7 +70,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
             'videos': [self.vid3_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'woman', 'table', 'sit', 'person', 'laptop', 'bookshelf',
                     'conversation', 'round table', 'closet', 'computer', 'girl',
                     'man', 'stool', 'computer screen', 'laugh', 'cabinet', 'hand',
@@ -94,13 +94,13 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             f'白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [],
             Fields.meta: {
-                Fields.video_frame_tags: [[]]}
+                MetaKeys.video_frame_tags: [[]]}
         }, {
             'text':
             f'{SpecialTokens.video} 身穿白色上衣的男子，拿着一个东西，拍打自己的胃部。{SpecialTokens.eoc}',
             'videos': [self.vid2_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'man', 'shirt', 't shirt', 't-shirt', 'wear', 'white', 'boy',
                     'catch', 'hand', 'blind', 'cotton candy', 'tennis racket',
                     'ball', 'person'
@@ -177,7 +177,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [self.vid1_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'cartoon', 'animal', 'anime', 'game', 'screenshot',
                     'video game', 'cartoon character', 'robe', 'ray', 'text',
                     'writing', 'yellow', 'doll', 'tail', 'sky', 'person']]}
@@ -186,7 +186,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 身穿白色上衣的男子，拿着一个东西，拍打自己的胃部。{SpecialTokens.eoc}',
             'videos': [self.vid2_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'man', 'shirt', 't shirt', 't-shirt', 'wear', 'white', 'boy',
                     'hand', 'catch', 'bulletin board', 'Wii', 'cotton candy',
                     'tennis racket', 'blind', 'game controller', 'remote', 'stand',
@@ -197,7 +197,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
             'videos': [self.vid3_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'table', 'sit', 'woman', 'bookshelf', 'conversation', 'person',
                     'round table', 'computer', 'girl', 'man', 'closet', 'laptop',
                     'stand', 'computer screen', 'talk', 'room', 'stool', 'hand',
@@ -231,7 +231,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
                 f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。',
             'videos': [self.vid1_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'animal', 'ray', 'text', 'writing', 'yellow', 'game',
                     'screenshot', 'cartoon', 'cartoon character', 'person', 'robe',
                     'sky'
@@ -241,7 +241,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
                 f'{SpecialTokens.video} 身穿白色上衣的男子，拿着一个东西，拍打自己的胃部。{SpecialTokens.eoc}',
             'videos': [self.vid2_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'man', 'shirt', 't shirt', 't-shirt', 'wear', 'white', 'boy',
                     'catch', 'hand', 'blind', 'cotton candy', 'tennis racket',
                     'ball', 'person'
@@ -251,7 +251,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
                 f'{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
             'videos': [self.vid3_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'woman', 'table', 'sit', 'person', 'laptop', 'bookshelf',
                     'conversation', 'round table', 'closet', 'computer', 'girl',
                     'man', 'stool', 'computer screen', 'laugh', 'cabinet', 'hand',
@@ -286,7 +286,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。{SpecialTokens.eoc}{SpecialTokens.video} 身穿白色上衣的男子，拿着一个东西，拍打自己的胃部。',
             'videos': [self.vid1_path, self.vid2_path],
             Fields.meta: {
-                Fields.video_frame_tags:
+                MetaKeys.video_frame_tags:
                 [[
                     'animal', 'ray', 'text', 'writing', 'yellow', 'game',
                     'screenshot', 'cartoon', 'cartoon character', 'person', 'robe',
@@ -301,7 +301,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 身穿白色上衣的男子，拿着一个东西，拍打自己的胃部。{SpecialTokens.eoc}{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
             'videos': [self.vid2_path, self.vid3_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'man', 'shirt', 't shirt', 't-shirt', 'wear', 'white', 'boy',
                     'catch', 'hand', 'blind', 'cotton candy', 'tennis racket',
                     'ball', 'person'
@@ -316,7 +316,7 @@ class VideoTaggingFromFramesMapperTest(DataJuicerTestCaseBase):
             f'{SpecialTokens.video} 白色的小羊站在一旁讲话。旁边还有两只灰色猫咪和一只拉着灰狼的猫咪。{SpecialTokens.eoc}{SpecialTokens.video} 两个长头发的女子正坐在一张圆桌前讲话互动。 {SpecialTokens.eoc}',
             'videos': [self.vid1_path, self.vid3_path],
             Fields.meta: {
-                Fields.video_frame_tags: [[
+                MetaKeys.video_frame_tags: [[
                     'animal', 'ray', 'text', 'writing', 'yellow', 'game',
                     'screenshot', 'cartoon', 'cartoon character', 'person', 'robe',
                     'sky'

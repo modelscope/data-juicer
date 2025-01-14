@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 from pydantic import PositiveInt
 
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 
 from ..base_op import (NON_STATS_FILTERS, OPERATORS, TAGGING_OPS, UNFORKABLE,
                        Filter)
@@ -30,7 +30,7 @@ class VideoTaggingFromFramesFilter(Filter):
                  contain: str = 'any',
                  frame_sampling_method: str = 'all_keyframes',
                  frame_num: PositiveInt = 3,
-                 tag_field_name: str = Fields.video_frame_tags,
+                 tag_field_name: str = MetaKeys.video_frame_tags,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -55,8 +55,8 @@ class VideoTaggingFromFramesFilter(Filter):
             the first and the last frames will be extracted. If it's larger
             than 2, in addition to the first and the last frames, other frames
             will be extracted uniformly within the video duration.
-        :param tag_field_name: the field name to store the tags. It's
-            "__dj__video_frame_tags__" in default.
+        :param tag_field_name: the key name to store the tags in the meta
+            field. It's "video_frame_tags" in default.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
             all videos. 'any': keep this sample if any videos meet the
             condition. 'all': keep this sample only if all videos meet the
