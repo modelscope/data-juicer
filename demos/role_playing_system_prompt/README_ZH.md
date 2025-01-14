@@ -2,7 +2,7 @@
 
 在该Demo中，我们展示了如何通过Data-Juicer的菜谱，生成让LLM扮演剧本中给定角色的system prompt。我们这里以《莲花楼》为例。下面是在少量剧本上的演示：
 
-<source src="https://github.com/modelscope/data-juicer/releases/download/null/role_playing_demo.mp4" type="video/mp4">
+https://github.com/user-attachments/assets/09846a7a-086e-42fc-aee4-ac2053e1c0ac
 
 ## 数据准备
 将《莲花楼》按章节划分，按顺序每个章节对应Data-Juicer的一个sample，放到“text”关键字下。如下json格式：
