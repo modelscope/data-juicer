@@ -20,7 +20,6 @@
 [![Document_List](https://img.shields.io/badge/Doc-DJ_Cookbook-blue?logo=Markdown)](#dj-cookbook)
 [![文档列表](https://img.shields.io/badge/文档-DJ指南-blue?logo=Markdown)](README_ZH.md#dj-cookbook)
 [![OpZoo](https://img.shields.io/badge/Doc-OperatorZoo-blue?logo=Markdown)](docs/Operators.md)
-[![算子池](https://img.shields.io/badge/文档-算子池-blue?logo=Markdown)](docs/Operators.md)
 [![Paper](http://img.shields.io/badge/cs.LG-1.0Paper(SIGMOD'24)-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
 [![Paper](http://img.shields.io/badge/cs.AI-2.0Paper-B31B1B?logo=arxiv&logoColor=red)](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/DJ2.0_arXiv_preview.pdf)
 
