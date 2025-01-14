@@ -2,7 +2,7 @@
 
 在该Demo中，我们展示了如何通过Data-Juicer的菜谱，生成让LLM扮演剧本中给定角色的system prompt。我们这里以《莲花楼》为例。下面是在少量剧本上的演示：
 
-<img src="https://img.alicdn.com/imgextra/i4/O1CN01Y5V6aO1OeODrBGp3Q_!!6000000001730-1-tps-282-166.gif" width = "533" height = "300" alt="Data-Juicer"/>
+<img src="https://img.alicdn.com/imgextra/i3/O1CN01YmDvpi1bN4FRR5WYN_!!6000000003452-1-tps-900-529.gif" width = "533" height = "300" alt="Data-Juicer"/>
 
 ## 数据准备
 将《莲花楼》按章节划分，按顺序每个章节对应Data-Juicer的一个sample，放到“text”关键字下。如下json格式：
