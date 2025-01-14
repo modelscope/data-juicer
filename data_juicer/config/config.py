@@ -225,7 +225,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
         '--skip_op_error',
         type=bool,
         default=True,
-        help='Skip errors in OPs caused by unexpected unvalid samples.')
+        help='Skip errors in OPs caused by unexpected invalid samples.')
     parser.add_argument(
         '--use_cache',
         type=bool,
