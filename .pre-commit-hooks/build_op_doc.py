@@ -203,7 +203,11 @@ class ClassVisitor(ast.NodeVisitor):
 
     def visit_ClassDef(self, node: ast.ClassDef) -> Any:
         name = node.name
-        docstring = ' '.join(ast.get_docstring(node).split()).split('. ')[0]
+        node_info = ast.get_docstring(node)
+        if node_info is None:
+            print(f'No docstring found for class {name}')
+            return
+        docstring = ' '.join(node_info.split()).split('. ')[0]
         if not docstring.endswith('.'):
             docstring += '.'
         self.docs.append((name, docstring))
@@ -355,7 +359,7 @@ def generate_overview(op_record_dict):
     # make tag description
     tag_intro = [
         'All the specific operators are listed below, each featured with '
-        'several capability tags.\n下面列出所有具体算子，每种算子都通过多个标签来注明其主要功能。'
+        'several capability tags. \n下面列出所有具体算子，每种算子都通过多个标签来注明其主要功能。'
     ]
     for tag_type in ALL_TAG_MAPPING:
         tag_intro.append(f'* {tag_type}')
@@ -455,10 +459,13 @@ def check_and_update_op_record(old_op_record_list, new_op_record_list):
     """
     Update states in the new OP records based on the old version.
 
-    Mainly covering:
-    1. usability tags update: If there is no unittest for this OP, set it to
-    alpha; otherwise, set it to beta. Then if it's stable in the old version,
-    and it's beta in the new version, set it to stable.
+    The update categories cover:
+    1. usability tags update
+        1.1 If there is no unittest for this OP, set it to alpha;
+            otherwise, set it to beta.
+        1.2 Then if it's beta in the new version, but it's *mannally* checked
+            and set to be stable in the old version,
+            the final tag will be overrided as stable.
 
     | old tag | new tag | res tag |
     |---|---|---|

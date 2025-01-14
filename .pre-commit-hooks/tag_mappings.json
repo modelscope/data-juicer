@@ -34,29 +34,29 @@
   "Usability Tags": {
     "alpha": {
       "icon": "![alpha](https://img.shields.io/badge/alpha-red?style=plastic)",
-      "desc": "alpha version OP. Only the basic OP implementations are finished. alpha 版本算子。只完成了基础的算子实现。"
+      "desc": "alpha version OP. Only the basic OP implementations are finished. 表示 alpha 版本算子。只完成了基础的算子实现。"
     },
     "beta": {
       "icon": "![beta](https://img.shields.io/badge/beta-yellow?style=plastic)",
-      "desc": "beta version OP. Based on the alpha version, unittests for this OP are added as well. beta 版本算子。基于 alpha 版本，添加了算子的单元测试。"
+      "desc": "beta version OP. Based on the alpha version, unittests for this OP are added as well. 表示 beta 版本算子。基于 alpha 版本，添加了算子的单元测试。"
     },
     "stable": {
       "icon": "![stable](https://img.shields.io/badge/stable-green?style=plastic)",
-      "desc": "stable version OP. Based on the beta version, OP optimizations (e.g. model management, batched processing, OP fusion, ...) are added to this OP. stable 版本算子。基于 beta 版本，添加了算子优化（如模型管理，批处理，算子融合等）。"
+      "desc": "stable version OP. Based on the beta version, OP optimizations related to DJ (e.g. model management, batched processing, OP fusion, ...) are added to this OP. 表示 stable 版本算子。基于 beta 版本，完善了DJ相关的算子优化项（如模型管理，批处理，算子融合等）。"
     }
   },
   "Modal Tags": {
     "api": {
       "icon": "![api](https://img.shields.io/badge/api-A64C44?style=plastic)",
-      "desc": "equipped with API-based models. (e.g. ChatGPT, GPT-4o). 使用了基于 API 调用的模型（如 ChatGPT，GPT-4o）。"
+      "desc": "equipped with API-based models. (e.g. ChatGPT, GPT-4o). 支持基于 API 调用模型（如 ChatGPT，GPT-4o）。"
     },
     "vllm": {
       "icon": "![vllm](https://img.shields.io/badge/vllm-D99379?style=plastic)",
-      "desc": "equipped with models supported by vLLM. 使用了被 vLLM 支持的模型。"
+      "desc": "equipped with models supported by vLLM. 支持基于 vLLM 进行模型推理。"
     },
     "hf": {
       "icon": "![hf](https://img.shields.io/badge/hf-590F08?style=plastic)",
-      "desc": "equipped with models from HuggingFace Hub. 使用了来自于 HuggingFace Hub 的模型。"
+      "desc": "equipped with models from HuggingFace Hub. 支持来自于 HuggingFace Hub 的模型。"
     }
   }
 }
