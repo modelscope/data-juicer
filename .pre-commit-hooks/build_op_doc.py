@@ -206,6 +206,7 @@ class ClassVisitor(ast.NodeVisitor):
         node_info = ast.get_docstring(node)
         if node_info is None:
             print(f'No docstring found for class {name}')
+            self.generic_visit(node)
             return
         docstring = ' '.join(node_info.split()).split('. ')[0]
         if not docstring.endswith('.'):

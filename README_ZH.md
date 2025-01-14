@@ -117,7 +117,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 ### 编写Data-Juicer (DJ) 代码
 - [DJ概览](README_ZH.md)
-- [算子库](docs/Operators_ZH.md)
+- [算子库](docs/Operators.md)
 - [快速上手](#快速上手)
 - [配置](configs/README_ZH.md)
 - [开发者指南](docs/DeveloperGuide_ZH.md)
