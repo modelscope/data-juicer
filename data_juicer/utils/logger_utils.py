@@ -22,6 +22,7 @@ from io import StringIO
 
 from loguru import logger
 from loguru._file_sink import FileSink
+from tabulate import tabulate
 
 from data_juicer.utils.file_utils import add_suffix_to_filename
 
@@ -193,8 +194,8 @@ def make_log_summarization(max_show_item=10):
             error_msg = error_log['record']['message']
             find_res = re.findall(error_pattern, error_msg)
             if len(find_res) > 0:
-                sample, error_type, error_msg = find_res[0]
-                error = f'{error_type} -- \'{error_msg}\''
+                op_name, sample, error_type, error_msg = find_res[0]
+                error = (op_name, error_type, error_msg)
                 error_dict.setdefault(error, 0)
                 error_dict[error] += 1
     total_error_count = sum(error_dict.values())
@@ -210,9 +211,18 @@ def make_log_summarization(max_show_item=10):
     error_items = list(error_dict.items())
     error_items.sort(key=lambda it: it[1], reverse=True)
     error_items = error_items[:max_show_item]
-    for key, num in error_items:
-        summary += f'- {key}: {num}\n'
-    summary += f'Error/Warning details can be found in the log file ' \
+    # convert error items to a table
+    if len(error_items) > 0:
+        error_table = []
+        table_header = [
+            'OP/Method', 'Error Type', 'Error Message', 'Error Count'
+        ]
+        for key, num in error_items:
+            op_name, error_type, error_msg = key
+            error_table.append([op_name, error_type, error_msg, num])
+        table = tabulate(error_table, table_header, tablefmt='fancy_grid')
+        summary += table
+    summary += f'\nError/Warning details can be found in the log file ' \
                f'[{log_file}] and its related log files.'
     logger.opt(ansi=True).info(summary)
 
