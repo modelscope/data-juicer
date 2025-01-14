@@ -9,9 +9,9 @@ from typing import Dict, List, Optional
 from loguru import logger
 from pydantic import NonNegativeInt, PositiveInt
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
+from data_juicer.ops.base_op import OPERATORS, TAGGING_OPS, Mapper
 from data_juicer.utils.common_utils import is_float
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..common import split_text_by_punctuation
@@ -20,6 +20,7 @@ OP_NAME = 'extract_entity_relation_mapper'
 
 
 # TODO: LLM-based inference.
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 class ExtractEntityRelationMapper(Mapper):
     """
@@ -149,8 +150,8 @@ Output:
                  api_model: str = 'gpt-4o',
                  entity_types: List[str] = None,
                  *,
-                 entity_key: str = Fields.entity,
-                 relation_key: str = Fields.relation,
+                 entity_key: str = MetaKeys.entity,
+                 relation_key: str = MetaKeys.relation,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
                  prompt_template: Optional[str] = None,
@@ -171,10 +172,10 @@ Output:
         Initialization method.
         :param api_model: API model name.
         :param entity_types: Pre-defined entity types for knowledge graph.
-        :param entity_key: The field name to store the entities. It's
-            "__dj__entity__" in default.
+        :param entity_key: The key name to store the entities in the meta
+            field. It's "entity" in default.
         :param relation_key: The field name to store the relations between
-            entities. It's "__dj__relation__" in default.
+            entities. It's "relation" in default.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -256,9 +257,9 @@ Output:
             entities.append(items)
         entities = list(set(entities))
         entities = [{
-            Fields.entity_name: e[0],
-            Fields.entity_type: e[1],
-            Fields.entity_description: e[2]
+            MetaKeys.entity_name: e[0],
+            MetaKeys.entity_type: e[1],
+            MetaKeys.entity_description: e[2]
         } for e in entities]
 
         relation_pattern = re.compile(self.relation_pattern,
@@ -271,11 +272,16 @@ Output:
             relations.append(items)
         relations = list(set(relations))
         relations = [{
-            Fields.source_entity: r[0],
-            Fields.target_entity: r[1],
-            Fields.relation_description: r[2],
-            Fields.relation_keywords: split_text_by_punctuation(r[3]),
-            Fields.relation_strength: float(r[4])
+            MetaKeys.source_entity:
+            r[0],
+            MetaKeys.target_entity:
+            r[1],
+            MetaKeys.relation_description:
+            r[2],
+            MetaKeys.relation_keywords:
+            split_text_by_punctuation(r[3]),
+            MetaKeys.relation_strength:
+            float(r[4])
         } for r in relations]
 
         return entities, relations
@@ -309,6 +315,11 @@ Output:
 
     def process_single(self, sample, rank=None):
 
+        # check if it's generated already
+        if self.entity_key in sample[
+                Fields.meta] and self.relation_key in sample[Fields.meta]:
+            return sample
+
         input_prompt = self.prompt_template.format(
             tuple_delimiter=self.tuple_delimiter,
             record_delimiter=self.record_delimiter,
@@ -327,6 +338,6 @@ Output:
             except Exception as e:
                 logger.warning(f'Exception: {e}')
 
-        sample[self.entity_key] = entities
-        sample[self.relation_key] = relations
+        sample[Fields.meta][self.entity_key] = entities
+        sample[Fields.meta][self.relation_key] = relations
         return sample

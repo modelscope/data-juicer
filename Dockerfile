@@ -36,4 +36,3 @@ RUN pip install --upgrade setuptools==69.5.1 setuptools_scm \
 # install data-juicer then
 COPY . .
 RUN pip install -v -e .[all] --default-timeout 1000
-RUN pip install -v -e .[sandbox] --default-timeout 1000

@@ -3,7 +3,7 @@ from typing import Dict, Optional
 
 from pydantic import PositiveInt
 
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.lazy_loader import AUTOINSTALL
 from data_juicer.utils.mm_utils import SpecialTokens, remove_special_tokens
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -197,19 +197,19 @@ class VideoCaptioningFromSummarizerMapper(Mapper):
             temp_sample = {
                 self.text_key: chunk,
                 self.video_key: loaded_video_keys[offset:offset + vid_count],
-                Fields.meta: {}
+                Fields.meta: {},
             }
 
             captioned_text_list = []
             # tag ops
             for op in self.tag_op_list:
                 temp_sample = op.process(temp_sample, rank=rank)
-            if Fields.video_audio_tags in temp_sample[Fields.meta]:
+            if MetaKeys.video_audio_tags in temp_sample[Fields.meta]:
                 captioned_text_list.extend(
-                    temp_sample[Fields.meta][Fields.video_audio_tags])
-            if Fields.video_frame_tags in temp_sample[Fields.meta]:
+                    temp_sample[Fields.meta][MetaKeys.video_audio_tags])
+            if MetaKeys.video_frame_tags in temp_sample[Fields.meta]:
                 for tag_list in temp_sample[Fields.meta][
-                        Fields.video_frame_tags]:
+                        MetaKeys.video_frame_tags]:
                     captioned_text_list.extend(tag_list[self.keep_tag_num])
             # cap ops
             for op in self.cap_op_list:

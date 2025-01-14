@@ -7,9 +7,9 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.extract_keyword_mapper import ExtractKeywordMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 
-# Skip tests for this OP in the GitHub actions due to unknown DistNetworkError.
+# Skip tests for this OP.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class ExtractKeywordMapperTest(DataJuicerTestCaseBase):
@@ -57,9 +57,9 @@ class ExtractKeywordMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=2)
+        dataset = op.run(dataset)
         sample = dataset[0]
-        logger.info(f"keywords: {sample[Fields.keyword]}")
+        logger.info(f"keywords: {sample[Fields.meta][MetaKeys.keyword]}")
 
     def test(self):
         # before runing this test, set below environment variables:

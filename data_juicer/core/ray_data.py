@@ -9,13 +9,14 @@ from loguru import logger
 
 from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
-from data_juicer.ops import Filter, Mapper
+from data_juicer.ops import Deduplicator, Filter, Mapper
+from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.process_utils import calculate_np
 
 rd = LazyLoader('rd', 'ray.data')
-ds = LazyLoader('ds', 'ray.data.datasource')
+ds = LazyLoader('ds', 'ray.data.read_api')
 
 
 def get_abs_path(path, dataset_dir):
@@ -62,18 +63,8 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
 
 
 def preprocess_dataset(dataset: rd.Dataset, dataset_path, cfg) -> rd.Dataset:
-    columns = dataset.columns()
     if dataset_path:
         dataset = set_dataset_to_absolute_path(dataset, dataset_path, cfg)
-    if Fields.stats not in columns:
-
-        def process_batch_arrow(table: pyarrow.Table) -> pyarrow.Table:
-            new_column_data = [{} for _ in range(len(table))]
-            new_talbe = table.append_column(Fields.stats, [new_column_data])
-            return new_talbe
-
-        dataset = dataset.map_batches(process_batch_arrow,
-                                      batch_format='pyarrow')
     return dataset
 
 
@@ -118,19 +109,68 @@ class RayDataset(DJDataset):
         op_proc = calculate_np(op._name, op.mem_required, op.cpu_required,
                                self.num_proc, op.use_cuda())
         num_gpus = get_num_gpus(op, op_proc)
+
+        if (op._name in TAGGING_OPS.modules
+                and Fields.meta not in self.data.columns()):
+
+            def process_batch_arrow(table: pyarrow.Table):
+                new_column_data = [{} for _ in range(len(table))]
+                new_talbe = table.append_column(Fields.meta, [new_column_data])
+                return new_talbe
+
+            self.data = self.data.map_batches(process_batch_arrow,
+                                              batch_format='pyarrow')
+
         try:
             batch_size = getattr(op, 'batch_size',
                                  1) if op.is_batched_op() else 1
             if isinstance(op, Mapper):
-                self.data = self.data.map_batches(op.process,
-                                                  batch_size=batch_size,
-                                                  batch_format='pyarrow',
-                                                  num_gpus=num_gpus)
+                if op.use_cuda():
+                    op_kwargs = op._op_cfg[op._name]
+                    self.data = self.data.map_batches(
+                        op.__class__,
+                        fn_args=None,
+                        fn_kwargs=None,
+                        fn_constructor_args=None,
+                        fn_constructor_kwargs=op_kwargs,
+                        batch_size=batch_size,
+                        num_gpus=num_gpus,
+                        concurrency=op_proc,
+                        batch_format='pyarrow')
+                else:
+                    self.data = self.data.map_batches(op.process,
+                                                      batch_size=batch_size,
+                                                      batch_format='pyarrow',
+                                                      num_gpus=num_gpus)
             elif isinstance(op, Filter):
-                self.data = self.data.map_batches(op.compute_stats,
-                                                  batch_size=batch_size,
-                                                  batch_format='pyarrow',
-                                                  num_gpus=num_gpus)
+                columns = self.data.columns()
+                if Fields.stats not in columns:
+
+                    def process_batch_arrow(table: pyarrow.Table):
+                        new_column_data = [{} for _ in range(len(table))]
+                        new_talbe = table.append_column(
+                            Fields.stats, [new_column_data])
+                        return new_talbe
+
+                    self.data = self.data.map_batches(process_batch_arrow,
+                                                      batch_format='pyarrow')
+                if op.use_cuda():
+                    op_kwargs = op._op_cfg[op._name]
+                    self.data = self.data.map_batches(
+                        op.__class__,
+                        fn_args=None,
+                        fn_kwargs=None,
+                        fn_constructor_args=None,
+                        fn_constructor_kwargs=op_kwargs,
+                        batch_size=batch_size,
+                        num_gpus=num_gpus,
+                        concurrency=op_proc,
+                        batch_format='pyarrow')
+                else:
+                    self.data = self.data.map_batches(op.compute_stats,
+                                                      batch_size=batch_size,
+                                                      batch_format='pyarrow',
+                                                      num_gpus=num_gpus)
                 if op.stats_export_path is not None:
                     self.data.write_json(op.stats_export_path,
                                          force_ascii=False)
@@ -143,6 +183,8 @@ class RayDataset(DJDataset):
                                                       zero_copy_batch=True)
                 else:
                     self.data = self.data.filter(op.process)
+            elif isinstance(op, Deduplicator):
+                self.data = op.run(self.data)
             else:
                 logger.error(
                     'Ray executor only support Filter and Mapper OPs for now')
@@ -206,7 +248,7 @@ def read_json_stream(
     arrow_open_stream_args: Optional[Dict[str, Any]] = None,
     meta_provider=None,
     partition_filter=None,
-    partitioning=ds.partitioning.Partitioning('hive'),
+    partitioning=ds.Partitioning('hive'),
     include_paths: bool = False,
     ignore_missing_paths: bool = False,
     shuffle: Union[Literal['files'], None] = None,
@@ -216,7 +258,7 @@ def read_json_stream(
     **arrow_json_args,
 ) -> rd.Dataset:
     if meta_provider is None:
-        meta_provider = ds.file_meta_provider.DefaultFileMetadataProvider()
+        meta_provider = ds.DefaultFileMetadataProvider()
 
     datasource = JSONStreamDatasource(
         paths,

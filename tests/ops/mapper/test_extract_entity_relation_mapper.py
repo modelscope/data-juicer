@@ -7,9 +7,9 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.extract_entity_relation_mapper import ExtractEntityRelationMapper
 from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
                                               DataJuicerTestCaseBase)
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 
-# Skip tests for this OP in the GitHub actions due to unknown DistNetworkError.
+# Skip tests for this OP.
 # These tests have been tested locally.
 @SKIPPED_TESTS.register_module()
 class ExtractEntityRelationMapperTest(DataJuicerTestCaseBase):
@@ -54,10 +54,10 @@ class ExtractEntityRelationMapperTest(DataJuicerTestCaseBase):
         }]
 
         dataset = Dataset.from_list(samples)
-        dataset = dataset.map(op.process, batch_size=2)
+        dataset = op.run(dataset)
         sample = dataset[0]
-        logger.info(f"entitis: {sample[Fields.entity]}")
-        logger.info(f"relations: {sample[Fields.relation]}")
+        logger.info(f"entitis: {sample[Fields.meta][MetaKeys.entity]}")
+        logger.info(f"relations: {sample[Fields.meta][MetaKeys.relation]}")
 
     def test_default(self):
         # before runing this test, set below environment variables:

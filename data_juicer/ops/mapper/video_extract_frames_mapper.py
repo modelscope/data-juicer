@@ -4,7 +4,7 @@ import os.path as osp
 
 from pydantic import PositiveInt
 
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.file_utils import dict_to_hash
 from data_juicer.utils.mm_utils import (
     SpecialTokens, close_video, extract_key_frames,
@@ -12,12 +12,13 @@ from data_juicer.utils.mm_utils import (
     extract_video_frames_uniformly_by_seconds, load_data_with_context,
     load_video)
 
-from ..base_op import OPERATORS, Mapper
+from ..base_op import OPERATORS, TAGGING_OPS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 
 OP_NAME = 'video_extract_frames_mapper'
 
 
+@TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoExtractFramesMapper(Mapper):
@@ -41,7 +42,7 @@ class VideoExtractFramesMapper(Mapper):
         frame_num: PositiveInt = 3,
         duration: float = 0,
         frame_dir: str = None,
-        frame_key=Fields.video_frames,
+        frame_key=MetaKeys.video_frames,
         *args,
         **kwargs,
     ):
@@ -103,7 +104,7 @@ class VideoExtractFramesMapper(Mapper):
 
     def process_single(self, sample, context=False):
         # check if it's generated already
-        if self.frame_key in sample:
+        if self.frame_key in sample[Fields.meta]:
             return sample
 
         # there is no videos in this sample
@@ -168,6 +169,6 @@ class VideoExtractFramesMapper(Mapper):
             for vid_key in videos:
                 close_video(videos[vid_key])
 
-        sample[self.frame_key] = json.dumps(video_to_frame_dir)
+        sample[Fields.meta][self.frame_key] = json.dumps(video_to_frame_dir)
 
         return sample

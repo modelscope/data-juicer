@@ -5,7 +5,7 @@ import unittest
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.image_tagging_mapper import \
     ImageTaggingMapper
-from data_juicer.utils.constant import Fields
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 class ImageTaggingMapperTest(DataJuicerTestCaseBase):
@@ -39,7 +39,7 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
         tgt_list = [{
             'images': [self.img1_path],
             Fields.meta: {
-                Fields.image_tags: [[
+                MetaKeys.image_tags: [[
                     'bed', 'bedcover', 'bedroom', 'bedding', 'lamp', 'ceiling',
                     'chair', 'pillar', 'comfort', 'side table', 'floor',
                     'hardwood floor', 'headboard', 'linen', 'mattress',
@@ -48,14 +48,14 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
         }, {
             'images': [self.img2_path],
             Fields.meta: {
-                Fields.image_tags: [[
+                MetaKeys.image_tags: [[
                     'advertisement', 'back', 'bus', 'car', 'city bus',
                     'city street', 'curb', 'decker bus', 'drive', 'license plate',
                     'road', 'street scene', 'tour bus', 'travel', 'white']]},
         }, {
             'images': [self.img3_path],
             Fields.meta: {
-                Fields.image_tags: [[
+                MetaKeys.image_tags: [[
                     'alley', 'black', 'building', 'catch', 'person', 'pavement',
                     'photo', 'rain', 'road', 'umbrella', 'walk', 'woman']]},
         }]
@@ -71,11 +71,11 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
         tgt_list = [{
             'images': [],
             Fields.meta: {
-                Fields.image_tags: [[]]},
+                MetaKeys.image_tags: [[]]},
         }, {
             'images': [self.img2_path],
             Fields.meta: {
-                Fields.image_tags: [[
+                MetaKeys.image_tags: [[
                     'advertisement', 'back', 'bus', 'car', 'city bus',
                     'city street', 'curb', 'decker bus', 'drive', 'license plate',
                     'road', 'street scene', 'tour bus', 'travel', 'white']]},
@@ -135,7 +135,7 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
         tgt_list = [{
             'images': [self.img1_path],
             Fields.meta: {
-                Fields.image_tags: [[
+                MetaKeys.image_tags: [[
                     'bed', 'bedcover', 'bedroom', 'bedding', 'lamp', 'ceiling',
                     'chair', 'pillar', 'comfort', 'side table', 'floor',
                     'hardwood floor', 'headboard', 'linen', 'mattress',
@@ -144,14 +144,14 @@ class ImageTaggingMapperTest(DataJuicerTestCaseBase):
         }, {
             'images': [self.img2_path],
             Fields.meta: {
-                Fields.image_tags: [[
+                MetaKeys.image_tags: [[
                     'advertisement', 'back', 'bus', 'car', 'city bus',
                     'city street', 'curb', 'decker bus', 'drive', 'license plate',
                     'road', 'street scene', 'tour bus', 'travel', 'white']]},
         }, {
             'images': [self.img3_path],
             Fields.meta: {
-                Fields.image_tags: [[
+                MetaKeys.image_tags: [[
                     'alley', 'black', 'building', 'catch', 'person', 'pavement',
                     'photo', 'rain', 'road', 'umbrella', 'walk', 'woman']]},
         }]
