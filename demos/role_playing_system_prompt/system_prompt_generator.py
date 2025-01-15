@@ -13,7 +13,7 @@ from data_juicer.core.data import NestedDataset as Dataset
 
 api_model = 'qwen2.5-72b-instruct'
 
-main_entity = "李莲花"
+main_entity ="孙悟空"
 query_attributes = ["语言风格", "角色性格", "角色武艺和能力"]
 system_prompt_key = 'system_prompt'
 example_num_limit = 5
