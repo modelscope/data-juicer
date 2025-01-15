@@ -28,6 +28,7 @@ from .suffix_filter import SuffixFilter
 from .text_action_filter import TextActionFilter
 from .text_entity_dependency_filter import TextEntityDependencyFilter
 from .text_length_filter import TextLengthFilter
+from .text_pair_similarity_filter import TextPairSimilarityFilter
 from .token_num_filter import TokenNumFilter
 from .video_aesthetics_filter import VideoAestheticsFilter
 from .video_aspect_ratio_filter import VideoAspectRatioFilter
@@ -56,12 +57,12 @@ __all__ = [
     'SpecialCharactersFilter', 'SpecifiedFieldFilter',
     'SpecifiedNumericFieldFilter', 'StopWordsFilter', 'SuffixFilter',
     'TextActionFilter', 'TextEntityDependencyFilter', 'TextLengthFilter',
-    'TokenNumFilter', 'VideoAestheticsFilter', 'VideoAspectRatioFilter',
-    'VideoDurationFilter', 'VideoFramesTextSimilarityFilter',
-    'VideoMotionScoreFilter', 'VideoMotionScoreRaftFilter', 'VideoNSFWFilter',
-    'VideoOcrAreaRatioFilter', 'VideoResolutionFilter',
-    'VideoTaggingFromFramesFilter', 'VideoWatermarkFilter',
-    'WordRepetitionFilter', 'WordsNumFilter'
+    'TextPairSimilarityFilter', 'TokenNumFilter', 'VideoAestheticsFilter',
+    'VideoAspectRatioFilter', 'VideoDurationFilter',
+    'VideoFramesTextSimilarityFilter', 'VideoMotionScoreFilter',
+    'VideoMotionScoreRaftFilter', 'VideoNSFWFilter', 'VideoOcrAreaRatioFilter',
+    'VideoResolutionFilter', 'VideoTaggingFromFramesFilter',
+    'VideoWatermarkFilter', 'WordRepetitionFilter', 'WordsNumFilter'
 ]
 
 NON_STATS_FILTERS = [

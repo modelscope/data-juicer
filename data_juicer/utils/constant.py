@@ -20,6 +20,9 @@ class Fields(object):
     context = DEFAULT_PREFIX + 'context__'
     suffix = DEFAULT_PREFIX + 'suffix__'
 
+    # bounding box tag
+    bbox_tag = DEFAULT_PREFIX + 'bbox__'
+
     # the name of the original file from which this sample was derived.
     source_file = DEFAULT_PREFIX + 'source_file__'
 
@@ -205,6 +208,7 @@ class StatsKeysConstant(object):
     special_char_ratio = 'special_char_ratio'
     stopwords_ratio = 'stopwords_ratio'
     text_len = 'text_len'
+    text_pair_similarity = 'text_pair_similarity'
     num_action = 'num_action'
     num_dependency_edges = 'num_dependency_edges'
     num_token = 'num_token'

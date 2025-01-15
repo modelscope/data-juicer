@@ -33,15 +33,15 @@ repos:
       - id: mixed-line-ending
         exclude: thirdparty/
         args: [ "--fix=lf" ]
-  - repo: local
-    hooks:
-      - id: build-op-doc
-        name: build OP doc
-        entry: python .pre-commit-hooks/build_op_doc.py
-        language: python
-        require_serial: true
-        additional_dependencies:
-          - googletrans==4.0.2
+  # - repo: local
+  #   hooks:
+  #     - id: build-op-doc
+  #       name: build OP doc
+  #       entry: python .pre-commit-hooks/build_op_doc.py
+  #       language: python
+  #       require_serial: true
+  #       additional_dependencies:
+  #         - googletrans==4.0.2
 
 exclude: |
   (?x)^(

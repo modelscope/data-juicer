@@ -29,6 +29,7 @@ diffusers = LazyLoader('diffusers', 'diffusers')
 ram = LazyLoader('ram', 'ram.models')
 cv2 = LazyLoader('cv2', 'cv2')
 openai = LazyLoader('openai', 'openai')
+ultralytics = LazyLoader('ultralytics', 'ultralytics')
 
 MODEL_ZOO = {}
 
@@ -304,6 +305,12 @@ def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
     return model
 
 
+def prepare_fastsam_model(model_path, **model_params):
+    device = model_params.pop('device', 'cpu')
+    model = ultralytics.FastSAM(model_path).to(device)
+    return model
+
+
 def prepare_fasttext_model(model_name='lid.176.bin', **model_params):
     """
     Prepare and load a fasttext model.
@@ -456,6 +463,21 @@ def prepare_recognizeAnything_model(
                              vit='swin_l')
     device = model_params.pop('device', 'cpu')
     model.to(device).eval()
+    return model
+
+
+def prepare_sdxl_prompt2prompt(pretrained_model_name_or_path,
+                               pipe_func,
+                               torch_dtype='fp32',
+                               device='cpu'):
+    if torch_dtype == 'fp32':
+        model = pipe_func.from_pretrained(pretrained_model_name_or_path,
+                                          torch_dtype=torch.float32,
+                                          use_safetensors=True).to(device)
+    else:
+        model = pipe_func.from_pretrained(pretrained_model_name_or_path,
+                                          torch_dtype=torch.float16,
+                                          use_safetensors=True).to(device)
     return model
 
 
@@ -754,11 +776,13 @@ MODEL_FUNCTION_MAPPING = {
     'api': prepare_api_model,
     'diffusion': prepare_diffusion_model,
     'fasttext': prepare_fasttext_model,
+    'fastsam': prepare_fastsam_model,
     'huggingface': prepare_huggingface_model,
     'kenlm': prepare_kenlm_model,
     'nltk': prepare_nltk_model,
     'opencv_classifier': prepare_opencv_classifier,
     'recognizeAnything': prepare_recognizeAnything_model,
+    'sdxl-prompt-to-prompt': prepare_sdxl_prompt2prompt,
     'sentencepiece': prepare_sentencepiece_for_lang,
     'simple_aesthetics': prepare_simple_aesthetics_model,
     'spacy': prepare_spacy_model,
