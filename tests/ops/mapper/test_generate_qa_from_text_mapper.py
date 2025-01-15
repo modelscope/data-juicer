@@ -11,7 +11,7 @@ from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
 
 # Skip tests for this OP in the GitHub actions due to ?
 # These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
+# @SKIPPED_TESTS.register_module()
 class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
     text_key = 'text'
 
