@@ -1,6 +1,6 @@
 # global parameters
 project_name: 'role-play-demo-process'
-dataset_path: 'path_to_the_lianhualou_novel_json_file'
+dataset_path: 'demos/role_playing_system_prompt/wukong_mini_test.json'
 np: 1  # number of subprocess to process your dataset
 
 export_path: 'path_to_output_jsonl_file'
@@ -17,7 +17,7 @@ process:
   # extract language_style, role_charactor and role_skill
   - extract_entity_attribute_mapper:                  
       api_model: 'qwen2.5-72b-instruct'                                   
-      query_entities: ['李莲花']
+      query_entities: ['孙悟空']
       query_attributes: ["角色性格", "角色武艺和能力", "语言风格"]
   # extract nickname
   - extract_nickname_mapper:
@@ -31,14 +31,14 @@ process:
   # role experiences summary from events
   - entity_attribute_aggregator:
       api_model: 'qwen2.5-72b-instruct' 
-      entity: '李莲花'
+      entity: '孙悟空'
       attribute: '身份背景'
       input_key: 'event_description'
       output_key: 'role_background'
       word_limit: 50
   - entity_attribute_aggregator:
       api_model: 'qwen2.5-72b-instruct' 
-      entity: '李莲花'
+      entity: '孙悟空'
       attribute: '主要经历'
       input_key: 'event_description'
       output_key: 'role_experience'
@@ -46,12 +46,12 @@ process:
   # most relavant roles summary from events
   - most_relavant_entities_aggregator: 
       api_model: 'qwen2.5-72b-instruct' 
-      entity: '李莲花'
+      entity: '孙悟空'
       query_entity_type: '人物'
       input_key: 'event_description'
       output_key: 'important_relavant_roles'
   # generate the system prompt
   - python_file_mapper:
-      file_path: 'path_to_system_prompt_gereration_python_file'
+      file_path: 'demos/role_playing_system_prompt/system_prompt_generator.py'
       function_name: 'get_system_prompt'
   

@@ -3,6 +3,7 @@
 import re
 from typing import Dict, Optional
 
+import numpy as np
 from loguru import logger
 from pydantic import PositiveInt
 
@@ -160,7 +161,7 @@ Output:
         matches = output_pattern.findall(raw_output)
         for record in matches:
             items = split_text_by_punctuation(record)
-            keywords.append(items)
+            keywords.extend(items)
 
         return keywords
 
@@ -177,12 +178,13 @@ Output:
             input_text=sample[self.text_key])
         messages = [{'role': 'user', 'content': input_prompt}]
 
-        keywords = []
+        keywords = np.array([], dtype=str)
         for _ in range(self.try_num):
             try:
-                result = client(messages, **self.sampling_params)
-                keywords = self.parse_output(result)
-                if len(keywords) > 0:
+                response = client(messages, **self.sampling_params)
+                results = self.parse_output(response)
+                if len(results) > 0:
+                    keywords = results
                     break
             except Exception as e:
                 logger.warning(f'Exception: {e}')

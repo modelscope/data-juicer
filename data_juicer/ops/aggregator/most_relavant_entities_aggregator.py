@@ -1,6 +1,7 @@
 import re
 from typing import Dict, Optional
 
+import numpy as np
 from loguru import logger
 from pydantic import PositiveInt
 
@@ -151,12 +152,13 @@ class MostRelavantEntitiesAggregator(Aggregator):
             'role': 'user',
             'content': input_prompt
         }]
-        result = []
+        result = np.array([], dtype=str)
         for i in range(self.try_num):
             try:
                 response = model(messages, **self.sampling_params)
-                result = self.parse_output(response)
-                if len(result) > 0:
+                cur_result = self.parse_output(response)
+                if len(cur_result) > 0:
+                    result = cur_result
                     break
             except Exception as e:
                 logger.warning(f'Exception: {e}')
