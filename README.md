@@ -148,6 +148,8 @@ Table of Contents
 - [Refined recipes for fine-tuning text data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
 - [Refined recipes for pre-training multi-modal data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-multimodal-dataset)
 - [DJ-SORA](docs/DJ_SORA.md)
+- [Agentic Filters of DJ](./demos/api_service/react_data_filter_process.ipynb)
+- [Agentic Mappers of DJ](./demos/api_service/react_data_mapper_process.ipynb)
 
 
 ### Interactive Examples
@@ -470,7 +472,7 @@ Data-Juicer thanks many community [contributers](https://github.com/modelscope/d
 
 
 ## References
-If you find our work useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2309.02033).
+If you find Data-Juicer useful for your research or development, please kindly cite the following [paper](https://arxiv.org/abs/2309.02033).
 ```
 @inproceedings{chen2024datajuicer,
   title={Data-Juicer: A One-Stop Data Processing System for Large Language Models},
