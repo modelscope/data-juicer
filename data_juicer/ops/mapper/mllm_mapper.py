@@ -16,13 +16,14 @@ torch.set_num_threads(1)
 class MllmMapper(Mapper):
     """Mapper to use MLLMs for visual question answering tasks.
     Recommended model list: [
-        liuhaotian/llava-v1.6-vicuna-7b
+        llava-hf/llava-v1.6-vicuna-7b-hf,
+        Qwen/Qwen2-VL-7B-Instruct,
     ]
     """
     _accelerator = 'cuda'
 
     def __init__(self,
-                 hf_model: str = 'liuhaotian/llava-v1.6-vicuna-7b',
+                 hf_model: str = 'llava-hf/llava-v1.6-vicuna-7b-hf',
                  max_new_tokens=256,
                  temperature=0.2,
                  top_p=None,
@@ -44,6 +45,7 @@ class MllmMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '32GB')
         super().__init__(*args, num_proc=1, **kwargs)
 
         self.hf_model = hf_model

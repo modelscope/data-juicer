@@ -54,6 +54,7 @@ class SentenceAugmentationMapper(Mapper):
         :param args: extra args
         :param kwargs: extra args
         """
+        kwargs.setdefault('mem_required', '31GB')
         super().__init__(*args, num_proc=1, **kwargs)
 
         if system_prompt is None:

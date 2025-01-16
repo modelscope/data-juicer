@@ -57,6 +57,7 @@ class SDXLPrompt2PromptMapper(Mapper):
             in the caption pair.
 
         """
+        kwargs.setdefault('mem_required', '38GB')
         super().__init__(*args, **kwargs)
         self._init_parameters = self.remove_extra_parameters(locals())
         self.num_inference_steps = num_inference_steps
@@ -99,7 +100,7 @@ class SDXLPrompt2PromptMapper(Mapper):
             },
         }
 
-        sample['images'] = []
+        sample[self.image_key] = []
 
         with torch.no_grad():
             prompts = [
@@ -111,8 +112,8 @@ class SDXLPrompt2PromptMapper(Mapper):
                           num_inference_steps=self.num_inference_steps,
                           generator=g_cpu)
 
-            for idx, img in enumerate(image['images']):
-                sample['images'].append(img)
+            for idx, img in enumerate(image[self.image_key]):
+                sample[self.image_key].append(img)
 
         return sample
 
