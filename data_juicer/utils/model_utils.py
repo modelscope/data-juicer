@@ -58,6 +58,14 @@ BACKUP_MODEL_LINKS = {
     'ram_plus_swin_large_14m.pth':
     'http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/models/'
     'ram_plus_swin_large_14m.pth',
+
+    # FastSAM
+    'FastSAM-s.pt':
+    'https://github.com/ultralytics/assets/releases/download/v8.2.0/'
+    'FastSAM-s.pt',
+    'FastSAM-x.pt':
+    'https://github.com/ultralytics/assets/releases/download/v8.2.0/'
+    'FastSAM-x.pt',
 }
 
 
@@ -307,7 +315,7 @@ def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
 
 def prepare_fastsam_model(model_path, **model_params):
     device = model_params.pop('device', 'cpu')
-    model = ultralytics.FastSAM(model_path).to(device)
+    model = ultralytics.FastSAM(check_model(model_path)).to(device)
     return model
 
 

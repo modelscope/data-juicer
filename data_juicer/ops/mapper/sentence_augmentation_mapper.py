@@ -1,5 +1,9 @@
 from data_juicer.ops.base_op import OPERATORS, Mapper
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
+
+torch = LazyLoader('torch', 'torch')
+transformers = LazyLoader('transformers', 'transformers')
 
 DEFAULT_SYSTEM_PROMPT = "A chat between a curious user and an artificial \
     intelligence assistant. The assistant gives helpful, detailed, and \

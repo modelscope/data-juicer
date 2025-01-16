@@ -20,9 +20,6 @@ class Fields(object):
     context = DEFAULT_PREFIX + 'context__'
     suffix = DEFAULT_PREFIX + 'suffix__'
 
-    # bounding box tag
-    bbox_tag = DEFAULT_PREFIX + 'bbox__'
-
     # the name of the original file from which this sample was derived.
     source_file = DEFAULT_PREFIX + 'source_file__'
 
@@ -65,6 +62,8 @@ class MetaKeys(object):
     video_frames = 'video_frames'
     # # image tags
     image_tags = 'image_tags'
+    # bounding box tag
+    bbox_tag = DEFAULT_PREFIX + 'bbox__'
 
     # === info extraction related tags ===
     # # for event extraction

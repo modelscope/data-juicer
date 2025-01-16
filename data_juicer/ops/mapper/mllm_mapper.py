@@ -7,6 +7,7 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 OP_NAME = 'mllm_mapper'
 
 torch = LazyLoader('torch', 'torch')
+transformers = LazyLoader('transformers', 'transformers')
 torch.set_num_threads(1)
 
 
