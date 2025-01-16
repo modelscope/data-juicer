@@ -751,6 +751,85 @@ def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
 
     return (model, tokenizer)
 
+def prepare_SenseVoiceSmall_model(pretrained_model_name_or_path):
+    """
+    Prepare and load light sharegpt4video.
+
+    :param model_name: input model name.
+    """
+    from data_juicer.my_pretrained_method.SenseVoice.model import SenseVoiceSmall
+    
+    logger.info('Loading ASR_Emo_model model...')
+    ASR_Emo_model, kwargs1 = SenseVoiceSmall.from_pretrained(model=pretrained_model_name_or_path)
+    
+    ASR_Emo_model.eval()
+    return ASR_Emo_model, kwargs1
+
+def prepare_light_asd_model(
+        pretrained_model_name_or_path='weight/finetuning_TalkSet.model'):
+    """
+    Prepare and load light asd model.
+
+    :param model_name: input model name.
+    """
+    logger.info('Loading light_asd model...')
+    from ASD import ASD
+    model = ASD()
+    model.loadParameters(pretrained_model_name_or_path)
+    model.eval()
+    return model
+
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+sys.path.append('./data_juicer/my_pretrained_method/VideoLLaMA2')
+from videollama2 import model_init
+def prepare_VideoLLaMA2_model(pretrained_model_name_or_path):
+    model, processor, tokenizer = model_init(pretrained_model_name_or_path, device_map="cpu")
+    model.eval()
+    return model, processor, tokenizer
+
+def prepare_sharegpt4video_model(pretrained_model_name_or_path):
+    """
+    Prepare and load light sharegpt4video.
+
+    :param model_name: input model name.
+    """
+    import sys
+    sys.path.append('./data_juicer/my_pretrained_method/ShareGPT4Video')
+    from llava.mm_utils import get_model_name_from_path
+    from llava.model.builder import load_pretrained_model
+    
+    logger.info('Loading sharegpt4video model...')
+    model_name = get_model_name_from_path(pretrained_model_name_or_path)
+    tokenizer, model, processor, context_len = load_pretrained_model(
+        pretrained_model_name_or_path, None, model_name, device_map='cpu')
+    
+    model.eval()
+    return tokenizer, model, processor
+
+def prepare_YOLOv8_human_model(
+        pretrained_model_name_or_path='/home/daoyuan_mm/data_juicer/data_juicer/my_pretrained_method/YOLOv8_human/weights/best.pt'):
+    """
+    Prepare and load light YOLOv8_human.
+
+    :param model_name: input model name.
+    """
+    logger.info('Loading YOLOv8_human model...')
+    human_detection_model = torch.load(pretrained_model_name_or_path)['model'].float()
+    human_detection_model.half()
+    human_detection_model.eval()
+    return human_detection_model
+
+def prepare_face_detect_S3FD_model():
+    """
+    Prepare and load light asd model.
+
+    :param model_name: input model name.
+    """
+    logger.info('Loading face_detect_S3FD_model model...')
+    from model.faceDetector.s3fd import S3FD
+    model = S3FD()
+    
 
 def update_sampling_params(sampling_params,
                            pretrained_model_name_or_path,
@@ -817,6 +896,12 @@ MODEL_FUNCTION_MAPPING = {
     'spacy': prepare_spacy_model,
     'video_blip': prepare_video_blip_model,
     'vllm': prepare_vllm_model,
+    'Light_ASD': prepare_light_asd_model,
+    'SenseVoiceSmall': prepare_SenseVoiceSmall_model,
+    'VideoLLaMA2': prepare_VideoLLaMA2_model,
+    'sharegpt4video': prepare_sharegpt4video_model,
+    'YOLOv8_human': prepare_YOLOv8_human_model,
+    'face_detect_S3FD': prepare_face_detect_S3FD_model
 }
 
 _MODELS_WITHOUT_FILE_LOCK = {

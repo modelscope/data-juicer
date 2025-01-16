@@ -73,6 +73,13 @@ from .video_split_by_scene_mapper import VideoSplitBySceneMapper
 from .video_tagging_from_audio_mapper import VideoTaggingFromAudioMapper
 from .video_tagging_from_frames_mapper import VideoTaggingFromFramesMapper
 from .whitespace_normalization_mapper import WhitespaceNormalizationMapper
+from .video_active_speaker_mapper import VideoActiveSpeakerMapper
+from .video_audio_attribute_mapper import VideoAudioAttributeMapper
+from .video_audio_speech_ASR_mapper import VideoAudioSpeechASRMapper
+from .video_captioning_face_attribute_emotion_mapper import VideoCaptioningFaceAttributeEmotionMapper
+from .video_captioning_from_human_tracks_mapper import VideoCaptioningFromHumanTracksMapper
+from .video_human_tracks_extraction_mapper import VideoHumanTracksExtractionMapper
+from .video_captioning_face_attribute_emotion_mapper import VideoCaptioningFaceAttributeEmotionMapper
 
 __all__ = [
     'AudioFFmpegWrappedMapper', 'CalibrateQAMapper', 'CalibrateQueryMapper',
@@ -105,5 +112,8 @@ __all__ = [
     'VideoResizeResolutionMapper', 'VideoSplitByDurationMapper',
     'VideoSplitByKeyFrameMapper', 'VideoSplitBySceneMapper',
     'VideoTaggingFromAudioMapper', 'VideoTaggingFromFramesMapper',
-    'WhitespaceNormalizationMapper'
+    'WhitespaceNormalizationMapper','VideoActiveSpeakerMapper',
+    'VideoAudioAttributeMapper', 'VideoAudioSpeechASRMapper',
+    'VideoCaptioningFaceAttributeEmotionMapper','VideoCaptioningFromHumanTracksMapper', 
+    'VideoHumanTracksExtractionMapper', 'VideoCaptioningFaceAttributeEmotionMapper'
 ]
