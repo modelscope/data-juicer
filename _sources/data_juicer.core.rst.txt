@@ -1,5 +1,83 @@
-data_juicer.core
-================
+data\_juicer.core package
+=========================
+
+Submodules
+----------
+
+data\_juicer.core.adapter module
+--------------------------------
+
+.. automodule:: data_juicer.core.adapter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.core.analyzer module
+---------------------------------
+
+.. automodule:: data_juicer.core.analyzer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.core.data module
+-----------------------------
+
+.. automodule:: data_juicer.core.data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.core.executor module
+---------------------------------
+
+.. automodule:: data_juicer.core.executor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.core.exporter module
+---------------------------------
+
+.. automodule:: data_juicer.core.exporter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.core.monitor module
+--------------------------------
+
+.. automodule:: data_juicer.core.monitor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.core.ray\_data module
+----------------------------------
+
+.. automodule:: data_juicer.core.ray_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.core.ray\_executor module
+--------------------------------------
+
+.. automodule:: data_juicer.core.ray_executor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+data\_juicer.core.tracer module
+-------------------------------
+
+.. automodule:: data_juicer.core.tracer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
 
 .. automodule:: data_juicer.core
    :members:
