@@ -62,7 +62,9 @@ class ExtractSupportTextMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(samples)
         dataset = op.run(dataset)
         sample = dataset[0]
+        self.assertIn(MetaKeys.support_text, sample[Fields.meta])
         logger.info(f"support_text: \n{sample[Fields.meta][MetaKeys.support_text]}")
+        self.assertNotEqual(sample[Fields.meta][MetaKeys.support_text], '')
 
     def test(self):
         # before runing this test, set below environment variables:

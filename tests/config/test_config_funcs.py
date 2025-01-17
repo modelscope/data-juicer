@@ -56,6 +56,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                         'work_dir': WORKDIR,
                     }
                 }, 'nested dict load fail, for nonparametric op')
@@ -79,6 +80,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                         'work_dir': WORKDIR,
                     }
                 }, 'nested dict load fail, un-expected internal value')
@@ -151,6 +153,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                         'work_dir': WORKDIR,
                     }
                 })
@@ -174,6 +177,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                         'work_dir': WORKDIR,
                     }
                 })
@@ -197,6 +201,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                         'work_dir': WORKDIR,
                     }
                 })
@@ -220,6 +225,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                         'work_dir': WORKDIR,
                     }
                 })
@@ -243,6 +249,7 @@ class ConfigTest(DataJuicerTestCaseBase):
                         'turbo': False,
                         'batch_size': 1000,
                         'index_key': None,
+                        'skip_op_error': True,
                         'work_dir': WORKDIR,
                     }
                 })
