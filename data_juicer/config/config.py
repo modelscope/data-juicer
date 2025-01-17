@@ -219,8 +219,13 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
         '--turbo',
         type=bool,
         default=False,
-        help='Enable Turbo mode to maximize processing speed. Stability '
-        'features like fault tolerance will be disabled.')
+        help='Enable Turbo mode to maximize processing speed when batch size '
+        'is 1.')
+    parser.add_argument(
+        '--skip_op_error',
+        type=bool,
+        default=True,
+        help='Skip errors in OPs caused by unexpected invalid samples.')
     parser.add_argument(
         '--use_cache',
         type=bool,
@@ -550,6 +555,7 @@ def init_setup_from_cfg(cfg: Namespace):
         'video_key': cfg.video_key,
         'num_proc': cfg.np,
         'turbo': cfg.turbo,
+        'skip_op_error': cfg.skip_op_error,
         'work_dir': cfg.work_dir,
     }
     cfg.process = update_op_attr(cfg.process, op_attrs)

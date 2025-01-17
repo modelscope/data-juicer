@@ -5,13 +5,13 @@ from loguru import logger
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.aggregator import EntityAttributeAggregator
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
-from data_juicer.utils.constant import Fields, MetaKeys
+from data_juicer.utils.constant import Fields, BatchMetaKeys, MetaKeys
 
 
 @SKIPPED_TESTS.register_module()
 class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
 
-    def _run_helper(self, op, samples):
+    def _run_helper(self, op, samples, output_key=BatchMetaKeys.entity_attribute):
 
         # before runing this test, set below environment variables:
         # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
@@ -23,6 +23,8 @@ class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
         for data in new_dataset:
             for k in data:
                 logger.info(f"{k}: {data[k]}")
+            self.assertIn(output_key, data[Fields.batch_meta])
+            self.assertNotEqual(data[Fields.batch_met][output_key], '')
 
         self.assertEqual(len(new_dataset), len(samples))
 
@@ -64,7 +66,7 @@ class EntityAttributeAggregatorTest(DataJuicerTestCaseBase):
             input_key='sub_docs',
             output_key='text'
         )
-        self._run_helper(op, samples)
+        self._run_helper(op, samples, output_key='text')
 
     def test_max_token_num(self):
         samples = [

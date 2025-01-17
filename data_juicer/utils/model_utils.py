@@ -29,6 +29,7 @@ diffusers = LazyLoader('diffusers', 'diffusers')
 ram = LazyLoader('ram', 'ram.models')
 cv2 = LazyLoader('cv2', 'cv2')
 openai = LazyLoader('openai', 'openai')
+ultralytics = LazyLoader('ultralytics', 'ultralytics')
 
 MODEL_ZOO = {}
 
@@ -57,6 +58,14 @@ BACKUP_MODEL_LINKS = {
     'ram_plus_swin_large_14m.pth':
     'http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/models/'
     'ram_plus_swin_large_14m.pth',
+
+    # FastSAM
+    'FastSAM-s.pt':
+    'https://github.com/ultralytics/assets/releases/download/v8.2.0/'
+    'FastSAM-s.pt',
+    'FastSAM-x.pt':
+    'https://github.com/ultralytics/assets/releases/download/v8.2.0/'
+    'FastSAM-x.pt',
 }
 
 
@@ -304,6 +313,12 @@ def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
     return model
 
 
+def prepare_fastsam_model(model_path, **model_params):
+    device = model_params.pop('device', 'cpu')
+    model = ultralytics.FastSAM(check_model(model_path)).to(device)
+    return model
+
+
 def prepare_fasttext_model(model_name='lid.176.bin', **model_params):
     """
     Prepare and load a fasttext model.
@@ -456,6 +471,21 @@ def prepare_recognizeAnything_model(
                              vit='swin_l')
     device = model_params.pop('device', 'cpu')
     model.to(device).eval()
+    return model
+
+
+def prepare_sdxl_prompt2prompt(pretrained_model_name_or_path,
+                               pipe_func,
+                               torch_dtype='fp32',
+                               device='cpu'):
+    if torch_dtype == 'fp32':
+        model = pipe_func.from_pretrained(pretrained_model_name_or_path,
+                                          torch_dtype=torch.float32,
+                                          use_safetensors=True).to(device)
+    else:
+        model = pipe_func.from_pretrained(pretrained_model_name_or_path,
+                                          torch_dtype=torch.float16,
+                                          use_safetensors=True).to(device)
     return model
 
 
@@ -744,21 +774,76 @@ def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     if model_params.get('device', '').startswith('cuda:'):
         model_params['device'] = 'cuda'
 
-    model = vllm.LLM(model=pretrained_model_name_or_path, **model_params)
+    model = vllm.LLM(model=pretrained_model_name_or_path,
+                     generation_config='auto',
+                     **model_params)
     tokenizer = model.get_tokenizer()
 
     return (model, tokenizer)
+
+
+def update_sampling_params(sampling_params,
+                           pretrained_model_name_or_path,
+                           enable_vllm=False):
+    if enable_vllm:
+        update_keys = {'max_tokens'}
+    else:
+        update_keys = {'max_new_tokens'}
+    generation_config_keys = {
+        'max_tokens': ['max_tokens', 'max_new_tokens'],
+        'max_new_tokens': ['max_tokens', 'max_new_tokens'],
+    }
+    generation_config_thresholds = {
+        'max_tokens': (max, 512),
+        'max_new_tokens': (max, 512),
+    }
+
+    # try to get the generation configs
+    from transformers import GenerationConfig
+    try:
+        model_generation_config = GenerationConfig.from_pretrained(
+            pretrained_model_name_or_path).to_dict()
+    except:  # noqa: E722
+        logger.warning(f'No generation config found for the model '
+                       f'[{pretrained_model_name_or_path}]')
+        model_generation_config = {}
+
+    for key in update_keys:
+        # if there is this param in the sampling_prams, compare it with the
+        # thresholds and apply the specified updating function
+        if key in sampling_params:
+            logger.debug(f'Found param {key} in the input `sampling_params`.')
+            continue
+        # if not, try to find it in the generation_config of the model
+        found = False
+        for config_key in generation_config_keys[key]:
+            if config_key in model_generation_config \
+                    and model_generation_config[config_key]:
+                sampling_params[key] = model_generation_config[config_key]
+                found = True
+                break
+        if found:
+            logger.debug(f'Found param {key} in the generation config as '
+                         f'{sampling_params[key]}.')
+            continue
+        # if not again, use the threshold directly
+        _, th = generation_config_thresholds[key]
+        sampling_params[key] = th
+        logger.debug(f'Use the threshold {th} as the sampling param {key}.')
+    return sampling_params
 
 
 MODEL_FUNCTION_MAPPING = {
     'api': prepare_api_model,
     'diffusion': prepare_diffusion_model,
     'fasttext': prepare_fasttext_model,
+    'fastsam': prepare_fastsam_model,
     'huggingface': prepare_huggingface_model,
     'kenlm': prepare_kenlm_model,
     'nltk': prepare_nltk_model,
     'opencv_classifier': prepare_opencv_classifier,
     'recognizeAnything': prepare_recognizeAnything_model,
+    'sdxl-prompt-to-prompt': prepare_sdxl_prompt2prompt,
     'sentencepiece': prepare_sentencepiece_for_lang,
     'simple_aesthetics': prepare_simple_aesthetics_model,
     'spacy': prepare_spacy_model,

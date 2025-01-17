@@ -28,6 +28,7 @@ class TestDialogSentimentIntensityMapper(DataJuicerTestCaseBase):
         for analysis, intensity in zip(analysis_list, intensity_list):
             logger.info(f'分析：{analysis}')
             logger.info(f'情绪：{intensity}')
+            self.assertNotEqual(analysis, '')
         
         self.assertEqual(len(analysis_list), target_len)
         self.assertEqual(len(intensity_list), target_len)
