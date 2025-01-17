@@ -4,7 +4,7 @@ from data_juicer.core.data import NestedDataset as Dataset
 
 from data_juicer.ops.deduplicator.ray_bts_minhash_deduplicator import \
     RayBTSMinhashDeduplicator
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
 
 class RayBTSMinhashDeduplicatorTest(DataJuicerTestCaseBase):
@@ -15,6 +15,7 @@ class RayBTSMinhashDeduplicatorTest(DataJuicerTestCaseBase):
         target_list.sort(key=lambda x: x['text'])
         self.assertEqual(res_list, target_list)
 
+    @TEST_TAG("ray")
     def test_english_deduplication(self):
         ds_list = [
             {
@@ -821,6 +822,7 @@ class RayBTSMinhashDeduplicatorTest(DataJuicerTestCaseBase):
         op = RayBTSMinhashDeduplicator(ignore_pattern=r'\p{P}')
         self._run_minhash_dedup(dataset, tgt_list, op)
 
+    @TEST_TAG("ray")
     def test_chinese_deduplication(self):
         ds_list = [
             {
