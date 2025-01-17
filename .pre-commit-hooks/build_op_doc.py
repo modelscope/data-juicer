@@ -151,7 +151,7 @@ def analyze_resource_tag(code):
 def analyze_model_tags(code):
     """
     Analyze the model tag for the given code content string. SHOULD be one of
-    the "Modal Tags" in `tagging_mappings.json`. It makes the choice by finding
+    the "Model Tags" in `tagging_mappings.json`. It makes the choice by finding
     the `model_type` arg in `prepare_model` method invocation.
     """
     pattern = r'model_type=[\'|\"](.*?)[\'|\"]'
