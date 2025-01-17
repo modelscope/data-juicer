@@ -2,10 +2,12 @@ import re
 from typing import Dict, Optional
 
 from loguru import logger
+from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.model_utils import (get_model, prepare_model,
+                                           update_sampling_params)
 
 torch = LazyLoader('torch', 'torch')
 vllm = LazyLoader('vllm', 'vllm')
@@ -35,6 +37,7 @@ class GenerateQAFromTextMapper(Mapper):
 
     def __init__(self,
                  hf_model: str = 'alibaba-pai/pai-qwen1_5-7b-doc2qa',
+                 max_num: Optional[PositiveInt] = None,
                  *,
                  output_pattern: Optional[str] = None,
                  enable_vllm: bool = False,
@@ -45,6 +48,8 @@ class GenerateQAFromTextMapper(Mapper):
         Initialization method.
 
         :param hf_model: Hugginface model ID.
+        :param max_num: The max num of returned QA sample for each text.
+            Not limit if it is None.
         :param output_pattern: Regular expression pattern to extract
             questions and answers from model response.
         :param enable_vllm: Whether to use vllm for inference acceleration.
@@ -68,6 +73,8 @@ class GenerateQAFromTextMapper(Mapper):
         """
 
         super().__init__(**kwargs)
+
+        self.max_num = max_num
 
         if output_pattern is None:
             self.output_pattern = r'Human:(.*?)Assistant:(.*?)(?=Human|$)'  # noqa: E501
@@ -100,6 +107,10 @@ class GenerateQAFromTextMapper(Mapper):
                 **model_params)
             self.sampling_params = sampling_params
 
+        self.sampling_params = update_sampling_params(sampling_params,
+                                                      hf_model,
+                                                      self.enable_vllm)
+
     def parse_output(self, raw_output):
         logger.debug(raw_output)
         qa_list = []
@@ -131,6 +142,10 @@ class GenerateQAFromTextMapper(Mapper):
                 output = response[0]['generated_text']
 
             qa_list = self.parse_output(output)
+
+            if self.max_num is not None:
+                qa_list = qa_list[:self.max_num]
+
             if len(qa_list) > 0:
                 for q, a in qa_list:
                     for input_k in input_keys:

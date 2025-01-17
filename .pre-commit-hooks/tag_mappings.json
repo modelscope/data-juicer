@@ -1,0 +1,62 @@
+{
+  "Modality Tags": {
+    "text": {
+      "icon": "![text](https://img.shields.io/badge/text-010326?style=plastic)",
+      "desc": "process text data specifically. 专用于处理文本。"
+    },
+    "image": {
+      "icon": "![image](https://img.shields.io/badge/image-07B0F2?style=plastic)",
+      "desc": "process image data specifically. 专用于处理图像。"
+    },
+    "audio": {
+      "icon": "![audio](https://img.shields.io/badge/audio-0DA64F?style=plastic)",
+      "desc": "process audio data specifically. 专用于处理音频。"
+    },
+    "video": {
+      "icon": "![video](https://img.shields.io/badge/video-F2B138?style=plastic)",
+      "desc": "process video data specifically. 专用于处理视频。"
+    },
+    "multimodal": {
+      "icon": "![multimodal](https://img.shields.io/badge/multimodal-F25922?style=plastic)",
+      "desc": "process multimodal data. 用于处理多模态数据。"
+    }
+  },
+  "Resource Tags": {
+    "cpu": {
+      "icon": "![cpu](https://img.shields.io/badge/cpu-F2AA6B?style=plastic)",
+      "desc": "only requires CPU resource. 只需要 CPU 资源。"
+    },
+    "gpu": {
+      "icon": "![gpu](https://img.shields.io/badge/gpu-F27649?style=plastic)",
+      "desc": "requires GPU/CUDA resource as well. 额外需要 GPU/CUDA 资源。"
+    }
+  },
+  "Usability Tags": {
+    "alpha": {
+      "icon": "![alpha](https://img.shields.io/badge/alpha-red?style=plastic)",
+      "desc": "alpha version OP. Only the basic OP implementations are finished. 表示 alpha 版本算子。只完成了基础的算子实现。"
+    },
+    "beta": {
+      "icon": "![beta](https://img.shields.io/badge/beta-yellow?style=plastic)",
+      "desc": "beta version OP. Based on the alpha version, unittests for this OP are added as well. 表示 beta 版本算子。基于 alpha 版本，添加了算子的单元测试。"
+    },
+    "stable": {
+      "icon": "![stable](https://img.shields.io/badge/stable-green?style=plastic)",
+      "desc": "stable version OP. Based on the beta version, OP optimizations related to DJ (e.g. model management, batched processing, OP fusion, ...) are added to this OP. 表示 stable 版本算子。基于 beta 版本，完善了DJ相关的算子优化项（如模型管理，批处理，算子融合等）。"
+    }
+  },
+  "Modal Tags": {
+    "api": {
+      "icon": "![api](https://img.shields.io/badge/api-A64C44?style=plastic)",
+      "desc": "equipped with API-based models. (e.g. ChatGPT, GPT-4o). 支持基于 API 调用模型（如 ChatGPT，GPT-4o）。"
+    },
+    "vllm": {
+      "icon": "![vllm](https://img.shields.io/badge/vllm-D99379?style=plastic)",
+      "desc": "equipped with models supported by vLLM. 支持基于 vLLM 进行模型推理。"
+    },
+    "hf": {
+      "icon": "![hf](https://img.shields.io/badge/hf-590F08?style=plastic)",
+      "desc": "equipped with models from HuggingFace Hub. 支持来自于 HuggingFace Hub 的模型。"
+    }
+  }
+}

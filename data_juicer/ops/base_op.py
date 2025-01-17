@@ -1,5 +1,4 @@
 import copy
-import traceback
 from functools import wraps
 
 import numpy as np
@@ -48,10 +47,13 @@ def convert_arrow_to_python(method):
     return wrapper
 
 
-def catch_map_batches_exception(method, skip_op_error=False):
+def catch_map_batches_exception(method, skip_op_error=False, op_name=None):
     """
     For batched-map sample-level fault tolerance.
     """
+
+    if op_name is None:
+        op_name = method.__name__
 
     @wraps(method)
     @convert_arrow_to_python
@@ -62,10 +64,8 @@ def catch_map_batches_exception(method, skip_op_error=False):
             if not skip_op_error:
                 raise
             from loguru import logger
-            logger.error(
-                f'An error occurred in mapper operation when processing '
-                f'samples {samples}, {type(e)}: {e}')
-            traceback.print_exc()
+            logger.error(f'An error occurred in {op_name} when processing '
+                         f'samples "{samples}" -- {type(e)}: {e}')
             ret = {key: [] for key in samples.keys()}
             ret[Fields.stats] = []
             ret[Fields.source_file] = []
@@ -76,11 +76,15 @@ def catch_map_batches_exception(method, skip_op_error=False):
 
 def catch_map_single_exception(method,
                                return_sample=True,
-                               skip_op_error=False):
+                               skip_op_error=False,
+                               op_name=None):
     """
     For single-map sample-level fault tolerance.
     The input sample is expected batch_size = 1.
     """
+
+    if op_name is None:
+        op_name = method.__name__
 
     def is_batched(sample):
         val_iter = iter(sample.values())
@@ -107,10 +111,8 @@ def catch_map_single_exception(method,
                 if skip_op_error:
                     raise
                 from loguru import logger
-                logger.error(
-                    f'An error occurred in mapper operation when processing '
-                    f'sample {sample}, {type(e)}: {e}')
-                traceback.print_exc()
+                logger.error(f'An error occurred in {op_name} when processing '
+                             f'sample "{sample}" -- {type(e)}: {e}')
                 ret = {key: [] for key in sample.keys()}
                 ret[Fields.stats] = []
                 ret[Fields.source_file] = []
@@ -288,10 +290,14 @@ class Mapper(OP):
         # runtime wrappers
         if self.is_batched_op():
             self.process = catch_map_batches_exception(
-                self.process_batched, skip_op_error=self.skip_op_error)
+                self.process_batched,
+                skip_op_error=self.skip_op_error,
+                op_name=self._name)
         else:
             self.process = catch_map_single_exception(
-                self.process_single, skip_op_error=self.skip_op_error)
+                self.process_single,
+                skip_op_error=self.skip_op_error,
+                op_name=self._name)
 
     # set the process method is not allowed to be overridden
     def __init_subclass__(cls, **kwargs):
@@ -378,16 +384,23 @@ class Filter(OP):
         # runtime wrappers
         if self.is_batched_op():
             self.compute_stats = catch_map_batches_exception(
-                self.compute_stats_batched, skip_op_error=self.skip_op_error)
+                self.compute_stats_batched,
+                skip_op_error=self.skip_op_error,
+                op_name=self._name)
             self.process = catch_map_batches_exception(
-                self.process_batched, skip_op_error=self.skip_op_error)
+                self.process_batched,
+                skip_op_error=self.skip_op_error,
+                op_name=self._name)
         else:
             self.compute_stats = catch_map_single_exception(
-                self.compute_stats_single, skip_op_error=self.skip_op_error)
+                self.compute_stats_single,
+                skip_op_error=self.skip_op_error,
+                op_name=self._name)
             self.process = catch_map_single_exception(
                 self.process_single,
                 return_sample=False,
-                skip_op_error=self.skip_op_error)
+                skip_op_error=self.skip_op_error,
+                op_name=self._name)
 
     # set the process method is not allowed to be overridden
     def __init_subclass__(cls, **kwargs):
@@ -497,10 +510,14 @@ class Deduplicator(OP):
         # runtime wrappers
         if self.is_batched_op():
             self.compute_hash = catch_map_batches_exception(
-                self.compute_hash, skip_op_error=self.skip_op_error)
+                self.compute_hash,
+                skip_op_error=self.skip_op_error,
+                op_name=self._name)
         else:
             self.compute_hash = catch_map_single_exception(
-                self.compute_hash, skip_op_error=self.skip_op_error)
+                self.compute_hash,
+                skip_op_error=self.skip_op_error,
+                op_name=self._name)
 
     def compute_hash(self, sample):
         """
@@ -637,7 +654,9 @@ class Aggregator(OP):
         """
         super(Aggregator, self).__init__(*args, **kwargs)
         self.process = catch_map_single_exception(
-            self.process_single, skip_op_error=self.skip_op_error)
+            self.process_single,
+            skip_op_error=self.skip_op_error,
+            op_name=self._name)
 
     def process_single(self, sample):
         """

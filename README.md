@@ -1,54 +1,57 @@
-[[中文主页]](README_ZH.md) | [[Docs]](#documents) | [[API]](https://modelscope.github.io/data-juicer) |  [[DJ-SORA]](docs/DJ_SORA.md) | [[Awesome List]](docs/awesome_llm_data.md)
+[[中文主页]](README_ZH.md) | [[DJ-Cookbook]](#dj-cookbook) | [[OperatorZoo]](docs/Operators.md) | [[API]](https://modelscope.github.io/data-juicer) | [[Awesome LLM Data]](docs/awesome_llm_data.md)
 
 
-# Data-Juicer: A One-Stop Data Processing System for Large Language Models
+# Data Processing for and with Foundation Models
 
- <img src="https://img.alicdn.com/imgextra/i3/O1CN017Eq5kf27AlA2NUKef_!!6000000007757-0-tps-1280-720.jpg" width = "640" height = "360" alt="Data-Juicer"/>
+ <img src="https://img.alicdn.com/imgextra/i1/O1CN01fUfM5A1vPclzPQ6VI_!!6000000006165-0-tps-1792-1024.jpg" width = "533" height = "300" alt="Data-Juicer"/>
 
 ![](https://img.shields.io/badge/language-Python-214870.svg)
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![pypi version](https://img.shields.io/pypi/v/py-data-juicer?logo=pypi&color=026cad)](https://pypi.org/project/py-data-juicer)
 [![Docker version](https://img.shields.io/docker/v/datajuicer/data-juicer?logo=docker&label=Docker&color=498bdf)](https://hub.docker.com/r/datajuicer/data-juicer)
 
-[![DataModality](https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg)](docs/DeveloperGuide_ZH.md)
-[![Usage](https://img.shields.io/badge/Usage-Cleaning,Generation,Analysis-FFD21E.svg)](docs/DeveloperGuide_ZH.md)
+[![DataModality](https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg)](#dj-cookbook)
+[![Usage](https://img.shields.io/badge/Usage-Cleaning,Synthesis,Analysis-FFD21E.svg)](#dj-cookbook)
 [![ModelScope- Demos](https://img.shields.io/badge/ModelScope-Demos-4e29ff.svg?logo=data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjI0IDEyMS4zMyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KCTxwYXRoIGQ9Im0wIDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtOTkuMTQgNzMuNDloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xNzYuMDkgOTkuMTRoLTI1LjY1djIyLjE5aDQ3Ljg0di00Ny44NGgtMjIuMTl6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTEyNC43OSA0Ny44NGgyNS42NXYyNS42NWgtMjUuNjV6IiBmaWxsPSIjMzZjZmQxIiAvPgoJPHBhdGggZD0ibTAgMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xOTguMjggNDcuODRoMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzYyNGFmZiIgLz4KCTxwYXRoIGQ9Im0xOTguMjggMjIuMTloMjUuNjV2MjUuNjVoLTI1LjY1eiIgZmlsbD0iIzM2Y2ZkMSIgLz4KCTxwYXRoIGQ9Im0xNTAuNDQgMHYyMi4xOWgyNS42NXYyNS42NWgyMi4xOXYtNDcuODR6IiBmaWxsPSIjNjI0YWZmIiAvPgoJPHBhdGggZD0ibTczLjQ5IDQ3Ljg0aDI1LjY1djI1LjY1aC0yNS42NXoiIGZpbGw9IiMzNmNmZDEiIC8+Cgk8cGF0aCBkPSJtNDcuODQgMjIuMTloMjUuNjV2LTIyLjE5aC00Ny44NHY0Ny44NGgyMi4xOXoiIGZpbGw9IiM2MjRhZmYiIC8+Cgk8cGF0aCBkPSJtNDcuODQgNzMuNDloLTIyLjE5djQ3Ljg0aDQ3Ljg0di0yMi4xOWgtMjUuNjV6IiBmaWxsPSIjNjI0YWZmIiAvPgo8L3N2Zz4K)](https://modelscope.cn/studios?name=Data-Jiucer&page=1&sort=latest&type=1)
 [![HuggingFace- Demos](https://img.shields.io/badge/🤗HuggingFace-Demos-4e29ff.svg)](https://huggingface.co/spaces?&search=datajuicer)
 
 
 
-[![Document_List](https://img.shields.io/badge/Docs-English-blue?logo=Markdown)](#documents)
-[![文档列表](https://img.shields.io/badge/文档-中文-blue?logo=Markdown)](README_ZH.md#documents)
-[![API Reference](https://img.shields.io/badge/Docs-API_Reference-blue?logo=Markdown)](https://modelscope.github.io/data-juicer/)
-[![Paper](http://img.shields.io/badge/cs.LG-arXiv%3A2309.02033-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
+[![Document_List](https://img.shields.io/badge/Doc-DJ_Cookbook-blue?logo=Markdown)](#dj-cookbook)
+[![文档列表](https://img.shields.io/badge/文档-DJ指南-blue?logo=Markdown)](README_ZH.md#dj-cookbook)
+[![OpZoo](https://img.shields.io/badge/Doc-OperatorZoo-blue?logo=Markdown)](docs/Operators.md)
+[![Paper](http://img.shields.io/badge/cs.LG-1.0Paper(SIGMOD'24)-B31B1B?logo=arxiv&logoColor=red)](https://arxiv.org/abs/2309.02033)
+[![Paper](http://img.shields.io/badge/cs.AI-2.0Paper-B31B1B?logo=arxiv&logoColor=red)](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/DJ2.0_arXiv_preview.pdf)
 
 
 
 
-Data-Juicer is a one-stop **multimodal** data processing system to make data higher-quality,
-juicier, and more digestible for LLMs.
 
-
-We provide a [playground](http://8.138.149.181/) with a managed JupyterLab. [Try Data-Juicer](http://8.138.149.181/) straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly cite our [work](#references).
+Data-Juicer is a one-stop system to process text and multimodal data for and with foundation models (typically LLMs).
+We provide a [playground](http://8.138.149.181/) with a managed JupyterLab. [Try Data-Juicer](http://8.138.149.181/) straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly support us by starting it (then be instantly notified of our new releases) and citing our [work](#references).
 
 [Platform for AI of Alibaba Cloud (PAI)](https://www.aliyun.com/product/bigdata/learn) has cited our work and integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: [PAI-Data Processing for Large Models](https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX).
 
-Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets. 
-We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw)  channel, [DingDing](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11) group, ...), in promoting data-model co-development along with research and applications of (multimodal) LLMs!
+Data-Juicer is being actively updated and maintained. We will periodically enhance and add more features, data recipes and datasets.  We welcome you to join us (via issues, PRs, [Slack](https://join.slack.com/t/data-juicer/shared_invite/zt-23zxltg9d-Z4d3EJuhZbCLGwtnLWWUDg?spm=a2c22.12281976.0.0.7a8253f30mgpjw)  channel, [DingDing](https://qr.dingtalk.com/action/joingroup?code=v1,k1,YFIXM2leDEk7gJP5aMC95AfYT+Oo/EP/ihnaIEhMyJM=&_dt_no_comment=1&origin=11) group, ...), in promoting data-model co-development along with research and applications of foundation models!
 
-----
 
 ## News
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-08-09] We propose Img-Diff, which enhances the performance of multimodal large language models through *contrastive data synthesis*, achieving a score that is 12 points higher than GPT-4V on the [MMVP benchmark](https://tsb0601.github.io/mmvp_blog/). See more details in our [paper](https://arxiv.org/abs/2408.04594), and download the dataset from [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) and [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff).
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-24] "Tianchi Better Synth Data Synthesis Competition for Multimodal Large Models" — Our 4th data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532251) for more information.
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-17] We utilized the Data-Juicer [Sandbox Laboratory Suite](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox.md) to systematically optimize data and models through a co-development workflow between data and models, achieving a new top spot on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard. The related achievements have been compiled and published in a [paper](http://arxiv.org/abs/2407.11784), and the model has been released on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms.
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-07-12] Our *awesome list of MLLM-Data* has evolved into a systemic [survey](https://arxiv.org/abs/2407.08583) from model-data co-development perspective. Welcome to [explore](docs/awesome_llm_data.md) and contribute!
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-06-01] ModelScope-Sora "Data Directors" creative sprint—Our third data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532219) for more information.
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-11] We release our 2.0 paper, [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/DJ2.0_arXiv_preview.pdf). It now can process 70B data samples within 2.1h, using 6400 CPU cores on 50 Ray nodes from Alibaba Cloud cluster, and deduplicate 5TB data within 2.8h using 1280 CPU cores on 8 Ray nodes.
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-03] We support post-tuning scenarios better, via 20+ related new [OPs](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2), and via unified [dataset format](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) compatiable to LLaMA-Factory and ModelScope-Swift.
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-12-17] We propose *HumanVBench*, which comprises 17 human-centric tasks with synthetic data, benchmarking video-MLLMs' capabilities from views of inner emotion and outer manifestations. See more details in our [paper](https://arxiv.org/abs/2412.17574), and try to [evaluate](https://github.com/modelscope/data-juicer/tree/HumanVBench) your models with it.
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-11-22] We release DJ [v1.0.0](https://github.com/modelscope/data-juicer/releases/tag/v1.0.0), in which we refactored Data-Juicer's *Operator*, *Dataset*, *Sandbox* and many other modules for better usability, such as supporting fault-tolerant, FastAPI and adaptive resource management.
+- [2024-08-25] We give a [tutorial](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html) about data processing for multimodal LLMs in KDD'2024.
+
 
 <details>
 <summary> History News:
 </summary>>
 
+- [2024-08-09] We propose Img-Diff, which enhances the performance of multimodal large language models through *contrastive data synthesis*, achieving a score that is 12 points higher than GPT-4V on the [MMVP benchmark](https://tsb0601.github.io/mmvp_blog/). See more details in our [paper](https://arxiv.org/abs/2408.04594), and download the dataset from [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) and [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff).
+- [2024-07-24] "Tianchi Better Synth Data Synthesis Competition for Multimodal Large Models" — Our 4th data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532251) for more information.
+- [2024-07-17] We utilized the Data-Juicer [Sandbox Laboratory Suite](https://github.com/modelscope/data-juicer/blob/main/docs/Sandbox.md) to systematically optimize data and models through a co-development workflow between data and models, achieving a new top spot on the [VBench](https://huggingface.co/spaces/Vchitect/VBench_Leaderboard) text-to-video leaderboard. The related achievements have been compiled and published in a [paper](http://arxiv.org/abs/2407.11784), and the model has been released on the [ModelScope](https://modelscope.cn/models/Data-Juicer/Data-Juicer-T2V) and [HuggingFace](https://huggingface.co/datajuicer/Data-Juicer-T2V) platforms.
+- [2024-07-12] Our *awesome list of MLLM-Data* has evolved into a systemic [survey](https://arxiv.org/abs/2407.08583) from model-data co-development perspective. Welcome to [explore](docs/awesome_llm_data.md) and contribute!
+- [2024-06-01] ModelScope-Sora "Data Directors" creative sprint—Our third data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532219) for more information.
 - [2024-03-07] We release **Data-Juicer [v0.2.0](https://github.com/alibaba/data-juicer/releases/tag/v0.2.0)** now! 
 In this new version, we support more features for **multimodal data (including video now)**, and introduce **[DJ-SORA](docs/DJ_SORA.md)** to provide open large-scale, high-quality datasets for SORA-like models.
 - [2024-02-20] We have actively maintained an *awesome list of LLM-Data*, welcome to [visit](docs/awesome_llm_data.md) and contribute!
@@ -67,83 +70,87 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 Table of Contents
 =================
 
-- [Data-Juicer:  A One-Stop Data Processing System for Large Language Models](#data-juicer--a-one-stop-data-processing-system-for-large-language-models)
-  - [News](#news)
-- [Table of Contents](#table-of-contents)
-  - [Features](#features)
-  - [Documentation Index ](#documentation-index-)
-  - [Demos](#demos)
+- [News](#news)
+- [Why Data-Juicer?](#why-data-juicer)
+- [DJ-Cookbook](#dj-cookbook)
+  - [Curated Resources](#curated-resources)
+  - [Coding with Data-Juicer (DJ)](#coding-with-data-juicer-dj)
+  - [Use Cases \& Data Recipes](#use-cases--data-recipes)
+  - [Interactive Examples](#interactive-examples)
+- [Installation](#installation)
   - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-    - [From Source](#from-source)
-    - [Using pip](#using-pip)
-    - [Using Docker](#using-docker)
-    - [Installation check](#installation-check)
-  - [Quick Start](#quick-start)
-    - [Data Processing](#data-processing)
-    - [Distributed Data Processing](#distributed-data-processing)
-    - [Data Analysis](#data-analysis)
-    - [Data Visualization](#data-visualization)
-    - [Build Up Config Files](#build-up-config-files)
-    - [Sandbox](#sandbox)
-    - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
-    - [For Docker Users](#for-docker-users)
-  - [Data Recipes](#data-recipes)
-  - [License](#license)
-  - [Contributing](#contributing)
-  - [Acknowledgement](#acknowledgement)
-  - [References](#references)
+  - [From Source](#from-source)
+  - [Using pip](#using-pip)
+  - [Using Docker](#using-docker)
+  - [Installation check](#installation-check)
+  - [For Video-related Operators](#for-video-related-operators)
+- [Quick Start](#quick-start)
+  - [Data Processing](#data-processing)
+  - [Distributed Data Processing](#distributed-data-processing)
+  - [Data Analysis](#data-analysis)
+  - [Data Visualization](#data-visualization)
+  - [Build Up Config Files](#build-up-config-files)
+  - [Sandbox](#sandbox)
+  - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
+  - [For Docker Users](#for-docker-users)
+- [License](#license)
+- [Contributing](#contributing)
+- [Acknowledgement](#acknowledgement)
+- [References](#references)
 
 
-## Features
+## Why Data-Juicer?
 
-![Overview](https://img.alicdn.com/imgextra/i4/O1CN01WYQP3Z1JHsaXaQDK6_!!6000000001004-0-tps-3640-1812.jpg)
+![Overview](https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png)
 
 - **Systematic & Reusable**:
-  Empowering users with a systematic library of 80+ core [OPs](docs/Operators.md), 20+ reusable [config recipes](configs), and 20+ feature-rich
-  dedicated [toolkits](#documentation), designed to
-  function independently of specific multimodal LLM datasets and processing pipelines.
+  Empowering users with a systematic library of 100+ core [OPs](docs/Operators.md), and 50+ reusable config recipes and 
+  dedicated toolkits, designed to
+  function independently of specific multimodal LLM datasets and processing pipelines. Supporting data analysis, cleaning, and synthesis in pre-training, post-tuning, en, zh, and more scenarios.
 
-- **Data-in-the-loop & Sandbox**: Supporting one-stop data-model collaborative development, enabling rapid iteration
-  through the [sandbox laboratory](docs/Sandbox.md), and providing features such as feedback loops based on data and model,
-  visualization, and multidimensional automatic evaluation, so that you can better understand and improve your data and models.
-  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg)
+- **User-Friendly & Extensible**: 
+  Designed for simplicity and flexibility, with easy-start [guides](#quick-start), and [DJ-Cookbook](#dj-cookbook) containing fruitful demo usages. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
 
-- **Towards production environment**: Providing efficient and parallel data processing pipelines (Aliyun-PAI\Ray\Slurm\CUDA\OP Fusion)
-  requiring less memory and CPU usage, optimized with automatic fault-toleration.
-  ![sys-perf](https://img.alicdn.com/imgextra/i4/O1CN01Sk0q2U1hdRxbnQXFg_!!6000000004300-0-tps-2438-709.jpg)
-
-- **Comprehensive Data Processing Recipes**: Offering tens of [pre-built data
-  processing recipes](configs/data_juicer_recipes/README.md) for pre-training, fine-tuning, en, zh, and more scenarios. Validated on
-  reference LLaMA and LLaVA models.
-  ![exp_llama](https://img.alicdn.com/imgextra/i2/O1CN019WtUPP1uhebnDlPR8_!!6000000006069-2-tps-2530-1005.png)
-
-- **Flexible & Extensible**: Accommodating most types of data formats (e.g., jsonl, parquet, csv, ...) and allowing flexible combinations of OPs. Feel free to [implement your own OPs](docs/DeveloperGuide.md#build-your-own-ops) for customizable data processing.
-
-- **User-Friendly Experience**: Designed for simplicity, with [comprehensive documentation](#documents), [easy start guides](#quick-start) and [demo configs](configs/README.md), and intuitive configuration with simple adding/removing OPs from [existing configs](configs/config_all.yaml).
+- **Efficient & Robust**: Providing performance-optimized [parallel data processing](docs/Distributed.md) (Aliyun-PAI\Ray\CUDA\OP Fusion),
+  faster with less resource usage, verified in large-scale production environments.
 
 
+- **Effect-Proven & Sandbox**: Supporting data-model co-development, enabling rapid iteration
+  through the [sandbox laboratory](docs/Sandbox.md), and providing features such as feedback loops and visualization, so that you can better understand and improve your data and models. Many effect-proven datasets and models have been derived from DJ, in scenarios such as pre-training, text-to-video and image-to-text generation.
+  ![Data-in-the-loop](https://img.alicdn.com/imgextra/i2/O1CN017U7Zz31Y7XtCJ5GOz_!!6000000003012-0-tps-3640-1567.jpg) 
 
-## Documentation Index <a name="documents"/>
 
-- [Overview](README.md)
+## DJ-Cookbook
+### Curated Resources
+- [KDD-Tutorial](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html)
+- [Awesome LLM-Data](docs/awesome_llm_data.md)
+- ["Bad" Data Exhibition](docs/BadDataExhibition.md)
+
+### Coding with Data-Juicer (DJ)
+- [Overview of DJ](README.md)
 - [Operator Zoo](docs/Operators.md)
-- [Configs](configs/README.md)
+- [Quick Start](#quick-start)
+- [Configuration](configs/README.md)
 - [Developer Guide](docs/DeveloperGuide.md)
 - [API references](https://modelscope.github.io/data-juicer/)
-- [KDD-Tutorial](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html)
-- ["Bad" Data Exhibition](docs/BadDataExhibition.md)
-- [Awesome LLM-Data](docs/awesome_llm_data.md)
-- Dedicated Toolkits
-  - [Quality Classifier](tools/quality_classifier/README.md)
-  - [Auto Evaluation](tools/evaluator/README.md)
-  - [Preprocess](tools/preprocess/README.md)
-  - [Postprocess](tools/postprocess/README.md)
+- [Preprocess Tools](tools/preprocess/README.md)
+- [Postprocess Tools](tools/postprocess/README.md)
+- [Format Conversion](tools/fmt_conversion/README.md)
+- [Sandbox](docs/Sandbox.md)
+- [Quality Classifier](tools/quality_classifier/README.md)
+- [Auto Evaluation](tools/evaluator/README.md)
+- [Third-parties Integration](thirdparty/LLM_ecosystems/README.md)
+
+### Use Cases & Data Recipes
+- [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
+- [Recipes for data process in RedPajama](configs/reproduced_redpajama/README.md)
+- [Refined recipes for pre-training text data](configs/data_juicer_recipes/README.md)
+- [Refined recipes for fine-tuning text data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
+- [Refined recipes for pre-training multi-modal data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-multimodal-dataset)
 - [DJ-SORA](docs/DJ_SORA.md)
-- [Third-parties (LLM Ecosystems)](thirdparty/README.md)
 
 
-## Demos
+### Interactive Examples
 - Introduction to Data-Juicer [[ModelScope](https://modelscope.cn/studios/Data-Juicer/overview_scan/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/overview_scan)]
 - Data Visualization:
   - Basic Statistics [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_visulization_statistics/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_visualization_statistics)]
@@ -161,12 +168,12 @@ Table of Contents
   - Data Sampling and Mixture [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_mixture/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_mixture)]
 - Data Processing Loop [[ModelScope](https://modelscope.cn/studios/Data-Juicer/data_process_loop/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/data_process_loop)]
 
-## Prerequisites
+## Installation
+
+### Prerequisites
 
 - Recommend Python>=3.9,<=3.10
 - gcc >= 5 (at least C++14 support)
-
-## Installation
 
 ### From Source 
 
@@ -181,8 +188,8 @@ pip install -v -e .
 
 ```shell
 cd <path_to_data_juicer>
-pip install -v -e .  # install a minimal dependencies, which support the basic functions
-pip install -v -e .[tools] # install a subset of tools dependencies
+pip install -v -e .  # Install minimal dependencies, which support the basic functions
+pip install -v -e .[tools] # Install a subset of tools dependencies
 ```
 
 The dependency options are listed below:
@@ -199,7 +206,7 @@ The dependency options are listed below:
 
 - Install dependencies for specific OPs
 
-With the growth of the number of OPs, the dependencies of all OPs becomes very heavy. Instead of using the command `pip install -v -e .[sci]` to install all dependencies,
+With the growth of the number of OPs, the dependencies of all OPs become very heavy. Instead of using the command `pip install -v -e .[sci]` to install all dependencies,
 we provide two alternative, lighter options:
 
   - Automatic Minimal Dependency Installation: During the execution of Data-Juicer, minimal dependencies will be automatically installed. This allows for immediate execution, but may potentially lead to dependency conflicts.
@@ -243,7 +250,7 @@ pip install py-data-juicer
     docker build -t datajuicer/data-juicer:<version_tag> .
     ```
 
-  - The format of `<version_tag>` is like `v0.2.0`, which is the same as release version tag.
+  - The format of `<version_tag>` is like `v0.2.0`, which is the same as the release version tag.
 
 ### Installation check
 
@@ -279,10 +286,10 @@ python tools/process_data.py --config configs/demo/process.yaml
 dj-process --config configs/demo/process.yaml
 ```
 
-- **Note:** For some operators that involve third-party models or resources which are not stored locally on your computer, it might be slow for the first running because these ops need to download corresponding resources into a directory first.
+- **Note:** For some operators that involve third-party models or resources that are not stored locally on your computer, it might be slow for the first running because these ops need to download corresponding resources into a directory first.
 The default download cache directory is `~/.cache/data_juicer`. Change the cache location by setting the shell environment variable, `DATA_JUICER_CACHE_HOME` to another directory, and you can also change `DATA_JUICER_MODELS_CACHE` or `DATA_JUICER_ASSETS_CACHE` in the same way:
 
-- **Note:** When using operators with third-party models, it's necessary to declare the corresponding `mem_required` in the configuration file (you can refer to the settings in the `config_all.yaml` file). During runtime, Data-Juicer will control the number of processes based on memory availability and the memory requirements of the operator models to achieve better data processing efficiency. When running with CUDA environment, if the mem_required for an operator is not declared correctly, it could potentially lead to a CUDA Out of Memory issue.
+- **Note:** When using operators with third-party models, it's necessary to declare the corresponding `mem_required` in the configuration file (you can refer to the settings in the `config_all.yaml` file). During runtime, Data-Juicer will control the number of processes based on memory availability and the memory requirements of the operator models to achieve better data processing efficiency. When running with CUDA environments, if the mem_required for an operator is not declared correctly, it could potentially lead to a CUDA Out of Memory issue.
 
 ```shell
 # cache home
@@ -293,7 +300,7 @@ export DATA_JUICER_MODELS_CACHE="/path/to/another/directory/models"
 export DATA_JUICER_ASSETS_CACHE="/path/to/another/directory/assets"
 ```
 
-#### Flexible Programming Interface
+- **Flexible Programming Interface:**
 We provide various simple interfaces for users to choose from as follows. 
 ```python
 #... init op & dataset ...
@@ -319,7 +326,8 @@ python tools/process_data.py --config ./demos/process_video_on_ray/configs/demo.
 ```
 
 - To run data processing across multiple machines, it is necessary to ensure that all distributed nodes can access the corresponding data paths (for example, by mounting the respective data paths on a file-sharing system such as NAS).
-- The deduplicator operators for RAY mode are different from the single-machine version, and all those operators are prefixed with `ray`, e.g. `ray_video_deduplicator` and `ray_document_deduplicator`. Those operators also rely on a [Redis](https://redis.io/) instance. So in addition to starting the RAY cluster, you also need to setup your Redis instance in advance and provide `host` and `port` of your Redis instance in configuration.
+- The deduplication operators for RAY mode are different from the single-machine version, and all those operators are prefixed with `ray`, e.g. `ray_video_deduplicator` and `ray_document_deduplicator`.
+- More details can be found in the doc for [distributed processing](docs/Distributed.md).
 
 > Users can also opt not to use RAY and instead split the dataset to run on a cluster with [Slurm](https://slurm.schedmd.com/). In this case, please use the default Data-Juicer without RAY.
 > [Aliyun PAI-DLC](https://www.aliyun.com/activity/bigdata/pai-dlc) supports the RAY framework, Slurm framework, etc. Users can directly create RAY jobs and Slurm jobs on the DLC cluster.
@@ -340,7 +348,7 @@ dj-analyze --config configs/demo/analyzer.yaml
 dj-analyze --auto --dataset_path xx.jsonl [--auto_num 1000]
 ```
 
-- **Note:** Analyzer only compute stats for Filters that produce stats or other OPs that produce tags/categories in meta. So other OPs will be ignored in the analysis process. We use the following registries to decorate OPs:
+- **Note:** Analyzer only computes stats for Filters that produce stats or other OPs that produce tags/categories in meta. So other OPs will be ignored in the analysis process. We use the following registries to decorate OPs:
   - `NON_STATS_FILTERS`: decorate Filters that **DO NOT** produce any stats.
   - `TAGGING_OPS`: decorate OPs that **DO** produce tags/categories in meta field.
 
@@ -390,13 +398,13 @@ python tools/sandbox_starter.py --config configs/demo/sandbox/sandbox.yaml
 ```
 
 ### Preprocess Raw Data (Optional)
-- Our formatters support some common input dataset formats for now:
+- Our Formatters support some common input dataset formats for now:
   - Multi-sample in one file: jsonl/json, parquet, csv/tsv, etc.
   - Single-sample in one file: txt, code, docx, pdf, etc.
 - However, data from different sources are complicated and diverse. Such as:
   - [Raw arXiv data downloaded from S3](https://info.arxiv.org/help/bulk_data_s3.html) include thousands of tar files and even more gzip files in them, and expected tex files are embedded in the gzip files so they are hard to obtain directly.
   - Some crawled data include different kinds of files (pdf, html, docx, etc.). And extra information like tables, charts, and so on is hard to extract.
-- It's impossible to handle all kinds of data in Data-Juicer, issues/PRs are welcome to contribute to process new data types!
+- It's impossible to handle all kinds of data in Data-Juicer, issues/PRs are welcome to contribute to processing new data types!
 - Thus, we provide some **common preprocessing tools** in [`tools/preprocess`](tools/preprocess/) for you to preprocess these data.
   - You are welcome to make your contributions to new preprocessing tools for the community.
   - We **highly recommend** that complicated data can be preprocessed to jsonl or parquet files.
@@ -442,13 +450,6 @@ docker exec -it <container_id> bash
 
 <p align="right"><a href="#table">🔼 back to index</a></p>
 
-## Data Recipes
-- [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
-- [Recipes for data process in RedPajama](configs/redpajama/README.md)
-- [Refined recipes for pre-training text data](configs/data_juicer_recipes/README.md)
-- [Refined recipes for fine-tuning text data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
-- [Refined recipes for pre-training multi-modal data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-multimodal-dataset)
-
 
 
 ## License
@@ -456,20 +457,15 @@ Data-Juicer is released under Apache License 2.0.
 
 ## Contributing
 We are in a rapidly developing field and greatly welcome contributions of new
-features, bug fixes and better documentations. Please refer to
+features, bug fixes, and better documentation. Please refer to
 [How-to Guide for Developers](docs/DeveloperGuide.md).
 
-If you have any questions, please join our [discussion groups](README.md).
-
 ## Acknowledgement
-Data-Juicer is used across various LLM products and research initiatives,
-including industrial LLMs from Alibaba Cloud's Tongyi, such as Dianjin for
-financial analysis, and Zhiwen for reading assistant, as well as the Alibaba
-Cloud's platform for AI (PAI).
-We look forward to more of your experience, suggestions and discussions for collaboration!
+Data-Juicer is used across various foundation model applications and research initiatives, such as industrial scenarios in Alibaba Tongyi and Alibaba Cloud's platform for AI (PAI).
+We look forward to more of your experience, suggestions, and discussions for collaboration!
 
-Data-Juicer thanks and refers to several community projects, such as
-[Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Pile](https://huggingface.co/datasets/EleutherAI/pile), [Alpaca-Cot](https://huggingface.co/datasets/QingyiSi/Alpaca-CoT), [Megatron-LM](https://github.com/NVIDIA/Megatron-LM), [DeepSpeed](https://www.deepspeed.ai/), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), [Beam](https://github.com/apache/beam),  [LM-Harness](https://github.com/EleutherAI/lm-evaluation-harness), [HELM](https://github.com/stanford-crfm/helm), ....
+Data-Juicer thanks many community [contributers](https://github.com/modelscope/data-juicer/graphs/contributors) and open-source projects, such as
+[Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), ....
 
 
 
@@ -485,14 +481,18 @@ If you find our work useful for your research or development, please kindly cite
 ```
 
 <details>
-<summary> More related papers from Data-Juicer Team:
+<summary> More related papers from the Data-Juicer Team:
 </summary>>
+
+- [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/DJ2.0_arXiv_preview.pdf)
 
 - [Data-Juicer Sandbox: A Comprehensive Suite for Multimodal Data-Model Co-development](https://arxiv.org/abs/2407.11784)
 
 - [The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective](https://arxiv.org/abs/2407.08583)
 
 - [ImgDiff: Contrastive Data Synthesis for Vision Large Language Models](https://arxiv.org/abs/2408.04594)
+
+- [HumanVBench: Exploring Human-Centric Video Understanding Capabilities of MLLMs with Synthetic Benchmark Data](https://arxiv.org/abs/2412.17574)
 
 - [Data Mixing Made Efficient: A Bivariate Scaling Law for Language Model Pretraining](https://arxiv.org/abs/2405.14908)
 
@@ -501,3 +501,4 @@ If you find our work useful for your research or development, please kindly cite
 
 
 <p align="right"><a href="#table">🔼 back to index</a></p>
+
