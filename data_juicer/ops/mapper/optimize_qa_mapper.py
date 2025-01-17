@@ -5,7 +5,8 @@ from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.lazy_loader import LazyLoader
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.model_utils import (get_model, prepare_model,
+                                           update_sampling_params)
 
 torch = LazyLoader('torch', 'torch')
 vllm = LazyLoader('vllm', 'vllm')
@@ -97,6 +98,10 @@ class OptimizeQAMapper(Mapper):
                 return_pipe=True,
                 **model_params)
             self.sampling_params = sampling_params
+
+        self.sampling_params = update_sampling_params(sampling_params,
+                                                      hf_model,
+                                                      self.enable_vllm)
 
     def build_input(self, sample):
         qa_pair = self.qa_pair_template.format(sample[self.query_key],

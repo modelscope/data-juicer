@@ -1,7 +1,5 @@
 from typing import List, Union
 
-from loguru import logger
-
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
@@ -55,7 +53,6 @@ class LanguageIDScoreFilter(Filter):
         ft_model = get_model(self.model_key)
         if ft_model is None:
             err_msg = 'Model not loaded. Please retry later.'
-            logger.error(err_msg)
             raise ValueError(err_msg)
         pred = ft_model.predict(text)
         lang_id = pred[0][0].replace('__label__', '')

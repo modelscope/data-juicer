@@ -156,8 +156,8 @@ class FusedFilter(Filter):
 
         :param fused_filters: a list of filters to be fused.
         """
-        super().__init__()
         self._name = name
+        super().__init__()
         self.fused_filters = fused_filters
         # set accelerator to 'cuda' if there exists any ops whose accelerator
         # is 'cuda'
