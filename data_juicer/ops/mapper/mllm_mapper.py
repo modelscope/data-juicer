@@ -46,7 +46,8 @@ class MllmMapper(Mapper):
         :param kwargs: extra args
         """
         kwargs.setdefault('mem_required', '32GB')
-        super().__init__(*args, num_proc=1, **kwargs)
+        kwargs.setdefault('num_proc', 1)
+        super().__init__(*args, **kwargs)
 
         self.hf_model = hf_model
         self.model_key = prepare_model(model_type='huggingface',
