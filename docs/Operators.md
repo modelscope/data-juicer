@@ -55,7 +55,7 @@ All the specific operators are listed below, each featured with several capabili
   - 🔴Alpha: alpha version OP. Only the basic OP implementations are finished. 表示 alpha 版本算子。只完成了基础的算子实现。
   - 🟡Beta: beta version OP. Based on the alpha version, unittests for this OP are added as well. 表示 beta 版本算子。基于 alpha 版本，添加了算子的单元测试。
   - 🟢Stable: stable version OP. Based on the beta version, OP optimizations related to DJ (e.g. model management, batched processing, OP fusion, ...) are added to this OP. 表示 stable 版本算子。基于 beta 版本，完善了DJ相关的算子优化项（如模型管理，批处理，算子融合等）。
-* Modal Tags
+* Model Tags
   - 🔗API: equipped with API-based models. (e.g. ChatGPT, GPT-4o). 支持基于 API 调用模型（如 ChatGPT，GPT-4o）。
   - 🌊vLLM: equipped with models supported by vLLM. 支持基于 vLLM 进行模型推理。
   - 🧩HF: equipped with models from HuggingFace Hub. 支持来自于 HuggingFace Hub 的模型。
