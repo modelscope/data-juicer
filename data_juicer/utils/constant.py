@@ -62,6 +62,8 @@ class MetaKeys(object):
     video_frames = 'video_frames'
     # # image tags
     image_tags = 'image_tags'
+    # bounding box tag
+    bbox_tag = DEFAULT_PREFIX + 'bbox__'
 
     # === info extraction related tags ===
     # # for event extraction
@@ -205,6 +207,7 @@ class StatsKeysConstant(object):
     special_char_ratio = 'special_char_ratio'
     stopwords_ratio = 'stopwords_ratio'
     text_len = 'text_len'
+    text_pair_similarity = 'text_pair_similarity'
     num_action = 'num_action'
     num_dependency_edges = 'num_dependency_edges'
     num_token = 'num_token'
