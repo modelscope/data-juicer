@@ -1,24 +1,21 @@
-from loguru import logger
-import os
 import argparse
+import os
 from typing import List
 
-
-import ray
 import pandas as pd
-
+import ray
+from loguru import logger
 
 DEFAULT_MAX_FILE_SIZE = 128  # 128 MB
 DEFAULT_MIN_FILE_SIZE = 1  # 1 MB
 
 
-def split_jsonl(file_path: str, max_size: int,
-                output_dir: str):
+def split_jsonl(file_path: str, max_size: float, output_dir: str):
     """Split a jsonl file into multiple sub files more efficiently.
 
     Args:
         file_path (`str`): path of the original jsonl file
-        max_size (`int`): max size of each sub file (in MB)
+        max_size (`float`): max size of each sub file (in MB)
         output_dir (`str`): directory to save the sub files
 
     Yields:
@@ -32,7 +29,6 @@ def split_jsonl(file_path: str, max_size: int,
     current_size = 0
     buffer = []
     buffer_size = 0
-    # logger.info(f'Spliting {file_path}.')
 
     with open(file_path, 'r', encoding='utf-8') as infile:
         while True:
@@ -95,25 +91,35 @@ def main(args):
 
     total_size = sum(os.path.getsize(f) for f in jsonl_files) / 1024 / 1024
     cpu_num = ray.cluster_resources().get('CPU', 1)
-    max_size = max(
-        DEFAULT_MIN_FILE_SIZE,
-        min(DEFAULT_MAX_FILE_SIZE, total_size / cpu_num / 4)
-    )
-    logger.info(f'Number of files: {len(jsonl_files)}, Total size: {total_size} MB, max size: {max_size} MB')
-    def split_jsonl_dataset(
-        jsonl_paths: pd.DataFrame,
-    ) -> List[str]:
+    max_size = max(DEFAULT_MIN_FILE_SIZE,
+                   min(DEFAULT_MAX_FILE_SIZE, total_size / cpu_num / 4))
+    logger.info(f'Number of files: {len(jsonl_files)}, '
+                f'Total size: {total_size} MB, max size: {max_size} MB')
+
+    def split_jsonl_dataset(jsonl_paths: pd.DataFrame, ) -> List[str]:
         for jsonl_path in jsonl_paths['jsonl_files']:
             split_jsonl(jsonl_path, max_size, args.resplit_dir)
         return jsonl_paths
+
     data.map_batches(split_jsonl_dataset).materialize()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--ray-address', type=str, default='auto', help='The address of the Ray cluster.')
-    parser.add_argument('--data-dir', '-i', type=str, required=True, help='Path to your dataset directory.')
-    parser.add_argument('--resplit-dir', '-o', type=str, required=True, help='Path to resplited dataset directory.')
+    parser.add_argument('--ray-address',
+                        type=str,
+                        default='auto',
+                        help='The address of the Ray cluster.')
+    parser.add_argument('--data-dir',
+                        '-i',
+                        type=str,
+                        required=True,
+                        help='Path to your dataset directory.')
+    parser.add_argument('--resplit-dir',
+                        '-o',
+                        type=str,
+                        required=True,
+                        help='Path to resplited dataset directory.')
     args = parser.parse_args()
 
     main(args)
