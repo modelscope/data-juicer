@@ -1,11 +1,10 @@
 import ast
-import asyncio
 import json
 import os
 import re
 from typing import Any, List
 
-from googletrans import Translator
+import translators as ts
 
 DOC_PATH = 'docs/Operators.md'
 
@@ -431,20 +430,16 @@ def generate_op_table_section(op_type, op_record_list):
     return '\n\n'.join(doc)
 
 
-async def translate_text(text, dest='zh'):
-    async with Translator() as translator:
-        res = await translator.translate(text, src='en', dest=dest)
-        return res
-
-
 def get_op_desc_in_en_zh_batched(descs):
-    zhs = asyncio.run(translate_text(descs, dest='zh'))
-    return [desc + ' ' + zh.text for desc, zh in zip(descs, zhs)]
-
-
-def get_op_desc_in_en_zh(desc):
-    zh = asyncio.run(translate_text(desc, dest='zh')).text
-    return desc + ' ' + zh
+    separator = '\n'
+    batch = separator.join(descs)
+    res = ts.translate_text(batch,
+                            translator='alibaba',
+                            from_language='en',
+                            to_language='zh')
+    zhs = res.split(separator)
+    assert len(zhs) == len(descs)
+    return [desc + ' ' + zh.strip() for desc, zh in zip(descs, zhs)]
 
 
 def parse_op_record_from_current_doc():
