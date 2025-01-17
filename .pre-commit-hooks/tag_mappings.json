@@ -45,7 +45,7 @@
       "desc": "stable version OP. Based on the beta version, OP optimizations related to DJ (e.g. model management, batched processing, OP fusion, ...) are added to this OP. 表示 stable 版本算子。基于 beta 版本，完善了DJ相关的算子优化项（如模型管理，批处理，算子融合等）。"
     }
   },
-  "Modal Tags": {
+  "Model Tags": {
     "api": {
       "icon": "🔗API",
       "desc": "equipped with API-based models. (e.g. ChatGPT, GPT-4o). 支持基于 API 调用模型（如 ChatGPT，GPT-4o）。"
