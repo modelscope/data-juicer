@@ -138,6 +138,9 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 * [Fine-tuning文本数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#完善前后的alpaca-cot数据集)
 * [预训练多模态数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#before-and-after-refining-for-multimodal-dataset)
 * [DJ-SORA](docs/DJ_SORA_ZH.md)
+* [智能体调用DJ Filters](./demos/api_service/react_data_filter_process.ipynb)
+* [智能体调用DJ Mappers](./demos/api_service/react_data_mapper_process.ipynb)
+
 
 ### 交互类示例
 * Data-Juicer 介绍 [[ModelScope](https://modelscope.cn/studios/Data-Juicer/overview_scan/summary)] [[HuggingFace](https://huggingface.co/spaces/datajuicer/overview_scan)]
@@ -452,7 +455,7 @@ Data-Juicer被许多大模型相关产品和研究工作所使用，例子阿里
 Data-Juicer 感谢社区[贡献者](https://github.com/modelscope/data-juicer/graphs/contributors) 和相关的先驱开源项目，譬如[Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), ....
 
 ## 参考文献
-如果您发现我们的工作对您的研发有帮助，请引用以下[论文](https://arxiv.org/abs/2309.02033) 。
+如果您发现Data-Juicer对您的研发有帮助，请引用以下[论文](https://arxiv.org/abs/2309.02033) 。
 
 ```
 @inproceedings{chen2024datajuicer,
