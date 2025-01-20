@@ -1,11 +1,10 @@
 import ast
-import asyncio
 import json
 import os
 import re
 from typing import Any, List
 
-from googletrans import Translator
+import translators as ts
 
 DOC_PATH = 'docs/Operators.md'
 
@@ -25,10 +24,16 @@ Users can refer to the
 parameters of each operator. Users can refer to and run the unit tests
 (`tests/ops/...`) for [examples of operator-wise usage](../tests/ops) as well
 as the effects of each operator when applied to built-in test data samples.
+Besides, you can try to use agent to automatically route suitable OPs and
+call them. E.g., refer to
+[Agentic Filters of DJ](../demos/api_service/react_data_filter_process.ipynb),
+ [Agentic Mappers of DJ](../demos/api_service/react_data_mapper_process.ipynb)
 
 这个页面提供了OP的基本描述，用户可以参考[API文档](https://modelscope.github.io/data-juicer/)更细致了解每个
-OP的具体参数，并且可以查看、运行单元测试 (`tests/ops/...`)，来体验[各OP的用法示例](../tests/ops)以及每个OP作用于内置
-测试数据样本时的效果。
+OP的具体参数，并且可以查看、运行单元测试 (`tests/ops/...`)，来体验
+[各OP的用法示例](../tests/ops)以及每个OP作用于内置测试数据样本时的效果。例如，参考
+[Agentic Filters of DJ](../demos/api_service/react_data_filter_process.ipynb),
+ [Agentic Mappers of DJ](../demos/api_service/react_data_mapper_process.ipynb)
 '''
 
 DOC_CONTRIBUTING = '''
@@ -87,6 +92,27 @@ def replace_tags_with_icons(tags, lang='en'):
     return icons
 
 
+def remove_emojis(text):
+    # This pattern includes a wide range of emoji characters
+    emoji_pattern = re.compile(
+        '['  # Start of character class
+        '\U0001F600-\U0001F64F'  # Emoticons
+        '\U0001F300-\U0001F5FF'  # Misc Symbols and Pictographs
+        '\U0001F680-\U0001F6FF'  # Transport and Map Symbols
+        '\U0001F700-\U0001F77F'  # Alchemical Symbols
+        '\U0001F780-\U0001F7FF'  # Geometric Shapes Extended
+        '\U0001F800-\U0001F8FF'  # Supplemental Arrows-C
+        '\U0001F900-\U0001F9FF'  # Supplemental Symbols and Pictographs
+        '\U0001FA00-\U0001FA6F'  # Chess Symbols
+        '\U0001F000-\U0001F02F'  # Mahjong Tiles
+        '\U0001F0A0-\U0001F0FF'  # Playing Cards
+        '\U00002700-\U000027BF'  # Dingbats
+        '\U0001F1E6-\U0001F1FF'  # Regional Indicator Symbols
+        ']+',  # One or more of the above
+        flags=re.UNICODE)
+    return emoji_pattern.sub(r'', text)  # Replace emojis with an empty string
+
+
 # OP tag analysis functions
 def analyze_modality_tag(code, op_prefix):
     """
@@ -125,7 +151,7 @@ def analyze_resource_tag(code):
 def analyze_model_tags(code):
     """
     Analyze the model tag for the given code content string. SHOULD be one of
-    the "Modal Tags" in `tagging_mappings.json`. It makes the choice by finding
+    the "Model Tags" in `tagging_mappings.json`. It makes the choice by finding
     the `model_type` arg in `prepare_model` method invocation.
     """
     pattern = r'model_type=[\'|\"](.*?)[\'|\"]'
@@ -190,6 +216,9 @@ class OPRecord:
                and set(self.tags) == set(other.tags) \
                and self.desc == other.desc and self.code == other.code \
                and self.test == other.test
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
 class ClassVisitor(ast.NodeVisitor):
@@ -401,20 +430,16 @@ def generate_op_table_section(op_type, op_record_list):
     return '\n\n'.join(doc)
 
 
-async def translate_text(text, dest='zh'):
-    async with Translator() as translator:
-        res = await translator.translate(text, src='en', dest=dest)
-        return res
-
-
 def get_op_desc_in_en_zh_batched(descs):
-    zhs = asyncio.run(translate_text(descs, dest='zh'))
-    return [desc + ' ' + zh.text for desc, zh in zip(descs, zhs)]
-
-
-def get_op_desc_in_en_zh(desc):
-    zh = asyncio.run(translate_text(desc, dest='zh')).text
-    return desc + ' ' + zh
+    separator = '\n'
+    batch = separator.join(descs)
+    res = ts.translate_text(batch,
+                            translator='alibaba',
+                            from_language='en',
+                            to_language='zh')
+    zhs = res.split(separator)
+    assert len(zhs) == len(descs)
+    return [desc + ' ' + zh.strip() for desc, zh in zip(descs, zhs)]
 
 
 def parse_op_record_from_current_doc():
@@ -423,7 +448,6 @@ def parse_op_record_from_current_doc():
     """
     # patterns
     tab_pattern = r'\| +(.*?) +\| +(.*?) +\| +(.*?) +\| +(.*?) +\| +(.*?) +\|'
-    tag_pattern = r'\!\[(.*?)\]\(https:\/\/img\.shields\.io\/badge\/'
     link_pattern = r'\[.*?\]\((.*?)\)'
 
     if os.path.exists(DOC_PATH):
@@ -437,7 +461,7 @@ def parse_op_record_from_current_doc():
                     continue
                 # extract tags
                 type = name.split('_')[-1]
-                tags = re.findall(tag_pattern, tags)
+                tags = [remove_emojis(tag.lower()) for tag in tags.split(' ')]
                 # only need English description
                 desc = desc.split('. ')[0] + '.'
                 code = re.findall(link_pattern, code)[0]
@@ -497,6 +521,7 @@ def check_and_update_op_record(old_op_record_list, new_op_record_list):
                     break
             if old_usability_tag and \
                     old_usability_tag == 'stable' and usability_tag == 'beta':
+                print(f'{record.name} kept stable')
                 usability_tag = 'stable'
         curr_tags = [
             tag for tag in record.tags if tag not in usability_tag_set
