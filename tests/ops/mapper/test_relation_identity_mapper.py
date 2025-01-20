@@ -49,6 +49,8 @@ class RelationIdentityMapperTest(DataJuicerTestCaseBase):
         for data in dataset:
             for k in data:
                 logger.info(f"{k}: {data[k]}")
+            self.assertIn(output_key, data[Fields.meta])
+            self.assertNotEqual(data[Fields.meta][output_key], '')
 
     def test_default(self):
         self._run_op('qwen2.5-72b-instruct')

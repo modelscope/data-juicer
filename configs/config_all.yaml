@@ -13,6 +13,8 @@ np: 4                                                       # number of subproce
 text_keys: 'text'                                           # the key name of field where the sample texts to be processed, e.g., `text`, `instruction`, `output`, ...
                                                             # Note: currently, we support specify only ONE key for each op, for cases requiring multiple keys, users can specify the op multiple times. We will only use the first key of `text_keys` when you set multiple keys.
 suffixes: []                                                # the suffix of files that will be read. For example: '.txt', 'txt' or ['txt', '.pdf', 'docx']
+turbo: false                                                # Enable Turbo mode to maximize processing speed when batch size is 1.
+skip_op_error: true                                         # Skip errors in OPs caused by unexpected invalid samples.
 use_cache: true                                             # whether to use the cache management of Hugging Face datasets. It might take up lots of disk space when using cache
 ds_cache_dir: null                                          # cache dir for Hugging Face datasets. In default, it\'s the same as the environment variable `HF_DATASETS_CACHE`, whose default value is usually "~/.cache/huggingface/datasets". If this argument is set to a valid path by users, it will override the default cache dir
 open_monitor: true                                          # Whether to open the monitor to trace resource utilization for each OP during data processing. It\'s True in default.

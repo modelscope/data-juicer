@@ -41,7 +41,7 @@ repos:
         language: python
         require_serial: true
         additional_dependencies:
-          - googletrans==4.0.2
+          - translators==5.9.3
 
 exclude: |
   (?x)^(

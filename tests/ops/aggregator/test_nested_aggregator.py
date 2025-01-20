@@ -12,7 +12,7 @@ from data_juicer.utils.constant import Fields, MetaKeys
 @SKIPPED_TESTS.register_module()
 class NestedAggregatorTest(DataJuicerTestCaseBase):
 
-    def _run_helper(self, op, samples):
+    def _run_helper(self, op, samples, output_key=MetaKeys.event_description):
 
         # before runing this test, set below environment variables:
         # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
@@ -24,6 +24,8 @@ class NestedAggregatorTest(DataJuicerTestCaseBase):
         for data in new_dataset:
             for k in data:
                 logger.info(f"{k}: {data[k]}")
+            self.assertIn(output_key, data[Fields.batch_meta])
+            self.assertNotEqual(data[Fields.batch_meta][output_key], '')
 
         self.assertEqual(len(new_dataset), len(samples))
 
@@ -61,7 +63,7 @@ class NestedAggregatorTest(DataJuicerTestCaseBase):
             input_key='sub_docs',
             output_key='text'
         )
-        self._run_helper(op, samples)
+        self._run_helper(op, samples, output_key='text')
 
     def test_max_token_num_1(self):
         samples = [
