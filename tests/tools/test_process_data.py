@@ -111,8 +111,8 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         if osp.exists(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
 
-        import ray
-        ray.shutdown()
+        # import ray
+        # ray.shutdown()
 
     @TEST_TAG("standalone", "ray")
     def test_ray_image(self):
