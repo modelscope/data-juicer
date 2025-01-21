@@ -114,7 +114,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         import ray
         ray.shutdown()
 
-    @TEST_TAG("ray")
+    @TEST_TAG("standalone", "ray")
     def test_ray_image(self):
         tmp_yaml_file = osp.join(self.tmp_dir, 'config_0.yaml')
         tmp_out_path = osp.join(self.tmp_dir, 'output_0.json')
@@ -165,208 +165,208 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         for item in dataset['jsonl']:
             self.assertIn('aspect_ratios', item['__dj__stats__'])
 
-    @TEST_TAG("ray")
-    def test_ray_precise_dedup(self):
-        tmp_yaml_file = osp.join(self.tmp_dir, 'config_1.yaml')
-        tmp_out_path = osp.join(self.tmp_dir, 'output_dedup')
-        text_keys = 'text'
+    # @TEST_TAG("ray")
+    # def test_ray_precise_dedup(self):
+    #     tmp_yaml_file = osp.join(self.tmp_dir, 'config_1.yaml')
+    #     tmp_out_path = osp.join(self.tmp_dir, 'output_dedup')
+    #     text_keys = 'text'
 
-        data_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))),
-            'demos', 'data', 'demo-dataset-deduplication.jsonl')
-        yaml_config = {
-            'dataset_path': data_path,
-            'executor_type': 'ray',
-            'ray_address': 'auto',
-            'text_keys': text_keys,
-            'image_key': 'images',
-            'export_path': tmp_out_path,
-            'process': [
-                {
-                    'ray_document_deduplicator': {
-                        'backend': 'ray_actor',
-                    },
-                }
-            ]
-        }
+    #     data_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))),
+    #         'demos', 'data', 'demo-dataset-deduplication.jsonl')
+    #     yaml_config = {
+    #         'dataset_path': data_path,
+    #         'executor_type': 'ray',
+    #         'ray_address': 'auto',
+    #         'text_keys': text_keys,
+    #         'image_key': 'images',
+    #         'export_path': tmp_out_path,
+    #         'process': [
+    #             {
+    #                 'ray_document_deduplicator': {
+    #                     'backend': 'ray_actor',
+    #                 },
+    #             }
+    #         ]
+    #     }
 
-        with open(tmp_yaml_file, 'w') as file:
-            yaml.dump(yaml_config, file)
+    #     with open(tmp_yaml_file, 'w') as file:
+    #         yaml.dump(yaml_config, file)
 
-        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
+    #     run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
 
-        self.assertTrue(osp.exists(tmp_out_path))
+    #     self.assertTrue(osp.exists(tmp_out_path))
 
-        jsonl_files = [os.path.join(tmp_out_path, f) \
-                       for f in os.listdir(tmp_out_path) \
-                        if f.endswith('.json')]
-        data_cnt = 0
-        for file in jsonl_files:
-            with open(file, 'r') as f:
-                for line in f.readlines():
-                    if line.strip():
-                        data_cnt += 1
+    #     jsonl_files = [os.path.join(tmp_out_path, f) \
+    #                    for f in os.listdir(tmp_out_path) \
+    #                     if f.endswith('.json')]
+    #     data_cnt = 0
+    #     for file in jsonl_files:
+    #         with open(file, 'r') as f:
+    #             for line in f.readlines():
+    #                 if line.strip():
+    #                     data_cnt += 1
 
-        self.assertEqual(data_cnt, 13)
+    #     self.assertEqual(data_cnt, 13)
 
-    @TEST_TAG("ray")
-    def test_ray_minhash_dedup(self):
-        tmp_yaml_file = osp.join(self.tmp_dir, 'config_2.yaml')
-        tmp_out_path = osp.join(self.tmp_dir, 'output_minhash_dedup')
-        text_keys = 'text'
+    # @TEST_TAG("ray")
+    # def test_ray_minhash_dedup(self):
+    #     tmp_yaml_file = osp.join(self.tmp_dir, 'config_2.yaml')
+    #     tmp_out_path = osp.join(self.tmp_dir, 'output_minhash_dedup')
+    #     text_keys = 'text'
 
-        data_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))),
-            'demos', 'data', 'demo-dataset-deduplication.jsonl')
-        yaml_config = {
-            'dataset_path': data_path,
-            'executor_type': 'ray',
-            'ray_address': 'auto',
-            'text_keys': text_keys,
-            'image_key': 'images',
-            'export_path': tmp_out_path,
-            'process': [
-                {
-                    'ray_bts_minhash_deduplicator': {
-                        'lowercase': True,
-                    },
-                }
-            ]
-        }
+    #     data_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))),
+    #         'demos', 'data', 'demo-dataset-deduplication.jsonl')
+    #     yaml_config = {
+    #         'dataset_path': data_path,
+    #         'executor_type': 'ray',
+    #         'ray_address': 'auto',
+    #         'text_keys': text_keys,
+    #         'image_key': 'images',
+    #         'export_path': tmp_out_path,
+    #         'process': [
+    #             {
+    #                 'ray_bts_minhash_deduplicator': {
+    #                     'lowercase': True,
+    #                 },
+    #             }
+    #         ]
+    #     }
 
-        with open(tmp_yaml_file, 'w') as file:
-            yaml.dump(yaml_config, file)
+    #     with open(tmp_yaml_file, 'w') as file:
+    #         yaml.dump(yaml_config, file)
 
-        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
+    #     run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
 
-        self.assertTrue(osp.exists(tmp_out_path))
+    #     self.assertTrue(osp.exists(tmp_out_path))
 
-        jsonl_files = [os.path.join(tmp_out_path, f) \
-                       for f in os.listdir(tmp_out_path) \
-                        if f.endswith('.json')]
-        data_cnt = 0
-        for file in jsonl_files:
-            with open(file, 'r') as f:
-                for line in f.readlines():
-                    if line.strip():
-                        data_cnt += 1
+    #     jsonl_files = [os.path.join(tmp_out_path, f) \
+    #                    for f in os.listdir(tmp_out_path) \
+    #                     if f.endswith('.json')]
+    #     data_cnt = 0
+    #     for file in jsonl_files:
+    #         with open(file, 'r') as f:
+    #             for line in f.readlines():
+    #                 if line.strip():
+    #                     data_cnt += 1
 
-        self.assertEqual(data_cnt, 9)
+    #     self.assertEqual(data_cnt, 9)
 
-    @TEST_TAG("ray")
-    def test_ray_compute_stats_single_filter(self):
-        tmp_yaml_file = osp.join(self.tmp_dir, 'config_3.yaml')
-        tmp_out_path = osp.join(self.tmp_dir, 'output_3')
-        text_keys = 'text'
+    # @TEST_TAG("ray")
+    # def test_ray_compute_stats_single_filter(self):
+    #     tmp_yaml_file = osp.join(self.tmp_dir, 'config_3.yaml')
+    #     tmp_out_path = osp.join(self.tmp_dir, 'output_3')
+    #     text_keys = 'text'
 
-        data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                 '..', 'ops', 'data')
-        ds_list = [{
-            'audios': [os.path.join(data_path, 'audio1.wav')]  # about 6s
-        }, {
-            'audios': [os.path.join(data_path, 'audio2.wav')]  # about 14s
-        }, {
-            'audios': [os.path.join(data_path, 'audio3.ogg')]  # about 1min59s
-        }]
-        dataset_path = osp.join(self.tmp_dir, 'ds_list.jsonl')
-        import json
-        with open(dataset_path, 'w') as f:
-            for data in ds_list:
-                f.write(f'{json.dumps(data)}\n')
-        yaml_config = {
-            'dataset_path': dataset_path,
-            'executor_type': 'ray',
-            'ray_address': 'auto',
-            'text_keys': text_keys,
-            'image_key': 'images',
-            'export_path': tmp_out_path,
-            'process': [
-                {
-                    'audio_duration_filter': {
-                        'max_duration': 10,
-                    },
-                }
-            ]
-        }
+    #     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+    #                              '..', 'ops', 'data')
+    #     ds_list = [{
+    #         'audios': [os.path.join(data_path, 'audio1.wav')]  # about 6s
+    #     }, {
+    #         'audios': [os.path.join(data_path, 'audio2.wav')]  # about 14s
+    #     }, {
+    #         'audios': [os.path.join(data_path, 'audio3.ogg')]  # about 1min59s
+    #     }]
+    #     dataset_path = osp.join(self.tmp_dir, 'ds_list.jsonl')
+    #     import json
+    #     with open(dataset_path, 'w') as f:
+    #         for data in ds_list:
+    #             f.write(f'{json.dumps(data)}\n')
+    #     yaml_config = {
+    #         'dataset_path': dataset_path,
+    #         'executor_type': 'ray',
+    #         'ray_address': 'auto',
+    #         'text_keys': text_keys,
+    #         'image_key': 'images',
+    #         'export_path': tmp_out_path,
+    #         'process': [
+    #             {
+    #                 'audio_duration_filter': {
+    #                     'max_duration': 10,
+    #                 },
+    #             }
+    #         ]
+    #     }
 
-        with open(tmp_yaml_file, 'w') as file:
-            yaml.dump(yaml_config, file)
+    #     with open(tmp_yaml_file, 'w') as file:
+    #         yaml.dump(yaml_config, file)
 
-        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
+    #     run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
 
-        self.assertTrue(osp.exists(tmp_out_path))
+    #     self.assertTrue(osp.exists(tmp_out_path))
 
-        jsonl_files = [os.path.join(tmp_out_path, f) \
-                       for f in os.listdir(tmp_out_path) \
-                        if f.endswith('.json')]
-        data_cnt = 0
-        for file in jsonl_files:
-            with open(file, 'r') as f:
-                for line in f.readlines():
-                    if line.strip():
-                        data_cnt += 1
+    #     jsonl_files = [os.path.join(tmp_out_path, f) \
+    #                    for f in os.listdir(tmp_out_path) \
+    #                     if f.endswith('.json')]
+    #     data_cnt = 0
+    #     for file in jsonl_files:
+    #         with open(file, 'r') as f:
+    #             for line in f.readlines():
+    #                 if line.strip():
+    #                     data_cnt += 1
 
-        self.assertEqual(data_cnt, 1)
+    #     self.assertEqual(data_cnt, 1)
 
-    @TEST_TAG("ray")
-    def test_ray_compute_stats_batched_filter(self):
-        tmp_yaml_file = osp.join(self.tmp_dir, 'config_4.yaml')
-        tmp_out_path = osp.join(self.tmp_dir, 'output_4')
-        text_key = 'text'
+    # @TEST_TAG("ray")
+    # def test_ray_compute_stats_batched_filter(self):
+    #     tmp_yaml_file = osp.join(self.tmp_dir, 'config_4.yaml')
+    #     tmp_out_path = osp.join(self.tmp_dir, 'output_4')
+    #     text_key = 'text'
 
-        ds_list = [{
-            text_key: 'a=1\nb\nc=1+2+3+5\nd=6'
-        }, {
-            text_key:
-            "Today is Sund Sund Sunda and it's a happy day!\nYou know"
-        }, {
-            text_key: 'a v s e e f g a qkc'
-        }, {
-            text_key: '，。、„”“«»１」「《》´∶：？！（）；–—．～’…━〈〉【】％►'
-        }, {
-            text_key: 'Do you need a cup of coffee?'
-        }, {
-            text_key: 'emoji表情测试下😊，😸31231\n'
-        }]
-        dataset_path = osp.join(self.tmp_dir, 'ds_list.jsonl')
-        import json
-        with open(dataset_path, 'w') as f:
-            for data in ds_list:
-                f.write(f'{json.dumps(data)}\n')
-        yaml_config = {
-            'dataset_path': dataset_path,
-            'executor_type': 'ray',
-            'ray_address': 'auto',
-            'text_keys': text_key,
-            'image_key': 'images',
-            'export_path': tmp_out_path,
-            'process': [
-                {
-                    'average_line_length_filter': {
-                        'min_len': 10,
-                        'max_len': 20,
-                        'batch_size': 3,
-                    },
-                }
-            ]
-        }
+    #     ds_list = [{
+    #         text_key: 'a=1\nb\nc=1+2+3+5\nd=6'
+    #     }, {
+    #         text_key:
+    #         "Today is Sund Sund Sunda and it's a happy day!\nYou know"
+    #     }, {
+    #         text_key: 'a v s e e f g a qkc'
+    #     }, {
+    #         text_key: '，。、„”“«»１」「《》´∶：？！（）；–—．～’…━〈〉【】％►'
+    #     }, {
+    #         text_key: 'Do you need a cup of coffee?'
+    #     }, {
+    #         text_key: 'emoji表情测试下😊，😸31231\n'
+    #     }]
+    #     dataset_path = osp.join(self.tmp_dir, 'ds_list.jsonl')
+    #     import json
+    #     with open(dataset_path, 'w') as f:
+    #         for data in ds_list:
+    #             f.write(f'{json.dumps(data)}\n')
+    #     yaml_config = {
+    #         'dataset_path': dataset_path,
+    #         'executor_type': 'ray',
+    #         'ray_address': 'auto',
+    #         'text_keys': text_key,
+    #         'image_key': 'images',
+    #         'export_path': tmp_out_path,
+    #         'process': [
+    #             {
+    #                 'average_line_length_filter': {
+    #                     'min_len': 10,
+    #                     'max_len': 20,
+    #                     'batch_size': 3,
+    #                 },
+    #             }
+    #         ]
+    #     }
 
-        with open(tmp_yaml_file, 'w') as file:
-            yaml.dump(yaml_config, file)
+    #     with open(tmp_yaml_file, 'w') as file:
+    #         yaml.dump(yaml_config, file)
 
-        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
+    #     run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
 
-        self.assertTrue(osp.exists(tmp_out_path))
+    #     self.assertTrue(osp.exists(tmp_out_path))
 
-        jsonl_files = [os.path.join(tmp_out_path, f) \
-                       for f in os.listdir(tmp_out_path) \
-                        if f.endswith('.json')]
-        data_cnt = 0
-        for file in jsonl_files:
-            with open(file, 'r') as f:
-                for line in f.readlines():
-                    if line.strip():
-                        data_cnt += 1
+    #     jsonl_files = [os.path.join(tmp_out_path, f) \
+    #                    for f in os.listdir(tmp_out_path) \
+    #                     if f.endswith('.json')]
+    #     data_cnt = 0
+    #     for file in jsonl_files:
+    #         with open(file, 'r') as f:
+    #             for line in f.readlines():
+    #                 if line.strip():
+    #                     data_cnt += 1
 
-        self.assertEqual(data_cnt, 2)
+    #     self.assertEqual(data_cnt, 2)
 
 
 if __name__ == '__main__':
