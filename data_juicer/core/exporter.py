@@ -114,12 +114,13 @@ class Exporter:
                 export_columns.append(Fields.stats)
             if Fields.meta in dataset.features:
                 export_columns.append(Fields.meta)
-            ds_stats = dataset.select_columns(export_columns)
-            stats_file = export_path.replace('.' + suffix, '_stats.jsonl')
-            Exporter.to_jsonl(
-                ds_stats,
-                stats_file,
-                num_proc=self.num_proc if self.export_in_parallel else 1)
+            if len(export_columns):
+                ds_stats = dataset.select_columns(export_columns)
+                stats_file = export_path.replace('.' + suffix, '_stats.jsonl')
+                Exporter.to_jsonl(
+                    ds_stats,
+                    stats_file,
+                    num_proc=self.num_proc if self.export_in_parallel else 1)
 
         if self.export_ds:
             # fetch the corresponding export method according to the suffix
