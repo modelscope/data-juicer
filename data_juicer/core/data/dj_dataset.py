@@ -21,6 +21,7 @@ from data_juicer.utils.compress import (CompressionOff,
                                         cleanup_compressed_cache_files,
                                         compress, decompress)
 from data_juicer.utils.fingerprint_utils import generate_fingerprint
+from data_juicer.utils.logger_utils import make_log_summarization
 from data_juicer.utils.process_utils import setup_mp
 
 
@@ -258,6 +259,9 @@ class NestedDataset(Dataset, DJDataset):
             if work_dir and enable_insight_mining:
                 logger.info('Insight mining for each OP...')
                 adapter.insight_mining()
+            # make summarization on the error/warning logs
+            if work_dir:
+                make_log_summarization()
         return dataset
 
     def update_args(self, args, kargs, is_filter=False):

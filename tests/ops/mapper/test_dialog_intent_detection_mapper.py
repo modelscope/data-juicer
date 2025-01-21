@@ -1,5 +1,4 @@
 import unittest
-import json
 
 from loguru import logger
 
@@ -20,7 +19,7 @@ class TestDialogIntentDetectionMapper(DataJuicerTestCaseBase):
     def _run_op(self, op, samples, target_len, labels_key=None, analysis_key=None):
         dataset = Dataset.from_list(samples)
         dataset = op.run(dataset)
-        labels_key = labels_key or  MetaKeys.dialog_intent_labels
+        labels_key = labels_key or MetaKeys.dialog_intent_labels
         analysis_key = analysis_key or MetaKeys.dialog_intent_labels_analysis
         labels_list = dataset[0][Fields.meta][labels_key]
         analysis_list = dataset[0][Fields.meta][analysis_key]
@@ -28,6 +27,8 @@ class TestDialogIntentDetectionMapper(DataJuicerTestCaseBase):
         for analysis, labels in zip(analysis_list, labels_list):
             logger.info(f'分析：{analysis}')
             logger.info(f'意图：{labels}')
+            self.assertNotEqual(analysis, '')
+            self.assertNotEqual(labels, '')
         
         self.assertEqual(len(analysis_list), target_len)
         self.assertEqual(len(labels_list), target_len)

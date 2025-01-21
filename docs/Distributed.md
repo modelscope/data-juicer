@@ -11,7 +11,7 @@ For reference, in our experiments with 25 to 100 Alibaba Cloud nodes, Data-Juice
 More details can be found in our paper, [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](arXiv_link_coming_soon).
 
 ![Arch-Overview](
-https://img.alicdn.com/imgextra/i4/O1CN01uawwRu1JMSdafy5lF_!!6000000001014-2-tps-4034-4146.png)
+https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png)
 
 ## Implementation and Optimizations
 

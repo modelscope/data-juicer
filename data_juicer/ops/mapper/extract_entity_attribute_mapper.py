@@ -1,6 +1,7 @@
 import re
 from typing import Dict, List, Optional
 
+import numpy as np
 from loguru import logger
 from pydantic import PositiveInt
 
@@ -157,12 +158,15 @@ class ExtractEntityAttributeMapper(Mapper):
                     'content': input_prompt
                 }]
 
-                desc, demos = '', []
+                desc, demos = '', np.array([], dtype=str)
                 for _ in range(self.try_num):
                     try:
                         output = client(messages, **self.sampling_params)
-                        desc, demos = self.parse_output(output, attribute)
-                        if desc and len(demos) > 0:
+                        cur_desc, cur_demos = self.parse_output(
+                            output, attribute)
+                        if cur_desc and len(cur_demos) > 0:
+                            desc = cur_desc
+                            demos = cur_demos
                             break
                     except Exception as e:
                         logger.warning(f'Exception: {e}')

@@ -59,6 +59,8 @@ class ExtractKeywordMapperTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(samples)
         dataset = op.run(dataset)
         sample = dataset[0]
+        self.assertIn(MetaKeys.keyword, sample[Fields.meta])
+        self.assertNotEqual(len(sample[Fields.meta][MetaKeys.keyword]), 0)
         logger.info(f"keywords: {sample[Fields.meta][MetaKeys.keyword]}")
 
     def test(self):
