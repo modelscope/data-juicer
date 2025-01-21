@@ -111,8 +111,8 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         if osp.exists(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
 
-        # import ray
-        # ray.shutdown()
+        import ray
+        ray.shutdown()
 
     @TEST_TAG("standalone", "ray")
     def test_ray_image(self):
@@ -165,48 +165,48 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         for item in dataset['jsonl']:
             self.assertIn('aspect_ratios', item['__dj__stats__'])
 
-    # @TEST_TAG("ray")
-    # def test_ray_precise_dedup(self):
-    #     tmp_yaml_file = osp.join(self.tmp_dir, 'config_1.yaml')
-    #     tmp_out_path = osp.join(self.tmp_dir, 'output_dedup')
-    #     text_keys = 'text'
+    @TEST_TAG("standalone", "ray")
+    def test_ray_precise_dedup(self):
+        tmp_yaml_file = osp.join(self.tmp_dir, 'config_1.yaml')
+        tmp_out_path = osp.join(self.tmp_dir, 'output_dedup')
+        text_keys = 'text'
 
-    #     data_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))),
-    #         'demos', 'data', 'demo-dataset-deduplication.jsonl')
-    #     yaml_config = {
-    #         'dataset_path': data_path,
-    #         'executor_type': 'ray',
-    #         'ray_address': 'auto',
-    #         'text_keys': text_keys,
-    #         'image_key': 'images',
-    #         'export_path': tmp_out_path,
-    #         'process': [
-    #             {
-    #                 'ray_document_deduplicator': {
-    #                     'backend': 'ray_actor',
-    #                 },
-    #             }
-    #         ]
-    #     }
+        data_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))),
+            'demos', 'data', 'demo-dataset-deduplication.jsonl')
+        yaml_config = {
+            'dataset_path': data_path,
+            'executor_type': 'ray',
+            'ray_address': 'auto',
+            'text_keys': text_keys,
+            'image_key': 'images',
+            'export_path': tmp_out_path,
+            'process': [
+                {
+                    'ray_document_deduplicator': {
+                        'backend': 'ray_actor',
+                    },
+                }
+            ]
+        }
 
-    #     with open(tmp_yaml_file, 'w') as file:
-    #         yaml.dump(yaml_config, file)
+        with open(tmp_yaml_file, 'w') as file:
+            yaml.dump(yaml_config, file)
 
-    #     run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
+        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
 
-    #     self.assertTrue(osp.exists(tmp_out_path))
+        self.assertTrue(osp.exists(tmp_out_path))
 
-    #     jsonl_files = [os.path.join(tmp_out_path, f) \
-    #                    for f in os.listdir(tmp_out_path) \
-    #                     if f.endswith('.json')]
-    #     data_cnt = 0
-    #     for file in jsonl_files:
-    #         with open(file, 'r') as f:
-    #             for line in f.readlines():
-    #                 if line.strip():
-    #                     data_cnt += 1
+        jsonl_files = [os.path.join(tmp_out_path, f) \
+                       for f in os.listdir(tmp_out_path) \
+                        if f.endswith('.json')]
+        data_cnt = 0
+        for file in jsonl_files:
+            with open(file, 'r') as f:
+                for line in f.readlines():
+                    if line.strip():
+                        data_cnt += 1
 
-    #     self.assertEqual(data_cnt, 13)
+        self.assertEqual(data_cnt, 13)
 
     # @TEST_TAG("ray")
     # def test_ray_minhash_dedup(self):
