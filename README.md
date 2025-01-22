@@ -158,7 +158,7 @@ Table of Contents
   - Basic Example Recipes for Video Data
   - Synthesizing Human-centered Video Evaluation Sets
   - Improving Existing Open Source Video Datasets
-- [Data-Juicer related Competitions]
+- Data-Juicer related Competitions
   - [Better Synth](https://tianchi.aliyun.com/competition/entrance/532251), explore the impact of large model synthetic data on image understanding ability with DJ-Sandbox Lab and multimodal large models
   - [Modelscope-Sora Challenge](https://tianchi.aliyun.com/competition/entrance/532219), based on Data-Juicer and [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) framework,  optimize data and train SORA-like small models to generate better videos
   - [Better Mixture](https://tianchi.aliyun.com/competition/entrance/532174), only adjust data mixing and sampling strategies for given multiple candidate datasets
