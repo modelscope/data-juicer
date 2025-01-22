@@ -68,8 +68,6 @@ def gather_test_cases(test_dir, pattern, tag):
             for test_case in test_suite:
                 if type(test_case) in SKIPPED_TESTS.modules.values():
                     continue
-                if tag == 'standalone' and test_case._testMethodName in ['test_ray_precise_dedup', 'test_ray_image']:
-                    continue  # test_ray_image
                 logger.info(f'Add test case [{test_case._testMethodName}]'
                             f' from {test_case.__class__.__name__}')
                 test_to_run.addTest(test_case)

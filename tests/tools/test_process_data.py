@@ -24,14 +24,6 @@ def run_in_subprocess(cmd):
                     print(return_line)
 
             err_lines = ''
-            # while True:
-            #     next_line = return_info.stderr.readline()
-            #     return_line = next_line.decode('utf-8', 'ignore').strip()
-            #     if return_line == '' and return_info.poll() != None:
-            #         break
-            #     if return_line != '':
-            #         print(return_line)
-            #         err_lines += return_line + '\n'
 
             return_code = return_info.wait()
             if return_code:
@@ -114,7 +106,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         import ray
         ray.shutdown()
 
-    @TEST_TAG("standalone", "ray")
+    @TEST_TAG("ray")
     def test_ray_image(self):
         tmp_yaml_file = osp.join(self.tmp_dir, 'config_0.yaml')
         tmp_out_path = osp.join(self.tmp_dir, 'output_0.json')
@@ -165,7 +157,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         for item in dataset['jsonl']:
             self.assertIn('aspect_ratios', item['__dj__stats__'])
 
-    @TEST_TAG("standalone", "ray")
+    @TEST_TAG("ray")
     def test_ray_precise_dedup(self):
         tmp_yaml_file = osp.join(self.tmp_dir, 'config_1.yaml')
         tmp_out_path = osp.join(self.tmp_dir, 'output_dedup')
