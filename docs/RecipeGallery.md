@@ -6,14 +6,14 @@
 Table of Contents
 - [1. Data-Juicer Minimal Example Recipe](#1-data-juicer-minimal-example-recipe)
 - [2. Reproduce Open Source Text Datasets](#2-reproduce-open-source-text-datasets)
-- [3. Improved Open Source Text Pre-training Datasets](#3-improved-open-source-text-pre-training-datasets)
-- [4. Improved open source text post-processing dataset](#4-improved-open-source-text-post-processing-dataset)
-- [5. Synthetic contrastive learning image and text datasets](#5-synthetic-contrastive-learning-image-and-text-datasets)
-- [6. Improved open source image and text datasets](#6-improved-open-source-image-and-text-datasets)
+- [3. Improved Open Source Pre-training Text Datasets](#3-improved-open-source-pre-training-text-datasets)
+- [4. Improved Open Source Post-tuning Text Dataset](#4-improved-open-source-post-tuning-text-dataset)
+- [5. Synthetic Contrastive Learning Image-text datasets](#5-synthetic-contrastive-learning-image-text-datasets)
+- [6. Improved Open Source Image-text datasets](#6-improved-open-source-image-text-datasets)
   - [6.1. Evaluation and Verification](#61-evaluation-and-verification)
 - [7. Basic Example Recipes for Video Data](#7-basic-example-recipes-for-video-data)
-- [8. Synthesize a human-centric video review set](#8-synthesize-a-human-centric-video-review-set)
-- [9. Improve existing open source video datasets](#9-improve-existing-open-source-video-datasets)
+- [8. Synthesize Human-centric Video Benchmarks](#8-synthesize-human-centric-video-benchmarks)
+- [9. Improve Existing Open Source Video Datasets](#9-improve-existing-open-source-video-datasets)
   - [9.1. Evaluation and Verification](#91-evaluation-and-verification)
 
 
@@ -24,7 +24,7 @@ Some basic configuration files are placed in the [Demo](../configs/demo/) folder
 - We reproduced the processing flow of part of the Redpajama dataset. Please refer to the [reproduced_redpajama](../configs/reproduced_redpajama) folder for detailed description.
 - We reproduced the processing flow of part of the BLOOM dataset. Please refer to the [reproduced_bloom](../configs/reproduced_bloom) folder for detailed description.
 
-## 3. Improved Open Source Text Pre-training Datasets
+## 3. Improved Open Source Pre-training Text Datasets
 
 We found that there are still some "bad" data samples in the existing processed datasets (such as Redpajama, The Pile, etc.). So we use our Data-Juicer to refine these datasets and try to feed them to LLM to get better performance.
 
@@ -53,7 +53,7 @@ We use a simple 3-σ rule to set the hyperparameters of the operators in each da
 | USPTO                |          5,883,024          |   4,516,283    |   76.77%   | [pile-uspto-refine.yaml](../configs/data_juicer_recipes/pile-uspto-refine.yaml)                                                                                                                                                                                   | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/pretraining/the-pile-uspto-refine-result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/the-pile-uspto-refined-by-data-juicer/summary) <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/the-pile-uspto-refined-by-data-juicer) | The Pile                |
 
 
-## 4. Improved open source text post-processing dataset
+## 4. Improved Open Source Post-tuning Text Dataset
 Take the Alpaca-CoT dataset as an example:
 
 | Data subset | Number of samples before improvement | Number of samples after improvement | Sample retention rate | Configuration link | Data link | Source |
@@ -61,10 +61,10 @@ Take the Alpaca-CoT dataset as an example:
 | Alpaca-Cot EN     |       136,219,879        | 72,855,345 |   54.48%   | [alpaca-cot-en-refine.yaml](../configs/data_juicer_recipes/alpaca_cot/alpaca-cot-en-refine.yaml)                                                                                                                                                                   | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/CFT/alpaca-cot-en-refine_result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/alpaca-cot-en-refined-by-data-juicer/summary) <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/alpaca-cot-en-refined-by-data-juicer)   | [39 subsets from Alpaca-CoT](../configs/data_juicer_recipes/alpaca_cot/README.md) |
 | Alpaca-Cot ZH     |        21,197,246        |             9,873,214              |  46.58%   | [alpaca-cot-zh-refine.yaml](../configs/data_juicer_recipes/alpaca_cot/alpaca-cot-zh-refine.yaml)                                                                                                                                                                   | [Aliyun](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/LLM_data/our_refined_datasets/CFT/alpaca-cot-zh-refine_result.jsonl) <br> [ModelScope](https://modelscope.cn/datasets/Data-Juicer/alpaca-cot-zh-refined-by-data-juicer/summary) <br> [HuggingFace](https://huggingface.co/datasets/datajuicer/alpaca-cot-zh-refined-by-data-juicer)   | [28 subsets from Alpaca-CoT](../configs/data_juicer_recipes/alpaca_cot/README.md) |
 
-## 5. Synthetic contrastive learning image and text datasets
+## 5. Synthetic Contrastive Learning Image-text datasets
 Data-Juicer has built-in rich operators to support image multimodal data synthesis, such as the Img-Diff dataset. This synthetic data brings a 12-point performance improvement on the MMVP benchmark. For more details, see the Img-Diff [paper](https://arxiv.org/abs/2408.04594), and the corresponding recipe implementation can refer to [ImgDiff-Dev](https://github.com/modelscope/data-juicer/tree/ImgDiff).
 
-## 6. Improved open source image and text datasets
+## 6. Improved Open Source Image-text datasets
 
 | Data subset | Number of samples before improvement | Number of samples after improvement | Sample retention rate | Configuration link | Data link | Source |
 |---------------------------|:---------------------------:|:--------------:|:----------:|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
@@ -102,10 +102,10 @@ We provide users with a video dataset processing recipe sample to help better us
 - Text-Video: Improve the dataset quality based on the alignment between text and video
 Users can start their video dataset processing workflow based on this recipe.
 
-## 8. Synthesize a human-centric video review set
-Data-Juicer can also support video review set synthesis, such as [HumanVBench](https://arxiv.org/abs/2412.17574), which converts in-the-wild videos into human-centric video benchmarks. The corresponding data recipes and construction process can be found in [HumanVBench-dev](https://github.com/modelscope/data-juicer/tree/HumanVBench).
+## 8. Synthesize Human-centric Video Benchmarks 
+Data-Juicer can also support video benchmark synthesis, such as [HumanVBench](https://arxiv.org/abs/2412.17574), which converts in-the-wild videos into human-centric video benchmarks. The corresponding data recipes and construction process can be found in [HumanVBench-dev](https://github.com/modelscope/data-juicer/tree/HumanVBench).
 
-## 9. Improve existing open source video datasets
+## 9. Improve Existing Open Source Video Datasets
 
 | Data subset | Number of samples before improvement | Number of samples after improvement | Sample retention rate | Configuration link | Data link | Source |
 |---------------------------|:---------------------------:|:--------------:|:----------:|--------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
