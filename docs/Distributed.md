@@ -10,8 +10,7 @@ For reference, in our experiments with 25 to 100 Alibaba Cloud nodes, Data-Juice
 
 More details can be found in our paper, [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](arXiv_link_coming_soon).
 
-![Arch-Overview](
-https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png)
+<img src="https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png" align="center" width="600" />
 
 ## Implementation and Optimizations
 
@@ -24,7 +23,7 @@ https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps
 
 When dealing with tens of thousands of nodes but only a few dataset files, Ray would split the dataset files according to available resources and distribute the blocks across all nodes, incurring huge network communication costs and reduces CPU utilization. For more details, see [Ray's autodetect_parallelism](https://github.com/ray-project/ray/blob/2dbd08a46f7f08ea614d8dd20fd0bca5682a3078/python/ray/data/_internal/util.py#L201-L205) and [tuning output blocks for Ray](https://docs.ray.io/en/latest/data/performance-tips.html#tuning-output-blocks-for-read).
 
-This default execution plan can be quite inefficient especially for scenarios with large number of nodes. To optimize performance for such cases, we automatically splitting the original dataset into smaller files in advance, taking into consideration the features of Ray and Arrow. When users encounter such performance issues, they can utilize this feature or split the dataset according to their own preferences. In our auto-split strategy, the single file size is set to 128MB, and the result should ensure that the number of sub-files after splitting is at least twice the total number of CPU cores available in the cluster.
+This default execution plan can be quite inefficient especially for scenarios with large number of nodes. To optimize performance for such cases, we automatically splitting the original dataset into smaller files in advance, taking into consideration the features of Ray and Arrow. When users encounter such performance issues, they can utilize this feature or split the dataset according to their own preferences. In our auto-split strategy, the single file size is set to 128MB, and the result should ensure that the number of sub-files after splitting is at least twice the total number of CPU cores available in the cluster. The corresponding tool can be obtained in tools/data_resplit.py.
 
 ### Streaming Reading of JSON Files
 

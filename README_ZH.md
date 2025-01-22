@@ -116,27 +116,34 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 - [“坏”数据展览](docs/BadDataExhibition_ZH.md)
 
 ### 编写Data-Juicer (DJ) 代码
-- [DJ概览](README_ZH.md)
-- [算子库](docs/Operators.md)
-- [快速上手](#快速上手)
-- [配置](configs/README_ZH.md)
-- [开发者指南](docs/DeveloperGuide_ZH.md)
-- [API参考](https://modelscope.github.io/data-juicer/)
-- [预处理工具](tools/preprocess/README_ZH.md)
-- [后处理工具](tools/postprocess/README_ZH.md)
-- [格式转换](tools/fmt_conversion/README_ZH.md)
-- [沙盒](docs/Sandbox-ZH.md)
-- [质量分类器](tools/quality_classifier/README_ZH.md)
-- [自动评估](tools/evaluator/README_ZH.md)
-- [第三方集成](thirdparty/LLM_ecosystems/README_ZH.md)
+- 基础
+  - [DJ概览](README_ZH.md)
+  - [快速上手](#快速上手)
+  - [配置](docs/RecipeGallery_ZH.md)
+  - [数据格式转换](tools/fmt_conversion/README_ZH.md)
+- 信息速查
+  - [算子库](docs/Operators.md)
+  - [API参考](https://modelscope.github.io/data-juicer/)
+- 进阶
+  - [开发者指南](docs/DeveloperGuide_ZH.md)
+  - [预处理工具](tools/preprocess/README_ZH.md)
+  - [后处理工具](tools/postprocess/README_ZH.md)
+  - [沙盒](docs/Sandbox-ZH.md)
+  - [质量分类器](tools/quality_classifier/README_ZH.md)
+  - [自动评估](tools/evaluator/README_ZH.md)
+  - [第三方集成](thirdparty/LLM_ecosystems/README_ZH.md)
 
 ### 用例与数据菜谱
-
-* [BLOOM 数据处理菜谱](configs/reproduced_bloom/README_ZH.md)
-* [RedPajama 数据处理菜谱](configs/reproduced_redpajama/README_ZH.md)
-* [预训练文本数据增强菜谱](configs/data_juicer_recipes/README_ZH.md)
-* [Fine-tuning文本数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#完善前后的alpaca-cot数据集)
-* [预训练多模态数据增强菜谱](configs/data_juicer_recipes/README_ZH.md#before-and-after-refining-for-multimodal-dataset)
+* [数据菜谱Gallery](docs/RecipeGallery.md)
+  - Data-Juicer 最小示例配方
+  - 复现开源文本数据集
+  - 改进开源文本预训练数据集
+  - 改进开源文本后处理数据集
+  - 合成对比学习图像文本数据集
+  - 改进开源图像文本数据集
+  - 视频数据的基本示例菜谱
+  - 合成以人为中心的视频评测集
+  - 改进现有的开源视频数据集
 * [DJ-SORA](docs/DJ_SORA_ZH.md)
 * [智能体调用DJ Filters](./demos/api_service/react_data_filter_process.ipynb)
 * [智能体调用DJ Mappers](./demos/api_service/react_data_mapper_process.ipynb)
@@ -449,7 +456,7 @@ Data-Juicer 在 Apache License 2.0 协议下发布。
 
 ## 致谢
 
-Data-Juicer被许多大模型相关产品和研究工作所使用，例子阿里巴巴通义和阿里云人工智能平台 (PAI) 之上的工业界场景。 我们期待更多您的体验反馈、建议和合作共建！
+Data-Juicer被许多大模型相关产品和研究工作所使用，例如阿里巴巴通义和阿里云人工智能平台 (PAI) 之上的工业界场景。 我们期待更多您的体验反馈、建议和合作共建！
 
 
 Data-Juicer 感谢社区[贡献者](https://github.com/modelscope/data-juicer/graphs/contributors) 和相关的先驱开源项目，譬如[Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), ....

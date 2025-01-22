@@ -1,14 +1,16 @@
 # 开发者指南
 
-- [开发者指南](#开发者指南)
-  - [编码规范](#编码规范)
-  - [构建自己的算子](#构建自己的算子)
-    - [（可选）使新算子可以进行算子融合](#可选使新算子可以进行算子融合)
-  - [构建自己的配置](#构建自己的配置)
-    - [丰富的配置源和类型提示](#丰富的配置源和类型提示)
-    - [层次化的配置和帮助](#层次化的配置和帮助)
+- [1.编码规范](#1编码规范)
+- [2.构建自己的算子](#2构建自己的算子)
+  - [2.1 构建示例](#21-构建示例)
+    - [2.1.2 提供算子基本功能（alpha版本)](#212-提供算子基本功能alpha版本)
+    - [2.1.2 使算子更可用（beta版本)](#212-使算子更可用beta版本)
+    - [2.1.3 使算子更快更完备（stable版本)](#213-使算子更快更完备stable版本)
+- [3. 构建自己的数据菜谱和配置](#3-构建自己的数据菜谱和配置)
+  - [3.1 丰富的配置源和类型提示](#31-丰富的配置源和类型提示)
+  - [3.2 层次化的配置和帮助](#32-层次化的配置和帮助)
 
-## 编码规范
+## 1.编码规范
 
 我们将编码规范定义在 `.pre-commit-config.yaml` 中。在向仓库贡献代码之前，请使用 `pre-commit` 工具对代码进行自动规范化。
 
@@ -31,17 +33,22 @@ git commit -m "<your_commit_message>"
 
 **注意**：我们在github workflow配置了pre-commit的检查。如果您的PR中该检查没通过，请在本地①确保pre-commit 的相关依赖与项目配置一致（可通过`pre-commit clean`和`pre-commit install`完成）；②push前执行了`pre-commit run --all-files`.
 
-## 构建自己的算子
+## 2.构建自己的算子
 
-- Data-Juicer 支持每个人定义自己的算子。
-- 在实现新的算子之前，请参考 [Operators](Operators.md) 以避免不必要的重复。
+- Data-Juicer 支持每个人灵活、便捷定义自己的算子。
+- 在实现新的算子之前，请参考已有 [算子池](Operators.md) 以避免不必要的重复。
 - 根据实现完整性，算子会被分类为3类：
   - ![alpha](https://img.shields.io/badge/alpha-red?style=plastic) 版本：仅实现了最基本的算子能力
-  - ![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 版本：在 alpha 版本基础上为算子添加了单元测试
+  - ![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 版本：在 alpha 版本基础上为算子添加了单元测试，补充基础文档描述
   - ![stable](https://img.shields.io/badge/stable-green?style=plastic) 版本：在 beta 版本基础上进行了各项算子优化（如模型管理、批处理、算子融合等）
-- 假设要添加一个名为 “TextLengthFilter” 的运算符以过滤仅包含预期文本长度的样本语料，可以按照以下步骤进行构建。
+- 📣📣📣 社区贡献者可在alpha状态后就提相应算子PR。此后该贡献者可以与Data-Juicer团队一起在后续PR中，将其渐进完善到beta和stable版本。我们非常欢迎共建，并会高亮[致谢](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)！
 
-1. (可选) 在 `data_juicer/utils/constant.py` 文件中添加一个新的StatsKeys来保存新算子的统计变量。
+### 2.1 构建示例
+下面以 “TextLengthFilter” 的算子（过滤仅包含预期文本长度的样本语料）为例，展示相应开发构建过程。
+
+#### 2.1.2 提供算子基本功能（alpha版本)
+
+1. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)，可选) 如果该算子定义了某个统计变量，那么请在 `data_juicer/utils/constant.py` 文件中添加一个新的`StatsKeys`属性来统一保存管理。
 
 ```python
 class StatsKeys(object):
@@ -50,8 +57,9 @@ class StatsKeys(object):
 ```
 
 2. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) 在 `data_juicer/ops/filter/` 目录下创建一个新的算子文件 `text_length_filter.py`，内容如下：
-    - 因为它是一个 Filter 算子，所以需要继承 `base_op.py` 中的 `Filter` 基类，并用 `OPERATORS` 修饰以实现自动注册。
-    - 为了方便实现，我们可以以单样本处理的方式实现两个核心方法 `compute_stats_single` 和 `process_single`，它们的输入输出均为单个样本的字典结构。如果你比较熟悉 Data-Juicer 中的batch化处理，你也可以通过覆写 `compute_stats_batched` 和 `process_batched` 方法直接实现它们的batch化版本，它的处理会比单样本版本稍快一些。它们的输入和输出则是按列存储的字典结构，其中包括多个样本。
+    - 因为它是一个 Filter 算子，所以需要继承 `base_op.py` 中的 `Filter` 基类，并用 `@OPERATORS.register_module(xx_op)` 装饰器标记，以实现自动注册。
+    - 为了方便实现，我们可以按单样本处理的方式实现两个核心方法 `compute_stats_single` 和 `process_single`，它们的输入输出均为单个样本的字典结构。
+    - 【进阶】如果你比较熟悉 Data-Juicer 中的batch化处理，你也可以通过覆写 `compute_stats_batched` 和 `process_batched` 方法直接实现它们的batch化版本，它的处理会比单样本版本稍快一些。它们的输入和输出则是按列存储的字典结构，其中包括多个样本 （详见下方 2.1.3 小节）。
 
     ```python
     import sys
@@ -104,7 +112,88 @@ class StatsKeys(object):
                 return False
     ```
 
-    - (![stable](https://img.shields.io/badge/stable-green?style=plastic)) 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在构造函数中声明 `_accelerator = 'cuda'`，并确保 `compute_stats_single/batched` 和 `process_single/batched` 方法接受一个额外的位置参数 `rank`。
+
+3. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
+
+```python
+from . import (...,              # other OPs
+               text_length_filter)  # import this new OP module
+# other OPs
+from text_length_filter import TextLengthFilter  # import this new OP class
+__all__ = [
+    # other Ops
+    text_length_filter,  # add this new Op to __all__
+]
+```
+
+4. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) 算子有`environments/science_requires.txt`中列举的包依赖时，需要在`data_juicer/utils/auto_install_mapping.py`里的`OPS_TO_PKG`中添加对应的依赖包，以支持算子粒度的依赖安装。
+
+5. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
+
+```yaml
+# other configs
+...
+
+# process configs
+process:
+  - text_length_filter:  # add this op to your process list and set the parameters
+      min_len: 10
+      max_len: 1000
+```
+
+#### 2.1.2 使算子更可用（beta版本)
+
+6. （![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 强烈推荐）为了增强代码鲁棒性、验证正确性和直观展示如何使用其功能，最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
+
+```python
+import unittest
+from data_juicer.ops.filter.text_length_filter import TextLengthFilter
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+
+
+class TextLengthFilterTest(DataJuicerTestCaseBase):
+
+    def test_func1(self):
+        pass
+
+    def test_func2(self):
+        pass
+
+    def test_func3(self):
+        pass
+        
+if __name__ == '__main__':
+    unittest.main()
+```
+
+1. （![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 强烈推荐）为了方便其他用户理解和使用，最好将新增的算子信息更新到相应的文档中，具体包括如下两个基本动作：
+   1. 请在算子基类的doc string中补充基础信息，确保其完整可读（包括算子基本功能描述、入参、出参等）。无需用户麻烦地多处撰写，我们的`pre-commit`和sphinx构建脚本会自动抽取doc string形成算子池文档和API文档。
+   2. `configs/config_all.yaml`：该全集配置文件保存了所有算子及参数的一个列表，作为一些自动化特性的信息来源以及用户参考可用算子的一个重要文档之一。因此，在新增算子后，请将其也添加到该文档process列表里（按算子类型分组并按字母序排序）：
+   
+   ```yaml
+   ...
+   - stopwords_filter:                                       # filter text with stopword ratio smaller than a specific min value
+       lang: en                                                # consider stopwords in what language
+       tokenization: false                                     # whether to use model to tokenize documents
+       min_ratio: 0.3                                          # the min ratio to filter text
+       stopwords_dir: ./assets                                 # directory to store stopwords dictionaries
+       use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
+       words_aug_group_sizes: [2]                              # the group size of words to augment
+       words_aug_join_char: ""                                 # the join char between words to augment
+   - text_length_filter:                                     # filter text with length out of specific range
+       min_len: 10                                             # the min length of filter range
+       max_len: 10000                                          # the max length of filter range
+   - token_num_filter:                                       # filter text with total token number out of specific range
+       hf_tokenizer: EleutherAI/pythia-6.9b-deduped            # name of used Hugging Face tokenizer
+       min_num: 10                                             # the min number of filter range
+       max_num: 10000                                          # the max number of filter range
+   ...
+   ```
+
+
+#### 2.1.3 使算子更快更完备（stable版本)
+
+- (![stable](https://img.shields.io/badge/stable-green?style=plastic)) 如果在算子中使用了 Hugging Face 模型，您可能希望利用 GPU 加速。为了实现这一点，请在算子的构造函数中声明 `_accelerator = 'cuda'`，并确保 `compute_stats_single/batched` 和 `process_single/batched` 方法接受一个额外的位置参数 `rank`。
 
     ```python
     # ... (same as above)
@@ -128,7 +217,7 @@ class StatsKeys(object):
             # ... (same as above)
     ```
 
-    - (![stable](https://img.shields.io/badge/stable-green?style=plastic)) 如果算子批量处理数据，输入不是一个样本而是一个batch，或者你想在单样本实现上直接激活batch化处理，需要声明`_batched_op = True`。
+- (![stable](https://img.shields.io/badge/stable-green?style=plastic)) 如果算子批量处理数据，输入不是一个样本而是一个batch，或者你想在单样本实现上直接激活batch化处理，需要声明`_batched_op = True`。
       - 对于单样本实现中原来的 `compute_stats_single` 和 `process_single` 方法，你可以保持它们不变，Data-Juicer 会调用默认的batch化处理版本，它们会自动拆分单个样本以调用单样本版本的两个方法来支持batch化处理。你也可以自行实现更高效的batch化的版本。
     ```python
     # ... (import some other libraries)
@@ -148,7 +237,7 @@ class StatsKeys(object):
             # ... (some codes)
     ```
 
-    - (![stable](https://img.shields.io/badge/stable-green?style=plastic)) 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式为`{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`，其中`HASH_VALUE`是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。为了方便，可以在OP类初始化开头调用`self.remove_extra_parameters(locals())`获取算子初始化参数，同时可以调用`self.add_parameters`添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：
+- (![stable](https://img.shields.io/badge/stable-green?style=plastic)) 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式为`{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`，其中`HASH_VALUE`是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。为了方便，可以在OP类初始化开头调用`self.remove_extra_parameters(locals())`获取算子初始化参数，同时可以调用`self.add_parameters`添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：
     ```python
     # ... (import some library)
     OP_NAME = 'image_diffusion_mapper'
@@ -193,82 +282,8 @@ class StatsKeys(object):
             # ... (some codes)
     ```
 
-3. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
 
-```python
-from . import (...,              # other OPs
-               text_length_filter)  # import this new OP module
-# other OPs
-from text_length_filter import TextLengthFilter  # import this new OP class
-__all__ = [
-    # other Ops
-    text_length_filter,  # add this new Op to __all__
-]
-```
-
-4. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) 算子有`environments/science_requires.txt`中列举的包依赖时，需要在`data_juicer/utils/auto_install_mapping.py`里的`OPS_TO_PKG`中添加对应的依赖包，以支持算子粒度的依赖安装。
-
-5. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
-
-```yaml
-# other configs
-...
-
-# process configs
-process:
-  - text_length_filter:  # add this op to your process list and set the parameters
-      min_len: 10
-      max_len: 1000
-```
-
-6. （![beta](https://img.shields.io/badge/beta-yellow?style=plastic) 强烈推荐）最好为新添加的算子进行单元测试。对于上面的 `TextLengthFilter` 算子，建议在 `tests/ops/filter/` 中实现如 `test_text_length_filter.py` 的测试文件：
-
-```python
-import unittest
-from data_juicer.ops.filter.text_length_filter import TextLengthFilter
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
-
-
-class TextLengthFilterTest(DataJuicerTestCaseBase):
-
-    def test_func1(self):
-        pass
-
-    def test_func2(self):
-        pass
-
-    def test_func3(self):
-        pass
-        
-if __name__ == '__main__':
-    unittest.main()
-```
-
-7. （![stable](https://img.shields.io/badge/stable-green?style=plastic) 强烈推荐）为了方便其他用户使用，我们还需要将新增的算子信息更新到相应的文档中，具体包括如下文档：
-   1. `configs/config_all.yaml`：该全集配置文件保存了所有算子及参数的一个列表，作为用户参考可用算子的一个重要文档。因此，在新增算子后，需要将其添加到该文档process列表里（按算子类型分组并按字母序排序）：
-   
-   ```yaml
-   ...
-   - stopwords_filter:                                       # filter text with stopword ratio smaller than a specific min value
-       lang: en                                                # consider stopwords in what language
-       tokenization: false                                     # whether to use model to tokenize documents
-       min_ratio: 0.3                                          # the min ratio to filter text
-       stopwords_dir: ./assets                                 # directory to store stopwords dictionaries
-       use_words_aug: false                                    # whether to augment words, especially for Chinese and Vietnamese
-       words_aug_group_sizes: [2]                              # the group size of words to augment
-       words_aug_join_char: ""                                 # the join char between words to augment
-   - text_length_filter:                                     # filter text with length out of specific range
-       min_len: 10                                             # the min length of filter range
-       max_len: 10000                                          # the max length of filter range
-   - token_num_filter:                                       # filter text with total token number out of specific range
-       hf_tokenizer: EleutherAI/pythia-6.9b-deduped            # name of used Hugging Face tokenizer
-       min_num: 10                                             # the min number of filter range
-       max_num: 10000                                          # the max number of filter range
-   ...
-   ```
-
-
-### （![stable](https://img.shields.io/badge/stable-green?style=plastic) 可选）使新算子可以进行算子融合
+（![stable](https://img.shields.io/badge/stable-green?style=plastic) 可选）**使新算子可以进行算子融合**
 
 - 如果我们的新算子中的部分中间变量的计算过程与已有的算子重复，那么可以将其添加到可融合算子中，以在数据处理时利用算子融合进行加速。（如`words_num_filter`与`word_repetition_filter`都需要对输入文本进行分词）
 - 当算子融合（OP Fusion）功能开启时，这些重复的计算过程和中间变量是可以在算子之间的`context`中共享的，从而可以减少重复计算。
@@ -369,11 +384,13 @@ class PerplexityFilter(Filter):
 
 - 至此，该算子已经能够在算子融合功能开启后，自动地与其他算子进行融合并共享共有的中间变量，减少重复计算，加快整体的数据处理速度
 
-## 构建自己的配置
+## 3. 构建自己的数据菜谱和配置
 
 - 我们提供基于 [jsonargparse](https://github.com/omni-us/jsonargparse/) 的简单配置以降低样板代码的成本。
+- 我们提供大量的示例性菜谱以供参阅复用和扩展，[数据菜谱Gallery](../docs/RecipeGallery_ZH.md)。
+- 📣📣📣 社区贡献者可提PR在*数据菜谱Gallery*中添加自定义的数据菜谱，促进传播、复用和相关技术演进。我们非常欢迎共建，并会高亮[致谢](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)！
 
-### 丰富的配置源和类型提示
+### 3.1 丰富的配置源和类型提示
 
 - 全局配置对象可以通过以下方式初始化
 
@@ -393,7 +410,7 @@ self.cfg = init_configs()
 此外，还支持许多参数类型和相应的验证。
 包含 Python内置类型、来自 [Lib/typing](https://docs.python.org/3/library/typing.html) 的类型，以及来自 jsonargparse 的 [扩展类型](https://jsonargparse.readthedocs.io/en/stable/#type-hints)，例如具有自定义限制的 `restricted types` 和 `Paths`。
 
-### 层次化的配置和帮助
+### 3.2 层次化的配置和帮助
 
 - 您可以在参数名称中自由使用点符号来定义层次结构， 例如 `maximum_line_length_filter.min`.
 更重要的是，默认情况下，我们自动注册已实现的运算符的 docstring。 也就是说，所有的结构配置始终与代码同步。

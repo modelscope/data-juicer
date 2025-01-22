@@ -10,8 +10,7 @@ Data-Juicer 支持基于 [Ray](https://github.com/ray-project/ray) 和阿里巴�
 
 更多细节请参考我们的论文：[Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](arXiv_link_coming_soon) 。
 
-![Arch-Overview](
-https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png)
+<img src="https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png" align="center" width="600" />
 
 ## 实现与优化
 
@@ -24,7 +23,7 @@ https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps
 
 当在上万个节点中处理仅有若干个文件的数据集时， Ray 会根据可用资源分割数据集文件，并将它们分发到所有节点上，这可能带来极大的网络通信开销并减少 CPU 利用率。更多细节可以参考文档 [Ray's autodetect_parallelism](https://github.com/ray-project/ray/blob/2dbd08a46f7f08ea614d8dd20fd0bca5682a3078/python/ray/data/_internal/util.py#L201-L205) 和 [tuning output blocks for Ray](https://docs.ray.io/en/latest/data/performance-tips.html#tuning-output-blocks-for-read) 。
 
-这种默认执行计划可能非常低效，尤其是在节点数量较多的情况下。为了优化此类情况的性能，我们考虑到 Ray 和 Arrow 的特性，提前将原始数据集自动拆分为较小的文件。当用户遇到此类性能问题时，他们可以利用此功能或根据偏好自己拆分数据集。在我们的自动拆分策略中，单个文件大小设置为 128MB，且结果应确保 拆分后的子文件数量 至少是 集群中可用CPU核心总数 的两倍。
+这种默认执行计划可能非常低效，尤其是在节点数量较多的情况下。为了优化此类情况的性能，我们考虑到 Ray 和 Arrow 的特性，提前将原始数据集自动拆分为较小的文件。当用户遇到此类性能问题时，他们可以利用此功能或根据偏好自己拆分数据集。在我们的自动拆分策略中，单个文件大小设置为 128MB，且结果应确保 拆分后的子文件数量 至少是 集群中可用CPU核心总数 的两倍。对应工具可在tools/data_resplit.py获取。
 
 
 ### JSON 文件的流式读取
