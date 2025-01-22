@@ -144,6 +144,12 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - 视频数据的基本示例菜谱
   - 合成以人为中心的视频评测集
   - 改进现有的开源视频数据集
+* Data-Juicer相关竞赛
+  - [Better Synth](https://tianchi.aliyun.com/competition/entrance/532251), 在DJ-沙盒实验室和多模态大模型上，探索大模型合成数据对图像理解能力的影响
+  - [Modelscope-Sora挑战赛](https://tianchi.aliyun.com/competition/entrance/532219), 基于Data-Juicer和[EasyAnimate](https://github.com/aigc-apps/EasyAnimate)，调优文本-视频数据集，在类SORA小模型上训练以生成更好的视频
+  - [Better Mixture](https://tianchi.aliyun.com/competition/entrance/532174), 针对指定多个候选数据集，仅调整数据混合和采样策略
+  - FT-Data Ranker ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), 针对指定候选数据集，仅调整数据过滤和增强策略
+  - [可图Kolors-LoRA风格故事挑战赛](https://tianchi.aliyun.com/competition/entrance/532254), 基于魔搭[DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio)和Data-Juicer框架，探索Difussion模型微调
 * [DJ-SORA](docs/DJ_SORA_ZH.md)
 * [智能体调用DJ Filters](./demos/api_service/react_data_filter_process.ipynb)
 * [智能体调用DJ Mappers](./demos/api_service/react_data_mapper_process.ipynb)
