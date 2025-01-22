@@ -4,17 +4,18 @@
 - 📣📣📣 Community contributors can submit PRs to add customized data recipes to promote dissemination, reuse and related technology evolution. We welcome co-construction and will highlight [acknowledgements](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)!
 
 Table of Contents
-- [1. Data-Juicer Minimal Example Recipe](#1-data-juicer Minimal Example Recipe)
-- [2. Reproducing Open Source Text Datasets](#2-Reproducing Open Source Text Datasets)
-- [3. Improving Open Source Text Pre-training Datasets](#3-Improving Open Source Text Pre-training Datasets)
-- [4. Improving Open Source Text Post-processing Datasets](#4-Improving Open Source Text Post-processing Datasets)
-- [5. Synthetic Contrastive Learning Image-text Datasets](#5-Synthetic Contrastive Learning Image-text Datasets)
-- [6. Improving Open Source Image-text Datasets](#6-Improving Open Source Image-text Datasets)
-- [6.1. Evaluation and Verification](#61-Evaluation and Verification)
-- [7. Basic Example Recipes for Video Data](#7-Basic Example Recipes for Video Data)
-- [8. Synthesizing Human-centered Video Evaluation Sets](#8-Synthesizing Human-centered Video Evaluation Sets)
-- [9. Improving Existing Open Source Video Datasets](#9-Improving Existing Open Source Video Datasets)
-- [9.1. Evaluation and Verification](#91-Evaluation and Verification)
+- [1. Data-Juicer Minimal Example Recipe](#1-data-juicer-minimal-example-recipe)
+- [2. Reproduce Open Source Text Datasets](#2-reproduce-open-source-text-datasets)
+- [3. Improved Open Source Text Pre-training Datasets](#3-improved-open-source-text-pre-training-datasets)
+- [4. Improved open source text post-processing dataset](#4-improved-open-source-text-post-processing-dataset)
+- [5. Synthetic contrastive learning image and text datasets](#5-synthetic-contrastive-learning-image-and-text-datasets)
+- [6. Improved open source image and text datasets](#6-improved-open-source-image-and-text-datasets)
+  - [6.1. Evaluation and Verification](#61-evaluation-and-verification)
+- [7. Basic Example Recipes for Video Data](#7-basic-example-recipes-for-video-data)
+- [8. Synthesize a human-centric video review set](#8-synthesize-a-human-centric-video-review-set)
+- [9. Improve existing open source video datasets](#9-improve-existing-open-source-video-datasets)
+  - [9.1. Evaluation and Verification](#91-evaluation-and-verification)
+
 
 ## 1. Data-Juicer Minimal Example Recipe
 Some basic configuration files are placed in the [Demo](../configs/demo/) folder to help users quickly familiarize themselves with the basic functions of Data-Juicer. Please refer to the folder for detailed description.
