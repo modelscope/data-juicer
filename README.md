@@ -151,12 +151,12 @@ Table of Contents
 - [Data Recipe Gallery](docs/RecipeGallery.md)
   - Data-Juicer Minimal Example Recipe
   - Reproducing Open Source Text Datasets
-  - Improving Open Source Text Pre-training Datasets
-  - Improving Open Source Text Post-processing Datasets
+  - Improving Open Source Pre-training Text Datasets
+  - Improving Open Source Post-tuning Text Datasets
   - Synthetic Contrastive Learning Image-text Datasets
   - Improving Open Source Image-text Datasets
   - Basic Example Recipes for Video Data
-  - Synthesizing Human-centered Video Evaluation Sets
+  - Synthesizing Human-centric Video Benchmarks
   - Improving Existing Open Source Video Datasets
 - Data-Juicer related Competitions
   - [Better Synth](https://tianchi.aliyun.com/competition/entrance/532251), explore the impact of large model synthetic data on image understanding ability with DJ-Sandbox Lab and multimodal large models
