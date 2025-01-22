@@ -2,10 +2,9 @@ import unittest
 
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.text_chunk_mapper import TextChunkMapper
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-@SKIPPED_TESTS.register_module()
 class TextChunkMapperTest(DataJuicerTestCaseBase):
 
     def _run_helper(self, op, samples, target):
@@ -101,7 +100,7 @@ class TextChunkMapperTest(DataJuicerTestCaseBase):
         op = TextChunkMapper(max_len=20, split_pattern=None)
         self._run_helper(op, source, target)
     
-    def test_max_len_text_chunk(self):
+    def test_max_len_text_chunk_overlap_len(self):
         source = [
             {
                 'text': "Today is Sunday and it's a happy day!"

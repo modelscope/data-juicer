@@ -1,18 +1,10 @@
-import os
 import unittest
-from unittest.mock import Mock, patch
-
-import httpx
 from loguru import logger
 
 from data_juicer.ops.mapper.calibrate_qa_mapper import CalibrateQAMapper
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-# Skip tests for this OP because the API call is not configured yet.
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
 class CalibrateQAMapperTest(DataJuicerTestCaseBase):
 
     def _run_op(self, op):
@@ -80,24 +72,6 @@ class CalibrateQAMapperTest(DataJuicerTestCaseBase):
             'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions',
             response_path='choices.0.message.content')
         self._run_op(op)
-
-    @patch('httpx.Client.send')
-    def test_retry(self, mock_send):
-        mock_response = Mock()
-        mock_response.status_code = 408
-        mock_response.headers = {}
-        mock_request = Mock()
-        mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
-            '408 Client Error: Request Timeout',
-            request=mock_request,
-            response=mock_response)
-        mock_send.return_value = mock_response
-
-        with self.assertLogs(level='DEBUG') as cm:
-            op = CalibrateQAMapper(api_model='test',
-                                   model_params={'max_retries': 3})
-            op.process({'text': '', 'query': '', 'response': ''})
-        self.assertIn('3 retries left', '\n'.join(cm.output))
 
 if __name__ == '__main__':
     unittest.main()

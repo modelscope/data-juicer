@@ -21,7 +21,8 @@ class Adapter:
         self.cfg = cfg
 
         # insight mining related
-        self.enable_insight_mining = self.cfg.open_insight_mining
+        self.enable_insight_mining = self.cfg.open_insight_mining if hasattr(
+            self.cfg, 'open_insight_mining') else False
 
         # resource probe related
         self.idle_resources = Monitor.monitor_current_resources()

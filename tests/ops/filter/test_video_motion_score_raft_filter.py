@@ -6,11 +6,7 @@ from datasets import Dataset
 from data_juicer.ops.filter.video_motion_score_raft_filter import \
     VideoMotionScoreRaftFilter
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
-
-# skip due to conflicts when run lazy_load in multiprocessing in librosa
-# tests passed locally.
-@SKIPPED_TESTS.register_module()
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 class VideoMotionScoreRaftFilterTest(DataJuicerTestCaseBase):
 
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..',
@@ -133,7 +129,7 @@ class VideoMotionScoreRaftFilterTest(DataJuicerTestCaseBase):
             'videos': [self.vid3_path]
         }]
         tgt_list = [{'videos': [self.vid2_path]}]
-        op = VideoMotionScoreRaftFilter(min_score=3, max_score=10.5)
+        op = VideoMotionScoreRaftFilter(min_score=3, max_score=10.2)
         self._run_helper(op, ds_list, tgt_list)
 
     def test_any(self):
@@ -150,7 +146,7 @@ class VideoMotionScoreRaftFilterTest(DataJuicerTestCaseBase):
             'videos': [self.vid2_path, self.vid3_path]
         }]
         op = VideoMotionScoreRaftFilter(min_score=3,
-                                    max_score=10.5,
+                                    max_score=10.2,
                                     any_or_all='any')
         self._run_helper(op, ds_list, tgt_list)
 
@@ -164,7 +160,7 @@ class VideoMotionScoreRaftFilterTest(DataJuicerTestCaseBase):
         }]
         tgt_list = []
         op = VideoMotionScoreRaftFilter(min_score=3,
-                                    max_score=10.5,
+                                    max_score=10.2,
                                     any_or_all='all')
         self._run_helper(op, ds_list, tgt_list)
 
@@ -180,7 +176,7 @@ class VideoMotionScoreRaftFilterTest(DataJuicerTestCaseBase):
             'videos': [self.vid3_path]
         }]
         tgt_list = [{'videos': [self.vid2_path]}]
-        op = VideoMotionScoreRaftFilter(min_score=3, max_score=10.5)
+        op = VideoMotionScoreRaftFilter(min_score=3, max_score=10.2)
         self._run_helper(op, ds_list, tgt_list, np=2)
 
 

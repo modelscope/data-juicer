@@ -4,13 +4,9 @@ from loguru import logger
 
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.dialog_intent_detection_mapper import DialogIntentDetectionMapper
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 from data_juicer.utils.constant import Fields, MetaKeys
 
-# Skip tests for this OP.
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
 class TestDialogIntentDetectionMapper(DataJuicerTestCaseBase):
     # before runing this test, set below environment variables:
     # export OPENAI_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
