@@ -32,7 +32,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
-                {'path': [dataset_path], 'type': 'ondisk', 'weight': 1.0}]},
+                {'path': dataset_path, 'type': 'ondisk', 'weight': 1.0}]},
              ans)
 
     def test_rewrite_cli_datapath_local_directory(self):
@@ -40,7 +40,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
-                {'path': [dataset_path], 'type': 'ondisk', 'weight': 1.0}]},
+                {'path': dataset_path, 'type': 'ondisk', 'weight': 1.0}]},
              ans)
 
     def test_rewrite_cli_datapath_hf(self):
@@ -63,8 +63,8 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
-                {'path': ['./data/sample.json'], 'type': 'ondisk', 'weight': 0.5},
-                {'path': ['./data/sample.txt'], 'type': 'ondisk', 'weight': 1.0}]},
+                {'path': './data/sample.json', 'type': 'ondisk', 'weight': 0.5},
+                {'path': './data/sample.txt', 'type': 'ondisk', 'weight': 1.0}]},
             ans)
 
     @patch('os.path.isdir')
@@ -77,9 +77,9 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         dataset_path = "1.0 ds1.jsonl 2.0 ds2_dir 3.0 ds3.jsonl"
         expected = {
             'configs': [
-                {'type': 'ondisk', 'path': ['ds1.jsonl'], 'weight': 1.0},
-                {'type': 'ondisk', 'path': ['ds2_dir'], 'weight': 2.0},
-                {'type': 'ondisk', 'path': ['ds3.jsonl'], 'weight': 3.0}
+                {'type': 'ondisk', 'path': 'ds1.jsonl', 'weight': 1.0},
+                {'type': 'ondisk', 'path': 'ds2_dir', 'weight': 2.0},
+                {'type': 'ondisk', 'path': 'ds3.jsonl', 'weight': 3.0}
             ]
         }
         result = rewrite_cli_datapath(dataset_path)
@@ -110,7 +110,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         expected = {
             'configs': [{
                 'type': 'ondisk',
-                'path': ['./data/sample.txt'],
+                'path': './data/sample.txt',
                 'weight': 1.0
             }],
             'max_sample_num': 1000
@@ -126,7 +126,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         expected = {
             'configs': [{
                 'type': 'ondisk',
-                'path': ['./data/sample.txt'],
+                'path': './data/sample.txt',
                 'weight': 1.0
             }]
         }
@@ -371,7 +371,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertIsInstance(cfg, Namespace)
             self.assertEqual(cfg.project_name, 'dataset-ondisk-json')
             self.assertEqual(cfg.dataset,
-                             {'configs': [{'path': ['sample.json'], 'type': 'ondisk'}]})
+                             {'configs': [{'path': 'sample.json', 'type': 'ondisk'}]})
             self.assertEqual(not cfg.dataset_path, True)
 
     def test_builder_ondisk_config_list(self):
@@ -383,8 +383,8 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertEqual(cfg.project_name, 'dataset-ondisk-list')
             self.assertEqual(cfg.dataset,
                              {'configs': [
-                                {'path': ['sample.json'], 'type': 'ondisk'},
-                                {'path': ['sample.txt'], 'type': 'ondisk'}
+                                {'path': 'sample.json', 'type': 'ondisk'},
+                                {'path': 'sample.txt', 'type': 'ondisk'}
                                 ]})
             self.assertEqual(not cfg.dataset_path, True)
 
@@ -393,7 +393,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         self.base_cfg.dataset = {
             'configs': [{
                 'type': 'ondisk',
-                'path': ['test.jsonl'],
+                'path': 'test.jsonl',
                 'weight': 1.0
             }],
             'max_sample_num': 1000
@@ -409,7 +409,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         self.base_cfg.dataset = {
             'configs': [{
                 'type': 'ondisk',
-                'path': ['test.jsonl'],
+                'path': 'test.jsonl',
                 'weight': 1.0
             }]
         }
@@ -425,12 +425,12 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             'configs': [
                 {
                     'type': 'ondisk',
-                    'path': ['test1.jsonl'],
+                    'path': 'test1.jsonl',
                     'weight': 1.0
                 },
                 {
                     'type': 'ondisk',
-                    'path': ['test2.jsonl'],
+                    'path': 'test2.jsonl',
                     'weight': 2.0
                 }
             ],
@@ -458,7 +458,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.base_cfg.dataset = {
                 'configs': [{
                     'type': 'ondisk',
-                    'path': ['test.jsonl'],
+                    'path': 'test.jsonl',
                     'weight': 1.0
                 }],
                 'max_sample_num': value

@@ -1,17 +1,10 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 from typing import Optional
 
 from jsonargparse import Namespace
 from pydantic import PositiveInt
 
 from data_juicer.config import init_configs
-
-
-class ExecutorType(Enum):
-    LOCAL = 'local'
-    RAY = 'ray'
-    ANY = '*'
 
 
 class ExecutorBase(ABC):

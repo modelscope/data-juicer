@@ -8,7 +8,6 @@ import datasets
 
 from data_juicer.core.data import DJDataset, RayDataset
 from data_juicer.core.data.config_validator import ConfigValidator
-from data_juicer.core.executor.base import ExecutorType
 from data_juicer.download.downloader import validate_snapshot_format
 from data_juicer.format.formatter import unify_format
 from data_juicer.format.load import load_formatter
@@ -27,7 +26,7 @@ class StrategyKey:
     """
     Immutable key for strategy registration with wildcard support
     """
-    executor_type: ExecutorType
+    executor_type: str
     data_type: str
     data_source: str
 
@@ -41,8 +40,7 @@ class StrategyKey:
         - '[seq]' matches any character in seq
         - '[!seq]' matches any character not in seq
         """
-        return (fnmatch.fnmatch(other.executor_type.value,
-                                self.executor_type.value)
+        return (fnmatch.fnmatch(other.executor_type, self.executor_type)
                 and fnmatch.fnmatch(other.data_type, self.data_type)
                 and fnmatch.fnmatch(other.data_source, self.data_source))
 
@@ -71,7 +69,7 @@ class DataLoadStrategyRegistry:
 
     @classmethod
     def get_strategy_class(
-            cls, executor_type: ExecutorType, data_type: str,
+            cls, executor_type: str, data_type: str,
             data_source: str) -> Optional[Type[DataLoadStrategy]]:
         """
         Retrieve the most specific matching strategy
@@ -81,7 +79,7 @@ class DataLoadStrategyRegistry:
         2. Wildcard matches from most specific to most general
         """
         # default to wildcard if not provided
-        executor_type = executor_type or ExecutorType.ANY
+        executor_type = executor_type or '*'
         data_type = data_type or '*'
         data_source = data_source or '*'
 
@@ -121,8 +119,7 @@ class DataLoadStrategyRegistry:
         return None
 
     @classmethod
-    def register(cls, executor_type: ExecutorType, data_type: str,
-                 data_source: str):
+    def register(cls, executor_type: str, data_type: str, data_source: str):
         """
         Decorator for registering data load strategies with wildcard support
 
@@ -179,7 +176,7 @@ class LocalDataLoadStrategy(DataLoadStrategy):
 #         pass
 
 
-@DataLoadStrategyRegistry.register(ExecutorType.RAY, 'ondisk', 'json')
+@DataLoadStrategyRegistry.register('ray', 'ondisk', 'json')
 class RayOndiskJsonDataLoadStrategy(RayDataLoadStrategy):
 
     CONFIG_VALIDATION_RULES = {
@@ -191,13 +188,13 @@ class RayOndiskJsonDataLoadStrategy(RayDataLoadStrategy):
     }
 
     def load_data(self, **kwargs):
-        dataset = rd.read_json(self.ds_config.path)
+        dataset = rd.read_json(self.ds_config['path'])
         return RayDataset(dataset,
-                          dataset_path=self.ds_config.path,
+                          dataset_path=self.ds_config['path'],
                           cfg=self.cfg)
 
 
-@DataLoadStrategyRegistry.register(ExecutorType.RAY, 'remote', 'huggingface')
+@DataLoadStrategyRegistry.register('ray', 'remote', 'huggingface')
 class RayHuggingfaceDataLoadStrategy(RayDataLoadStrategy):
 
     CONFIG_VALIDATION_RULES = {
@@ -213,7 +210,7 @@ class RayHuggingfaceDataLoadStrategy(RayDataLoadStrategy):
             'Huggingface data load strategy is not implemented')
 
 
-@DataLoadStrategyRegistry.register(ExecutorType.LOCAL, 'ondisk', '*')
+@DataLoadStrategyRegistry.register('local', 'ondisk', '*')
 class LocalOndiskDataLoadStrategy(LocalDataLoadStrategy):
     """
     data load strategy for on disk data for LocalExecutor
@@ -229,16 +226,18 @@ class LocalOndiskDataLoadStrategy(LocalDataLoadStrategy):
     }
 
     def load_data(self, **kwargs):
+        print(f'kwards: {kwargs}')
         # use proper formatter to load data
-        formatter = load_formatter(dataset_path=self.ds_config.path,
+        formatter = load_formatter(dataset_path=self.ds_config['path'],
                                    suffixes=self.cfg.suffixes,
                                    text_keys=self.cfg.text_keys,
-                                   add_suffix=self.cfg.add_suffix**kwargs)
+                                   add_suffix=self.cfg.add_suffix,
+                                   **kwargs)
         # TODO more sophiscated localformatter routing
-        return formatter.load_data()
+        return formatter.load_dataset()
 
 
-@DataLoadStrategyRegistry.register(ExecutorType.LOCAL, 'remote', 'huggingface')
+@DataLoadStrategyRegistry.register('local', 'remote', 'huggingface')
 class LocalHuggingfaceDataLoadStrategy(LocalDataLoadStrategy):
     """
     data load strategy for Huggingface dataset for LocalExecutor
@@ -254,8 +253,8 @@ class LocalHuggingfaceDataLoadStrategy(LocalDataLoadStrategy):
     }
 
     def load_data(self, **kwargs):
-        num_proc = kwargs.get('num_proc', 1)
-        ds = datasets.load_dataset(self.ds_config.path,
+        num_proc = kwargs.pop('num_proc', 1)
+        ds = datasets.load_dataset(self.ds_config['path'],
                                    split=self.ds_config.split,
                                    name=self.ds_config.name,
                                    limit=self.ds_config.limit,
@@ -264,7 +263,7 @@ class LocalHuggingfaceDataLoadStrategy(LocalDataLoadStrategy):
         ds = unify_format(ds, text_keys=self.text_keys, num_proc=num_proc)
 
 
-@DataLoadStrategyRegistry.register(ExecutorType.LOCAL, 'remote', 'modelscope')
+@DataLoadStrategyRegistry.register('local', 'remote', 'modelscope')
 class LocalModelScopeDataLoadStrategy(LocalDataLoadStrategy):
     """
     data load strategy for ModelScope dataset for LocalExecutor
@@ -275,7 +274,7 @@ class LocalModelScopeDataLoadStrategy(LocalDataLoadStrategy):
             'ModelScope data load strategy is not implemented')
 
 
-@DataLoadStrategyRegistry.register(ExecutorType.LOCAL, 'remote', 'arxiv')
+@DataLoadStrategyRegistry.register('local', 'remote', 'arxiv')
 class LocalArxivDataLoadStrategy(LocalDataLoadStrategy):
     """
     data load strategy for arxiv dataset for LocalExecutor
@@ -294,7 +293,7 @@ class LocalArxivDataLoadStrategy(LocalDataLoadStrategy):
             'Arxiv data load strategy is not implemented')
 
 
-@DataLoadStrategyRegistry.register(ExecutorType.LOCAL, 'remote', 'wiki')
+@DataLoadStrategyRegistry.register('local', 'remote', 'wiki')
 class LocalWikiDataLoadStrategy(LocalDataLoadStrategy):
     """
     data load strategy for wiki dataset for LocalExecutor
@@ -312,7 +311,7 @@ class LocalWikiDataLoadStrategy(LocalDataLoadStrategy):
         raise NotImplementedError('Wiki data load strategy is not implemented')
 
 
-@DataLoadStrategyRegistry.register(ExecutorType.LOCAL, 'remote', 'commoncrawl')
+@DataLoadStrategyRegistry.register('local', 'remote', 'commoncrawl')
 class LocalCommonCrawlDataLoadStrategy(LocalDataLoadStrategy):
     """
     data load strategy for commoncrawl dataset for LocalExecutor

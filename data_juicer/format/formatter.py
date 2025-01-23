@@ -59,6 +59,8 @@ class LocalFormatter(BaseFormatter):
         :param global_cfg: global cfg used in consequent processes,
         :return: formatted dataset
         """
+        _num_proc = self.kwargs.pop('num_proc', 1)
+        num_proc = num_proc or _num_proc
         datasets = load_dataset(self.type,
                                 data_files={
                                     key.strip('.'): self.data_files[key]

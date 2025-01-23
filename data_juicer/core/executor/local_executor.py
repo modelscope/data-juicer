@@ -7,7 +7,6 @@ from jsonargparse import Namespace
 from loguru import logger
 from pydantic import PositiveInt
 
-from data_juicer.core import ExecutorType
 from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
@@ -54,7 +53,7 @@ class Executor(ExecutorBase):
         # setup dataset builder
         logger.info('Setting up dataset builder...')
         self.dataset_builder = DatasetBuilder(cfg,
-                                              executor_type=ExecutorType.LOCAL)
+                                              executor_type=self.executor_type)
 
         # whether to use checkpoint mechanism. If it's true, Executor will
         # check if there are existing checkpoints first and try to load the

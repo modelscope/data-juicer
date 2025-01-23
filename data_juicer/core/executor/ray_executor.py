@@ -9,7 +9,7 @@ from pydantic import PositiveInt
 
 from data_juicer.core.adapter import Adapter
 from data_juicer.core.data.dataset_builder import DatasetBuilder
-from data_juicer.core.executor import ExecutorBase, ExecutorType
+from data_juicer.core.executor import ExecutorBase
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 from data_juicer.utils.lazy_loader import LazyLoader
@@ -63,8 +63,7 @@ class RayExecutor(ExecutorBase):
                                     ray.get_runtime_context().get_job_id())
 
         # init dataset builder
-        self.datasetbuilder = DatasetBuilder(self.cfg,
-                                             executor_type=ExecutorType.RAY)
+        self.datasetbuilder = DatasetBuilder(self.cfg, executor_type='ray')
 
     def run(self,
             load_data_np: Optional[PositiveInt] = None,

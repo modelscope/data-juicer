@@ -11,7 +11,6 @@ from data_juicer.core.data.config_validator import ConfigValidationError
 from data_juicer.core.data.data_validator import DataValidatorRegistry
 from data_juicer.core.data.load_strategy import DataLoadStrategyRegistry
 from data_juicer.core.data.ray_dataset import RayDataset
-from data_juicer.core.executor.base import ExecutorType
 from data_juicer.utils.file_utils import is_absolute_path
 from data_juicer.utils.sample import random_sample
 
@@ -23,17 +22,20 @@ class DatasetBuilder(object):
 
     def __init__(self, cfg: Namespace, executor_type: str = 'local'):
         # if generated_dataset_config present, prioritize
-        if cfg.generated_dataset_config:
+        if hasattr(
+                cfg,
+                'generated_dataset_config') and cfg.generated_dataset_config:
             self.use_generated_dataset_config = True
             self.generated_dataset_config = cfg.generated_dataset_config
             return
+        self.use_generated_dataset_config = False
 
         self.cfg = cfg
-        self.executor_type = ExecutorType(executor_type)
+        self.executor_type = executor_type
 
-        if cfg.dataset_path is not None:
+        if hasattr(cfg, 'dataset_path') and cfg.dataset_path is not None:
             ds_configs = rewrite_cli_datapath(cfg.dataset_path)
-        elif cfg.dataset is not None:
+        elif hasattr(cfg, 'dataset') and cfg.dataset is not None:
             ds_configs = cfg.dataset
         else:
             raise ConfigValidationError(
@@ -80,8 +82,8 @@ class DatasetBuilder(object):
             data_source = ds_config.get('source', None)
             self.load_strategies.append(
                 DataLoadStrategyRegistry.get_strategy_class(
-                    self.executor_type.value, data_type,
-                    data_source)(ds_config, cfg=self.cfg))
+                    self.executor_type, data_type, data_source)(ds_config,
+                                                                cfg=self.cfg))
 
         # initialzie the sample numbers
         self.max_sample_num = ds_configs.get('max_sample_num', None)
@@ -90,6 +92,9 @@ class DatasetBuilder(object):
             self.weights = [stra.weight for stra in self.load_strategies]
             self.sample_numbers = get_sample_numbers(self.weights,
                                                      self.max_sample_num)
+        else:
+            self.weights = [1.0 for stra in self.load_strategies]
+            self.sample_numbers = [None for stra in self.load_strategies]
 
         # initialize data validators
         self.validators = []
@@ -125,9 +130,9 @@ class DatasetBuilder(object):
             _datasets.append(dataset)
 
         # handle data mixture
-        if self.executor_type == ExecutorType.LOCAL:
+        if self.executor_type == 'local':
             return NestedDataset(concatenate_datasets(_datasets))
-        elif self.executor_type == ExecutorType.RAY:
+        elif self.executor_type == 'ray':
             # TODO: support multiple datasets and mixing for ray
             assert len(_datasets) == 1, 'Ray setup supports one dataset now'
             return _datasets[0]
@@ -169,7 +174,7 @@ def rewrite_cli_datapath(dataset_path, max_sample_num=None) -> List:
     for p, w in zip(paths, weights):
         if os.path.isdir(p) or os.path.isfile(p):
             # local files
-            ret['configs'].append({'type': 'ondisk', 'path': [p], 'weight': w})
+            ret['configs'].append({'type': 'ondisk', 'path': p, 'weight': w})
         elif (not is_absolute_path(p) and not p.startswith('.')
               and p.count('/') <= 1):
             # remote huggingface
