@@ -920,3 +920,36 @@ def get_init_configs(cfg: Union[Namespace, Dict]):
         json.dump(cfg, f)
     inited_dj_cfg = init_configs(['--config', temp_file])
     return inited_dj_cfg
+
+
+def get_default_cfg():
+    """Get default config values from config_all.yaml"""
+    cfg = Namespace()
+
+    # Get path to config_all.yaml
+    config_dir = os.path.dirname(os.path.abspath(__file__))
+    default_config_path = os.path.join(config_dir,
+                                       '../../configs/config_all.yaml')
+
+    # Load default values from yaml
+    with open(default_config_path, 'r', encoding='utf-8') as f:
+        defaults = yaml.safe_load(f)
+
+    # Convert to flat dictionary for namespace
+    flat_defaults = {
+        'executor_type': 'default',
+        'ray_address': 'auto',
+        'suffixes': None,
+        'text_keys': 'text',
+        'add_suffix': False,
+        'export_path': './outputs',
+        # Add other top-level keys from config_all.yaml
+        **defaults
+    }
+
+    # Update cfg with defaults
+    for key, value in flat_defaults.items():
+        if not hasattr(cfg, key):
+            setattr(cfg, key, value)
+
+    return cfg

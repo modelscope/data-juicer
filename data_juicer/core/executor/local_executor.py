@@ -36,7 +36,7 @@ class Executor(ExecutorBase):
         :param cfg: optional jsonargparse Namespace.
         """
         super().__init__(cfg)
-        self.executor_type = 'local'
+        self.executor_type = 'default'
         self.work_dir = self.cfg.work_dir
 
         self.tracer = None

@@ -5,7 +5,7 @@ from io import StringIO
 
 from jsonargparse import Namespace
 
-from data_juicer.config import init_configs
+from data_juicer.config import init_configs, get_default_cfg
 from data_juicer.ops import load_ops
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
@@ -275,6 +275,32 @@ class ConfigTest(DataJuicerTestCaseBase):
                 base_param_key = f'{op_name}.{base_param}'
                 self.assertIn(base_param_key, params)
 
+
+    def test_get_default_cfg(self):
+        """Test getting default configuration from config_all.yaml"""
+        # Get default config
+        cfg = get_default_cfg()
+        
+        # Verify basic default values
+        self.assertIsInstance(cfg, Namespace)
+        
+        # Test essential defaults
+        self.assertEqual(cfg.executor_type, 'default')
+        self.assertEqual(cfg.ray_address, 'auto')
+        self.assertEqual(cfg.text_keys, 'text')
+        self.assertEqual(cfg.add_suffix, False)
+        self.assertEqual(cfg.export_path, '/path/to/result/dataset.jsonl')
+        self.assertEqual(cfg.suffixes, [])
+        
+        # Test other important defaults from config_all.yaml
+        self.assertTrue(hasattr(cfg, 'np'))  # Number of processes
+        self.assertTrue(hasattr(cfg, 'use_cache'))  # Cache usage flag
+        self.assertTrue(hasattr(cfg, 'temp_dir'))  # Temporary directory
+        
+        # Test default values are of correct type
+        self.assertIsInstance(cfg.executor_type, str)
+        self.assertIsInstance(cfg.add_suffix, bool)
+        self.assertIsInstance(cfg.export_path, str)
 
 if __name__ == '__main__':
     unittest.main()
