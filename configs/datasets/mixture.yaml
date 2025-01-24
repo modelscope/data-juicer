@@ -7,4 +7,4 @@ dataset:
       path: 'path/to/json/file'
     - type: 'ondisk'
       weight: 1.0
-      files: 'path/to/csv/file'
+      path: 'path/to/csv/file'

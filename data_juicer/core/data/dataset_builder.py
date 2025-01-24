@@ -5,6 +5,7 @@ from typing import List, Tuple, Union
 
 import numpy as np
 from datasets import concatenate_datasets
+from loguru import logger
 
 from data_juicer.core.data import NestedDataset
 from data_juicer.core.data.config_validator import ConfigValidationError
@@ -33,9 +34,11 @@ class DatasetBuilder(object):
         self.cfg = cfg
         self.executor_type = executor_type
 
-        if hasattr(cfg, 'dataset_path') and cfg.dataset_path is not None:
+        if hasattr(cfg, 'dataset_path') and cfg.dataset_path:
+            logger.info(f'found dataset_path setting: {cfg.dataset_path}')
             ds_configs = rewrite_cli_datapath(cfg.dataset_path)
-        elif hasattr(cfg, 'dataset') and cfg.dataset is not None:
+        elif hasattr(cfg, 'dataset') and cfg.dataset:
+            logger.info(f'found dataset setting: {cfg.dataset}')
             ds_configs = cfg.dataset
         else:
             raise ConfigValidationError(

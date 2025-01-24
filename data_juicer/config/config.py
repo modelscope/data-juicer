@@ -459,14 +459,14 @@ def init_setup_from_cfg(cfg: Namespace):
 
     # check and get dataset dir
     if cfg.get('dataset_path', None) and os.path.exists(cfg.dataset_path):
-        logger.warning('dataset_path config is set and a valid local path')
+        logger.info('dataset_path config is set and a valid local path')
         cfg.dataset_path = os.path.abspath(cfg.dataset_path)
         if os.path.isdir(cfg.dataset_path):
             cfg.dataset_dir = cfg.dataset_path
         else:
             cfg.dataset_dir = os.path.dirname(cfg.dataset_path)
     elif cfg.dataset_path == '' and cfg.get('dataset', None):
-        logger.warning('dataset_path config is empty; dataset is present')
+        logger.info('dataset_path config is empty; dataset is present')
         cfg.dataset_dir = ''
     else:
         logger.warning(f'dataset_path [{cfg.dataset_path}] is not a valid '

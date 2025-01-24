@@ -1,0 +1,14 @@
+
+# global parameters
+project_name: 'ray-demo-new-config'
+dataset:
+  configs:
+    - type: ondisk
+      path: ./demos/process_on_ray/data/demo-dataset.jsonl  # path to your dataset directory or file
+      weight: 1.0
+
+export_path: './outputs/demo/demo-processed'
+
+executor_type: 'ray'
+ray_address: 'auto'       
+

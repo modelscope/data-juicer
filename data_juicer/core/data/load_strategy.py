@@ -262,7 +262,10 @@ class LocalHuggingfaceDataLoadStrategy(LocalDataLoadStrategy):
                                    limit=self.ds_config.limit,
                                    num_proc=num_proc,
                                    **kwargs)
-        ds = unify_format(ds, text_keys=self.text_keys, num_proc=num_proc)
+        ds = unify_format(ds,
+                          text_keys=self.text_keys,
+                          num_proc=num_proc,
+                          global_cfg=self.cfg)
 
 
 @DataLoadStrategyRegistry.register('local', 'remote', 'modelscope')

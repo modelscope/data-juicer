@@ -11,7 +11,11 @@ from data_juicer.core.data.dataset_builder import (rewrite_cli_datapath,
 from data_juicer.core.data.config_validator import ConfigValidationError
 from data_juicer.utils.unittest_utils import (DataJuicerTestCaseBase, 
                                               SKIPPED_TESTS)
+from data_juicer.core.data.load_strategy import RayOndiskJsonDataLoadStrategy
 
+
+WORK_DIR = os.path.dirname(os.path.realpath(__file__))
+             
 
 @SKIPPED_TESTS.register_module()
 class DatasetBuilderTest(DataJuicerTestCaseBase):
@@ -364,7 +368,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
                       str(context.exception))
 
     def test_builder_ondisk_config(self):
-        test_config_file = './data/test_config.yaml'
+        test_config_file = os.path.join(WORK_DIR, 'data/test_config.yaml')
         out = StringIO()
         with redirect_stdout(out):
             cfg = init_configs(args=f'--config {test_config_file}'.split())
@@ -375,7 +379,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertEqual(not cfg.dataset_path, True)
 
     def test_builder_ondisk_config_list(self):
-        test_config_file = './data/test_config_list.yaml'
+        test_config_file = os.path.join(WORK_DIR, 'data/test_config_list.yaml')
         out = StringIO()
         with redirect_stdout(out):
             cfg = init_configs(args=f'--config {test_config_file}'.split())
@@ -468,6 +472,33 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
                 DatasetBuilder(self.base_cfg, self.executor_type)
             self.assertIn('should be a positive integer', 
                           str(context.exception))
+
+    def test_builder_ray_config(self):
+        """Test loading Ray configuration from YAML"""
+        test_config_file = os.path.join(WORK_DIR, 'data/test_config_ray.yaml')
+        out = StringIO()
+        with redirect_stdout(out):
+            cfg = init_configs(args=f'--config {test_config_file}'.split())
+            
+            # Verify basic config
+            self.assertIsInstance(cfg, Namespace)
+            self.assertEqual(cfg.project_name, 'ray-demo-new-config')
+            self.assertEqual(cfg.executor_type, 'ray')
+            self.assertEqual(cfg.ray_address, 'auto')
+            
+            # Verify dataset config
+            self.assertEqual(cfg.dataset, {
+                'configs': [{
+                    'type': 'ondisk',
+                    'path': './demos/process_on_ray/data/demo-dataset.jsonl',
+                    'weight': 1.0
+                }]
+            })
+            
+            # Create builder and verify
+            builder = DatasetBuilder(cfg, executor_type=cfg.executor_type)
+            self.assertEqual(len(builder.load_strategies), 1)
+            self.assertIsInstance(builder.load_strategies[0], RayOndiskJsonDataLoadStrategy)
 
 if __name__ == '__main__':
     unittest.main()
