@@ -176,8 +176,10 @@ class LocalDataLoadStrategy(DataLoadStrategy):
 #         pass
 
 
-@DataLoadStrategyRegistry.register('ray', 'ondisk', 'json')
+@DataLoadStrategyRegistry.register('ray', 'ondisk', '*')
 class RayOndiskJsonDataLoadStrategy(RayDataLoadStrategy):
+
+    # TODO ray defaults to json
 
     CONFIG_VALIDATION_RULES = {
         'required_fields': ['path'],
