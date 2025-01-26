@@ -115,8 +115,8 @@ class RayDataset(DJDataset):
 
             def process_batch_arrow(table: pyarrow.Table):
                 new_column_data = [{} for _ in range(len(table))]
-                new_talbe = table.append_column(Fields.meta, [new_column_data])
-                return new_talbe
+                new_table = table.append_column(Fields.meta, [new_column_data])
+                return new_table
 
             self.data = self.data.map_batches(process_batch_arrow,
                                               batch_format='pyarrow')
