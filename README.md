@@ -28,7 +28,7 @@
 
 
 Data-Juicer is a one-stop system to process text and multimodal data for and with foundation models (typically LLMs).
-We provide a [playground](http://8.138.149.181/) with a managed JupyterLab. [Try Data-Juicer](http://8.138.149.181/) straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly support us by starting it (then be instantly notified of our new releases) and citing our [work](#references).
+We provide a [playground](http://8.138.149.181/) with a managed JupyterLab. [Try Data-Juicer](http://8.138.149.181/) straight away in your browser! If you find Data-Juicer useful for your research or development, please kindly support us by starting it (then be instantly notified of our new releases) and citing our [works](#references).
 
 [Platform for AI of Alibaba Cloud (PAI)](https://www.aliyun.com/product/bigdata/learn) has cited our work and integrated Data-Juicer into its data processing products. PAI is an AI Native large model and AIGC engineering platform that provides dataset management, computing power management, model tool chain, model development, model training, model deployment, and AI asset management. For documentation on data processing, please refer to: [PAI-Data Processing for Large Models](https://help.aliyun.com/zh/pai/user-guide/components-related-to-data-processing-for-foundation-models/?spm=a2c4g.11186623.0.0.3e9821a69kWdvX).
 
@@ -101,7 +101,7 @@ Table of Contents
 
 ## Why Data-Juicer?
 
-![Overview](https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png)
+<img src="https://img.alicdn.com/imgextra/i2/O1CN01EteoQ31taUweAW1UE_!!6000000005918-2-tps-4034-4146.png" align="center" width="600" />
 
 - **Systematic & Reusable**:
   Empowering users with a systematic library of 100+ core [OPs](docs/Operators.md), and 50+ reusable config recipes and 
@@ -121,35 +121,51 @@ Table of Contents
 
 
 ## DJ-Cookbook
+
 ### Curated Resources
 - [KDD-Tutorial](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html)
 - [Awesome LLM-Data](docs/awesome_llm_data.md)
 - ["Bad" Data Exhibition](docs/BadDataExhibition.md)
 
+
 ### Coding with Data-Juicer (DJ)
-- [Overview of DJ](README.md)
-- [Operator Zoo](docs/Operators.md)
-- [Quick Start](#quick-start)
-- [Configuration](configs/README.md)
-- [Developer Guide](docs/DeveloperGuide.md)
-- [API references](https://modelscope.github.io/data-juicer/)
-- [Preprocess Tools](tools/preprocess/README.md)
-- [Postprocess Tools](tools/postprocess/README.md)
-- [Format Conversion](tools/fmt_conversion/README.md)
-- [Sandbox](docs/Sandbox.md)
-- [Quality Classifier](tools/quality_classifier/README.md)
-- [Auto Evaluation](tools/evaluator/README.md)
-- [Third-parties Integration](thirdparty/LLM_ecosystems/README.md)
+- Basics
+  - [Overview of DJ](README.md)
+  - [Quick Start](#quick-start)
+  - [Configuration](docs/RecipeGallery.md)
+  - [Data Format Conversion](tools/fmt_conversion/README.md)
+- Lookup Materials
+  - [DJ OperatorZoo](docs/Operators.md)
+  - [API references](https://modelscope.github.io/data-juicer/)
+- Advanced
+  - [Developer Guide](docs/DeveloperGuide.md)
+  - [Preprocess Tools](tools/preprocess/README.md)
+  - [Postprocess Tools](tools/postprocess/README.md)
+  - [Sandbox](docs/Sandbox.md)
+  - [Quality Classifier](tools/quality_classifier/README.md)
+  - [Auto Evaluation](tools/evaluator/README.md)
+  - [Third-parties Integration](thirdparty/LLM_ecosystems/README.md)
+
 
 ### Use Cases & Data Recipes
-- [Recipes for data process in BLOOM](configs/reproduced_bloom/README.md)
-- [Recipes for data process in RedPajama](configs/reproduced_redpajama/README.md)
-- [Refined recipes for pre-training text data](configs/data_juicer_recipes/README.md)
-- [Refined recipes for fine-tuning text data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-alpaca-cot-dataset)
-- [Refined recipes for pre-training multi-modal data](configs/data_juicer_recipes/README.md#before-and-after-refining-for-multimodal-dataset)
+- [Data Recipe Gallery](docs/RecipeGallery.md)
+  - Data-Juicer Minimal Example Recipe
+  - Reproducing Open Source Text Datasets
+  - Improving Open Source Pre-training Text Datasets
+  - Improving Open Source Post-tuning Text Datasets
+  - Synthetic Contrastive Learning Image-text Datasets
+  - Improving Open Source Image-text Datasets
+  - Basic Example Recipes for Video Data
+  - Synthesizing Human-centric Video Benchmarks
+  - Improving Existing Open Source Video Datasets
+- Data-Juicer related Competitions
+  - [Better Synth](https://tianchi.aliyun.com/competition/entrance/532251), explore the impact of large model synthetic data on image understanding ability with DJ-Sandbox Lab and multimodal large models
+  - [Modelscope-Sora Challenge](https://tianchi.aliyun.com/competition/entrance/532219), based on Data-Juicer and [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) framework,  optimize data and train SORA-like small models to generate better videos
+  - [Better Mixture](https://tianchi.aliyun.com/competition/entrance/532174), only adjust data mixing and sampling strategies for given multiple candidate datasets
+  - FT-Data Ranker ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), For a specified candidate dataset, only adjust the data filtering and enhancement strategies
+  - [Kolors-LoRA Stylized Story Challenge](https://tianchi.aliyun.com/competition/entrance/532254), based on Data-Juicer and [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) framework, explore Difussion model fine-tuning
 - [DJ-SORA](docs/DJ_SORA.md)
-- [Agentic Filters of DJ](./demos/api_service/react_data_filter_process.ipynb)
-- [Agentic Mappers of DJ](./demos/api_service/react_data_mapper_process.ipynb)
+- Based on Data-Juicer and [AgentScope](https://github.com/modelscope/agentscope) framework, leverage [agents to call DJ Filters](./demos/api_service/react_data_filter_process.ipynb) and [call DJ Mappers](./demos/api_service/react_data_mapper_process.ipynb)
 
 
 ### Interactive Examples
@@ -466,7 +482,7 @@ features, bug fixes, and better documentation. Please refer to
 Data-Juicer is used across various foundation model applications and research initiatives, such as industrial scenarios in Alibaba Tongyi and Alibaba Cloud's platform for AI (PAI).
 We look forward to more of your experience, suggestions, and discussions for collaboration!
 
-Data-Juicer thanks many community [contributers](https://github.com/modelscope/data-juicer/graphs/contributors) and open-source projects, such as
+Data-Juicer thanks many community [contributors](https://github.com/modelscope/data-juicer/graphs/contributors) and open-source projects, such as
 [Huggingface-Datasets](https://github.com/huggingface/datasets), [Bloom](https://huggingface.co/bigscience/bloom), [RedPajama](https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1), [Arrow](https://github.com/apache/arrow), [Ray](https://github.com/ray-project/ray), ....
 
 

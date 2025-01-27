@@ -108,7 +108,7 @@ def catch_map_single_exception(method,
                 else:
                     return [res]
             except Exception as e:
-                if skip_op_error:
+                if not skip_op_error:
                     raise
                 from loguru import logger
                 logger.error(f'An error occurred in {op_name} when processing '

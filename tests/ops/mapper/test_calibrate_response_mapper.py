@@ -4,13 +4,9 @@ from loguru import logger
 
 from data_juicer.ops.mapper.calibrate_response_mapper import \
     CalibrateResponseMapper
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-# Skip tests for this OP because the API call is not configured yet.
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
 class CalibrateResponseMapperTest(DataJuicerTestCaseBase):
 
     def _run_op(self, api_model, response_path=None):

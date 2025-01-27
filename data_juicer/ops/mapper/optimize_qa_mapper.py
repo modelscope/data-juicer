@@ -77,6 +77,9 @@ class OptimizeQAMapper(Mapper):
         model_params = model_params or {}
         sampling_params = sampling_params or {}
 
+        sampling_params = update_sampling_params(sampling_params, hf_model,
+                                                 self.enable_vllm)
+
         if enable_vllm:
             assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
             # cannot initialize vllm replicas on different GPUs
@@ -98,10 +101,6 @@ class OptimizeQAMapper(Mapper):
                 return_pipe=True,
                 **model_params)
             self.sampling_params = sampling_params
-
-        self.sampling_params = update_sampling_params(sampling_params,
-                                                      hf_model,
-                                                      self.enable_vllm)
 
     def build_input(self, sample):
         qa_pair = self.qa_pair_template.format(sample[self.query_key],

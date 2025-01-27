@@ -5,10 +5,8 @@ from loguru import logger
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.aggregator import MetaTagsAggregator
 from data_juicer.utils.constant import Fields, MetaKeys
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-
-@SKIPPED_TESTS.register_module()
 class MetaTagsAggregatorTest(DataJuicerTestCaseBase):
 
     def _run_helper(self, op, samples):

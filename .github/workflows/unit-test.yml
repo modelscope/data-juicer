@@ -44,7 +44,7 @@ jobs:
     - name: Run unittest standalone
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
-        docker compose exec ray-head python tests/run.py --tag standalone
+        docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head python tests/run.py --tag standalone
 
     - name: Run unittest ray
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker

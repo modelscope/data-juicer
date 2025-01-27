@@ -4,12 +4,10 @@ from loguru import logger
 
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.aggregator import NestedAggregator
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 from data_juicer.utils.constant import Fields, MetaKeys
 
-
-@SKIPPED_TESTS.register_module()
 class NestedAggregatorTest(DataJuicerTestCaseBase):
 
     def _run_helper(self, op, samples, output_key=MetaKeys.event_description):
