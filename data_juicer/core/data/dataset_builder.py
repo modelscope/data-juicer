@@ -83,10 +83,13 @@ class DatasetBuilder(object):
             # initialize data loading strategy
             data_type = ds_config.get('type', None)
             data_source = ds_config.get('source', None)
-            self.load_strategies.append(
-                DataLoadStrategyRegistry.get_strategy_class(
-                    self.executor_type, data_type, data_source)(ds_config,
-                                                                cfg=self.cfg))
+            stra = DataLoadStrategyRegistry.get_strategy_class(
+                self.executor_type, data_type, data_source)(ds_config,
+                                                            cfg=self.cfg)
+            if stra is None:
+                raise ValueError(f'No data load strategy found for'
+                                 f' {data_type} {data_source}')
+            self.load_strategies.append(stra)
 
         # initialzie the sample numbers
         self.max_sample_num = ds_configs.get('max_sample_num', None)

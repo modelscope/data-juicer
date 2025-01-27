@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Dict, Optional, Type, Union
 
 import datasets
+from loguru import logger
 
 from data_juicer.core.data import DJDataset, RayDataset
 from data_juicer.core.data.config_validator import ConfigValidator
@@ -78,6 +79,11 @@ class DataLoadStrategyRegistry:
         1. Exact match
         2. Wildcard matches from most specific to most general
         """
+        logger.info(f'Getting strategy class for '
+                    f'exec: {executor_type}, '
+                    f'data_type: {data_type}, '
+                    f'data_source: {data_source}')
+
         # default to wildcard if not provided
         executor_type = executor_type or '*'
         data_type = data_type or '*'
@@ -113,9 +119,12 @@ class DataLoadStrategyRegistry:
                            if part == '*')
 
             matching_strategies.sort(key=lambda x: specificity_score(x[0]))
-            return matching_strategies[0][1]
+            found = matching_strategies[0][1]
+            logger.info(f'Found matching strategies: {found}')
+            return found
 
         # No matching strategy found
+        logger.warning('No matching strategy found')
         return None
 
     @classmethod
@@ -247,7 +256,8 @@ class DefaultHuggingfaceDataLoadStrategy(DefaultDataLoadStrategy):
 
     CONFIG_VALIDATION_RULES = {
         'required_fields': ['path'],
-        'optional_fields': ['split', 'limit', 'name'],
+        'optional_fields':
+        ['split', 'limit', 'name', 'data_files', 'data_dir'],
         'field_types': {
             'path': str
         },
@@ -256,16 +266,19 @@ class DefaultHuggingfaceDataLoadStrategy(DefaultDataLoadStrategy):
 
     def load_data(self, **kwargs):
         num_proc = kwargs.pop('num_proc', 1)
-        ds = datasets.load_dataset(self.ds_config['path'],
-                                   split=self.ds_config.split,
-                                   name=self.ds_config.name,
-                                   limit=self.ds_config.limit,
-                                   num_proc=num_proc,
-                                   **kwargs)
-        ds = unify_format(ds,
-                          text_keys=self.text_keys,
-                          num_proc=num_proc,
-                          global_cfg=self.cfg)
+        ds = datasets.load_dataset(
+            self.ds_config['path'],
+            split=self.ds_config.get('split', None),
+            data_files=self.ds_config.get('data_files', None),
+            data_dir=self.ds_config.get('data_dir', None),
+            name=self.ds_config.get('name', None),
+            limit=self.ds_config.get('limit', None),
+            num_proc=num_proc,
+            **kwargs)
+        return unify_format(ds,
+                            text_keys=self.cfg.text_keys,
+                            num_proc=num_proc,
+                            global_cfg=self.cfg)
 
 
 @DataLoadStrategyRegistry.register('default', 'remote', 'modelscope')
