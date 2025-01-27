@@ -21,7 +21,7 @@ class DatasetBuilder(object):
     DatasetBuilder is a class that builds a dataset from a configuration.
     """
 
-    def __init__(self, cfg: Namespace, executor_type: str = 'local'):
+    def __init__(self, cfg: Namespace, executor_type: str = 'default'):
         # if generated_dataset_config present, prioritize
         if hasattr(
                 cfg,
@@ -133,11 +133,12 @@ class DatasetBuilder(object):
             _datasets.append(dataset)
 
         # handle data mixture
-        if self.executor_type == 'local':
+        if self.executor_type == 'default':
             return NestedDataset(concatenate_datasets(_datasets))
         elif self.executor_type == 'ray':
             # TODO: support multiple datasets and mixing for ray
-            assert len(_datasets) == 1, 'Ray setup supports one dataset now'
+            assert len(
+                _datasets) == 1, 'Ray setup only supports one dataset now'
             return _datasets[0]
 
     @classmethod
@@ -177,7 +178,7 @@ def rewrite_cli_datapath(dataset_path, max_sample_num=None) -> List:
     for p, w in zip(paths, weights):
         if os.path.isdir(p) or os.path.isfile(p):
             # local files
-            ret['configs'].append({'type': 'ondisk', 'path': p, 'weight': w})
+            ret['configs'].append({'type': 'local', 'path': p, 'weight': w})
         elif (not is_absolute_path(p) and not p.startswith('.')
               and p.count('/') <= 1):
             # remote huggingface

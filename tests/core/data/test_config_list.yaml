@@ -1,7 +1,7 @@
-project_name: 'dataset-ondisk-list'
+project_name: 'dataset-local-list'
 dataset:
   configs:
-    - type: 'ondisk'
+    - type: 'local'
       path: 'sample.json'
-    - type: 'ondisk'
+    - type: 'local'
       path: 'sample.txt' 

@@ -46,7 +46,7 @@ class Analyzer:
 
         # setup dataset builder
         logger.info('Setting up dataset builder...')
-        self.dataset_builder = DatasetBuilder(cfg, executor_type='local')
+        self.dataset_builder = DatasetBuilder(cfg, executor_type='default')
 
         # prepare exporter and check export path suffix
         # NOTICE: no need to export dataset texts for analyzer
@@ -86,7 +86,7 @@ class Analyzer:
             load_data_np = self.cfg.np
         if dataset is None:
             logger.info('Loading dataset from data formatter...')
-            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
+            dataset = self.dataset_builder.load_dataset(num_proc=load_data_np)
         else:
             logger.info(f'Using existing dataset {dataset}')
         if self.cfg.auto:

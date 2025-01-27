@@ -11,7 +11,7 @@ from data_juicer.core.data.dataset_builder import (rewrite_cli_datapath,
 from data_juicer.core.data.config_validator import ConfigValidationError
 from data_juicer.utils.unittest_utils import (DataJuicerTestCaseBase, 
                                               SKIPPED_TESTS)
-from data_juicer.core.data.load_strategy import RayOndiskJsonDataLoadStrategy
+from data_juicer.core.data.load_strategy import RayLocalJsonDataLoadStrategy
 
 
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -24,7 +24,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         """Setup basic configuration for tests"""
         self.base_cfg = Namespace()
         self.base_cfg.dataset_path = None
-        self.executor_type = 'local'
+        self.executor_type = 'default'
 
         # Get the directory where this test file is located
         test_file_dir = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +36,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
-                {'path': dataset_path, 'type': 'ondisk', 'weight': 1.0}]},
+                {'path': dataset_path, 'type': 'local', 'weight': 1.0}]},
              ans)
 
     def test_rewrite_cli_datapath_local_directory(self):
@@ -44,7 +44,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
-                {'path': dataset_path, 'type': 'ondisk', 'weight': 1.0}]},
+                {'path': dataset_path, 'type': 'local', 'weight': 1.0}]},
              ans)
 
     def test_rewrite_cli_datapath_hf(self):
@@ -67,8 +67,8 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
-                {'path': './data/sample.json', 'type': 'ondisk', 'weight': 0.5},
-                {'path': './data/sample.txt', 'type': 'ondisk', 'weight': 1.0}]},
+                {'path': './data/sample.json', 'type': 'local', 'weight': 0.5},
+                {'path': './data/sample.txt', 'type': 'local', 'weight': 1.0}]},
             ans)
 
     @patch('os.path.isdir')
@@ -81,9 +81,9 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         dataset_path = "1.0 ds1.jsonl 2.0 ds2_dir 3.0 ds3.jsonl"
         expected = {
             'configs': [
-                {'type': 'ondisk', 'path': 'ds1.jsonl', 'weight': 1.0},
-                {'type': 'ondisk', 'path': 'ds2_dir', 'weight': 2.0},
-                {'type': 'ondisk', 'path': 'ds3.jsonl', 'weight': 3.0}
+                {'type': 'local', 'path': 'ds1.jsonl', 'weight': 1.0},
+                {'type': 'local', 'path': 'ds2_dir', 'weight': 2.0},
+                {'type': 'local', 'path': 'ds3.jsonl', 'weight': 3.0}
             ]
         }
         result = rewrite_cli_datapath(dataset_path)
@@ -113,7 +113,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         
         expected = {
             'configs': [{
-                'type': 'ondisk',
+                'type': 'local',
                 'path': './data/sample.txt',
                 'weight': 1.0
             }],
@@ -129,7 +129,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         
         expected = {
             'configs': [{
-                'type': 'ondisk',
+                'type': 'local',
                 'path': './data/sample.txt',
                 'weight': 1.0
             }]
@@ -255,7 +255,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         self.base_cfg.dataset = {
             'configs': [
                 {
-                    'type': 'ondisk',
+                    'type': 'local',
                     'path': 'test.jsonl'
                 }
             ]
@@ -269,7 +269,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         
         # Verify config content preserved
         strategy = builder.load_strategies[0]
-        self.assertEqual(strategy.ds_config['type'], 'ondisk')
+        self.assertEqual(strategy.ds_config['type'], 'local')
         self.assertEqual(strategy.ds_config['path'], 'test.jsonl')
 
     def test_builder_multiple_dataset_config(self):
@@ -278,11 +278,11 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         self.base_cfg.dataset = {
             'configs': [
                 {
-                    'type': 'ondisk',
+                    'type': 'local',
                     'path': 'test1.jsonl'
                 },
                 {
-                    'type': 'ondisk',
+                    'type': 'local',
                     'path': 'test2.jsonl'
                 }
             ]
@@ -311,7 +311,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         self.base_cfg.dataset = {
             'configs': [
                 {
-                    'type': 'ondisk',
+                    'type': 'local',
                     'path': 'test1.jsonl'
                 },
                 {
@@ -373,9 +373,9 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         with redirect_stdout(out):
             cfg = init_configs(args=f'--config {test_config_file}'.split())
             self.assertIsInstance(cfg, Namespace)
-            self.assertEqual(cfg.project_name, 'dataset-ondisk-json')
+            self.assertEqual(cfg.project_name, 'dataset-local-json')
             self.assertEqual(cfg.dataset,
-                             {'configs': [{'path': 'sample.json', 'type': 'ondisk'}]})
+                             {'configs': [{'path': 'sample.json', 'type': 'local'}]})
             self.assertEqual(not cfg.dataset_path, True)
 
     def test_builder_ondisk_config_list(self):
@@ -384,11 +384,11 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         with redirect_stdout(out):
             cfg = init_configs(args=f'--config {test_config_file}'.split())
             self.assertIsInstance(cfg, Namespace)
-            self.assertEqual(cfg.project_name, 'dataset-ondisk-list')
+            self.assertEqual(cfg.project_name, 'dataset-local-list')
             self.assertEqual(cfg.dataset,
                              {'configs': [
-                                {'path': 'sample.json', 'type': 'ondisk'},
-                                {'path': 'sample.txt', 'type': 'ondisk'}
+                                {'path': 'sample.json', 'type': 'local'},
+                                {'path': 'sample.txt', 'type': 'local'}
                                 ]})
             self.assertEqual(not cfg.dataset_path, True)
 
@@ -396,7 +396,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         """Test DatasetBuilder with max_sample_num"""
         self.base_cfg.dataset = {
             'configs': [{
-                'type': 'ondisk',
+                'type': 'local',
                 'path': 'test.jsonl',
                 'weight': 1.0
             }],
@@ -412,7 +412,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         """Test DatasetBuilder without max_sample_num"""
         self.base_cfg.dataset = {
             'configs': [{
-                'type': 'ondisk',
+                'type': 'local',
                 'path': 'test.jsonl',
                 'weight': 1.0
             }]
@@ -428,12 +428,12 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         self.base_cfg.dataset = {
             'configs': [
                 {
-                    'type': 'ondisk',
+                    'type': 'local',
                     'path': 'test1.jsonl',
                     'weight': 1.0
                 },
                 {
-                    'type': 'ondisk',
+                    'type': 'local',
                     'path': 'test2.jsonl',
                     'weight': 2.0
                 }
@@ -461,7 +461,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         for value in invalid_values:
             self.base_cfg.dataset = {
                 'configs': [{
-                    'type': 'ondisk',
+                    'type': 'local',
                     'path': 'test.jsonl',
                     'weight': 1.0
                 }],
@@ -489,7 +489,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             # Verify dataset config
             self.assertEqual(cfg.dataset, {
                 'configs': [{
-                    'type': 'ondisk',
+                    'type': 'local',
                     'path': './demos/process_on_ray/data/demo-dataset.jsonl',
                     'weight': 1.0
                 }]
@@ -498,7 +498,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             # Create builder and verify
             builder = DatasetBuilder(cfg, executor_type=cfg.executor_type)
             self.assertEqual(len(builder.load_strategies), 1)
-            self.assertIsInstance(builder.load_strategies[0], RayOndiskJsonDataLoadStrategy)
+            self.assertIsInstance(builder.load_strategies[0], RayLocalJsonDataLoadStrategy)
 
 if __name__ == '__main__':
     unittest.main()

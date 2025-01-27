@@ -1,6 +1,6 @@
 dataset:
   configs:
-    - type: ondisk
+    - type: local
       path: path/to/data.json
 
 validators:

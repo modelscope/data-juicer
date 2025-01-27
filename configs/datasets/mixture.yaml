@@ -2,9 +2,9 @@ project_name: 'dataset-mixture'
 dataset:
   max_sample_num: 10000
   configs:
-    - type: 'ondisk'
+    - type: 'local'
       weight: 1.0
       path: 'path/to/json/file'
-    - type: 'ondisk'
+    - type: 'local'
       weight: 1.0
       path: 'path/to/csv/file'

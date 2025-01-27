@@ -1,6 +1,6 @@
 from typing import Union
 
-from .local_executor import Executor
+from .default_executor import Executor
 from .ray_executor import RayExecutor
 
 

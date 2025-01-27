@@ -123,8 +123,8 @@ class DataLoadStrategyRegistry:
         """
         Decorator for registering data load strategies with wildcard support
 
-        :param executor_type: Type of executor (e.g., 'local', 'ray')
-        :param data_type: Type of data (e.g., 'ondisk', 'remote')
+        :param executor_type: Type of executor (e.g., 'default', 'ray')
+        :param data_type: Type of data (e.g., 'local', 'remote')
         :param data_source: Specific data source (e.g., 'arxiv', 's3')
         :return: Decorator function
         """
@@ -153,7 +153,7 @@ class RayDataLoadStrategy(DataLoadStrategy):
         pass
 
 
-class LocalDataLoadStrategy(DataLoadStrategy):
+class DefaultDataLoadStrategy(DataLoadStrategy):
     """
     abstract class for data load strategy for LocalExecutor
     """
@@ -176,8 +176,8 @@ class LocalDataLoadStrategy(DataLoadStrategy):
 #         pass
 
 
-@DataLoadStrategyRegistry.register('ray', 'ondisk', '*')
-class RayOndiskJsonDataLoadStrategy(RayDataLoadStrategy):
+@DataLoadStrategyRegistry.register('ray', 'local', '*')
+class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
 
     # TODO ray defaults to json
 
@@ -212,8 +212,8 @@ class RayHuggingfaceDataLoadStrategy(RayDataLoadStrategy):
             'Huggingface data load strategy is not implemented')
 
 
-@DataLoadStrategyRegistry.register('local', 'ondisk', '*')
-class LocalOndiskDataLoadStrategy(LocalDataLoadStrategy):
+@DataLoadStrategyRegistry.register('default', 'local', '*')
+class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for on disk data for LocalExecutor
     rely on AutoFormatter for actual data loading
@@ -239,8 +239,8 @@ class LocalOndiskDataLoadStrategy(LocalDataLoadStrategy):
         return formatter.load_dataset()
 
 
-@DataLoadStrategyRegistry.register('local', 'remote', 'huggingface')
-class LocalHuggingfaceDataLoadStrategy(LocalDataLoadStrategy):
+@DataLoadStrategyRegistry.register('default', 'remote', 'huggingface')
+class DefaultHuggingfaceDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for Huggingface dataset for LocalExecutor
     """
@@ -268,19 +268,19 @@ class LocalHuggingfaceDataLoadStrategy(LocalDataLoadStrategy):
                           global_cfg=self.cfg)
 
 
-@DataLoadStrategyRegistry.register('local', 'remote', 'modelscope')
-class LocalModelScopeDataLoadStrategy(LocalDataLoadStrategy):
+@DataLoadStrategyRegistry.register('default', 'remote', 'modelscope')
+class DefaultModelScopeDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for ModelScope dataset for LocalExecutor
     """
 
-    def load_data(self):
+    def load_data(self, **kwargs):
         raise NotImplementedError(
             'ModelScope data load strategy is not implemented')
 
 
-@DataLoadStrategyRegistry.register('local', 'remote', 'arxiv')
-class LocalArxivDataLoadStrategy(LocalDataLoadStrategy):
+@DataLoadStrategyRegistry.register('default', 'remote', 'arxiv')
+class DefaultArxivDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for arxiv dataset for LocalExecutor
     """
@@ -293,13 +293,13 @@ class LocalArxivDataLoadStrategy(LocalDataLoadStrategy):
         'custom_validators': {}
     }
 
-    def load_data(self):
+    def load_data(self, **kwargs):
         raise NotImplementedError(
             'Arxiv data load strategy is not implemented')
 
 
-@DataLoadStrategyRegistry.register('local', 'remote', 'wiki')
-class LocalWikiDataLoadStrategy(LocalDataLoadStrategy):
+@DataLoadStrategyRegistry.register('default', 'remote', 'wiki')
+class DefaultWikiDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for wiki dataset for LocalExecutor
     """
@@ -312,12 +312,12 @@ class LocalWikiDataLoadStrategy(LocalDataLoadStrategy):
         'custom_validators': {}
     }
 
-    def load_data(self):
+    def load_data(self, **kwargs):
         raise NotImplementedError('Wiki data load strategy is not implemented')
 
 
-@DataLoadStrategyRegistry.register('local', 'remote', 'commoncrawl')
-class LocalCommonCrawlDataLoadStrategy(LocalDataLoadStrategy):
+@DataLoadStrategyRegistry.register('default', 'remote', 'commoncrawl')
+class DefaultCommonCrawlDataLoadStrategy(DefaultDataLoadStrategy):
     """
     data load strategy for commoncrawl dataset for LocalExecutor
     """
@@ -336,6 +336,6 @@ class LocalCommonCrawlDataLoadStrategy(LocalDataLoadStrategy):
         }
     }
 
-    def load_data(self):
+    def load_data(self, **kwargs):
         raise NotImplementedError(
             'CommonCrawl data load strategy is not implemented')
