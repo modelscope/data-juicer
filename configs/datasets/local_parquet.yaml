@@ -1,5 +1,5 @@
 # global parameters
-project_name: 'dataset-ondisk-parquet'
+project_name: 'dataset-local-parquet'
 dataset:
   configs:
     - type: 'local'
