@@ -8,6 +8,8 @@ from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.ops.op_fusion import LOADED_IMAGES
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
+from diffusers.models.attention import Attention
+
 
 diffusers = LazyLoader('diffusers', 'diffusers')
 torch = LazyLoader('torch', 'torch')
