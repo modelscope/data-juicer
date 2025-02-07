@@ -130,7 +130,7 @@ class RequiredFieldsValidator(DataValidator):
         if isinstance(dataset, NestedDataset):
             available_fields = set(dataset.column_names)
         elif isinstance(dataset, RayDataset):
-            available_fields = set(dataset.schema().names)
+            available_fields = set(dataset.data.schema().names)
         else:
             raise DataValidationError(
                 f'Unsupported dataset type: {type(dataset)}')
