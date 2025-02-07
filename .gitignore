@@ -17,3 +17,6 @@ __pycache__
 .vscode/
 **/__dj__produced_data__/*
 venv/
+
+# dup files created by tests
+tests/ops/data/*dup*
