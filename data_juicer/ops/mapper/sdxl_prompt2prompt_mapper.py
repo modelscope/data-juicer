@@ -8,7 +8,8 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 diffusers = LazyLoader('diffusers', 'diffusers')
 torch = LazyLoader('torch', 'torch')
 p2p_pipeline = LazyLoader('p2p_pipeline',
-                          'data_juicer.ops.common.prompt2prompt_pipeline')
+                          'data_juicer.ops.common.prompt2prompt_pipeline',
+                          auto_install=False)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
