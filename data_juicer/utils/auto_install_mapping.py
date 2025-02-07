@@ -8,6 +8,7 @@ MODULE_TO_PKGS = {
     'ram': ['ram@git+https://github.com/xinyu1205/recognize-anything.git'],
     'scenedetect': ['scenedetect[opencv]'],
     'simhash': ['simhash-pybind'],
+    'data_juicer': ['py-data-juicer'],
 }
 
 # Extra packages required by each op

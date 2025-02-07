@@ -7,9 +7,8 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 
 diffusers = LazyLoader('diffusers', 'diffusers')
 torch = LazyLoader('torch', 'torch')
-Prompt2PromptPipeline = LazyLoader(
-    'Prompt2PromptPipeline',
-    '..common.prompt2prompt_pipeline.Prompt2PromptPipeline')
+p2p_pipeline = LazyLoader('p2p_pipeline',
+                          'data_juicer.ops.common.prompt2prompt_pipeline')
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -66,7 +65,7 @@ class SDXLPrompt2PromptMapper(Mapper):
         self.model_key = prepare_model(
             model_type='sdxl-prompt-to-prompt',
             pretrained_model_name_or_path=hf_diffusion,
-            pipe_func=Prompt2PromptPipeline,
+            pipe_func=p2p_pipeline.Prompt2PromptPipeline,
             torch_dtype=torch_dtype)
         self.text_key_second = text_key_second
         self.text_key_third = text_key_third
