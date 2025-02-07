@@ -47,7 +47,7 @@ class DatasetBuilder(object):
                 'in configurations')
 
         # validate dataset config for type constraints
-        # TODO other constraints; ray dataset only supports ondisk, etc.
+        # TODO other constraints; ray dataset only supports local, etc.
         if type(ds_configs) != dict:
             raise ConfigValidationError(
                 'Dataset config should be a dictionary')
@@ -72,7 +72,7 @@ class DatasetBuilder(object):
         ]
         if len(set(types)) > 1:
             raise ConfigValidationError(
-                'Mixture of diff types (ONDISK/REMOTE/...) are not supported')
+                'Mixture of diff types (LOCAL/REMOTE/...) are not supported')
         if types[0] == 'remote' and len(ds_configs['configs']) > 1:
             raise ConfigValidationError(
                 'Multiple remote datasets are not supported')

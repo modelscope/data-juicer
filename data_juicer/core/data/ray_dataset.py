@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import os
 from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union
 
@@ -17,55 +16,6 @@ from data_juicer.utils.process_utils import calculate_np
 
 rd = LazyLoader('rd', 'ray.data')
 ds = LazyLoader('ds', 'ray.data.read_api')
-
-
-def get_abs_path(path, dataset_dir):
-    full_path = os.path.abspath(os.path.join(dataset_dir, path))
-    if os.path.exists(full_path):
-        return full_path
-    else:
-        return path
-
-
-def convert_to_absolute_paths(samples, dataset_dir, path_keys):
-    samples = samples.to_pydict()
-    for key in path_keys:
-        for idx in range(len(samples[key])):
-            paths = samples[key][idx]
-            if isinstance(paths, str):
-                samples[key][idx] = get_abs_path(paths, dataset_dir)
-            elif isinstance(paths, list):
-                samples[key][idx] = [
-                    get_abs_path(item, dataset_dir) for item in paths
-                ]
-    return pyarrow.Table.from_pydict(samples)
-
-
-# TODO: check path for nestdataset
-def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
-    """
-    Set all the path in input data to absolute path.
-    Checks dataset_dir and project_dir for valid paths.
-    """
-    path_keys = []
-    columns = dataset.columns()
-    for key in [cfg.video_key, cfg.image_key, cfg.audio_key]:
-        if key in columns:
-            path_keys.append(key)
-    if len(path_keys) > 0:
-        dataset_dir = os.path.dirname(dataset_path)
-        dataset = dataset.map_batches(partial(convert_to_absolute_paths,
-                                              dataset_dir=dataset_dir,
-                                              path_keys=path_keys),
-                                      batch_format='pyarrow',
-                                      zero_copy_batch=True)
-    return dataset
-
-
-def preprocess_dataset(dataset: rd.Dataset, dataset_path, cfg) -> rd.Dataset:
-    if dataset_path:
-        dataset = set_dataset_to_absolute_path(dataset, dataset_path, cfg)
-    return dataset
 
 
 def get_num_gpus(op, op_proc):
@@ -86,7 +36,8 @@ class RayDataset(DJDataset):
                  dataset: rd.Dataset,
                  dataset_path: str = None,
                  cfg=None) -> None:
-        self.data = preprocess_dataset(dataset, dataset_path, cfg)
+        self.data = dataset
+        # self.data = preprocess_dataset(dataset, dataset_path, cfg)
         self.num_proc = None
         if cfg:
             self.num_proc = cfg.np
