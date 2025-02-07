@@ -9,11 +9,12 @@ import xml.etree.cElementTree as etree
 import mwparserfromhell
 from datasets import Dataset
 
+from data_juicer.download.downloader import (DocumentDownloader,
+                                             DocumentExtractor,
+                                             DocumentIterator,
+                                             download_and_extract,
+                                             get_wikipedia_urls)
 from data_juicer.utils.file_utils import expand_outdir_and_mkdir
-
-from .downloader import (DocumentDownloader, DocumentExtractor,
-                         DocumentIterator, download_and_extract,
-                         get_wikipedia_urls)
 
 # The majority of this code is taken from the HuggingFace
 # implementation of the Wikipedia dataset preparation:
