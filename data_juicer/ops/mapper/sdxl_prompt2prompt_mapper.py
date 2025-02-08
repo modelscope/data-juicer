@@ -698,6 +698,8 @@ class P2PCrossAttnProcessor:
         super().__init__()
         self.controller = controller
         self.place_in_unet = place_in_unet
+        
+    from diffusers.models.attention import Attention
 
     def __call__(self,
                  attn: diffusers.models.attention.Attention,
