@@ -297,7 +297,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             union-find algorithm. Default it's 'auto', and it will be
             determined by half of the number of CPUs.
         :param union_threshold: threshold for minhash values group to
-            perform union-find algorightm. Default it's 256.
+            perform union-find algorithm. Default it's 256.
         :param max_pending_edge_buffer_task: max number of pending edge buffer
             ray tasks. Default it's 20.
         :param num_edge_buffer_task_returns: number of edge buffer tasks for

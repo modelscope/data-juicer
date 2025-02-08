@@ -31,7 +31,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
         3. environment variables
         4. hard-coded defaults
 
-    :param args: list of params, e.g., ['--conifg', 'cfg.yaml'], defaut None.
+    :param args: list of params, e.g., ['--config', 'cfg.yaml'], default None.
     :param which_entry: which entry to init configs (executor/analyzer)
     :return: a global cfg object used by the Executor or Analyzer
     """

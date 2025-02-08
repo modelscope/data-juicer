@@ -58,7 +58,7 @@ class PairPreferenceMapper(Mapper):
             Defaults to 'choices.0.message.content'.
         :param system_prompt: System prompt for guiding the generation task.
         :param input_template: Template for building the model input. It must
-            contain placeholders '{query}' and '{reponse}', and can optionally
+            contain placeholders '{query}' and '{response}', and can optionally
             include '{reference}'.
         :param output_pattern: Regular expression for parsing model output.
         :param rejected_key: The field name in the sample to store the
