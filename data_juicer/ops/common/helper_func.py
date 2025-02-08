@@ -57,7 +57,7 @@ def split_on_whitespace(document, new_line=False, tab=False):
     """
     This method also removes concatenated spaces.
 
-    :param document: document to be splited
+    :param document: document to be split
     :param new_line: whether to split document with '\\\\n'
     :param tag: whether to split document with '\\\\t'
     :return: word list obtained after splitting document
@@ -75,7 +75,7 @@ def split_on_newline_tab_whitespace(document):
     sentences.
 
     First split on "\\\\n", then on "\\\\t", then on " ".
-    :param document: document to be splited
+    :param document: document to be split
     :return: sentence list obtained after splitting document
     """
     sentences = document.split('\n')
@@ -189,7 +189,7 @@ def get_sentences_from_document(document, model_func=None):
 
     :param document: document that need to split sentences
     :param model_func: function of sentence model, if specified, the
-        function will be used for spliting document into different
+        function will be used for splitting document into different
         sentences.
     :return: document with the sentences separated by '\\\\n'
     """
@@ -204,8 +204,8 @@ def split_text_by_punctuation(text):
     """
     Split text by any zh and en punctuation
 
-    :param text: text to be splitted.
-    :return: sub texts splitted by any zh and en punctuation
+    :param text: text to be split.
+    :return: sub texts split by any zh and en punctuation
     """
     # any zh and en punctuation
     punctuation_pattern = r'[\u3000-\u303f\uff00-\uffef]|[!"#$%&\'()*+,-./:;<=>?@[\\\]^_`{|}~]'  # noqa: E501
