@@ -180,7 +180,7 @@ def process_site(site, counts, src_dir, target_dir, num_proc=24):
         3) sort  answers by their score for each question
     :param site: site name endwith `".xml"`
     :param counts: dict stores pair of site name and its size
-    :parma src_dir: dir path of site
+    :param src_dir: dir path of site
     :param target_dir: path to save jsonl file
     :param num_proc: number of process workers. Default it's 24.
     """

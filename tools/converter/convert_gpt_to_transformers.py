@@ -188,7 +188,7 @@ def transformers_to_megatron_fix_query_key_value_ordering(
         param, checkpoint_version, num_splits, num_heads, hidden_size):
     """
     Permutes layout of param tensor to the one compatible with respective
-    NVIDIA Megatron-LM chekpoint versions. Input is
+    NVIDIA Megatron-LM checkpoint versions. Input is
     [num_splits * num_heads * hidden_size, :] and output is
     [num_heads * hidden_size * num_splits, :] for version 1.0 and
     [num_heads * num_splits * hidden_size, :] for version 2.0 and later. If
@@ -311,8 +311,8 @@ def convert_checkpoint_from_megatron_to_transformers(args):
             'Megatron-LM checkpoint does not contain arguments. This utility '
             'only supports Megatron-LM checkpoints containing all the '
             'architecture, the tensor and pipeline model parallel size from '
-            'the checkpoint insead of user having to manually specify all the '
-            'details. Please save Megatron-LM checkpoint along with all the '
+            'the checkpoint instead of user having to manually specify all the'
+            ' details. Please save Megatron-LM checkpoint along with all the '
             'megatron arguments to use this utility.')
 
     # Create Transformers GPT2 config from Megatron-LM arguments

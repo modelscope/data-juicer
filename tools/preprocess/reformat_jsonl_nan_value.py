@@ -46,7 +46,7 @@ def reformat_jsonl(fp, jsonl_fp, features):
     """
     Reformat a jsonl file with reference features
     :param fp: input jsonl file
-    :param jsonl_fp: formated jsonl file
+    :param jsonl_fp: formatted jsonl file
     :param features: reference feature to use for dataset.
     """
     with jsonlines.open(fp, 'r') as reader:
@@ -70,7 +70,7 @@ def main(src_dir, target_dir, num_proc=1):
     Reformat the jsonl files which may contain Nan values. Traverse jsonl
     files to find the first object that does not contain Nan as a
     reference feature type, then set it for loading all jsonl files.
-    :param src_dir: path thats stores jsonl files.
+    :param src_dir: path that's stores jsonl files.
     :param target_dir: path to store the converted jsonl files.
     :param num_proc: number of process workers. Default it's 1.
     """

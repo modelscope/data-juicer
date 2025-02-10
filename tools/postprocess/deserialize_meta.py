@@ -35,7 +35,7 @@ def meta_deserialize(file_name, target_file, serialized_key):
 def main(src_dir, target_dir, serialized_key='source_info', num_proc=1):
     """
     Deserialize the specified field in the jsonl file.
-    :param src_dir: path thats stores jsonl files.
+    :param src_dir: path that's stores jsonl files.
     :param target_dir: path to save the converted jsonl files.
     :param serialized_key: the key corresponding to the field that will be
     deserialized. Default it's 'source_info'.

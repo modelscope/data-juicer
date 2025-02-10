@@ -482,7 +482,7 @@ def main(src_dir, target_dir, num_proc=4):
     Load dataset from the source directory, then apply language identification
     using the operation filter called `LanguageIDScoreFilter`,
     finally, split the dataset by language and save it.
-    :param src_dir: path thats store dataset directory
+    :param src_dir: path that's store dataset directory
     :param target_dir: path to store subset files(`jsonl` format)
     :param num_proc: number of processes to process dataset, default 1.
     """

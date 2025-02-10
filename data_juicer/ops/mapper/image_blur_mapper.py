@@ -27,7 +27,7 @@ class ImageBlurMapper(Mapper):
         """
         Initialization method.
 
-        :param p: Probability of the image being blured.
+        :param p: Probability of the image being blurred.
         :param blur_type: Type of blur kernel, including
             ['mean', 'box', 'gaussian'].
         :param radius: Radius of blur kernel.

@@ -45,13 +45,13 @@ def main(src_dir,
     Serialize all the fields in the jsonl file except the fields specified
     by users to ensure that the jsonl file with inconsistent text format
     for each line can also be load normally by the dataset.
-    :param src_dir: path thats stores jsonl files.
+    :param src_dir: path that's stores jsonl files.
     :param target_dir: path to save the converted jsonl files.
     :param text_key: the key corresponding to the field that will not be
     serialized. Default it's 'text'.
     :param serialized_key: the key corresponding to the field that the
         serialized info saved. Default it's 'source_info'.
-    :param num_proc: number of process worke. Default it's 1.
+    :param num_proc: number of process worker. Default it's 1.
     """
 
     assert isinstance(
