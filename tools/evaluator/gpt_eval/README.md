@@ -42,7 +42,7 @@
             openai_organization: <str>
             openai_api_key: <str>
             model: <str> # the type of model，e.g., gpt-3.5-turbo
-            max_retry: <int> # the maxium number of retries when api access fails
+            max_retry: <int> # the maximum number of retries when api access fails
         ```
     3. Run the script.
         ```shell
@@ -66,7 +66,7 @@
           baseline_file: <str>
           prompt_file: <str>
           reviewer_file: <str>
-          result_file: <str>    # path of the evaulation result
+          result_file: <str>    # path of the evaluation result
         ```
     3. Run the script.
         ```shell

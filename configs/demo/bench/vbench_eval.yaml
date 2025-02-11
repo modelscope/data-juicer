@@ -12,7 +12,7 @@ result_dir: ./outputs/demo-bench/eval_results
 # Give a name for this eval
 eval_name: mini_test
 
-# If true, load the required model for VBench from the cache path of evironment parameter VBENCH_CACHE_DIR
+# If true, load the required model for VBench from the cache path of environment parameter VBENCH_CACHE_DIR
 load_ckpt_from_local: false
 
 # The dimensions considered in this eval.

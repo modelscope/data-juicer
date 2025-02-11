@@ -16,7 +16,7 @@ from data_juicer.utils import cache_utils
 
 class FileLock(HF_FileLock):
     """
-    File lock for compresssion or decompression, and
+    File lock for compression or decompression, and
     remove lock file automatically.
     """
 
