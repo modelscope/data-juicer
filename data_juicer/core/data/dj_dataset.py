@@ -8,7 +8,7 @@ import traceback
 from abc import ABC, abstractmethod
 from functools import wraps
 from time import time
-from typing import Union
+from typing import Dict, List, Tuple, Union
 
 from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
@@ -37,6 +37,17 @@ class DJDataset(ABC):
             checkpointer=None,
             tracer=None) -> DJDataset:
         """process a list of operators on the dataset."""
+        pass
+
+    @abstractmethod
+    def schema(self) -> Tuple[Dict, List[str]]:
+        """Get dataset schema and columns.
+
+        Returns:
+            Tuple containing:
+            - Dict: Schema information mapping column names to types
+            - List[str]: List of column names
+        """
         pass
 
 
@@ -164,6 +175,31 @@ class NestedDataset(Dataset, DJDataset):
             # or iter of indices or bools
             res = super().__getitem__(key)
         return nested_obj_factory(res)
+
+    def schema(self) -> Tuple[Dict, List[str]]:
+        """Get dataset schema and columns.
+
+        Returns:
+            Tuple containing:
+            - Dict: Schema information mapping column names to types
+            - List[str]: List of column names
+        """
+        # Get features dictionary from HF dataset
+        features = self.features
+
+        # Convert features to schema dict
+        schema = {}
+        for name, feature in features.items():
+            # Map HF feature types to Python types
+            if hasattr(feature, 'dtype'):
+                schema[name] = feature.dtype
+            else:
+                schema[name] = str(feature)
+
+        # Get column names
+        columns = self.column_names
+
+        return schema, columns
 
     def process(
         self,
@@ -463,3 +499,44 @@ def add_same_content_to_new_column(sample,
     """
     sample[new_column_name] = initial_value
     return sample
+
+
+class RayDataset(DJDataset):
+    """Ray-based dataset implementation."""
+
+    def schema(self) -> Tuple[Dict, List[str]]:
+        """Get dataset schema and columns.
+
+        Returns:
+            Tuple containing:
+            - Dict: Schema information mapping column names to types
+            - List[str]: List of column names
+        """
+        # Get PyArrow schema from Ray dataset
+        arrow_schema = self.data.schema()
+
+        # Convert PyArrow schema to dict
+        schema = {}
+        for field in arrow_schema:
+            schema[field.name] = field.type
+
+        # Get column names
+        columns = self.data.columns()
+
+        return schema, columns
+
+    def get_schema_string(self) -> str:
+        """Get a formatted string representation of the schema.
+
+        Returns:
+            str: Formatted schema string
+        """
+        schema, columns = self.schema()
+
+        # Build formatted string
+        lines = ['Dataset Schema:']
+        lines.append('-' * 40)
+        for col in columns:
+            lines.append(f'{col}: {schema[col]}')
+
+        return '\n'.join(lines)

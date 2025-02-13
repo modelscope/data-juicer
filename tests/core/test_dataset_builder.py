@@ -9,12 +9,12 @@ from data_juicer.core.data.dataset_builder import (rewrite_cli_datapath,
                                                    parse_cli_datapath,
                                                    DatasetBuilder)
 from data_juicer.core.data.config_validator import ConfigValidationError
-from data_juicer.utils.unittest_utils import (DataJuicerTestCaseBase, 
-                                              SKIPPED_TESTS)
+from data_juicer.utils.unittest_utils import (DataJuicerTestCaseBase)
 from data_juicer.core.data.load_strategy import RayLocalJsonDataLoadStrategy
+from data_juicer.core.data import RayDataset
 
 
-WORK_DIR = os.path.dirname(os.path.realpath(__file__))
+WORK_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
              
 
 class DatasetBuilderTest(DataJuicerTestCaseBase):
@@ -489,7 +489,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertEqual(cfg.dataset, {
                 'configs': [{
                     'type': 'local',
-                    'path': './demos/process_on_ray/data/demo-dataset.jsonl',
+                    'path': '../../demos/process_on_ray/data/demo-dataset.jsonl',
                     'weight': 1.0
                 }]
             })
@@ -498,6 +498,99 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             builder = DatasetBuilder(cfg, executor_type=cfg.executor_type)
             self.assertEqual(len(builder.load_strategies), 1)
             self.assertIsInstance(builder.load_strategies[0], RayLocalJsonDataLoadStrategy)
+
+            # Load dataset and verify schema
+            dataset = builder.load_dataset()
+            schema, columns = dataset.schema()
+            
+            # Verify expected columns exist
+            self.assertIn('text', columns)
+            
+            # Verify schema types
+            import pyarrow as pa
+            self.assertTrue(pa.types.is_string(schema['text']))
+            
+
+   ### schema related tests
+    def test_builder_schema_single_dataset(self):
+        """Test schema for single dataset configuration"""
+        # Setup single dataset config
+        self.base_cfg.dataset = {
+            'configs': [
+                {
+                    'type': 'local',
+                    'path': os.path.join(WORK_DIR, 'data/sample.json')
+                }
+            ]
+        }
+        
+        builder = DatasetBuilder(self.base_cfg, self.executor_type)
+        dataset = builder.load_dataset()
+        
+        # Get schema
+        schema, columns = dataset.schema()
+        
+        # Verify expected columns exist
+        self.assertIn('text', columns)
+        
+        # Verify schema types
+        if isinstance(dataset, RayDataset):
+            import pyarrow as pa
+            self.assertTrue(pa.types.is_string(schema['text']))
+        else:  # NestedDataset
+            self.assertEqual(schema['text'], 'string')
+            
+    def test_builder_schema_multiple_datasets(self):
+        """Test schema for multiple dataset configurations"""
+        # Setup multiple dataset config
+        self.base_cfg.dataset = {
+            'configs': [
+                {
+                    'type': 'local',
+                    'path': os.path.join(WORK_DIR, 'data/sample.json')
+                },
+                {
+                    'type': 'local', 
+                    'path': os.path.join(WORK_DIR, 'data/sample.txt')
+                }
+            ]
+        }
+        
+        builder = DatasetBuilder(self.base_cfg, self.executor_type)
+        dataset = builder.load_dataset()
+        
+        schema, columns = dataset.schema()
+        
+        # Verify columns from both datasets
+        self.assertIn('text', columns)
+        
+        # Verify schema consistency
+        if isinstance(dataset, RayDataset):
+            import pyarrow as pa
+            self.assertTrue(pa.types.is_string(schema['text']))
+        else:  # NestedDataset
+            self.assertEqual(schema['text'], 'string')
+
+    def test_builder_schema_validation(self):
+        """Test schema validation during dataset building"""
+        # Test with invalid schema
+        self.base_cfg.dataset = {
+            'configs': [
+                {
+                    'type': 'local',
+                    'path': os.path.join(WORK_DIR, 'data/invalid_schema.json')
+                }
+            ]
+        }
+        
+        with self.assertRaises(Exception) as context:
+            builder = DatasetBuilder(self.base_cfg, self.executor_type)
+            dataset = builder.load_dataset()
+            schema, columns = dataset.schema()
+        
+        # Verify error message
+        self.assertIn('schema', str(context.exception).lower()) 
+
 
 if __name__ == '__main__':
     unittest.main()

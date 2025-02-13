@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import copy
+from argparse import Namespace
 from functools import partial
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 import pyarrow
 from loguru import logger
@@ -35,12 +37,31 @@ class RayDataset(DJDataset):
     def __init__(self,
                  dataset: rd.Dataset,
                  dataset_path: str = None,
-                 cfg=None) -> None:
+                 cfg: Optional[Namespace] = None) -> None:
         self.data = dataset
-        # self.data = preprocess_dataset(dataset, dataset_path, cfg)
-        self.num_proc = None
-        if cfg:
-            self.num_proc = cfg.np
+        self.num_proc = getattr(cfg, 'np', getattr(cfg, 'num_proc',
+                                                   None)) if cfg else None
+
+    def schema(self) -> Tuple[Dict, List[str]]:
+        """Get dataset schema and columns.
+
+        Returns:
+            Tuple containing:
+            - Dict: Schema information mapping column names to types
+            - List[str]: List of column names
+        """
+        # Get schema from Ray dataset
+        ray_schema = self.data.schema()
+
+        # Convert PyArrow schema to dict
+        schema = {}
+        for n, t in zip(ray_schema.names, ray_schema.types):
+            schema[n] = t
+
+        # Get column names
+        columns = copy.deepcopy(ray_schema.names)
+
+        return schema, columns
 
     def process(self,
                 operators,
