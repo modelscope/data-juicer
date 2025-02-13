@@ -237,12 +237,19 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
     }
 
     def load_data(self, **kwargs):
-        print(f'kwards: {kwargs}')
+        logger.info(f'kwargs: {kwargs}')
+
+        # Get config values with defaults
+        text_keys = getattr(self.cfg, 'text_keys',
+                            ['text'])  # Default to ['text']
+        suffixes = getattr(self.cfg, 'suffixes', None)  # Default to None
+        add_suffix = getattr(self.cfg, 'add_suffix', False)  # Default to False
+
         # use proper formatter to load data
         formatter = load_formatter(dataset_path=self.ds_config['path'],
-                                   suffixes=self.cfg.suffixes,
-                                   text_keys=self.cfg.text_keys,
-                                   add_suffix=self.cfg.add_suffix,
+                                   text_keys=text_keys,
+                                   suffixes=suffixes,
+                                   add_suffix=add_suffix,
                                    **kwargs)
         # TODO more sophiscated localformatter routing
         return formatter.load_dataset()

@@ -1,7 +1,9 @@
 import unittest
 from data_juicer.core.data.load_strategy import (
-    DataLoadStrategyRegistry, DataLoadStrategy, StrategyKey
+    DataLoadStrategyRegistry, DataLoadStrategy, StrategyKey,
+    DefaultLocalDataLoadStrategy
 )
+from argparse import Namespace
 
 class MockStrategy(DataLoadStrategy):
     def load_data(self):
@@ -129,3 +131,83 @@ class DataLoadStrategyRegistryTest(unittest.TestCase):
         
         self.assertTrue(pattern_key.matches(match_key))
         self.assertFalse(pattern_key.matches(no_match_key))
+
+    def test_load_strategy_default_config(self):
+        """Test load strategy with minimal config"""
+        # Create minimal config
+        minimal_cfg = Namespace(
+            path='test/path'
+        )
+        
+        ds_config = {
+            'path': 'test/path'
+        }
+        
+        strategy = DefaultLocalDataLoadStrategy(ds_config, minimal_cfg)
+        
+        # Verify defaults are used
+        assert getattr(strategy.cfg, 'text_keys', ['text']) == ['text']
+        assert getattr(strategy.cfg, 'suffixes', None) is None
+        assert getattr(strategy.cfg, 'add_suffix', False) is False
+
+    def test_load_strategy_full_config(self):
+        """Test load strategy with full config"""
+        # Create config with all options
+        full_cfg = Namespace(
+            path='test/path',
+            text_keys=['content', 'title'],
+            suffixes=['.txt', '.md'],
+            add_suffix=True
+        )
+        
+        ds_config = {
+            'path': 'test/path'
+        }
+        
+        strategy = DefaultLocalDataLoadStrategy(ds_config, full_cfg)
+        
+        # Verify all config values are used
+        assert strategy.cfg.text_keys == ['content', 'title']
+        assert strategy.cfg.suffixes == ['.txt', '.md']
+        assert strategy.cfg.add_suffix is True
+
+    def test_load_strategy_partial_config(self):
+        """Test load strategy with partial config"""
+        # Create config with some options
+        partial_cfg = Namespace(
+            path='test/path',
+            text_keys=['content'],
+            # suffixes and add_suffix omitted
+        )
+        
+        ds_config = {
+            'path': 'test/path'
+        }
+        
+        strategy = DefaultLocalDataLoadStrategy(ds_config, partial_cfg)
+        
+        # Verify mix of specified and default values
+        assert strategy.cfg.text_keys == ['content']
+        assert getattr(strategy.cfg, 'suffixes', None) is None
+        assert getattr(strategy.cfg, 'add_suffix', False) is False
+
+    def test_load_strategy_empty_config(self):
+        """Test load strategy with empty config"""
+        # Create empty config
+        empty_cfg = Namespace()
+        
+        ds_config = {
+            'path': 'test/path'
+        }
+        
+        strategy = DefaultLocalDataLoadStrategy(ds_config, empty_cfg)
+        
+        # Verify all defaults are used
+        assert getattr(strategy.cfg, 'text_keys', ['text']) == ['text']
+        assert getattr(strategy.cfg, 'suffixes', None) is None
+        assert getattr(strategy.cfg, 'add_suffix', False) is False
+        
+
+
+if __name__ == '__main__':
+    unittest.main()
