@@ -199,7 +199,7 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
     }
 
     def load_data(self, **kwargs):
-        dataset = rd.read_json(self.ds_config['path'])
+        dataset = RayDataset.read_json(self.ds_config['path'])
         return RayDataset(dataset,
                           dataset_path=self.ds_config['path'],
                           cfg=self.cfg)
@@ -218,7 +218,7 @@ class RayHuggingfaceDataLoadStrategy(RayDataLoadStrategy):
 
     def load_data(self, **kwargs):
         raise NotImplementedError(
-            'Huggingface data load strategy is not implemented')
+            'Huggingface data load strategy for Ray is not implemented')
 
 
 @DataLoadStrategyRegistry.register('default', 'local', '*')

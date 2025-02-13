@@ -17,7 +17,6 @@ from data_juicer.core.data.load_strategy import RayLocalJsonDataLoadStrategy
 WORK_DIR = os.path.dirname(os.path.realpath(__file__))
              
 
-@SKIPPED_TESTS.register_module()
 class DatasetBuilderTest(DataJuicerTestCaseBase):
 
     def setUp(self):
@@ -32,7 +31,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
 
 
     def test_rewrite_cli_datapath_local_single_file(self):
-        dataset_path = "./data/sample.txt"
+        dataset_path =  os.path.join(WORK_DIR, "data/sample.txt")
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
@@ -40,7 +39,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
              ans)
 
     def test_rewrite_cli_datapath_local_directory(self):
-        dataset_path = "./data"
+        dataset_path = os.path.join(WORK_DIR, "data")
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
@@ -58,7 +57,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
              ans)
 
     def test_rewrite_cli_datapath_local_wrong_files(self):
-        dataset_path = "./missingDir"
+        dataset_path = os.path.join(WORK_DIR, "missingDir")
         self.assertRaisesRegex(ValueError, "Unable to load the dataset",
                                rewrite_cli_datapath, dataset_path)
 

@@ -173,7 +173,6 @@ class Executor(ExecutorBase):
         Sample a subset from the given dataset.
         TODO add support other than LocalExecutor
 
-        :param executor: executor
         :param dataset_to_sample: Dataset to sample from. If None, will use
             the formatter linked by the executor. Default is None.
         :param load_data_np: number of workers when loading the dataset.

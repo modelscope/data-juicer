@@ -104,4 +104,6 @@ class RayExecutor(ExecutorBase):
             dataset.data.write_json(self.cfg.export_path, force_ascii=False)
             tend = time.time()
             logger.info(f'All Ops are done in {tend - tstart:.3f}s.')
-        return dataset
+
+        if not skip_return:
+            return dataset

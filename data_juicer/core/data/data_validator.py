@@ -150,7 +150,7 @@ class RequiredFieldsValidator(DataValidator):
             MAX_SAMPLE_SIZE = 1000
             if isinstance(dataset, NestedDataset):
                 sample_size = min(MAX_SAMPLE_SIZE, len(dataset))
-                sample = dataset.select(range(sample_size))
+                sample = dataset.take(sample_size)
                 values = sample[field]
             elif isinstance(dataset, RayDataset):  # RayDataset
                 sample_size = min(MAX_SAMPLE_SIZE, dataset.data.count())

@@ -15,8 +15,10 @@ def load_formatter(dataset_path,
     :param dataset_path: Path to dataset file or dataset directory
     :param text_keys: key names of field that stores sample text.
         Default: None
-    :param suffixes: the suffix of files that will be read. Default:
-        None
+    :param suffixes: the suffix of files that will be read.
+        Default: None
+    :param add_suffix: whether to add the file suffix to dataset meta.
+        Default: False
     :return: a dataset formatter.
     """
 

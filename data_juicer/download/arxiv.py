@@ -14,7 +14,7 @@ from data_juicer.utils.file_utils import (expand_outdir_and_mkdir,
 
 # The iterator and extractor code are in large part taken
 # from the Red-Pajama repo
-# https://github.com/togethercomputer/RedPajama-Data/tree/main/data_prep/arxiv
+# https://github.com/togethercomputer/RedPajama-Data/tree/rp_v1/data_prep/arxiv
 
 
 class ArxivDownloader(DocumentDownloader):
