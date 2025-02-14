@@ -20,3 +20,4 @@ venv/
 
 # dup files created by tests
 tests/ops/data/*dup*
+tests/tools/tmp_*/

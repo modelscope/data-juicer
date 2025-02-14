@@ -474,7 +474,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
 
     def test_builder_ray_config(self):
         """Test loading Ray configuration from YAML"""
-        test_config_file = os.path.join(WORK_DIR, 'data/test_config_ray.yaml')
+        test_config_file = os.path.join(WORK_DIR, 'data', 'test_config_ray.yaml')
         out = StringIO()
         with redirect_stdout(out):
             cfg = init_configs(args=f'--config {test_config_file}'.split())
@@ -489,7 +489,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertEqual(cfg.dataset, {
                 'configs': [{
                     'type': 'local',
-                    'path': '../../demos/process_on_ray/data/demo-dataset.jsonl',
+                    'path': './data/sample.json',
                     'weight': 1.0
                 }]
             })
