@@ -1,32 +1,43 @@
 from unittest import TestCase, main
 import datasets
-import ray
-import ray.data
-import pandas as pd
-
-from data_juicer.core.data import NestedDataset, RayDataset
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
+from data_juicer.core.data import NestedDataset
 from data_juicer.core.data.data_validator import (DataValidationError, 
     RequiredFieldsValidator
 )
 
 
 # Test RequiredFieldsValidator
-class RequiredFieldsValidatorTest(TestCase):
+class RequiredFieldsValidatorTest(DataJuicerTestCaseBase):
     
     def setUp(self):
         # Create sample DataFrame
-        self.df  = pd.DataFrame({
-            'text': ['Hello', 'World', None, 'Test'],
-            'metadata': [{'lang': 'en'}, {'lang': 'es'}, {'lang': 'fr'}, None],
-            'score': [1.0, 2.0, 3.0, 4.0]
-        })
+        self.data = [
+            {
+                'text': 'Hello',
+                'metadata': {'lang': 'en'},
+                'score': 1.0
+            },
+            {
+                'text': 'World',
+                'metadata': {'lang': 'es'},
+                'score': 2.0
+            },
+            {
+                'text': None,
+                'metadata': {'lang': 'fr'},
+                'score': 3.0
+            },
+            {
+                'text': 'Test',
+                'metadata': None,
+                'score': 4.0
+            }
+        ]
 
         # Create dataset
-        self.dataset = NestedDataset(datasets.Dataset.from_pandas(self.df))
-        
-        # Create ray dataset
-        self.ray_dataset = RayDataset(ray.data.from_pandas(self.df))    
-
+        self.dataset = NestedDataset(datasets.Dataset.from_list(self.data))
+    
 
     def test_basic_validation(self):
         """Test basic field validation"""
@@ -67,7 +78,14 @@ class RequiredFieldsValidatorTest(TestCase):
             validator.validate(self.dataset)
         self.assertIn("incorrect type", str(exc.exception).lower())
 
+    @TEST_TAG('ray')
     def test_ray_dataset_support(self):
+        import ray.data
+        from data_juicer.core.data import RayDataset
+        
+        # Create ray dataset
+        self.ray_dataset = RayDataset(ray.data.from_items(self.data))    
+
         """Test validation with RayDataset"""
         config = {
             'required_fields': ['text', 'metadata'],
@@ -103,7 +121,14 @@ class RequiredFieldsValidatorTest(TestCase):
         # Should pass as no fields are required
         validator.validate(self.dataset)
 
+    @TEST_TAG('ray')
     def test_multiple_dataset_types(self):
+        import ray.data
+        from data_juicer.core.data import RayDataset
+
+        # Create ray dataset
+        self.ray_dataset = RayDataset(ray.data.from_items(self.data))    
+
         """Test validation works with different dataset types"""
         datasets_to_test = [
             ('nested', self.dataset),

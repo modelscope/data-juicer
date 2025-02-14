@@ -4,12 +4,12 @@ from data_juicer.core.data.load_strategy import (
     DefaultLocalDataLoadStrategy
 )
 from argparse import Namespace
-
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 class MockStrategy(DataLoadStrategy):
     def load_data(self):
         pass
 
-class DataLoadStrategyRegistryTest(unittest.TestCase):
+class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
     def setUp(self):
         # Clear existing strategies before each test
         DataLoadStrategyRegistry._strategies = {}
