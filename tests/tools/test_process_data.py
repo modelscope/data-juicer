@@ -62,8 +62,10 @@ class ProcessDataTest(DataJuicerTestCaseBase):
         with open(yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
 
+        script_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))), 
+                               "tools", "process_data.py")
         status_code = subprocess.call(
-            f'python tools/process_data.py --config {yaml_file}', shell=True)
+            f'python {script_path} --config {yaml_file}', shell=True)
 
         return status_code
 
@@ -95,6 +97,8 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
 
         cur_dir = osp.dirname(osp.abspath(__file__))
         self.tmp_dir = osp.join(cur_dir, f'tmp_{uuid.uuid4().hex}')
+        self.script_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))), 
+                               "tools", "process_data.py")
         os.makedirs(self.tmp_dir, exist_ok=True)
 
     def tearDown(self):
@@ -113,7 +117,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         text_keys = 'text'
 
         data_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))),
-            'demos', 'data', 'demo-dataset-images.jsonl')
+                             'demos', 'data', 'demo-dataset-images.jsonl')
         yaml_config = {
             'dataset_path': data_path,
             'executor_type': 'ray',
@@ -141,7 +145,8 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         with open(tmp_yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
 
-        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
+        print(f"Is the config file present? {os.path.exists(tmp_yaml_file)}")
+        run_in_subprocess(f'python {self.script_path} --config {tmp_yaml_file}')
 
         self.assertTrue(osp.exists(tmp_out_path))
 
@@ -184,7 +189,9 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         with open(tmp_yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
 
-        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
+        script_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))), 
+                               "tools", "process_data.py")
+        run_in_subprocess(f'python {script_path} --config {tmp_yaml_file}')
 
         self.assertTrue(osp.exists(tmp_out_path))
 
@@ -227,7 +234,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         with open(tmp_yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
 
-        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
+        run_in_subprocess(f'python {self.script_path} --config {tmp_yaml_file}')
 
         self.assertTrue(osp.exists(tmp_out_path))
 
@@ -282,7 +289,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         with open(tmp_yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
 
-        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
+        run_in_subprocess(f'python {self.script_path} --config {tmp_yaml_file}')
 
         self.assertTrue(osp.exists(tmp_out_path))
 
@@ -344,7 +351,8 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         with open(tmp_yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
 
-        run_in_subprocess(f'python tools/process_data.py --config {tmp_yaml_file}')
+
+        run_in_subprocess(f'python {self.script_path} --config {tmp_yaml_file}')
 
         self.assertTrue(osp.exists(tmp_out_path))
 
