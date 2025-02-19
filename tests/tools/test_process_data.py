@@ -189,9 +189,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         with open(tmp_yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
 
-        script_path = osp.join(osp.dirname(osp.dirname(osp.dirname(osp.realpath(__file__)))), 
-                               "tools", "process_data.py")
-        run_in_subprocess(f'python {script_path} --config {tmp_yaml_file}')
+        run_in_subprocess(f'python {self.script_path} --config {tmp_yaml_file}')
 
         self.assertTrue(osp.exists(tmp_out_path))
 
@@ -350,7 +348,6 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
 
         with open(tmp_yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
-
 
         run_in_subprocess(f'python {self.script_path} --config {tmp_yaml_file}')
 

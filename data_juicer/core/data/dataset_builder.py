@@ -1,17 +1,16 @@
 import os
 import shlex
 from argparse import Namespace
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 import numpy as np
 from datasets import concatenate_datasets
 from loguru import logger
 
-from data_juicer.core.data import NestedDataset
+from data_juicer.core.data import DJDataset, NestedDataset
 from data_juicer.core.data.config_validator import ConfigValidationError
 from data_juicer.core.data.data_validator import DataValidatorRegistry
 from data_juicer.core.data.load_strategy import DataLoadStrategyRegistry
-from data_juicer.core.data.ray_dataset import RayDataset
 from data_juicer.utils.file_utils import is_absolute_path
 from data_juicer.utils.sample import random_sample
 
@@ -43,7 +42,7 @@ class DatasetBuilder(object):
         else:
             raise ConfigValidationError(
                 'Unable to initialize dataset; should have one of '
-                'generated_dataset_configdataset_path or dataset '
+                'generated_dataset_config, dataset_path, or dataset '
                 'in configurations')
 
         # validate dataset config for type constraints
@@ -91,6 +90,11 @@ class DatasetBuilder(object):
                                  f' {data_type} {data_source}')
             self.load_strategies.append(stra)
 
+        # failed to initialize any load strategy
+        if not self.load_strategies:
+            logger.error(f'No data load strategies found for {ds_configs}')
+            raise ConfigValidationError('No data load strategies found')
+
         # initialzie the sample numbers
         self.max_sample_num = ds_configs.get('max_sample_num', None)
         # get weights and sample numbers
@@ -112,7 +116,7 @@ class DatasetBuilder(object):
                 if validator_cls:
                     self.validators.append(validator_cls(validator_config))
 
-    def load_dataset(self, **kwargs) -> Union[NestedDataset, RayDataset]:
+    def load_dataset(self, **kwargs) -> DJDataset:
         # if generated_dataset_config present, prioritize
         if self.use_generated_dataset_config:
             return DatasetBuilder.load_dataset_by_generated_config(

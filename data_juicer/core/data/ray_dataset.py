@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-import copy
 from argparse import Namespace
 from functools import partial
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import pyarrow
 from loguru import logger
 
 from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
+from data_juicer.core.data.schema import Schema
 from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
@@ -35,33 +35,53 @@ def filter_batch(batch, filter_func):
 class RayDataset(DJDataset):
 
     def __init__(self,
-                 dataset: rd.Dataset,
+                 ds: rd.Dataset,
                  dataset_path: str = None,
                  cfg: Optional[Namespace] = None) -> None:
-        self.data = dataset
+        self.data = ds
         self.num_proc = getattr(cfg, 'np', getattr(cfg, 'num_proc',
                                                    None)) if cfg else None
 
-    def schema(self) -> Tuple[Dict, List[str]]:
-        """Get dataset schema and columns.
+    def schema(self) -> Schema:
+        """Get dataset schema.
 
         Returns:
-            Tuple containing:
-            - Dict: Schema information mapping column names to types
-            - List[str]: List of column names
+            Schema: Dataset schema containing column names and types
         """
         # Get schema from Ray dataset
-        ray_schema = self.data.schema()
+        _schema = self.data.schema()
 
-        # Convert PyArrow schema to dict
-        schema = {}
-        for n, t in zip(ray_schema.names, ray_schema.types):
-            schema[n] = t
+        # convert schema to proper list and dict
+        column_names = _schema.names
+        column_types = {k: v for k, v in zip(_schema.names, _schema.types)}
+        return Schema(column_types=column_types, columns=column_names)
 
-        # Get column names
-        columns = copy.deepcopy(ray_schema.names)
+    def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
+        """Get column values from Ray dataset.
 
-        return schema, columns
+        Args:
+            column: Name of the column to retrieve
+            k: Optional number of rows to return. If None, returns all rows
+
+        Returns:
+            List of values from the specified column
+
+        Raises:
+            KeyError: If column doesn't exist
+            ValueError: If k is negative
+        """
+        if column not in self.data.columns():
+            raise KeyError(f"Column '{column}' not found in dataset")
+
+        if k is not None:
+            if k < 0:
+                raise ValueError(f'k must be non-negative, got {k}')
+            if k == 0:
+                return []
+            k = min(k, self.data.count())
+            return [row[column] for row in self.data.limit(k).take()]
+
+        return [row[column] for row in self.data.take()]
 
     def process(self,
                 operators,

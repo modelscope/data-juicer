@@ -2,12 +2,12 @@ import fnmatch
 from abc import ABC, abstractmethod
 from argparse import Namespace
 from dataclasses import dataclass
-from typing import Dict, Optional, Type, Union
+from typing import Dict, Optional, Type
 
 import datasets
 from loguru import logger
 
-from data_juicer.core.data import DJDataset, RayDataset
+from data_juicer.core.data import DJDataset
 from data_juicer.core.data.config_validator import ConfigValidator
 from data_juicer.download.downloader import validate_snapshot_format
 from data_juicer.format.formatter import unify_format
@@ -58,7 +58,7 @@ class DataLoadStrategy(ABC, ConfigValidator):
         self.weight = ds_config.get('weight', 1.0)  # default weight is 1.0
 
     @abstractmethod
-    def load_data(self, **kwargs) -> Union[DJDataset, RayDataset]:
+    def load_data(self, **kwargs) -> DJDataset:
         pass
 
 
@@ -124,7 +124,10 @@ class DataLoadStrategyRegistry:
             return found
 
         # No matching strategy found
-        logger.warning('No matching strategy found')
+        logger.warning(f'No matching strategy found for combination '
+                       f'exec: {executor_type}, '
+                       f'data_type: {data_type}, '
+                       f'data_source: {data_source}')
         return None
 
     @classmethod
@@ -158,7 +161,7 @@ class RayDataLoadStrategy(DataLoadStrategy):
     """
 
     @abstractmethod
-    def load_data(self, **kwargs) -> RayDataset:
+    def load_data(self, **kwargs) -> DJDataset:
         pass
 
 
@@ -199,6 +202,7 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
     }
 
     def load_data(self, **kwargs):
+        from data_juicer.core.data import RayDataset
         dataset = RayDataset.read_json(self.ds_config['path'])
         return RayDataset(dataset,
                           dataset_path=self.ds_config['path'],

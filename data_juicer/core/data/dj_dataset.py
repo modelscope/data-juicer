@@ -8,12 +8,13 @@ import traceback
 from abc import ABC, abstractmethod
 from functools import wraps
 from time import time
-from typing import Dict, List, Tuple, Union
+from typing import Any, List, Optional, Union
 
 from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
+from data_juicer.core.data.schema import Schema
 from data_juicer.core.monitor import Monitor
 from data_juicer.ops import UNFORKABLE
 from data_juicer.utils import cache_utils
@@ -40,13 +41,28 @@ class DJDataset(ABC):
         pass
 
     @abstractmethod
-    def schema(self) -> Tuple[Dict, List[str]]:
-        """Get dataset schema and columns.
+    def schema(self) -> Schema:
+        """Get dataset schema.
 
         Returns:
-            Tuple containing:
-            - Dict: Schema information mapping column names to types
-            - List[str]: List of column names
+            Schema: Dataset schema containing column names and types
+        """
+        pass
+
+    @abstractmethod
+    def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
+        """Get values from a specific column/field, optionally limited to first k rows.
+
+        Args:
+            column: Name of the column to retrieve
+            k: Optional number of rows to return. If None, returns all rows
+
+        Returns:
+            List of values from the specified column
+
+        Raises:
+            KeyError: If column doesn't exist in dataset
+            ValueError: If k is negative
         """
         pass
 
@@ -176,30 +192,51 @@ class NestedDataset(Dataset, DJDataset):
             res = super().__getitem__(key)
         return nested_obj_factory(res)
 
-    def schema(self) -> Tuple[Dict, List[str]]:
-        """Get dataset schema and columns.
-
-        Returns:
-            Tuple containing:
-            - Dict: Schema information mapping column names to types
-            - List[str]: List of column names
-        """
+    def schema(self) -> Schema:
+        """Get dataset schema."""
         # Get features dictionary from HF dataset
         features = self.features
 
         # Convert features to schema dict
-        schema = {}
+        column_types = {}
         for name, feature in features.items():
             # Map HF feature types to Python types
             if hasattr(feature, 'dtype'):
-                schema[name] = feature.dtype
+                column_types[name] = feature.dtype
             else:
-                schema[name] = str(feature)
+                column_types[name] = str(feature)
 
         # Get column names
         columns = self.column_names
 
-        return schema, columns
+        return Schema(column_types=column_types, columns=columns)
+
+    def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
+        """Get column values from HuggingFace dataset.
+
+        Args:
+            column: Name of the column to retrieve
+            k: Optional number of rows to return. If None, returns all rows
+
+        Returns:
+            List of values from the specified column
+
+        Raises:
+            KeyError: If column doesn't exist
+            ValueError: If k is negative
+        """
+        if column not in self.column_names:
+            raise KeyError(f"Column '{column}' not found in dataset")
+
+        if k is not None:
+            if k < 0:
+                raise ValueError(f'k must be non-negative, got {k}')
+            if k == 0:
+                return []
+            k = min(k, len(self))
+            return self[column][:k]
+
+        return self[column]
 
     def process(
         self,
@@ -499,44 +536,3 @@ def add_same_content_to_new_column(sample,
     """
     sample[new_column_name] = initial_value
     return sample
-
-
-class RayDataset(DJDataset):
-    """Ray-based dataset implementation."""
-
-    def schema(self) -> Tuple[Dict, List[str]]:
-        """Get dataset schema and columns.
-
-        Returns:
-            Tuple containing:
-            - Dict: Schema information mapping column names to types
-            - List[str]: List of column names
-        """
-        # Get PyArrow schema from Ray dataset
-        arrow_schema = self.data.schema()
-
-        # Convert PyArrow schema to dict
-        schema = {}
-        for field in arrow_schema:
-            schema[field.name] = field.type
-
-        # Get column names
-        columns = self.data.columns()
-
-        return schema, columns
-
-    def get_schema_string(self) -> str:
-        """Get a formatted string representation of the schema.
-
-        Returns:
-            str: Formatted schema string
-        """
-        schema, columns = self.schema()
-
-        # Build formatted string
-        lines = ['Dataset Schema:']
-        lines.append('-' * 40)
-        for col in columns:
-            lines.append(f'{col}: {schema[col]}')
-
-        return '\n'.join(lines)

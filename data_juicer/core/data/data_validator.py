@@ -1,8 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Optional, Type, Union
+from typing import Dict, Optional, Type
 
-from data_juicer.core.data.dj_dataset import NestedDataset
-from data_juicer.core.data.ray_dataset import RayDataset
+from data_juicer.core.data.dj_dataset import DJDataset
 
 
 class DataValidator(ABC):
@@ -12,7 +11,7 @@ class DataValidator(ABC):
         self.config = config
 
     @abstractmethod
-    def validate(self, dataset) -> None:
+    def validate(self, dataset: DJDataset) -> None:
         """
         Validate dataset content
 
@@ -22,7 +21,9 @@ class DataValidator(ABC):
         Raises:
             DataValidationError: If validation fails
         """
-        pass
+        if not isinstance(dataset, DJDataset):
+            raise DataValidationError(
+                'unsupported dataset type; must be a DJDataset')
 
 
 class DataValidationError(Exception):
@@ -50,34 +51,175 @@ class DataValidatorRegistry:
         return cls._validators.get(validator_type)
 
 
-@DataValidatorRegistry.register('conversation')
-class ConversationDataValidator(DataValidator):
-    """Validator for conversation data"""
+class BaseConversationValidator(DataValidator):
+    """Base class for conversation validators"""
 
     def __init__(self, config: Dict):
         super().__init__(config)
-
-        # Validation rules specific to conversation data
-        self.required_columns = ['text']
-        self.min_turns = config.get('min_turns', 2)
+        self.min_turns = config.get('min_turns', 1)
         self.max_turns = config.get('max_turns', 100)
+        self.sample_size = config.get('sample_size', 100)
 
-    def validate(self, dataset) -> None:
-        # Check required columns
-        if not all(col in dataset.column_names
-                   for col in self.required_columns):
+    def validate(self, dataset: DJDataset) -> None:
+        """Base validation for all conversation formats"""
+        super().validate(dataset)
+
+        schema = dataset.schema()
+        if not all(col in schema.columns for col in ['text']):
+            raise DataValidationError('Missing required column: text')
+
+        for item in dataset.get_column('text', self.sample_size):
+            self.validate_conversation(item)
+
+    @abstractmethod
+    def validate_conversation(self, data: Dict) -> None:
+        """Validate specific conversation format"""
+        pass
+
+
+@DataValidatorRegistry.register('swift_messages')
+class SwiftMessagesValidator(BaseConversationValidator):
+    """Validator for Swift Messages format"""
+
+    def validate_conversation(self, data: Dict) -> None:
+        if 'messages' not in data:
+            raise DataValidationError("Missing 'messages' field")
+
+        messages = data['messages']
+        if not isinstance(messages, list):
+            raise DataValidationError("'messages' must be an array")
+
+        if not (self.min_turns <= len(messages) <= self.max_turns):
             raise DataValidationError(
-                f'Missing required columns: {self.required_columns}')
+                f'Conversation must have between {self.min_turns} and '
+                f'{self.max_turns} messages')
 
-        # Validate conversation structure
-        for item in dataset:
-            turns = self._parse_turns(item['text'])
-            if not (self.min_turns <= len(turns) <= self.max_turns):
+        for msg in messages:
+            if not isinstance(msg, dict):
+                raise DataValidationError('Message must be an object')
+
+            if 'role' not in msg:
+                raise DataValidationError("Missing 'role' field in message")
+            if msg['role'] not in ['system', 'user', 'assistant']:
+                raise DataValidationError(f"Invalid role: {msg['role']}")
+
+            if 'content' not in msg:
+                raise DataValidationError("Missing 'content' field in message")
+            if not isinstance(msg['content'], str):
+                raise DataValidationError("'content' must be string")
+
+
+@DataValidatorRegistry.register('swift_sharegpt')
+class SwiftShareGPTValidator(BaseConversationValidator):
+    """Validator for Swift ShareGPT format"""
+
+    def validate_conversation(self, data: Dict) -> None:
+        if 'system' in data and not isinstance(data['system'], str):
+            raise DataValidationError("'system' must be string")
+
+        if 'conversation' not in data:
+            raise DataValidationError("Missing 'conversation' field")
+
+        conv = data['conversation']
+        if not isinstance(conv, list):
+            raise DataValidationError("'conversation' must be an array")
+
+        if not (self.min_turns <= len(conv) <= self.max_turns):
+            raise DataValidationError(
+                f'Conversation must have between {self.min_turns} and '
+                f'{self.max_turns} turns')
+
+        for turn in conv:
+            if not isinstance(turn, dict):
+                raise DataValidationError('Turn must be an object')
+
+            if 'human' not in turn or not isinstance(turn['human'], str):
+                raise DataValidationError("Missing or invalid 'human' field")
+            if 'assistant' not in turn or not isinstance(
+                    turn['assistant'], str):
+                raise DataValidationError(
+                    "Missing or invalid 'assistant' field")
+
+
+@DataValidatorRegistry.register('alpaca')
+class AlpacaValidator(BaseConversationValidator):
+    """Validator for Alpaca format"""
+
+    def validate_conversation(self, data: Dict) -> None:
+        if 'system' in data and not isinstance(data['system'], str):
+            raise DataValidationError("'system' must be string")
+
+        for field in ['instruction', 'input', 'output']:
+            if field not in data:
+                raise DataValidationError(f"Missing '{field}' field")
+            if not isinstance(data[field], str):
+                raise DataValidationError(f"'{field}' must be string")
+
+
+@DataValidatorRegistry.register('swift_query_response')
+class SwiftQueryResponseValidator(BaseConversationValidator):
+    """Validator for Swift Query-Response format"""
+
+    def validate_conversation(self, data: Dict) -> None:
+        if 'system' in data and not isinstance(data['system'], str):
+            raise DataValidationError("'system' must be string")
+
+        for field in ['query', 'response']:
+            if field not in data:
+                raise DataValidationError(f"Missing '{field}' field")
+            if not isinstance(data[field], str):
+                raise DataValidationError(f"'{field}' must be string")
+
+        if 'history' in data:
+            if not isinstance(data['history'], list):
+                raise DataValidationError("'history' must be an array")
+
+            total_turns = len(data['history']) + 1
+            if not (self.min_turns <= total_turns <= self.max_turns):
                 raise DataValidationError(
                     f'Conversation must have between {self.min_turns} and '
-                    f'{self.max_turns} turns')
+                    f'{self.max_turns} turns including history')
 
-            # Additional conversation-specific validations...
+            for turn in data['history']:
+                if not isinstance(turn, list) or len(turn) != 2:
+                    raise DataValidationError(
+                        'History turn must be [query, response] pair')
+                if not all(isinstance(x, str) for x in turn):
+                    raise DataValidationError(
+                        'History elements must be strings')
+
+
+@DataValidatorRegistry.register('dj_conversation')
+class DataJuicerFormatValidator(BaseConversationValidator):
+    """Validator for Data-Juicer default format"""
+
+    def validate_conversation(self, data: Dict) -> None:
+        if 'system' in data and not isinstance(data['system'], str):
+            raise DataValidationError("'system' must be string")
+
+        for field in ['instruction', 'query', 'response']:
+            if field not in data:
+                raise DataValidationError(f"Missing '{field}' field")
+            if not isinstance(data[field], str):
+                raise DataValidationError(f"'{field}' must be string")
+
+        if 'history' in data:
+            if not isinstance(data['history'], list):
+                raise DataValidationError("'history' must be an array")
+
+            total_turns = len(data['history']) + 1
+            if not (self.min_turns <= total_turns <= self.max_turns):
+                raise DataValidationError(
+                    f'Conversation must have between {self.min_turns} and '
+                    f'{self.max_turns} turns including history')
+
+            for turn in data['history']:
+                if not isinstance(turn, list) or len(turn) != 2:
+                    raise DataValidationError(
+                        'History turn must be [query, response] pair')
+                if not all(isinstance(x, str) for x in turn):
+                    raise DataValidationError(
+                        'History elements must be strings')
 
 
 @DataValidatorRegistry.register('code')
@@ -90,7 +232,7 @@ class CodeDataValidator(DataValidator):
         self.required_columns = ['code', 'language']
         self.supported_languages = config.get('supported_languages', [])
 
-    def validate(self, dataset) -> None:
+    def validate(self, dataset: DJDataset) -> None:
         # Implement code-specific validation logic...
         pass
 
@@ -116,7 +258,7 @@ class RequiredFieldsValidator(DataValidator):
         # Default no missing allowed
         self.allow_missing = config.get('allow_missing', 0.0)
 
-    def validate(self, dataset: Union[NestedDataset, RayDataset]) -> None:
+    def validate(self, dataset: DJDataset) -> None:
         """
         Validate dataset has required fields with correct types
 
@@ -126,14 +268,10 @@ class RequiredFieldsValidator(DataValidator):
         Raises:
             DataValidationError: If validation fails
         """
+        super().validate(dataset)
+
         # Check if fields exist in dataset
-        if isinstance(dataset, NestedDataset):
-            available_fields = set(dataset.column_names)
-        elif isinstance(dataset, RayDataset):
-            available_fields = set(dataset.data.schema().names)
-        else:
-            raise DataValidationError(
-                f'Unsupported dataset type: {type(dataset)}')
+        available_fields = set(dataset.schema().columns)
 
         missing_fields = set(self.required_fields) - available_fields
         if missing_fields:
@@ -145,24 +283,13 @@ class RequiredFieldsValidator(DataValidator):
             # Get expected type if specified
             expected_type = self.field_types.get(field)
 
-            # Sample data for validation
-            # For large datasets, we check a sample for performance
+            # Sample head part of data for validation
             MAX_SAMPLE_SIZE = 1000
-            if isinstance(dataset, NestedDataset):
-                sample_size = min(MAX_SAMPLE_SIZE, len(dataset))
-                sample = dataset.take(sample_size)
-                values = sample[field]
-            elif isinstance(dataset, RayDataset):  # RayDataset
-                sample_size = min(MAX_SAMPLE_SIZE, dataset.data.count())
-                sample = dataset.data.take(sample_size)
-                values = [row[field] for row in sample]
-            else:
-                raise NotImplementedError(
-                    f'Unsupported dataset type: {type(dataset)}')
+            sample_values = dataset.get_column(field, MAX_SAMPLE_SIZE)
 
             # Check for missing values
-            missing_count = sum(1 for v in values if v is None)
-            missing_ratio = missing_count / len(values)
+            missing_count = sum(1 for v in sample_values if v is None)
+            missing_ratio = missing_count / len(sample_values)
             if missing_ratio > self.allow_missing:
                 raise DataValidationError(
                     f"Field '{field}' has {missing_ratio:.1%} missing values, "
@@ -171,7 +298,7 @@ class RequiredFieldsValidator(DataValidator):
             # Check types if specified
             if expected_type:
                 invalid_types = [
-                    type(v) for v in values
+                    type(v) for v in sample_values
                     if v is not None and not isinstance(v, expected_type)
                 ]
                 if invalid_types:
