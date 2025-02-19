@@ -173,7 +173,7 @@ def HumanVBench_eval(task_jsonls_path,
 
     elif eval_goal == 'all':
         ave_2 = {}
-        ave_2['Emotion Perception'] = (ave["Emotion_Recognition"] + ave["Emotion_Temporal_Analysis"] + ave["Attitude_Recognition"] + ave["Emotion_Intensity_Compare"] + ave["Emotion_Recognition_in_Conversation"])/5
+        ave_2['Emotion Perception'] = (ave["Emotion_Recognition"] + ave["Emotion_Temporal_Analysis"] + ave["Attitude_Recognition"] + ave["Emotion_Intensity_Compare"])/4
         ave_2['Person Recognition'] = (ave["Text2Human"] + ave["Human2Text"] + ave["Human_Count"] + ave["Appearance_Time_Detection"])/4
         ave_2['Human Behavior Analysis'] = (ave["Behavior_Temporal_Analysis"] + ave["Behavior_Causualty_Analysis"] + ave["Action_at_Specified_Time"] + ave["Time_of_Specific_Action"])/4
         ave_2['Cross-Modal Speech-Visual Alignment'] = (ave["Audio_Visual_Speaker_Matching"] + ave["Active_Speaker_Detection"] + ave["Audio_Visual_Alignment_Detection"] + ave["Speech_Content_Matching"])/4
@@ -186,7 +186,7 @@ def HumanVBench_eval(task_jsonls_path,
     
     elif eval_goal == 'Emotion Perception':
         ave_2 = {}
-        ave_2['Emotion Perception'] = (ave["Emotion_Recognition"] + ave["Emotion_Temporal_Analysis"] + ave["Attitude_Recognition"] + ave["Emotion_Intensity_Compare"] + ave["Emotion_Recognition_in_Conversation"])/5
+        ave_2['Emotion Perception'] = (ave["Emotion_Recognition"] + ave["Emotion_Temporal_Analysis"] + ave["Attitude_Recognition"] + ave["Emotion_Intensity_Compare"])/4
         with open(os.path.join(result_save_path, 'avg_modelname_result.json'), 'w') as file:
             json.dump(acc_dict, file, indent=1)
             json.dump(ave, file, indent=1)
@@ -226,7 +226,7 @@ def HumanVBench_eval(task_jsonls_path,
 
 
 Evaluation_items = ['all', 'Emotion Perception', 'Person Recognition', 'Human Behavior Analysis', 'Cross-Modal Speech-Visual Alignment', 'Self Selection']
-all_task_names = ["Emotion_Recognition", "Emotion_Temporal_Analysis", "Attitude_Recognition", "Emotion_Intensity_Compare", "Emotion_Recognition_in_Conversation",
+all_task_names = ["Emotion_Recognition", "Emotion_Temporal_Analysis", "Attitude_Recognition", "Emotion_Intensity_Compare",
                   "Text2Human", "Human2Text", "Human_Count", "Appearance_Time_Detection",
                   "Behavior_Temporal_Analysis", "Behavior_Causualty_Analysis", "Action_at_Specified_Time", "Time_of_Specific_Action",
                   "Audio_Visual_Speaker_Matching", "Active_Speaker_Detection", "Audio_Visual_Alignment_Detection", "Speech_Content_Matching"]
@@ -247,7 +247,7 @@ if __name__ == "__main__":
 
 
     if eval_goal == 'Emotion Perception':
-        select_tasks = ["Emotion_Recognition", "Emotion_Temporal_Analysis", "Attitude_Recognition", "Emotion_Intensity_Compare", "Emotion_Recognition_in_Conversation"]
+        select_tasks = ["Emotion_Recognition", "Emotion_Temporal_Analysis", "Attitude_Recognition", "Emotion_Intensity_Compare"]
     if eval_goal == 'Person Recognition':
         select_tasks = ["Text2Human", "Human2Text", "Human_Count", "Appearance_Time_Detection"]
     if eval_goal == 'Human Behavior Analysis':
