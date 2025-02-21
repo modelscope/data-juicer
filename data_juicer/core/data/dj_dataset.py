@@ -8,12 +8,13 @@ import traceback
 from abc import ABC, abstractmethod
 from functools import wraps
 from time import time
-from typing import Union
+from typing import Any, List, Optional, Union
 
 from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
 from loguru import logger
 
+from data_juicer.core.data.schema import Schema
 from data_juicer.core.monitor import Monitor
 from data_juicer.ops import UNFORKABLE
 from data_juicer.utils import cache_utils
@@ -37,6 +38,32 @@ class DJDataset(ABC):
             checkpointer=None,
             tracer=None) -> DJDataset:
         """process a list of operators on the dataset."""
+        pass
+
+    @abstractmethod
+    def schema(self) -> Schema:
+        """Get dataset schema.
+
+        Returns:
+            Schema: Dataset schema containing column names and types
+        """
+        pass
+
+    @abstractmethod
+    def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
+        """Get values from a specific column/field, optionally limited to first k rows.
+
+        Args:
+            column: Name of the column to retrieve
+            k: Optional number of rows to return. If None, returns all rows
+
+        Returns:
+            List of values from the specified column
+
+        Raises:
+            KeyError: If column doesn't exist in dataset
+            ValueError: If k is negative
+        """
         pass
 
 
@@ -164,6 +191,52 @@ class NestedDataset(Dataset, DJDataset):
             # or iter of indices or bools
             res = super().__getitem__(key)
         return nested_obj_factory(res)
+
+    def schema(self) -> Schema:
+        """Get dataset schema."""
+        # Get features dictionary from HF dataset
+        features = self.features
+
+        # Convert features to schema dict
+        column_types = {}
+        for name, feature in features.items():
+            # Map HF feature types to Python types
+            if hasattr(feature, 'dtype'):
+                column_types[name] = feature.dtype
+            else:
+                column_types[name] = str(feature)
+
+        # Get column names
+        columns = self.column_names
+
+        return Schema(column_types=column_types, columns=columns)
+
+    def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
+        """Get column values from HuggingFace dataset.
+
+        Args:
+            column: Name of the column to retrieve
+            k: Optional number of rows to return. If None, returns all rows
+
+        Returns:
+            List of values from the specified column
+
+        Raises:
+            KeyError: If column doesn't exist
+            ValueError: If k is negative
+        """
+        if column not in self.column_names:
+            raise KeyError(f"Column '{column}' not found in dataset")
+
+        if k is not None:
+            if k < 0:
+                raise ValueError(f'k must be non-negative, got {k}')
+            if k == 0:
+                return []
+            k = min(k, len(self))
+            return self[column][:k]
+
+        return self[column]
 
     def process(
         self,

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import os
+from argparse import Namespace
 from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union
 
@@ -9,6 +9,7 @@ from loguru import logger
 
 from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
+from data_juicer.core.data.schema import Schema
 from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
@@ -17,55 +18,6 @@ from data_juicer.utils.process_utils import calculate_np
 
 rd = LazyLoader('rd', 'ray.data')
 ds = LazyLoader('ds', 'ray.data.read_api')
-
-
-def get_abs_path(path, dataset_dir):
-    full_path = os.path.abspath(os.path.join(dataset_dir, path))
-    if os.path.exists(full_path):
-        return full_path
-    else:
-        return path
-
-
-def convert_to_absolute_paths(samples, dataset_dir, path_keys):
-    samples = samples.to_pydict()
-    for key in path_keys:
-        for idx in range(len(samples[key])):
-            paths = samples[key][idx]
-            if isinstance(paths, str):
-                samples[key][idx] = get_abs_path(paths, dataset_dir)
-            elif isinstance(paths, list):
-                samples[key][idx] = [
-                    get_abs_path(item, dataset_dir) for item in paths
-                ]
-    return pyarrow.Table.from_pydict(samples)
-
-
-# TODO: check path for nestdataset
-def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
-    """
-    Set all the path in input data to absolute path.
-    Checks dataset_dir and project_dir for valid paths.
-    """
-    path_keys = []
-    columns = dataset.columns()
-    for key in [cfg.video_key, cfg.image_key, cfg.audio_key]:
-        if key in columns:
-            path_keys.append(key)
-    if len(path_keys) > 0:
-        dataset_dir = os.path.dirname(dataset_path)
-        dataset = dataset.map_batches(partial(convert_to_absolute_paths,
-                                              dataset_dir=dataset_dir,
-                                              path_keys=path_keys),
-                                      batch_format='pyarrow',
-                                      zero_copy_batch=True)
-    return dataset
-
-
-def preprocess_dataset(dataset: rd.Dataset, dataset_path, cfg) -> rd.Dataset:
-    if dataset_path:
-        dataset = set_dataset_to_absolute_path(dataset, dataset_path, cfg)
-    return dataset
 
 
 def get_num_gpus(op, op_proc):
@@ -83,13 +35,53 @@ def filter_batch(batch, filter_func):
 class RayDataset(DJDataset):
 
     def __init__(self,
-                 dataset: rd.Dataset,
+                 ds: rd.Dataset,
                  dataset_path: str = None,
-                 cfg=None) -> None:
-        self.data = preprocess_dataset(dataset, dataset_path, cfg)
-        self.num_proc = None
-        if cfg:
-            self.num_proc = cfg.np
+                 cfg: Optional[Namespace] = None) -> None:
+        self.data = ds
+        self.num_proc = getattr(cfg, 'np', getattr(cfg, 'num_proc',
+                                                   None)) if cfg else None
+
+    def schema(self) -> Schema:
+        """Get dataset schema.
+
+        Returns:
+            Schema: Dataset schema containing column names and types
+        """
+        # Get schema from Ray dataset
+        _schema = self.data.schema()
+
+        # convert schema to proper list and dict
+        column_names = _schema.names
+        column_types = {k: v for k, v in zip(_schema.names, _schema.types)}
+        return Schema(column_types=column_types, columns=column_names)
+
+    def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
+        """Get column values from Ray dataset.
+
+        Args:
+            column: Name of the column to retrieve
+            k: Optional number of rows to return. If None, returns all rows
+
+        Returns:
+            List of values from the specified column
+
+        Raises:
+            KeyError: If column doesn't exist
+            ValueError: If k is negative
+        """
+        if column not in self.data.columns():
+            raise KeyError(f"Column '{column}' not found in dataset")
+
+        if k is not None:
+            if k < 0:
+                raise ValueError(f'k must be non-negative, got {k}')
+            if k == 0:
+                return []
+            k = min(k, self.data.count())
+            return [row[column] for row in self.data.limit(k).take()]
+
+        return [row[column] for row in self.data.take()]
 
     def process(self,
                 operators,
