@@ -5,13 +5,9 @@ from loguru import logger
 from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer.ops.mapper.generate_qa_from_text_mapper import \
     GenerateQAFromTextMapper
-from data_juicer.utils.unittest_utils import (SKIPPED_TESTS,
-                                              DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-
-# Skip tests for this OP in the GitHub actions due to ?
-# These tests have been tested locally.
-@SKIPPED_TESTS.register_module()
+@unittest.skip('unknown vllm connection error')
 class GenerateQAFromTextMapperTest(DataJuicerTestCaseBase):
     text_key = 'text'
 
