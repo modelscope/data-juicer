@@ -84,7 +84,7 @@ def main():
     if not res.wasSuccessful():
         exit(1)
 
-    cov.report()
+    cov.report(ignore_errors=True)
 
 
 if __name__ == '__main__':
