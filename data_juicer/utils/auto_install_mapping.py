@@ -82,7 +82,7 @@ OPS_TO_PKG = {
     'optimize_response_mapper': ['torch', 'transformers', 'vllm'],
     'text_chunk_mapper': ['transformers', 'dashscope', 'openai'],
     'entity_attribute_aggregator': ['transformers', 'dashscope', 'openai'],
-    'most_relavant_entities_aggregator':
+    'most_relevant_entities_aggregator':
     ['transformers', 'dashscope', 'openai'],
     'nested_aggregator': ['transformers', 'dashscope', 'openai'],
     'calibrate_qa_mapper': ['openai'],
