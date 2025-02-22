@@ -17,7 +17,7 @@ We release **Img-Diff**,  A high-quality synthesis dataset focusing on describin
 ## Codes and Data Recipes
 
 - The original codes are organized and presented in [Img-Diff-codes](https://github.com/modelscope/data-juicer/tree/ImgDiff/Img-Diff-codes).
-- The codes and data recipes in data-juicer format will be released soon.
+- We develop a series of data-juicer operators related to Img-Diff, including: `image_pair_similarity_filter`, `mllm_mapper`, `sdxl_prompt2prompt_mapper`, `image_segment_mapper`, `sentence_augmentation_mapper`, and `text_pair_similarity_filter`. Relevant information can be accessed on the [main branch](https://github.com/modelscope/data-juicer/blob/main/docs/Operators.md).
 
 
 
