@@ -65,7 +65,7 @@ class ExtractEventMapperTest(DataJuicerTestCaseBase):
             self.assertNotEqual(sample[Fields.meta][MetaKeys.relevant_characters], [])
 
     def test(self):
-        # before runing this test, set below environment variables:
+        # before running this test, set below environment variables:
         # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
         # export OPENAI_API_KEY=your_dashscope_key
         self._run_op('qwen2.5-72b-instruct')

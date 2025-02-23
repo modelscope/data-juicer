@@ -44,7 +44,7 @@ class ExtractNicknameMapperTest(DataJuicerTestCaseBase):
         self.assertIn(("李莲花","方多病","方小宝"), result)
 
     def test(self):
-        # before runing this test, set below environment variables:
+        # before running this test, set below environment variables:
         # export OPENAI_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
         # export OPENAI_API_KEY=your_key
         self._run_op('qwen2.5-72b-instruct')

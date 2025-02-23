@@ -9,7 +9,7 @@ from data_juicer.utils.constant import Fields, MetaKeys
 
 class RelationIdentityMapperTest(DataJuicerTestCaseBase):
 
-    # before runing this test, set below environment variables:
+    # before running this test, set below environment variables:
     # export OPENAI_API_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
     # export OPENAI_API_KEY=your_key
 

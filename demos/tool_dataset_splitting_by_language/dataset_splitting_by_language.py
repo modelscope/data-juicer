@@ -1,5 +1,5 @@
 # This tool is used to split datasets to sub-datasets
-# by fast-text lanuage model.
+# by fast-text language model.
 
 import os
 

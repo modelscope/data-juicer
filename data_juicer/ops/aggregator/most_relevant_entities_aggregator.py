@@ -12,12 +12,12 @@ from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..common import split_text_by_punctuation
 
-OP_NAME = 'most_relavant_entities_aggregator'
+OP_NAME = 'most_relevant_entities_aggregator'
 
 
 # TODO: LLM-based inference.
 @OPERATORS.register_module(OP_NAME)
-class MostRelavantEntitiesAggregator(Aggregator):
+class MostRelevantEntitiesAggregator(Aggregator):
     """
     Extract entities closely related to a given entity from some texts,
     and sort them in descending order of importance.
@@ -46,7 +46,7 @@ class MostRelavantEntitiesAggregator(Aggregator):
                  entity: str = None,
                  query_entity_type: str = None,
                  input_key: str = MetaKeys.event_description,
-                 output_key: str = BatchMetaKeys.most_relavant_entities,
+                 output_key: str = BatchMetaKeys.most_relevant_entities,
                  max_token_num: Optional[PositiveInt] = None,
                  *,
                  api_endpoint: Optional[str] = None,
@@ -62,11 +62,11 @@ class MostRelavantEntitiesAggregator(Aggregator):
         Initialization method.
         :param api_model: API model name.
         :param entity: The given entity.
-        :param query_entity_type: The type of queried relavant entities.
+        :param query_entity_type: The type of queried relevant entities.
         :param input_key: The input key in the meta field of the samples.
             It is "event_description" in default.
         :param output_key: The output key in the aggregation field of the
-            samples. It is "most_relavant_entities" in default.
+            samples. It is "most_relevant_entities" in default.
         :param max_token_num: The max token num of the total tokens of the
             sub documents. Without limitation if it is None.
         :param api_endpoint: URL endpoint for the API.
@@ -122,7 +122,7 @@ class MostRelavantEntitiesAggregator(Aggregator):
 
         return result
 
-    def query_most_relavant_entities(self, sub_docs, rank=None):
+    def query_most_relevant_entities(self, sub_docs, rank=None):
         if not sub_docs:
             return ''
 
@@ -182,7 +182,7 @@ class MostRelavantEntitiesAggregator(Aggregator):
             return sample
 
         sample[Fields.batch_meta][
-            self.output_key] = self.query_most_relavant_entities(sub_docs,
+            self.output_key] = self.query_most_relevant_entities(sub_docs,
                                                                  rank=rank)
 
         return sample

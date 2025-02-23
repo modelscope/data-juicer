@@ -3,16 +3,16 @@ import unittest
 from loguru import logger
 
 from data_juicer.core.data import NestedDataset as Dataset
-from data_juicer.ops.aggregator import MostRelavantEntitiesAggregator
+from data_juicer.ops.aggregator import MostRelevantEntitiesAggregator
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 from data_juicer.utils.constant import Fields, BatchMetaKeys, MetaKeys
 
-class MostRelavantEntitiesAggregatorTest(DataJuicerTestCaseBase):
+class MostRelevantEntitiesAggregatorTest(DataJuicerTestCaseBase):
 
-    def _run_helper(self, op, samples, output_key=BatchMetaKeys.most_relavant_entities):
+    def _run_helper(self, op, samples, output_key=BatchMetaKeys.most_relevant_entities):
 
-        # before runing this test, set below environment variables:
+        # before running this test, set below environment variables:
         # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
         # export OPENAI_API_KEY=your_dashscope_key
 
@@ -40,7 +40,7 @@ class MostRelavantEntitiesAggregatorTest(DataJuicerTestCaseBase):
             },
         ]
         
-        op = MostRelavantEntitiesAggregator(
+        op = MostRelevantEntitiesAggregator(
             api_model='qwen2.5-72b-instruct',
             entity='李莲花',
             query_entity_type='人物'
@@ -60,14 +60,14 @@ class MostRelavantEntitiesAggregatorTest(DataJuicerTestCaseBase):
             },
         ]
 
-        op = MostRelavantEntitiesAggregator(
+        op = MostRelevantEntitiesAggregator(
             api_model='qwen2.5-72b-instruct',
             entity='李莲花',
             query_entity_type='人物',
             input_key='events',
-            output_key='relavant_roles'
+            output_key='relevant_roles'
         )
-        self._run_helper(op, samples, output_key='relavant_roles')
+        self._run_helper(op, samples, output_key='relevant_roles')
 
     def test_max_token_num(self):
         samples = [
@@ -81,7 +81,7 @@ class MostRelavantEntitiesAggregatorTest(DataJuicerTestCaseBase):
                 ]
             },
         ]
-        op = MostRelavantEntitiesAggregator(
+        op = MostRelevantEntitiesAggregator(
             api_model='qwen2.5-72b-instruct',
             entity='李莲花',
             query_entity_type='人物',
