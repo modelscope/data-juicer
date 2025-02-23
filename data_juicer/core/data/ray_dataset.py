@@ -48,13 +48,18 @@ class RayDataset(DJDataset):
         Returns:
             Schema: Dataset schema containing column names and types
         """
+        if self.data is None or self.data.columns() is None:
+            raise ValueError('Dataset is empty or not initialized')
+
         # Get schema from Ray dataset
         _schema = self.data.schema()
 
         # convert schema to proper list and dict
-        column_names = _schema.names
-        column_types = {k: v for k, v in zip(_schema.names, _schema.types)}
-        return Schema(column_types=column_types, columns=column_names)
+        column_types = {
+            k: Schema.map_ray_type_to_python(v)
+            for k, v in zip(_schema.names, _schema.types)
+        }
+        return Schema(column_types=column_types, columns=column_types.keys())
 
     def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
         """Get column values from Ray dataset.
@@ -70,7 +75,8 @@ class RayDataset(DJDataset):
             KeyError: If column doesn't exist
             ValueError: If k is negative
         """
-        if column not in self.data.columns():
+        if (self.data is None or self.data.columns() is None
+                or column not in self.data.columns()):
             raise KeyError(f"Column '{column}' not found in dataset")
 
         if k is not None:

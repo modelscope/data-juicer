@@ -201,10 +201,7 @@ class NestedDataset(Dataset, DJDataset):
         column_types = {}
         for name, feature in features.items():
             # Map HF feature types to Python types
-            if hasattr(feature, 'dtype'):
-                column_types[name] = feature.dtype
-            else:
-                column_types[name] = str(feature)
+            column_types[name] = Schema.map_hf_type_to_python(feature)
 
         # Get column names
         columns = self.column_names
@@ -225,7 +222,7 @@ class NestedDataset(Dataset, DJDataset):
             KeyError: If column doesn't exist
             ValueError: If k is negative
         """
-        if column not in self.column_names:
+        if self.datacolumn not in self.column_names:
             raise KeyError(f"Column '{column}' not found in dataset")
 
         if k is not None:
@@ -234,7 +231,7 @@ class NestedDataset(Dataset, DJDataset):
             if k == 0:
                 return []
             k = min(k, len(self))
-            return self[column][:k]
+            return self.take(k)[column]
 
         return self[column]
 
