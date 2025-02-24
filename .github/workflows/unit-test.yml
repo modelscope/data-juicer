@@ -48,9 +48,9 @@ jobs:
 
     - name: Upload coverage report of standlone
       uses: actions/upload-artifact@v4
-      include-hidden-files: true
       with:
         name: coverage_report_standalone
+        include-hidden-files: true
         path: dj-${{ github.run_id }}/.coverage
 
     - name: Run unittest ray
@@ -60,9 +60,9 @@ jobs:
 
     - name: Upload coverage report of ray
       uses: actions/upload-artifact@v4
-      include-hidden-files: true
       with:
         name: coverage_report_ray
+        include-hidden-files: true
         path: dj-${{ github.run_id }}/.coverage
 
     - name: Remove docker compose
