@@ -61,6 +61,17 @@ class RayDataset(DJDataset):
         }
         return Schema(column_types=column_types, columns=column_types.keys())
 
+    def get(self, k: int) -> List[Dict[str, Any]]:
+        """Get k rows from the dataset."""
+        if k < 0:
+            raise ValueError(f'k must be non-negative, got {k}')
+
+        if k == 0:
+            return []
+
+        k = min(k, self.data.count())
+        return list(self.data.limit(k).take())
+
     def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
         """Get column values from Ray dataset.
 

@@ -4,7 +4,7 @@ from data_juicer.core.data import NestedDataset
 from data_juicer.utils.unittest_utils import (DataJuicerTestCaseBase, TEST_TAG)
 
 
-class TestDJDataset(DataJuicerTestCaseBase):
+class TestNestedDataset(DataJuicerTestCaseBase):
     def setUp(self):
         """Set up test data"""
         self.data = [
@@ -237,6 +237,55 @@ class TestDJDataset(DataJuicerTestCaseBase):
             isinstance(row['flag'], schema.column_types['flag'])
             for row in dataset
         ))
+
+    def test_get(self):
+        """Test get method for NestedDataset"""
+        # Test with simple data
+        simple_data = [
+            {'text': 'hello', 'score': 1},
+            {'text': 'world', 'score': 2},
+            {'text': 'test', 'score': 3}
+        ]
+        dataset = NestedDataset(Dataset.from_list(simple_data))
+        
+        # Basic get
+        rows = dataset.get(2)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0], {'text': 'hello', 'score': 1})
+        self.assertEqual(rows[1], {'text': 'world', 'score': 2})
+        
+        # Test with nested structures
+        nested_data = [
+            {
+                'text': 'hello',
+                'metadata': {'lang': 'en', 'source': 'web'},
+                'tags': [1, 2, 3]
+            },
+            {
+                'text': 'world',
+                'metadata': {'lang': 'es', 'source': 'book'},
+                'tags': [4, 5, 6]
+            }
+        ]
+        nested_dataset = NestedDataset(Dataset.from_list(nested_data))
+        
+        # Test nested structure preservation
+        rows = nested_dataset.get(1)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['metadata']['lang'], 'en')
+        self.assertEqual(rows[0]['tags'], [1, 2, 3])
+        
+        # Test edge cases
+        self.assertEqual(dataset.get(0), [])
+        self.assertEqual(len(dataset.get(10)), 3)  # More than dataset size
+        with self.assertRaises(ValueError):
+            dataset.get(-1)
+            
+        # Test type preservation
+        row = dataset.get(1)[0]
+        self.assertIsInstance(row, dict)
+        self.assertIsInstance(row['text'], str)
+        self.assertIsInstance(row['score'], int)
 
 
 @TEST_TAG('ray')
@@ -517,6 +566,58 @@ class TestRayDataset(unittest.TestCase):
             isinstance(row['flag'], schema.column_types['flag'])
             for row in rows
         ))
+
+    def test_get(self):
+        """Test get method for RayDataset"""
+        import ray
+        from data_juicer.core.data import RayDataset
+        
+        # Test with simple data
+        simple_data = [
+            {'text': 'hello', 'score': 1},
+            {'text': 'world', 'score': 2},
+            {'text': 'test', 'score': 3}
+        ]
+        dataset = RayDataset(ray.data.from_items(simple_data))
+        
+        # Basic get
+        rows = dataset.get(2)
+        self.assertEqual(len(rows), 2)
+        self.assertEqual(rows[0], {'text': 'hello', 'score': 1})
+        self.assertEqual(rows[1], {'text': 'world', 'score': 2})
+        
+        # Test with nested structures
+        nested_data = [
+            {
+                'text': 'hello',
+                'metadata': {'lang': 'en', 'source': 'web'},
+                'tags': [1, 2, 3]
+            },
+            {
+                'text': 'world',
+                'metadata': {'lang': 'es', 'source': 'book'},
+                'tags': [4, 5, 6]
+            }
+        ]
+        nested_dataset = RayDataset(ray.data.from_items(nested_data))
+        
+        # Test nested structure preservation
+        rows = nested_dataset.get(1)
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['metadata']['lang'], 'en')
+        self.assertEqual(rows[0]['tags'], [1, 2, 3])
+        
+        # Test edge cases
+        self.assertEqual(dataset.get(0), [])
+        self.assertEqual(len(dataset.get(10)), 3)  # More than dataset size
+        with self.assertRaises(ValueError):
+            dataset.get(-1)
+            
+        # Test type preservation
+        row = dataset.get(1)[0]
+        self.assertIsInstance(row, dict)
+        self.assertIsInstance(row['text'], str)
+        self.assertIsInstance(row['score'], int)
 
 
 if __name__ == '__main__':

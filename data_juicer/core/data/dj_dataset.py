@@ -8,7 +8,7 @@ import traceback
 from abc import ABC, abstractmethod
 from functools import wraps
 from time import time
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from datasets import Dataset, DatasetDict, is_caching_enabled
 from datasets.formatting.formatting import LazyBatch
@@ -46,6 +46,18 @@ class DJDataset(ABC):
 
         Returns:
             Schema: Dataset schema containing column names and types
+        """
+        pass
+
+    @abstractmethod
+    def get(self, k: int) -> List[Dict[str, Any]]:
+        """Get k rows from the dataset.
+
+        Args:
+            k: Number of rows to take
+
+        Returns:
+            List[Any]: A list of rows from the dataset.
         """
         pass
 
@@ -208,6 +220,17 @@ class NestedDataset(Dataset, DJDataset):
 
         return Schema(column_types=column_types, columns=columns)
 
+    def get(self, k: int) -> List[Dict[str, Any]]:
+        """Get k rows from the dataset."""
+        if k < 0:
+            raise ValueError(f'k must be non-negative, got {k}')
+
+        if k == 0:
+            return []
+
+        k = min(k, len(self))
+        return self.take(k).to_list()
+
     def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
         """Get column values from HuggingFace dataset.
 
@@ -222,7 +245,7 @@ class NestedDataset(Dataset, DJDataset):
             KeyError: If column doesn't exist
             ValueError: If k is negative
         """
-        if self.datacolumn not in self.column_names:
+        if column not in self.column_names:
             raise KeyError(f"Column '{column}' not found in dataset")
 
         if k is not None:
