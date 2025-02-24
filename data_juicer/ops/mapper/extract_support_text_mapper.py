@@ -110,7 +110,7 @@ class ExtractSupportTextMapper(Mapper):
             return sample
         summary = sample[Fields.meta][self.summary_key]
         if not isinstance(summary, str):
-            logger.warning('Unvalid input summary!')
+            logger.warning('Invalid input summary!')
             return sample
 
         input_prompt = self.input_template.format(text=sample[self.text_key],

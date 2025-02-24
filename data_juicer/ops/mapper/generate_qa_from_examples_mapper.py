@@ -68,7 +68,7 @@ class GenerateQAFromExamplesMapper(Mapper):
         """
         Initialization method.
 
-        :param hf_model: Hugginface model ID.
+        :param hf_model: Huggingface model ID.
         :param seed_file: Path to the seed file in chatml format.
         :param example_num: The number of selected examples.
             Randomly select N examples from "seed_file" and

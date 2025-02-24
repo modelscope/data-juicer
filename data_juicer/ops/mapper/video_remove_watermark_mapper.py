@@ -78,13 +78,13 @@ class VideoRemoveWatermarkMapper(Mapper):
 
         if detection_method not in ['pixel_value', 'pixel_diversity']:
             raise ValueError(
-                f'etection_method [{detection_method}]'
+                f'detection_method [{detection_method}]'
                 f' is not supported. '
                 f"Can only be one of ['pixel_value', 'pixel_diversity']. ")
 
         if detection_method == 'pixel_diversity' and frame_num < 2:
             raise ValueError(
-                "frame_num must be gteater than 1 in 'pixel_diversity' mode.")
+                "frame_num must be greater than 1 in 'pixel_diversity' mode.")
 
         rois = []
         if roi_key is None:
@@ -119,10 +119,10 @@ class VideoRemoveWatermarkMapper(Mapper):
 
                 # assume the watermark is located in the box, so the pixel in
                 # the edge must be 0, if not, reverse binary_frame
-                edge_postive_num = (binary_frame[0] >
-                                    0).sum() + (binary_frame[:, 0] > 0).sum()
+                edge_positive_num = (binary_frame[0] >
+                                     0).sum() + (binary_frame[:, 0] > 0).sum()
                 total = binary_frame.shape[0] + binary_frame.shape[1]
-                if edge_postive_num * 2 > total:
+                if edge_positive_num * 2 > total:
                     binary_frame = ~binary_frame
 
                 mask[roi[1]:roi[3],

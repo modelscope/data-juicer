@@ -14,7 +14,7 @@ process:
 #       overlap_len: 400
 #       tokenizer: 'qwen2.5-72b-instruct'
 #       trust_remote_code: True
-  # extract language_style, role_charactor and role_skill
+  # extract language_style, role_character and role_skill
   - extract_entity_attribute_mapper:                  
       api_model: 'qwen2.5-72b-instruct'                                   
       query_entities: ['孙悟空']
