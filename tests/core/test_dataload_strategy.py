@@ -10,12 +10,10 @@ class MockStrategy(DataLoadStrategy):
         pass
 
 class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
-    def setUp(self):
-        # Clear existing strategies before each test
-        DataLoadStrategyRegistry._strategies = {}
-    
+
     def test_exact_match(self):
         # Register a specific strategy
+        DataLoadStrategyRegistry._strategies = {}
         @DataLoadStrategyRegistry.register("default", 'local', 'json')
         class TestStrategy(MockStrategy):
             pass
@@ -32,6 +30,7 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
 
     def test_wildcard_matching(self):
         # Register strategies with different wildcard patterns
+        DataLoadStrategyRegistry._strategies = {}
         @DataLoadStrategyRegistry.register("default", 'local', '*')
         class AllFilesStrategy(MockStrategy):
             pass
@@ -58,6 +57,8 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
         self.assertEqual(strategy, FallbackStrategy)  # Should match most general wildcard
 
     def test_specificity_priority(self):
+        DataLoadStrategyRegistry._strategies = {}
+
         @DataLoadStrategyRegistry.register("*", '*', '*')
         class GeneralStrategy(MockStrategy):
             pass
@@ -116,6 +117,8 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
         self.assertIsNone(strategy)
 
     def test_strategy_key_matches(self):
+        DataLoadStrategyRegistry._strategies = {}
+
         # Test StrategyKey matching directly
         wildcard_key = StrategyKey("*", 'local', '*.json')
         specific_key = StrategyKey("default", 'local', 'test.json')
@@ -134,6 +137,8 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
 
     def test_load_strategy_default_config(self):
         """Test load strategy with minimal config"""
+        DataLoadStrategyRegistry._strategies = {}
+
         # Create minimal config
         minimal_cfg = Namespace(
             path='test/path'
@@ -152,6 +157,8 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
 
     def test_load_strategy_full_config(self):
         """Test load strategy with full config"""
+        DataLoadStrategyRegistry._strategies = {}
+
         # Create config with all options
         full_cfg = Namespace(
             path='test/path',
@@ -173,6 +180,8 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
 
     def test_load_strategy_partial_config(self):
         """Test load strategy with partial config"""
+        DataLoadStrategyRegistry._strategies = {}
+
         # Create config with some options
         partial_cfg = Namespace(
             path='test/path',
@@ -193,6 +202,8 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
 
     def test_load_strategy_empty_config(self):
         """Test load strategy with empty config"""
+        DataLoadStrategyRegistry._strategies = {}
+        
         # Create empty config
         empty_cfg = Namespace()
         
