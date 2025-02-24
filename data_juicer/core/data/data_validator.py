@@ -64,11 +64,7 @@ class BaseConversationValidator(DataValidator):
         """Base validation for all conversation formats"""
         super().validate(dataset)
 
-        schema = dataset.schema()
-        if not all(col in schema.columns for col in ['text']):
-            raise DataValidationError('Missing required column: text')
-
-        for item in dataset.get_column('text', self.sample_size):
+        for item in dataset.get(self.sample_size):
             self.validate_conversation(item)
 
     @abstractmethod
@@ -79,7 +75,18 @@ class BaseConversationValidator(DataValidator):
 
 @DataValidatorRegistry.register('swift_messages')
 class SwiftMessagesValidator(BaseConversationValidator):
-    """Validator for Swift Messages format"""
+    """Validator for Swift Messages format.
+
+    Format:
+    {
+        "messages": [
+            {"role": "system", "content": "<system>"},
+            {"role": "user", "content": "<query>"},
+            {"role": "assistant", "content": "<response>"},
+            ...
+        ]
+    }
+    """
 
     def validate_conversation(self, data: Dict) -> None:
         if 'messages' not in data:
@@ -94,132 +101,70 @@ class SwiftMessagesValidator(BaseConversationValidator):
                 f'Conversation must have between {self.min_turns} and '
                 f'{self.max_turns} messages')
 
+        # each message should have a role and content
+        # and role should be one of system, user, assistant
         for msg in messages:
-            if not isinstance(msg, dict):
-                raise DataValidationError('Message must be an object')
-
-            if 'role' not in msg:
-                raise DataValidationError("Missing 'role' field in message")
+            if 'role' not in msg or msg['role'] is None:
+                raise DataValidationError("Missing 'role' field")
             if msg['role'] not in ['system', 'user', 'assistant']:
-                raise DataValidationError(f"Invalid role: {msg['role']}")
-
-            if 'content' not in msg:
-                raise DataValidationError("Missing 'content' field in message")
-            if not isinstance(msg['content'], str):
-                raise DataValidationError("'content' must be string")
-
-
-@DataValidatorRegistry.register('swift_sharegpt')
-class SwiftShareGPTValidator(BaseConversationValidator):
-    """Validator for Swift ShareGPT format"""
-
-    def validate_conversation(self, data: Dict) -> None:
-        if 'system' in data and not isinstance(data['system'], str):
-            raise DataValidationError("'system' must be string")
-
-        if 'conversation' not in data:
-            raise DataValidationError("Missing 'conversation' field")
-
-        conv = data['conversation']
-        if not isinstance(conv, list):
-            raise DataValidationError("'conversation' must be an array")
-
-        if not (self.min_turns <= len(conv) <= self.max_turns):
-            raise DataValidationError(
-                f'Conversation must have between {self.min_turns} and '
-                f'{self.max_turns} turns')
-
-        for turn in conv:
-            if not isinstance(turn, dict):
-                raise DataValidationError('Turn must be an object')
-
-            if 'human' not in turn or not isinstance(turn['human'], str):
-                raise DataValidationError("Missing or invalid 'human' field")
-            if 'assistant' not in turn or not isinstance(
-                    turn['assistant'], str):
-                raise DataValidationError(
-                    "Missing or invalid 'assistant' field")
-
-
-@DataValidatorRegistry.register('alpaca')
-class AlpacaValidator(BaseConversationValidator):
-    """Validator for Alpaca format"""
-
-    def validate_conversation(self, data: Dict) -> None:
-        if 'system' in data and not isinstance(data['system'], str):
-            raise DataValidationError("'system' must be string")
-
-        for field in ['instruction', 'input', 'output']:
-            if field not in data:
-                raise DataValidationError(f"Missing '{field}' field")
-            if not isinstance(data[field], str):
-                raise DataValidationError(f"'{field}' must be string")
-
-
-@DataValidatorRegistry.register('swift_query_response')
-class SwiftQueryResponseValidator(BaseConversationValidator):
-    """Validator for Swift Query-Response format"""
-
-    def validate_conversation(self, data: Dict) -> None:
-        if 'system' in data and not isinstance(data['system'], str):
-            raise DataValidationError("'system' must be string")
-
-        for field in ['query', 'response']:
-            if field not in data:
-                raise DataValidationError(f"Missing '{field}' field")
-            if not isinstance(data[field], str):
-                raise DataValidationError(f"'{field}' must be string")
-
-        if 'history' in data:
-            if not isinstance(data['history'], list):
-                raise DataValidationError("'history' must be an array")
-
-            total_turns = len(data['history']) + 1
-            if not (self.min_turns <= total_turns <= self.max_turns):
-                raise DataValidationError(
-                    f'Conversation must have between {self.min_turns} and '
-                    f'{self.max_turns} turns including history')
-
-            for turn in data['history']:
-                if not isinstance(turn, list) or len(turn) != 2:
-                    raise DataValidationError(
-                        'History turn must be [query, response] pair')
-                if not all(isinstance(x, str) for x in turn):
-                    raise DataValidationError(
-                        'History elements must be strings')
+                raise DataValidationError("Invalid 'role' field")
+            if 'content' not in msg or msg['content'] is None:
+                raise DataValidationError("Missing 'content' field")
 
 
 @DataValidatorRegistry.register('dj_conversation')
 class DataJuicerFormatValidator(BaseConversationValidator):
-    """Validator for Data-Juicer default format"""
+    """Validator for Data-Juicer default conversation format.
+
+    Format:
+    {
+        "system": "<system>",  # Optional
+        "instruction": "<query-inst>",
+        "query": "<query2>",
+        "response": "<response2>",
+        "history": [  # Optional
+            ["<query1>", "<response1>"],
+            ...
+        ]
+    }
+    """
 
     def validate_conversation(self, data: Dict) -> None:
-        if 'system' in data and not isinstance(data['system'], str):
-            raise DataValidationError("'system' must be string")
+        # Validate system if present
+        if 'system' in data:
+            if not isinstance(data['system'], str):
+                raise DataValidationError("'system' must be string")
 
+        # Validate required fields
         for field in ['instruction', 'query', 'response']:
             if field not in data:
                 raise DataValidationError(f"Missing '{field}' field")
             if not isinstance(data[field], str):
                 raise DataValidationError(f"'{field}' must be string")
 
+        # Validate history if present
         if 'history' in data:
             if not isinstance(data['history'], list):
                 raise DataValidationError("'history' must be an array")
 
+            # Count total turns including current query/response
             total_turns = len(data['history']) + 1
             if not (self.min_turns <= total_turns <= self.max_turns):
                 raise DataValidationError(
                     f'Conversation must have between {self.min_turns} and '
                     f'{self.max_turns} turns including history')
 
-            for turn in data['history']:
+            # Validate each history turn
+            for i, turn in enumerate(data['history']):
                 if not isinstance(turn, list) or len(turn) != 2:
                     raise DataValidationError(
-                        'History turn must be [query, response] pair')
-                if not all(isinstance(x, str) for x in turn):
+                        f'History turn {i} must be [query, response] pair')
+                if not isinstance(turn[0], str):
                     raise DataValidationError(
-                        'History elements must be strings')
+                        f'Query in history turn {i} must be string')
+                if not isinstance(turn[1], str):
+                    raise DataValidationError(
+                        f'Response in history turn {i} must be string')
 
 
 @DataValidatorRegistry.register('code')
