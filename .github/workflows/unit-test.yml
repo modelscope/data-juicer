@@ -46,12 +46,12 @@ jobs:
       run: |
         docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head python tests/run.py --tag standalone
 
-    - name: Upload coverage report of standlone
+    - name: Upload coverage report of standalone
       uses: actions/upload-artifact@v4
       with:
         name: coverage_report_standalone
         include-hidden-files: true
-        path: dj-${{ github.run_id }}/.coverage
+        path: dj-${{ github.run_id }}/coverage_report_standalone
 
     - name: Run unittest ray
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
@@ -63,7 +63,7 @@ jobs:
       with:
         name: coverage_report_ray
         include-hidden-files: true
-        path: dj-${{ github.run_id }}/.coverage
+        path: dj-${{ github.run_id }}/coverage_report_ray
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker

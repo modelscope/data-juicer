@@ -81,12 +81,11 @@ def main():
     res = runner.run(test_suite)
 
     cov.stop()
-    cov.save()
 
     if not res.wasSuccessful():
         exit(1)
 
-    cov.report(ignore_errors=True)
+    cov.html_report(directory=f'coverage_report_{args.tag}', ignore_errors=True)
 
 
 if __name__ == '__main__':
