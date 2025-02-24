@@ -47,8 +47,8 @@ jobs:
         docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head python tests/run.py --tag standalone
 
     - name: Upload coverage report of standlone
-      uses: actions/upload-artifact@v4
       working-directory: dj-${{ github.run_id }}
+      uses: actions/upload-artifact@v4
       with:
         name: coverage_report_standalone
         path: .coverage
@@ -59,8 +59,8 @@ jobs:
         docker compose exec ray-head python tests/run.py --tag ray
 
     - name: Upload coverage report of ray
-      uses: actions/upload-artifact@v4
       working-directory: dj-${{ github.run_id }}
+      uses: actions/upload-artifact@v4
       with:
         name: coverage_report_ray
         path: .coverage
