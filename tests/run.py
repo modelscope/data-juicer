@@ -67,7 +67,6 @@ def gather_test_cases(test_dir, pattern, tag):
                 logger.info(f'Add test case [{test_case._testMethodName}]'
                             f' from {test_case.__class__.__name__}')
                 test_to_run.addTest(test_case)
-        break
     return test_to_run
 
 
@@ -85,6 +84,7 @@ def main():
     if not res.wasSuccessful():
         exit(1)
 
+    cov.report(ignore_errors=True)
     cov.html_report(directory=f'coverage_report_{args.tag}', ignore_errors=True)
 
 
