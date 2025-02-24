@@ -71,7 +71,7 @@ def gather_test_cases(test_dir, pattern, tag):
 
 
 def main():
-    cov = coverage.Coverage()
+    cov = coverage.Coverage(include='data_juicer/**')
     cov.start()
 
     runner = unittest.TextTestRunner()
