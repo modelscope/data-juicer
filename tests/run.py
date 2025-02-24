@@ -80,6 +80,7 @@ def main():
     res = runner.run(test_suite)
 
     cov.stop()
+    cov.save()
 
     if not res.wasSuccessful():
         exit(1)
