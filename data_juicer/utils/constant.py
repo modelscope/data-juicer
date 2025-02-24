@@ -29,7 +29,7 @@ class Fields(object):
 
 class BatchMetaKeys(object):
     entity_attribute = 'entity_attribute'
-    most_relavant_entities = 'most_relavant_entities'
+    most_relevant_entities = 'most_relevant_entities'
 
 
 class MetaKeys(object):

@@ -811,5 +811,5 @@ The collapsible list of back reference will be periodically updated based on the
 - M3CoT: A Novel Benchmark for Multi-Domain Multi-step Multi-modal Chain-of-Thought
 - Panda-70m: Captioning 70m videos with multiple cross-modality teachers
 - Multimodal C4: An Open, Billion-scale Corpus of Images Interleaved With Text
-- ChartAssisstant: A Universal Chart Multimodal Language Model via Chart-to-Table Pre-training and Multitask Instruction Tuning
+- ChartAssistant: A Universal Chart Multimodal Language Model via Chart-to-Table Pre-training and Multitask Instruction Tuning
 </details>

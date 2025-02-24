@@ -33,7 +33,7 @@ class QueryIntentDetectionMapper(Mapper):
         """
         Initialization method.
 
-        :param hf_model: Hugginface model ID to predict intent label.
+        :param hf_model: Huggingface model ID to predict intent label.
         :param zh_to_en_hf_model: Translation model from Chinese to English.
             If not None, translate the query from Chinese to English.
         :param model_params: model param for hf_model.
