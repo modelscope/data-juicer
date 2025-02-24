@@ -82,7 +82,7 @@ class TextFormatter(LocalFormatter):
 
         :param dataset_path: a dataset file or a dataset directory
         :param suffixes: files with specified suffixes to be processed
-        :param add_suffix: Whether to add file suffix to datase meta
+        :param add_suffix: Whether to add file suffix to dataset meta
             info
         :param kwargs: extra args
         """
@@ -147,7 +147,7 @@ class TextFormatter(LocalFormatter):
                                 sample_by='document',
                                 num_proc=num_proc,
                                 **self.kwargs)
-        # whether to add file suffix to datase meta info
+        # whether to add file suffix to dataset meta info
         if self.add_suffix:
             logger.info('Add suffix info into dataset...')
             datasets = add_suffixes(datasets, num_proc)
