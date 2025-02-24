@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.aggregator.most_relavant_entities_aggregator &mdash; data_juicer 1.2.0 documentation</title>
+  <title>data_juicer.ops.aggregator.most_relevant_entities_aggregator &mdash; data_juicer 1.2.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
@@ -67,7 +67,7 @@
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
           <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
-      <li class="breadcrumb-item active">data_juicer.ops.aggregator.most_relavant_entities_aggregator</li>
+      <li class="breadcrumb-item active">data_juicer.ops.aggregator.most_relevant_entities_aggregator</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -76,7 +76,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for data_juicer.ops.aggregator.most_relavant_entities_aggregator</h1><div class="highlight"><pre>
+  <h1>Source code for data_juicer.ops.aggregator.most_relevant_entities_aggregator</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
@@ -91,14 +91,14 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..common</span><span class="w"> </span><span class="kn">import</span> <span class="n">split_text_by_punctuation</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;most_relavant_entities_aggregator&#39;</span>
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;most_relevant_entities_aggregator&#39;</span>
 
 
 <span class="c1"># TODO: LLM-based inference.</span>
-<div class="viewcode-block" id="MostRelavantEntitiesAggregator">
-<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MostRelavantEntitiesAggregator">[docs]</a>
+<div class="viewcode-block" id="MostRelevantEntitiesAggregator">
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">MostRelavantEntitiesAggregator</span><span class="p">(</span><span class="n">Aggregator</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MostRelevantEntitiesAggregator</span><span class="p">(</span><span class="n">Aggregator</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract entities closely related to a given entity from some texts,</span>
 <span class="sd">    and sort them in descending order of importance.</span>
@@ -122,14 +122,14 @@
 
     <span class="n">DEFAULT_OUTPUT_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\#\#\s*列表\s*(.*?)\Z&#39;</span>
 
-<div class="viewcode-block" id="MostRelavantEntitiesAggregator.__init__">
-<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MostRelavantEntitiesAggregator.__init__">[docs]</a>
+<div class="viewcode-block" id="MostRelevantEntitiesAggregator.__init__">
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
                  <span class="n">entity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">query_entity_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">input_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">MetaKeys</span><span class="o">.</span><span class="n">event_description</span><span class="p">,</span>
-                 <span class="n">output_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BatchMetaKeys</span><span class="o">.</span><span class="n">most_relavant_entities</span><span class="p">,</span>
+                 <span class="n">output_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">BatchMetaKeys</span><span class="o">.</span><span class="n">most_relevant_entities</span><span class="p">,</span>
                  <span class="n">max_token_num</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="o">*</span><span class="p">,</span>
                  <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -145,11 +145,11 @@
 <span class="sd">        Initialization method.</span>
 <span class="sd">        :param api_model: API model name.</span>
 <span class="sd">        :param entity: The given entity.</span>
-<span class="sd">        :param query_entity_type: The type of queried relavant entities.</span>
+<span class="sd">        :param query_entity_type: The type of queried relevant entities.</span>
 <span class="sd">        :param input_key: The input key in the meta field of the samples.</span>
 <span class="sd">            It is &quot;event_description&quot; in default.</span>
 <span class="sd">        :param output_key: The output key in the aggregation field of the</span>
-<span class="sd">            samples. It is &quot;most_relavant_entities&quot; in default.</span>
+<span class="sd">            samples. It is &quot;most_relevant_entities&quot; in default.</span>
 <span class="sd">        :param max_token_num: The max token num of the total tokens of the</span>
 <span class="sd">            sub documents. Without limitation if it is None.</span>
 <span class="sd">        :param api_endpoint: URL endpoint for the API.</span>
@@ -195,8 +195,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span></div>
 
 
-<div class="viewcode-block" id="MostRelavantEntitiesAggregator.parse_output">
-<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MostRelavantEntitiesAggregator.parse_output">[docs]</a>
+<div class="viewcode-block" id="MostRelevantEntitiesAggregator.parse_output">
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.parse_output">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
         <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_pattern</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">VERBOSE</span> <span class="o">|</span> <span class="n">re</span><span class="o">.</span><span class="n">DOTALL</span><span class="p">)</span>
         <span class="n">matches</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
@@ -209,9 +209,9 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="MostRelavantEntitiesAggregator.query_most_relavant_entities">
-<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MostRelavantEntitiesAggregator.query_most_relavant_entities">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">query_most_relavant_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_docs</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="MostRelevantEntitiesAggregator.query_most_relevant_entities">
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.query_most_relevant_entities">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query_most_relevant_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_docs</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sub_docs</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;&#39;</span>
 
@@ -255,8 +255,8 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="MostRelavantEntitiesAggregator.process_single">
-<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MostRelavantEntitiesAggregator.process_single">[docs]</a>
+<div class="viewcode-block" id="MostRelevantEntitiesAggregator.process_single">
+<a class="viewcode-back" href="../../../../data_juicer.ops.aggregator.html#data_juicer.ops.aggregator.MostRelevantEntitiesAggregator.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">batch_meta</span><span class="p">]:</span>
@@ -274,7 +274,7 @@
             <span class="k">return</span> <span class="n">sample</span>
 
         <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">batch_meta</span><span class="p">][</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">output_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_most_relavant_entities</span><span class="p">(</span><span class="n">sub_docs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">query_most_relevant_entities</span><span class="p">(</span><span class="n">sub_docs</span><span class="p">,</span>
                                                                  <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">sample</span></div>
