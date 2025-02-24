@@ -117,6 +117,12 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
         'The dataset will be created from this configuration if provided. '
         'It must contain the `type` field to specify the dataset name.')
     parser.add_argument(
+        '--validators',
+        type=List[Dict],
+        default=[],
+        help='List of validators to apply to the dataset. Each validator '
+        'must have a `type` field specifying the validator type.')
+    parser.add_argument(
         '--export_path',
         type=str,
         default='./outputs/hello_world/hello_world.jsonl',

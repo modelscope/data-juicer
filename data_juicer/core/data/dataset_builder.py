@@ -110,11 +110,16 @@ class DatasetBuilder(object):
         self.validators = []
         if hasattr(cfg, 'validators'):
             for validator_config in cfg.validators:
+                if 'type' not in validator_config:
+                    raise ValueError('Validator config must have a "type" key')
                 validator_type = validator_config['type']
                 validator_cls = DataValidatorRegistry.get_validator(
                     validator_type)
                 if validator_cls:
                     self.validators.append(validator_cls(validator_config))
+                else:
+                    raise ValueError(
+                        f'No data validator found for {validator_type}')
 
     def load_dataset(self, **kwargs) -> DJDataset:
         # if generated_dataset_config present, prioritize
