@@ -46,22 +46,28 @@ jobs:
       run: |
         docker compose exec -e OPENAI_BASE_URL=${{ secrets.OPENAI_BASE_URL }} -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} ray-head python tests/run.py --tag standalone
 
+    - name: Upload coverage report of standlone
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage_report_standalone
+        path: dj-${{ github.run_id }}/.coverage
+
     - name: Run unittest ray
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         docker compose exec ray-head python tests/run.py --tag ray
+
+    - name: Upload coverage report of ray
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage_report_ray
+        path: dj-${{ github.run_id }}/.coverage
 
     - name: Remove docker compose
       working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       if: always()
       run: |
         docker compose down --remove-orphans
-
-    - name: Upload coverage report
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage_report
-        path: dj-${{ github.run_id }}/.coverage
 
     - name: Cleanup workspace
       if: always()
