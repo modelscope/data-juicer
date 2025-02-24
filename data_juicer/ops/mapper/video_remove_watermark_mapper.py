@@ -49,14 +49,14 @@ class VideoRemoveWatermarkMapper(Mapper):
         :param roi_type: the roi string type. When the type is 'pixel', (x1,
             y1), (x2, y2) are the locations of pixels in the top left corner
             and the bottom right corner respectively. If the roi_type is
-            'ratio', the coordinates are normalized by wights and heights.
+            'ratio', the coordinates are normalized by widths and heights.
         :param roi_key: the key name of fields in samples to store roi_strings
             for each sample. It's used for set different rois for different
             samples. If it's none, use rois in parameter "roi_strings".
             It's None in default.
         :param frame_num: the number of frames to be extracted uniformly from
             the video to detect the pixels of watermark.
-        :param min_frame_threshold: a coodination is considered as the
+        :param min_frame_threshold: a coordination is considered as the
             location of a watermark pixel when it is that in no less
             min_frame_threshold frames.
         :param detection_method: the method to detect the pixels of watermark.
