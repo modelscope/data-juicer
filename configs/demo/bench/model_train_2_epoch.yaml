@@ -15,7 +15,7 @@ train:
   dataset_path:
     # The root directory to videos. Set empty if it is the absolute path in the dataset.
     dataset_name: ""
-    # path to the Data-Juicer dataset. Note that the root path is in "thirdparth/easy_animate"
+    # path to the Data-Juicer dataset. Note that the root path is in "thirdparty/easy_animate"
     dataset_meta_name: "../../../outputs/demo-bench/demo-dataset-with-multi-op-stats.jsonl"
   training_config:
     # image size, must match the pretrained easyanimate checkpoint.
@@ -27,5 +27,5 @@ train:
     dataloader_num_workers: 8
     seed: 42
   saving_config:
-    # Note that the root path is in "thirdparth/easy_animate"
+    # Note that the root path is in "thirdparty/easy_animate"
     output_dir: "../../../outputs/demo-bench/models"

@@ -10,7 +10,7 @@ from .formatter import BaseFormatter, load_formatter
 
 class MixtureFormatter(BaseFormatter):
     """The class mixes multiple datasets by randomly selecting samples from
-    every dataset and merging them, and then exports the merged datasset as a
+    every dataset and merging them, and then exports the merged dataset as a
     new mixed dataset."""
 
     def __init__(self,

@@ -47,7 +47,7 @@ class GenerateQAFromTextMapper(Mapper):
         """
         Initialization method.
 
-        :param hf_model: Hugginface model ID.
+        :param hf_model: Huggingface model ID.
         :param max_num: The max num of returned QA sample for each text.
             Not limit if it is None.
         :param output_pattern: Regular expression pattern to extract
