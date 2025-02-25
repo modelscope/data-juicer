@@ -514,7 +514,7 @@ process:
   - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
   - video_remove_watermark_mapper:                          # Remove the watermarks in videos given regions
       roi_strings: ['0,0,0.1,0.1']                            # a given list of regions the watermarks locate. The format of each can be "x1, y1, x2, y2", "(x1, y1, x2, y2)", or "[x1, y1, x2, y2]".
-      roi_type: ratio                                         # the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by wights and heights.
+      roi_type: ratio                                         # the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by widths and heights.
       roi_key: null                                           # the key name of fields in samples to store roi_strings for each sample. It's used for set different rois for different samples.
       frame_num: 10                                           # the number of frames to be extracted uniformly from the video to detect the pixels of watermark.
       min_frame_threshold: 7                                  # a coordination is considered as the location of a watermark pixel when it is a watermark pixel in no less min_frame_threshold frames.
@@ -922,12 +922,12 @@ process:
       try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
-  - most_relavant_entities_aggregator:                      # Extract entities closely related to a given entity from some texts, and sort them in descending order of importance.
+  - most_relevant_entities_aggregator:                      # Extract entities closely related to a given entity from some texts, and sort them in descending order of importance.
       api_model: 'gpt-4o'                                     # API model name.
       entity: '孙悟空'                                         # The given entity.
       query_entity_type: '人物'                                # The type of queried relevant entities.
       input_key: 'event_description'                          # The input key in the meta field of the samples. It is "event_description" in default.
-      output_key: 'most_relavant_entities'                    # The output key in the aggregation field of the samples. It is "most_relavant_entities" in default.
+      output_key: 'most_relevant_entities'                    # The output key in the aggregation field of the samples. It is "most_relevant_entities" in default.
       max_token_num: null                                     # The max token num of the total tokens of the sub documents. Without limitation if it is None.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.

@@ -899,7 +899,7 @@ def prepare_side_configs(ori_config: Union[str, Namespace, Dict]):
 
 def get_init_configs(cfg: Union[Namespace, Dict]):
     """
-    set init configs of datajucer for cfg
+    set init configs of data-juicer for cfg
     """
     temp_dir = tempfile.gettempdir()
     temp_file = os.path.join(temp_dir, 'job_dj_config.json')

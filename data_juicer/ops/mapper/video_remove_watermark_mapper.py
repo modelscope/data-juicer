@@ -49,14 +49,14 @@ class VideoRemoveWatermarkMapper(Mapper):
         :param roi_type: the roi string type. When the type is 'pixel', (x1,
             y1), (x2, y2) are the locations of pixels in the top left corner
             and the bottom right corner respectively. If the roi_type is
-            'ratio', the coordinates are normalized by wights and heights.
+            'ratio', the coordinates are normalized by widths and heights.
         :param roi_key: the key name of fields in samples to store roi_strings
             for each sample. It's used for set different rois for different
             samples. If it's none, use rois in parameter "roi_strings".
             It's None in default.
         :param frame_num: the number of frames to be extracted uniformly from
             the video to detect the pixels of watermark.
-        :param min_frame_threshold: a coodination is considered as the
+        :param min_frame_threshold: a coordination is considered as the
             location of a watermark pixel when it is that in no less
             min_frame_threshold frames.
         :param detection_method: the method to detect the pixels of watermark.
@@ -78,13 +78,13 @@ class VideoRemoveWatermarkMapper(Mapper):
 
         if detection_method not in ['pixel_value', 'pixel_diversity']:
             raise ValueError(
-                f'etection_method [{detection_method}]'
+                f'detection_method [{detection_method}]'
                 f' is not supported. '
                 f"Can only be one of ['pixel_value', 'pixel_diversity']. ")
 
         if detection_method == 'pixel_diversity' and frame_num < 2:
             raise ValueError(
-                "frame_num must be gteater than 1 in 'pixel_diversity' mode.")
+                "frame_num must be greater than 1 in 'pixel_diversity' mode.")
 
         rois = []
         if roi_key is None:
@@ -119,10 +119,10 @@ class VideoRemoveWatermarkMapper(Mapper):
 
                 # assume the watermark is located in the box, so the pixel in
                 # the edge must be 0, if not, reverse binary_frame
-                edge_postive_num = (binary_frame[0] >
-                                    0).sum() + (binary_frame[:, 0] > 0).sum()
+                edge_positive_num = (binary_frame[0] >
+                                     0).sum() + (binary_frame[:, 0] > 0).sum()
                 total = binary_frame.shape[0] + binary_frame.shape[1]
-                if edge_postive_num * 2 > total:
+                if edge_positive_num * 2 > total:
                     binary_frame = ~binary_frame
 
                 mask[roi[1]:roi[3],

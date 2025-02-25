@@ -39,7 +39,7 @@ class SentenceAugmentationMapper(Mapper):
                  **kwargs):
         """
         Initialization method.
-        :param hf_model: Hugginface model id.
+        :param hf_model: Huggingface model id.
         :param system_prompt: System prompt.
         :param task_sentence: The instruction for the current task.
         :param max_new_tokens: the maximum number of new tokens
