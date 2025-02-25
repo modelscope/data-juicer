@@ -164,7 +164,7 @@ def convert_absolute_path_to_relative_path(
                     last_dict[final_key] = relative_paths
                     abs_dir_last_dict[final_key] = cur_dirs
 
-                # copy and reorganize multimodal datas
+                # copy and reorganize multimodal data
                 if target_mt_dir is not None:
                     for d, p in zip(cur_dirs, relative_paths):
                         succeed = copy_data(d, target_mt_dir, p)
