@@ -26,6 +26,7 @@ OPS_TO_PKG = {
     'optimize_qa_mapper': ['torch', 'transformers', 'vllm'],
     'video_motion_score_filter': ['opencv-python'],
     'image_tagging_mapper': ['ram', 'torch'],
+    'image_remove_background_mapper': ['rembg', 'onnxruntime'],
     'video_resize_aspect_ratio_mapper': ['ffmpeg-python'],
     'video_captioning_from_audio_mapper': [
         'accelerate', 'einops', 'tiktoken', 'transformers',
