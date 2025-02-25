@@ -128,7 +128,7 @@ class VideoSplitBySceneMapper(Mapper):
             else:
                 output_video_keys[video_key] = [video_key]
 
-        # replace splited video tokens
+        # replace split video tokens
         if self.text_key in sample:
             scene_counts_iter = iter(
                 [scene_counts[key] for key in loaded_video_keys])
