@@ -27,6 +27,7 @@ from .image_captioning_from_gpt4v_mapper import ImageCaptioningFromGPT4VMapper
 from .image_captioning_mapper import ImageCaptioningMapper
 from .image_diffusion_mapper import ImageDiffusionMapper
 from .image_face_blur_mapper import ImageFaceBlurMapper
+from .image_remove_background_mapper import ImageRemoveBackgroundMapper
 from .image_segment_mapper import ImageSegmentMapper
 from .image_tagging_mapper import ImageTaggingMapper
 from .mllm_mapper import MllmMapper
@@ -91,9 +92,9 @@ __all__ = [
     'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
     'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
     'ImageCaptioningMapper', 'ImageDiffusionMapper', 'ImageFaceBlurMapper',
-    'ImageSegmentMapper', 'ImageTaggingMapper', 'MllmMapper', 'NlpaugEnMapper',
-    'NlpcdaZhMapper', 'OptimizeQAMapper', 'OptimizeQueryMapper',
-    'OptimizeResponseMapper', 'PairPreferenceMapper',
+    'ImageRemoveBackgroundMapper', 'ImageSegmentMapper', 'ImageTaggingMapper',
+    'MllmMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper', 'OptimizeQAMapper',
+    'OptimizeQueryMapper', 'OptimizeResponseMapper', 'PairPreferenceMapper',
     'PunctuationNormalizationMapper', 'PythonFileMapper', 'PythonLambdaMapper',
     'QuerySentimentDetectionMapper', 'QueryIntentDetectionMapper',
     'QueryTopicDetectionMapper', 'RelationIdentityMapper',
