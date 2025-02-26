@@ -14,7 +14,7 @@ import coverage
 
 from loguru import logger
 
-from data_juicer.utils.unittest_utils import SKIPPED_TESTS, set_clear_model_flag
+from data_juicer.utils.unittest_utils import set_clear_model_flag
 
 file_dir = os.path.join(os.path.dirname(__file__), '..')
 sys.path.append(file_dir)
@@ -57,8 +57,6 @@ def gather_test_cases(test_dir, pattern, tag):
     test_to_run = unittest.TestSuite()
     test_loader = TaggedTestLoader(tag)
     discover = test_loader.discover(test_dir, pattern=pattern, top_level_dir=None)
-    print(f'These tests will be skipped due to some reasons: '
-          f'{SKIPPED_TESTS.modules}')
     for suite_discovered in discover:
         print('suite_discovered', suite_discovered)
         for test_suite in suite_discovered:
@@ -66,8 +64,6 @@ def gather_test_cases(test_dir, pattern, tag):
             if isinstance(test_suite, unittest.loader._FailedTest):
                 raise test_suite._exception
             for test_case in test_suite:
-                if type(test_case) in SKIPPED_TESTS.modules.values():
-                    continue
                 logger.info(f'Add test case [{test_case._testMethodName}]'
                             f' from {test_case.__class__.__name__}')
                 test_to_run.addTest(test_case)
@@ -75,7 +71,7 @@ def gather_test_cases(test_dir, pattern, tag):
 
 
 def main():
-    cov = coverage.Coverage()
+    cov = coverage.Coverage(include='data_juicer/**')
     cov.start()
 
     runner = unittest.TextTestRunner()
@@ -88,7 +84,8 @@ def main():
     if not res.wasSuccessful():
         exit(1)
 
-    cov.report()
+    cov.report(ignore_errors=True)
+    cov.html_report(directory=f'coverage_report_{args.tag}', ignore_errors=True)
 
 
 if __name__ == '__main__':

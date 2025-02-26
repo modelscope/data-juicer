@@ -2,11 +2,9 @@ import unittest
 import time
 from loguru import logger
 from data_juicer.core import Monitor
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-# Skip this test due to some random resource utilization fluctuation, which may
-# cause failure of this test
-@SKIPPED_TESTS.register_module()
+@unittest.skip('random resource utilization fluctuation may cause failure')
 class MonitorTest(DataJuicerTestCaseBase):
 
     def test_monitor_current_resources(self):

@@ -321,6 +321,12 @@ process:
       cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
+  - image_remove_background_mapper:                         # remove background from images
+      alpha_matting: false                                    # Flag indicating whether to use alpha matting. Defaults to False.
+      alpha_matting_foreground_threshold: 240                 # Foreground threshold for alpha matting. Defaults to 240.
+      alpha_matting_background_threshold: 10                  # Background threshold for alpha matting. Defaults to 10.
+      alpha_matting_erode_size: 10                            # Erosion size for alpha matting. Defaults to 10.
+      bgcolor: None                                           # Background color for the cutout image. Defaults to None.
   - image_segment_mapper:                                   # perform segment-anything on images and return the bounding boxes.
       imgsz: 1024                                             # image resolution after image resizing
       conf: 0.05                                              # confidence score threshold
