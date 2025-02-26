@@ -3,8 +3,11 @@ import os
 from typing import List
 
 import pandas as pd
-import ray
 from loguru import logger
+
+from data_juicer.utils.lazy_loader import LazyLoader
+
+ray = LazyLoader('ray', 'ray')
 
 DEFAULT_MAX_FILE_SIZE = 128  # 128 MB
 DEFAULT_MIN_FILE_SIZE = 1  # 1 MB

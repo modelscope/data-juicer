@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
 
-import ray
-
 from data_juicer.utils.constant import HashKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import Filter
 
 redis = LazyLoader('redis', 'redis')
+ray = LazyLoader('ray', 'ray')
 
 MERSENNE_PRIME = (1 << 61) - 1
 
