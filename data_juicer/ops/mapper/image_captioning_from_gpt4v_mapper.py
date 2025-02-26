@@ -16,7 +16,7 @@ from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 SYSTEM_PROMPTS = {
-    'resoning':
+    'reasoning':
     "You are an AI visual assistant that can analyze a single image. The task is to use the provided image, create a plausible question about the image, and provide the answer in detail.\n\nYou can create complex questions beyond describing the scene. Make the question challenging by not including the visual content details in the question so that the user needs to reason about that first.\n\nTo answer such questions, you should require first understanding the visual content, then based on the background knowledge or reasoning, either explain why the things are happening that way, or provide guides and help to user's request. \n\nPlease give the Q&A content directly and separate questions and answers with Q and A.",  # noqa: E501
     'description':
     'You are an AI visual assistant that can analyze a single image. The task is to use the provided image, create a reasonable question that describes the content of the image, and provide the answer in detail.\n\nPlease give the Q&A content directly and separate questions and answers with Q and A.',  # noqa: E501
@@ -98,7 +98,7 @@ def call_gpt_vision_api(api_key,
 @LOADED_IMAGES.register_module('image_captioning_from_gpt4v_mapper')
 class ImageCaptioningFromGPT4VMapper(Mapper):
     """Mapper to generate samples whose texts are generated based on
-    gpt-4-visison and the image."""
+    gpt-4-vision and the image."""
 
     _batched_op = True
 
@@ -118,7 +118,7 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
         Initialization method.
 
         :param mode: mode of text generated from images, can be one of
-            ['resoning', 'description', 'conversation', 'custom']
+            ['reasoning', 'description', 'conversation', 'custom']
         :param api_key: the API key to authenticate the request.
         :param max_token: the maximum number of tokens to generate.
             Default is 500.
@@ -131,7 +131,7 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
         :param user_prompt: a string prompt to guide the generation of
             gpt4-vision for each samples. It's "" in default, which means no
             prompt provided.
-        :param uers_prompt_key: the key name of fields in samples to store
+        :param user_prompt_key: the key name of fields in samples to store
             prompts for each sample. It's used for set different prompts for
             different samples. If it's none, use prompt in parameter "prompt".
             It's None in default.
@@ -148,11 +148,11 @@ class ImageCaptioningFromGPT4VMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
 
-        if mode not in ['resoning', 'description', 'conversation', 'custom']:
+        if mode not in ['reasoning', 'description', 'conversation', 'custom']:
             raise ValueError(
                 f'Mode [{mode}] is not supported. '
                 f'Can only be one of '
-                f'["resoning", "description", "conversation", "custom"].')
+                f'["reasoning", "description", "conversation", "custom"].')
 
         if mode == 'custom':
             self.system_prompt = system_prompt
