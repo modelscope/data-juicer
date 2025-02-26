@@ -266,8 +266,7 @@ class RayDataset(DJDataset):
             js.open_json
             return read_json_stream(paths)
         except AttributeError:
-            import ray.data
-            return ray.data.read_json(paths)
+            return rd.read_json(paths)
 
 
 class JSONStreamDatasource(ds.JSONDatasource):
