@@ -8,7 +8,7 @@ from data_juicer.core.data import NestedDataset as Dataset
 from data_juicer import _cuda_device_count
 from data_juicer.ops.filter.video_watermark_filter import VideoWatermarkFilter
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 class VideoWatermarkFilterTest(DataJuicerTestCaseBase):
 
