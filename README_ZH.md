@@ -64,33 +64,35 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 
 目录
 ===
-- [新消息](#新消息)
-- [为什么选择 Data-Juicer？](#为什么选择-data-juicer)
-- [DJ-Cookbook](#dj-cookbook)
-  - [资源合集](#资源合集)
-  - [编写Data-Juicer (DJ) 代码](#编写data-juicer-dj-代码)
-  - [用例与数据菜谱](#用例与数据菜谱)
-  - [交互类示例](#交互类示例)
-- [安装](#安装)
-  - [前置条件](#前置条件)
-  - [从源码安装](#从源码安装)
-  - [使用 pip 安装](#使用-pip-安装)
-  - [使用 Docker 安装](#使用-docker-安装)
-  - [安装校验](#安装校验)
-  - [使用视频相关算子](#使用视频相关算子)
-- [快速上手](#快速上手)
-  - [数据处理](#数据处理)
-  - [分布式数据处理](#分布式数据处理)
-  - [数据分析](#数据分析)
-  - [数据可视化](#数据可视化)
-  - [构建配置文件](#构建配置文件)
-  - [沙盒实验室](#沙盒实验室)
-  - [预处理原始数据（可选）](#预处理原始数据可选)
-  - [对于 Docker 用户](#对于-docker-用户)
-- [开源协议](#开源协议)
-- [贡献](#贡献)
-- [致谢](#致谢)
-- [参考文献](#参考文献)
+- [Data Processing for and with Foundation Models](#data-processing-for-and-with-foundation-models)
+  - [新消息](#新消息)
+- [目录](#目录)
+  - [为什么选择 Data-Juicer？](#为什么选择-data-juicer)
+  - [DJ-Cookbook](#dj-cookbook)
+    - [资源合集](#资源合集)
+    - [编写Data-Juicer (DJ) 代码](#编写data-juicer-dj-代码)
+    - [用例与数据菜谱](#用例与数据菜谱)
+    - [交互类示例](#交互类示例)
+  - [安装](#安装)
+    - [前置条件](#前置条件)
+    - [从源码安装](#从源码安装)
+    - [使用 pip 安装](#使用-pip-安装)
+    - [使用 Docker 安装](#使用-docker-安装)
+    - [安装校验](#安装校验)
+    - [使用视频相关算子](#使用视频相关算子)
+  - [快速上手](#快速上手)
+    - [数据处理](#数据处理)
+    - [分布式数据处理](#分布式数据处理)
+    - [数据分析](#数据分析)
+    - [数据可视化](#数据可视化)
+    - [构建配置文件](#构建配置文件)
+    - [沙盒实验室](#沙盒实验室)
+    - [预处理原始数据（可选）](#预处理原始数据可选)
+    - [对于 Docker 用户](#对于-docker-用户)
+  - [开源协议](#开源协议)
+  - [贡献](#贡献)
+  - [致谢](#致谢)
+  - [参考文献](#参考文献)
 
 
 ## 为什么选择 Data-Juicer？
@@ -150,7 +152,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - [Modelscope-Sora挑战赛](https://tianchi.aliyun.com/competition/entrance/532219)，基于Data-Juicer和[EasyAnimate](https://github.com/aigc-apps/EasyAnimate)框架，调优文本-视频数据集，在类SORA小模型上训练以生成更好的视频
   - [Better Mixture](https://tianchi.aliyun.com/competition/entrance/532174)，针对指定多个候选数据集，仅调整数据混合和采样策略
   - FT-Data Ranker ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157)、 [7B Track](https://tianchi.aliyun.com/competition/entrance/532158))，针对指定候选数据集，仅调整数据过滤和增强策略
-  - [可图Kolors-LoRA风格故事挑战赛](https://tianchi.aliyun.com/competition/entrance/532254)，基于Data-Juicer和[DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio)框架，探索Difussion模型微调
+  - [可图Kolors-LoRA风格故事挑战赛](https://tianchi.aliyun.com/competition/entrance/532254)，基于Data-Juicer和[DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio)框架，探索Diffusion模型微调
 * [DJ-SORA](docs/DJ_SORA_ZH.md)
 * 基于Data-Juicer和[AgentScope](https://github.com/modelscope/agentscope)框架，通过[智能体调用DJ Filters](./demos/api_service/react_data_filter_process.ipynb)和[调用DJ Mappers](./demos/api_service/react_data_mapper_process.ipynb)
   
