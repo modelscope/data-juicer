@@ -10,6 +10,7 @@ from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_IMAGES
 
 rembg = LazyLoader('rembg', 'rembg')
+onnxruntime = LazyLoader('onnxruntime', 'onnxruntime')
 
 OP_NAME = 'image_remove_background_mapper'
 
