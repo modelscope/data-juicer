@@ -35,7 +35,7 @@ class QueryTopicDetectionMapper(Mapper):
         """
         Initialization method.
 
-        :param hf_model: Hugginface model ID to predict topic label.
+        :param hf_model: Huggingface model ID to predict topic label.
         :param zh_to_en_hf_model: Translation model from Chinese to English.
             If not None, translate the query from Chinese to English.
         :param model_params: model param for hf_model.
@@ -77,9 +77,9 @@ class QueryTopicDetectionMapper(Mapper):
         queries = samples[self.query_key]
 
         if self.zh_to_en_model_key is not None:
-            translater, _ = get_model(self.zh_to_en_model_key, rank,
+            translator, _ = get_model(self.zh_to_en_model_key, rank,
                                       self.use_cuda())
-            results = translater(queries)
+            results = translator(queries)
             queries = [item['translation_text'] for item in results]
 
         classifier, _ = get_model(self.model_key, rank, self.use_cuda())

@@ -16,7 +16,7 @@ from data_juicer.utils import cache_utils
 
 class FileLock(HF_FileLock):
     """
-    File lock for compresssion or decompression, and
+    File lock for compression or decompression, and
     remove lock file automatically.
     """
 
@@ -384,7 +384,7 @@ class CacheCompressManager:
         dataset cache directory.
 
         :param ds: input dataset.
-        :param fingerprints: fingerprintd of cache files. String or List are
+        :param fingerprints: fingerprints of cache files. String or List are
             accepted. If `None`, we will find all cache files which starts with
             `cache-` and ends with compression format.
         :param num_proc: number of processes to decompress cache files.

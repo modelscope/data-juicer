@@ -5,7 +5,7 @@ import seaborn as sns
 
 def draw_heatmap(data, xlabels, ylables=None, figsize=None, triangle=False):
     """
-    Draw heatmap of input data with special lables.
+    Draw heatmap of input data with special labels.
 
     :param data: input data, now support
         [`list`, `tuple`, `numpy array`, 'torch tensor']

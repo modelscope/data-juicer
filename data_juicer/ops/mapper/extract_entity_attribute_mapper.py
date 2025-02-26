@@ -87,7 +87,7 @@ class ExtractEntityAttributeMapper(Mapper):
         :param input_template: Template for building the model input.
         :param attr_pattern_template: Pattern for parsing the attribute from
             output. Need to be specified by given attribute.
-        :param: demo_pattern: Pattern for parsing the demonstraction from
+        :param: demo_pattern: Pattern for parsing the demonstration from
             output to support the attribute.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.

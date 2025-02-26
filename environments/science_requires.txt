@@ -19,7 +19,7 @@ tiktoken
 opencc==1.1.6
 imagededup
 spacy-pkuseg
-diffusers
+diffusers>=0.18.0
 simple-aesthetics-predictor
 scenedetect[opencv]
 ffmpeg-python

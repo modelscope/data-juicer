@@ -51,7 +51,7 @@ def parse_args():
 def run_mixture():
     """
     Mix multiple datasets into one dataset.
-    Randomly select samples from every dataset and mix theses
+    Randomly select samples from every dataset and mix these
     samples, then export to a new mixed dataset
 
     `data_path` with optional weight(1.0 as default),

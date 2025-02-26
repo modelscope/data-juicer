@@ -141,7 +141,7 @@ class OP:
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
-        :param query_key: the key name of field that stores sample queris
+        :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
             queries and responses
@@ -175,7 +175,7 @@ class OP:
         else:
             self.accelerator = self._accelerator
 
-        # parameters to determind the number of procs for this op
+        # parameters to determine the number of procs for this op
         self.num_proc = kwargs.get('num_proc', None)
         self.cpu_required = kwargs.get('cpu_required', 1)
         self.mem_required = kwargs.get('mem_required', 0)
@@ -212,7 +212,7 @@ class OP:
 
     def remove_extra_parameters(self, param_dict, keys=None):
         """
-            at the begining of the init of the mapper op, call
+            at the beginning of the init of the mapper op, call
             self.remove_extra_parameters(locals())
             to get the init parameter dict of the op for convenience
 
@@ -280,7 +280,7 @@ class Mapper(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
-        :param query_key: the key name of field that stores sample queris
+        :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
             queries and responses
@@ -373,7 +373,7 @@ class Filter(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
-        :param query_key: the key name of field that stores sample queris
+        :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
             queries and responses
@@ -500,7 +500,7 @@ class Deduplicator(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
-        :param query_key: the key name of field that stores sample queris
+        :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
             queries and responses
@@ -569,7 +569,7 @@ class Selector(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
-        :param query_key: the key name of field that stores sample queris
+        :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
             queries and responses
@@ -607,7 +607,7 @@ class Grouper(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
-        :param query_key: the key name of field that stores sample queris
+        :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
             queries and responses
@@ -647,7 +647,7 @@ class Aggregator(OP):
             to be processed
         :param video_key: the key name of field that stores sample video list
             to be processed
-        :param query_key: the key name of field that stores sample queris
+        :param query_key: the key name of field that stores sample queries
         :param response_key: the key name of field that stores responses
         :param history_key: the key name of field that stores history of
             queries and responses

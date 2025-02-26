@@ -140,7 +140,7 @@ class Tracer:
         # index of the current sample in the previous dataset
         i = 0
         filter_dict = []
-        # number of found filtered samples. It's the offset bewteen two
+        # number of found filtered samples. It's the offset between two
         # datasets as well.
         num = 0
         while i < len(previous_ds):

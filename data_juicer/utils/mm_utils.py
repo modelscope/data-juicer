@@ -910,7 +910,7 @@ def parse_string_to_roi(roi_string, roi_type='pixel'):
     Convert a roi string to four number x1, y1, x2, y2 stand for the region.
     When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels
     in the top left corner and the bottom right corner respectively. If the
-    roi_type is 'ratio', the coordinates are normalized by wights and
+    roi_type is 'ratio', the coordinates are normalized by widths and
     heights.
 
     :param roi_string: the roi string

@@ -47,7 +47,7 @@ def nested_access(data, path, digit_allowed=True):
     :param path: A dot-separated string representing the path to access.
                     This can include numeric indices when accessing list
                     elements.
-    :param digit_allowed: Allow transfering string to digit.
+    :param digit_allowed: Allow transferring string to digit.
     :return: The value located at the specified path, or raises a KeyError
                 or IndexError if the path does not exist.
     """

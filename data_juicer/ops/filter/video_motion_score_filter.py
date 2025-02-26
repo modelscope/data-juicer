@@ -29,7 +29,7 @@ def VideoCapture(*args, **kwargs):
 @OPERATORS.register_module(OP_NAME)
 class VideoMotionScoreFilter(Filter):
     """Filter to keep samples with video motion scores within a specific range. The
-    Farneback's algorith from OpenCV is used to compute dense optical flow.
+    Farneback's algorithm from OpenCV is used to compute dense optical flow.
     """
 
     _default_kwargs = {

@@ -35,10 +35,10 @@ class TextChunkMapper(Mapper):
         :param overlap_len: Overlap length of the split texts if not split in
             the split pattern.
         :param tokenizer: The tokenizer name of Hugging Face tokenizers.
-            The text length will be calculate as the token num if it is offerd.
-            Otherwise, the text length equals to string length. Support
-            tiktoken tokenizer (such as gpt-4o), dashscope tokenizer (such as
-            qwen2.5-72b-instruct) and huggingface tokenizer.
+            The text length will be calculate as the token num if it is
+            offered. Otherwise, the text length equals to string length.
+            Support tiktoken tokenizer (such as gpt-4o), dashscope tokenizer (
+            such as qwen2.5-72b-instruct) and huggingface tokenizer.
         :trust_remote_code: for loading huggingface model
         :param args: extra args
         :param kwargs: extra args

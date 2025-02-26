@@ -167,7 +167,7 @@ process:
       system_prompt_template: null                            # System prompt template for the task. Need to be specified by given entity and attribute.
       input_template: null                                    # Template for building the model input.
       attr_pattern_template: null                             # Pattern for parsing the attribute from output. Need to be specified by given attribute.
-      demo_pattern: null                                      # Pattern for parsing the demonstraction from output to support the attribute.
+      demo_pattern: null                                      # Pattern for parsing the demonstration from output to support the attribute.
       try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
       drop_text: false                                        # If drop the text in the output.
       model_params: {}                                        # Parameters for initializing the API model.
@@ -265,11 +265,11 @@ process:
       sampling_params: {}                                     # Sampling parameters for text generation. e.g {'temperature': 0.9, 'top_p': 0.95}
       mem_required: '31GB'                                    # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrain the maximum number of processes that can be launched
   - image_blur_mapper:                                      # mapper to blur images.
-      p: 0.2                                                  # probability of the image being blured
+      p: 0.2                                                  # probability of the image being blurred
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
-  - image_captioning_from_gpt4v_mapper:                     # generate samples whose texts are generated based on gpt-4-visison and the image
-      mode: 'description'                                     # mode of text generated from images, can be one of ['resoning', 'description', 'conversation', 'custom']
+  - image_captioning_from_gpt4v_mapper:                     # generate samples whose texts are generated based on gpt-4-vision and the image
+      mode: 'description'                                     # mode of text generated from images, can be one of ['reasoning', 'description', 'conversation', 'custom']
       api_key: ''                                             # the API key to authenticate the request
       max_token: 500                                          # the maximum number of tokens to generate. Default is 500.
       temperature: 1.0                                        # controls the randomness of the output (range from 0 to 1). Default is 0.
@@ -370,21 +370,21 @@ process:
       lambda_str: ''                                          # A string representation of the lambda function to be executed on data samples. If empty, the identity function is used.
       batched: False                                          # A boolean indicating whether to process input data in batches.
   - query_intent_detection_mapper:                          # Mapper to predict user's Intent label in query.
-      hf_model: 'bespin-global/klue-roberta-small-3i4k-intent-classification'     # Hugginface model ID to predict intent label.
+      hf_model: 'bespin-global/klue-roberta-small-3i4k-intent-classification'     # Huggingface model ID to predict intent label.
       zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
       model_params: {}                                        # model param for hf_model.
       zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
       label_key: 'query_intent_label'                         # The key name in the meta field to store the output label. It is 'query_intent_label' in default.
       score_key: 'query_intent_label_score'                   # The key name in the meta field to store the corresponding label score. It is 'query_intent_label_score' in default.
   - query_sentiment_detection_mapper:                       # Mapper to predict user's sentiment label ('negative', 'neutral' and 'positive') in query.
-      hf_model: 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'     # Hugginface model ID to predict sentiment label.
+      hf_model: 'mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis'     # Huggingface model ID to predict sentiment label.
       zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
       model_params: {}                                        # model param for hf_model.
       zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
       label_key: 'query_sentiment_label'                      # The key name in the meta field to store the output label. It is 'query_sentiment_label' in default.
       score_key: 'query_sentiment_label_score'                # The key name in the meta field to store the corresponding label score. It is 'query_sentiment_label_score' in default.
   - query_topic_detection_mapper:                           # Mapper to predict user's topic label in query.
-      hf_model: 'dstefa/roberta-base_topic_classification_nyt_news'     # Hugginface model ID to predict topic label.
+      hf_model: 'dstefa/roberta-base_topic_classification_nyt_news'     # Huggingface model ID to predict topic label.
       zh_to_en_hf_model: 'Helsinki-NLP/opus-mt-zh-en'         # Translation model from Chinese to English. If not None, translate the query from Chinese to English.
       model_params: {}                                        # model param for hf_model.
       zh_to_en_model_params: {}                               # model param for zh_to_hf_model.
@@ -392,7 +392,7 @@ process:
       score_key: 'query_topic_label_score'                    # The key name in the meta field to store the corresponding label score. It is 'query_topic_label_score' in default.
   - relation_identity_mapper:                               # identify relation between two entity in the text.
       api_model: 'gpt-4o'                                     # API model name.
-      source_entity: '孙悟空'                                  # The source entity of the relation to be dentified.
+      source_entity: '孙悟空'                                  # The source entity of the relation to be identified.
       target_entity: '猪八戒'                                  # The target entity of the relation to be identified.
       output_key: 'role_relation'                             # The output key in the meta field in the samples. It is 'role_relation' in default.
       api_endpoint: null                                      # URL endpoint for the API.
@@ -453,7 +453,7 @@ process:
       max_len: 2000                                           # Split text into multi texts with this max len if not None.
       split_pattern: '\n\n'                                   # Make sure split in this pattern if it is not None and force cut if the length exceeds max_len.
       overlap_len: 200                                        # Overlap length of the split texts if not split in the split pattern.
-      tokenizer: 'gpt-4o'                                     # The tokenizer name of Hugging Face tokenizers. The text length will be calculate as the token num if it is offerd. Otherwise, the text length equals to string length.
+      tokenizer: 'gpt-4o'                                     # The tokenizer name of Hugging Face tokenizers. The text length will be calculate as the token num if it is offered. Otherwise, the text length equals to string length.
       trust_remote_code: True                                 # for loading huggingface model.
   - video_captioning_from_audio_mapper:                     # caption a video according to its audio streams based on Qwen-Audio model
       keep_original_sample: true                              # whether to keep the original sample. If it's set to False, there will be only captioned sample in the final datasets and the original sample will be removed. It's True in default.
@@ -508,10 +508,10 @@ process:
   - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
   - video_remove_watermark_mapper:                          # Remove the watermarks in videos given regions
       roi_strings: ['0,0,0.1,0.1']                            # a given list of regions the watermarks locate. The format of each can be "x1, y1, x2, y2", "(x1, y1, x2, y2)", or "[x1, y1, x2, y2]".
-      roi_type: ratio                                         # the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by wights and heights.
+      roi_type: ratio                                         # the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by widths and heights.
       roi_key: null                                           # the key name of fields in samples to store roi_strings for each sample. It's used for set different rois for different samples.
       frame_num: 10                                           # the number of frames to be extracted uniformly from the video to detect the pixels of watermark.
-      min_frame_threshold: 7                                  # a coodination is considered as the location of a watermark pixel when it is a watermark pixel in no less min_frame_threshold frames.
+      min_frame_threshold: 7                                  # a coordination is considered as the location of a watermark pixel when it is a watermark pixel in no less min_frame_threshold frames.
       detection_method: pixel_value                           # the method to detect the pixels of watermark. If it is 'pixel_value', we consider the distribution of pixel value in each frame. If it is 'pixel_diversity', we will consider the pixel diversity in different frames.
   - video_resize_aspect_ratio_mapper:                       # resize videos aspect ratios of videos (a fraction of width by height, r=w/h) to a specified range
       min_ratio: 9/21                                         # the minimum aspect ratio to enforce videos with an aspect ratio below `min_ratio` will be resized to match this minimum ratio. The ratio should be provided as a string in the format "9:21" or "9/21".
@@ -845,7 +845,7 @@ process:
       ignore_pattern: null                                    # whether to ignore sub-strings with specific pattern when computing simhash.
       tokenizer_model: null                                   # path for the sentencepiece model, used for sentencepiece tokenization.
       union_find_parallel_num: 'auto'                         # number of parallel workers for union-find algorithm. Default it's 'auto', and it will be determined by half of the number of CPUs.
-      union_threshold: 256                                    # threshold for minhash values group to perform union-find algorightm.
+      union_threshold: 256                                    # threshold for minhash values group to perform union-find algorithm.
       max_pending_edge_buffer_task: 20                        # max number of pending edge buffer ray tasks.
       num_edge_buffer_task_returns: 10                        # number of edge buffer tasks for `ray.wait` to return.
       max_pending_filter_tasks: 20                            # max number of pending filter ray tasks.
@@ -916,12 +916,12 @@ process:
       try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
-  - most_relavant_entities_aggregator:                      # Extract entities closely related to a given entity from some texts, and sort them in descending order of importance.
+  - most_relevant_entities_aggregator:                      # Extract entities closely related to a given entity from some texts, and sort them in descending order of importance.
       api_model: 'gpt-4o'                                     # API model name.
       entity: '孙悟空'                                         # The given entity.
-      query_entity_type: '人物'                                # The type of queried relavant entities.
+      query_entity_type: '人物'                                # The type of queried relevant entities.
       input_key: 'event_description'                          # The input key in the meta field of the samples. It is "event_description" in default.
-      output_key: 'most_relavant_entities'                    # The output key in the aggregation field of the samples. It is "most_relavant_entities" in default.
+      output_key: 'most_relevant_entities'                    # The output key in the aggregation field of the samples. It is "most_relevant_entities" in default.
       max_token_num: null                                     # The max token num of the total tokens of the sub documents. Without limitation if it is None.
       api_endpoint: null                                      # URL endpoint for the API.
       response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.

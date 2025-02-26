@@ -32,8 +32,8 @@ class TextEntityDependencyFilter(Filter):
             Objects is independent if their number of edges in the dependency
             tree is below this parameter.
         :param any_or_all: keep this sample with 'any' or 'all' strategy.
-            'any': keep this sample if any objet is dependent. 'all': keep this
-            sample only if all images are dependent.
+            'any': keep this sample if any object is dependent. 'all': keep
+            this sample only if all images are dependent.
         """
         super().__init__(*args, **kwargs)
         # '--no-deps' do not update numpy
@@ -74,7 +74,7 @@ class TextEntityDependencyFilter(Filter):
             if obj.dep_ != 'ROOT':
                 entity_to_dependency_nums[obj] += 1
         for token in doc:
-            # the punctation mark such as ',', '.'
+            # the punctuation mark such as ',', '.'
             if token.pos_ == 'PUNCT':
                 continue
 

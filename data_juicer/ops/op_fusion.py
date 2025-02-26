@@ -25,7 +25,7 @@ INTER_SAMPLED_FRAMES = Registry(InterVars.sampled_frames)
 
 # all
 ALL_INTER_VARS = [
-    INTER_LINES, INTER_WORDS, LOADED_IMAGES, LOADED_VIDEOS,
+    INTER_LINES, INTER_WORDS, LOADED_AUDIOS, LOADED_IMAGES, LOADED_VIDEOS,
     INTER_SAMPLED_FRAMES
 ]
 
@@ -46,26 +46,19 @@ def fuse_operators(ops, probe_res=None):
     # detect filter groups and try to fuse them
     fused_ops = []
     filter_group = []
-    in_group = False
     for op, op_probe in zip(ops, probe_res):
         if isinstance(op, Filter):
-            if not in_group:
-                in_group = True
             filter_group.append((op, op_probe))
-        elif in_group:
-            # got a filter group, try to fuse them
-            fused_group = fuse_filter_group(filter_group)
-            fused_ops.extend(fused_group)
-            filter_group = []
-            in_group = False
+        else:
+            if filter_group:
+                # got a filter group, try to fuse them
+                fused_ops.extend(fuse_filter_group(filter_group))
+                filter_group = []
             # and add the current non-filter op into fused_ops
             fused_ops.append(op)
-        else:  # not a filter and not in a filter group, skip
-            fused_ops.append(op)
-    if in_group and len(filter_group) > 0:
-        # the final filter group, try to fuse them
-        fused_group = fuse_filter_group(filter_group)
-        fused_ops.extend(fused_group)
+    # the final filter group, try to fuse them
+    if filter_group:
+        fused_ops.extend(fuse_filter_group(filter_group))
     return fused_ops
 
 

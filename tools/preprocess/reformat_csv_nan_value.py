@@ -44,7 +44,7 @@ def main(src_dir,
     """
     Reformat csv or tsv files that may contain Nan values using HuggingFace
     to load with extra args, e.g. set `keep_default_na` to False
-    :param src_dir: path thats stores filenames are like "*.csv" or "*.tsv".
+    :param src_dir: path that's stores filenames are like "*.csv" or "*.tsv".
     :param target_dir: path to store the converted jsonl files.
     :param suffixes: files with suffixes to be to process, multi-suffixes args
                    like `--suffixes "'.tsv', '.csv'"

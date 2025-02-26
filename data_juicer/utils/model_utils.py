@@ -353,7 +353,7 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
                               pipe_task='text-generation',
                               **model_params):
     """
-    Prepare and load a HuggingFace model with the correspoding processor.
+    Prepare and load a HuggingFace model with the corresponding processor.
 
     :param pretrained_model_name_or_path: model name or path
     :param return_model: return model or not
@@ -521,7 +521,7 @@ def prepare_sentencepiece_for_lang(lang,
                                    name_pattern='{}.sp.model',
                                    **model_params):
     """
-    Prepare and load a sentencepiece model for specific langauge.
+    Prepare and load a sentencepiece model for specific language.
 
     :param lang: language to render model name
     :param name_pattern: pattern to render the model name
@@ -634,7 +634,7 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
                              return_model=True,
                              **model_params):
     """
-    Prepare and load a video-clip model with the correspoding processor.
+    Prepare and load a video-clip model with the corresponding processor.
 
     :param pretrained_model_name_or_path: model name or path
     :param return_model: return model or not
@@ -775,7 +775,7 @@ def prepare_video_blip_model(pretrained_model_name_or_path,
 
 def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
     """
-    Prepare and load a HuggingFace model with the correspoding processor.
+    Prepare and load a HuggingFace model with the corresponding processor.
 
     :param pretrained_model_name_or_path: model name or path
     :param model_params: LLM initialization parameters.
