@@ -54,7 +54,6 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
     for key in [cfg.video_key, cfg.image_key, cfg.audio_key]:
         if key in columns:
             path_keys.append(key)
-    logger.error(f'path_keys: {path_keys}')
     if len(path_keys) > 0:
         dataset_dir = os.path.dirname(dataset_path)
         logger.error(f'dataset_dir: {dataset_dir}')
@@ -63,7 +62,6 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
                                               path_keys=path_keys),
                                       batch_format='pyarrow',
                                       zero_copy_batch=True)
-        logger.error(dataset.limit(1).take())
     return dataset
 
 

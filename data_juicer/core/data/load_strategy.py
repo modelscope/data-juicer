@@ -243,7 +243,7 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
                     f'Tried: {possible_paths}. '
                     f'Current working directory: {os.getcwd()}')
 
-        logger.error(f'Using resolved path for loading ray dataset: {path}')
+        logger.info(f'Using resolved path for loading ray dataset: {path}')
         try:
             dataset = RayDataset.read_json(path)
             return RayDataset(dataset, dataset_path=path, cfg=self.cfg)
@@ -285,8 +285,6 @@ class DefaultLocalDataLoadStrategy(DefaultDataLoadStrategy):
     }
 
     def load_data(self, **kwargs):
-        logger.info(f'kwargs: {kwargs}')
-
         # Get config values with defaults
         text_keys = getattr(self.cfg, 'text_keys',
                             ['text'])  # Default to ['text']

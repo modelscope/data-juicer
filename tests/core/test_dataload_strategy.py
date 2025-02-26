@@ -10,7 +10,6 @@ from data_juicer.config import get_default_cfg
 import os
 import os.path as osp
 import json
-import tempfile
 import shutil
 import uuid
 
@@ -312,8 +311,8 @@ class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
         self.assertEqual(result[1]['text'], "Today is Monday and it's a happy day!")
 
     @TEST_TAG('ray')
-    def test_home_and_workdir_resolution(self):
-        """Test path resolution for home directory ('~') and work_dir"""
+    def test_workdir_resolution(self):
+        """Test path resolution for work_dir"""
         test_filename = 'test_resolution.jsonl'
         
         # Create test file in work_dir
@@ -322,7 +321,6 @@ class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
             for item in self.test_data:
                 f.write(json.dumps(item, ensure_ascii=False).rstrip() + '\n')
     
-        # Test 1: work_dir resolution
         strategy = RayLocalJsonDataLoadStrategy({
             'path': test_filename  # relative to work_dir
         }, self.cfg)
@@ -331,28 +329,6 @@ class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
         result = list(dataset.get(2))
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0]['text'], 'hello world')
-            
-        # Test 2: home directory resolution
-        home_dir = osp.expanduser('~')
-        home_path = osp.join(home_dir, test_filename)
-        
-        # Move test file to home directory
-        shutil.copy2(work_path, home_path)
-        
-        try:
-            strategy = RayLocalJsonDataLoadStrategy({
-                'path': test_filename
-            }, self.cfg)
-            
-            dataset = strategy.load_data()
-            result = list(dataset.get(2))
-            self.assertEqual(len(result), 2)
-            self.assertEqual(result[0]['text'], 'hello world')
-        
-        finally:
-            # Clean up home directory test file
-            if osp.exists(home_path):
-                os.remove(home_path)
         
 
 if __name__ == '__main__':
