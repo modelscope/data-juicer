@@ -202,11 +202,55 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
     }
 
     def load_data(self, **kwargs):
+        import os
+
         from data_juicer.core.data import RayDataset
-        dataset = RayDataset.read_json(self.ds_config['path'])
-        return RayDataset(dataset,
-                          dataset_path=self.ds_config['path'],
-                          cfg=self.cfg)
+
+        path = self.ds_config['path']
+
+        # Convert to absolute path if relative
+        if not os.path.isabs(path):
+            # Try multiple base paths
+            possible_paths = [
+                # Current working directory
+                os.path.abspath(path),
+
+                # Original DJ root directory relative to script location
+                os.path.abspath(
+                    os.path.join(os.path.dirname(__file__), '..', '..', '..',
+                                 path)),
+
+                # User's home directory
+                os.path.expanduser(os.path.join('~', path))
+            ]
+
+            # Ray work directory
+            ray_work_dir = getattr(self.cfg, 'work_dir',
+                                   None) if self.cfg else None
+            if ray_work_dir:
+                possible_paths.append(
+                    os.path.abspath(os.path.join(ray_work_dir, path)))
+
+            # Try each path
+            for abs_path in possible_paths:
+                if os.path.exists(abs_path):
+                    path = abs_path
+                    break
+            else:
+                # No valid path found
+                raise FileNotFoundError(
+                    f"Could not find file '{path}' in any location. "
+                    f'Tried: {possible_paths}. '
+                    f'Current working directory: {os.getcwd()}')
+
+        logger.error(f'Using resolved path for loading ray dataset: {path}')
+        try:
+            dataset = RayDataset.read_json(path)
+            return RayDataset(dataset, dataset_path=path, cfg=self.cfg)
+        except Exception as e:
+            raise RuntimeError(f'Failed to load JSON data from {path}. '
+                               f'Current working directory: {os.getcwd()}. '
+                               f'Error: {str(e)}')
 
 
 @DataLoadStrategyRegistry.register('ray', 'remote', 'huggingface')

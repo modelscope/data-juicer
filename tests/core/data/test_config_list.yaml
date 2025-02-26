@@ -2,6 +2,6 @@ project_name: 'dataset-local-list'
 dataset:
   configs:
     - type: 'local'
-      path: 'sample.json'
+      path: 'sample.jsonl'
     - type: 'local'
       path: 'sample.txt' 

@@ -1,15 +1,51 @@
 import unittest
 from data_juicer.core.data.load_strategy import (
     DataLoadStrategyRegistry, DataLoadStrategy, StrategyKey,
-    DefaultLocalDataLoadStrategy
+    DefaultLocalDataLoadStrategy,
+    RayLocalJsonDataLoadStrategy
 )
 from argparse import Namespace
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
+from data_juicer.config import get_default_cfg
+import os
+import os.path as osp
+import json
+import tempfile
+import shutil
+import uuid
+
+WORK_DIR = os.path.dirname(os.path.abspath(__file__))
+
 class MockStrategy(DataLoadStrategy):
     def load_data(self):
         pass
 
 class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
+    @classmethod
+    def setUpClass(cls):
+        """Class-level setup run once before all tests"""
+        super().setUpClass()
+        # Save original strategies
+        cls._original_strategies = DataLoadStrategyRegistry._strategies.copy()
+
+    @classmethod
+    def tearDownClass(cls):
+        """Class-level cleanup run once after all tests"""
+        # Restore original strategies
+        DataLoadStrategyRegistry._strategies = cls._original_strategies
+        super().tearDownClass()
+
+    def setUp(self):
+        """Instance-level setup run before each test"""
+        super().setUp()
+        # Clear strategies before each test
+        DataLoadStrategyRegistry._strategies = {}
+
+    def tearDown(self):
+        """Instance-level cleanup"""
+        # Reset strategies after each test
+        DataLoadStrategyRegistry._strategies = {}
+        super().tearDown()
 
     def test_exact_match(self):
         # Register a specific strategy
@@ -219,6 +255,105 @@ class DataLoadStrategyRegistryTest(DataJuicerTestCaseBase):
         assert getattr(strategy.cfg, 'add_suffix', False) is False
         
 
+class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
+    def setUp(self):
+        """Instance-level setup run before each test"""
+        cur_dir = osp.dirname(osp.abspath(__file__))
+        self.tmp_dir = osp.join(cur_dir, f'tmp_{uuid.uuid4().hex}')
+        os.makedirs(self.tmp_dir, exist_ok=True)
+
+        self.cfg = get_default_cfg()
+        self.cfg.ray_address = 'local'
+        self.cfg.executor_type = 'ray'
+        self.cfg.work_dir = self.tmp_dir
+
+        self.test_data = [
+            {'text': 'hello world'},
+            {'text': 'hello world again'}
+        ]
+
+    def tearDown(self):
+        if osp.exists(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
+
+
+    @TEST_TAG('ray')
+    def test_absolute_path_resolution(self):
+        """Test loading from absolute path"""
+        abs_path = os.path.join(WORK_DIR, 'data', 'sample.jsonl')
+    
+        # Now test the strategy
+        strategy = RayLocalJsonDataLoadStrategy({
+            'path': abs_path
+        }, self.cfg)
+        
+        dataset = strategy.load_data()
+        result = list(dataset.get(2))
+        
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['text'], "Today is Sunday and it's a happy day!")
+        self.assertEqual(result[1]['text'], "Today is Monday and it's a happy day!")
+
+    @TEST_TAG('ray')
+    def test_relative_path_resolution(self):
+        """Test loading from relative path"""
+        rel_path = './tests/core/data/sample.jsonl'
+    
+        # Now test the strategy
+        strategy = RayLocalJsonDataLoadStrategy({
+            'path': rel_path
+        }, self.cfg)
+        
+        dataset = strategy.load_data()
+        result = list(dataset.get(2))
+        
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['text'], "Today is Sunday and it's a happy day!")
+        self.assertEqual(result[1]['text'], "Today is Monday and it's a happy day!")
+
+    @TEST_TAG('ray')
+    def test_home_and_workdir_resolution(self):
+        """Test path resolution for home directory ('~') and work_dir"""
+        test_filename = 'test_resolution.jsonl'
+        
+        # Create test file in work_dir
+        work_path = osp.join(self.cfg.work_dir, test_filename)
+        with open(work_path, 'w', encoding='utf-8', newline='\n') as f:
+            for item in self.test_data:
+                f.write(json.dumps(item, ensure_ascii=False).rstrip() + '\n')
+    
+        # Test 1: work_dir resolution
+        strategy = RayLocalJsonDataLoadStrategy({
+            'path': test_filename  # relative to work_dir
+        }, self.cfg)
+        
+        dataset = strategy.load_data()
+        result = list(dataset.get(2))
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]['text'], 'hello world')
+            
+        # Test 2: home directory resolution
+        home_dir = osp.expanduser('~')
+        home_path = osp.join(home_dir, test_filename)
+        
+        # Move test file to home directory
+        shutil.copy2(work_path, home_path)
+        
+        try:
+            strategy = RayLocalJsonDataLoadStrategy({
+                'path': test_filename
+            }, self.cfg)
+            
+            dataset = strategy.load_data()
+            result = list(dataset.get(2))
+            self.assertEqual(len(result), 2)
+            self.assertEqual(result[0]['text'], 'hello world')
+        
+        finally:
+            # Clean up home directory test file
+            if osp.exists(home_path):
+                os.remove(home_path)
+        
 
 if __name__ == '__main__':
     unittest.main()

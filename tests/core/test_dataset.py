@@ -288,22 +288,7 @@ class TestNestedDataset(DataJuicerTestCaseBase):
         self.assertIsInstance(row['score'], int)
 
 
-@TEST_TAG('ray')
 class TestRayDataset(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        """Initialize Ray once for all tests in this class"""
-        import ray
-        if not ray.is_initialized():
-            ray.init(local_mode=True, ignore_reinit_error=True)
-
-    @classmethod
-    def tearDownClass(cls):
-        """Shutdown Ray after all tests are done"""
-        import ray
-        if ray.is_initialized():
-            ray.shutdown()
-
     def setUp(self):
         """Set up test data"""
         import ray
@@ -337,6 +322,8 @@ class TestRayDataset(unittest.TestCase):
         """Clean up test data"""
         self.dataset = None
 
+
+    @TEST_TAG('ray')
     def test_get_column_basic(self):
         """Test basic column retrieval"""
         # Test string column
@@ -363,6 +350,7 @@ class TestRayDataset(unittest.TestCase):
             [7, 8, 9]
         ])
 
+    @TEST_TAG('ray')
     def test_get_column_with_k(self):
         """Test column retrieval with k limit"""
         # Test k=2
@@ -381,6 +369,7 @@ class TestRayDataset(unittest.TestCase):
         texts = self.dataset.get_column('text', k=1)
         self.assertEqual(texts, ['Hello'])
 
+    @TEST_TAG('ray')
     def test_get_column_errors(self):
         """Test error handling"""
         # Test non-existent column
@@ -393,6 +382,7 @@ class TestRayDataset(unittest.TestCase):
             self.dataset.get_column('text', k=-1)
         self.assertIn("must be non-negative", str(context.exception))
 
+    @TEST_TAG('ray')
     def test_get_column_empty_dataset(self):
         """Test with empty dataset"""
         import ray
@@ -404,6 +394,7 @@ class TestRayDataset(unittest.TestCase):
         with self.assertRaises(KeyError):
             empty_dataset.get_column('text')
 
+    @TEST_TAG('ray')
     def test_get_column_types(self):
         """Test return type consistency"""
         # All elements should be strings
@@ -422,6 +413,7 @@ class TestRayDataset(unittest.TestCase):
         labels = self.dataset.get_column('labels')
         self.assertTrue(all(isinstance(x, list) for x in labels))
 
+    @TEST_TAG('ray')
     def test_get_column_preserve_order(self):
         """Test that column order is preserved"""
         texts = self.dataset.get_column('text')
@@ -434,6 +426,7 @@ class TestRayDataset(unittest.TestCase):
         self.assertEqual(texts[0], 'Hello')
         self.assertEqual(texts[1], 'World')
 
+    @TEST_TAG('ray')
     def test_schema_single_dataset(self):
         """Test schema for single dataset"""
         import ray.data
@@ -446,6 +439,7 @@ class TestRayDataset(unittest.TestCase):
         self.assertEqual(schema.column_types['text'], str)
         self.assertEqual(schema.column_types['score'], int)
 
+    @TEST_TAG('ray')
     def test_schema_multiple_datasets(self):
         """Test schema consistency across multiple datasets"""
         import ray.data
@@ -463,6 +457,7 @@ class TestRayDataset(unittest.TestCase):
         self.assertEqual(schema1.columns, schema2.columns)
         self.assertEqual(schema1.column_types, schema2.column_types)
 
+    @TEST_TAG('ray')
     def test_schema_validation(self):
         """Test schema validation"""
         import ray.data
@@ -480,6 +475,7 @@ class TestRayDataset(unittest.TestCase):
         # Ray might choose either type
         self.assertIn("unable to merge", str(context.exception).lower())
 
+    @TEST_TAG('ray')
     def test_schema_nested_structures(self):
         """Test schema with nested data structures"""
         import ray.data
@@ -505,6 +501,7 @@ class TestRayDataset(unittest.TestCase):
         self.assertEqual(schema.column_types['tags'], list)
         self.assertEqual(schema.column_types['nested'], dict)
 
+    @TEST_TAG('ray')
     def test_schema_empty_dataset(self):
         """Test schema with empty dataset"""
         import ray.data
@@ -516,6 +513,7 @@ class TestRayDataset(unittest.TestCase):
         
         self.assertIn("empty", str(context.exception).lower())
 
+    @TEST_TAG('ray')
     def test_schema_special_characters(self):
         """Test schema with special characters in column names"""
         import ray.data
@@ -537,6 +535,7 @@ class TestRayDataset(unittest.TestCase):
         }
         self.assertEqual(set(schema.columns), expected_columns)
 
+    @TEST_TAG('ray')
     def test_schema_type_consistency(self):
         """Test schema type consistency across rows"""
         import ray.data
@@ -567,6 +566,7 @@ class TestRayDataset(unittest.TestCase):
             for row in rows
         ))
 
+    @TEST_TAG('ray')
     def test_get(self):
         """Test get method for RayDataset"""
         import ray

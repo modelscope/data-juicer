@@ -11,25 +11,46 @@ from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
 
 def run_in_subprocess(cmd):
+    """Run command in subprocess and capture all output."""
     try:
-        with subprocess.Popen(
-                cmd, shell=True, stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT) as return_info:
+        # Create a temporary file for logging
+        with tempfile.NamedTemporaryFile(mode='w+', suffix='.log') as log_file:
+            # Redirect both stdout and stderr to the log file
+            process = subprocess.Popen(
+                cmd, 
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+                bufsize=1  # Line buffered
+            )
+
+            # Real-time output handling
             while True:
-                next_line = return_info.stdout.readline()
-                return_line = next_line.decode('utf-8', 'ignore').strip()
-                if return_line == '' and return_info.poll() != None:
+                line = process.stdout.readline()
+                if not line and process.poll() is not None:
                     break
-                if return_line != '':
-                    print(return_line)
+                if line:
+                    print(line.rstrip())  # Print to console
+                    log_file.write(line)  # Write to log file
+                    log_file.flush()      # Ensure it's written immediately
 
-            err_lines = ''
+            # Get return code
+            return_code = process.wait()
+            
+            # If process failed, read the entire log
+            if return_code != 0:
+                log_file.seek(0)
+                log_content = log_file.read()
+                raise RuntimeError(
+                    f"Process failed with return code {return_code}.\n"
+                    f"Command: {cmd}\n"
+                    f"Log output:\n{log_content}"
+                )
 
-            return_code = return_info.wait()
-            if return_code:
-                raise RuntimeError(err_lines)
     except Exception as e:
-        raise e
+        print(f"Error running subprocess: {str(e)}")
+        raise
 
 
 class ProcessDataTest(DataJuicerTestCaseBase):
@@ -317,7 +338,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         }, {
             text_key: 'a v s e e f g a qkc'
         }, {
-            text_key: '，。、„”“«»１」「《》´∶：？！（）；–—．～’…━〈〉【】％►'
+            text_key: '，。、„" "«»１」「《》´∶：？！（）；–—．～…━〈〉【】％►'
         }, {
             text_key: 'Do you need a cup of coffee?'
         }, {

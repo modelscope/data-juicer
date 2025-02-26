@@ -9,7 +9,7 @@ from data_juicer.core.data.dataset_builder import (rewrite_cli_datapath,
                                                    parse_cli_datapath,
                                                    DatasetBuilder)
 from data_juicer.core.data.config_validator import ConfigValidationError
-from data_juicer.utils.unittest_utils import (DataJuicerTestCaseBase)
+from data_juicer.utils.unittest_utils import (DataJuicerTestCaseBase, TEST_TAG)
 from data_juicer.core.data.load_strategy import RayLocalJsonDataLoadStrategy
 
 
@@ -61,11 +61,11 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
                                rewrite_cli_datapath, dataset_path)
 
     def test_rewrite_cli_datapath_with_weights(self):
-        dataset_path = "0.5 ./data/sample.json ./data/sample.txt"
+        dataset_path = "0.5 ./data/sample.jsonl ./data/sample.txt"
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
-                {'path': './data/sample.json', 'type': 'local', 'weight': 0.5},
+                {'path': './data/sample.jsonl', 'type': 'local', 'weight': 0.5},
                 {'path': './data/sample.txt', 'type': 'local', 'weight': 1.0}]},
             ans)
 
@@ -373,7 +373,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertIsInstance(cfg, Namespace)
             self.assertEqual(cfg.project_name, 'dataset-local-json')
             self.assertEqual(cfg.dataset,
-                             {'configs': [{'path': 'sample.json', 'type': 'local'}]})
+                             {'configs': [{'path': 'sample.jsonl', 'type': 'local'}]})
             self.assertEqual(not cfg.dataset_path, True)
 
     def test_builder_ondisk_config_list(self):
@@ -385,7 +385,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertEqual(cfg.project_name, 'dataset-local-list')
             self.assertEqual(cfg.dataset,
                              {'configs': [
-                                {'path': 'sample.json', 'type': 'local'},
+                                {'path': 'sample.jsonl', 'type': 'local'},
                                 {'path': 'sample.txt', 'type': 'local'}
                                 ]})
             self.assertEqual(not cfg.dataset_path, True)
@@ -471,43 +471,41 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertIn('should be a positive integer', 
                           str(context.exception))
 
+    @TEST_TAG('ray')
     def test_builder_ray_config(self):
         """Test loading Ray configuration from YAML"""
         test_config_file = os.path.join(WORK_DIR, 'data', 'test_config_ray.yaml')
-        out = StringIO()
-        with redirect_stdout(out):
-            cfg = init_configs(args=f'--config {test_config_file}'.split())
-            
-            # Verify basic config
-            self.assertIsInstance(cfg, Namespace)
-            self.assertEqual(cfg.project_name, 'ray-demo-new-config')
-            self.assertEqual(cfg.executor_type, 'ray')
-            self.assertEqual(cfg.ray_address, 'auto')
-            
-            # Verify dataset config
-            self.assertEqual(cfg.dataset, {
-                'configs': [{
-                    'type': 'local',
-                    'path': './data/sample.json',
-                    'weight': 1.0
-                }]
-            })
-            
-            # Create builder and verify
-            builder = DatasetBuilder(cfg, executor_type=cfg.executor_type)
-            self.assertEqual(len(builder.load_strategies), 1)
-            self.assertIsInstance(builder.load_strategies[0], RayLocalJsonDataLoadStrategy)
 
-            # Load dataset and verify schema
-            dataset = builder.load_dataset()
-            schema = dataset.schema()
-            
-            # Verify expected columns exist
-            self.assertIn('text', schema.columns)
-            
-            # Verify schema types
-            import pyarrow as pa
-            self.assertTrue(pa.types.is_string(schema.column_types['text']))
+        cfg = init_configs(args=f'--config {test_config_file}'.split())
+        
+        # Verify basic config
+        self.assertIsInstance(cfg, Namespace)
+        self.assertEqual(cfg.project_name, 'ray-demo-new-config')
+        self.assertEqual(cfg.executor_type, 'ray')
+        self.assertEqual(cfg.ray_address, 'auto')
+        
+        # Verify dataset config
+        self.assertEqual(cfg.dataset, {
+            'configs': [{
+                'type': 'local',
+                'path': './data/sample.jsonl'
+            }]
+        })
+        
+        # Create builder and verify
+        builder = DatasetBuilder(cfg, executor_type=cfg.executor_type)
+        self.assertEqual(len(builder.load_strategies), 1)
+        self.assertIsInstance(builder.load_strategies[0], RayLocalJsonDataLoadStrategy)
+
+        # Load dataset and verify schema
+        dataset = builder.load_dataset()
+        schema = dataset.schema()
+        
+        # Verify expected columns exist
+        self.assertIn('text', schema.columns)
+        
+        # Verify schema types
+        self.assertEqual(schema.column_types['text'], str) 
             
 
 if __name__ == '__main__':

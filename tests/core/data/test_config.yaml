@@ -2,4 +2,4 @@ project_name: 'dataset-local-json'
 dataset:
   configs:
     - type: 'local'
-      path: 'sample.json'
+      path: 'sample.jsonl'

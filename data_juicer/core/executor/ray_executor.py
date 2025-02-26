@@ -62,6 +62,8 @@ class RayExecutor(ExecutorBase):
         self.tmp_dir = os.path.join(self.work_dir, '.tmp',
                                     ray.get_runtime_context().get_job_id())
 
+        # absolute path resolution logic
+
         # init dataset builder
         self.datasetbuilder = DatasetBuilder(self.cfg, executor_type='ray')
 
