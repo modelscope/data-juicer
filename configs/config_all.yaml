@@ -269,7 +269,7 @@ process:
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
   - image_captioning_from_gpt4v_mapper:                     # generate samples whose texts are generated based on gpt-4-vision and the image
-      mode: 'description'                                     # mode of text generated from images, can be one of ['resoning', 'description', 'conversation', 'custom']
+      mode: 'description'                                     # mode of text generated from images, can be one of ['reasoning', 'description', 'conversation', 'custom']
       api_key: ''                                             # the API key to authenticate the request
       max_token: 500                                          # the maximum number of tokens to generate. Default is 500.
       temperature: 1.0                                        # controls the randomness of the output (range from 0 to 1). Default is 0.
@@ -301,6 +301,12 @@ process:
       cv_classifier: ''                                       # OpenCV classifier path for face detection. By default, we will use 'haarcascade_frontalface_alt.xml'.
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
+  - image_remove_background_mapper:                         # remove background from images
+      alpha_matting: false                                    # Flag indicating whether to use alpha matting. Defaults to False.
+      alpha_matting_foreground_threshold: 240                 # Foreground threshold for alpha matting. Defaults to 240.
+      alpha_matting_background_threshold: 10                  # Background threshold for alpha matting. Defaults to 10.
+      alpha_matting_erode_size: 10                            # Erosion size for alpha matting. Defaults to 10.
+      bgcolor: None                                           # Background color for the cutout image. Defaults to None.
   - image_segment_mapper:                                   # perform segment-anything on images and return the bounding boxes.
       imgsz: 1024                                             # image resolution after image resizing
       conf: 0.05                                              # confidence score threshold
