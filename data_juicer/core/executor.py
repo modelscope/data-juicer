@@ -1,6 +1,6 @@
 import os
 from time import time
-from typing import Optional
+from typing import Optional, Union
 
 from jsonargparse import Namespace
 from loguru import logger
@@ -20,6 +20,7 @@ from ..ops.selector.frequency_specified_field_selector import \
 from ..ops.selector.topk_specified_field_selector import \
     TopkSpecifiedFieldSelector
 from .adapter import Adapter
+from .data import NestedDataset
 from .exporter import Exporter
 from .tracer import Tracer
 
@@ -143,17 +144,21 @@ class Executor:
             raise ValueError(f'Unsupported sample_algo: {sample_algo}')
 
     def run(self,
+            dataset: Union[Dataset, NestedDataset] = None,
             load_data_np: Optional[PositiveInt] = None,
             skip_return=False):
         """
         Running the dataset process pipeline.
 
+        :param dataset: a Dataset object to be executed.
         :param load_data_np: number of workers when loading the dataset.
         :param skip_return: skip return for API called.
         :return: processed dataset.
         """
         # 1. format data
-        if self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
+        if dataset is not None:
+            logger.info(f'Using existing dataset {dataset}')
+        elif self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
             logger.info('Loading dataset from checkpoint...')
             dataset = self.ckpt_manager.load_ckpt()
         else:
