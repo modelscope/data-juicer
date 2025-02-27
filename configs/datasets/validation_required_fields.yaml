@@ -1,12 +1,9 @@
 dataset:
   configs:
     - type: local
-      path: path/to/data.json
+      path: /path/to/data.json
 
 validators:
-  - type: conversation
-    min_turns: 2
-    max_turns: 20
   - type: required_fields
     required_fields:
       - "text"

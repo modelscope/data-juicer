@@ -88,6 +88,7 @@ Table of Contents
     - [Installation check](#installation-check)
     - [For Video-related Operators](#for-video-related-operators)
   - [Quick Start](#quick-start)
+    - [Dataset configuration](#dataset-configuration)
     - [Data Processing](#data-processing)
     - [Distributed Data Processing](#distributed-data-processing)
     - [Data Analysis](#data-analysis)
@@ -293,6 +294,10 @@ Check if your environment path is set correctly by running the ffmpeg command fr
 
 ## Quick Start
 
+### Dataset Configuration
+
+DJ supports various dataset input, including local files, remote datasets like huggingface; it also supports data validation and data mixture.
+Refer to [Dataset Configuration Guide](data_juicer/core/data/readme.md) for more details.
 
 ### Data Processing
 

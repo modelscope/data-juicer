@@ -75,17 +75,39 @@ class BaseConversationValidator(DataValidator):
 
 @DataValidatorRegistry.register('swift_messages')
 class SwiftMessagesValidator(BaseConversationValidator):
-    """Validator for Swift Messages format.
+    """Validator for Swift Messages conversation format.
 
-    Format:
-    {
-        "messages": [
-            {"role": "system", "content": "<system>"},
-            {"role": "user", "content": "<query>"},
-            {"role": "assistant", "content": "<response>"},
-            ...
-        ]
-    }
+    This validator ensures conversations follow the Swift Messages format with
+    proper message structure and role assignments.
+
+    Args:
+        config (Dict): Configuration dictionary containing:
+            min_turns (int, optional): Minimum number of messages.
+                Defaults to 1.
+            max_turns (int, optional): Maximum number of messages.
+                Defaults to 100.
+            sample_size (int, optional): Number of samples to validate.
+                Defaults to 100.
+
+    Example Format:
+        .. code-block:: python
+
+            {
+                "messages": [
+                    {"role": "system", "content": "<system>"},
+                    {"role": "user", "content": "<query>"},
+                    {"role": "assistant", "content": "<response>"},
+                    ...
+                ]
+            }
+
+    Raises:
+        DataValidationError: If validation fails due to:
+            - Missing 'messages' field
+            - Invalid message structure
+            - Invalid role values
+            - Missing content
+            - Message count outside allowed range
     """
 
     def validate_conversation(self, data: Dict) -> None:
@@ -116,17 +138,38 @@ class SwiftMessagesValidator(BaseConversationValidator):
 class DataJuicerFormatValidator(BaseConversationValidator):
     """Validator for Data-Juicer default conversation format.
 
-    Format:
-    {
-        "system": "<system>",  # Optional
-        "instruction": "<query-inst>",
-        "query": "<query2>",
-        "response": "<response2>",
-        "history": [  # Optional
-            ["<query1>", "<response1>"],
-            ...
-        ]
-    }
+    This validator ensures conversations follow the Data-Juicer format with
+    proper fields and structure.
+
+    Args:
+        config (Dict): Configuration dictionary containing:
+            min_turns (int, optional): Minimum number of conversation turns.
+                Defaults to 1.
+            max_turns (int, optional): Maximum number of conversation turns.
+                Defaults to 100.
+            sample_size (int, optional): Number of samples to validate.
+                Defaults to 100.
+
+    Example Format:
+        .. code-block:: python
+
+            {
+                "system": "<system>",  # Optional
+                "instruction": "<query-inst>",
+                "query": "<query2>",
+                "response": "<response2>",
+                "history": [  # Optional
+                    ["<query1>", "<response1>"],
+                    ...
+                ]
+            }
+
+    Raises:
+        DataValidationError: If validation fails due to:
+            - Missing required fields
+            - Invalid field types
+            - Invalid conversation structure
+            - Turn count outside allowed range
     """
 
     def validate_conversation(self, data: Dict) -> None:
@@ -184,7 +227,30 @@ class CodeDataValidator(DataValidator):
 
 @DataValidatorRegistry.register('required_fields')
 class RequiredFieldsValidator(DataValidator):
-    """Validator that checks for required fields in dataset"""
+    """Validator that checks for required fields in dataset.
+
+    This validator ensures that specified fields exist in the dataset and
+    optionally checks their types and missing value ratios.
+
+    Args:
+        config (Dict): Configuration dictionary containing:
+            required_fields (List[str]): List of field names that must exist
+            field_types (Dict[str, type], optional): Map of field names to
+            expected types allow_missing (float, optional): Maximum ratio of
+            missing values allowed. Defaults to 0.0.
+
+    Example Config:
+        .. code-block:: python
+
+            {
+                "required_fields": ["field1", "field2"],
+                "field_types": {"field1": str, "field2": int},
+                "allow_missing": 0.0
+            }
+
+    Raises:
+        DataValidationError: If validation fails
+    """
 
     def __init__(self, config: Dict):
         """
@@ -202,6 +268,7 @@ class RequiredFieldsValidator(DataValidator):
         self.field_types = config.get('field_types', {})
         # Default no missing allowed
         self.allow_missing = config.get('allow_missing', 0.0)
+        self.sample_size = config.get('sample_size', 100)
 
     def validate(self, dataset: DJDataset) -> None:
         """
@@ -229,8 +296,7 @@ class RequiredFieldsValidator(DataValidator):
             expected_type = self.field_types.get(field)
 
             # Sample head part of data for validation
-            MAX_SAMPLE_SIZE = 1000
-            sample_values = dataset.get_column(field, MAX_SAMPLE_SIZE)
+            sample_values = dataset.get_column(field, self.sample_size)
 
             # Check for missing values
             missing_count = sum(1 for v in sample_values if v is None)
