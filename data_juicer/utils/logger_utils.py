@@ -60,6 +60,9 @@ class StreamToLoguru:
         self.buffer = StringIO()
         self.BUFFER_SIZE = 1024 * 1024
 
+    def fileno(self):
+        return self.buffer.fileno()
+
     def write(self, buf):
         full_name = get_caller_name(depth=1)
         module_name = full_name.rsplit('.', maxsplit=-1)[0]
