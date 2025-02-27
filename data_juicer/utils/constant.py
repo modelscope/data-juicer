@@ -76,7 +76,7 @@ class MetaKeys(object):
     attributes = 'attributes'
     # # the extracted attribute descriptions
     attribute_descriptions = 'attribute_descriptions'
-    # # extract from raw datas for support the attribute
+    # # extract from raw data for support the attribute
     attribute_support_texts = 'attribute_support_texts'
     # # the nickname relationship
     nickname = 'nickname'

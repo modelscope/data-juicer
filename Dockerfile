@@ -1,5 +1,5 @@
 # The data-juicer image includes all open-source contents of data-juicer,
-# and it will be instaled in editable mode.
+# and it will be installed in editable mode.
 
 FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
