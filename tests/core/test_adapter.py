@@ -4,12 +4,12 @@ import datasets
 from datasets import load_dataset
 from loguru import logger
 from data_juicer.core import Adapter
-from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, SKIPPED_TESTS
+from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 from data_juicer.ops.mapper import FixUnicodeMapper
 from data_juicer.ops.filter import PerplexityFilter
 from data_juicer.ops.deduplicator import DocumentDeduplicator
 
-@SKIPPED_TESTS.register_module()
+@unittest.skip('random resource utilization fluctuation may cause failure')
 class AdapterTest(DataJuicerTestCaseBase):
 
     @classmethod

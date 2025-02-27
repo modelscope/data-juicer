@@ -9,12 +9,9 @@ from data_juicer.core.data import DJDataset, NestedDataset
 from data_juicer.core.ray_data import RayDataset
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import free_models
-from data_juicer.utils.registry import Registry
 
 rd = LazyLoader('rd', 'ray.data')
 transformers = LazyLoader('transformers', 'transformers')
-
-SKIPPED_TESTS = Registry('SkippedTests')
 
 CLEAR_MODEL = False
 
