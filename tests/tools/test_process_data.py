@@ -103,7 +103,8 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         if osp.exists(self.tmp_dir):
             shutil.rmtree(self.tmp_dir)
 
-        import ray
+        from data_juicer.utils.lazy_loader import LazyLoader
+        ray = LazyLoader('ray', 'ray')
         ray.shutdown()
 
     @TEST_TAG("ray")
