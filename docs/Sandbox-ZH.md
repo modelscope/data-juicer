@@ -22,7 +22,7 @@ Data-Juicer (DJ, 228k)模型输出样例如下表所示。
   | A corgi's head depicted as an explosion of a nebula | [![Case 4](https://img.alicdn.com/imgextra/i2/O1CN014oPB8Q1IrJg0AbUUg_!!6000000000946-2-tps-2048-320.png)](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case4.mp4) |
   | A graceful ballerina doing a pirouette on a dimly lit stage, with soft spotlight highlighting her movements. | [![Case 5](https://img.alicdn.com/imgextra/i4/O1CN01yNlsVu1ymvkJgkvY8_!!6000000006622-2-tps-2048-320.png)](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/show_cases/case5.mp4) |
 
-复现论文实验请参考下面的sandbox使用指南，下图的实验流程，[初始数据集](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip)，以及该流程的工作流的配置文件demo：[1_single_op_pipline.yaml](../configs/demo/bench/1_single_op_pipline.yaml)、[2_multi_op_pipline.yaml](../configs/demo/bench/2_multi_op_pipline.yaml)、[3_duplicate_pipline.yaml](../configs/demo/bench/3_duplicate_pipline.yaml)。
+复现论文实验请参考下面的sandbox使用指南，下图的实验流程，[初始数据集](http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/MM_data/our_refined_data/Data-Juicer-T2V/data_juicer_t2v_init_data_pool.zip)，以及该流程的工作流的配置文件demo：[1_single_op_pipeline.yaml](../configs/demo/bench/1_single_op_pipeline.yaml)、[2_multi_op_pipeline.yaml](../configs/demo/bench/2_multi_op_pipeline.yaml)、[3_duplicate_pipeline.yaml](../configs/demo/bench/3_duplicate_pipeline.yaml)。
 ![bench_bottom_up](https://img.alicdn.com/imgextra/i2/O1CN01xvu2fo1HU80biR6Q5_!!6000000000760-2-tps-7756-3693.png)
 
 ## 什么是沙盒实验室（DJ-Sandbox）？

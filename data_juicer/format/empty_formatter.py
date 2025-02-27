@@ -1,13 +1,10 @@
 from typing import List
 
 import pandas as pd
+import ray
 from datasets import Dataset, Features, Value
 
-from data_juicer.utils.lazy_loader import LazyLoader
-
 from .formatter import FORMATTERS, BaseFormatter
-
-ray = LazyLoader('ray', 'ray')
 
 
 @FORMATTERS.register_module()

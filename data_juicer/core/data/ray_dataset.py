@@ -6,6 +6,8 @@ from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union
 
 import pyarrow
+import ray.data as rd
+import ray.data.read_api as ds
 from loguru import logger
 
 from data_juicer import cuda_device_count
@@ -14,11 +16,7 @@ from data_juicer.core.data.schema import Schema
 from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.process_utils import calculate_np
-
-rd = LazyLoader('rd', 'ray.data')
-ds = LazyLoader('ds', 'ray.data.read_api')
 
 
 def get_abs_path(path, dataset_dir):

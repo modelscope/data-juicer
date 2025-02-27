@@ -1,6 +1,6 @@
 import os
 from time import time
-from typing import Optional
+from typing import Optional, Union
 
 from datasets import Dataset
 from jsonargparse import Namespace
@@ -8,6 +8,7 @@ from loguru import logger
 from pydantic import PositiveInt
 
 from data_juicer.core.adapter import Adapter
+from data_juicer.core.data import NestedDataset
 from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.executor import ExecutorBase
 from data_juicer.core.exporter import Exporter
@@ -21,7 +22,7 @@ from data_juicer.utils.ckpt_utils import CheckpointManager
 from data_juicer.utils.sample import random_sample
 
 
-class Executor(ExecutorBase):
+class DefaultExecutor(ExecutorBase):
     """
     This Executor class is used to process a specific dataset.
 
@@ -90,17 +91,21 @@ class Executor(ExecutorBase):
                 self.op_list_to_trace = set(OPERATORS.modules.keys())
 
     def run(self,
+            dataset: Union[Dataset, NestedDataset] = None,
             load_data_np: Optional[PositiveInt] = None,
             skip_return=False):
         """
         Running the dataset process pipeline.
 
+        :param dataset: a Dataset object to be executed.
         :param load_data_np: number of workers when loading the dataset.
         :param skip_return: skip return for API called.
         :return: processed dataset.
         """
-        # 1. load data
-        if self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
+        # 1. format data
+        if dataset is not None:
+            logger.info(f'Using existing dataset {dataset}')
+        elif self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
             logger.info('Loading dataset from checkpoint...')
             dataset = self.ckpt_manager.load_ckpt()
         else:
