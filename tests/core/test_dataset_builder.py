@@ -11,6 +11,7 @@ from data_juicer.core.data.dataset_builder import (rewrite_cli_datapath,
 from data_juicer.core.data.config_validator import ConfigValidationError
 from data_juicer.utils.unittest_utils import (DataJuicerTestCaseBase, TEST_TAG)
 from data_juicer.core.data.load_strategy import RayLocalJsonDataLoadStrategy
+import tempfile
 
 
 WORK_DIR = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
@@ -507,6 +508,69 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         # Verify schema types
         self.assertEqual(schema.column_types['text'], str) 
             
+
+    def test_dataset_path_and_dataset_priority(self):
+        """Test priority between dataset_path and dataset configuration"""
+        # Create test files
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            # Create two different test files
+            path1 = os.path.join(tmp_dir, 'test1.jsonl')
+            path2 = os.path.join(tmp_dir, 'test2.jsonl')
+            
+            # Write different content to each file
+            with open(path1, 'w', encoding='utf-8') as f:
+                f.write('{"text": "content from dataset_path"}\n')
+            
+            with open(path2, 'w', encoding='utf-8') as f:
+                f.write('{"text": "content from dataset config"}\n')
+            
+            # Test Case 1: Only dataset_path
+            cfg1 = Namespace()
+            cfg1.dataset_path = path1
+            cfg1.dataset = None
+            
+            builder1 = DatasetBuilder(cfg1, self.executor_type)
+            self.assertEqual(len(builder1.load_strategies), 1)
+            self.assertEqual(
+                builder1.load_strategies[0].ds_config['path'],
+                path1
+            )
+            
+            # Test Case 2: Only dataset config
+            cfg2 = Namespace()
+            cfg2.dataset_path = None
+            cfg2.dataset = {
+                'configs': [{
+                    'type': 'local',
+                    'path': path2
+                }]
+            }
+            
+            builder2 = DatasetBuilder(cfg2, self.executor_type)
+            self.assertEqual(len(builder2.load_strategies), 1)
+            self.assertEqual(
+                builder2.load_strategies[0].ds_config['path'],
+                path2
+            )
+            
+            # Test Case 3: Both present - dataset config should take priority
+            cfg3 = Namespace()
+            cfg3.dataset_path = path1
+            cfg3.dataset = {
+                'configs': [{
+                    'type': 'local',
+                    'path': path2
+                }]
+            }
+            
+            builder3 = DatasetBuilder(cfg3, self.executor_type)
+            self.assertEqual(len(builder3.load_strategies), 1)
+            self.assertEqual(
+                builder3.load_strategies[0].ds_config['path'],
+                path1,
+                "dataset_path should take priority over dataset config"
+            )
+
 
 if __name__ == '__main__':
     unittest.main()

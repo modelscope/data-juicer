@@ -21,19 +21,18 @@ class DatasetBuilder(object):
     """
 
     def __init__(self, cfg: Namespace, executor_type: str = 'default'):
-        # if generated_dataset_config present, prioritize
+        self.use_generated_dataset_config = False
+        self.cfg = cfg
+        self.executor_type = executor_type
+
+        # priority: generated_dataset_config > dataset_path > dataset
         if hasattr(
                 cfg,
                 'generated_dataset_config') and cfg.generated_dataset_config:
             self.use_generated_dataset_config = True
             self.generated_dataset_config = cfg.generated_dataset_config
             return
-        self.use_generated_dataset_config = False
-
-        self.cfg = cfg
-        self.executor_type = executor_type
-
-        if hasattr(cfg, 'dataset_path') and cfg.dataset_path:
+        elif hasattr(cfg, 'dataset_path') and cfg.dataset_path:
             logger.info(f'found dataset_path setting: {cfg.dataset_path}')
             ds_configs = rewrite_cli_datapath(cfg.dataset_path)
         elif hasattr(cfg, 'dataset') and cfg.dataset:
