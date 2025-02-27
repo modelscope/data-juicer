@@ -4,21 +4,19 @@ from typing import List, Optional, Union
 
 import numpy as np
 import pyarrow as pa
+import ray
 import regex
 from loguru import logger
 from pydantic import Field, PositiveInt
 from typing_extensions import Annotated
 
 from data_juicer.utils.constant import HashKeys
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import prepare_sentencepiece_model
 
 from ..base_op import OPERATORS, Deduplicator
 from ..common.helper_func import split_on_whitespace
 from .document_minhash_deduplicator import (MAX_HASH, MERSENNE_PRIME,
                                             optimal_param, sha1_hash32)
-
-ray = LazyLoader('ray', 'ray')
 
 BATCH_SIZE = 1000
 
