@@ -38,7 +38,7 @@ Data-Juicer is being actively updated and maintained. We will periodically enhan
 ## News
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-05] We propose a new data selection method, *DaaR*, which is theoretically informed, via treating diversity as a reward, achieves better overall performance across 7 benchmarks when post-training SOTA LLMs. See more details in [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/DaaR_arXiv_preview.pdf).
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-11] We release our 2.0 paper, [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755). It now can process 70B data samples within 2.1h, using 6400 CPU cores on 50 Ray nodes from Alibaba Cloud cluster, and deduplicate 5TB data within 2.8h using 1280 CPU cores on 8 Ray nodes.
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-03] We support post-tuning scenarios better, via 20+ related new [OPs](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2), and via unified [dataset format](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) compatiable to LLaMA-Factory and ModelScope-Swift.
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-03] We support post-tuning scenarios better, via 20+ related new [OPs](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2), and via unified [dataset format](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) compatible to LLaMA-Factory and ModelScope-Swift.
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-12-17] We propose *HumanVBench*, which comprises 17 human-centric tasks with synthetic data, benchmarking video-MLLMs' capabilities from views of inner emotion and outer manifestations. See more details in our [paper](https://arxiv.org/abs/2412.17574), and try to [evaluate](https://github.com/modelscope/data-juicer/tree/HumanVBench) your models with it.
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-11-22] We release DJ [v1.0.0](https://github.com/modelscope/data-juicer/releases/tag/v1.0.0), in which we refactored Data-Juicer's *Operator*, *Dataset*, *Sandbox* and many other modules for better usability, such as supporting fault-tolerant, FastAPI and adaptive resource management.
 - [2024-08-25] We give a [tutorial](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html) about data processing for multimodal LLMs in KDD'2024.
@@ -71,33 +71,35 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 Table of Contents
 =================
 
-- [News](#news)
-- [Why Data-Juicer?](#why-data-juicer)
-- [DJ-Cookbook](#dj-cookbook)
-  - [Curated Resources](#curated-resources)
-  - [Coding with Data-Juicer (DJ)](#coding-with-data-juicer-dj)
-  - [Use Cases \& Data Recipes](#use-cases--data-recipes)
-  - [Interactive Examples](#interactive-examples)
-- [Installation](#installation)
-  - [Prerequisites](#prerequisites)
-  - [From Source](#from-source)
-  - [Using pip](#using-pip)
-  - [Using Docker](#using-docker)
-  - [Installation check](#installation-check)
-  - [For Video-related Operators](#for-video-related-operators)
-- [Quick Start](#quick-start)
-  - [Data Processing](#data-processing)
-  - [Distributed Data Processing](#distributed-data-processing)
-  - [Data Analysis](#data-analysis)
-  - [Data Visualization](#data-visualization)
-  - [Build Up Config Files](#build-up-config-files)
-  - [Sandbox](#sandbox)
-  - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
-  - [For Docker Users](#for-docker-users)
-- [License](#license)
-- [Contributing](#contributing)
-- [Acknowledgement](#acknowledgement)
-- [References](#references)
+- [Data Processing for and with Foundation Models](#data-processing-for-and-with-foundation-models)
+  - [News](#news)
+- [Table of Contents](#table-of-contents)
+  - [Why Data-Juicer?](#why-data-juicer)
+  - [DJ-Cookbook](#dj-cookbook)
+    - [Curated Resources](#curated-resources)
+    - [Coding with Data-Juicer (DJ)](#coding-with-data-juicer-dj)
+    - [Use Cases \& Data Recipes](#use-cases--data-recipes)
+    - [Interactive Examples](#interactive-examples)
+  - [Installation](#installation)
+    - [Prerequisites](#prerequisites)
+    - [From Source](#from-source)
+    - [Using pip](#using-pip)
+    - [Using Docker](#using-docker)
+    - [Installation check](#installation-check)
+    - [For Video-related Operators](#for-video-related-operators)
+  - [Quick Start](#quick-start)
+    - [Data Processing](#data-processing)
+    - [Distributed Data Processing](#distributed-data-processing)
+    - [Data Analysis](#data-analysis)
+    - [Data Visualization](#data-visualization)
+    - [Build Up Config Files](#build-up-config-files)
+    - [Sandbox](#sandbox)
+    - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
+    - [For Docker Users](#for-docker-users)
+  - [License](#license)
+  - [Contributing](#contributing)
+  - [Acknowledgement](#acknowledgement)
+  - [References](#references)
 
 
 ## Why Data-Juicer?
@@ -164,7 +166,7 @@ Table of Contents
   - [Modelscope-Sora Challenge](https://tianchi.aliyun.com/competition/entrance/532219), based on Data-Juicer and [EasyAnimate](https://github.com/aigc-apps/EasyAnimate) framework,  optimize data and train SORA-like small models to generate better videos
   - [Better Mixture](https://tianchi.aliyun.com/competition/entrance/532174), only adjust data mixing and sampling strategies for given multiple candidate datasets
   - FT-Data Ranker ([1B Track](https://tianchi.aliyun.com/competition/entrance/532157), [7B Track](https://tianchi.aliyun.com/competition/entrance/532158)), For a specified candidate dataset, only adjust the data filtering and enhancement strategies
-  - [Kolors-LoRA Stylized Story Challenge](https://tianchi.aliyun.com/competition/entrance/532254), based on Data-Juicer and [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) framework, explore Difussion model fine-tuning
+  - [Kolors-LoRA Stylized Story Challenge](https://tianchi.aliyun.com/competition/entrance/532254), based on Data-Juicer and [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) framework, explore Diffusion model fine-tuning
 - [DJ-SORA](docs/DJ_SORA.md)
 - Based on Data-Juicer and [AgentScope](https://github.com/modelscope/agentscope) framework, leverage [agents to call DJ Filters](./demos/api_service/react_data_filter_process.ipynb) and [call DJ Mappers](./demos/api_service/react_data_mapper_process.ipynb)
 
