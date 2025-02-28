@@ -131,8 +131,8 @@
             <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hf_qwen_audio</span><span class="p">,</span>
             <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="s1">&#39;&lt;|startoftranscription|&gt;&lt;|unkown|&gt;&lt;|caption|&gt;&#39;</span> \
-                      <span class="s1">&#39;&lt;|unkown|&gt;&lt;|notimestamps|&gt;&lt;|wo_itn|&gt;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="s1">&#39;&lt;|startoftranscription|&gt;&lt;|unknown|&gt;&lt;|caption|&gt;&#39;</span> \
+                      <span class="s1">&#39;&lt;|unknown|&gt;&lt;|notimestamps|&gt;&lt;|wo_itn|&gt;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response_remove_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&lt;\|.*?\|&gt;&#39;</span><span class="p">)</span></div>
 
 
