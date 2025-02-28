@@ -85,8 +85,26 @@
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.core.html">data_juicer.core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Adapter"><code class="docutils literal notranslate"><span class="pre">Adapter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Analyzer"><code class="docutils literal notranslate"><span class="pre">Analyzer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.NestedDataset"><code class="docutils literal notranslate"><span class="pre">NestedDataset</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Executor"><code class="docutils literal notranslate"><span class="pre">Executor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Exporter"><code class="docutils literal notranslate"><span class="pre">Exporter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Monitor"><code class="docutils literal notranslate"><span class="pre">Monitor</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.core.html#data_juicer.core.Tracer"><code class="docutils literal notranslate"><span class="pre">Tracer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.html">data_juicer.ops</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.load_ops"><code class="docutils literal notranslate"><span class="pre">load_ops()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Filter"><code class="docutils literal notranslate"><span class="pre">Filter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Mapper"><code class="docutils literal notranslate"><span class="pre">Mapper</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Deduplicator"><code class="docutils literal notranslate"><span class="pre">Deduplicator</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Selector"><code class="docutils literal notranslate"><span class="pre">Selector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Grouper"><code class="docutils literal notranslate"><span class="pre">Grouper</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Aggregator"><code class="docutils literal notranslate"><span class="pre">Aggregator</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.filter.html">data_juicer.ops.filter</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.AlphanumericFilter"><code class="docutils literal notranslate"><span class="pre">AlphanumericFilter</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.filter.html#data_juicer.ops.filter.AudioDurationFilter"><code class="docutils literal notranslate"><span class="pre">AudioDurationFilter</span></code></a></li>
@@ -219,10 +237,22 @@
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentMinhashDeduplicator"><code class="docutils literal notranslate"><span class="pre">DocumentMinhashDeduplicator</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.DocumentSimhashDeduplicator"><code class="docutils literal notranslate"><span class="pre">DocumentSimhashDeduplicator</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.ImageDeduplicator"><code class="docutils literal notranslate"><span class="pre">ImageDeduplicator</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayBasicDeduplicator"><code class="docutils literal notranslate"><span class="pre">RayBasicDeduplicator</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayDocumentDeduplicator"><code class="docutils literal notranslate"><span class="pre">RayDocumentDeduplicator</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayImageDeduplicator"><code class="docutils literal notranslate"><span class="pre">RayImageDeduplicator</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayVideoDeduplicator"><code class="docutils literal notranslate"><span class="pre">RayVideoDeduplicator</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayBTSMinhashDeduplicator"><code class="docutils literal notranslate"><span class="pre">RayBTSMinhashDeduplicator</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.VideoDeduplicator"><code class="docutils literal notranslate"><span class="pre">VideoDeduplicator</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.selector.html">data_juicer.ops.selector</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.FrequencySpecifiedFieldSelector"><code class="docutils literal notranslate"><span class="pre">FrequencySpecifiedFieldSelector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.RandomSelector"><code class="docutils literal notranslate"><span class="pre">RandomSelector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.RangeSpecifiedFieldSelector"><code class="docutils literal notranslate"><span class="pre">RangeSpecifiedFieldSelector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.TagsSpecifiedFieldSelector"><code class="docutils literal notranslate"><span class="pre">TagsSpecifiedFieldSelector</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.selector.html#data_juicer.ops.selector.TopkSpecifiedFieldSelector"><code class="docutils literal notranslate"><span class="pre">TopkSpecifiedFieldSelector</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="data_juicer.ops.common.html">data_juicer.ops.common</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.get_sentences_from_document"><code class="docutils literal notranslate"><span class="pre">get_sentences_from_document()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.get_words_from_document"><code class="docutils literal notranslate"><span class="pre">get_words_from_document()</span></code></a></li>
@@ -249,7 +279,20 @@
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.config.html#data_juicer.config.prepare_side_configs"><code class="docutils literal notranslate"><span class="pre">prepare_side_configs()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_juicer.format.html">data_juicer.format</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.load_formatter"><code class="docutils literal notranslate"><span class="pre">load_formatter()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.JsonFormatter"><code class="docutils literal notranslate"><span class="pre">JsonFormatter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.LocalFormatter"><code class="docutils literal notranslate"><span class="pre">LocalFormatter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.RemoteFormatter"><code class="docutils literal notranslate"><span class="pre">RemoteFormatter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.TextFormatter"><code class="docutils literal notranslate"><span class="pre">TextFormatter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.ParquetFormatter"><code class="docutils literal notranslate"><span class="pre">ParquetFormatter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.CsvFormatter"><code class="docutils literal notranslate"><span class="pre">CsvFormatter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.TsvFormatter"><code class="docutils literal notranslate"><span class="pre">TsvFormatter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.MixtureFormatter"><code class="docutils literal notranslate"><span class="pre">MixtureFormatter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.EmptyFormatter"><code class="docutils literal notranslate"><span class="pre">EmptyFormatter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.format.html#data_juicer.format.RayEmptyFormatter"><code class="docutils literal notranslate"><span class="pre">RayEmptyFormatter</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
