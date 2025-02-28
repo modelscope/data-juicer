@@ -140,10 +140,7 @@ class StatsKeysMeta(type):
             from data_juicer.core import Analyzer
             tmp_analyzer = Analyzer(tmp_dj_cfg)
 
-            from data_juicer.core.data import NestedDataset
-            dataset = NestedDataset.from_dict(
-                {k: [v]
-                 for k, v in dataset[0].items()})
+            dataset = dataset.take(1)
             # do not overwrite the true analysis results
             tmp_analyzer.run(dataset=dataset, skip_export=True)
         elif dj_cfg:
