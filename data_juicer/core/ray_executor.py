@@ -2,18 +2,15 @@ import os
 import shutil
 import time
 
+import ray
 from loguru import logger
 
 from data_juicer.config import init_configs
 from data_juicer.core.ray_data import RayDataset
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
-from data_juicer.utils.lazy_loader import LazyLoader
 
 from .adapter import Adapter
-
-ray = LazyLoader('ray', 'ray')
-rd = LazyLoader('rd', 'ray.data')
 
 
 class TempDirManager:
