@@ -1,14 +1,15 @@
 # How-to Guide for Developers
 
-- [1. Coding Style](#1-coding-style)
-- [2. Build Your Own OPs](#2-build-your-own-ops)
-  - [2.1 Building Illustration](#21-building-illustration)
-    - [2.1.2 Providing Basic OP Functions (alpha version)](#212-providing-basic-op-functions-alpha-version)
-  - [2.1.2 Making the OP More Usable (beta version)](#212-making-the-op-more-usable-beta-version)
-  - [2.1.3 Making OP Faster \& More complete (stable version)](#213-making-op-faster--more-complete-stable-version)
-- [3. Build Your Own Data Recipes and Configs](#3-build-your-own-data-recipes-and-configs)
-  - [3.1 Fruitful Config Sources \& Type Hints](#31-fruitful-config-sources--type-hints)
-  - [3.2 Hierarchical Configs and Helps](#32-hierarchical-configs-and-helps)
+- [How-to Guide for Developers](#how-to-guide-for-developers)
+  - [1. Coding Style](#1-coding-style)
+  - [2. Build Your Own OPs](#2-build-your-own-ops)
+    - [2.1 Building Illustration](#21-building-illustration)
+      - [2.1.2 Providing Basic OP Functions (alpha version)](#212-providing-basic-op-functions-alpha-version)
+    - [2.1.2 Making the OP More Usable (beta version)](#212-making-the-op-more-usable-beta-version)
+    - [2.1.3 Making OP Faster \& More complete (stable version)](#213-making-op-faster--more-complete-stable-version)
+  - [3. Build Your Own Data Recipes and Configs](#3-build-your-own-data-recipes-and-configs)
+    - [3.1 Fruitful Config Sources \& Type Hints](#31-fruitful-config-sources--type-hints)
+    - [3.2 Hierarchical Configs and Helps](#32-hierarchical-configs-and-helps)
 
 ## 1. Coding Style
 
@@ -55,7 +56,7 @@ Assuming we want to add a new Filter operator called "TextLengthFilter" to get c
 
 #### 2.1.2 Providing Basic OP Functions (alpha version)
 
-1. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic), Optional) If the new OP defines  some statistical variables, please add the corrosponding new `StatsKeys` attribute in `data_juicer/utils/constant.py` for unified management.
+1. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic), Optional) If the new OP defines  some statistical variables, please add the corresponding new `StatsKeys` attribute in `data_juicer/utils/constant.py` for unified management.
 
 ```python
 class StatsKeys(object):
@@ -119,7 +120,7 @@ class StatsKeys(object):
                 return False
     ```
 
-3. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) After implemention, add it to the OP dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
+3. (![alpha](https://img.shields.io/badge/alpha-red?style=plastic)) After implementation, add it to the OP dictionary in the `__init__.py` file in `data_juicer/ops/filter/` directory.
 
 ```python
 from . import (...,              # other OPs
@@ -242,7 +243,7 @@ if __name__ == '__main__':
             # ... (some codes)
     ```
 
-- (![stable](https://img.shields.io/badge/stable-green?style=plastic)) In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra datas. The format of the saving path is `{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`, where the `HASH_VALUE` is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. For convenience, we can call `self.remove_extra_parameters(locals())` at the beginning of the initiation to get the init parameters. At the same time, we can call `self.add_parameters` to add related parameters with the produced extra datas from each sample. Take the operator which enhances the images with diffusion models as example:
+- (![stable](https://img.shields.io/badge/stable-green?style=plastic)) In a mapper operator, to avoid process conflicts and data coverage, we offer an interface to make a saving path for produced extra data. The format of the saving path is `{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`, where the `HASH_VALUE` is hashed from the init parameters of the operator, the related parameters in each sample, the process ID, and the timestamp. For convenience, we can call `self.remove_extra_parameters(locals())` at the beginning of the initiation to get the init parameters. At the same time, we can call `self.add_parameters` to add related parameters with the produced extra data from each sample. Take the operator which enhances the images with diffusion models as example:
     ```python
     from data_juicer.utils.file_utils import transfer_filename
     # ... (import some other libraries)
@@ -266,7 +267,7 @@ if __name__ == '__main__':
                     origin_image_path, OP_NAME, **related_parameters)
             # ... (some codes)
     ```
-    For the mapper to produce multi extra datas base on one origin data, we can add suffix at the saving path. Take the operator which splits videos according to their key frames as example:
+    For the mapper to produce multi extra data base on one origin data, we can add suffix at the saving path. Take the operator which splits videos according to their key frames as example:
     ```python
     from data_juicer.utils.file_utils import add_suffix_to_filename, transfer_filename
     # ... (import some other libraries)

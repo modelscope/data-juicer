@@ -20,12 +20,15 @@ This project is being actively updated and maintained. We eagerly invite you to 
 
 # Roadmap
 ## Overview
-* [Support high-performance loading and processing of video data](#support-high-performance-loading-and-processing-of-video-data)
-* [Basic Operators (video spatio-temporal dimension)](#basic-operators-video-spatio-temporal-dimension)
-* [Advanced Operators (fine-grained modal matching and data generation)](#advanced-operators-fine-grained-modal-matching-and-data-generation)
-* [Advanced Operators (Video Content)](#advanced-operators-video-content)
-* [DJ-SORA Data Recipes and Datasets](#dj-sora-data-recipes-and-datasets)
-* [DJ-SORA Data Validation and Model Training](#dj-sora-data-validation-and-model-training)
+- [Motivation](#motivation)
+- [Roadmap](#roadmap)
+  - [Overview](#overview)
+  - [Support high-performance loading and processing of video data](#support-high-performance-loading-and-processing-of-video-data)
+  - [Basic Operators (video spatio-temporal dimension)](#basic-operators-video-spatio-temporal-dimension)
+  - [Advanced Operators (fine-grained modal matching and data generation)](#advanced-operators-fine-grained-modal-matching-and-data-generation)
+  - [Advanced Operators (Video Content)](#advanced-operators-video-content)
+  - [DJ-SORA Data Recipes and Datasets](#dj-sora-data-recipes-and-datasets)
+  - [DJ-SORA Data Validation and Model Training](#dj-sora-data-validation-and-model-training)
 
 
 ## Support high-performance loading and processing of video data
@@ -46,7 +49,7 @@ This project is being actively updated and maintained. We eagerly invite you to 
   - [✅] video_resolution_filter (targeted resolution)
   - [✅] video_aspect_ratio_filter (targeted aspect ratio)
   - [✅] video_duration_filter (targeted) duration)
-  - [✅] video_motion_score_filter (video continuity dimension, calculating optical flow and removing statics and extreme dynamics)
+  - [✅] video_motion_score_filter (video continuity dimension, calculating optical flow and removing statistics and extreme dynamics)
   - [✅] video_ocr_area_ratio_filter (remove samples with text areas that are too large)
 - Towards Data Diversity & Quantity
    - [✅] video_resize_resolution_mapper (enhancement in resolution dimension)
