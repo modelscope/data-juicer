@@ -864,7 +864,8 @@ MODEL_FUNCTION_MAPPING = {
 }
 
 _MODELS_WITHOUT_FILE_LOCK = {
-    'kenlm', 'nltk', 'recognizeAnything', 'sentencepiece', 'spacy'
+    'fasttext', 'fastsam', 'kenlm', 'nltk', 'recognizeAnything',
+    'sentencepiece', 'spacy'
 }
 
 

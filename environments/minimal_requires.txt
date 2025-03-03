@@ -37,3 +37,4 @@ httpx
 wordcloud
 jsonlines
 bs4
+ray==2.40.0

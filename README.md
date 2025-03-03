@@ -36,17 +36,20 @@ Data-Juicer is being actively updated and maintained. We will periodically enhan
 
 
 ## News
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-28] DJ has been integrated in [Ray's official Ecosystem](https://docs.ray.io/en/latest/ray-overview/ray-libraries.html) and [Example Gallery](https://docs.ray.io/en/latest/data/examples/data_juicer_distributed_data_processing.html). Besides, our patch in DJ2.0 for the streaming JSON reader has been officially integrated by [Apache Arrow](https://github.com/apache/arrow/pull/45084). 
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-27] Our work on contrastive data synthesis, [ImgDiff](https://arxiv.org/pdf/2408.04594), has been accepted by *CVPR 2025*!
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-05] We propose a new data selection method, *DaaR*, which is theoretically informed, via treating diversity as a reward, achieves better overall performance across 7 benchmarks when post-training SOTA LLMs. See more details in [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/DaaR_arXiv_preview.pdf).
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-11] We release our 2.0 paper, [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755). It now can process 70B data samples within 2.1h, using 6400 CPU cores on 50 Ray nodes from Alibaba Cloud cluster, and deduplicate 5TB data within 2.8h using 1280 CPU cores on 8 Ray nodes.
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-03] We support post-tuning scenarios better, via 20+ related new [OPs](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2), and via unified [dataset format](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) compatible to LLaMA-Factory and ModelScope-Swift.
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-12-17] We propose *HumanVBench*, which comprises 17 human-centric tasks with synthetic data, benchmarking video-MLLMs' capabilities from views of inner emotion and outer manifestations. See more details in our [paper](https://arxiv.org/abs/2412.17574), and try to [evaluate](https://github.com/modelscope/data-juicer/tree/HumanVBench) your models with it.
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-11-22] We release DJ [v1.0.0](https://github.com/modelscope/data-juicer/releases/tag/v1.0.0), in which we refactored Data-Juicer's *Operator*, *Dataset*, *Sandbox* and many other modules for better usability, such as supporting fault-tolerant, FastAPI and adaptive resource management.
-- [2024-08-25] We give a [tutorial](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html) about data processing for multimodal LLMs in KDD'2024.
-
 
 <details>
 <summary> History News:
 </summary>>
+
+- [2024-11-22] We release DJ [v1.0.0](https://github.com/modelscope/data-juicer/releases/tag/v1.0.0), in which we refactored Data-Juicer's *Operator*, *Dataset*, *Sandbox* and many other modules for better usability, such as supporting fault-tolerant, FastAPI and adaptive resource management.
+
+- [2024-08-25] We give a [tutorial](https://modelscope.github.io/data-juicer/_static/tutorial_kdd24.html) about data processing for multimodal LLMs in KDD'2024.
 
 - [2024-08-09] We propose Img-Diff, which enhances the performance of multimodal large language models through *contrastive data synthesis*, achieving a score that is 12 points higher than GPT-4V on the [MMVP benchmark](https://tsb0601.github.io/mmvp_blog/). See more details in our [paper](https://arxiv.org/abs/2408.04594), and download the dataset from [huggingface](https://huggingface.co/datasets/datajuicer/Img-Diff) and [modelscope](https://modelscope.cn/datasets/Data-Juicer/Img-Diff).
 - [2024-07-24] "Tianchi Better Synth Data Synthesis Competition for Multimodal Large Models" — Our 4th data-centric LLM competition has kicked off! Please visit the competition's [official website](https://tianchi.aliyun.com/competition/entrance/532251) for more information.
@@ -71,6 +74,7 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 Table of Contents
 =================
 
+<<<<<<< HEAD
 - [Data Processing for and with Foundation Models](#data-processing-for-and-with-foundation-models)
   - [News](#news)
 - [Table of Contents](#table-of-contents)
@@ -101,6 +105,35 @@ Table of Contents
   - [Contributing](#contributing)
   - [Acknowledgement](#acknowledgement)
   - [References](#references)
+=======
+- [News](#news)
+- [Why Data-Juicer?](#why-data-juicer)
+- [DJ-Cookbook](#dj-cookbook)
+  - [Curated Resources](#curated-resources)
+  - [Coding with Data-Juicer (DJ)](#coding-with-data-juicer-dj)
+  - [Use Cases \& Data Recipes](#use-cases--data-recipes)
+  - [Interactive Examples](#interactive-examples)
+- [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [From Source](#from-source)
+  - [Using pip](#using-pip)
+  - [Using Docker](#using-docker)
+  - [Installation check](#installation-check)
+  - [For Video-related Operators](#for-video-related-operators)
+- [Quick Start](#quick-start)
+  - [Data Processing](#data-processing)
+  - [Distributed Data Processing](#distributed-data-processing)
+  - [Data Analysis](#data-analysis)
+  - [Data Visualization](#data-visualization)
+  - [Build Up Config Files](#build-up-config-files)
+  - [Sandbox](#sandbox)
+  - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
+  - [For Docker Users](#for-docker-users)
+- [License](#license)
+- [Contributing](#contributing)
+- [Acknowledgement](#acknowledgement)
+- [References](#references)
+>>>>>>> main
 
 
 ## Why Data-Juicer?
