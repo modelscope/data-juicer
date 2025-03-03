@@ -8,7 +8,6 @@ import uuid
 import yaml
 
 from data_juicer.config import init_configs
-from tools.process_data import main as process_data_main
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
 
 
@@ -255,11 +254,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
         with open(tmp_yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
 
-        # Initialize configs directly
-        args = init_configs(['--config', tmp_yaml_file])
-            
-        # Call the process_data function directly
-        process_data_main(args)
+        run_in_subprocess(f'python {self.script_path} --config {tmp_yaml_file}')
 
         self.assertTrue(osp.exists(tmp_out_path))
 
@@ -375,6 +370,8 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
 
         with open(tmp_yaml_file, 'w') as file:
             yaml.dump(yaml_config, file)
+
+        init_configs(['--config', tmp_yaml_file])
 
         run_in_subprocess(f'python {self.script_path} --config {tmp_yaml_file}')
 
