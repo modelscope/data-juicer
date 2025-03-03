@@ -7,7 +7,6 @@ import ray.data as rd
 
 from data_juicer import is_cuda_available
 from data_juicer.core.data import DJDataset, NestedDataset
-from data_juicer.core.data.ray_dataset import RayDataset
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import free_models
 
@@ -87,6 +86,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         if current_tag.startswith('standalone'):
             return NestedDataset.from_list(data)
         elif current_tag.startswith('ray'):
+            from data_juicer.core.data.ray_dataset import RayDataset
             dataset = rd.from_items(data)
             return RayDataset(dataset)
         else:

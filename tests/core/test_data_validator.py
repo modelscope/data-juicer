@@ -84,7 +84,7 @@ class RequiredFieldsValidatorTest(DataJuicerTestCaseBase):
     @TEST_TAG('ray')
     def test_ray_dataset_support(self):
         import ray.data
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
         
         # Create ray dataset
         self.ray_dataset = RayDataset(ray.data.from_items(self.data))    
@@ -127,7 +127,7 @@ class RequiredFieldsValidatorTest(DataJuicerTestCaseBase):
     @TEST_TAG('ray')
     def test_multiple_dataset_types(self):
         import ray.data
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
 
         # Create ray dataset
         self.ray_dataset = RayDataset(ray.data.from_items(self.data))    

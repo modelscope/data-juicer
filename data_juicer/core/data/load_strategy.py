@@ -1,4 +1,5 @@
 import fnmatch
+import os
 from abc import ABC, abstractmethod
 from argparse import Namespace
 from dataclasses import dataclass
@@ -202,9 +203,7 @@ class RayLocalJsonDataLoadStrategy(RayDataLoadStrategy):
     }
 
     def load_data(self, **kwargs):
-        import os
-
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
 
         path = self.ds_config['path']
 

@@ -292,7 +292,7 @@ class TestRayDataset(unittest.TestCase):
     def setUp(self):
         """Set up test data"""
         import ray
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
         
         self.data = [
             {
@@ -386,7 +386,7 @@ class TestRayDataset(unittest.TestCase):
     def test_get_column_empty_dataset(self):
         """Test with empty dataset"""
         import ray
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
 
         empty_dataset = RayDataset(ray.data.from_items([]))
         
@@ -430,7 +430,7 @@ class TestRayDataset(unittest.TestCase):
     def test_schema_single_dataset(self):
         """Test schema for single dataset"""
         import ray.data
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
         data = [{'text': 'hello', 'score': 1}]
         dataset = RayDataset(ray.data.from_items(data))
         
@@ -443,7 +443,7 @@ class TestRayDataset(unittest.TestCase):
     def test_schema_multiple_datasets(self):
         """Test schema consistency across multiple datasets"""
         import ray.data
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
         data1 = [{'text': 'hello', 'score': 1}]
         data2 = [{'text': 'world', 'score': 2}]
         
@@ -461,7 +461,7 @@ class TestRayDataset(unittest.TestCase):
     def test_schema_validation(self):
         """Test schema validation"""
         import ray.data
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
         # Test with invalid schema (mixed types)
         data = [
             {'text': 'hello', 'value': 1},
@@ -479,7 +479,7 @@ class TestRayDataset(unittest.TestCase):
     def test_schema_nested_structures(self):
         """Test schema with nested data structures"""
         import ray.data
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
         data = [{
             'text': 'hello',
             'int_value': 1,
@@ -505,7 +505,7 @@ class TestRayDataset(unittest.TestCase):
     def test_schema_empty_dataset(self):
         """Test schema with empty dataset"""
         import ray.data
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
 
         with self.assertRaises(ValueError) as context:
             dataset = RayDataset(ray.data.from_items([]))
@@ -517,7 +517,7 @@ class TestRayDataset(unittest.TestCase):
     def test_schema_special_characters(self):
         """Test schema with special characters in column names"""
         import ray.data
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
         data = [{
             'normal': 1,
             'with.dot': 2,
@@ -539,7 +539,7 @@ class TestRayDataset(unittest.TestCase):
     def test_schema_type_consistency(self):
         """Test schema type consistency across rows"""
         import ray.data
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
         data = [
             {'text': 'hello', 'score': 1, 'flag': True},
             {'text': 'world', 'score': 2, 'flag': False},
@@ -570,7 +570,7 @@ class TestRayDataset(unittest.TestCase):
     def test_get(self):
         """Test get method for RayDataset"""
         import ray
-        from data_juicer.core.data import RayDataset
+        from data_juicer.core.data.ray_dataset import RayDataset
         
         # Test with simple data
         simple_data = [
