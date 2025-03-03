@@ -27,7 +27,7 @@ dataset:
 
 ### Remote Huggingface Dataset
 
-The `remote_huggingface.yaml` configuration file is used to specify datasets stored remotely in JSON format. *type* and *source* are fixed to 'remote' and 'huggingface' to locate huggingface loading logic. *path* is required to specify the huggingface dataset name. *name*, *split* and *limit* are optional to specify the dataset split and limit the number of samples to load.
+The `remote_huggingface.yaml` configuration file is used to specify huggingface datasets. *type* and *source* are fixed to 'remote' and 'huggingface' to locate huggingface loading logic. *path* is required to identify the huggingface dataset. *name*, *split* and *limit* are optional to specify the dataset name/split and limit the number of samples to load.
 Refer to [remote_huggingface.yaml](https://github.com/data-juicer/data-juicer/blob/main/configs/datasets/remote_huggingface.yaml) for more details.
 
 ```yaml

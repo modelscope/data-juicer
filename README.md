@@ -296,8 +296,8 @@ Check if your environment path is set correctly by running the ffmpeg command fr
 
 ### Dataset Configuration
 
-DJ supports various dataset input, including local files, remote datasets like huggingface; it also supports data validation and data mixture.
-Refer to [Dataset Configuration Guide](data_juicer/core/data/readme.md) for more details.
+DJ supports various dataset input types, including local files, remote datasets like huggingface; it also supports data validation and data mixture.
+Refer to [Dataset Configuration Guide](data_juicer/core/data/README.md) for more details.
 
 ### Data Processing
 
