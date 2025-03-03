@@ -23,6 +23,8 @@ def get_row_col(total_num, factor=2):
         for each stat figure
     :return: "best" number of rows and columns, and the grid list
     """
+    if factor <= 0 or total_num <= 0:
+        return 0, 0, []
     n = total_num * factor  # actual number of figures
     now_col = factor  # search from the minimum number of columns
     now_row = total_num
