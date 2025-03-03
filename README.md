@@ -74,7 +74,6 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 Table of Contents
 =================
 
-<<<<<<< HEAD
 - [Data Processing for and with Foundation Models](#data-processing-for-and-with-foundation-models)
   - [News](#news)
 - [Table of Contents](#table-of-contents)
@@ -105,7 +104,6 @@ Table of Contents
   - [Contributing](#contributing)
   - [Acknowledgement](#acknowledgement)
   - [References](#references)
-=======
 - [News](#news)
 - [Why Data-Juicer?](#why-data-juicer)
 - [DJ-Cookbook](#dj-cookbook)
@@ -133,7 +131,6 @@ Table of Contents
 - [Contributing](#contributing)
 - [Acknowledgement](#acknowledgement)
 - [References](#references)
->>>>>>> main
 
 
 ## Why Data-Juicer?
