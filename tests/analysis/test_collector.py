@@ -22,7 +22,7 @@ class TextTokenDistCollectorTest(DataJuicerTestCaseBase):
     def tearDownClass(cls) -> None:
         super().tearDownClass(cls.tokenizer_model)
 
-    def test_init(self):
+    def test_basic_func(self):
         collector = TextTokenDistCollector(self.tokenizer_model)
         dist = collector.collect(self.test_data_path, 'text')
         self.assertIsInstance(dist, torch.distributions.Categorical)

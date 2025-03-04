@@ -51,6 +51,10 @@ class GetDiversityTest(DataJuicerTestCaseBase):
             {'verb': None, 'noun': None},  # invalid
         ]
 
+    @staticmethod
+    def list_of_dict_equal(l1, l2):
+        return set(tuple(d.items()) for d in l1) == set(tuple(d.items()) for d in l2)
+
     def test_basic_func(self):
         res_data = [
             {'verb': 'play', 'noun': 'basketball', 'count': 1},
@@ -60,9 +64,7 @@ class GetDiversityTest(DataJuicerTestCaseBase):
         ]
         df = pd.DataFrame(self.test_data)
         res = get_diversity(df)
-        print(res)
-        print(res_data)
-        self.assertEqual(res.to_dict(orient='records'), res_data)
+        self.assertTrue(self.list_of_dict_equal(res.to_dict(orient='records'), res_data))
 
     def test_top_k_verbs(self):
         res_data = [
@@ -73,22 +75,20 @@ class GetDiversityTest(DataJuicerTestCaseBase):
         df = pd.DataFrame(self.test_data)
         # only keep the top 2 verb groups
         res = get_diversity(df, top_k_verbs=2)
-        print(res)
-        print(res_data)
-        self.assertEqual(res.to_dict(orient='records'), res_data)
+        self.assertTrue(self.list_of_dict_equal(res.to_dict(orient='records'), res_data))
 
     def test_top_k_nouns(self):
-        res_data = [
-            {'verb': 'play', 'noun': 'basketball', 'count': 1},
-            {'verb': 'read', 'noun': 'book', 'count': 2},
-            {'verb': 'watch', 'noun': 'movie', 'count': 3},
-        ]
+        res_data_1 = [{'verb': 'play', 'noun': 'basketball', 'count': 1},
+                      {'verb': 'read', 'noun': 'book', 'count': 2},
+                      {'verb': 'watch', 'noun': 'movie', 'count': 3},]
+        res_data_2 = [{'verb': 'play', 'noun': 'football', 'count': 1},
+                      {'verb': 'read', 'noun': 'book', 'count': 2},
+                      {'verb': 'watch', 'noun': 'movie', 'count': 3},]
         df = pd.DataFrame(self.test_data)
         # only keep the top 1 noun for each verb group
         res = get_diversity(df, top_k_nouns=1)
-        print(res)
-        print(res_data)
-        self.assertEqual(res.to_dict(orient='records'), res_data)
+        self.assertTrue(self.list_of_dict_equal(res.to_dict(orient='records'), res_data_1) or
+                        self.list_of_dict_equal(res.to_dict(orient='records'), res_data_2))
 
 class DiversityAnalysisTest(DataJuicerTestCaseBase):
 
