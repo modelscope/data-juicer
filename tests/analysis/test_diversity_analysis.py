@@ -60,6 +60,8 @@ class GetDiversityTest(DataJuicerTestCaseBase):
         ]
         df = pd.DataFrame(self.test_data)
         res = get_diversity(df)
+        print(res)
+        print(res_data)
         self.assertEqual(res.to_dict(orient='records'), res_data)
 
     def test_top_k_verbs(self):
@@ -71,6 +73,8 @@ class GetDiversityTest(DataJuicerTestCaseBase):
         df = pd.DataFrame(self.test_data)
         # only keep the top 2 verb groups
         res = get_diversity(df, top_k_verbs=2)
+        print(res)
+        print(res_data)
         self.assertEqual(res.to_dict(orient='records'), res_data)
 
     def test_top_k_nouns(self):
@@ -82,6 +86,8 @@ class GetDiversityTest(DataJuicerTestCaseBase):
         df = pd.DataFrame(self.test_data)
         # only keep the top 1 noun for each verb group
         res = get_diversity(df, top_k_nouns=1)
+        print(res)
+        print(res_data)
         self.assertEqual(res.to_dict(orient='records'), res_data)
 
 class DiversityAnalysisTest(DataJuicerTestCaseBase):
