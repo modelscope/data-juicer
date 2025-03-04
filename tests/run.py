@@ -100,12 +100,20 @@ def main():
     res = runner.run(test_suite)
 
     cov.stop()
+    cov.save()
 
     if not res.wasSuccessful():
         exit(1)
 
-    cov.report(ignore_errors=True)
-    cov.html_report(directory=f'coverage_report_{args.tag}', ignore_errors=True)
+    try:
+        cov.report(ignore_errors=True)
+    except Exception as e:
+        logger.error(f'Failed to print coverage report: {e}')
+
+    try:
+        cov.html_report(directory=f'coverage_report_{args.tag}', ignore_errors=True)
+    except Exception as e:
+        logger.error(f'Failed to generate coverage report in html: {e}')
 
 
 if __name__ == '__main__':
