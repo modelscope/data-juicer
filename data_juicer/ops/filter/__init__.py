@@ -17,6 +17,7 @@ from .image_text_matching_filter import ImageTextMatchingFilter
 from .image_text_similarity_filter import ImageTextSimilarityFilter
 from .image_watermark_filter import ImageWatermarkFilter
 from .language_id_score_filter import LanguageIDScoreFilter
+from .llm_api_quality_score_filter import LLMAPIQualityScoreFilter
 from .maximum_line_length_filter import MaximumLineLengthFilter
 from .perplexity_filter import PerplexityFilter
 from .phrase_grounding_recall_filter import PhraseGroundingRecallFilter
@@ -52,13 +53,13 @@ __all__ = [
     'ImageFaceCountFilter', 'ImageFaceRatioFilter', 'ImageNSFWFilter',
     'ImagePairSimilarityFilter', 'ImageShapeFilter', 'ImageSizeFilter',
     'ImageTextMatchingFilter', 'ImageTextSimilarityFilter',
-    'ImageWatermarkFilter', 'LanguageIDScoreFilter', 'MaximumLineLengthFilter',
-    'PerplexityFilter', 'PhraseGroundingRecallFilter',
-    'SpecialCharactersFilter', 'SpecifiedFieldFilter',
-    'SpecifiedNumericFieldFilter', 'StopWordsFilter', 'SuffixFilter',
-    'TextActionFilter', 'TextEntityDependencyFilter', 'TextLengthFilter',
-    'TextPairSimilarityFilter', 'TokenNumFilter', 'VideoAestheticsFilter',
-    'VideoAspectRatioFilter', 'VideoDurationFilter',
+    'ImageWatermarkFilter', 'LanguageIDScoreFilter',
+    'LLMAPIQualityScoreFilter', 'MaximumLineLengthFilter', 'PerplexityFilter',
+    'PhraseGroundingRecallFilter', 'SpecialCharactersFilter',
+    'SpecifiedFieldFilter', 'SpecifiedNumericFieldFilter', 'StopWordsFilter',
+    'SuffixFilter', 'TextActionFilter', 'TextEntityDependencyFilter',
+    'TextLengthFilter', 'TextPairSimilarityFilter', 'TokenNumFilter',
+    'VideoAestheticsFilter', 'VideoAspectRatioFilter', 'VideoDurationFilter',
     'VideoFramesTextSimilarityFilter', 'VideoMotionScoreFilter',
     'VideoMotionScoreRaftFilter', 'VideoNSFWFilter', 'VideoOcrAreaRatioFilter',
     'VideoResolutionFilter', 'VideoTaggingFromFramesFilter',
