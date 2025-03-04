@@ -143,7 +143,7 @@ def find_corresponding_test_file(file_path):
     test_file = file_path.replace('data_juicer', 'tests')
     basename = os.path.basename(test_file)
     dir = os.path.dirname(test_file)
-    if not basename.startswith('test_'):
+    if not basename.startswith('test_') and basename != 'run.py':
         basename = 'test_' + basename
     test_file = os.path.join(dir, basename)
     if os.path.exists(test_file):
