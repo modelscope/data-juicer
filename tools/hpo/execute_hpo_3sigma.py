@@ -7,7 +7,7 @@ import yaml
 from jsonargparse import namespace_to_dict
 from loguru import logger
 
-from data_juicer.config import init_configs
+from data_juicer.config import get_init_configs, init_configs
 from data_juicer.core import Analyzer, Executor
 from data_juicer.utils.constant import StatsKeys
 
@@ -47,7 +47,8 @@ def modify_recipe_k_sigma(cfg, df, path_k_sigma_recipe, k=3):
     stats_key_to_mean = mean_series.iloc[0, :].to_dict()
     std_series = df[df.index == 'std']
     stats_key_to_std = std_series.iloc[0, :].to_dict()
-    op_name_to_stats_key = StatsKeys.get_access_log(dj_cfg=cfg)
+    op_name_to_stats_key = StatsKeys.get_access_log(
+        dj_cfg=get_init_configs(cfg))
     logger.info(f'Begin to modify the recipe with {k}-sigma rule')
     for i in range(len(cfg.process)):
         if isinstance(cfg.process[i], Namespace):
