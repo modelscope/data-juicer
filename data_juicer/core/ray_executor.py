@@ -7,7 +7,7 @@ from loguru import logger
 
 from data_juicer.config import init_configs
 from data_juicer.core.ray_data import RayDataset
-from data_juicer.ops import load_ops
+from data_juicer.ops import Aggregator, Grouper, Selector, load_ops
 from data_juicer.ops.op_fusion import fuse_operators
 
 from .adapter import Adapter
@@ -53,7 +53,7 @@ class RayExecutor:
         self.adapter = Adapter(self.cfg)
 
         # init ray
-        logger.info('Initing Ray ...')
+        logger.info('Initializing Ray ...')
         ray.init(self.cfg.ray_address)
         self.tmp_dir = os.path.join(self.work_dir, '.tmp',
                                     ray.get_runtime_context().get_job_id())
@@ -84,6 +84,13 @@ class RayExecutor:
         # 2. extract processes
         logger.info('Preparing process operators...')
         ops = load_ops(self.cfg.process)
+
+        # check if the ops contain unsupported operators
+        # raise error before processing
+        for op in ops:
+            if isinstance(op, (Selector, Grouper, Aggregator)):
+                raise ValueError(
+                    f'Operator {op} is not supported in RayExecutor')
 
         if self.cfg.op_fusion:
             probe_res = None
