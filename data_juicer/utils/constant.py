@@ -221,6 +221,8 @@ class StatsKeysConstant(object):
     num_token = 'num_token'
     num_words = 'num_words'
     word_rep_ratio = 'word_rep_ratio'
+    llm_difficulty_score = 'llm_difficulty_score'
+    llm_difficulty_record = 'llm_difficulty_record'
 
     #  === image ===
     aspect_ratios = 'aspect_ratios'

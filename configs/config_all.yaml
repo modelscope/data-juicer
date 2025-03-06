@@ -649,6 +649,19 @@ process:
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
       lang: en                                                # keep text in what language
       min_score: 0.8                                          # the min language scores to filter text
+  - llm_api_difficulty_score_filter:                        # filter to keep sample with high difficulty score estimated by LLM in API.
+      api_model: 'gpt-4o'                                     # API model name.
+      score_threshold: 0.5                                    # The lowest difficulty score threshold to keep the sample.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      input_keys: ['text']                                    # Sub set of keys in the sample. Support data with multi fields such as 'query', 'analysis' and 'answer' in RFT data.
+      field_names: ['text']                                   # Corresponding field names for input keys.
+      system_prompt: null                                     # System prompt for the task.
+      input_template: null                                    # The input template.
+      field_template: null                                    # Template for each field in the prompt.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - maximum_line_length_filter:                             # filter text with the maximum length of lines out of specific range
       min_len: 10                                             # the min length of filter range
       max_len: 10000                                          # the max length of filter range
