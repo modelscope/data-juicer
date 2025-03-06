@@ -1,4 +1,4 @@
-# This tool is used to convert the absolute paths ot relative paths in
+# This tool is used to convert the absolute paths or relative paths in
 # dj dataset.
 #
 # Data-Juicer format with absolute path:
@@ -99,7 +99,7 @@ def convert_absolute_path_to_relative_path(
     target_mt_dir: str = None,
 ):
     """
-    Convert the absolute paths ot relative paths in Data-Juicer dataset.
+    Convert the absolute paths or relative paths in Data-Juicer dataset.
 
     :param dj_ds_path: path to the input Data-Juicer dataset with absolute
         paths to multimodal data.

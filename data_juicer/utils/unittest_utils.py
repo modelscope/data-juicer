@@ -1,8 +1,10 @@
 import os
 import shutil
+import subprocess
 import unittest
 
 import numpy
+import ray.data as rd
 
 from data_juicer import is_cuda_available
 from data_juicer.core.data import DJDataset, NestedDataset
@@ -10,7 +12,6 @@ from data_juicer.core.ray_data import RayDataset
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import free_models
 
-rd = LazyLoader('rd', 'ray.data')
 transformers = LazyLoader('transformers', 'transformers')
 
 CLEAR_MODEL = False
@@ -122,3 +123,39 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         first = sorted(first, key=lambda x: tuple(sorted(x.items())))
         second = sorted(second, key=lambda x: tuple(sorted(x.items())))
         return self.assertEqual(first, second)
+
+
+# for partial unittest
+def get_diff_files(prefix_filter=['data_juicer/', 'tests/']):
+    """Get git diff files in target dirs except the __init__.py files"""
+    changed_files = subprocess.check_output(
+        ['git', 'diff', '--name-only', '--diff-filter=ACMRT', 'origin/main'],
+        universal_newlines=True,
+    ).strip().split('\n')
+    return [
+        f for f in changed_files
+        if any([f.startswith(prefix) for prefix in prefix_filter])
+        and f.endswith('.py') and not f.endswith('__init__.py')
+    ]
+
+
+def find_corresponding_test_file(file_path):
+    test_file = file_path.replace('data_juicer', 'tests')
+    basename = os.path.basename(test_file)
+    dir = os.path.dirname(test_file)
+    test_file = os.path.join(dir, 'test_' + basename)
+    if os.path.exists(test_file):
+        return test_file
+    else:
+        return None
+
+
+def get_partial_test_cases():
+    diff_files = get_diff_files()
+    test_files = [
+        find_corresponding_test_file(file_path) for file_path in diff_files
+    ]
+    if None in test_files:
+        # can't find corresponding test files for some changed files: run all
+        return None
+    return test_files

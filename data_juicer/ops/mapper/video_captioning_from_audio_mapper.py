@@ -48,8 +48,8 @@ class VideoCaptioningFromAudioMapper(Mapper):
             pretrained_model_name_or_path=self._hf_qwen_audio,
             trust_remote_code=True,
         )
-        self.prompt = '<|startoftranscription|><|unkown|><|caption|>' \
-                      '<|unkown|><|notimestamps|><|wo_itn|>'
+        self.prompt = '<|startoftranscription|><|unknown|><|caption|>' \
+                      '<|unknown|><|notimestamps|><|wo_itn|>'
         self.response_remove_pattern = re.compile(r'<\|.*?\|>')
 
     def _process_single_sample(self, sample, rank=None):

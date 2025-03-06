@@ -129,9 +129,20 @@ class StatsKeysMeta(type):
             cls._accessed_by[caller_class].add(stat_key)
         return stat_key
 
-    def get_access_log(cls, dj_cfg=None):
+    def get_access_log(cls, dj_cfg=None, dataset=None):
         if cls._accessed_by:
             return cls._accessed_by
+        elif dj_cfg and dataset:
+            tmp_dj_cfg = copy.deepcopy(dj_cfg)
+            tmp_dj_cfg.use_cache = False
+            tmp_dj_cfg.use_checkpoint = False
+
+            from data_juicer.core import Analyzer
+            tmp_analyzer = Analyzer(tmp_dj_cfg)
+
+            dataset = dataset.take(1)
+            # do not overwrite the true analysis results
+            tmp_analyzer.run(dataset=dataset, skip_export=True)
         elif dj_cfg:
             tmp_dj_cfg = copy.deepcopy(dj_cfg)
             # the access has been skipped due to the use of cache
@@ -175,9 +186,6 @@ class StatsKeysMeta(type):
                 tmp_dj_cfg.use_cache = False
                 tmp_dj_cfg.use_checkpoint = False
 
-                from data_juicer.config import get_init_configs
-                tmp_dj_cfg = get_init_configs(tmp_dj_cfg)
-
                 from data_juicer.core import Analyzer
                 tmp_analyzer = Analyzer(tmp_dj_cfg)
                 # do not overwrite the true analysis results
@@ -215,6 +223,8 @@ class StatsKeysConstant(object):
     word_rep_ratio = 'word_rep_ratio'
     llm_quality_score = 'llm_quality_score'
     llm_quality_record = 'llm_quality_record'
+    llm_difficulty_score = 'llm_difficulty_score'
+    llm_difficulty_record = 'llm_difficulty_record'
 
     #  === image ===
     aspect_ratios = 'aspect_ratios'

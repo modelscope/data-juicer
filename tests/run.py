@@ -14,7 +14,7 @@ import coverage
 
 from loguru import logger
 
-from data_juicer.utils.unittest_utils import set_clear_model_flag
+from data_juicer.utils.unittest_utils import set_clear_model_flag, get_partial_test_cases
 
 file_dir = os.path.join(os.path.dirname(__file__), '..')
 sys.path.append(file_dir)
@@ -24,6 +24,11 @@ parser.add_argument('--tag', choices=["standalone", "ray"],
                     default="standalone",
                     help="the tag of tests being run")
 parser.add_argument('--pattern', default='test_*.py', help='test file pattern')
+parser.add_argument('--mode', default='partial',
+                    help='test mode. Should be one of the ["partial", '
+                         '"regression"]. "partial" means only test on the '
+                         'unit tests of the changed files. "regression" means '
+                         'test on all unit tests.')
 parser.add_argument('--test_dir',
                     default='tests',
                     help='directory to be tested')
@@ -37,9 +42,12 @@ args = parser.parse_args()
 set_clear_model_flag(args.clear_model)
 
 class TaggedTestLoader(unittest.TestLoader):
-    def __init__(self, tag="standalone"):
+    def __init__(self, tag="standalone", included_test_files=None):
         super().__init__()
         self.tag = tag
+        if isinstance(included_test_files, str):
+            included_test_files = [included_test_files]
+        self.included_test_files = included_test_files
     
     def loadTestsFromTestCase(self, testCaseClass):
         # set tag to testcase class
@@ -53,9 +61,21 @@ class TaggedTestLoader(unittest.TestLoader):
                 loaded_suite.addTest(test_case)
         return loaded_suite
 
-def gather_test_cases(test_dir, pattern, tag):
+    def _match_path(self, path, full_path, pattern):
+        # override this method to use alternative matching strategy
+        match = super()._match_path(path, full_path, pattern)
+        if self.included_test_files:
+            for included_test_file in self.included_test_files:
+                if included_test_file in full_path:
+                    return match
+            return False
+        else:
+            return match
+
+def gather_test_cases(test_dir, pattern, tag, mode='partial'):
     test_to_run = unittest.TestSuite()
-    test_loader = TaggedTestLoader(tag)
+    partial_test_files = get_partial_test_cases() if mode == 'partial' else None
+    test_loader = TaggedTestLoader(tag, included_test_files=partial_test_files)
     discover = test_loader.discover(test_dir, pattern=pattern, top_level_dir=None)
     for suite_discovered in discover:
         print('suite_discovered', suite_discovered)
@@ -76,7 +96,7 @@ def main():
 
     runner = unittest.TextTestRunner()
     test_suite = gather_test_cases(os.path.abspath(args.test_dir),
-                                   args.pattern, args.tag)
+                                   args.pattern, args.tag, args.mode)
     res = runner.run(test_suite)
 
     cov.stop()

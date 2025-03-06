@@ -126,7 +126,7 @@ class NaiveReverseGrouperTest(DataJuicerTestCaseBase):
                     'Can I help you?'
                 ],
                 Fields.batch_meta: {
-                    'reponse':[
+                    'response':[
                         'No',
                         'Yes'
                     ],
@@ -141,7 +141,7 @@ class NaiveReverseGrouperTest(DataJuicerTestCaseBase):
                     '欢迎来到阿里巴巴！'
                 ],
                 Fields.batch_meta: {
-                    'reponse':[
+                    'response':[
                         'No',
                         'Yes'
                     ],
@@ -163,14 +163,14 @@ class NaiveReverseGrouperTest(DataJuicerTestCaseBase):
 
         target_meta = [
             {
-                'reponse':[
+                'response':[
                     'No',
                     'Yes'
                 ],
                 'batch_size': 1,
             },
             {
-                'reponse':[
+                'response':[
                     'No',
                     'Yes'
                 ],
