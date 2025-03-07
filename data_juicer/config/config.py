@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Union
 import yaml
 from jsonargparse import (ActionConfigFile, ArgumentParser, Namespace,
                           dict_to_namespace, namespace_to_dict)
-from jsonargparse.typehints import ActionTypeHint
+from jsonargparse._typehints import ActionTypeHint
 from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
 
