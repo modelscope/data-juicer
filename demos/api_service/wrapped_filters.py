@@ -125,7 +125,7 @@ def execute_image_nsfw_filter(dataset_path: str) -> ServiceResponse:
         min_th, max_th = show_analyzed_results(export_path, require_min=False)
         dj_config = init_config(export_path,
                                 'image_nsfw_filter',
-                                score_threshold=max_th,
+                                max_score=max_th,
                                 hf_nsfw_model=nsfw_model_path)
         result_path = execute_config(dj_config)
         return ServiceResponse(ServiceExecStatus.SUCCESS,
@@ -150,7 +150,7 @@ def execute_video_nsfw_filter(dataset_path: str) -> ServiceResponse:
         min_th, max_th = show_analyzed_results(export_path, require_min=False)
         dj_config = init_config(export_path,
                                 'video_nsfw_filter',
-                                score_threshold=max_th,
+                                max_score=max_th,
                                 hf_nsfw_model=nsfw_model_path,
                                 frame_sampling_method='uniform')
         result_path = execute_config(dj_config)

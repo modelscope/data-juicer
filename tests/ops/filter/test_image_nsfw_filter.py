@@ -59,7 +59,7 @@ class ImageNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = ImageNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.0005)
+                            max_score=0.0005)
         self._run_filter(dataset, tgt_list, op)
 
     def test_any(self):
@@ -75,7 +75,7 @@ class ImageNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = ImageNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.00012,
+                            max_score=0.00012,
                             any_or_all='any')
         self._run_filter(dataset, tgt_list, op)    
 
@@ -92,7 +92,7 @@ class ImageNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = ImageNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.0005,
+                            max_score=0.0005,
                             any_or_all='all')
         self._run_filter(dataset, tgt_list, op)   
 
@@ -119,7 +119,7 @@ class ImageNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = ImageNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.0005)
+                            max_score=0.0005)
         self._run_filter(dataset, tgt_list, op, num_proc=num_proc)
 
 if __name__ == '__main__':

@@ -74,7 +74,7 @@ json
 
     def __init__(self,
                  api_model: str = 'gpt-4o',
-                 score_threshold: float = 0.5,
+                 min_score: float = 0.5,
                  *,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
@@ -91,7 +91,7 @@ json
         Initialization method.
 
         :param api_model: API model name.
-        :param score_threshold: The lowest quality score threshold to keep the
+        :param min_score: The lowest quality score threshold to keep the
             sample.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
@@ -120,7 +120,7 @@ json
         self.input_template = input_template or self.DEFAULT_INPUT_TEMPLATE
         self.field_template = field_template or self.DEFAULT_FIELD_TEMPLATE
 
-        self.score_threshold = score_threshold
+        self.min_score = min_score
 
         self.sampling_params = sampling_params
 
@@ -202,4 +202,4 @@ json
     def process_single(self, sample, rank=None):
         itm_score = sample[Fields.stats][StatsKeys.llm_quality_score]
 
-        return itm_score >= self.score_threshold
+        return itm_score >= self.min_score
