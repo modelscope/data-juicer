@@ -1,6 +1,6 @@
 # HumanVBench
 ## HumanVBench Download and Evaluation
-You can download HumanVBench from HuggingFace(https://huggingface.co/datasets/datajuicer/HumanVBench) or ModelScope(https://www.modelscope.cn/datasets/Data-Juicer/HumanVBench)
+You can download HumanVBench from link https://ixjf-open-share.oss-cn-hangzhou.aliyuncs.com/data/humanvbench.zip
 
 To evaluate a model on HumanVBench, use the Evaluation.py script. You can modify the eval_goal parameter to specify the evaluation type. Options include:
 
@@ -12,7 +12,7 @@ One of 'Emotion Perception', 'Person Recognition', 'Human Behavior Analysis', 'C
 
 
 ### Steps to Complete the Evaluation
-1. Download all task JSONL files and the corresponding video collections from the benchmark download link. Set task_jsonls_path in Evaluation.py to the directory where the JSONL files are stored. The directory should directly contain 17 JSONL files. Set videos_save_path to the directory where all the task-related videos are stored. The directory structure should meet the following format:
+1. Download all task JSONL files and the corresponding video collections from the benchmark download link. Set task_jsonls_path in Evaluation.py to the directory where the JSONL files are stored. The directory should directly contain 16 JSONL files. Set videos_save_path to the directory where all the task-related videos are stored. The directory structure should meet the following format:
 
 (videos_save_path)--  
 &nbsp;&nbsp;&nbsp;&nbsp;Action_Temporal_Analysis--  
@@ -47,4 +47,4 @@ Then you can start filtering and annotating process. The executed yaml is in /Hu
 python tools/process_data.py --config /HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml
 
 
-With the help of the annotated results, most tasks in HumanVBench can be constructed. Details about the construction process are provided in the paper's appendix. We will release the code for constructing all 17 tasks as soon as possible.
+With the help of the annotated results, most tasks in HumanVBench can be constructed. Details about the construction process are provided in the paper's appendix. We will release the code for constructing all 16 tasks as soon as possible.
