@@ -1,7 +1,7 @@
 # HumanVBench
 
 ## HumanVBench下载和测评方法
-你可以在HuggingFace(https://huggingface.co/datasets/datajuicer/HumanVBench)或是ModelScope(https://www.modelscope.cn/datasets/Data-Juicer/HumanVBench)上下载HumanVBench。
+你可以通过链接 https://ixjf-open-share.oss-cn-hangzhou.aliyuncs.com/data/humanvbench.zip 下载HumanVBench。
 
 如需在HumanVBench上对模型进行测评，可以通过Evaluation.py实现。您可以修改eval_goal指定测评类型，可选包括：
 'all'--对所有任务进行测评；你将获得每个问题的模型输出结果记录，每个任务的accuracy，每个任务的随机准确率，四类测评维度下分别的平均准确率。
@@ -12,7 +12,7 @@ One of 'Emotion Perception', 'Person Recognition', 'Human Behavior Analysis', 'C
 
 
 ### 为了顺利完成测评，您需要补充的操作包括：
-1. 在(benchmark存放网址)下载所有任务的jsonl文件，和每个任务的视频集合。将Evaluation.py中的task_jsonls_path指定为存放jsonl的存放路径。(task_jsonls_path下直接为17个jsonl), videos_save_path指定为存放所有出题视频的目录，存放格式满足
+1. 在(benchmark存放网址)下载所有任务的jsonl文件，和每个任务的视频集合。将Evaluation.py中的task_jsonls_path指定为存放jsonl的存放路径。(task_jsonls_path下直接为16个jsonl), videos_save_path指定为存放所有出题视频的目录，存放格式满足
 
 (videos_save_path)--  
 &nbsp;&nbsp;&nbsp;&nbsp;Action_Temporal_Analysis--  
@@ -47,5 +47,5 @@ One of 'Emotion Perception', 'Person Recognition', 'Human Behavior Analysis', 'C
 python tools/process_data.py --config /HumanVBenchRecipe/HumanCentricVideoAnnotationPipeline/process.yaml
 
 
-在上述标注结果的帮助下，可以构建HumanVBench中绝大多数任务。构建细节详见论文附录。我们会尽快公布17个任务的构建流程代码。
+在上述标注结果的帮助下，可以构建HumanVBench中绝大多数任务。构建细节详见论文附录。我们会尽快公布16个任务的构建流程代码。
 
