@@ -1,7 +1,7 @@
 # HumanVBench
 
 ## HumanVBench下载和测评方法
-你可以通过链接 https://ixjf-open-share.oss-cn-hangzhou.aliyuncs.com/data/humanvbench.zip 下载HumanVBench。
+你可以在 HuggingFace(https://huggingface.co/datasets/datajuicer/HumanVBench) 或 ModelScope(https://www.modelscope.cn/datasets/Data-Juicer/HumanVBench)下载HumanVBench。
 
 如需在HumanVBench上对模型进行测评，可以通过Evaluation.py实现。您可以修改eval_goal指定测评类型，可选包括：
 'all'--对所有任务进行测评；你将获得每个问题的模型输出结果记录，每个任务的accuracy，每个任务的随机准确率，四类测评维度下分别的平均准确率。
