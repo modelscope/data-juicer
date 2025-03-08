@@ -1,6 +1,6 @@
 # HumanVBench
 ## HumanVBench Download and Evaluation
-You can download HumanVBench from link https://ixjf-open-share.oss-cn-hangzhou.aliyuncs.com/data/humanvbench.zip
+You can download HumanVBench from HuggingFace(https://huggingface.co/datasets/datajuicer/HumanVBench) or ModelScope(https://www.modelscope.cn/datasets/Data-Juicer/HumanVBench).
 
 To evaluate a model on HumanVBench, use the Evaluation.py script. You can modify the eval_goal parameter to specify the evaluation type. Options include:
 
