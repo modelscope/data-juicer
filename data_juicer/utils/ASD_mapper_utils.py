@@ -9,8 +9,8 @@ from scipy.interpolate import interp1d
 from scipy.io import wavfile
 import sys, os, tqdm, torch, subprocess, cv2, numpy, math, python_speech_features
 from deepface import DeepFace
-from data_juicer.my_pretrained_method.YOLOv8_human.dj import demo
-sys.path.append('./data_juicer/my_pretrained_method/Light-ASD')
+from thirdparty.humanvbench_models.YOLOv8_human.dj import demo
+sys.path.append('./thirdparty/humanvbench_models/Light-ASD')
 
 def scene_detect(videoFilePath):
     # CPU: Scene detection, output is the list of each shot's time duration

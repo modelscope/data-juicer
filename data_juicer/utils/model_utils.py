@@ -751,13 +751,13 @@ def prepare_vllm_model(pretrained_model_name_or_path, **model_params):
 
     return (model, tokenizer)
 
-def prepare_SenseVoiceSmall_model(pretrained_model_name_or_path):
+def prepare_SenseVoiceSmall_model(pretrained_model_name_or_path, **model_params):
     """
     Prepare and load light sharegpt4video.
 
     :param model_name: input model name.
     """
-    from data_juicer.my_pretrained_method.SenseVoice.model import SenseVoiceSmall
+    from thirdparty.humanvbench_models.SenseVoice.model import SenseVoiceSmall
     
     logger.info('Loading ASR_Emo_model model...')
     ASR_Emo_model, kwargs1 = SenseVoiceSmall.from_pretrained(model=pretrained_model_name_or_path)
@@ -766,7 +766,7 @@ def prepare_SenseVoiceSmall_model(pretrained_model_name_or_path):
     return ASR_Emo_model, kwargs1
 
 def prepare_light_asd_model(
-        pretrained_model_name_or_path='weight/finetuning_TalkSet.model'):
+        pretrained_model_name_or_path='weight/finetuning_TalkSet.model', **model_params):
     """
     Prepare and load light asd model.
 
@@ -779,36 +779,8 @@ def prepare_light_asd_model(
     model.eval()
     return model
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
-sys.path.append('./data_juicer/my_pretrained_method/VideoLLaMA2')
-from videollama2 import model_init
-def prepare_VideoLLaMA2_model(pretrained_model_name_or_path):
-    model, processor, tokenizer = model_init(pretrained_model_name_or_path, device_map="cpu")
-    model.eval()
-    return model, processor, tokenizer
-
-def prepare_sharegpt4video_model(pretrained_model_name_or_path):
-    """
-    Prepare and load light sharegpt4video.
-
-    :param model_name: input model name.
-    """
-    import sys
-    sys.path.append('./data_juicer/my_pretrained_method/ShareGPT4Video')
-    from llava.mm_utils import get_model_name_from_path
-    from llava.model.builder import load_pretrained_model
-    
-    logger.info('Loading sharegpt4video model...')
-    model_name = get_model_name_from_path(pretrained_model_name_or_path)
-    tokenizer, model, processor, context_len = load_pretrained_model(
-        pretrained_model_name_or_path, None, model_name, device_map='cpu')
-    
-    model.eval()
-    return tokenizer, model, processor
-
 def prepare_YOLOv8_human_model(
-        pretrained_model_name_or_path='/home/daoyuan_mm/data_juicer/data_juicer/my_pretrained_method/YOLOv8_human/weights/best.pt'):
+        pretrained_model_name_or_path='./thirdparty/humanvbench_models/YOLOv8_human/weights/best.pt', **model_params):
     """
     Prepare and load light YOLOv8_human.
 
@@ -820,7 +792,9 @@ def prepare_YOLOv8_human_model(
     human_detection_model.eval()
     return human_detection_model
 
-def prepare_face_detect_S3FD_model():
+import sys
+sys.path.append("./thirdparty/humanvbench_models/Light-ASD")
+def prepare_face_detect_S3FD_model(model_path=None, **model_params):
     """
     Prepare and load light asd model.
 
@@ -829,7 +803,71 @@ def prepare_face_detect_S3FD_model():
     logger.info('Loading face_detect_S3FD_model model...')
     from model.faceDetector.s3fd import S3FD
     model = S3FD()
+    return model
     
+
+import torch
+import torch.nn as nn
+from transformers import Wav2Vec2Processor
+from transformers.models.wav2vec2.modeling_wav2vec2 import (
+    Wav2Vec2Model,
+    Wav2Vec2PreTrainedModel,
+)
+def prepare_wav2vec2_age_gender_model(pretrained_model_name_or_path = 'audeering/wav2vec2-large-robust-24-ft-age-gender', **model_params):
+    
+    class ModelHead(nn.Module):
+        r"""Classification head."""
+
+        def __init__(self, config, num_labels):
+
+            super().__init__()
+
+            self.dense = nn.Linear(config.hidden_size, config.hidden_size)
+            self.dropout = nn.Dropout(config.final_dropout)
+            self.out_proj = nn.Linear(config.hidden_size, num_labels)
+
+        def forward(self, features, **kwargs):
+
+            x = features
+            x = self.dropout(x)
+            x = self.dense(x)
+            x = torch.tanh(x)
+            x = self.dropout(x)
+            x = self.out_proj(x)
+
+            return x
+
+
+    class AgeGenderModel(Wav2Vec2PreTrainedModel):
+        r"""Speech emotion classifier."""
+
+        def __init__(self, config):
+
+            super().__init__(config)
+
+            self.config = config
+            self.wav2vec2 = Wav2Vec2Model(config)
+            self.age = ModelHead(config, 1)
+            self.gender = ModelHead(config, 3)
+            self.init_weights()
+
+        def forward(
+                self,
+                input_values,
+        ):
+
+            outputs = self.wav2vec2(input_values)
+            hidden_states = outputs[0]
+            hidden_states = torch.mean(hidden_states, dim=1)
+            logits_age = self.age(hidden_states)
+            logits_gender = torch.softmax(self.gender(hidden_states), dim=1)
+
+            return hidden_states, logits_age, logits_gender
+
+    processor = Wav2Vec2Processor.from_pretrained(pretrained_model_name_or_path)
+    model = AgeGenderModel.from_pretrained(pretrained_model_name_or_path)
+    return model, processor
+
 
 def update_sampling_params(sampling_params,
                            pretrained_model_name_or_path,
@@ -898,10 +936,9 @@ MODEL_FUNCTION_MAPPING = {
     'vllm': prepare_vllm_model,
     'Light_ASD': prepare_light_asd_model,
     'SenseVoiceSmall': prepare_SenseVoiceSmall_model,
-    'VideoLLaMA2': prepare_VideoLLaMA2_model,
-    'sharegpt4video': prepare_sharegpt4video_model,
     'YOLOv8_human': prepare_YOLOv8_human_model,
-    'face_detect_S3FD': prepare_face_detect_S3FD_model
+    'face_detect_S3FD': prepare_face_detect_S3FD_model,
+    'wav2vec2_age_gender': prepare_wav2vec2_age_gender_model
 }
 
 _MODELS_WITHOUT_FILE_LOCK = {

@@ -1,5 +1,4 @@
 from loguru import logger
-
 from data_juicer.config import init_configs
 from data_juicer.core import Executor
 

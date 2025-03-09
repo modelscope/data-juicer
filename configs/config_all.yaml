@@ -514,39 +514,48 @@ process:
   - whitespace_normalization_mapper:                        # normalize different kinds of whitespaces to English whitespace.
 
 
+# When use HumanVBench mapper, keep_stats_in_res_ds should be set true
+
   - video_human_tracks_extraction_mapper:                   # Get the body and face trajectory bounding box of people in one shot of the video. To ensure correctness, it should be applied after video_split_by_scene_mapper
-      face_track_bbox_path: your_path_to_save_bounding_box_data
-      YOLOv8_human_model_path: ./data_juicer/my_pretrained_method/YOLOv8_human/weights/best.pt
+      face_track_bbox_path: /home/daoyuan_mm/data-juicer/tmptreciept/tpt        # The storage location of the bounding box tracks of the characters in the video
+      YOLOv8_human_model_path: ./thirdparty/humanvbench_models/YOLOv8_human/weights/best.pt
       mem_required: '10GB'
 
-  - video_active_speaker_mapper:                          # Based on the results of video_human_tracks_extraction_mapper, determine whether each person is an active speaker
-      tempt_save_path: ./HumanVBenchRecipe/dj_ASD_tempt          # Used to store temporary videos
-      face_track_bbox_path: ./HumanVBenchRecipe/dj_human_track        # Human track Data storage address in video_human_tracks_extraction_mapper
-      mem_required: '10GB' 
+  - video_humantrack_face_demographic_mapper:                   # Get the facial demographics of each person based on the results of video_human_tracks_extraction_mapper
+      original_data_save_path: /home/daoyuan_mm/data-juicer/tmptreciept/tpt2                # The location where the specific results of each frame's detection are stored
+      detect_interval: 5
 
   - video_audio_attribute_mapper:                         # If the audio is speech, classify the gender and age of the speech
-      hf_audio_mapper: 'pt_model/wav2vec2-large-robust-24-ft-age-gender'      # Huggingface model name for speech age and gender classification
+      hf_audio_mapper: '/mnt/daoyuan_open_research/zt_data/pt_model/wav2vec2-large-robust-24-ft-age-gender'      # Huggingface model name for speech age and gender classification
       mem_required: '7GB' 
 
   - video_captioning_from_human_tracks_mapper:                # Based on the results of video_human_tracks_extraction_mapper, focus on the single person in the video for captioning
-      video_describe_model_path: pt_model/sharegpt4video-8b           # model path to sharegpt4video-8b
-      tempt_video_path: data_juicer/HumanVBenchRecipe/dj_tmpt           # Used to store temporary videos
-      mem_required: '35GB' 
+      video_describe_model_path: /mnt/daoyuan_open_research/zt_data/pt_model/videollm/VideoLLaMA3-7B           # model path to sharegpt4video-8b
+      trust_remote_code: true
+      tempt_video_path: /home/daoyuan_mm/data-juicer/tmptreciept/tpt2           # Used to store temporary videos that will be removed finally.
+      mem_required: '40GB'     
 
   - video_captioning_face_attribute_emotion_mapper:                   # Based on the results of video_human_tracks_extraction_mapper, focus on judging the gender, age, and race of a single person in the video
       face_track_query: Please only describe the appearance and facial emotions of the person in the video in detail. Don't mention the background. Less than 80 words.
-      cropping_face_video_tempt_path: ./tempt_video/tmp_video_remove            # Used to store temporary videos
-      video_describe_model_path: 'pt_model/VideoLLaMA2'          # Huggingface model DAMO-NLP-SG/VideoLLaMA2-7B-16F
-      mem_required: '35GB' 
+      trust_remote_code: true
+      cropping_face_video_tempt_path: /home/daoyuan_mm/data-juicer/tmptreciept/tpt2            # Used to store temporary videos
+      video_describe_model_path: /mnt/daoyuan_open_research/zt_data/pt_model/videollm/VideoLLaMA3-7B          # Huggingface model DAMO-NLP-SG/VideoLLaMA2-7B-16F
+      mem_required: '40GB' 
+
+  - video_active_speaker_mapper:                          # Based on the results of video_human_tracks_extraction_mapper, determine whether each person is an active speaker
+      tempt_save_path: /home/daoyuan_mm/data-juicer/tmptreciept/tpt2          # Used to store temporary videos
+      Light_ASD_model_path: /home/daoyuan_mm/data-juicer/thirdparty/humanvbench_models/Light-ASD/weight/finetuning_TalkSet.model
+      acitve_threshold: 15
+      mem_required: '10GB' 
+
 
   - video_audio_speech_ASR_mapper:                          # Automatic speech recognition from video speech
-      model_dir_ASR: 'pt_model/SenseVoiceSmall'                     # Huggingface model FunAudioLLM/SenseVoiceSmall
+      model_dir_ASR: '/mnt/daoyuan_open_research/zt_data/pt_model/SenseVoiceSmall'                     # Huggingface model FunAudioLLM/SenseVoiceSmall
       mem_required: '20GB' 
 
   - video_audio_speech_emotion_mapper:                          # Speech emotion recognition from video speech
-      model_dir_emo: 'pt_model/SenseVoiceSmall'                         # # Huggingface model FunAudioLLM/SenseVoiceSmall
+      model_dir_emo: '/mnt/daoyuan_open_research/zt_data/pt_model/SenseVoiceSmall'                         # # Huggingface model FunAudioLLM/SenseVoiceSmall
       mem_required: '20GB' 
-
 
   # Filter ops
   - video_face_ratio_filter:                                # Filter to retain human-centric videos

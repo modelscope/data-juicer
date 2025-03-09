@@ -27,22 +27,26 @@ class Fields(object):
     multimodal_data_output_dir = DEFAULT_PREFIX + 'produced_data__'
 
 
-    active_speaker_flag = DEFAULT_PREFIX + 'active_speaker_flag_'
-    audio_speech_attribute = DEFAULT_PREFIX + 'audio_speech_attribute_'
-    speech_ASR = DEFAULT_PREFIX + 'speech_ASR_'
-    speech_emotion = DEFAULT_PREFIX + 'speech_emotion_'
-    video_facetrack_attribute_emotion = DEFAULT_PREFIX + 'video_facetrack_attribute_emotion_'
-    track_video_caption = DEFAULT_PREFIX + 'track_video_caption_'
-    video_track_is_child = DEFAULT_PREFIX + 'video_track_is_child_'
-    human_track_data_path = DEFAULT_PREFIX + 'human_track_data_path_'
-    min_people_in_video = DEFAULT_PREFIX + 'min_people_in_video_'
-
 class BatchMetaKeys(object):
     entity_attribute = 'entity_attribute'
     most_relavant_entities = 'most_relavant_entities'
 
 
 class MetaKeys(object):
+    # === humanvbench related tags ===
+    
+    active_speaker_flag = 'active_speaker_flag'
+    audio_speech_attribute = 'audio_speech_attribute'
+    speech_ASR = 'speech_ASR'
+    speech_emotion = 'speech_emotion'
+    video_facetrack_attribute_demographic = 'video_facetrack_attribute_demographic'
+    video_facetrack_attribute_emotion = 'video_facetrack_attribute_emotion'
+    track_video_caption = 'track_video_caption'
+    video_track_is_child = 'video_track_is_child'
+    human_track_data_path = 'human_track_data_path'
+    number_people_in_video = 'number_people_in_video'
+
+
 
     # === text related tags ===
     # # sentiment
@@ -250,6 +254,7 @@ class StatsKeysConstant(object):
     video_motion_score = 'video_motion_score'
     video_nsfw_score = 'video_nsfw_score'
     video_watermark_prob = 'video_watermark_prob'
+    
 
     #  === multimodal ===
     # image-text

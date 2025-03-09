@@ -76,10 +76,12 @@ from .whitespace_normalization_mapper import WhitespaceNormalizationMapper
 from .video_active_speaker_mapper import VideoActiveSpeakerMapper
 from .video_audio_attribute_mapper import VideoAudioAttributeMapper
 from .video_audio_speech_ASR_mapper import VideoAudioSpeechASRMapper
+from .video_audio_speech_emotion_mapper import VideoAudioSpeechEmotionMapper
 from .video_captioning_face_attribute_emotion_mapper import VideoCaptioningFaceAttributeEmotionMapper
 from .video_captioning_from_human_tracks_mapper import VideoCaptioningFromHumanTracksMapper
 from .video_human_tracks_extraction_mapper import VideoHumanTracksExtractionMapper
 from .video_captioning_face_attribute_emotion_mapper import VideoCaptioningFaceAttributeEmotionMapper
+from .video_humantrack_face_demographic_mapper import VideoHumantrackFaceDemographicMapper
 
 __all__ = [
     'AudioFFmpegWrappedMapper', 'CalibrateQAMapper', 'CalibrateQueryMapper',
@@ -115,5 +117,6 @@ __all__ = [
     'WhitespaceNormalizationMapper','VideoActiveSpeakerMapper',
     'VideoAudioAttributeMapper', 'VideoAudioSpeechASRMapper',
     'VideoCaptioningFaceAttributeEmotionMapper','VideoCaptioningFromHumanTracksMapper', 
-    'VideoHumanTracksExtractionMapper', 'VideoCaptioningFaceAttributeEmotionMapper'
+    'VideoHumanTracksExtractionMapper', 'VideoCaptioningFaceAttributeEmotionMapper',
+    'VideoHumantrackFaceDemographicMapper', 'VideoAudioSpeechEmotionMapper'
 ]

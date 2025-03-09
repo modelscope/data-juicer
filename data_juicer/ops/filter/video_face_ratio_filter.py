@@ -1,7 +1,6 @@
 import av
 import numpy as np
 from jsonargparse.typing import ClosedUnitInterval
-from data_juicer.utils.availability_utils import AvailabilityChecking
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.mm_utils import (load_data_with_context, load_video,
                                         pil_to_opencv, pil_to_opencv, process_each_frame)
@@ -13,9 +12,8 @@ import gc,os
 
 OP_NAME = 'video_face_ratio_filter'
 
-with AvailabilityChecking(['dlib', 'Pillow'], OP_NAME):
-    import cv2,dlib
-    from PIL import ImageFilter
+import cv2,dlib
+from PIL import ImageFilter
 
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
@@ -49,13 +47,12 @@ class VideoFaceRatioFilter(Filter):
 
         # Initialize face detector
         self.detector = dlib.get_frontal_face_detector()
-        # self.detector_key = prepare_model(model_type='face_detect_S3FD')
 
 
         self.detect_interval = detect_interval
 
 
-    def compute_stats(self, sample, rank=None, context=False):
+    def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
         if StatsKeys.video_face_exist in sample[Fields.stats]:
             return sample
@@ -126,7 +123,7 @@ class VideoFaceRatioFilter(Filter):
 
         return sample
 
-    def process(self, sample):
+    def process_single(self, sample):
         video_faces_ratio = sample[Fields.stats][StatsKeys.video_face_exist]
         keep_bools = np.array([
             duration >= self.threshold

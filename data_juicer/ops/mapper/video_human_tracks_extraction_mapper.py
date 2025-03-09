@@ -1,6 +1,4 @@
-from data_juicer.utils.availability_utils import AvailabilityChecking
-from data_juicer.utils.constant import Fields
-
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.ASD_mapper_utils import scene_detect, \
     get_video_array_cv2, inference_video, track_shot, get_face_and_human_tracks,\
     post_merge
@@ -12,11 +10,10 @@ import gc,os
 
 OP_NAME = 'video_human_tracks_extraction_mapper'
 
-with AvailabilityChecking([], OP_NAME):
-    import torch
-    import pickle
-    import os
-    import tqdm
+import torch
+import pickle
+import os
+import tqdm
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -24,18 +21,22 @@ with AvailabilityChecking([], OP_NAME):
 class VideoHumanTracksExtractionMapper(Mapper):
     """
     """
-
+    _accelerator = 'cuda'
+    _batched_op = True
     _default_kwargs = {'upsample_num_times': 0}
 
     def __init__(self,
                  face_track_bbox_path: str = './HumanVBenchRecipe/dj_human_track',
-                 YOLOv8_human_model_path: str = './data_juicer/my_pretrained_method/YOLOv8_human/weights/best.pt',
+                 YOLOv8_human_model_path: str = './thirdparty/humanvbench_models/YOLOv8_human/weights/best.pt',
+                 tag_field_name_human_track_path: str = MetaKeys.human_track_data_path,
+                 tag_field_name_people_num: str = MetaKeys.number_people_in_video,
                  *args,
                  **kwargs):
         """
         Initialization method.
 
         """
+        kwargs.setdefault('mem_required', '10GB')
         super().__init__(*args, **kwargs)
         self._accelerator = 'cuda'
         self._init_parameters = self.remove_extra_parameters(locals())
@@ -45,10 +46,12 @@ class VideoHumanTracksExtractionMapper(Mapper):
         self.human_detection_model_key = prepare_model(model_type='YOLOv8_human',  # 240MB
                                        pretrained_model_name_or_path=YOLOv8_human_model_path)
         
-        self.face_detect_S3FD_model_key = prepare_model(model_type='face_detect_S3FD')
+        self.face_detect_S3FD_model_key = prepare_model(model_type='face_detect_S3FD',
+                                                        pretrained_model_name_or_path=None)
+        self.tag_field_name_human_track_path = tag_field_name_human_track_path
+        self.tag_field_name_people_num = tag_field_name_people_num
 
-
-    def process(self, sample, rank=None):
+    def process_single(self, sample, rank=None):
         # there is no video in this sample
         if self.video_key not in sample or not sample[self.video_key]:
             sample[Fields.source_file] = []
@@ -59,8 +62,8 @@ class VideoHumanTracksExtractionMapper(Mapper):
         Total_result = []
         min_people_in_video = []
 
-        face_detect_S3FD = get_model(self.face_detect_S3FD_model_key, rank=rank)
-        human_detection_model = get_model(self.human_detection_model_key, rank=rank)
+        face_detect_S3FD = get_model(self.face_detect_S3FD_model_key, rank, self.use_cuda())
+        human_detection_model = get_model(self.human_detection_model_key, rank, self.use_cuda())
         
         for id_out,video_key in enumerate(loaded_video_keys):
             # Scene detection for the video frames
@@ -80,7 +83,6 @@ class VideoHumanTracksExtractionMapper(Mapper):
             
             # Get face and human tracks
             for ii, track in tqdm.tqdm(enumerate(allTracks), total = len(allTracks)):
-                # 待优化！
                 result = get_face_and_human_tracks(video_array, track, human_detection_model)
                 if result:
                     vidTracks.append(result)
@@ -107,8 +109,8 @@ class VideoHumanTracksExtractionMapper(Mapper):
             min_people_in_video.append(people_num_atleast)
             torch.cuda.empty_cache()
  
-        sample[Fields.human_track_data_path] = Total_result
-        sample[Fields.min_people_in_video] = min_people_in_video
+        sample[Fields.meta][self.tag_field_name_human_track_path] = Total_result
+        sample[Fields.meta][self.tag_field_name_people_num] = min_people_in_video
 
         gc.collect()
         torch.cuda.empty_cache()

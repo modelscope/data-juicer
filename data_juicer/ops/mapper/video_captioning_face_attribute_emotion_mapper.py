@@ -1,42 +1,36 @@
 import numpy as np
-from data_juicer.utils.constant import Fields
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
-from data_juicer.utils.ASD_mapper_utils import get_video_array_cv2, annotate_video_with_bounding_boxes, crop_from_array
-import sys
-sys.path.append('/home/daoyuan_mm/data_juicer/data_juicer/my_pretrained_method/ShareGPT4Video')
+from data_juicer.utils.ASD_mapper_utils import get_video_array_cv2
 import gc
 
 OP_NAME = 'video_captioning_face_attribute_emotion_mapper'
 
-with AvailabilityChecking(['torch', 'transformers'],
-                          OP_NAME):
+import torch, os, tempfile, shutil
+from shutil import rmtree
+import pickle, copy, cv2
+import transformers  # noqa: F401
 
-    import torch, os, tempfile, shutil
-    from shutil import rmtree
-    import pickle, copy, cv2
-    import transformers  # noqa: F401
-    
-    # avoid hanging when calling clip in multiprocessing
-    torch.set_num_threads(1)
+# avoid hanging when calling clip in multiprocessing
+torch.set_num_threads(1)
 import sys
-sys.path.append('/home/daoyuan_mm/data_juicer/data_juicer/my_pretrained_method/VideoLLaMA2')
-from videollama2 import mm_infer
 
 
 @OPERATORS.register_module(OP_NAME)
 @LOADED_VIDEOS.register_module(OP_NAME)
 class VideoCaptioningFaceAttributeEmotionMapper(Mapper):
-    """Mapper to generate samples whose captions are generated based on
-    a video-to-text model and sampled video frame."""
+    _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(
         self,
         face_track_query: str = "Please describe the person's facial expression, tell me the person's emotion through the video, like Happiness, Excitement, Love, Gratitude, Relief, Pride, Anger, Sadness, Fear, Guilt, Shame, Disgust, Surprise, Confusion, Curiosity, Boredom ...",
+        trust_remote_code: bool = False,
         cropping_face_video_tempt_path = './tempt_video/tmp_video_remove',
-        video_describe_model_path: str = 'pt_model/VideoLLaMA2',
+        video_describe_model_path: str = 'DAMO-NLP-SG/VideoLLaMA3-7B',
+        video_facetrack_attribute_emotion: str = MetaKeys.video_facetrack_attribute_emotion,
         *args,
         **kwargs
     ):
@@ -46,6 +40,7 @@ class VideoCaptioningFaceAttributeEmotionMapper(Mapper):
         :param hf_video_blip: video-blip model name on huggingface
             to generate caption
         """
+        kwargs.setdefault('mem_required', '40GB')
         super().__init__(*args, **kwargs)
 
         self._batched_op = True
@@ -56,26 +51,36 @@ class VideoCaptioningFaceAttributeEmotionMapper(Mapper):
         self.query = face_track_query
         self.cropping_face_video_tempt_path = cropping_face_video_tempt_path
 
+        self.video_describe_model_path = video_describe_model_path if video_describe_model_path else 'DAMO-NLP-SG/VideoLLaMA3-7B'
         self.model_key = prepare_model(
-            model_type='VideoLLaMA2',
+            model_type='huggingface',
             pretrained_model_name_or_path=video_describe_model_path,
+            trust_remote_code=trust_remote_code,
+            torch_dtype=torch.bfloat16,
+            attn_implementation="flash_attention_2"
         )
 
+        self.video_facetrack_attribute_emotion = video_facetrack_attribute_emotion
 
 
-    def process(self, samples, rank=None):
+
+    def process_single(self, samples, rank=None):
+
+        if not MetaKeys.human_track_data_path in samples[Fields.meta]:
+            raise ValueError("video_captioning_from_human_tracks_mapper must be operated after video_human_tracks_extraction_mapper.")
+        
 
         Total_information = []
-        video_samples = samples[Fields.human_track_data_path]
-        loaded_video_keys = samples[self.video_key][0]
+        video_samples = samples[Fields.meta][MetaKeys.human_track_data_path]
+        loaded_video_keys = samples[self.video_key]
         
         cropping_face_video_tempt_path = tempfile.mkdtemp(dir=self.cropping_face_video_tempt_path)
         if os.path.exists(cropping_face_video_tempt_path):
             rmtree(cropping_face_video_tempt_path)
 
         os.makedirs(cropping_face_video_tempt_path, exist_ok = False)
-        model, processor, tokenizer= get_model(self.model_key, rank=rank)
-        for vedio_id,ASD_attribute_all_tracks_for_one_video in enumerate(video_samples[0]):
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
+        for vedio_id,ASD_attribute_all_tracks_for_one_video in enumerate(video_samples):
             if len(ASD_attribute_all_tracks_for_one_video) == 0:
                 Total_information.append([])
                 continue
@@ -110,14 +115,36 @@ class VideoCaptioningFaceAttributeEmotionMapper(Mapper):
                     vOut.write(cv2.resize(face, (224, 224)))
                 vOut.release()
                 
-                outputs = mm_infer(processor['video'](face_video_out_path), self.query, model=model, tokenizer=tokenizer, do_sample=False, modal='video')
+                conversation = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "video", "video": {"video_path": face_video_out_path, "fps": 1, "max_frames": 180}},
+                            {"type": "text", "text": self.query},
+                        ]
+                    },
+                ]
 
+                inputs = processor(
+                    conversation=conversation,
+                    add_system_prompt=True,
+                    add_generation_prompt=True,
+                    return_tensors="pt"
+                )
+                inputs = {k: v.to(model.device) if isinstance(v, torch.Tensor) else v for k, v in inputs.items()}
+                if "pixel_values" in inputs:
+                    inputs["pixel_values"] = inputs["pixel_values"].to(torch.bfloat16)
+                output_ids = model.generate(**inputs, max_new_tokens=1024)
+
+                outputs = processor.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
+                
                 description_for_each_track.append(outputs)
             
             Total_information.append(description_for_each_track)
 
         shutil.rmtree(cropping_face_video_tempt_path)
-        samples[Fields.video_facetrack_attribute_emotion] = [Total_information]
+        samples[Fields.meta][self.video_facetrack_attribute_emotion] = [Total_information]
         gc.collect()
         torch.cuda.empty_cache()
         return samples

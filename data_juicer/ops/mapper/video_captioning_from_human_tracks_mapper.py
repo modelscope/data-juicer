@@ -1,24 +1,19 @@
 import numpy as np
-from data_juicer.utils.constant import Fields
-from data_juicer.utils.availability_utils import AvailabilityChecking
+from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.model_utils import get_model, prepare_model
 from ..base_op import OPERATORS, Mapper
 from ..op_fusion import LOADED_VIDEOS
 from data_juicer.utils.ASD_mapper_utils import get_video_array_cv2
 import sys
-sys.path.append('./data_juicer/my_pretrained_method/ShareGPT4Video')
-from data_juicer.my_pretrained_method.ShareGPT4Video.run import single_test
 import gc
 
 OP_NAME = 'video_captioning_from_human_tracks_mapper'
 
-with AvailabilityChecking(['torch', 'transformers'],OP_NAME):
+import torch, os, tempfile, shutil
+from shutil import rmtree
+import pickle, cv2
 
-    import torch, os, tempfile, shutil
-    from shutil import rmtree
-    import pickle, cv2
-    
-    torch.set_num_threads(1)
+torch.set_num_threads(1)
 
 
 @OPERATORS.register_module(OP_NAME)
@@ -26,12 +21,17 @@ with AvailabilityChecking(['torch', 'transformers'],OP_NAME):
 class VideoCaptioningFromHumanTracksMapper(Mapper):
     """Mapper to generate samples whose captions are generated based on
     a video-to-text model and sampled video frame."""
+    _accelerator = 'cuda'
+    _batched_op = True
 
     def __init__(
         self,
-        human_track_query: str = "Descibe the person's apperance. ",
-        video_describe_model_path: str = 'pt_model/sharegpt4video-8b',
+        human_track_query: str = "Descibe the person's apperance. Less than 80 words. ",
+        trust_remote_code: bool = False,
+        video_describe_model_path: str = 'DAMO-NLP-SG/VideoLLaMA3-7B',
         tempt_video_path: str = None,
+        tag_field_name_track_video_caption: str = MetaKeys.track_video_caption,
+        tag_field_name_video_track_is_child: str = MetaKeys.video_track_is_child,
         *args,
         **kwargs
     ):
@@ -41,28 +41,34 @@ class VideoCaptioningFromHumanTracksMapper(Mapper):
         :param hf_video_blip: video-blip model name on huggingface
             to generate caption
         """
+        kwargs.setdefault('mem_required', '40GB')
         super().__init__(*args, **kwargs)
 
-        self._batched_op = True
-        self._accelerator = 'cuda'
-
-        self.pre_query_prompt = "The provided image arranges keyframes from a video in a grid view, keyframes are separated with white bands. "
         self.query = human_track_query
         self.is_child_query = 'Is the person a little child? Just answer yes or no. '
         self.tempt_video_path = tempt_video_path
 
+        self.video_describe_model_path = video_describe_model_path if video_describe_model_path else 'DAMO-NLP-SG/VideoLLaMA3-7B'
         self.model_key = prepare_model(
-            model_type='sharegpt4video',
+            model_type='huggingface',
             pretrained_model_name_or_path=video_describe_model_path,
+            trust_remote_code=trust_remote_code,
+            torch_dtype=torch.bfloat16,
+            attn_implementation="flash_attention_2"
         )
 
+        self.tag_field_name_track_video_caption = tag_field_name_track_video_caption
+        self.tag_field_name_video_track_is_child = tag_field_name_video_track_is_child
 
-    def process(self, samples, rank=None, context=False):
+    def process_single(self, samples, rank=None, context=False):
 
+        if not MetaKeys.human_track_data_path in samples[Fields.meta]:
+            raise ValueError("video_captioning_from_human_tracks_mapper must be operated after video_human_tracks_extraction_mapper.")
+        
         Total_information = []
         Is_child = [] 
-        video_samples = samples[Fields.human_track_data_path]
-        loaded_video_keys = samples[self.video_key][0]
+        video_samples = samples[Fields.meta][MetaKeys.human_track_data_path]
+        loaded_video_keys = samples[self.video_key]
 
         cropping_face_video_tempt_path = tempfile.mkdtemp(dir=self.tempt_video_path)
         if os.path.exists(cropping_face_video_tempt_path):
@@ -70,23 +76,23 @@ class VideoCaptioningFromHumanTracksMapper(Mapper):
         
         os.makedirs(cropping_face_video_tempt_path, exist_ok = False)
         
-        tokenizer, model, processor = get_model(self.model_key, rank=rank)
+        model, processor = get_model(self.model_key, rank, self.use_cuda())
 
-        for vedio_id,ASD_attribute_all_tracks_for_one_video in enumerate(video_samples[0]):
-            if len(ASD_attribute_all_tracks_for_one_video) == 0:
+        for vedio_id,attribute_all_tracks_for_one_video in enumerate(video_samples):
+            if len(attribute_all_tracks_for_one_video) == 0:
                 Total_information.append([])
                 Is_child.append([])
                 continue
             description_for_each_track = []
             is_child_for_each_track = []
             video_array = get_video_array_cv2(loaded_video_keys[vedio_id])
-            for track_id,tracks_now in enumerate(ASD_attribute_all_tracks_for_one_video):
+            for track_id,tracks_now in enumerate(attribute_all_tracks_for_one_video):
                 with open(tracks_now['bbox_path'], 'rb') as f:
                     bbox_data = pickle.load(f)
                     xy_human_bbox = bbox_data['xy_human_bbox']
                     track_frame = bbox_data['frame']
                     
-                face_video_out_path = os.path.join(cropping_face_video_tempt_path, loaded_video_keys[vedio_id].split('/')[-1][:-4] + '__' + str(track_id) + '.mp4')
+                human_video_out_path = os.path.join(cropping_face_video_tempt_path, loaded_video_keys[vedio_id].split('/')[-1][:-4] + '__' + str(track_id) + '.mp4')
                 wide_max = int((np.array(xy_human_bbox['x2']) - np.array(xy_human_bbox['x1'])).max())
                 height_max = int((np.array(xy_human_bbox['y2']) - np.array(xy_human_bbox['y1'])).max())
                 pad_max_w = (wide_max - (np.array(xy_human_bbox['x2']) - np.array(xy_human_bbox['x1']))).max()
@@ -96,7 +102,7 @@ class VideoCaptioningFromHumanTracksMapper(Mapper):
                 start_frame_id_in = 0
                 start_frame_id_out = track_frame[start_frame_id_in]  # tag
 
-                vOut = cv2.VideoWriter(face_video_out_path, cv2.VideoWriter_fourcc(*'XVID'), 25, (wide_max + 2,height_max+2))# Write video
+                vOut = cv2.VideoWriter(human_video_out_path, cv2.VideoWriter_fourcc(*'XVID'), 25, (wide_max + 2,height_max+2))# Write video
 	
                 while start_frame_id_in + 1 <len(track_frame):
                     bsi = pad_max  #
@@ -137,35 +143,62 @@ class VideoCaptioningFromHumanTracksMapper(Mapper):
                     vOut.write(padded_image)
                 vOut.release()
 
-                outputs = single_test(model,
-                          processor,
-                          tokenizer,
-                          face_video_out_path,
-                          qs=self.query,
-                          pre_query_prompt=self.pre_query_prompt,
-                          num_frames=16,
-                          conv_mode='llava_llama_3')
+                conversation = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "video", "video": {"video_path": human_video_out_path, "fps": 1, "max_frames": 180}},
+                            {"type": "text", "text": self.query},
+                        ]
+                    },
+                ]
 
-                description_for_each_track.append([outputs])
+                inputs = processor(
+                    conversation=conversation,
+                    add_system_prompt=True,
+                    add_generation_prompt=True,
+                    return_tensors="pt"
+                )
+                inputs = {k: v.to(model.device) if isinstance(v, torch.Tensor) else v for k, v in inputs.items()}
+                if "pixel_values" in inputs:
+                    inputs["pixel_values"] = inputs["pixel_values"].to(torch.bfloat16)
+                output_ids = model.generate(**inputs, max_new_tokens=1024)
 
-                outputs_ischild_response = single_test(model,
-                          processor,
-                          tokenizer,
-                          face_video_out_path,
-                          qs=self.is_child_query,
-                          pre_query_prompt=self.pre_query_prompt,
-                          num_frames=16,
-                          conv_mode='llava_llama_3')
-                
+                response = processor.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
+                description_for_each_track.append([response])
+
+                conversation = [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "video", "video": {"video_path": human_video_out_path, "fps": 1, "max_frames": 180}},
+                            {"type": "text", "text": self.is_child_query},
+                        ]
+                    },
+                ]
+
+                inputs = processor(
+                    conversation=conversation,
+                    add_system_prompt=True,
+                    add_generation_prompt=True,
+                    return_tensors="pt"
+                )
+                inputs = {k: v.to(model.device) if isinstance(v, torch.Tensor) else v for k, v in inputs.items()}
+                if "pixel_values" in inputs:
+                    inputs["pixel_values"] = inputs["pixel_values"].to(torch.bfloat16)
+                output_ids = model.generate(**inputs, max_new_tokens=1024)
+
+                outputs_ischild_response = processor.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
                 is_child_for_each_track.append([outputs_ischild_response])
             
             Total_information.append(description_for_each_track)
             Is_child.append(is_child_for_each_track)
 
         shutil.rmtree(cropping_face_video_tempt_path)
-        samples[Fields.track_video_caption] = [Total_information]
-        samples[Fields.video_facetrack_is_child] = [Is_child]
-        # Fields.track_video_caption
+        samples[Fields.meta][self.tag_field_name_track_video_caption] = [Total_information]
+        samples[Fields.meta][self.tag_field_name_video_track_is_child] = [Is_child]
         gc.collect()
         torch.cuda.empty_cache()
         return samples
