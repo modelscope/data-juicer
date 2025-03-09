@@ -1,0 +1,1 @@
+# 由于上传文件大小存在限制，(Light-ASD/model/faceDetector/s3fd/sfd_face.pth)模型文件被移除，需要手动从Light-ASD仓库下载（https://github.com/Junhua-Liao/Light-ASD）
