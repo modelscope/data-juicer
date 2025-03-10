@@ -845,7 +845,7 @@ process:
       window_size: 5                                          # window size of shingling
       num_permutations: 256                                   # number of permutations in minhash computing
       jaccard_threshold: 0.7                                  # the min jaccard similarity threshold in near-duplicate detection. When the jaccard similarity of two sample texts is >= this threshold, they are regarded as similar samples and this op will only keep one of them after deduplication
-      num_bands: null                                         # number of bands in LSH. Default it's None, and it will be determined by an optimal params computation algorithm by minimize the weighted sum of probs of False Positives and False Negatives
+      num_bands: null                                         # number of bands in LSH. Default it's None, and it will be determined by an optimal params computation algorithm
       num_rows_per_band: null                                 # number of rows in each band in LSH. Default it's None, and it will be determined by an optimal params computation algorithm
       lowercase: true                                         # whether to convert text to lower case
       ignore_pattern: null                                    # whether to ignore sub-strings with specific pattern when computing simhash.
@@ -950,3 +950,46 @@ process:
       try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+
+# Notification configurations
+notification:
+  email:
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    sender_email: "notifications@example.com"
+    sender_password: ""  # Fill in your password or app-specific password
+    recipients: ["user@example.com"]
+    subject: "Data Juicer Notification"
+
+  slack:
+    webhook_url: ""  # Fill in your Slack webhook URL
+    channel: "#data-juicer-notifications"
+    username: "Data Juicer Bot"
+
+  dingtalk:
+    access_token: ""  # Fill in your DingTalk access token
+    secret: ""  # Fill in your DingTalk secret (optional)
+
+# Human annotation configurations
+annotation:
+  label_studio:
+    api_url: "http://localhost:8080"
+    api_key: ""  # Fill in your Label Studio API key
+    project_name: "Data Annotation Project"
+    label_config: |
+      <View>
+        <Text name="text" value="$text"/>
+        <Choices name="sentiment" toName="text" choice="single">
+          <Choice value="Positive"/>
+          <Choice value="Neutral"/>
+          <Choice value="Negative"/>
+        </Choices>
+      </View>
+    wait_for_annotations: false
+    timeout: 3600
+    poll_interval: 60
+    notification:
+      on_task_created: true
+      on_annotation_completed: true
+      on_project_completed: true
+      on_error: true
