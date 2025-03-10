@@ -1,11 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock, call
-import requests
 import json
-import time
-from collections import defaultdict
 
-from data_juicer.ops.human.annotation_op import (
+from data_juicer.ops.mapper.annotation_mapper import (
     BaseAnnotationOp, 
     LabelStudioAnnotationOp,
     ANNOTATION_EVENTS
