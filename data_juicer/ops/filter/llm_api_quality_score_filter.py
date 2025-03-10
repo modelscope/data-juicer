@@ -7,7 +7,12 @@ from pydantic import PositiveInt
 
 from data_juicer.ops.base_op import OPERATORS, Filter
 from data_juicer.utils.constant import Fields, StatsKeys
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.lazy_loader import LazyLoader
+from data_juicer.utils.model_utils import (get_model, prepare_model,
+                                           update_sampling_params)
+
+torch = LazyLoader('torch', 'torch')
+vllm = LazyLoader('vllm', 'vllm')
 
 OP_NAME = 'llm_api_quality_score_filter'
 
@@ -84,6 +89,7 @@ json
                  input_template: Optional[str] = None,
                  field_template: Optional[str] = None,
                  try_num: PositiveInt = 3,
+                 enable_vllm: bool = False,
                  model_params: Dict = {},
                  sampling_params: Dict = {},
                  **kwargs):
@@ -104,6 +110,7 @@ json
         :param field_template: Template for each field in the prompt.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
+        :param enable_vllm: Whether to use VLLM for loading local llm.
         :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
@@ -121,16 +128,35 @@ json
         self.field_template = field_template or self.DEFAULT_FIELD_TEMPLATE
 
         self.min_score = min_score
-
-        self.sampling_params = sampling_params
-
-        self.model_key = prepare_model(model_type='api',
-                                       model=api_model,
-                                       endpoint=api_endpoint,
-                                       response_path=response_path,
-                                       **model_params)
-
         self.try_num = try_num
+
+        self.enable_vllm = enable_vllm
+
+        sampling_params = update_sampling_params(sampling_params, api_model,
+                                                 self.enable_vllm)
+
+        if enable_vllm:
+            assert torch.cuda.device_count() >= 1, 'must be executed in CUDA'
+            # cannot initialize vllm replicas on different GPUs
+            self.num_proc = 1
+            if model_params.get('tensor_parallel_size') is None:
+                tensor_parallel_size = torch.cuda.device_count()
+                logger.info(f'Set tensor_parallel_size to \
+                    {tensor_parallel_size} for vllm.')
+                model_params['tensor_parallel_size'] = tensor_parallel_size
+            self.model_key = prepare_model(
+                model_type='vllm',
+                pretrained_model_name_or_path=api_model,
+                **model_params)
+            self.sampling_params = vllm.SamplingParams(**sampling_params)
+        else:
+            self.sampling_params = sampling_params
+
+            self.model_key = prepare_model(model_type='api',
+                                           model=api_model,
+                                           endpoint=api_endpoint,
+                                           response_path=response_path,
+                                           **model_params)
 
     def build_input(self, sample):
         if not set(self.input_keys) <= set(sample.keys()):
@@ -175,7 +201,7 @@ json
         if StatsKeys.llm_quality_score in sample[Fields.stats]:
             return sample
 
-        client = get_model(self.model_key, rank=rank)
+        model = get_model(self.model_key, rank, self.use_cuda())
 
         messages = [{
             'role': 'system',
@@ -187,7 +213,11 @@ json
         score, record = 0, None
         for _ in range(self.try_num):
             try:
-                output = client(messages, **self.sampling_params)
+                if self.enable_vllm:
+                    response = model.chat(messages, self.sampling_params)
+                    output = response[0].outputs[0].text
+                else:
+                    output = model(messages, **self.sampling_params)
                 score, record = self.parse_output(output)
                 if record is not None:
                     break
