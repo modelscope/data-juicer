@@ -23,7 +23,7 @@ class ImageNSFWFilter(Filter):
     def __init__(self,
                  hf_nsfw_model: str = 'Falconsai/nsfw_image_detection',
                  trust_remote_code: bool = False,
-                 score_threshold: float = 0.5,
+                 max_score: float = 0.5,
                  any_or_all: str = 'any',
                  *args,
                  **kwargs):
@@ -31,7 +31,7 @@ class ImageNSFWFilter(Filter):
         Initialization method.
 
         :param hf_nsfw_model: nsfw detection model name on huggingface.
-        :param score_threshold: the nsfw score threshold for samples.
+        :param max_score: the nsfw score threshold for samples.
             range from 0 to 1. Samples with nsfw score less than this threshold
             will be kept.
         :param any_or_all: keep this sample with 'any' or 'all' strategy of
@@ -43,7 +43,7 @@ class ImageNSFWFilter(Filter):
         """
         kwargs.setdefault('mem_required', '1GB')
         super().__init__(*args, **kwargs)
-        self.score_threshold = score_threshold
+        self.max_score = max_score
         if any_or_all not in ['any', 'all']:
             raise ValueError(f'Keep strategy [{any_or_all}] is not supported. '
                              f'Can only be one of ["any", "all"].')
@@ -90,7 +90,7 @@ class ImageNSFWFilter(Filter):
             return True
 
         keep_bools = np.array(
-            [itm_score < self.score_threshold for itm_score in itm_scores])
+            [itm_score < self.max_score for itm_score in itm_scores])
 
         # different strategies
         if self.any:
