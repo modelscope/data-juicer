@@ -110,7 +110,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">hf_nsfw_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Falconsai/nsfw_image_detection&#39;</span><span class="p">,</span>
                  <span class="n">trust_remote_code</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">score_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+                 <span class="n">max_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
                  <span class="n">frame_sampling_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;all_keyframes&#39;</span><span class="p">,</span>
                  <span class="n">frame_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
                  <span class="n">reduce_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;avg&#39;</span><span class="p">,</span>
@@ -121,7 +121,7 @@
 <span class="sd">        Initialization method.</span>
 
 <span class="sd">        :param hf_nsfw_model: nsfw detection model name on huggingface.</span>
-<span class="sd">        :param score_threshold: the nsfw score threshold for samples.</span>
+<span class="sd">        :param max_score: the nsfw score threshold for samples.</span>
 <span class="sd">            range from 0 to 1. Samples with nsfw score less than this threshold</span>
 <span class="sd">            will be kept.</span>
 <span class="sd">        :param frame_sampling_method: sampling method of extracting frame</span>
@@ -150,7 +150,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;mem_required&#39;</span><span class="p">,</span> <span class="s1">&#39;1GB&#39;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">score_threshold</span> <span class="o">=</span> <span class="n">score_threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span> <span class="o">=</span> <span class="n">max_score</span>
         <span class="k">if</span> <span class="n">frame_sampling_method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;all_keyframes&#39;</span><span class="p">,</span> <span class="s1">&#39;uniform&#39;</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;Frame sampling method &#39;</span>
@@ -257,7 +257,7 @@
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="n">keep_bools</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">itm_score</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">score_threshold</span> <span class="k">for</span> <span class="n">itm_score</span> <span class="ow">in</span> <span class="n">itm_scores</span><span class="p">])</span>
+            <span class="p">[</span><span class="n">itm_score</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_score</span> <span class="k">for</span> <span class="n">itm_score</span> <span class="ow">in</span> <span class="n">itm_scores</span><span class="p">])</span>
 
         <span class="c1"># different strategies</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">any</span><span class="p">:</span>
