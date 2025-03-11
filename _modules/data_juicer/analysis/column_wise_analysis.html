@@ -102,6 +102,8 @@
 <span class="sd">        for each stat figure</span>
 <span class="sd">    :return: &quot;best&quot; number of rows and columns, and the grid list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">factor</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">total_num</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">[]</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">total_num</span> <span class="o">*</span> <span class="n">factor</span>  <span class="c1"># actual number of figures</span>
     <span class="n">now_col</span> <span class="o">=</span> <span class="n">factor</span>  <span class="c1"># search from the minimum number of columns</span>
     <span class="n">now_row</span> <span class="o">=</span> <span class="n">total_num</span>
