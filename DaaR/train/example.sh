@@ -1,0 +1,23 @@
+#!/bin/bash
+swift sft \
+    --sft_type lora \
+    --model_type qwen2_5-7b \
+    --model_id_or_path ./models/Qwen2.5-7B \
+    --dataset ./data/example.jsonl \
+    --dataset_test_ratio 0 \
+    --output_dir ./ckpt/example \
+    --lora_target_modules ALL \
+    --lora_rank 8 \
+    --lora_alpha 16 \
+    --dtype bf16 \
+    --seed 42 \
+    --learning_rate 5e-5 \
+    --warmup_ratio 0.05 \
+    --max_length 2048 \
+    --batch_size 4 \
+    --eval_batch_size 4 \
+    --num_train_epochs 1 \
+    --gradient_accumulation_steps 4 \
+    --save_total_limit 1000 \
+    --eval_steps 100 \
+    --save_steps 200
