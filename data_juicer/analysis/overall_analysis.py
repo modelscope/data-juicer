@@ -85,6 +85,8 @@ class OverallAnalysis:
         pool = Pool(num_proc)
         for col_name in all_columns:
             this_col = self.refine_single_column(stats_and_meta[col_name])
+            if this_col is None:
+                continue
             res = pool.apply_async(_single_column_analysis,
                                    kwds={
                                        'col': this_col,

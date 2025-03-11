@@ -3,7 +3,12 @@ import numpy as np
 import seaborn as sns
 
 
-def draw_heatmap(data, xlabels, ylables=None, figsize=None, triangle=False):
+def draw_heatmap(data,
+                 xlabels,
+                 ylables='auto',
+                 figsize=None,
+                 triangle=False,
+                 show=False):
     """
     Draw heatmap of input data with special labels.
 
@@ -38,5 +43,6 @@ def draw_heatmap(data, xlabels, ylables=None, figsize=None, triangle=False):
                 annot_kws={'size': 8})
     plt.subplots_adjust(left=.1, right=0.95, bottom=0.22, top=0.95)
     fig = plt.gcf()
-    plt.show()
+    if show:
+        plt.show()
     return fig
