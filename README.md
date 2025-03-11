@@ -13,7 +13,7 @@ Extensive experiments show that the proposed method notably boosts performance a
 
 ## Codes and Data Recipes
 
-- The original codes are organized and presented in [DaaR](https://github.com/lingzhq/data-juicer/tree/DaaR/DaaR).
+- The original codes are organized and presented in [DaaR](https://github.com/modelscope/data-juicer/tree/DaaR/DaaR).
 - We are developing a series of data-juicer operators related to DaaR. Stay tuned.
 
 
