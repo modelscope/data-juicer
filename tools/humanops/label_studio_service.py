@@ -17,7 +17,7 @@ Usage:
     python label_studio_service.py --kill
 
 Options:
-    --port PORT                  Port to run Label Studio on (default: 8080)
+    --port PORT                  Port to run Label Studio on (default: 7070)
     --data-dir PATH              Directory to store Label Studio data (default: ./label_studio_data)
     --create-test-project        Create a test project with sample configuration
     --username USERNAME          Admin username for Label Studio (default: admin@example.com)
@@ -48,8 +48,8 @@ def parse_args():
         description='Start a Label Studio Docker container')
     parser.add_argument('--port',
                         type=int,
-                        default=8080,
-                        help='Port to run Label Studio on (default: 8080)')
+                        default=7070,
+                        help='Port to run Label Studio on (default: 7070)')
     parser.add_argument('--data-dir',
                         default='./label_studio_data',
                         help='Directory to store Label Studio data')
@@ -527,7 +527,7 @@ def create_test_project(server_url, api_token):
 
 def load_connection_info():
     """Load connection information from file"""
-    connection_file = 'label_studio_connection.json'
+    connection_file = 'label_studio_localhost_connection.json'
     if os.path.exists(connection_file):
         try:
             with open(connection_file, 'r') as f:

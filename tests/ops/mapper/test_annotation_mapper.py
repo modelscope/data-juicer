@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, MagicMock, call
 import json
 
-from data_juicer.ops.mapper.annotation_mapper import (
+from data_juicer.ops.mapper.annotation.annotation_mapper import (
     BaseAnnotationOp, 
     LabelStudioAnnotationOp,
     ANNOTATION_EVENTS

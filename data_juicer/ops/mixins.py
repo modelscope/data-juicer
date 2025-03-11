@@ -2,6 +2,8 @@ import threading
 import time
 from typing import Callable, Dict
 
+from loguru import logger
+
 
 class EventDrivenMixin:
     """Mixin for event-driven capabilities in operations.
@@ -122,32 +124,48 @@ class NotificationMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.notification_config = kwargs.get('notification_config', {})
-        self.notification_handlers = {
-            'email': self._send_email_notification,
-            'slack': self._send_slack_notification,
-            'dingtalk': self._send_dingtalk_notification,
-        }
+        if self.notification_config.get('enabled', False):
+            self.notification_handlers = {
+                'email': self._send_email_notification,
+                'slack': self._send_slack_notification,
+                'dingtalk': self._send_dingtalk_notification,
+            }
+        else:
+            self.notification_handlers = {}
+            logger.warning('Notification is disabled')
 
     def send_notification(self,
                           message: str,
                           notification_type: str = None,
                           **kwargs):
-        """Send a notification through the specified channel.
+        """Send a notification message.
 
         Args:
             message: The message to send
-            notification_type: The type of notification to send (email, slack, dingtalk)
-                               If None, will use all configured notification types
-            **kwargs: Additional parameters specific to the notification type
+            notification_type: The type of notification to send.
+                                Email, Slack, DingTalk.
+                                If None, disable all notifications
+            **kwargs: Additional arguments to pass to the notification handler
 
         Returns:
-            bool: Whether the notification was sent successfully
-        """  # noqa: E501
+            bool: True if the notification was sent successfully, else False
+        """
+        # Check if notifications are enabled
+        if not hasattr(self, 'notification_config'
+                       ) or not self.notification_config.get('enabled', False):
+            # Notifications are disabled, return success without sending
+            return True
+
+        # Check if notification handlers are initialized
+        if not hasattr(self, 'notification_handlers'):
+            logger.error('Notification handlers not initialized')
+            return False
+
         if notification_type is None:
             # Send to all configured notification types
             success = True
             for ntype in self.notification_config.keys():
-                if ntype in self.notification_handlers:
+                if ntype != 'enabled' and ntype in self.notification_handlers:
                     success = success and self.notification_handlers[ntype](
                         message, **kwargs)
             return success
@@ -155,9 +173,7 @@ class NotificationMixin:
             return self.notification_handlers[notification_type](message,
                                                                  **kwargs)
         else:
-            import logging
-            logging.error(
-                f'Unsupported notification type: {notification_type}')
+            logger.error(f'Unsupported notification type: {notification_type}')
             return False
 
     def _send_email_notification(self, message: str, **kwargs):
@@ -240,8 +256,7 @@ class NotificationMixin:
                                   config.get('username', 'Data Juicer'))
 
             if not webhook_url:
-                import logging
-                logging.error('Missing required Slack webhook URL')
+                logger.error('Missing required Slack webhook URL')
                 return False
 
             # Prepare payload
@@ -261,8 +276,7 @@ class NotificationMixin:
 
             return response.status_code == 200
         except Exception as e:
-            import logging
-            logging.error(f'Failed to send Slack notification: {e}')
+            logger.error(f'Failed to send Slack notification: {e}')
             return False
 
     def _send_dingtalk_notification(self, message: str, **kwargs):
@@ -323,6 +337,5 @@ class NotificationMixin:
             result = response.json()
             return result.get('errcode') == 0
         except Exception as e:
-            import logging
-            logging.error(f'Failed to send DingTalk notification: {e}')
+            logger.error(f'Failed to send DingTalk notification: {e}')
             return False

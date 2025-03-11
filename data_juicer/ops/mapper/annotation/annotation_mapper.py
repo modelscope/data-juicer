@@ -7,9 +7,10 @@ from typing import Any, Dict, List, Optional
 import requests
 from loguru import logger
 
-from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.ops.mixins import EventDrivenMixin, NotificationMixin
 from data_juicer.utils.constant import Fields
+
+from ...base_op import Mapper
 
 # Common annotation event types
 ANNOTATION_EVENTS = {
@@ -25,7 +26,7 @@ ANNOTATION_EVENTS = {
 }
 
 
-class BaseAnnotationOp(EventDrivenMixin, NotificationMixin, Mapper, ABC):
+class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
     """Base class for annotation operations with event-driven capabilities"""
 
     _batched_op = True  # Mark this as a batched operator
@@ -405,8 +406,7 @@ class BaseAnnotationOp(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         self.stop_all_polling()
 
 
-@OPERATORS.register_module('label_studio_annotation')
-class LabelStudioAnnotationOp(BaseAnnotationOp):
+class LabelStudioAnnotationMapper(BaseAnnotationMapper):
     """Operation for annotating data using Label Studio"""
 
     def __init__(self,
