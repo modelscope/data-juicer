@@ -17,7 +17,9 @@ from data_juicer.format.load import load_formatter
 DJ_OUTPUT = 'outputs'
 
 allowed_methods = {
-    'run', 'process', 'compute_stats', 'compute_hash', 'analyze', 'compute'
+    'run', 'process', 'compute_stats', 'compute_hash', 'analyze', 'compute',
+    'process_single', 'process_batched', 'compute_stats_single',
+    'compute_stats_batched'
 }
 
 logger = logging.getLogger('uvicorn.error')
@@ -110,6 +112,8 @@ def _invoke(callable, request):
     # flatten lists with a single element
     d_params = dict(
         (k, v if len(v) > 1 else v[0]) for k, v in q_params.items())
+    # parse json dumps
+    d_params = _parse_json_dumps(d_params)
     # pre-processing
     d_params = _setup_cfg(d_params)
     exporter = _setup_dataset(d_params)
@@ -123,6 +127,13 @@ def _invoke(callable, request):
     if skip_return:
         result = ''
     return result
+
+
+def _parse_json_dumps(params: Dict, prefix='<json_dumps>'):
+    for k, v in params.items():
+        if isinstance(v, str) and v.startswith(prefix):
+            params[k] = json.loads(v[len(prefix):])
+    return params
 
 
 def _setup_cfg(params: Dict):
