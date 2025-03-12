@@ -47,7 +47,7 @@ json
     "accuracy": ,
     "grammar": ,
     "informativeness": ,
-    "coherence": ,
+    "coherence":
   },
   "flags": ["syntax_error", "insufficient_information", ...],
   "rationale": "Concise technical analysis",
@@ -67,7 +67,7 @@ json
     "accuracy": 2,
     "grammar": 4,
     "informativeness": 4,
-    "coherence": 2,
+    "coherence": 2
   },
   "flags": ["accuracy_concern", "logical_confusion"],
   "rationale": "The text provides rich information but suffers from logical confusion and lacks contextual coherence. Excellent grammatical structure offset by factual inaccuracies.",
@@ -78,7 +78,7 @@ json
     DEFAULT_FIELD_TEMPLATE = '**{field_name}**\n{field_data}'
 
     def __init__(self,
-                 api_model: str = 'gpt-4o',
+                 api_or_hf_model: str = 'gpt-4o',
                  min_score: float = 0.5,
                  *,
                  api_endpoint: Optional[str] = None,
@@ -96,7 +96,7 @@ json
         """
         Initialization method.
 
-        :param api_model: API model name.
+        :param api_or_hf_model: API or huggingface model name.
         :param min_score: The lowest quality score threshold to keep the
             sample.
         :param api_endpoint: URL endpoint for the API.
@@ -110,7 +110,8 @@ json
         :param field_template: Template for each field in the prompt.
         :param try_num: The number of retry attempts when there is an API
             call error or output parsing error.
-        :param enable_vllm: Whether to use VLLM for loading local llm.
+        :param enable_vllm: If true, use VLLM for loading hugging face or
+            local llm. Otherwise, use API for reference.
         :param model_params: Parameters for initializing the API model.
         :param sampling_params: Extra parameters passed to the API call.
             e.g {'temperature': 0.9, 'top_p': 0.95}
@@ -132,7 +133,8 @@ json
 
         self.enable_vllm = enable_vllm
 
-        sampling_params = update_sampling_params(sampling_params, api_model,
+        sampling_params = update_sampling_params(sampling_params,
+                                                 api_or_hf_model,
                                                  self.enable_vllm)
 
         if enable_vllm:
@@ -146,14 +148,14 @@ json
                 model_params['tensor_parallel_size'] = tensor_parallel_size
             self.model_key = prepare_model(
                 model_type='vllm',
-                pretrained_model_name_or_path=api_model,
+                pretrained_model_name_or_path=api_or_hf_model,
                 **model_params)
             self.sampling_params = vllm.SamplingParams(**sampling_params)
         else:
             self.sampling_params = sampling_params
 
             self.model_key = prepare_model(model_type='api',
-                                           model=api_model,
+                                           model=api_or_hf_model,
                                            endpoint=api_endpoint,
                                            response_path=response_path,
                                            **model_params)
@@ -201,7 +203,10 @@ json
         if StatsKeys.llm_quality_score in sample[Fields.stats]:
             return sample
 
-        model = get_model(self.model_key, rank, self.use_cuda())
+        if self.enable_vllm:
+            model, _ = get_model(self.model_key, rank, self.use_cuda())
+        else:
+            model = get_model(self.model_key, rank, self.use_cuda())
 
         messages = [{
             'role': 'system',
