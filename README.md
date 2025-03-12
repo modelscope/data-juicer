@@ -146,7 +146,8 @@ Table of Contents
   - [Preprocess Tools](tools/preprocess/README.md)
   - [Postprocess Tools](tools/postprocess/README.md)
   - [Sandbox](docs/Sandbox.md)
-  - [Quality Classifier](tools/quality_classifier/README.md)
+  - [API Service](docs/DJ_service.md)
+  - [Data Scoring](tools/quality_classifier/README.md)
   - [Auto Evaluation](tools/evaluator/README.md)
   - [Third-parties Integration](thirdparty/LLM_ecosystems/README.md)
 

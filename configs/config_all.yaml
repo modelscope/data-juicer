@@ -437,6 +437,9 @@ process:
       lang: en                                                # sample in which language
       tokenization: false                                     # whether to use model to tokenize documents
       substrings: ['http', 'www', '.com', 'href', '//']       # incorrect substrings to remove
+  - replace_content_mapper:                                 # replace all content in the text that matches a specific regular expression pattern with a designated replacement string.
+      pattern: null                                           # regular expression pattern(s) to search for within text
+      repl: ''                                                # replacement string(s), default is empty string
   - sdxl_prompt2prompt_mapper:                              # use the generative model SDXL and image editing technique Prompt-to-Prompt to generate pairs of similar images.
       hf_diffusion: 'stabilityai/stable-diffusion-xl-base-1.0' # model name of the SDXL model on huggingface
       num_inference_steps: 50                                 # the larger the value, the better the image generation quality
