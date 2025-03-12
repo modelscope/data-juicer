@@ -1,4 +1,14 @@
-# Quality Classifier Toolkit
+# 数据打分能力
+
+Data-Juicer 提供了一组数据打分能力，可帮助您评估数据集。
+
+- 所有 [Filter OPs](../../docs/Operators.md) 都包含一个名为 `compute_stats` 的子过程，该过程根据运算符的预定义功能目标，计算统计测量值。这些测量值通常使用简单规则、辅助模型或高级算法得出，例如困惑度、长度、模态匹配分数等。`Analyzer` 将自动汇总这些统计数据并将其报告在结果数据集中。
+
+- 我们也提供了基于提示词的 LLM 评分算子，例如 `llm_api_difficulty_score_filter` 和 `llm_api_quality_score_filter`。这些算子带有针对一般用例的默认提示，但也为用户提供了灵活性，以自定义特定模型或特定要求。
+
+- 此外，我们还提供了一个工具包来复现 GPT-3 质量分类器，如下一节所述。
+
+# 复现GPT3的质量分类器套件
 
 帮助您复现类似于 GPT-3 质量分类器并将其应用到您的 Web 数据集。
 
