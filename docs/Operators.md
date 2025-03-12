@@ -34,7 +34,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 |------|:------:|-------------|
 | [aggregator](#aggregator) | 4 | Aggregate for batched samples, such as summary or conclusion. 对批量样本进行汇总，如得出总结或结论。 |
 | [deduplicator](#deduplicator) | 10 | Detects and removes duplicate samples. 识别、删除重复样本。 |
-| [filter](#filter) | 49 | Filters out low-quality samples. 过滤低质量样本。 |
+| [filter](#filter) | 47 | Filters out low-quality samples. 过滤低质量样本。 |
 | [formatter](#formatter) | 9 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
 | [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
 | [mapper](#mapper) | 76 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
