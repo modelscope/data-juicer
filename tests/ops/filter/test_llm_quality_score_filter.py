@@ -4,12 +4,12 @@ from loguru import logger
 
 from data_juicer.core.data import NestedDataset as Dataset
 
-from data_juicer.ops.filter.llm_api_quality_score_filter import LLMAPIQualityScoreFilter
+from data_juicer.ops.filter.llm_quality_score_filter import LLMQualityScoreFilter
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class LLMAPIQualityScoreFilterTest(DataJuicerTestCaseBase):
+class LLMQualityScoreFilterTest(DataJuicerTestCaseBase):
     # before running this test, set below environment variables:
     # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
     # export OPENAI_API_KEY=your_dashscope_key
@@ -47,7 +47,7 @@ class LLMAPIQualityScoreFilterTest(DataJuicerTestCaseBase):
             "Cats are domesticated animals known for their agility, intelligence, and independent nature. Research shows that they spend approximately 70% of their lives sleeping, which helps conserve energy for hunting. Unlike dogs, cats are obligate carnivores, meaning their diet must consist primarily of meat to meet nutritional needs."
         }]
         dataset = Dataset.from_list(ds_list)
-        op = LLMAPIQualityScoreFilter(api_or_hf_model=self.api_or_hf_model)
+        op = LLMQualityScoreFilter(api_or_hf_model=self.api_or_hf_model)
         dataset= self._run_test(dataset, op)
 
     def test_rft_data(self):
@@ -65,7 +65,7 @@ class LLMAPIQualityScoreFilterTest(DataJuicerTestCaseBase):
             "answer": "Plants use chlorophyll to absorb sunlight, converting carbon dioxide and water into glucose and oxygen through a process that occurs in chloroplasts."
         }]
         dataset = Dataset.from_list(ds_list)
-        op = LLMAPIQualityScoreFilter(
+        op = LLMQualityScoreFilter(
             api_or_hf_model=self.api_or_hf_model,
             input_keys=['text', 'analysis', 'answer'],
             field_names=['Query', 'Analysis', 'Answer'],
@@ -85,7 +85,7 @@ class LLMAPIQualityScoreFilterTest(DataJuicerTestCaseBase):
     #         "Cats are domesticated animals known for their agility, intelligence, and independent nature. Research shows that they spend approximately 70% of their lives sleeping, which helps conserve energy for hunting. Unlike dogs, cats are obligate carnivores, meaning their diet must consist primarily of meat to meet nutritional needs."
     #     }]
     #     dataset = Dataset.from_list(ds_list)
-    #     op = LLMAPIQualityScoreFilter(
+    #     op = LLMQualityScoreFilter(
     #           api_or_hf_model=self.api_or_hf_model,
     #           enable_vllm=True,
     #           accelerator='cuda'

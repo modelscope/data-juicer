@@ -14,46 +14,49 @@ from data_juicer.utils.model_utils import (get_model, prepare_model,
 torch = LazyLoader('torch', 'torch')
 vllm = LazyLoader('vllm', 'vllm')
 
-OP_NAME = 'llm_api_difficulty_score_filter'
+OP_NAME = 'llm_quality_score_filter'
 
 
 @OPERATORS.register_module(OP_NAME)
-class LLMAPIDifficultyScoreFilter(Filter):
+class LLMQualityScoreFilter(Filter):
     """
-    Filter to keep sample with high difficulty score estimated by LLM in API.
+    Filter to keep sample with high quality score estimated by LLM in API.
     """
 
     # avoid leading whitespace
     DEFAULT_SYSTEM_PROMPT = """
-You are an expert pedagogical evaluator for LLM training data. Analyze each data sample through multiple difficulty lenses and provide calibrated scores with detailed reasoning. Follow these guidelines:
+You are a meticulous data quality assessor for LLM training. Analyze each data sample across multiple quality dimensions and provide numerical scores with reasoning. Follow these guidelines:
 
 1. Evaluation Dimensions
-Rate each dimension (1-5 scale: 1=Novice-friendly, 3=Intermediate, 5=Expert-level):
-- Linguistic Complexity: Vocabulary sophistication & syntactic structures
-- Conceptual Depth: Abstraction level & theoretical requirements
-- Prior Knowledge: Required domain-specific understanding
-- Step Complexity: Problem-solving steps needed
-- Ambiguity: Multiple valid interpretations
+Score each dimension (1-5 scale: 1=lowest, 5=highest):
+- Accuracy: Factual correctness & verifiability
+- Grammar: Linguistic correctness & fluency
+- Informativeness: Depth/utility of content
+- Coherence: Logical structure & consistency
 
-2. Output Format
+2. Scoring Protocol
+- Base scores on concrete evidence from text
+- Flag samples needing human review (confidence <90%)
+- Compare with similar data points for consistency
+- Penalize hallucination/misinformation severely
+
+3. Output Format
 json
 {
   "dimension_scores": {
-    "linguistic_complexity": ,
-    "conceptual_depth": ,
-    "prior_knowledge": ,
-    "step_complexity": ,
-    "ambiguity":
+    "accuracy": ,
+    "grammar": ,
+    "informativeness": ,
+    "coherence":
   },
-  "flags": ["multistep_reasoning", "cultural_context", ...],
-  "rationale": "Technical analysis of challenge sources"
+  "flags": ["syntax_error", "insufficient_information", ...],
+  "rationale": "Concise technical analysis",
+  "recommendation": ["keep", "review", "discard"]
 }
-3. Special Instructions
-- Differentiate intrinsic vs. extrinsic difficulty factors
-- Account for varying cultural/educational backgrounds
-- Mark samples requiring cross-domain knowledge synthesis
-- Consider temporal aspects for time-sensitive subjects
-- Flag ambiguous samples needing difficulty bracketing
+4. Special Instructions
+- Prioritize factual integrity over stylistic qualities
+- Treat unverified medical/legal claims as high-risk
+- Contextualize cultural references appropriately
 - Response a json dict
 
 Example Response:
@@ -61,14 +64,14 @@ Example Response:
 json
 {
   "dimension_scores": {
-    "linguistic_complexity": 3,
-    "conceptual_depth": 5,
-    "prior_knowledge": 4,
-    "step_complexity": 4,
-    "ambiguity": 5
+    "accuracy": 2,
+    "grammar": 4,
+    "informativeness": 4,
+    "coherence": 2
   },
-  "flags": ["nonlinear_reasoning", "semantic_ambiguity"],
-  "rationale": "High conceptual difficulty due to multi-layered metaphor interpretation requiring philosophy background. Moderate linguistic complexity offset by implicit cultural references."
+  "flags": ["accuracy_concern", "logical_confusion"],
+  "rationale": "The text provides rich information but suffers from logical confusion and lacks contextual coherence. Excellent grammatical structure offset by factual inaccuracies.",
+  "recommendation": "review"
 }
 """  # noqa: E501
     DEFAULT_INPUT_TEMPLATE = "# Data\n'''\n{data}\n'''\n\n# Response\njson\n"
@@ -94,8 +97,8 @@ json
         Initialization method.
 
         :param api_or_hf_model: API or huggingface model name.
-        :param min_score: The lowest difficulty score threshold to keep
-            the sample.
+        :param min_score: The lowest quality score threshold to keep the
+            sample.
         :param api_endpoint: URL endpoint for the API.
         :param response_path: Path to extract content from the API response.
             Defaults to 'choices.0.message.content'.
@@ -185,10 +188,7 @@ json
         data = json.loads(json_str)
 
         dimension_scores = data['dimension_scores']
-        required_keys = [
-            'linguistic_complexity', 'conceptual_depth', 'prior_knowledge',
-            'step_complexity', 'ambiguity'
-        ]
+        required_keys = ['accuracy', 'grammar', 'informativeness', 'coherence']
 
         total_score = 0
         for key in required_keys:
@@ -200,7 +200,7 @@ json
 
     def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
-        if StatsKeys.llm_difficulty_score in sample[Fields.stats]:
+        if StatsKeys.llm_quality_score in sample[Fields.stats]:
             return sample
 
         if self.enable_vllm:
@@ -229,12 +229,12 @@ json
             except Exception as e:
                 logger.warning(f'Exception: {e}')
 
-        sample[Fields.stats][StatsKeys.llm_difficulty_score] = score
-        sample[Fields.stats][StatsKeys.llm_difficulty_record] = record
+        sample[Fields.stats][StatsKeys.llm_quality_score] = score
+        sample[Fields.stats][StatsKeys.llm_quality_record] = record
 
         return sample
 
     def process_single(self, sample, rank=None):
-        itm_score = sample[Fields.stats][StatsKeys.llm_difficulty_score]
+        itm_score = sample[Fields.stats][StatsKeys.llm_quality_score]
 
         return itm_score >= self.min_score
