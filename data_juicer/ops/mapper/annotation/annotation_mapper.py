@@ -4,13 +4,11 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
-import requests
 from loguru import logger
 
-from data_juicer.ops.mixins import EventDrivenMixin, NotificationMixin
-from data_juicer.utils.constant import Fields
-
+from ....utils.constant import Fields
 from ...base_op import Mapper
+from ...mixins import EventDrivenMixin, NotificationMixin
 
 # Common annotation event types
 ANNOTATION_EVENTS = {
@@ -32,36 +30,63 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
     _batched_op = True  # Mark this as a batched operator
 
     def __init__(self,
-                 config_path: Optional[str] = None,
-                 project_name: str = 'Annotation Project',
-                 project_id: Optional[int] = None,
+                 project_name_prefix: str = 'DataJuicer_Annotation',
                  wait_for_annotations: bool = False,
                  timeout: int = 3600,
                  poll_interval: int = 60,
                  samples_per_task: int = 1,
                  max_tasks_per_batch: int = 100,
+                 project_id: Optional[int] = None,
                  notification_config: Optional[Dict] = None,
                  notification_events: Optional[Dict[str, bool]] = None,
                  **kwargs):
         """Initialize the base annotation operation
 
         Args:
-            config_path: Path to the configuration file
-            project_name: Name of the project to create or use
+            project_name_prefix: Prefix for the project name
             project_id: ID of existing project (if None, creates new project)
             wait_for_annotations: Whether to wait for annotations to complete
             timeout: Maximum time to wait for annotations in seconds
             poll_interval: Time between annotation status checks in seconds
             samples_per_task: Number of samples in each annotation task
             max_tasks_per_batch: Maximum number of tasks in a single batch
-            notification_config: Configuration for notifications
+            notification_config: Configuration for notifications:
+                {
+                    'enabled': True,  # Whether notifications are enabled
+                    'email': {  # Email notification settings
+                        'smtp_server': 'smtp.example.com',
+                        'smtp_port': 587,
+                        'sender_email': 'sender@example.com',
+                        'sender_password': 'password',
+                        'recipients': ['recipient@example.com']
+                    },
+                    'slack': {  # Slack notification settings
+                        'webhook_url': 'https://hooks.slack.com/services/...',
+                        'channel': '#channel',
+                        'username': 'Data Juicer'
+                    },
+                    'dingtalk': {  # DingTalk notification settings
+                        'access_token': 'your_access_token',
+                        'secret': 'your_secret'
+                    }
+                }
             notification_events: Events that should trigger notifications
+                {
+                    'task_created': False,
+                    'batch_created': True,
+                    'annotation_completed': True,
+                    'project_completed': True,
+                    'error_occurred': True
+                }
         """
-        # Initialize with notification config
-        super().__init__(notification_config=notification_config, **kwargs)
+        # Ensure notification_config is passed to kwargs for NotificationMixin
+        kwargs['notification_config'] = notification_config or {}
+
+        # Initialize parent classes
+        super().__init__(**kwargs)
 
         # Store configuration
-        self.project_name = project_name
+        self.project_name = project_name_prefix + '_' + str(uuid.uuid4())[:6]
         self.project_id = project_id
         self.wait_for_annotations = wait_for_annotations
         self.timeout = timeout
@@ -195,54 +220,65 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         """Get annotation for a task if available"""
         pass
 
+    @abstractmethod
+    def _process_annotation_result(self, annotation: Dict,
+                                   sample: Dict) -> Dict:
+        """Process annotation result and update the sample
+
+        Args:
+            annotation: The annotation result from the annotation platform
+            sample: The original sample that was annotated
+
+        Returns:
+            Dict: The updated sample with annotation results
+        """
+        pass
+
     def process_batched(self, samples):
         """Process a batch of samples by creating annotation tasks
 
         Args:
-            samples: Dictionary of samples to process
+            samples: Dictionary of samples to process (column-oriented)
 
         Returns:
-            Dict: Processed samples
+            Dict: Processed samples (column-oriented)
         """
-        # Extract sample list from the batch dictionary
-        keys = samples.keys()
-        first_key = next(iter(keys))
-        num_samples = len(samples[first_key])
+        # Get dimensions of the data
+        keys = list(samples.keys())
+        num_samples = len(samples[keys[0]])
 
-        # Create a list of sample dictionaries
-        sample_list = []
-        for i in range(num_samples):
-            this_sample = {key: samples[key][i] for key in keys}
-            sample_list.append(this_sample)
+        # Step 1: Convert to row-oriented format (list of sample dictionaries)
+        sample_list = [{key: samples[key][i]
+                        for key in keys} for i in range(num_samples)]
 
-        # Generate unique IDs for each sample
-        sample_ids = [str(uuid.uuid4()) for _ in range(len(sample_list))]
+        # Step 2: Generate unique IDs for each sample
+        sample_ids = [str(uuid.uuid4()) for _ in range(num_samples)]
 
-        # Group samples into tasks based on samples_per_task
-        tasks_data = []
-        task_sample_ids = []
+        # Step 3: Process samples in batches
+        for batch_start in range(0, num_samples, self.max_tasks_per_batch):
+            batch_end = min(batch_start + self.max_tasks_per_batch,
+                            num_samples)
 
-        for i in range(0, len(sample_list), self.samples_per_task):
-            batch_samples = sample_list[i:i + self.samples_per_task]
-            batch_ids = sample_ids[i:i + self.samples_per_task]
+            # Prepare tasks for this batch
+            tasks_data = []
+            task_sample_ids = []
 
-            # Format the samples as a task
-            task_data = self._format_task(batch_samples)
-            tasks_data.append(task_data)
-            task_sample_ids.append(batch_ids)
+            for i in range(batch_start, batch_end, self.samples_per_task):
+                end_idx = min(i + self.samples_per_task, batch_end)
+                batch_samples = sample_list[i:end_idx]
+                batch_ids = sample_ids[i:end_idx]
 
-            # If we've reached max_tasks_per_batch or this is the last group,
-            # create the tasks in the annotation platform
-            if len(
-                    tasks_data
-            ) >= self.max_tasks_per_batch or i + self.samples_per_task >= len(
-                    sample_list):
-                self._create_and_process_batch(tasks_data, task_sample_ids,
-                                               sample_list, sample_ids)
-                tasks_data = []
-                task_sample_ids = []
+                # Format the samples as a task
+                task_data = self._format_task(batch_samples)
+                tasks_data.append(task_data)
+                task_sample_ids.append(batch_ids)
 
-        # Update the samples with task IDs
+            # Create and process this batch of tasks
+            self._create_and_process_batch(tasks_data, task_sample_ids,
+                                           sample_list[batch_start:batch_end],
+                                           sample_ids[batch_start:batch_end])
+
+        # Step 4: Update samples with annotation results
         for i, sample_id in enumerate(sample_ids):
             if sample_id in self.sample_to_task_id:
                 task_id = self.sample_to_task_id[sample_id]
@@ -257,15 +293,21 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                         and task_id in self.processed_annotations):
                     annotation = self._get_task_annotation(task_id)
                     if annotation:
-                        sample_list[i][Fields.meta]['annotations'] = annotation
+                        # Process the annotation result
+                        sample_list[i] = self._process_annotation_result(
+                            annotation, sample_list[i])
 
-        # Update the original samples dictionary
-        for i in range(num_samples):
-            for key in keys:
-                if key in sample_list[i]:
-                    samples[key][i] = sample_list[i][key]
+        # Step 5: Convert back to column-oriented format efficiently
+        # Find all keys that exist in any sample
+        all_keys = set().union(*(sample.keys() for sample in sample_list))
 
-        return samples
+        # Create the result dictionary with all keys
+        result = {}
+        for key in all_keys:
+            # Use a list comprehension for better performance
+            result[key] = [sample.get(key) for sample in sample_list]
+
+        return result
 
     def _create_and_process_batch(self, tasks_data, task_sample_ids,
                                   sample_list, sample_ids):
@@ -313,7 +355,9 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
 
                 # Wait for all tasks in this batch to be annotated
                 try:
-                    self._wait_for_batch_annotations(task_ids)
+                    completed_tasks = self._wait_for_batch_annotations(
+                        task_ids)
+                    logger.info(f'Completed tasks: {completed_tasks}')
                 except TimeoutError as e:
                     # Trigger error event but continue processing
                     self.trigger_event(
@@ -332,33 +376,122 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
             logger.error(f'Error creating batch {batch_id}: {str(e)}')
 
     def _wait_for_batch_annotations(self, task_ids):
-        """Wait for all tasks in a batch to be annotated
+        """Wait for all tasks in a batch to be annotated using efficient
+            polling with the SDK.
 
         Args:
             task_ids: List of task IDs to wait for
 
-        Raises:
-            TimeoutError: If waiting times out
+        Returns:
+            Dict: Mapping of task IDs to their annotations
         """
+        if not self.wait_for_annotations:
+            return {}
+
+        if not task_ids:
+            return {}
+
+        logger.info(f'Waiting for annotations for {len(task_ids)} tasks')
+
         start_time = time.time()
+        completed_tasks = {}
+        task_id_set = set(task_ids)
+        remaining_tasks = task_id_set - set(
+            completed_tasks.keys()) - self.processed_annotations
 
-        while time.time() - start_time < self.timeout:
-            # Check if all tasks are annotated
-            all_annotated = True
-            for task_id in task_ids:
-                if task_id not in self.processed_annotations:
-                    all_annotated = False
-                    break
+        # Track the last time we saw a change in annotations
+        last_annotation_count = 0
+        last_change_time = time.time()
 
-            if all_annotated:
-                return
+        # Use efficient polling with the SDK
+        while time.time() - start_time < self.timeout and remaining_tasks:
+            try:
+                # First, check project summary to see if there are anything new
+                # This is much lighter than fetching all tasks
+                project_summary = self.project.get_summary()
 
-            # Sleep before checking again
-            time.sleep(self.poll_interval)
+                # Get the total number of annotations
+                total_annotations = project_summary.get(
+                    'total_annotations_number', 0)
 
-        # If we get here, we timed out
-        raise TimeoutError(
-            f'Timed out waiting for annotations of {len(task_ids)} tasks')
+                # If annotation count hasn't changed, no need to fetch tasks
+                if total_annotations == last_annotation_count:
+                    # But if we've been waiting too long without changes
+                    # Do a full check occasionally
+                    if time.time() - last_change_time > max(
+                            self.poll_interval * 5, 30):
+                        logger.info('No new annotations detected for a while, '
+                                    'doing a full check')
+                        last_change_time = time.time()  # Reset the timer
+                    else:
+                        # No changes, just wait and check stats again
+                        logger.info(f'No new annotations detected '
+                                    f'({total_annotations} total)')
+                        time.sleep(self.poll_interval)
+                        continue
+                else:
+                    # Update our tracking variables
+                    logger.info(
+                        f'Detected change in annotations: '
+                        f'{last_annotation_count} → {total_annotations}')
+                    last_annotation_count = total_annotations
+                    last_change_time = time.time()
+
+                # Now fetch only the tasks we're still waiting for
+                for task_id in list(remaining_tasks):
+                    try:
+                        # Use the SDK to get this specific task
+                        task = self.project.get_task(task_id)
+
+                        # Check if task has annotations
+                        if task and 'annotations' in task and task[
+                                'annotations']:
+                            # Get the latest annotation
+                            annotation = task['annotations'][-1]
+                            completed_tasks[task_id] = annotation
+                            self.processed_annotations.add(task_id)
+
+                            # Trigger annotation completed event
+                            self.trigger_event(
+                                ANNOTATION_EVENTS['ANNOTATION_COMPLETED'], {
+                                    'task_id':
+                                    task_id,
+                                    'annotation_id':
+                                    annotation.get('id', 'unknown'),
+                                    'annotation':
+                                    annotation,
+                                    'sample_ids':
+                                    self.task_to_samples.get(task_id, [])
+                                })
+
+                            # Remove from remaining tasks
+                            remaining_tasks.remove(task_id)
+                    except Exception as e:
+                        logger.warning(f'Error fetching task {task_id}: {e}')
+
+                # Log progress
+                logger.info(
+                    f'Completed {len(completed_tasks)}/{len(task_ids)} '
+                    f'annotations, {len(remaining_tasks)} remaining')
+
+                # If all tasks are annotated, we're done
+                if not remaining_tasks:
+                    return completed_tasks
+
+                # Sleep before checking again
+                time.sleep(self.poll_interval)
+
+            except Exception as e:
+                logger.error(f'Error polling for annotations: {e}')
+                time.sleep(self.poll_interval)
+
+        # If we get here, we timed out or completed all annotations
+        if remaining_tasks:
+            logger.warning(
+                f'Timeout waiting for {len(remaining_tasks)}/{len(task_ids)} '
+                'annotations')
+
+        return completed_tasks
 
     def _poll_for_completed_annotations(self):
         """Poll for completed annotations
@@ -406,87 +539,87 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         self.stop_all_polling()
 
 
-class LabelStudioAnnotationMapper(BaseAnnotationMapper):
+class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
     """Operation for annotating data using Label Studio"""
 
     def __init__(self,
-                 config_path: Optional[str] = None,
-                 api_url: Optional[str] = None,
-                 api_key: Optional[str] = None,
-                 project_name: str = 'Annotation Project',
-                 project_id: Optional[int] = None,
+                 api_url: str = None,
+                 api_key: str = None,
                  label_config: Optional[str] = None,
-                 wait_for_annotations: bool = False,
-                 timeout: int = 3600,
-                 poll_interval: int = 60,
-                 samples_per_task: int = 1,
-                 max_tasks_per_batch: int = 100,
-                 notification_config: Optional[Dict] = None,
                  **kwargs):
         """Initialize the Label Studio annotation operation
 
         Args:
-            config_path: Path to the configuration file
             api_url: Base URL for Label Studio API
             api_key: API key for authentication
-            project_name: Name of the project to create or use
-            project_id: ID of existing project (if None, creates new project)
             label_config: XML configuration for the labeling interface
-            wait_for_annotations: Whether to wait for annotations to complete
-            timeout: Maximum time to wait for annotations in seconds
-            poll_interval: Time between annotation status checks in seconds
-            samples_per_task: Number of samples in each annotation task
-            max_tasks_per_batch: Maximum number of tasks in a single batch
-            notification_config: Configuration for notifications
+            **kwargs: Additional parameters passed to BaseAnnotationMapper
         """
-        super().__init__(config_path=config_path,
-                         project_name=project_name,
-                         project_id=project_id,
-                         wait_for_annotations=wait_for_annotations,
-                         timeout=timeout,
-                         poll_interval=poll_interval,
-                         samples_per_task=samples_per_task,
-                         max_tasks_per_batch=max_tasks_per_batch,
-                         notification_config=notification_config,
-                         **kwargs)
+        # Initialize parent classes
+        super().__init__(**kwargs)
+
+        # Make sure samples_per_task is 1
+        # Label studio only supports 1 sample per task
+        if self.samples_per_task != 1:
+            logger.warning(
+                'Label Studio Annotation Mapper only supports 1 sample '
+                'per task, but samples_per_task is set to '
+                f'{self.samples_per_task}. Setting samples_per_task to 1.')
+            self.samples_per_task = 1
 
         # Store Label Studio specific configuration
         self.api_url = api_url
         self.api_key = api_key
         self.label_config = label_config
 
-        # Initialize session and project
-        self.session = self._create_session()
+        # Initialize Label Studio client
+        try:
+            from label_studio_sdk import Client
+            self.client = Client(url=self.api_url, api_key=self.api_key)
+            logger.info(f'Connected to Label Studio at {self.api_url}')
+        except ImportError:
+            logger.error(
+                'Failed to import label_studio_sdk. Please install it with: '
+                'pip install label-studio-sdk')
+            raise ImportError(
+                'label-studio-sdk is required for LabelStudioAnnotationMapper')
+
+        # Initialize project
         if self.project_id is None:
-            self.project_id = self.setup_project()
+            self.project = self.setup_project()
+            self.project_id = self.project.id
+        else:
+            try:
+                self.project = self.client.get_project(self.project_id)
+                logger.info(
+                    f'Using existing project with ID: {self.project_id}')
+            except Exception as e:
+                logger.error(
+                    f'Failed to get project with ID {self.project_id}: {e}')
+                raise
 
-    def _create_session(self) -> requests.Session:
-        """Create a session with authentication headers"""
-        session = requests.Session()
-        session.headers.update({
-            'Authorization': f'Token {self.api_key}',
-            'Content-Type': 'application/json'
-        })
-        return session
-
-    def setup_project(self) -> int:
+    def setup_project(self):
         """Create a new project or use existing one"""
-        # Create new project
-        project_data = {
-            'title': self.project_name,
-            'description': 'Created by Data Juicer',
-            'label_config': self.label_config,
-        }
+        try:
+            # Create new project
+            logger.info(
+                f'Creating new Label Studio project: {self.project_name}')
+            logger.info(f'Label config type: {type(self.label_config)}')
+            if self.label_config:
+                logger.info(f'Label config length: {len(self.label_config)}')
 
-        response = self.session.post(f'{self.api_url}/api/projects',
-                                     json=project_data)
-        if response.status_code != 201:
-            raise Exception(f'Failed to create project: {response.text}')
+            project = self.client.create_project(
+                title=self.project_name,
+                description='Created by Data Juicer',
+                label_config=self.label_config)
 
-        project_id = response.json()['id']
-        logger.info(f'Created new Label Studio project with ID: {project_id}')
+            logger.info(
+                f'Created new Label Studio project with ID: {project.id}')
+            return project
 
-        return project_id
+        except Exception as e:
+            logger.error(f'Failed to create project: {e}')
+            raise
 
     def _create_tasks_batch(self, tasks_data: List[Dict],
                             sample_ids: List[Any]) -> List[int]:
@@ -499,98 +632,19 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper):
         Returns:
             List[int]: List of created task IDs
         """
-        # Label Studio API expects a list of tasks
-        response = self.session.post(
-            f'{self.api_url}/api/projects/{self.project_id}/import',
-            json=tasks_data)
+        try:
+            # Create tasks in the project
+            logger.info(
+                f'Creating tasks in project {self.project_id} with data: '
+                f'{tasks_data}')
+            created_tasks = self.project.import_tasks(tasks_data)
+            logger.info(f'Created {len(created_tasks)} tasks in project '
+                        f'{self.project_id}')
+            return created_tasks
 
-        if response.status_code != 201:
-            raise Exception(f'Failed to create tasks: {response.text}')
-
-        result = response.json()
-        task_ids = [task['id'] for task in result['tasks']]
-
-        return task_ids
-
-    def _format_task(self, samples: List[Dict]) -> Dict:
-        """Format samples as a Label Studio task
-
-        Args:
-            samples: List of samples to include in the task
-
-        Returns:
-            Dict: Formatted task data
-        """
-        # For Label Studio, we'll create a task with multiple samples
-        task = {'data': {}}
-
-        # If there's only one sample, format it normally
-        if len(samples) == 1:
-            sample = samples[0]
-
-            # Handle text data
-            if self.text_key in sample:
-                task['data']['text'] = sample[self.text_key]
-
-            # Handle image data
-            if self.image_key in sample and sample[self.image_key]:
-                task['data']['image'] = sample[self.image_key][
-                    0]  # Use first image
-
-            # Handle audio data
-            if self.audio_key in sample and sample[self.audio_key]:
-                task['data']['audio'] = sample[self.audio_key][
-                    0]  # Use first audio
-
-            # Add any other fields as metadata
-            for key, value in sample.items():
-                if key not in [
-                        self.text_key, self.image_key, self.audio_key,
-                        Fields.meta
-                ]:
-                    # Skip complex objects that can't be serialized
-                    if isinstance(value,
-                                  (str, int, float, bool)) or value is None:
-                        task['data'][f'meta:{key}'] = value
-        else:
-            # For multiple samples, create a list of items
-            task['data']['items'] = []
-
-            for i, sample in enumerate(samples):
-                item = {}
-
-                # Handle text data
-                if self.text_key in sample:
-                    item['text'] = sample[self.text_key]
-
-                # Handle image data
-                if self.image_key in sample and sample[self.image_key]:
-                    item['image'] = sample[self.image_key][
-                        0]  # Use first image
-
-                # Handle audio data
-                if self.audio_key in sample and sample[self.audio_key]:
-                    item['audio'] = sample[self.audio_key][
-                        0]  # Use first audio
-
-                # Add sample index
-                item['index'] = i
-
-                # Add any other fields as metadata
-                for key, value in sample.items():
-                    if key not in [
-                            self.text_key, self.image_key, self.audio_key,
-                            Fields.meta
-                    ]:
-                        # Skip complex objects that can't be serialized
-                        if isinstance(value,
-                                      (str, int, float,
-                                       bool)) or value is None:  # noqa: E501
-                            item[f'meta:{key}'] = value
-
-                task['data']['items'].append(item)
-
-        return task
+        except Exception as e:
+            logger.error(f'Failed to create tasks: {e}')
+            raise
 
     def _get_task_annotation(self, task_id: int) -> Optional[Dict]:
         """Get annotation for a task if available
@@ -601,18 +655,20 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper):
         Returns:
             Optional[Dict]: Annotation data or None if not yet annotated
         """
-        response = self.session.get(f'{self.api_url}/api/tasks/{task_id}')
+        try:
+            # Get task with annotations
+            task = self.project.get_task(task_id)
 
-        if response.status_code != 200:
-            raise Exception(f'Failed to get task: {response.text}')
+            logger.info(f'getting task: {task}')
+            # Check if task has annotations
+            if task and 'annotations' in task and task['annotations']:
+                return task['annotations'][0]  # Return the first annotation
 
-        task = response.json()
+            return None
 
-        # Check if task has annotations
-        if task['annotations'] and len(task['annotations']) > 0:
-            return task['annotations'][0]  # Return the first annotation
-
-        return None
+        except Exception as e:
+            logger.error(f'Failed to get task annotation: {e}')
+            return None
 
     def get_all_annotations(self) -> Dict[int, Dict]:
         """Get all annotations for tasks created by this operation

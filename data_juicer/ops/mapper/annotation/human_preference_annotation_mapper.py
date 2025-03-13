@@ -13,32 +13,114 @@ from ...base_op import OPERATORS
 class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
     """Operator for human preference annotation using Label Studio."""
 
+    DEFAULT_LABEL_CONFIG = """
+    <View className="root">
+      <Style>
+        .root {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+          font-family: 'Roboto',
+            sans-serif;
+          line-height: 1.6;
+          background-color: #f0f0f0;
+        }
+
+        .container {
+          margin: 0 auto;
+          padding: 20px;
+          background-color: #ffffff;
+          border-radius: 5px;
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .prompt {
+          padding: 20px;
+          background-color: #0084ff;
+          color: #ffffff;
+          border-radius: 5px;
+          margin-bottom: 20px;
+          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .answers {
+          display: flex;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 20px;
+        }
+
+        .answer-box {
+          flex-basis: 49%;
+          padding: 20px;
+          background-color: rgba(44, 62, 80, 0.9);
+          color: #ffffff;
+          border-radius: 5px;
+          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1), 0 3px 10px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .answer-box p {
+          word-wrap: break-word;
+        }
+
+        .answer-box:hover {
+          background-color: rgba(52, 73, 94, 0.9);
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .lsf-richtext__line:hover {
+          background: unset;
+        }
+
+        .answer-box .lsf-object {
+          padding: 20px
+        }
+      </Style>
+      <View className="container">
+        <View className="prompt">
+          <Text name="prompt" value="$prompt" />
+        </View>
+        <View className="answers">
+          <Pairwise name="comparison" toName="answer1,answer2"
+                    selectionStyle="background-color: #27ae60; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.2); border: 2px solid #2ecc71; cursor: pointer; transition: all 0.3s ease;"
+                    leftChoiceValue="answer1" rightChoiceValue="answer2" />
+          <View className="answer-box">
+            <Text name="answer1" value="$answer1" />
+          </View>
+          <View className="answer-box">
+            <Text name="answer2" value="$answer2" />
+          </View>
+        </View>
+      </View>
+    </View>
+    """  # noqa: E501
+
     def __init__(self,
                  label_config_file: str = None,
                  answer1_key: str = 'answer1',
                  answer2_key: str = 'answer2',
-                 text_key: str = 'prompt',
+                 prompt_key: str = 'prompt',
+                 result_key: str = 'result',
                  **kwargs):
-        """Initialize the human preference annotation operator.
-
-        Args:
-            label_config_file: Path to the XML template file for Label Studio
-            answer1_key: Field name for the first answer option
-            answer2_key: Field name for the second answer option
-            **kwargs: Additional arguments passed to LabelStudioAnnotationOp
-        """
-        # Load label config from file if provided
-        if label_config_file and os.path.exists(label_config_file):
-            with open(label_config_file, 'r') as f:
-                kwargs['label_config'] = f.read()
-                logger.info(f'Loaded label config from {label_config_file}')
-
-        # Store data field keys
+        """Initialize the human preference annotation operator."""
+        # Store our class-specific attributes
         self.answer1_key = answer1_key
         self.answer2_key = answer2_key
-        self.text_key = text_key
+        self.prompt_key = prompt_key
+        self.result_key = result_key
 
-        # Initialize the parent class
+        # Prepare the label_config parameter
+        if label_config_file and os.path.exists(label_config_file):
+            with open(label_config_file, 'r') as f:
+                kwargs['label_config'] = f.read().strip()
+                logger.info(f'Loaded label config from {label_config_file}')
+        else:
+            kwargs['label_config'] = self.DEFAULT_LABEL_CONFIG.strip()
+            logger.info(
+                'Using default UI config for human preference annotation')
+
+        # Initialize the parent class with remaining kwargs
         super().__init__(**kwargs)
 
     def _format_task(self, samples: List[Dict]) -> Dict:
@@ -59,10 +141,11 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
         task = {'data': {}}
 
         # Add the prompt/question
-        if self.text_key in sample:
-            task['data']['prompt'] = sample[self.text_key]
+        if self.prompt_key in sample:
+            task['data']['prompt'] = sample[self.prompt_key]
         else:
-            logger.warning(f"Sample missing required field '{self.text_key}'")
+            logger.warning(
+                f"Sample missing required field '{self.prompt_key}'")
             task['data']['prompt'] = 'No prompt provided'
 
         # Add the answer options
@@ -82,8 +165,11 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
 
         # Add any other metadata as string values only
         for key, value in sample.items():
-            if key not in [self.text_key, self.answer1_key, self.answer2_key]:
-                if isinstance(value, (str, int, float, bool)) or value is None:
+            if key not in [
+                    self.prompt_key, self.answer1_key, self.answer2_key
+            ]:
+                if (isinstance(value, (str, int, float, bool))
+                        or value is None):
                     # Convert to string to ensure compatibility
                     task['data'][f'meta:{key}'] = str(
                         value) if value is not None else ''
@@ -110,18 +196,38 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
 
         return annotation
 
-    def process_dataset(self, dataset):
-        """Process the dataset with custom field handling.
+    def _process_annotation_result(self, annotation: Dict,
+                                   sample: Dict) -> Dict:
+        """Process human preference annotation result and update the sample
 
-        This method is called by the executor to process the dataset.
-        We override it to handle datasets with custom field names.
+        Args:
+            annotation: The annotation result from Label Studio
+            sample: The original sample that was annotated
+
+        Returns:
+            Dict: The updated sample with preference results
         """
-        # Check if the dataset has the required fields
-        required_fields = [self.text_key, self.answer1_key, self.answer2_key]
-        for field in required_fields:
-            if field not in dataset.column_names:
-                raise ValueError(
-                    f"Required field '{field}' not found in dataset")
+        # Extract the preference information
+        logger.info(f'Processing annotation result: {annotation}')
 
-        # Call the parent class's process_dataset method
-        return super().process_dataset(dataset)
+        preference = None
+        for item in annotation['result']:
+            if item.get('type') == 'pairwise':
+                # Get the selected option
+                selected = item.get('value', {}).get('selected')
+                if selected:
+                    # Map 'left'/'right' to 'answer1'/'answer2'
+                    if selected == 'left':
+                        preference = self.answer1_key
+                    elif selected == 'right':
+                        preference = self.answer2_key
+                    else:
+                        # In case it's already 'answer1'/'answer2'
+                        preference = selected
+                    break
+
+        # Store the preference result directly in the sample
+        sample[self.result_key] = preference if preference else 'Unanswered'
+
+        logger.info(f'Updated sample: {sample}')
+        return sample
