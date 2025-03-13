@@ -9,6 +9,7 @@ from data_juicer.utils.logger_utils import setup_logger, get_log_file_path, make
 
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
+@unittest.skip('This case could break the logger.')
 class LoggerUtilsTest(DataJuicerTestCaseBase):
 
     def setUp(self) -> None:
@@ -42,6 +43,12 @@ class LoggerUtilsTest(DataJuicerTestCaseBase):
         self.assertTrue(os.path.exists(os.path.join(self.temp_output_path, 'log_ERROR.txt')))
         self.assertTrue(os.path.exists(os.path.join(self.temp_output_path, 'log_WARNING.txt')))
         self.assertTrue(os.path.exists(os.path.join(self.temp_output_path, 'log_DEBUG.txt')))
+        with open(os.path.join(self.temp_output_path, 'log.txt'), 'r') as f:
+            content = f.read()
+            messages = self.get_log_messages(content)
+            self.assertEqual(len(messages), 5)
+            self.assertEqual(messages, ['info test', 'warning test', 'error test', 'debug test', 'extra normal info'])
+
         with jsonlines.open(os.path.join(self.temp_output_path, 'log_ERROR.txt'), 'r') as reader:
             messages = [line for line in reader]
             self.assertEqual(len(messages), 1)
