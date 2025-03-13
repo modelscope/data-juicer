@@ -97,6 +97,7 @@ def main():
     runner = unittest.TextTestRunner()
     test_suite = gather_test_cases(os.path.abspath(args.test_dir),
                                    args.pattern, args.tag, args.mode)
+    logger.info(f'There are {len(test_suite._tests)} test cases to run.')
     res = runner.run(test_suite)
 
     cov.stop()
