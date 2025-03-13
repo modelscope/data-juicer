@@ -4,16 +4,16 @@ from loguru import logger
 
 from data_juicer.core.data import NestedDataset as Dataset
 
-from data_juicer.ops.filter.llm_api_difficulty_score_filter import LLMAPIDifficultyScoreFilter
+from data_juicer.ops.filter.llm_difficulty_score_filter import LLMDifficultyScoreFilter
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
 
-class LLMAPIDifficultyScoreFilterTest(DataJuicerTestCaseBase):
+class LLMDifficultyScoreFilterTest(DataJuicerTestCaseBase):
     # before running this test, set below environment variables:
     # export OPENAI_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1/
     # export OPENAI_API_KEY=your_dashscope_key
-    api_model = 'qwen2.5-72b-instruct'
+    api_or_hf_model = 'qwen2.5-72b-instruct'
 
     def _run_test(self, dataset: Dataset, op):
         if Fields.stats not in dataset.features:
@@ -47,7 +47,7 @@ class LLMAPIDifficultyScoreFilterTest(DataJuicerTestCaseBase):
             "In quantum field theory, renormalization addresses infinities arising from loop integrals in Feynman diagrams. By redefining parameters such as mass and charge, physicists ensure finite predictions align with experimental observations. However, this procedure raises philosophical questions about whether these adjustments reflect physical reality or merely mathematical conveniences."
         }]
         dataset = Dataset.from_list(ds_list)
-        op = LLMAPIDifficultyScoreFilter(api_model=self.api_model)
+        op = LLMDifficultyScoreFilter(api_or_hf_model=self.api_or_hf_model)
         dataset= self._run_test(dataset, op)
 
     def test_rft_data(self):
@@ -65,12 +65,32 @@ class LLMAPIDifficultyScoreFilterTest(DataJuicerTestCaseBase):
             "answer": "Gödel's incompleteness theorems imply that no formal system capable of expressing arithmetic can be both consistent and complete. There will always exist true statements that cannot be derived from the axioms of the system. This challenges the notion of a single, all-encompassing formal system for mathematics and highlights the inherent limitations of logical reasoning. Philosophically, it raises questions about whether mathematical truth is independent of human construction or if it is inherently incomplete."
         }]
         dataset = Dataset.from_list(ds_list)
-        op = LLMAPIDifficultyScoreFilter(
-            api_model=self.api_model,
+        op = LLMDifficultyScoreFilter(
+            api_or_hf_model=self.api_or_hf_model,
             input_keys=['text', 'analysis', 'answer'],
             field_names=['Query', 'Analysis', 'Answer'],
         )
         dataset= self._run_test(dataset, op)
+
+    # def test_vllm_case(self):
+
+    #     ds_list = [{
+    #         'text':
+    #         "The cat sleeps on the mat. It is a sunny day, and the cat feels warm. Cats like to rest when they are not playing."
+    #     }, {
+    #         'text':
+    #         "In quantum field theory, renormalization addresses infinities arising from loop integrals in Feynman diagrams. By redefining parameters such as mass and charge, physicists ensure finite predictions align with experimental observations. However, this procedure raises philosophical questions about whether these adjustments reflect physical reality or merely mathematical conveniences."
+    #     }, {
+    #        'text':
+    #        "In quantum field theory, renormalization addresses infinities arising from loop integrals in Feynman diagrams. By redefining parameters such as mass and charge, physicists ensure finite predictions align with experimental observations. However, this procedure raises philosophical questions about whether these adjustments reflect physical reality or merely mathematical conveniences."
+    #     }]
+    #     dataset = Dataset.from_list(ds_list)
+    #     op = LLMDifficultyScoreFilter(
+    #           api_or_hf_model=self.api_or_hf_model,
+    #           enable_vllm=True,
+    #           accelerator='cuda'
+    #       )
+    #     dataset= self._run_test(dataset, op)
 
 if __name__ == '__main__':
     unittest.main()
