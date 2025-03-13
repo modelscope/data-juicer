@@ -493,7 +493,7 @@ Data-Juicer 感谢社区[贡献者](https://github.com/modelscope/data-juicer/gr
 }
 ```
 <details>
-<summary>更多Data-Juicer团队相关论文:
+<summary>更多Data-Juicer团队关于数据的论文:
 </summary>>
 
 - [Data-Juicer Sandbox: A Feedback-Driven Suite for Multimodal Data-Model Co-development](https://arxiv.org/abs/2407.11784)
@@ -504,7 +504,9 @@ Data-Juicer 感谢社区[贡献者](https://github.com/modelscope/data-juicer/gr
 
 - [The Synergy between Data and Multi-Modal Large Language Models: A Survey from Co-Development Perspective](https://arxiv.org/abs/2407.08583)
 
-- [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/DaaR_arXiv_preview.pdf)
+- [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380)
+
+- [MindGym: Enhancing Vision-Language Models via Synthetic Self-Challenging Questions](https://arxiv.org/abs/2503.09499)
   
 - [BiMix: A Bivariate Data Mixing Law for Language Model Pretraining](https://arxiv.org/abs/2405.14908)
 
