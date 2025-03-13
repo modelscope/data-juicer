@@ -16,7 +16,6 @@ class LoggerUtilsTest(DataJuicerTestCaseBase):
         data_juicer.utils.logger_utils.LOGGER_SETUP = False
 
     def tearDown(self):
-        data_juicer.utils.logger_utils.LOGGER_SETUP = False
         if os.path.exists(self.temp_output_path):
             os.system(f'rm -rf {self.temp_output_path}')
 
