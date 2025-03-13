@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional
 
 from loguru import logger
 
-from ....utils.constant import Fields
 from ...base_op import Mapper
 from ...mixins import EventDrivenMixin, NotificationMixin
 
@@ -130,7 +129,7 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         task_id = data.get('task_id')
         sample_ids = data.get('sample_ids', [])
 
-        logger.info(f'Task {task_id} created with {len(sample_ids)} samples')
+        logger.debug(f'Task {task_id} created with {len(sample_ids)} samples')
 
         # Send notification if configured
         if self.notification_events.get('task_created', False):
@@ -161,7 +160,8 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         task_id = data.get('task_id')
         annotation_id = data.get('annotation_id')
 
-        logger.info(f'Annotation {annotation_id} completed for task {task_id}')
+        logger.debug(
+            f'Annotation {annotation_id} completed for task {task_id}')
 
         # Mark this task as processed
         self.processed_annotations.add(task_id)
@@ -234,6 +234,20 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         """
         pass
 
+    @abstractmethod
+    def _check_annotation_status(self, task_ids):
+        """Check the status of annotations for the given task IDs.
+
+        Args:
+            task_ids: List of task IDs to check
+
+        Returns:
+            Tuple[bool, Dict]: (has_changes, completed_tasks_dict)
+                - has_changes: If there are new annotations since last check
+                - completed_tasks_dict: Dictionary for task IDs to annotations
+        """
+        pass
+
     def process_batched(self, samples):
         """Process a batch of samples by creating annotation tasks
 
@@ -279,14 +293,15 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                                            sample_ids[batch_start:batch_end])
 
         # Step 4: Update samples with annotation results
+        processed_count = 0
         for i, sample_id in enumerate(sample_ids):
             if sample_id in self.sample_to_task_id:
                 task_id = self.sample_to_task_id[sample_id]
 
                 # Add task ID to sample metadata
-                if Fields.meta not in sample_list[i]:
-                    sample_list[i][Fields.meta] = {}
-                sample_list[i][Fields.meta]['annotation_task_id'] = task_id
+                # if Fields.meta not in sample_list[i]:
+                #     sample_list[i][Fields.meta] = {}
+                # sample_list[i][Fields.meta]['annotation_task_id'] = task_id
 
                 # If waiting for annotations and they're available, add them
                 if (self.wait_for_annotations
@@ -296,6 +311,7 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                         # Process the annotation result
                         sample_list[i] = self._process_annotation_result(
                             annotation, sample_list[i])
+                        processed_count += 1
 
         # Step 5: Convert back to column-oriented format efficiently
         # Find all keys that exist in any sample
@@ -307,6 +323,8 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
             # Use a list comprehension for better performance
             result[key] = [sample.get(key) for sample in sample_list]
 
+        logger.info(f'Processed {num_samples} samples with {processed_count} '
+                    'annotations')
         return result
 
     def _create_and_process_batch(self, tasks_data, task_sample_ids,
@@ -347,17 +365,17 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                     'sample_count': len(all_batch_sample_ids)
                 })
 
-            # If waiting for annotations, start polling for them
+            # If waiting for annotations, wait for them directly
             if self.wait_for_annotations:
-                self.start_polling(ANNOTATION_EVENTS['ANNOTATION_COMPLETED'],
-                                   self._poll_for_completed_annotations,
-                                   interval=self.poll_interval)
-
-                # Wait for all tasks in this batch to be annotated
                 try:
+                    # Wait for all tasks in this batch to be annotated
+                    logger.info(
+                        f'Waiting for annotations for batch {batch_id}')
                     completed_tasks = self._wait_for_batch_annotations(
                         task_ids)
-                    logger.info(f'Completed tasks: {completed_tasks}')
+                    logger.info(
+                        f'Completed {len(completed_tasks)}/{len(task_ids)} '
+                        f'annotations for batch {batch_id}')
                 except TimeoutError as e:
                     # Trigger error event but continue processing
                     self.trigger_event(
@@ -375,9 +393,8 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                 })
             logger.error(f'Error creating batch {batch_id}: {str(e)}')
 
-    def _wait_for_batch_annotations(self, task_ids):
-        """Wait for all tasks in a batch to be annotated using efficient
-            polling with the SDK.
+    def _wait_for_batch_annotations(self, task_ids=None):
+        """Wait for all tasks in a batch to be annotated using efficient polling.
 
         Args:
             task_ids: List of task IDs to wait for
@@ -400,74 +417,45 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
             completed_tasks.keys()) - self.processed_annotations
 
         # Track the last time we saw a change in annotations
-        last_annotation_count = 0
         last_change_time = time.time()
 
-        # Use efficient polling with the SDK
+        # Use efficient polling with platform-specific status checks
         while time.time() - start_time < self.timeout and remaining_tasks:
             try:
-                # First, check project summary to see if there are anything new
-                # This is much lighter than fetching all tasks
-                project_summary = self.project.get_summary()
+                # Check for new annotations using the platform-specific method
+                has_changes, new_completed_tasks = (
+                    self._check_annotation_status(list(remaining_tasks)))
 
-                # Get the total number of annotations
-                total_annotations = project_summary.get(
-                    'total_annotations_number', 0)
+                # Update our completed tasks
+                completed_tasks.update(new_completed_tasks)
 
-                # If annotation count hasn't changed, no need to fetch tasks
-                if total_annotations == last_annotation_count:
-                    # But if we've been waiting too long without changes
-                    # Do a full check occasionally
-                    if time.time() - last_change_time > max(
-                            self.poll_interval * 5, 30):
-                        logger.info('No new annotations detected for a while, '
-                                    'doing a full check')
-                        last_change_time = time.time()  # Reset the timer
-                    else:
-                        # No changes, just wait and check stats again
-                        logger.info(f'No new annotations detected '
-                                    f'({total_annotations} total)')
-                        time.sleep(self.poll_interval)
-                        continue
-                else:
-                    # Update our tracking variables
+                # Update remaining tasks
+                for task_id in new_completed_tasks:
+                    if task_id in remaining_tasks:
+                        remaining_tasks.remove(task_id)
+                        self.processed_annotations.add(task_id)
+
+                        # Trigger annotation completed event
+                        annotation = new_completed_tasks[task_id]
+                        self.trigger_event(
+                            ANNOTATION_EVENTS['ANNOTATION_COMPLETED'], {
+                                'task_id': task_id,
+                                'annotation_id': annotation.get(
+                                    'id', 'unknown'),
+                                'annotation': annotation,
+                                'sample_ids': self.task_to_samples.get(
+                                    task_id, [])
+                            })
+
+                # If no changes and we've been waiting a while, do a full check
+                if not has_changes and time.time() - last_change_time > max(
+                        self.poll_interval * 5, 30):
                     logger.info(
-                        f'Detected change in annotations: '
-                        f'{last_annotation_count} → {total_annotations}')
-                    last_annotation_count = total_annotations
+                        'No new annotations detected for a while, full check')
+                    last_change_time = time.time()  # Reset the timer
+                elif has_changes:
+                    # Update our tracking variables if changes were detected
                     last_change_time = time.time()
-
-                # Now fetch only the tasks we're still waiting for
-                for task_id in list(remaining_tasks):
-                    try:
-                        # Use the SDK to get this specific task
-                        task = self.project.get_task(task_id)
-
-                        # Check if task has annotations
-                        if task and 'annotations' in task and task[
-                                'annotations']:
-                            # Get the latest annotation
-                            annotation = task['annotations'][-1]
-                            completed_tasks[task_id] = annotation
-                            self.processed_annotations.add(task_id)
-
-                            # Trigger annotation completed event
-                            self.trigger_event(
-                                ANNOTATION_EVENTS['ANNOTATION_COMPLETED'], {
-                                    'task_id':
-                                    task_id,
-                                    'annotation_id':
-                                    annotation.get('id', 'unknown'),
-                                    'annotation':
-                                    annotation,
-                                    'sample_ids':
-                                    self.task_to_samples.get(task_id, [])
-                                })
-
-                            # Remove from remaining tasks
-                            remaining_tasks.remove(task_id)
-                    except Exception as e:
-                        logger.warning(f'Error fetching task {task_id}: {e}')
 
                 # Log progress
                 logger.info(
@@ -488,55 +476,39 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         # If we get here, we timed out or completed all annotations
         if remaining_tasks:
             logger.warning(
-                f'Timeout waiting for {len(remaining_tasks)}/{len(task_ids)} '
-                'annotations')
+                f'Timed out waiting for {len(remaining_tasks)} annotations')
 
         return completed_tasks
-
-    def _poll_for_completed_annotations(self):
-        """Poll for completed annotations
-
-        Returns:
-            Dict or None: Event data if annotation was done, None otherwise
-        """
-        # Get all tasks that we're waiting for annotations
-        pending_task_ids = [
-            task_id for task_id in self.task_to_samples.keys()
-            if task_id not in self.processed_annotations
-        ]
-
-        if not pending_task_ids:
-            return None
-
-        # Check for completed annotations
-        for task_id in pending_task_ids:
-            try:
-                annotation = self._get_task_annotation(task_id)
-
-                # If we have annotations and they weren't processed yet
-                if annotation and task_id not in self.processed_annotations:
-                    self.processed_annotations.add(task_id)
-
-                    # Return the completed annotation as an event
-                    return {
-                        'task_id': task_id,
-                        'annotation_id': annotation.get('id', 'unknown'),
-                        'annotation': annotation,
-                        'sample_ids': self.task_to_samples.get(task_id, [])
-                    }
-            except Exception as e:
-                # Trigger error event
-                self.trigger_event(ANNOTATION_EVENTS['ERROR_OCCURRED'], {
-                    'task_id': task_id,
-                    'message': str(e)
-                })
-
-        return None
 
     def __del__(self):
         """Clean up resources when the object is deleted"""
         # Stop all polling threads
         self.stop_all_polling()
+
+    # for pickling
+    def __getstate__(self):
+        """Control how the object is pickled"""
+        state = self.__dict__.copy()
+        # Remove unpicklable attributes
+        if 'client' in state:
+            del state['client']  # Remove Label Studio client
+        if 'project' in state:
+            del state['project']  # Remove project reference
+        return state
+
+    # for unpickling
+    def __setstate__(self, state):
+        """Control how the object is unpickled"""
+        self.__dict__.update(state)
+        # Reconnect to Label Studio if needed
+        if hasattr(self, 'api_url') and hasattr(self, 'api_key'):
+            try:
+                from label_studio_sdk import Client
+                self.client = Client(url=self.api_url, api_key=self.api_key)
+                if hasattr(self, 'project_id'):
+                    self.project = self.client.get_project(self.project_id)
+            except ImportError:
+                pass
 
 
 class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
@@ -634,17 +606,102 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
         """
         try:
             # Create tasks in the project
-            logger.info(
+            logger.debug(
                 f'Creating tasks in project {self.project_id} with data: '
                 f'{tasks_data}')
             created_tasks = self.project.import_tasks(tasks_data)
-            logger.info(f'Created {len(created_tasks)} tasks in project '
-                        f'{self.project_id}')
+            logger.debug(f'Created {len(created_tasks)} tasks in project '
+                         f'{self.project_id}')
             return created_tasks
 
         except Exception as e:
             logger.error(f'Failed to create tasks: {e}')
             raise
+
+    def _check_annotation_status(self, task_ids=None):
+        """Check the status of annotations for the given task IDs
+
+        Args:
+            task_ids: List of task IDs to check. If None, uses all in batch
+
+        Returns:
+            Tuple[bool, Dict]: (has_changes, completed_tasks_dict)
+        """
+        # Handle the case where task_ids is not provided
+        if task_ids is None:
+            task_ids = list(self.task_to_samples.keys())
+
+        if not task_ids:
+            return False, {}
+
+        # Initialize tracking variables
+        has_changes = False
+        completed_tasks = {}
+
+        # Filter out tasks we already know are completed
+        remaining_tasks = [
+            tid for tid in task_ids if tid not in self.processed_annotations
+        ]
+
+        # If all tasks are already processed, return immediately
+        if not remaining_tasks:
+            return False, {}
+
+        logger.debug(
+            f'Checking {len(remaining_tasks)} tasks (skipping '
+            f'{len(task_ids) - len(remaining_tasks)} already processed)')
+
+        try:
+            # Use filters to get completed tasks efficiently
+            completed_task_data = self.project.get_tasks(
+                filters={
+                    'conjunction':
+                    'and',
+                    'items': [{
+                        'filter': 'filter:tasks:completed_at',
+                        'operator': 'empty',
+                        'value': False,
+                        'type': 'Datetime'
+                    }]
+                })
+
+            # Process newly completed tasks
+            for task in completed_task_data:
+                task_id = task['id']
+                has_changes = True
+
+                # Get the annotations for this task
+                if 'annotations' in task and task['annotations']:
+                    # Use the latest annotation
+                    annotation = task['annotations'][-1]
+                    completed_tasks[task_id] = annotation
+                else:
+                    # If task is marked as completed but has no annotations,
+                    # fetch the full task to get annotations
+                    full_task = self.project.get_task(task_id)
+                    if 'annotations' in full_task and full_task['annotations']:
+                        annotation = full_task['annotations'][-1]
+                        completed_tasks[task_id] = annotation
+                    else:
+                        # Task is completed but has no annotations (unusual)
+                        logger.warning(
+                            f'Task {task_id} is marked as completed but has '
+                            'no annotations')
+                        completed_tasks[task_id] = {
+                            'id': 'no_annotation',
+                            'result': []
+                        }
+
+                logger.debug(f'Task {task_id} is newly completed')
+
+            # Update our class-level cache of processed annotations
+            for task_id in completed_tasks:
+                self.processed_annotations.add(task_id)
+
+        except Exception as e:
+            logger.error(f'Error checking annotation status: {e}')
+
+        return has_changes, completed_tasks
 
     def _get_task_annotation(self, task_id: int) -> Optional[Dict]:
         """Get annotation for a task if available
@@ -659,7 +716,7 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
             # Get task with annotations
             task = self.project.get_task(task_id)
 
-            logger.info(f'getting task: {task}')
+            logger.debug(f'Getting task: {task}')
             # Check if task has annotations
             if task and 'annotations' in task and task['annotations']:
                 return task['annotations'][0]  # Return the first annotation

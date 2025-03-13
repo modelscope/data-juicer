@@ -208,7 +208,7 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
             Dict: The updated sample with preference results
         """
         # Extract the preference information
-        logger.info(f'Processing annotation result: {annotation}')
+        logger.debug(f'Processing annotation result: {annotation}')
 
         preference = None
         for item in annotation['result']:
@@ -229,5 +229,5 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
         # Store the preference result directly in the sample
         sample[self.result_key] = preference if preference else 'Unanswered'
 
-        logger.info(f'Updated sample: {sample}')
+        logger.debug(f'Updated sample: {sample}')
         return sample
