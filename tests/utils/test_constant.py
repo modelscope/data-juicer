@@ -13,6 +13,10 @@ test_yaml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
 
 class StatsKeysTest(DataJuicerTestCaseBase):
 
+    def setUp(self) -> None:
+        super().setUp()
+        StatsKeys._accessed_by = {}
+
     def tearDown(cls) -> None:
         super().tearDown()
         StatsKeys._accessed_by = {}

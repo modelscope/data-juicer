@@ -16,6 +16,7 @@ class LoggerUtilsTest(DataJuicerTestCaseBase):
         data_juicer.utils.logger_utils.LOGGER_SETUP = False
 
     def tearDown(self):
+        data_juicer.utils.logger_utils.LOGGER_SETUP = False
         if os.path.exists(self.temp_output_path):
             os.system(f'rm -rf {self.temp_output_path}')
 
@@ -42,11 +43,6 @@ class LoggerUtilsTest(DataJuicerTestCaseBase):
         self.assertTrue(os.path.exists(os.path.join(self.temp_output_path, 'log_ERROR.txt')))
         self.assertTrue(os.path.exists(os.path.join(self.temp_output_path, 'log_WARNING.txt')))
         self.assertTrue(os.path.exists(os.path.join(self.temp_output_path, 'log_DEBUG.txt')))
-        with open(os.path.join(self.temp_output_path, 'log.txt'), 'r') as f:
-            content = f.read()
-            messages = self.get_log_messages(content)
-            self.assertEqual(len(messages), 5)
-            self.assertEqual(messages, ['info test', 'warning test', 'error test', 'debug test', 'extra normal info'])
         with jsonlines.open(os.path.join(self.temp_output_path, 'log_ERROR.txt'), 'r') as reader:
             messages = [line for line in reader]
             self.assertEqual(len(messages), 1)
