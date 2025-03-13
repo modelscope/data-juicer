@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>data_juicer.ops.filter.llm_api_quality_score_filter &mdash; data_juicer 1.2.1 documentation</title>
+  <title>data_juicer.ops.filter.llm_difficulty_score_filter &mdash; data_juicer 1.2.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
 
@@ -67,7 +67,7 @@
       <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
           <li class="breadcrumb-item"><a href="../../../data_juicer.html">data_juicer</a></li>
-      <li class="breadcrumb-item active">data_juicer.ops.filter.llm_api_quality_score_filter</li>
+      <li class="breadcrumb-item active">data_juicer.ops.filter.llm_difficulty_score_filter</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -76,7 +76,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <h1>Source code for data_juicer.ops.filter.llm_api_quality_score_filter</h1><div class="highlight"><pre>
+  <h1>Source code for data_juicer.ops.filter.llm_difficulty_score_filter</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
@@ -86,53 +86,55 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Filter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">StatsKeys</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span><span class="p">,</span>
+                                           <span class="n">update_sampling_params</span><span class="p">)</span>
 
-<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;llm_api_quality_score_filter&#39;</span>
+<span class="n">torch</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;torch&#39;</span><span class="p">,</span> <span class="s1">&#39;torch&#39;</span><span class="p">)</span>
+<span class="n">vllm</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;vllm&#39;</span><span class="p">,</span> <span class="s1">&#39;vllm&#39;</span><span class="p">)</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;llm_difficulty_score_filter&#39;</span>
 
 
-<div class="viewcode-block" id="LLMAPIQualityScoreFilter">
-<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMAPIQualityScoreFilter">[docs]</a>
+<div class="viewcode-block" id="LLMDifficultyScoreFilter">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMDifficultyScoreFilter">[docs]</a>
 <span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">LLMAPIQualityScoreFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LLMDifficultyScoreFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Filter to keep sample with high quality score estimated by LLM in API.</span>
+<span class="sd">    Filter to keep sample with high difficulty score estimated by LLM in API.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># avoid leading whitespace</span>
     <span class="n">DEFAULT_SYSTEM_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">You are a meticulous data quality assessor for LLM training. Analyze each data sample across multiple quality dimensions and provide numerical scores with reasoning. Follow these guidelines:</span>
+<span class="s2">You are an expert pedagogical evaluator for LLM training data. Analyze each data sample through multiple difficulty lenses and provide calibrated scores with detailed reasoning. Follow these guidelines:</span>
 
 <span class="s2">1. Evaluation Dimensions</span>
-<span class="s2">Score each dimension (1-5 scale: 1=lowest, 5=highest):</span>
-<span class="s2">- Accuracy: Factual correctness &amp; verifiability</span>
-<span class="s2">- Grammar: Linguistic correctness &amp; fluency</span>
-<span class="s2">- Informativeness: Depth/utility of content</span>
-<span class="s2">- Coherence: Logical structure &amp; consistency</span>
+<span class="s2">Rate each dimension (1-5 scale: 1=Novice-friendly, 3=Intermediate, 5=Expert-level):</span>
+<span class="s2">- Linguistic Complexity: Vocabulary sophistication &amp; syntactic structures</span>
+<span class="s2">- Conceptual Depth: Abstraction level &amp; theoretical requirements</span>
+<span class="s2">- Prior Knowledge: Required domain-specific understanding</span>
+<span class="s2">- Step Complexity: Problem-solving steps needed</span>
+<span class="s2">- Ambiguity: Multiple valid interpretations</span>
 
-<span class="s2">2. Scoring Protocol</span>
-<span class="s2">- Base scores on concrete evidence from text</span>
-<span class="s2">- Flag samples needing human review (confidence &lt;90%)</span>
-<span class="s2">- Compare with similar data points for consistency</span>
-<span class="s2">- Penalize hallucination/misinformation severely</span>
-
-<span class="s2">3. Output Format</span>
+<span class="s2">2. Output Format</span>
 <span class="s2">json</span>
 <span class="s2">{</span>
 <span class="s2">  &quot;dimension_scores&quot;: {</span>
-<span class="s2">    &quot;accuracy&quot;: ,</span>
-<span class="s2">    &quot;grammar&quot;: ,</span>
-<span class="s2">    &quot;informativeness&quot;: ,</span>
-<span class="s2">    &quot;coherence&quot;: ,</span>
+<span class="s2">    &quot;linguistic_complexity&quot;: ,</span>
+<span class="s2">    &quot;conceptual_depth&quot;: ,</span>
+<span class="s2">    &quot;prior_knowledge&quot;: ,</span>
+<span class="s2">    &quot;step_complexity&quot;: ,</span>
+<span class="s2">    &quot;ambiguity&quot;:</span>
 <span class="s2">  },</span>
-<span class="s2">  &quot;flags&quot;: [&quot;syntax_error&quot;, &quot;insufficient_information&quot;, ...],</span>
-<span class="s2">  &quot;rationale&quot;: &quot;Concise technical analysis&quot;,</span>
-<span class="s2">  &quot;recommendation&quot;: [&quot;keep&quot;, &quot;review&quot;, &quot;discard&quot;]</span>
+<span class="s2">  &quot;flags&quot;: [&quot;multistep_reasoning&quot;, &quot;cultural_context&quot;, ...],</span>
+<span class="s2">  &quot;rationale&quot;: &quot;Technical analysis of challenge sources&quot;</span>
 <span class="s2">}</span>
-<span class="s2">4. Special Instructions</span>
-<span class="s2">- Prioritize factual integrity over stylistic qualities</span>
-<span class="s2">- Treat unverified medical/legal claims as high-risk</span>
-<span class="s2">- Contextualize cultural references appropriately</span>
+<span class="s2">3. Special Instructions</span>
+<span class="s2">- Differentiate intrinsic vs. extrinsic difficulty factors</span>
+<span class="s2">- Account for varying cultural/educational backgrounds</span>
+<span class="s2">- Mark samples requiring cross-domain knowledge synthesis</span>
+<span class="s2">- Consider temporal aspects for time-sensitive subjects</span>
+<span class="s2">- Flag ambiguous samples needing difficulty bracketing</span>
 <span class="s2">- Response a json dict</span>
 
 <span class="s2">Example Response:</span>
@@ -140,23 +142,23 @@
 <span class="s2">json</span>
 <span class="s2">{</span>
 <span class="s2">  &quot;dimension_scores&quot;: {</span>
-<span class="s2">    &quot;accuracy&quot;: 2,</span>
-<span class="s2">    &quot;grammar&quot;: 4,</span>
-<span class="s2">    &quot;informativeness&quot;: 4,</span>
-<span class="s2">    &quot;coherence&quot;: 2,</span>
+<span class="s2">    &quot;linguistic_complexity&quot;: 3,</span>
+<span class="s2">    &quot;conceptual_depth&quot;: 5,</span>
+<span class="s2">    &quot;prior_knowledge&quot;: 4,</span>
+<span class="s2">    &quot;step_complexity&quot;: 4,</span>
+<span class="s2">    &quot;ambiguity&quot;: 5</span>
 <span class="s2">  },</span>
-<span class="s2">  &quot;flags&quot;: [&quot;accuracy_concern&quot;, &quot;logical_confusion&quot;],</span>
-<span class="s2">  &quot;rationale&quot;: &quot;The text provides rich information but suffers from logical confusion and lacks contextual coherence. Excellent grammatical structure offset by factual inaccuracies.&quot;,</span>
-<span class="s2">  &quot;recommendation&quot;: &quot;review&quot;</span>
+<span class="s2">  &quot;flags&quot;: [&quot;nonlinear_reasoning&quot;, &quot;semantic_ambiguity&quot;],</span>
+<span class="s2">  &quot;rationale&quot;: &quot;High conceptual difficulty due to multi-layered metaphor interpretation requiring philosophy background. Moderate linguistic complexity offset by implicit cultural references.&quot;</span>
 <span class="s2">}</span>
 <span class="s2">&quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
     <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;# Data</span><span class="se">\n</span><span class="s2">&#39;&#39;&#39;</span><span class="se">\n</span><span class="si">{data}</span><span class="se">\n</span><span class="s2">&#39;&#39;&#39;</span><span class="se">\n\n</span><span class="s2"># Response</span><span class="se">\n</span><span class="s2">json</span><span class="se">\n</span><span class="s2">&quot;</span>
     <span class="n">DEFAULT_FIELD_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;**</span><span class="si">{field_name}</span><span class="s1">**</span><span class="se">\n</span><span class="si">{field_data}</span><span class="s1">&#39;</span>
 
-<div class="viewcode-block" id="LLMAPIQualityScoreFilter.__init__">
-<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMAPIQualityScoreFilter.__init__">[docs]</a>
+<div class="viewcode-block" id="LLMDifficultyScoreFilter.__init__">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMDifficultyScoreFilter.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">api_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
+                 <span class="n">api_or_hf_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
                  <span class="n">min_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
                  <span class="o">*</span><span class="p">,</span>
                  <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -167,15 +169,16 @@
                  <span class="n">input_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">field_template</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">try_num</span><span class="p">:</span> <span class="n">PositiveInt</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                 <span class="n">enable_vllm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="n">model_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
                  <span class="n">sampling_params</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
-<span class="sd">        :param api_model: API model name.</span>
-<span class="sd">        :param min_score: The lowest quality score threshold to keep the</span>
-<span class="sd">            sample.</span>
+<span class="sd">        :param api_or_hf_model: API or huggingface model name.</span>
+<span class="sd">        :param min_score: The lowest difficulty score threshold to keep</span>
+<span class="sd">            the sample.</span>
 <span class="sd">        :param api_endpoint: URL endpoint for the API.</span>
 <span class="sd">        :param response_path: Path to extract content from the API response.</span>
 <span class="sd">            Defaults to &#39;choices.0.message.content&#39;.</span>
@@ -187,6 +190,8 @@
 <span class="sd">        :param field_template: Template for each field in the prompt.</span>
 <span class="sd">        :param try_num: The number of retry attempts when there is an API</span>
 <span class="sd">            call error or output parsing error.</span>
+<span class="sd">        :param enable_vllm: If true, use VLLM for loading hugging face or</span>
+<span class="sd">            local llm. Otherwise, use API for reference.</span>
 <span class="sd">        :param model_params: Parameters for initializing the API model.</span>
 <span class="sd">        :param sampling_params: Extra parameters passed to the API call.</span>
 <span class="sd">            e.g {&#39;temperature&#39;: 0.9, &#39;top_p&#39;: 0.95}</span>
@@ -204,20 +209,40 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">field_template</span> <span class="o">=</span> <span class="n">field_template</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_FIELD_TEMPLATE</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span> <span class="o">=</span> <span class="n">min_score</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span> <span class="o">=</span> <span class="n">enable_vllm</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">,</span>
-                                       <span class="n">model</span><span class="o">=</span><span class="n">api_model</span><span class="p">,</span>
-                                       <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
-                                       <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
-                                       <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="n">sampling_params</span> <span class="o">=</span> <span class="n">update_sampling_params</span><span class="p">(</span><span class="n">sampling_params</span><span class="p">,</span>
+                                                 <span class="n">api_or_hf_model</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span></div>
+        <span class="k">if</span> <span class="n">enable_vllm</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;must be executed in CUDA&#39;</span>
+            <span class="c1"># cannot initialize vllm replicas on different GPUs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_proc</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">model_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tensor_parallel_size&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">tensor_parallel_size</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">device_count</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Set tensor_parallel_size to </span><span class="se">\</span>
+<span class="s1">                    </span><span class="si">{</span><span class="n">tensor_parallel_size</span><span class="si">}</span><span class="s1"> for vllm.&#39;</span><span class="p">)</span>
+                <span class="n">model_params</span><span class="p">[</span><span class="s1">&#39;tensor_parallel_size&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tensor_parallel_size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+                <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;vllm&#39;</span><span class="p">,</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">api_or_hf_model</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">vllm</span><span class="o">.</span><span class="n">SamplingParams</span><span class="p">(</span><span class="o">**</span><span class="n">sampling_params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;api&#39;</span><span class="p">,</span>
+                                           <span class="n">model</span><span class="o">=</span><span class="n">api_or_hf_model</span><span class="p">,</span>
+                                           <span class="n">endpoint</span><span class="o">=</span><span class="n">api_endpoint</span><span class="p">,</span>
+                                           <span class="n">response_path</span><span class="o">=</span><span class="n">response_path</span><span class="p">,</span>
+                                           <span class="o">**</span><span class="n">model_params</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="LLMAPIQualityScoreFilter.build_input">
-<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMAPIQualityScoreFilter.build_input">[docs]</a>
+<div class="viewcode-block" id="LLMDifficultyScoreFilter.build_input">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMDifficultyScoreFilter.build_input">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_keys</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -232,8 +257,8 @@
         <span class="k">return</span> <span class="n">input_prompt</span></div>
 
 
-<div class="viewcode-block" id="LLMAPIQualityScoreFilter.parse_output">
-<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMAPIQualityScoreFilter.parse_output">[docs]</a>
+<div class="viewcode-block" id="LLMDifficultyScoreFilter.parse_output">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMDifficultyScoreFilter.parse_output">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">parse_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_output</span><span class="p">):</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">extract_outer_braces</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
@@ -249,7 +274,10 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json_str</span><span class="p">)</span>
 
         <span class="n">dimension_scores</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;dimension_scores&#39;</span><span class="p">]</span>
-        <span class="n">required_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">,</span> <span class="s1">&#39;grammar&#39;</span><span class="p">,</span> <span class="s1">&#39;informativeness&#39;</span><span class="p">,</span> <span class="s1">&#39;coherence&#39;</span><span class="p">]</span>
+        <span class="n">required_keys</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;linguistic_complexity&#39;</span><span class="p">,</span> <span class="s1">&#39;conceptual_depth&#39;</span><span class="p">,</span> <span class="s1">&#39;prior_knowledge&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;step_complexity&#39;</span><span class="p">,</span> <span class="s1">&#39;ambiguity&#39;</span>
+        <span class="p">]</span>
 
         <span class="n">total_score</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">required_keys</span><span class="p">:</span>
@@ -260,14 +288,17 @@
         <span class="k">return</span> <span class="n">avg_score</span><span class="p">,</span> <span class="n">json_str</span></div>
 
 
-<div class="viewcode-block" id="LLMAPIQualityScoreFilter.compute_stats_single">
-<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMAPIQualityScoreFilter.compute_stats_single">[docs]</a>
+<div class="viewcode-block" id="LLMDifficultyScoreFilter.compute_stats_single">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMDifficultyScoreFilter.compute_stats_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_stats_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># check if it&#39;s computed already</span>
-        <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_quality_score</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_difficulty_score</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">sample</span>
 
-        <span class="n">client</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span><span class="p">:</span>
+            <span class="n">model</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
 
         <span class="n">messages</span> <span class="o">=</span> <span class="p">[{</span>
             <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;system&#39;</span><span class="p">,</span>
@@ -279,23 +310,27 @@
         <span class="n">score</span><span class="p">,</span> <span class="n">record</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">try_num</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">output</span> <span class="o">=</span> <span class="n">client</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
                 <span class="n">score</span><span class="p">,</span> <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_output</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">break</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_quality_score</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
-        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_quality_record</span><span class="p">]</span> <span class="o">=</span> <span class="n">record</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_difficulty_score</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_difficulty_record</span><span class="p">]</span> <span class="o">=</span> <span class="n">record</span>
 
         <span class="k">return</span> <span class="n">sample</span></div>
 
 
-<div class="viewcode-block" id="LLMAPIQualityScoreFilter.process_single">
-<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMAPIQualityScoreFilter.process_single">[docs]</a>
+<div class="viewcode-block" id="LLMDifficultyScoreFilter.process_single">
+<a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMDifficultyScoreFilter.process_single">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">process_single</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">itm_score</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_quality_score</span><span class="p">]</span>
+        <span class="n">itm_score</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_difficulty_score</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">itm_score</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_score</span></div>
 </div>
