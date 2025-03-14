@@ -12,14 +12,9 @@ from ...mixins import EventDrivenMixin, NotificationMixin
 # Common annotation event types
 ANNOTATION_EVENTS = {
     'TASK_CREATED': 'task_created',
-    'TASK_ASSIGNED': 'task_assigned',
-    'ANNOTATION_STARTED': 'annotation_started',
+    'BATCH_CREATED': 'batch_created',
     'ANNOTATION_COMPLETED': 'annotation_completed',
-    'ANNOTATION_REJECTED': 'annotation_rejected',
-    'ANNOTATION_SKIPPED': 'annotation_skipped',
-    'PROJECT_COMPLETED': 'project_completed',
-    'ERROR_OCCURRED': 'error_occurred',
-    'BATCH_CREATED': 'batch_created'
+    'ERROR_OCCURRED': 'error_occurred'
 }
 
 
@@ -49,34 +44,8 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
             poll_interval: Time between annotation status checks in seconds
             samples_per_task: Number of samples in each annotation task
             max_tasks_per_batch: Maximum number of tasks in a single batch
-            notification_config: Configuration for notifications:
-                {
-                    'enabled': True,  # Whether notifications are enabled
-                    'email': {  # Email notification settings
-                        'smtp_server': 'smtp.example.com',
-                        'smtp_port': 587,
-                        'sender_email': 'sender@example.com',
-                        'sender_password': 'password',
-                        'recipients': ['recipient@example.com']
-                    },
-                    'slack': {  # Slack notification settings
-                        'webhook_url': 'https://hooks.slack.com/services/...',
-                        'channel': '#channel',
-                        'username': 'Data Juicer'
-                    },
-                    'dingtalk': {  # DingTalk notification settings
-                        'access_token': 'your_access_token',
-                        'secret': 'your_secret'
-                    }
-                }
+            notification_config: Configuration for notifications (email, slack)
             notification_events: Events that should trigger notifications
-                {
-                    'task_created': False,
-                    'batch_created': True,
-                    'annotation_completed': True,
-                    'project_completed': True,
-                    'error_occurred': True
-                }
         """
         # Ensure notification_config is passed to kwargs for NotificationMixin
         kwargs['notification_config'] = notification_config or {}
@@ -98,14 +67,12 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
             'task_created': False,
             'batch_created': True,
             'annotation_completed': True,
-            'project_completed': True,
             'error_occurred': True
         }
 
         # Track task IDs and sample mappings
         self.sample_to_task_id = {}  # Maps sample ID to task ID
-        self.task_to_samples = defaultdict(
-            list)  # Maps task ID to list of sample IDs
+        self.task_to_samples = defaultdict(list)  # Maps task ID to sample IDs
         self.processed_annotations = set()
         self.batch_counter = 0
 
@@ -288,20 +255,13 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                 task_sample_ids.append(batch_ids)
 
             # Create and process this batch of tasks
-            self._create_and_process_batch(tasks_data, task_sample_ids,
-                                           sample_list[batch_start:batch_end],
-                                           sample_ids[batch_start:batch_end])
+            self._create_and_process_batch(tasks_data, task_sample_ids)
 
         # Step 4: Update samples with annotation results
         processed_count = 0
         for i, sample_id in enumerate(sample_ids):
             if sample_id in self.sample_to_task_id:
                 task_id = self.sample_to_task_id[sample_id]
-
-                # Add task ID to sample metadata
-                # if Fields.meta not in sample_list[i]:
-                #     sample_list[i][Fields.meta] = {}
-                # sample_list[i][Fields.meta]['annotation_task_id'] = task_id
 
                 # If waiting for annotations and they're available, add them
                 if (self.wait_for_annotations
@@ -327,8 +287,7 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                     'annotations')
         return result
 
-    def _create_and_process_batch(self, tasks_data, task_sample_ids,
-                                  sample_list, sample_ids):
+    def _create_and_process_batch(self, tasks_data, task_sample_ids):
         """Create a batch of tasks and process the results"""
         if not tasks_data:
             return
@@ -381,8 +340,10 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                     self.trigger_event(
                         ANNOTATION_EVENTS['ERROR_OCCURRED'], {
                             'message':
-                            f'Timeout waiting for batch annotations: {str(e)}',
-                            'batch_id': batch_id
+                            (f'Timeout waiting for batch annotations: {str(e)}'
+                             ),
+                            'batch_id':
+                            batch_id
                         })
         except Exception as e:
             # Trigger error event
@@ -394,7 +355,7 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
             logger.error(f'Error creating batch {batch_id}: {str(e)}')
 
     def _wait_for_batch_annotations(self, task_ids=None):
-        """Wait for all tasks in a batch to be annotated using efficient polling.
+        """Wait for all tasks in a batch to be annotated.
 
         Args:
             task_ids: List of task IDs to wait for
@@ -402,10 +363,7 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         Returns:
             Dict: Mapping of task IDs to their annotations
         """
-        if not self.wait_for_annotations:
-            return {}
-
-        if not task_ids:
+        if not self.wait_for_annotations or not task_ids:
             return {}
 
         logger.info(f'Waiting for annotations for {len(task_ids)} tasks')
@@ -413,8 +371,8 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         start_time = time.time()
         completed_tasks = {}
         task_id_set = set(task_ids)
-        remaining_tasks = task_id_set - set(
-            completed_tasks.keys()) - self.processed_annotations
+        remaining_tasks = (task_id_set - set(completed_tasks.keys()) -
+                           self.processed_annotations)
 
         # Track the last time we saw a change in annotations
         last_change_time = time.time()
@@ -423,13 +381,13 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         while time.time() - start_time < self.timeout and remaining_tasks:
             try:
                 # Check for new annotations using the platform-specific method
-                has_changes, new_completed_tasks = (
-                    self._check_annotation_status(list(remaining_tasks)))
+                has_changes, new_completed_tasks = \
+                    self._check_annotation_status(list(remaining_tasks))
 
                 # Update our completed tasks
                 completed_tasks.update(new_completed_tasks)
 
-                # Update remaining tasks
+                # Update remaining tasks and trigger events for completed tasks
                 for task_id in new_completed_tasks:
                     if task_id in remaining_tasks:
                         remaining_tasks.remove(task_id)
@@ -447,17 +405,17 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                                     task_id, [])
                             })
 
-                # If no changes and we've been waiting a while, do a full check
-                if not has_changes and time.time() - last_change_time > max(
-                        self.poll_interval * 5, 30):
-                    logger.info(
-                        'No new annotations detected for a while, full check')
+                # If no changes for a while, do a full check
+                poll_timeout = max(self.poll_interval * 5, 30)
+                if not has_changes and time.time(
+                ) - last_change_time > poll_timeout:
+                    logger.info('No new annotations detected for a while, '
+                                'performing full check')
                     last_change_time = time.time()  # Reset the timer
                 elif has_changes:
-                    # Update our tracking variables if changes were detected
                     last_change_time = time.time()
 
-                # Log progress
+                # Log progress periodically
                 logger.info(
                     f'Completed {len(completed_tasks)}/{len(task_ids)} '
                     f'annotations, {len(remaining_tasks)} remaining')
@@ -479,36 +437,6 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                 f'Timed out waiting for {len(remaining_tasks)} annotations')
 
         return completed_tasks
-
-    def __del__(self):
-        """Clean up resources when the object is deleted"""
-        # Stop all polling threads
-        self.stop_all_polling()
-
-    # for pickling
-    def __getstate__(self):
-        """Control how the object is pickled"""
-        state = self.__dict__.copy()
-        # Remove unpicklable attributes
-        if 'client' in state:
-            del state['client']  # Remove Label Studio client
-        if 'project' in state:
-            del state['project']  # Remove project reference
-        return state
-
-    # for unpickling
-    def __setstate__(self, state):
-        """Control how the object is unpickled"""
-        self.__dict__.update(state)
-        # Reconnect to Label Studio if needed
-        if hasattr(self, 'api_url') and hasattr(self, 'api_key'):
-            try:
-                from label_studio_sdk import Client
-                self.client = Client(url=self.api_url, api_key=self.api_key)
-                if hasattr(self, 'project_id'):
-                    self.project = self.client.get_project(self.project_id)
-            except ImportError:
-                pass
 
 
 class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
@@ -576,9 +504,6 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
             # Create new project
             logger.info(
                 f'Creating new Label Studio project: {self.project_name}')
-            logger.info(f'Label config type: {type(self.label_config)}')
-            if self.label_config:
-                logger.info(f'Label config length: {len(self.label_config)}')
 
             project = self.client.create_project(
                 title=self.project_name,
@@ -606,9 +531,6 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
         """
         try:
             # Create tasks in the project
-            logger.debug(
-                f'Creating tasks in project {self.project_id} with data: '
-                f'{tasks_data}')
             created_tasks = self.project.import_tasks(tasks_data)
             logger.debug(f'Created {len(created_tasks)} tasks in project '
                          f'{self.project_id}')
@@ -716,7 +638,6 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
             # Get task with annotations
             task = self.project.get_task(task_id)
 
-            logger.debug(f'Getting task: {task}')
             # Check if task has annotations
             if task and 'annotations' in task and task['annotations']:
                 return task['annotations'][0]  # Return the first annotation
@@ -742,3 +663,28 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
                 annotations[task_id] = annotation
 
         return annotations
+
+    # for pickling
+    def __getstate__(self):
+        """Control how the object is pickled"""
+        state = self.__dict__.copy()
+        # Remove unpicklable attributes
+        if 'client' in state:
+            del state['client']  # Remove Label Studio client
+        if 'project' in state:
+            del state['project']  # Remove project reference
+        return state
+
+    # for unpickling
+    def __setstate__(self, state):
+        """Control how the object is unpickled"""
+        self.__dict__.update(state)
+        # Reconnect to Label Studio if needed
+        if hasattr(self, 'api_url') and hasattr(self, 'api_key'):
+            try:
+                from label_studio_sdk import Client
+                self.client = Client(url=self.api_url, api_key=self.api_key)
+                if hasattr(self, 'project_id'):
+                    self.project = self.client.get_project(self.project_id)
+            except ImportError:
+                pass
