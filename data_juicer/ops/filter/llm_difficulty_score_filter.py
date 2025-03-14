@@ -20,7 +20,7 @@ OP_NAME = 'llm_difficulty_score_filter'
 @OPERATORS.register_module(OP_NAME)
 class LLMDifficultyScoreFilter(Filter):
     """
-    Filter to keep sample with high difficulty score estimated by LLM in API.
+    Filter to keep sample with high difficulty score estimated by LLM.
     """
 
     # avoid leading whitespace
