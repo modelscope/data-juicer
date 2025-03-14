@@ -12,6 +12,10 @@ import sys
 import unittest
 import coverage
 
+# start the coverage immediately
+cov = coverage.Coverage(include='data_juicer/**')
+cov.start()
+
 from loguru import logger
 
 from data_juicer.utils.unittest_utils import set_clear_model_flag, get_partial_test_cases
@@ -91,12 +95,11 @@ def gather_test_cases(test_dir, pattern, tag, mode='partial'):
 
 
 def main():
-    cov = coverage.Coverage(include='data_juicer/**')
-    cov.start()
-
+    global cov
     runner = unittest.TextTestRunner()
     test_suite = gather_test_cases(os.path.abspath(args.test_dir),
                                    args.pattern, args.tag, args.mode)
+    logger.info(f'There are {len(test_suite._tests)} test cases to run.')
     res = runner.run(test_suite)
 
     cov.stop()

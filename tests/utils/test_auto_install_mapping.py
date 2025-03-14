@@ -2,10 +2,9 @@ import unittest
 
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase
 
-class UnittestUtilsTest(DataJuicerTestCaseBase):
+class AutoInstallMappingTest(DataJuicerTestCaseBase):
 
     def test_placeholder(self):
-        # placeholder for test
         pass
 
 
