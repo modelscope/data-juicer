@@ -20,7 +20,7 @@ OP_NAME = 'llm_quality_score_filter'
 @OPERATORS.register_module(OP_NAME)
 class LLMQualityScoreFilter(Filter):
     """
-    Filter to keep sample with high quality score estimated by LLM in API.
+    Filter to keep sample with high quality score estimated by LLM.
     """
 
     # avoid leading whitespace

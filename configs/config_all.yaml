@@ -652,7 +652,7 @@ process:
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
       lang: en                                                # keep text in what language
       min_score: 0.8                                          # the min language scores to filter text
-  - llm_difficulty_score_filter:                            # filter to keep sample with high difficulty score estimated by LLM in API.
+  - llm_difficulty_score_filter:                            # filter to keep sample with high difficulty score estimated by LLM.
       api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
       min_score: 0.5                                          # The lowest difficulty score threshold to keep the sample.
       api_endpoint: null                                      # URL endpoint for the API.
@@ -666,7 +666,7 @@ process:
       enable_vllm: false                                      # If true, use VLLM for loading hugging face or local llm. Otherwise, use API for reference.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
-  - llm_quality_score_filter:                               # filter to keep sample with high quality score estimated by LLM in API.
+  - llm_quality_score_filter:                               # filter to keep sample with high quality score estimated by LLM.
       api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
       min_score: 0.5                                          # The lowest quality score threshold to keep the sample.
       api_endpoint: null                                      # URL endpoint for the API.
