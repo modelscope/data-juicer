@@ -1,3 +1,5 @@
+from .annotation.human_preference_annotation_mapper import \
+    HumanPreferenceAnnotationMapper
 from .audio_ffmpeg_wrapped_mapper import AudioFFmpegWrappedMapper
 from .calibrate_qa_mapper import CalibrateQAMapper
 from .calibrate_query_mapper import CalibrateQueryMapper
@@ -111,5 +113,6 @@ __all__ = [
     'VideoResizeAspectRatioMapper', 'VideoResizeResolutionMapper',
     'VideoSplitByDurationMapper', 'VideoSplitByKeyFrameMapper',
     'VideoSplitBySceneMapper', 'VideoTaggingFromAudioMapper',
-    'VideoTaggingFromFramesMapper', 'WhitespaceNormalizationMapper'
+    'VideoTaggingFromFramesMapper', 'WhitespaceNormalizationMapper',
+    'HumanPreferenceAnnotationMapper'
 ]
