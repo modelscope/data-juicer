@@ -79,6 +79,8 @@ class AudioAddGaussianNoiseMapper(Mapper):
 
             new_audio_key = transfer_filename(audio_key, OP_NAME,
                                               **self._init_parameters)
+            if new_audio_key.endswith('.ogg'):
+                new_audio_key = new_audio_key.replace('.ogg', '.wav')
             if not os.path.exists(
                     new_audio_key) or new_audio_key not in audios.keys():
                 audio_array, audio_sample_rate = audios[audio_key]
