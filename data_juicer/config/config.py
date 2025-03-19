@@ -943,12 +943,6 @@ def get_default_cfg():
 
     # Convert to flat dictionary for namespace
     flat_defaults = {
-        'executor_type': 'default',
-        'ray_address': 'auto',
-        'suffixes': None,
-        'text_keys': 'text',
-        'add_suffix': False,
-        'export_path': './outputs',
         # Add other top-level keys from config_min.yaml
         **defaults
     }
