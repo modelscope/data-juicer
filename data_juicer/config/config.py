@@ -949,7 +949,7 @@ def get_default_cfg():
         'text_keys': 'text',
         'add_suffix': False,
         'export_path': './outputs',
-        # Add other top-level keys from config_all.yaml
+        # Add other top-level keys from config_min.yaml
         **defaults
     }
 

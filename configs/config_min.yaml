@@ -1,3 +1,13 @@
-dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
+project_name: 'min'
+
 np: 4  # number of subprocess to process your dataset
-export_path: './outputs/demo-process/demo-processed.jsonl'
+export_path: './outputs/'
+
+text_keys: 'text'
+video_key: 'videos'
+image_key: 'images'
+audio_key: 'audios'
+executor_type: default                                      # type of executor, support "default" or "ray" for now.
+ray_address: auto                                           # the address of the Ray cluster.
+suffixes: None
+add_suffix: False
