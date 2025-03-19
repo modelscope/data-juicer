@@ -45,6 +45,11 @@ def load_formatter(dataset_path,
         formatter = max(formatter_num, key=lambda x: formatter_num[x])
         target_suffixes = set(ext_num.keys()).intersection(
             set(FORMATTERS.modules[formatter].SUFFIXES))
+        if not target_suffixes:
+            raise ValueError(
+                f'No suitable formatter found for {dataset_path}. '
+                f'Supported extensions: '
+                f'{[f.SUFFIXES for f in FORMATTERS.modules.values()]}')
         return FORMATTERS.modules[formatter](dataset_path,
                                              text_keys=text_keys,
                                              suffixes=target_suffixes,

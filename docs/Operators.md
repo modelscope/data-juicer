@@ -35,7 +35,7 @@ Data-Juicer 中的算子分为以下 7 种类型。
 | [aggregator](#aggregator) | 4 | Aggregate for batched samples, such as summary or conclusion. 对批量样本进行汇总，如得出总结或结论。 |
 | [deduplicator](#deduplicator) | 10 | Detects and removes duplicate samples. 识别、删除重复样本。 |
 | [filter](#filter) | 47 | Filters out low-quality samples. 过滤低质量样本。 |
-| [formatter](#formatter) | 9 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
+| [formatter](#formatter) | 8 | Discovers, loads, and canonicalizes source data. 发现、加载、规范化原始数据。 |
 | [grouper](#grouper) | 3 | Group samples to batched samples. 将样本分组，每一组组成一个批量样本。 |
 | [mapper](#mapper) | 77 | Edits and transforms samples. 对数据样本进行编辑和转换。 |
 | [selector](#selector) | 5 | Selects top samples based on ranking. 基于排序选取高质量样本。 |
@@ -142,7 +142,7 @@ All the specific operators are listed below, each featured with several capabili
 |----------|------|-------------|-------------|------------|
 | csv_formatter | 🟢Stable | The class is used to load and format csv-type files. 类用于加载和格式化csv类型的文件。 | [code](../data_juicer/format/csv_formatter.py) | [tests](../tests/format/test_csv_formatter.py) |
 | empty_formatter | 🟢Stable | The class is used to create empty data. 类用于创建空数据。 | [code](../data_juicer/format/empty_formatter.py) | [tests](../tests/format/test_empty_formatter.py) |
-| json_formatter | 🔴Alpha | The class is used to load and format json-type files. 类用于加载和格式化json类型的文件。 | [code](../data_juicer/format/json_formatter.py) | - |
+| json_formatter | 🟡Beta | The class is used to load and format json-type files. 类用于加载和格式化json类型的文件。 | [code](../data_juicer/format/json_formatter.py) | [tests](../tests/format/test_json_formatter.py) |
 | local_formatter | 🟢Stable | The class is used to load a dataset from local files or local directory. 类用于从本地文件或本地目录加载数据集。 | [code](../data_juicer/format/formatter.py) | [tests](../tests/format/test_unify_format.py) |
 | parquet_formatter | 🟢Stable | The class is used to load and format parquet-type files. 该类用于加载和格式化镶木地板类型的文件。 | [code](../data_juicer/format/parquet_formatter.py) | [tests](../tests/format/test_parquet_formatter.py) |
 | remote_formatter | 🟢Stable | The class is used to load a dataset from repository of huggingface hub. 该类用于从huggingface hub的存储库加载数据集。 | [code](../data_juicer/format/formatter.py) | [tests](../tests/format/test_unify_format.py) |
