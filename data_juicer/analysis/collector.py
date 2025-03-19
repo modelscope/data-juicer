@@ -1,6 +1,7 @@
 from itertools import chain
 
-from data_juicer.format import load_formatter
+from data_juicer.config.config import get_default_cfg
+from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.utils.lazy_loader import LazyLoader
 
 torch = LazyLoader('torch', 'torch')
@@ -33,9 +34,10 @@ class TextTokenDistCollector(object):
         :param num_proc: number of processes to count tokens.
         :return: token distribution.
         """
-
-        formatter = load_formatter(data_path)
-        dataset = formatter.load_dataset(num_proc=num_proc)
+        cfg = get_default_cfg()
+        cfg.dataset_path = data_path
+        builder = DatasetBuilder(cfg)
+        dataset = builder.load_dataset(num_proc=num_proc)
         assert text_key in dataset.features, f'[{text_key} not find in dataset'
 
         def prepare_tokenizer(

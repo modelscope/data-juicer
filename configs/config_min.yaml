@@ -1,0 +1,3 @@
+dataset_path: './demos/data/demo-dataset.jsonl'  # path to your dataset directory or file
+np: 4  # number of subprocess to process your dataset
+export_path: './outputs/demo-process/demo-processed.jsonl'
