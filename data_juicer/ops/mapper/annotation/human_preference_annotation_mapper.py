@@ -110,6 +110,10 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
         self.prompt_key = prompt_key
         self.result_key = result_key
 
+        # Ensure text_key is set to prompt_key if not explicitly provided
+        if 'text_key' not in kwargs:
+            kwargs['text_key'] = prompt_key
+
         # Prepare the label_config parameter
         if label_config_file and os.path.exists(label_config_file):
             with open(label_config_file, 'r') as f:
@@ -228,6 +232,17 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
 
         # Store the preference result directly in the sample
         sample[self.result_key] = preference if preference else 'Unanswered'
+
+        # Also modify the text field to ensure the tracer detects the change
+        # This is needed because the tracer only checks the text_key field
+        if self.text_key in sample:
+            # Append the result to the text field in a way that doesn't affect
+            # the actual content
+            original_text = sample[self.text_key]
+            if not original_text.endswith('\n'):
+                original_text += '\n'
+            sample[self.text_key] = f'{original_text}' + \
+                                    f'[Preference: {sample[self.result_key]}]'
 
         logger.debug(f'Updated sample: {sample}')
         return sample
