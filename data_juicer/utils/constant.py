@@ -172,14 +172,15 @@ class StatsKeysMeta(type):
                 elif 'jsonl' in dj_cfg.dataset_path:
                     tmp_f_name = dj_cfg.dataset_path. \
                         replace('.jsonl', '.tmp.jsonl')
-                    with open(dj_cfg.dataset_path, 'r') as orig_file:
+                    with open(dj_cfg.dataset_path, 'r',
+                              encoding='utf-8') as orig_file:
                         first_line = orig_file.readline()
 
                 assert tmp_f_name is not None and first_line is not None, \
                     'error when loading the first line, when ' \
                     f'dj_cfg.dataset_path={dj_cfg.dataset_path}'
 
-                with open(tmp_f_name, 'w') as tmp_file:
+                with open(tmp_f_name, 'w', encoding='utf-8') as tmp_file:
                     tmp_file.write(first_line)
 
                 tmp_dj_cfg.dataset_path = tmp_f_name
@@ -221,6 +222,10 @@ class StatsKeysConstant(object):
     num_token = 'num_token'
     num_words = 'num_words'
     word_rep_ratio = 'word_rep_ratio'
+    llm_quality_score = 'llm_quality_score'
+    llm_quality_record = 'llm_quality_record'
+    llm_difficulty_score = 'llm_difficulty_score'
+    llm_difficulty_record = 'llm_difficulty_record'
 
     #  === image ===
     aspect_ratios = 'aspect_ratios'

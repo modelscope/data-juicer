@@ -48,6 +48,8 @@ def load_words_asset(words_dir: str, words_type: str):
         logger.info(f'Specified {words_dir} does not contain '
                     f'any {words_type} files in json format, now '
                     'download the one cached by data_juicer team')
+        if words_type not in ASSET_LINKS:
+            raise ValueError(f'{words_type} is not in remote server.')
         response = requests.get(ASSET_LINKS[words_type])
         words_dict = response.json()
         # cache the asset file locally

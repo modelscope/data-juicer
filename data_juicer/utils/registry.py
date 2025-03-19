@@ -17,8 +17,6 @@
 #  https://github.com/modelscope/modelscope/blob/master/modelscope/utils/registry.py
 # --------------------------------------------------------
 
-from loguru import logger
-
 
 class Registry(object):
     """This class is used to register some modules to registry by a repo
@@ -53,8 +51,7 @@ class Registry(object):
 
     def list(self):
         """Logging the list of module in current registry."""
-        for m in self._modules.keys():
-            logger.info(f'{self._name}\t{m}')
+        return list(self._modules.keys())
 
     def get(self, module_key):
         """

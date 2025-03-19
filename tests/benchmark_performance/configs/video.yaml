@@ -11,7 +11,7 @@ use_cache: false
 process:
   - video_nsfw_filter:
       hf_nsfw_model: 'Falconsai/nsfw_image_detection'
-      score_threshold: 1.0
+      max_score: 1.0
       mem_required: '1GB'
   - video_tagging_from_frames_mapper:
       mem_required: '9GB'

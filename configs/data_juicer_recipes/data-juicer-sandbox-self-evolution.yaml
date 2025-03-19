@@ -10,7 +10,7 @@ np: 4  # number of subprocess to process your dataset
 process:
   - video_nsfw_filter:
       hf_nsfw_model: Falconsai/nsfw_image_detection
-      score_threshold: 0.000195383
+      max_score: 0.000195383
       frame_sampling_method: uniform
       frame_num: 3
       reduce_mode: avg

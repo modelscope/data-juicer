@@ -77,6 +77,10 @@ hpo_config: null                                            # path to a configur
 # process schedule: a list of several process operators with their arguments
 process:
   # Mapper ops. Most of these ops need no arguments.
+  - audio_add_gaussian_noise_mapper:                         # Mapper to add Gaussian noise to audio.
+      min_amplitude: 0.001                                     # Default: 0.001. Minimum noise amplification factor.
+      max_amplitude: 0.015                                     # Default: 0.015. Maximum noise amplification factor.
+      p: 0.5                                                   # Default: 0.5.(range: [ 0.0, 1.0 ].) The probability of applying this transform.
   - audio_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg audio filters
   - calibrate_qa_mapper:                                    # calibrate question-answer pairs based on reference text.
       api_model: 'gpt-4o'                                     # API model name.
@@ -457,6 +461,9 @@ process:
       lang: en                                                # sample in which language
       tokenization: false                                     # whether to use model to tokenize documents
       substrings: ['http', 'www', '.com', 'href', '//']       # incorrect substrings to remove
+  - replace_content_mapper:                                 # replace all content in the text that matches a specific regular expression pattern with a designated replacement string.
+      pattern: null                                           # regular expression pattern(s) to search for within text
+      repl: ''                                                # replacement string(s), default is empty string
   - sdxl_prompt2prompt_mapper:                              # use the generative model SDXL and image editing technique Prompt-to-Prompt to generate pairs of similar images.
       hf_diffusion: 'stabilityai/stable-diffusion-xl-base-1.0' # model name of the SDXL model on huggingface
       num_inference_steps: 50                                 # the larger the value, the better the image generation quality
@@ -625,7 +632,7 @@ process:
       max_ratio: 0.4                                          # the max face area ratio of filter range
   - image_nsfw_filter:                                      # filter samples according to the nsfw scores of images in them
       hf_nsfw_model: Falconsai/nsfw_image_detection           # Huggingface model name for nsfw classification
-      score_threshold: 0.5                                    # the nsfw score threshold for samples, range from 0 to 1. Samples with nsfw score less than this threshold will be kept.
+      max_score: 0.5                                          # the nsfw score threshold for samples, range from 0 to 1. Samples with nsfw score less than this threshold will be kept.
       any_or_all: any                                         # keep this sample when any/all images meet the filter condition
       mem_required: '1GB'                                     # This operation (Op) utilizes deep neural network models that consume a significant amount of memory for computation, hence the system's available memory might constrain the maximum number of processes that can be launched
   - image_pair_similarity_filter:                           # filter samples according to the similarity score between the image pair.
@@ -669,6 +676,34 @@ process:
   - language_id_score_filter:                               # filter text in specific language with language scores larger than a specific max value
       lang: en                                                # keep text in what language
       min_score: 0.8                                          # the min language scores to filter text
+  - llm_difficulty_score_filter:                            # filter to keep sample with high difficulty score estimated by LLM.
+      api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
+      min_score: 0.5                                          # The lowest difficulty score threshold to keep the sample.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      input_keys: ['text']                                    # Sub set of keys in the sample. Support data with multi fields such as 'query', 'analysis' and 'answer' in RFT data.
+      field_names: ['text']                                   # Corresponding field names for input keys.
+      system_prompt: null                                     # System prompt for the task.
+      input_template: null                                    # The input template.
+      field_template: null                                    # Template for each field in the prompt.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      enable_vllm: false                                      # If true, use VLLM for loading hugging face or local llm. Otherwise, use API for reference.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - llm_quality_score_filter:                               # filter to keep sample with high quality score estimated by LLM.
+      api_or_hf_model: 'gpt-4o'                               # API or huggingface model name.
+      min_score: 0.5                                          # The lowest quality score threshold to keep the sample.
+      api_endpoint: null                                      # URL endpoint for the API.
+      response_path: null                                     # Path to extract content from the API response. Defaults to 'choices.0.message.content'.
+      input_keys: ['text']                                    # Sub set of keys in the sample. Support data with multi fields such as 'query', 'analysis' and 'answer' in RFT data.
+      field_names: ['text']                                   # Corresponding field names for input keys.
+      system_prompt: null                                     # System prompt for the task.
+      input_template: null                                    # The input template.
+      field_template: null                                    # Template for each field in the prompt.
+      try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
+      enable_vllm: false                                      # If true, use VLLM for loading hugging face or local llm. Otherwise, use API for reference.
+      model_params: {}                                        # Parameters for initializing the API model.
+      sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
   - maximum_line_length_filter:                             # filter text with the maximum length of lines out of specific range
       min_len: 10                                             # the min length of filter range
       max_len: 10000                                          # the max length of filter range
@@ -776,7 +811,7 @@ process:
       any_or_all: any                                         # keep this sample when any/all videos meet the filter condition
   - video_nsfw_filter:                                      # filter samples according to the nsfw scores of videos in them
       hf_nsfw_model: Falconsai/nsfw_image_detection           # Huggingface model name for nsfw classification
-      score_threshold: 0.5                                    # the nsfw score threshold for samples, range from 0 to 1. Samples with nsfw score less than this threshold will be kept.
+      max_score: 0.5                                          # the nsfw score threshold for samples, range from 0 to 1. Samples with nsfw score less than this threshold will be kept.
       frame_sampling_method: all_keyframes                    # sampling method of extracting frame images from the videos. Should be one of ["all_keyframes", "uniform"]. The former one extracts all key frames and the latter one extract specified number of frames uniformly from the video. Default: "all_keyframes".
       frame_num: 3                                            # the number of frames to be extracted uniformly from the video. Only works when frame_sampling_method is "uniform". If it's 1, only the middle frame will be extracted. If it's 2, only the first and the last frames will be extracted. If it's larger than 2, in addition to the first and the last frames, other frames will be extracted uniformly within the video duration.
       reduce_mode: avg                                        # reduce mode for multiple sampled video frames to compute nsfw scores of videos, must be one of ['avg','max', 'min'].

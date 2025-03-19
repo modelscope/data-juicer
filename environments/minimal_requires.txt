@@ -32,7 +32,7 @@ psutil
 pydantic>=2.0
 mwparserfromhell
 Pillow
-fastapi[standard]>=0.100
+fastapi[standard]>=0.110
 httpx
 wordcloud
 jsonlines

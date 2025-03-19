@@ -150,7 +150,7 @@ class ProcessDataRayTest(DataJuicerTestCaseBase):
                     'image_nsfw_filter': {
                         'hf_nsfw_model': 'Falconsai/nsfw_image_detection',
                         'trust_remote_code': True,
-                        'score_threshold': 0.5,
+                        'max_score': 0.5,
                         'any_or_all': 'any',
                         'mem_required': '8GB'
                     },

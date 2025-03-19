@@ -105,4 +105,6 @@ OPS_TO_PKG = {
     'query_sentiment_detection_mapper': ['transformers'],
     'query_topic_detection_mapper': ['transformers'],
     'meta_tags_aggregator': ['openai'],
+    'llm_quality_score_filter': ['openai', 'torch', 'transformers', 'vllm'],
+    'llm_difficulty_score_filter': ['openai', 'torch', 'transformers', 'vllm'],
 }

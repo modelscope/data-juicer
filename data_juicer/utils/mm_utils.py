@@ -160,9 +160,9 @@ def iou(box1, box2):
     ix_max = min(x1_max, x2_max)
     iy_min = max(y1_min, y2_min)
     iy_max = min(y1_max, y2_max)
-    intersection = max(0, (ix_max - ix_min) * (iy_max - iy_min))
+    intersection = max(0, max(0, ix_max - ix_min) * max(0, iy_max - iy_min))
     union = area1 + area2 - intersection
-    return 1.0 * intersection / union
+    return 1.0 * intersection / union if union != 0 else 0.0
 
 
 def calculate_resized_dimensions(
@@ -207,7 +207,7 @@ def calculate_resized_dimensions(
 
     # Determine final dimensions based on original orientation
     resized_dimensions = ((new_short_edge,
-                           new_long_edge) if width <= height else
+                           new_long_edge) if width >= height else
                           (new_long_edge, new_short_edge))
 
     # Ensure final dimensions are divisible by the specified value

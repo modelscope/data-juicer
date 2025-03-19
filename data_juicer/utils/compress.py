@@ -23,8 +23,8 @@ class FileLock(HF_FileLock):
     def _release(self):
         super()._release()
         try:
-            # logger.debug(f'Remove {self._lock_file}')
-            os.remove(self._lock_file)
+            # logger.debug(f'Remove {self.lock_file}')
+            os.remove(self.lock_file)
         # The file is already deleted and that's what we want.
         except OSError:
             pass
@@ -497,4 +497,4 @@ def decompress(ds, fingerprints=None, num_proc=1):
 
 
 def cleanup_compressed_cache_files(ds):
-    CacheCompressManager().cleanup_cache_files(ds)
+    CacheCompressManager(cache_utils.CACHE_COMPRESS).cleanup_cache_files(ds)
