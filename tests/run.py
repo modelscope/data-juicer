@@ -68,7 +68,7 @@ class TaggedTestLoader(unittest.TestLoader):
     def _match_path(self, path, full_path, pattern):
         # override this method to use alternative matching strategy
         match = super()._match_path(path, full_path, pattern)
-        if self.included_test_files:
+        if self.included_test_files is not None:
             for included_test_file in self.included_test_files:
                 if included_test_file in full_path:
                     return match
