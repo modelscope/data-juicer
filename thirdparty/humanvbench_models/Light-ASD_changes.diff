@@ -1,0 +1,66 @@
+diff --git a/__pycache__/ASD.cpython-39.pyc b/__pycache__/ASD.cpython-39.pyc
+new file mode 100644
+index 0000000..2b6d14b
+Binary files /dev/null and b/__pycache__/ASD.cpython-39.pyc differ
+diff --git a/__pycache__/loss.cpython-39.pyc b/__pycache__/loss.cpython-39.pyc
+new file mode 100644
+index 0000000..38f0c69
+Binary files /dev/null and b/__pycache__/loss.cpython-39.pyc differ
+diff --git a/model/__pycache__/Classifier.cpython-39.pyc b/model/__pycache__/Classifier.cpython-39.pyc
+new file mode 100644
+index 0000000..91653ac
+Binary files /dev/null and b/model/__pycache__/Classifier.cpython-39.pyc differ
+diff --git a/model/__pycache__/Encoder.cpython-39.pyc b/model/__pycache__/Encoder.cpython-39.pyc
+new file mode 100644
+index 0000000..5a935d0
+Binary files /dev/null and b/model/__pycache__/Encoder.cpython-39.pyc differ
+diff --git a/model/__pycache__/Model.cpython-39.pyc b/model/__pycache__/Model.cpython-39.pyc
+new file mode 100644
+index 0000000..38b7681
+Binary files /dev/null and b/model/__pycache__/Model.cpython-39.pyc differ
+diff --git a/model/faceDetector/__pycache__/__init__.cpython-39.pyc b/model/faceDetector/__pycache__/__init__.cpython-39.pyc
+new file mode 100644
+index 0000000..4fcd28a
+Binary files /dev/null and b/model/faceDetector/__pycache__/__init__.cpython-39.pyc differ
+diff --git a/model/faceDetector/s3fd/__init__.py b/model/faceDetector/s3fd/__init__.py
+index 943292a..a029f3d 100644
+--- a/model/faceDetector/s3fd/__init__.py
++++ b/model/faceDetector/s3fd/__init__.py
+@@ -6,7 +6,7 @@ from torchvision import transforms
+ from .nets import S3FDNet
+ from .box_utils import nms_
+ 
+-PATH_WEIGHT = 'model/faceDetector/s3fd/sfd_face.pth'
++PATH_WEIGHT = './thirdparty/humanvbench_models/Light-ASD/model/faceDetector/s3fd/sfd_face.pth'
+ if os.path.isfile(PATH_WEIGHT) == False:
+     Link = "1KafnHz7ccT-3IyddBsL5yi2xGtxAKypt"
+     cmd = "gdown --id %s -O %s"%(Link, PATH_WEIGHT)
+diff --git a/model/faceDetector/s3fd/__pycache__/__init__.cpython-39.pyc b/model/faceDetector/s3fd/__pycache__/__init__.cpython-39.pyc
+new file mode 100644
+index 0000000..1859ab0
+Binary files /dev/null and b/model/faceDetector/s3fd/__pycache__/__init__.cpython-39.pyc differ
+diff --git a/model/faceDetector/s3fd/__pycache__/box_utils.cpython-39.pyc b/model/faceDetector/s3fd/__pycache__/box_utils.cpython-39.pyc
+new file mode 100644
+index 0000000..c41063b
+Binary files /dev/null and b/model/faceDetector/s3fd/__pycache__/box_utils.cpython-39.pyc differ
+diff --git a/model/faceDetector/s3fd/__pycache__/nets.cpython-39.pyc b/model/faceDetector/s3fd/__pycache__/nets.cpython-39.pyc
+new file mode 100644
+index 0000000..116e8ef
+Binary files /dev/null and b/model/faceDetector/s3fd/__pycache__/nets.cpython-39.pyc differ
+diff --git a/model/faceDetector/s3fd/box_utils.py b/model/faceDetector/s3fd/box_utils.py
+index 0779bcd..1bf4be2 100644
+--- a/model/faceDetector/s3fd/box_utils.py
++++ b/model/faceDetector/s3fd/box_utils.py
+@@ -35,7 +35,7 @@ def nms_(dets, thresh):
+         inds = np.where(ovr <= thresh)[0]
+         order = order[inds + 1]
+ 
+-    return np.array(keep).astype(np.int)
++    return np.array(keep).astype(int)
+ 
+ 
+ def decode(loc, priors, variances):
+diff --git a/model/faceDetector/s3fd/sfd_face.pth b/model/faceDetector/s3fd/sfd_face.pth
+new file mode 100644
+index 0000000..2bdf053
+Binary files /dev/null and b/model/faceDetector/s3fd/sfd_face.pth differ

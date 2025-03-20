@@ -67,7 +67,7 @@ class VideoActiveSpeakerMapper(Mapper):
             speech_gender = 'Woman'
             speech_gender_confidence = speech_female
         
-        if ' not ' in is_child_descrip:
+        if 'No' in is_child_descrip or 'no' in is_child_descrip:
             is_child_apperance = False
         else:
             is_child_apperance = True
@@ -86,7 +86,7 @@ class VideoActiveSpeakerMapper(Mapper):
             if not is_child_voice == 'Not Sure':
                 if is_child_apperance == is_child_voice:
                     # gender consistency test
-                    if speech_gender_confidence > 0.9 and float(face_gender[1]) > 0.9:
+                    if speech_gender_confidence > 0.85 and float(face_gender[1]) > 0.85:
                         if not speech_gender == face_gender[0]:
                             speak_active = False
                 else:

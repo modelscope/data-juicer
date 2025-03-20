@@ -1,1 +1,6 @@
-# 由于上传文件大小存在限制，(Light-ASD/model/faceDetector/s3fd/sfd_face.pth)模型文件被移除，需要手动从Light-ASD仓库下载（https://github.com/Junhua-Liao/Light-ASD）
+git clone
+https://github.com/jahongir7174/YOLOv8-human.git
+https://github.com/Junhua-Liao/Light-ASD.git
+https://github.com/FunAudioLLM/SenseVoice.git
+
+其中./thirdparty/humanvbench_models/Light-ASD/model/faceDetector/s3fd目录下有一个sfd_face.pth是需要单独下载放进去的：https://huggingface.co/lithiumice/syncnet/tree/main
