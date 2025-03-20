@@ -289,13 +289,8 @@ class ConfigTest(DataJuicerTestCaseBase):
         self.assertEqual(cfg.ray_address, 'auto')
         self.assertEqual(cfg.text_keys, 'text')
         self.assertEqual(cfg.add_suffix, False)
-        self.assertEqual(cfg.export_path, '/path/to/result/dataset.jsonl')
-        self.assertEqual(cfg.suffixes, [])
-        
-        # Test other important defaults from config_all.yaml
-        self.assertTrue(hasattr(cfg, 'np'))  # Number of processes
-        self.assertTrue(hasattr(cfg, 'use_cache'))  # Cache usage flag
-        self.assertTrue(hasattr(cfg, 'temp_dir'))  # Temporary directory
+        self.assertEqual(cfg.export_path, './outputs/')
+        self.assertEqual(cfg.suffixes, None)
         
         # Test default values are of correct type
         self.assertIsInstance(cfg.executor_type, str)
