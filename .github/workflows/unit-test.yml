@@ -20,7 +20,7 @@ jobs:
     runs-on: [GPU, unittest]
     environment: Testing
     outputs:
-      total_coverage: ${{ steps.total.outputs.total }}
+      total: ${{ steps.total.outputs.total }}
     steps:
     - uses: actions/checkout@v3
       with:
