@@ -3,10 +3,10 @@ from typing import List
 import numpy as np
 from loguru import logger
 
+from data_juicer.ops.base_op import OP, OPERATORS, Filter, Mapper
+from data_juicer.ops.load import load_ops
 from data_juicer.utils.constant import Fields, InterVars
 from data_juicer.utils.registry import Registry
-
-from .base_op import Filter
 
 # Type of intermediate vars
 # text
@@ -196,3 +196,74 @@ class FusedFilter(Filter):
             else:
                 res = this_res
         return res
+
+
+@OPERATORS.register_module('general_fused_op')
+class GeneralFusedOP(OP):
+    """A general fused operator for OPs that is used to run sequential OPs on
+    the same batch to allow fine-grained control on data processing."""
+
+    _batched_op = True
+
+    def __init__(self,
+                 batch_size: int = 1,
+                 fused_op_list: List = None,
+                 *args,
+                 **kwargs):
+        super().__init__(*args, **kwargs)
+        self.batch_size = batch_size
+        if fused_op_list is None:
+            fused_op_list = []
+        self.fused_ops = load_ops(fused_op_list)
+        self._name = 'GeneralFusedOP:(%s)' % ','.join(
+            [op._name for op in self.fused_ops])
+        # set accelerator to 'cuda' if there exists any ops whose accelerator
+        # is 'cuda'
+        accelerator_methods = set([op.accelerator for op in self.fused_ops])
+        if 'cuda' in accelerator_methods:
+            self.accelerator = 'cuda'
+
+        # update num_proc with the min num_proc of all fusible filters
+        self.num_proc = min([op.runtime_np() for op in self.fused_ops]) \
+            if self.fused_ops else 1
+
+    def process_batched(self, samples, rank=None):
+        for op in self.fused_ops:
+            process_args = {'rank': rank} if op.accelerator == 'cuda' else {}
+            if isinstance(op, Mapper):
+                samples = op.process_batched(samples, **process_args)
+            elif isinstance(op, Filter):
+                samples = op.compute_stats_batched(samples, **process_args)
+                indicators = list(op.process_batched(samples))
+                new_samples = {}
+                for key in samples:
+                    new_samples[key] = [
+                        val for val, indicator in zip(samples[key], indicators)
+                        if indicator
+                    ]
+                samples = new_samples
+            else:
+                raise NotImplementedError(
+                    f'FusedOP does not support OP {op._name} of type '
+                    f'{type(op)} and only supports Mapper and Filter now.')
+        return samples
+
+    def run(self, dataset, *, exporter=None, tracer=None):
+        # prepare the dataset
+        from data_juicer.core.data import NestedDataset
+        if not isinstance(dataset, NestedDataset):
+            dataset = NestedDataset(dataset)
+        if not self.fused_ops:
+            return dataset
+        # initialize for different kinds of datasets
+        for op in self.fused_ops:
+            dataset = OP.run(op, dataset)
+
+        new_dataset = dataset.map(
+            self.process_batched,
+            num_proc=self.num_proc,
+            with_rank=self.use_cuda(),
+            batch_size=self.batch_size,
+            desc=self._name + '_process',
+        )
+        return new_dataset
