@@ -7,8 +7,9 @@ import fire
 import pandas as pd
 from loguru import logger
 
+from data_juicer.config.config import get_default_cfg
 from data_juicer.core.data import add_same_content_to_new_column
-from data_juicer.format import load_formatter
+from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.ops.filter.language_id_score_filter import \
     LanguageIDScoreFilter
 from data_juicer.utils.constant import Fields, StatsKeys
@@ -47,8 +48,10 @@ def main(src_dir, target_dir, text_key=None, suffixes=[], num_proc=1):
     if not os.path.exists(target_dir):
         os.makedirs(target_dir, exist_ok=True)
 
-    formatter = load_formatter(src_dir, text_keys=text_key, suffixes=suffixes)
-    dataset = formatter.load_dataset(num_proc)
+    cfg = get_default_cfg()
+    cfg.dataset_path = src_dir
+    builder = DatasetBuilder(cfg)
+    dataset = builder.load_dataset(num_proc)
 
     op = LanguageIDScoreFilter(text_key=text_key)
 

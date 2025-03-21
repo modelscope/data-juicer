@@ -1,7 +1,7 @@
 import argparse
 
+from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.exporter import Exporter
-from data_juicer.format import load_formatter
 
 
 def parse_args():
@@ -58,13 +58,14 @@ def run_mixture():
         e.g.
         1) a single data path
         2) multiple datasets in the format: <w1> dataset1-path
-            <w2> dataset1-file  <w3>dataset3-path ...'
+            <w2> dataset1-file  <w3> dataset3-path ...'
 
     """
     args = parse_args()
     data_path = ' '.join(args.data_path)
-    formatter = load_formatter(data_path, max_samples=args.max_samples)
-    dataset = formatter.load_dataset(args.num_proc)
+    args.dataset_path = data_path
+    dataset_builder = DatasetBuilder(args)
+    dataset = dataset_builder.load_dataset(args.num_proc)
     exporter = Exporter(export_path=args.export_path,
                         export_shard_size=args.export_shard_size,
                         num_proc=args.num_proc,

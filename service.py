@@ -11,8 +11,9 @@ from fastapi import FastAPI, HTTPException, Request
 from jsonargparse import Namespace
 from pydantic import validate_call
 
+from data_juicer.config.config import get_default_cfg
+from data_juicer.core.data.dataset_builder import DatasetBuilder
 from data_juicer.core.exporter import Exporter
-from data_juicer.format.load import load_formatter
 
 DJ_OUTPUT = 'outputs'
 
@@ -152,7 +153,10 @@ def _setup_dataset(params: Dict):
     exporter = None
     if dataset_path := params.get('dataset'):
         if isinstance(dataset_path, str):
-            dataset = load_formatter(dataset_path).load_dataset()
+            cfg = get_default_cfg()
+            cfg.dataset_path = dataset_path
+            builder = DatasetBuilder(cfg)
+            dataset = builder.load_dataset()
             params['dataset'] = dataset
             timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
             export_path = os.path.join(DJ_OUTPUT, timestamp,
