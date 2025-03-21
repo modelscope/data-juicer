@@ -56,6 +56,7 @@ jobs:
 
     - name: Get Total Coverage Result
       id: total
+      working-directory: dj-${{ github.run_id }}/.github/workflows/docker
       run: |
         echo "total=$(docker compose exec ray-head coverage report --format=total)" >> $GITHUB_OUTPUT
 
