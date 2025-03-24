@@ -54,12 +54,12 @@ After generating data using the code in `data_generate`, the data needs to be pr
 
 For text data:
 ```python
-python ./data_process/process.py --input_en_path \[input_file_en\] --input_cn_path [input_file_cn]
+python ./data_process/process.py --input_en_path [input_file_en] --input_cn_path [input_file_cn]
 ```
 
 For image data (note that the path of the image needs to be modified accordingly):
 ```python
-python ./data_process/process_img.py --input_en_path \[input_file_en\] --input_cn_path [input_file_cn]
+python ./data_process/process_img.py --input_en_path [input_file_en] --input_cn_path [input_file_cn]
 ```
 
 The following eight training data for course learning will be obtained (taking text data as an example):
