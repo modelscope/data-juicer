@@ -36,5 +36,5 @@ httpx
 wordcloud
 jsonlines
 ray==2.40.0
-label-studio==1.16.0
+label-studio
 label-studio-sdk
