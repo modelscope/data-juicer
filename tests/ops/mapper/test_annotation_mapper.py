@@ -361,6 +361,43 @@ class AnnotationMapperTest(DataJuicerTestCaseBase):
             self.assertIn(task_id, completed_tasks)
             self.assertEqual(completed_tasks[task_id]["result"]["label"], f"Annotation for task {task_id}")
 
+    def test_process_uses_existing_ids(self):
+        """Test that the mapper uses existing IDs in samples instead of generating new ones"""
+        mapper = MockAnnotationMapper(wait_for_annotations=True, timeout=0.1, poll_interval=0.01)
+        
+        # Create samples with predefined IDs
+        samples_with_ids = {
+            "text": ["Sample text 1", "Sample text 2", "Sample text 3"],
+            "id": ["predefined_id_1", "predefined_id_2", "predefined_id_3"]
+        }
+        
+        # Process the samples
+        result = mapper.process_batched(samples_with_ids)
+        
+        # Verify that the predefined IDs were used in the mapping
+        for i, sample_id in enumerate(samples_with_ids["id"]):
+            # Check if each predefined ID is in the sample-to-task mapping
+            self.assertIn(sample_id, mapper.sample_to_task_id)
+            
+            # Get the task ID for this sample
+            task_id = mapper.sample_to_task_id[sample_id]
+            
+            # Verify that the sample ID is in the task's sample list
+            self.assertIn(sample_id, mapper.task_to_samples[task_id])
+            
+        # Add mock annotations using the task IDs that were created
+        for task_id in mapper.created_task_ids:
+            mapper.add_mock_annotation(task_id, {"label": f"Annotation for task {task_id}"})
+            
+        # Process the samples again
+        result = mapper.process_batched(samples_with_ids)
+        
+        # Verify results include the annotations
+        self.assertIn("annotation_result", result)
+        for i in range(len(samples_with_ids["id"])):
+            task_id = mapper.sample_to_task_id[samples_with_ids["id"][i]]
+            self.assertEqual(result["annotation_result"][i]["label"], f"Annotation for task {task_id}")
+
 
 class MockLabelStudioAnnotationMapper(BaseAnnotationMapper):
     """Mock implementation of LabelStudioAnnotationMapper for testing"""
@@ -835,6 +872,61 @@ class HumanPreferenceAnnotationMapperTest(DataJuicerTestCaseBase):
         # Verify the results
         self.assertIn("preference", result)
         self.assertEqual(result["preference"][0], "response_a")
+
+    def test_process_uses_existing_ids(self):
+        """Test that the Human Preference mapper uses existing IDs in samples instead of generating new ones"""
+        mapper = MockHumanPreferenceAnnotationMapper(wait_for_annotations=True)
+        
+        # Create samples with predefined IDs
+        samples_with_ids = {
+            "prompt": ["Which is better? A or B", "Which is clearer? X or Y"],
+            "answer1": ["Option A", "Option X"],
+            "answer2": ["Option B", "Option Y"],
+            "id": ["preference_id_1", "preference_id_2"]
+        }
+        
+        # Process the samples
+        result = mapper.process_batched(samples_with_ids)
+        
+        # Verify that the predefined IDs were used in the mapping
+        for i, sample_id in enumerate(samples_with_ids["id"]):
+            # Check if each predefined ID is in the sample-to-task mapping
+            self.assertIn(sample_id, mapper.sample_to_task_id)
+            
+            # Get the task ID for this sample
+            task_id = mapper.sample_to_task_id[sample_id]
+            
+            # Verify that the sample ID is in the task's sample list
+            self.assertIn(sample_id, mapper.task_to_samples[task_id])
+        
+        # Add mock annotations for the created tasks
+        for i, task_id in enumerate(mapper.created_task_ids):
+            # Alternate between left and right selections
+            selected = "left" if i % 2 == 0 else "right"
+            
+            mapper.add_mock_annotation(task_id, [
+                {
+                    "type": "pairwise",
+                    "value": {
+                        "selected": selected
+                    }
+                }
+            ])
+        
+        # Process the samples again
+        result = mapper.process_batched(samples_with_ids)
+        
+        # Verify results include preference annotations
+        self.assertIn("result", result)
+        
+        # First sample should prefer answer1 (left choice)
+        self.assertEqual(result["result"][0], "answer1")
+        
+        # Second sample should prefer answer2 (right choice)
+        self.assertEqual(result["result"][1], "answer2")
+        
+        # Verify the original IDs were preserved in the result
+        self.assertEqual(result["id"], samples_with_ids["id"])
 
 
 if __name__ == '__main__':

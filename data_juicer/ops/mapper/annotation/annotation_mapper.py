@@ -232,8 +232,12 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         sample_list = [{key: samples[key][i]
                         for key in keys} for i in range(num_samples)]
 
-        # Step 2: Generate unique IDs for each sample
-        sample_ids = [str(uuid.uuid4()) for _ in range(num_samples)]
+        # Step 2: Retrieve or generate unique IDs for each sample
+        # TODO: Use ID from database or metadata if not present
+        if 'id' not in keys:
+            sample_ids = [str(uuid.uuid4()) for _ in range(num_samples)]
+        else:
+            sample_ids = [sample['id'] for sample in sample_list]
 
         # Step 3: Process samples in batches
         for batch_start in range(0, num_samples, self.max_tasks_per_batch):
