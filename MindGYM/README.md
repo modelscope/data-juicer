@@ -129,7 +129,7 @@ pip install -e '.[eval]'
 python=3.10, evalscope==0.11.0, ms-swift==3.2.0, ms-vlmeval==0.0.13, torch==2.5.1, transformers==4.49.0
 ```
 
-For detailed `pip list`, please refer to `./eval/requirements.txt`. Note that an additional library that may need to be installed is `qwen-vl-utils` for Qwen2.5-VL, and `timm` for Intern2.5-VL.
+For detailed `pip list`, please refer to `./eval/requirements.txt`. Note that an additional library that may need to be installed is `qwen-vl-utils` for Qwen2.5-VL.
 
 ### Evaluation
 
@@ -142,8 +142,6 @@ We selected four datasets: `MMStar`, `MathVision`, and `MathVista`, to conduct c
 2. **Text-based Evaluation**
 
 We selected `GSM8K`, `MATH`, and `GPQA` for comprehensive evaluation. The `--eval_backend` is set to `Native`. Similarly, except for `GPQA` (`./eval/qw25/text-eval-2.sh`), where we set a limit of 300 due to time constraints, we conduct full evaluations on the other datasets (`./eval/qw25/text-eval-1.sh`), resulting in two separate scripts.
-
-(To avoid repetitive operations, can we ignore the time constraints and perform a full evaluation? It would take an additional 2-3 hours approximately.)
 
 Two points to note:
 
