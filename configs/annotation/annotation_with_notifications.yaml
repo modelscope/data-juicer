@@ -47,13 +47,13 @@ process:
           smtp_port: 465
 
           # Sender information
-          usernameL: "yilei.z"
-          password: "Shangxinsi202111"
-          sender_email: "yilei.z@alibaba-inc.com"
-          sender_name: "Data Juicer Annotation"
+          username: "your_user_name"
+          password: "your_passsword"
+          sender_email: "your_email@alibaba-inc.com"
+          sender_name: "your_name"
 
           # Recipients who will receive annotation status notifications
-          recipients: ["yilei.z@alibaba-inc.com", "cyrus.ylzhang@gmail.com"]
+          recipients: ["email1@example.com", "email2@example.com"]
 
           # Subject prefix for notifications
           subject: "Annotation Status Update"
