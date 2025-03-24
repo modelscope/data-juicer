@@ -1,5 +1,7 @@
 import os
 import unittest
+import tempfile
+import json
 
 from data_juicer.core import NestedDataset
 from data_juicer.config import init_configs
@@ -16,13 +18,24 @@ class StatsKeysTest(DataJuicerTestCaseBase):
     def setUp(self) -> None:
         super().setUp()
         StatsKeys._accessed_by = {}
+        
+        # Create a temporary jsonl file for testing
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.temp_jsonl = os.path.join(self.temp_dir.name, "test-dataset.jsonl")
+        with open(self.temp_jsonl, 'w', encoding='utf-8') as f:
+            f.write(json.dumps({"text": "hello world"}) + "\n")
 
     def tearDown(cls) -> None:
         super().tearDown()
         StatsKeys._accessed_by = {}
+        if hasattr(cls, 'temp_dir'):
+            cls.temp_dir.cleanup()
 
     def test_basic_func(self):
-        cfg = init_configs(args=f'--config {test_yaml_path}'.split())
+        # Create a temporary config with the test dataset path
+        args = f'--config {test_yaml_path} --dataset_path {self.temp_jsonl}'.split()
+        cfg = init_configs(args=args)
+        
         res = StatsKeys.get_access_log(cfg)
         self.assertEqual(len(res), 1)  # only 1 filter
         self.assertIn('language_id_score_filter', res)
@@ -34,7 +47,9 @@ class StatsKeysTest(DataJuicerTestCaseBase):
 
     def test_basic_func_with_dataset(self):
         dataset = NestedDataset.from_list([{'text': 'hello world'}])
-        cfg = init_configs(args=f'--config {test_yaml_path}'.split())
+        args = f'--config {test_yaml_path} --dataset_path {self.temp_jsonl}'.split()
+        cfg = init_configs(args=args)
+        
         res = StatsKeys.get_access_log(cfg, dataset)
         self.assertEqual(len(res), 1)  # only 1 filter
         self.assertIn('language_id_score_filter', res)
