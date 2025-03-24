@@ -137,7 +137,7 @@ We have listed the detailed evaluation scripts in this folder, including the Qwe
 
 1. **Multimodal Evaluation**
 
-We selected four datasets: `MMMU`, `MMStar`, `MathVision`, and `MathVista`, to conduct comprehensive evaluations. The `--eval_backend`is set to `VLMEvalKit`. Except for `MMMU` (`./eval/qw25/mm-eval-2.sh`), where we evaluate only 500 samples, we conduct full evaluations on the other datasets (`./eval/qw25/mm-eval-1.sh`), resulting in two separate scripts. Note that the`OPENAI_API_KEY` can be used directly, but **remember to delete it when pushing to an anonymous repo**.
+We selected four datasets: `MMStar`, `MathVision`, and `MathVista`, to conduct comprehensive evaluations. The `--eval_backend`is set to `VLMEvalKit`. We conduct full evaluations on the other datasets (`./eval/qw25/mm-eval-1.sh`), resulting in two separate scripts. Note that the`OPENAI_API_KEY` can be used directly, but **remember to delete it when pushing to an anonymous repo**.
 
 2. **Text-based Evaluation**
 
