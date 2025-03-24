@@ -5,7 +5,7 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 \
 NPROC_PER_NODE=$nproc_per_node \
 swift sft \
     --model_type qwen2_5_vl \
-    --model /mnt/dj_data/xuz/MindGYM/models/Qwen2.5-VL-72B-Instruct \
+    --model model_path \
     --resume_from_checkpoint checkpoint_adapter_1_path \
     --resume_only_model \
     --dataset data_2_path \
