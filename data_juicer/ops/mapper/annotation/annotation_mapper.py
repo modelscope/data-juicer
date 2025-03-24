@@ -14,12 +14,30 @@ ANNOTATION_EVENTS = {
     'TASK_CREATED': 'task_created',
     'BATCH_CREATED': 'batch_created',
     'ANNOTATION_COMPLETED': 'annotation_completed',
+    'BATCH_ANNOTATION_COMPLETED': 'batch_annotation_completed',
     'ERROR_OCCURRED': 'error_occurred'
 }
 
 
 class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
-    """Base class for annotation operations with event-driven capabilities"""
+    """Base class for annotation operations with event-driven capabilities.
+
+    This class provides functionality for creating annotation tasks, waiting
+    for annotations to be completed, and handling notification events for
+    various stages of the annotation process.
+
+    It supports sending notifications with annotation platform URLs included,
+    making it easy for annotators to directly access the annotation interface
+    when they receive a notification. This is particularly useful for time-se-
+    -nsitive annotation tasks or for coordinating with remote annotation teams.
+
+    Notifications can be sent via email, Slack, or DingTalk, and can be
+    configured to trigger on various events such as task creation, batch
+    creation, annotation completion, and error conditions.
+
+    URL inclusion in notifications can be enabled or disabled using the
+    `include_urls_in_notifications` parameter.
+    """
 
     _batched_op = True  # Mark this as a batched operator
 
@@ -66,7 +84,8 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         self.notification_events = notification_events or {
             'task_created': False,
             'batch_created': True,
-            'annotation_completed': True,
+            'annotation_completed': False,
+            'batch_annotation_completed': True,
             'error_occurred': True
         }
 
@@ -88,6 +107,9 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                                     self._handle_batch_created)
         self.register_event_handler(ANNOTATION_EVENTS['ANNOTATION_COMPLETED'],
                                     self._handle_annotation_completed)
+        self.register_event_handler(
+            ANNOTATION_EVENTS['BATCH_ANNOTATION_COMPLETED'],
+            self._handle_batch_annotation_completed)
         self.register_event_handler(ANNOTATION_EVENTS['ERROR_OCCURRED'],
                                     self._handle_error)
 
@@ -117,9 +139,17 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
 
         # Send notification if configured
         if self.notification_events.get('batch_created', False):
-            self.send_notification(
+            # Build message with or without URL
+            message = (
                 f'Batch {batch_id} created with {task_count} tasks containing '
-                f'{sample_count} samples in project {self.project_name}',
+                f'{sample_count} samples in project {self.project_name}')
+
+            project_url = self._get_project_url()
+            if project_url:
+                message += f'\n\nAnnotation URL: {project_url}'
+
+            self.send_notification(
+                message,
                 subject=f'New Annotation Batch Created - {self.project_name}')
 
     def _handle_annotation_completed(self, data):
@@ -136,10 +166,39 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
         # Send notification if configured
         if self.notification_events.get('annotation_completed', False):
             sample_count = len(self.task_to_samples.get(task_id, []))
-            self.send_notification(
+
+            # Build message with or without URL
+            message = (
                 f'Annotation {annotation_id} completed for task {task_id} '
-                f'with {sample_count} samples in project {self.project_name}',
-                subject=f'Annotation Completed - {self.project_name}')
+                f'with {sample_count} samples in project {self.project_name}')
+
+            # Add URL if configured to include it
+            task_url = self._get_task_url(task_id)
+            if task_url:
+                message += f'\n\nTask URL: {task_url}'
+
+            self.send_notification(
+                message, subject=f'Annotation Completed - {self.project_name}')
+
+    def _handle_batch_annotation_completed(self, data):
+        """Handle batch annotation completed event with notification"""
+        batch_id = data.get('batch_id')
+        task_count = data.get('task_count', 0)
+        sample_count = data.get('sample_count', 0)
+
+        if self.notification_events.get('batch_annotation_completed', False):
+            # Build message with or without URL
+            message = (
+                f'Batch {batch_id} done with {task_count} tasks containing '
+                f'{sample_count} samples in project {self.project_name}')
+
+            project_url = self._get_project_url()
+            if project_url:
+                message += f'\n\nProject URL: {project_url}'
+
+            self.send_notification(
+                message,
+                subject=f'Batch Annotation Completed - {self.project_name}')
 
     def _handle_error(self, data):
         """Handle error event with notification"""
@@ -349,6 +408,15 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                             'batch_id':
                             batch_id
                         })
+
+            # Trigger batch created event
+            self.trigger_event(
+                ANNOTATION_EVENTS['BATCH_ANNOTATION_COMPLETED'], {
+                    'batch_id': batch_id,
+                    'task_count': len(task_ids),
+                    'sample_count': len(all_batch_sample_ids)
+                })
+
         except Exception as e:
             # Trigger error event
             self.trigger_event(
@@ -441,6 +509,25 @@ class BaseAnnotationMapper(EventDrivenMixin, NotificationMixin, Mapper, ABC):
                 f'Timed out waiting for {len(remaining_tasks)} annotations')
 
         return completed_tasks
+
+    def _get_project_url(self):
+        """Get URL to the annotation project (abstract method)
+
+        Returns:
+            str: URL to the annotation project, or None if not available
+        """
+        return None
+
+    def _get_task_url(self, task_id):
+        """Get URL to a specific annotation task (abstract method)
+
+        Args:
+            task_id: ID of the task
+
+        Returns:
+            str: URL to the task, or None if not available
+        """
+        return None
 
 
 class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
@@ -692,3 +779,44 @@ class LabelStudioAnnotationMapper(BaseAnnotationMapper, ABC):
                     self.project = self.client.get_project(self.project_id)
             except ImportError:
                 pass
+
+    def _get_project_url(self):
+        """Get URL to the Label Studio project
+
+        Returns:
+            str: URL to the Label Studio project, or None if not available
+        """
+        if not hasattr(self,
+                       'api_url') or not self.api_url or not self.project_id:
+            return None
+
+        # Remove trailing slash if present
+        base_url = self.api_url.rstrip('/')
+
+        # Label Studio web UI URL format (remove /api if present in the URL)
+        if '/api' in base_url:
+            base_url = base_url.replace('/api', '')
+
+        return f'{base_url}/projects/{self.project_id}'
+
+    def _get_task_url(self, task_id):
+        """Get URL to a specific Label Studio task
+
+        Args:
+            task_id: ID of the task
+
+        Returns:
+            str: URL to the task in Label Studio, or None if not available
+        """
+        if not hasattr(self,
+                       'api_url') or not self.api_url or not self.project_id:
+            return None
+
+        # Remove trailing slash if present
+        base_url = self.api_url.rstrip('/')
+
+        # Label Studio web UI URL format (remove /api if present in the URL)
+        if '/api' in base_url:
+            base_url = base_url.replace('/api', '')
+
+        return f'{base_url}/projects/{self.project_id}/data?task={task_id}'

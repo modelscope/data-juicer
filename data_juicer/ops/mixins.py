@@ -119,20 +119,170 @@ class NotificationMixin:
 
     This mixin provides functionality for sending notifications via email,
     Slack, DingTalk, and other platforms.
+
+    Notification configuration can be specified as a "notification_config"
+    parameter within an operator (for backward compatibility):
+    ```yaml
+    process:
+      - some_mapper:
+          notification_config:
+            enabled: true
+            email:
+              # ... email settings ...
+    ```
+
+    For security best practices, sensitive information like passwords and
+    tokens should be provided via environment variables:
+
+    - Email: set 'DATA_JUICER_EMAIL_PASSWORD' environment variable
+      or service-specific 'DATA_JUICER_SMTP_SERVER_NAME_PASSWORD'
+    - Slack: set 'DATA_JUICER_SLACK_WEBHOOK' environment variable
+    - DingTalk: set 'DATA_JUICER_DINGTALK_TOKEN' and
+      'DATA_JUICER_DINGTALK_SECRET' environment variables
+
+    For even more secure email authentication, you can use TLS client
+    certificates instead of passwords:
+
+    1. Generate a client certificate and key (example using OpenSSL):
+       ```bash
+       # Generate a private key
+       openssl genrsa -out client.key 2048
+
+       # Generate a certificate signing request (CSR)
+       openssl req -new -key client.key -out client.csr
+
+       # Generate a self-signed certificate
+       openssl x509 -req -days 365 -in client.csr -signkey client.key
+            -out client.crt
+       ```
+
+    2. Configure your SMTP server to accept this client certificate for
+        authentication
+
+    3. Configure Data Juicer to use certificate authentication:
+       ```yaml
+       notification:
+         enabled: true
+         email:
+           use_cert_auth: true
+           client_cert_file: "/path/to/client.crt"
+           client_key_file: "/path/to/client.key"
+           smtp_server: "smtp.example.com"
+           smtp_port: 587
+           sender_email: "notifications@example.com"
+           recipients: ["recipient@example.com"]
+       ```
+
+    4. Or use environment variables:
+       ```bash
+       export DATA_JUICER_EMAIL_CERT="/path/to/client.crt"
+       export DATA_JUICER_EMAIL_KEY="/path/to/client.key"
+       ```
+
+    For maximum connection security, you can use a direct SSL connection
+    instead of STARTTLS by enabling the 'use_ssl' option:
+
+    ```yaml
+    notification:
+      enabled: true
+      email:
+        use_ssl: true
+        smtp_port: 465  # Common port for SMTP over SSL
+        # ... other email configuration ...
+    ```
+
+    This establishes an encrypted connection from the beginning, rather than
+     starting with an unencrypted connection and upgrading to TLS as with
+     STARTTLS. Note that this option can be combined with certificate
+     authentication for maximum security.
+
+    The email notification system supports various email server configurations
+      through a flexible configuration system. Here are some examples for
+      different servers:
+
+    Standard SMTP with STARTTLS:
+    ```yaml
+    notification:
+      enabled: true
+      email:
+        smtp_server: "smtp.example.com"
+        smtp_port: 587
+        username: "your.username@example.com"
+        sender_email: "your.username@example.com"
+        sender_name: "Your Name"  # Optional
+        recipients: ["recipient1@example.com", "recipient2@example.com"]
+    ```
+
+    Direct SSL Connection (e.g., Gmail):
+    ```yaml
+    notification:
+      enabled: true
+      email:
+        smtp_server: "smtp.gmail.com"
+        smtp_port: 465
+        use_ssl: true
+        username: "your.username@gmail.com"
+        sender_email: "your.username@gmail.com"
+        sender_name: "Your Name"
+        recipients: ["recipient1@example.com", "recipient2@example.com"]
+    ```
+
+    Alibaba Email Server:
+    ```yaml
+    notification:
+      enabled: true
+      email:
+        smtp_server: "smtp.alibaba-inc.com"
+        smtp_port: 465
+        username: "your.username@alibaba-inc.com"
+        sender_email: "your.username@alibaba-inc.com"
+        sender_name: "Your Name"
+        recipient_separator: ";"       # Use semicolons to separate recipients
+        recipients: ["recipient1@example.com", "recipient2@example.com"]
+    ```
+
+    Environment variable usage examples:
+    ```bash
+    # General email password
+    export DATA_JUICER_EMAIL_PASSWORD="your_email_password"
+
+    # Server-specific passwords (preferred for clarity)
+    export DATA_JUICER_SMTP_GMAIL_COM_PASSWORD="your_gmail_password"
+    export DATA_JUICER_SMTP_ALIBABA_INC_COM_PASSWORD="your_alibaba_password"
+
+    # Slack webhook
+    export DATA_JUICER_SLACK_WEBHOOK="your_slack_webhook_url"
+
+    # DingTalk credentials
+    export DATA_JUICER_DINGTALK_TOKEN="your_dingtalk_token"
+    export DATA_JUICER_DINGTALK_SECRET="your_dingtalk_secret"
+    ```
+
+    If environment variables are not set, the system will fall back to using
+    values from the configuration file, but this is less secure and not
+    recommended for production environments.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        # Get notification configuration directly from kwargs
         self.notification_config = kwargs.get('notification_config', {})
+
+        # Initialize notification handlers if configured
+        self.notification_handlers = {
+            'email': self._send_email_notification,
+            'slack': self._send_slack_notification,
+            'dingtalk': self._send_dingtalk_notification,
+        }
+
+        # Check if notifications are enabled for this operator
         if self.notification_config.get('enabled', False):
-            self.notification_handlers = {
-                'email': self._send_email_notification,
-                'slack': self._send_slack_notification,
-                'dingtalk': self._send_dingtalk_notification,
-            }
+            logger.info(
+                f'Notification is enabled for {self.__class__.__name__}')
         else:
-            self.notification_handlers = {}
-            logger.warning('Notification is disabled')
+            logger.debug(
+                f'Notification is disabled for {self.__class__.__name__}')
 
     def send_notification(self,
                           message: str,
@@ -144,8 +294,10 @@ class NotificationMixin:
             message: The message to send
             notification_type: The type of notification to send.
                                 Email, Slack, DingTalk.
-                                If None, disable all notifications
+                                If None, send nothing
             **kwargs: Additional arguments to pass to the notification handler
+                      These can override any configuration settings for this
+                      specific notification
 
         Returns:
             bool: True if the notification was sent successfully, else False
@@ -153,7 +305,9 @@ class NotificationMixin:
         # Check if notifications are enabled
         if not hasattr(self, 'notification_config'
                        ) or not self.notification_config.get('enabled', False):
-            # Notifications are disabled, return success without sending
+            # Notifications are disabled, log and return
+            logger.debug(f'Not sending notification: disabled for '
+                         f'{self.__class__.__name__}')
             return True
 
         # Check if notification handlers are initialized
@@ -161,20 +315,46 @@ class NotificationMixin:
             logger.error('Notification handlers not initialized')
             return False
 
-        if notification_type is None:
-            # Send to all configured notification types
-            success = True
-            for ntype in self.notification_config.keys():
-                if ntype != 'enabled' and ntype in self.notification_handlers:
-                    success = success and self.notification_handlers[ntype](
-                        message, **kwargs)
-            return success
-        elif notification_type in self.notification_handlers:
-            return self.notification_handlers[notification_type](message,
-                                                                 **kwargs)
-        else:
-            logger.error(f'Unsupported notification type: {notification_type}')
-            return False
+        # Apply any temporary overrides for this specific notification
+        temp_config = self.notification_config.copy() if hasattr(
+            self, 'notification_config') else {}
+
+        # Process the specific notification overrides from kwargs
+        for key, value in kwargs.items():
+            if key in temp_config and isinstance(
+                    temp_config[key], dict) and isinstance(value, dict):
+                # For dict values (like email settings), merge them
+                temp_config[key].update(value)
+            else:
+                # For other values, just replace them
+                temp_config[key] = value
+
+        # Store the original config and set the temporary one
+        original_config = self.notification_config
+        self.notification_config = temp_config
+
+        try:
+            if notification_type is None:
+                logger.info('No notification type specified, ignoring... ')
+            elif notification_type in self.notification_handlers:
+                # Check if this specific channel is enabled
+                channel_config = self.notification_config.get(
+                    notification_type, {})
+                if isinstance(channel_config, dict) and not channel_config.get(
+                        'enabled', True):
+                    logger.debug(
+                        f'Not sending {notification_type} notification: '
+                        f'channel disabled')
+                    return True
+                return self.notification_handlers[notification_type](message,
+                                                                     **kwargs)
+            else:
+                logger.error(
+                    f'Unsupported notification type: {notification_type}')
+                return False
+        finally:
+            # Restore the original configuration
+            self.notification_config = original_config
 
     def _send_email_notification(self, message: str, **kwargs):
         """Send an email notification.
@@ -188,47 +368,177 @@ class NotificationMixin:
             bool: Whether the email was sent successfully
         """
         try:
+            import os
             import smtplib
-            from email.mime.multipart import MIMEMultipart
+            import ssl
             from email.mime.text import MIMEText
 
             config = self.notification_config.get('email', {})
 
-            # Override config with kwargs if provided
+            # Get email configuration settings with priority order:
+            # 1. kwargs (passed directly to the method)
+            # 2. config (from notification_config)
+            # 3. default values (Alibaba-specific defaults)
+
+            # SMTP server configuration
             smtp_server = kwargs.get('smtp_server', config.get('smtp_server'))
-            smtp_port = kwargs.get('smtp_port', config.get('smtp_port', 587))
+            smtp_port = kwargs.get('smtp_port',
+                                   config.get('smtp_port',
+                                              465))  # Default to 465 (SSL)
+            use_ssl = kwargs.get('use_ssl', config.get('use_ssl',
+                                                       True))  # Default to SSL
+
+            # Some more defaults
+            include_port_in_address = kwargs.get(
+                'include_port_in_address',
+                config.get('include_port_in_address', True))
+            recipient_separator = kwargs.get('recipient_separator',
+                                             config.get(
+                                                 'recipient_separator',
+                                                 ';'))  # Default to semicolon
+            message_encoding = kwargs.get(
+                'message_encoding', config.get('message_encoding', 'utf-8'))
+
+            # Authentication method
+            use_cert_auth = kwargs.get('use_cert_auth',
+                                       config.get('use_cert_auth', False))
+
+            # Sender information
             sender_email = kwargs.get('sender_email',
                                       config.get('sender_email'))
-            sender_password = kwargs.get('sender_password',
-                                         config.get('sender_password'))
+            sender_name = kwargs.get('sender_name',
+                                     config.get('sender_name', ''))
+
+            # Format sender with name if provided
+            formatted_sender = sender_email
+            if (sender_name and sender_name != ''
+                    and '<' not in formatted_sender):
+                formatted_sender = f'{sender_name}<{sender_email}>'
+
+            # Authentication credentials
+            username = kwargs.get('username',
+                                  config.get('username', sender_email))
+
+            # Recipients and subject
             recipients = kwargs.get('recipients', config.get('recipients', []))
             subject = kwargs.get(
                 'subject',
                 config.get('subject', 'Notification from Data Juicer'))
 
-            if (not smtp_server or not sender_email or not sender_password
-                    or not recipients):
-                import logging
-                logging.error('Missing required email configuration')
+            # Try to get password from environment var first (most secure)
+            # Check for service-specific env vars first, then fall back to
+            # generic one
+            password = None
+            env_password_keys = [
+                f"DATA_JUICER_{smtp_server.upper().replace('.', '_')}_PASSWORD",  # noqa: E501
+                'DATA_JUICER_EMAIL_PASSWORD'
+            ]
+
+            for env_key in env_password_keys:
+                if os.environ.get(env_key):
+                    password = os.environ.get(env_key)
+                    break
+
+            # Fall back to config if no environment variable is set
+            if not password:
+                logger.warning('Email password environment variables not set. '
+                               f'Tried: {", ".join(env_password_keys)}. '
+                               'Falling back to configuration. Consider using '
+                               'environmentvariables for better security.')
+                password = kwargs.get('password', config.get('password'))
+
+            # Certificate authentication settings
+            client_cert_file = os.environ.get('DATA_JUICER_EMAIL_CERT')
+            client_key_file = os.environ.get('DATA_JUICER_EMAIL_KEY')
+
+            # Fall back to config if environment variables not set
+            if not client_cert_file:
+                client_cert_file = kwargs.get('client_cert_file',
+                                              config.get('client_cert_file'))
+            if not client_key_file:
+                client_key_file = kwargs.get('client_key_file',
+                                             config.get('client_key_file'))
+
+            # Validate required parameters
+            if not smtp_server or not recipients:
+                logger.error(
+                    'Missing required email configuration (server/recipients)')
                 return False
 
-            # Create message
-            msg = MIMEMultipart()
-            msg['From'] = sender_email
-            msg['To'] = ', '.join(recipients)
-            msg['Subject'] = subject
-            msg.attach(MIMEText(message, 'plain'))
+            if not use_cert_auth and not (username and password):
+                logger.error(
+                    'Missing credentials for password-based authentication')
+                return False
 
-            # Send email
-            with smtplib.SMTP(smtp_server, smtp_port) as server:
-                server.starttls()
-                server.login(sender_email, sender_password)
-                server.send_message(msg)
+            if use_cert_auth and (not client_cert_file or not client_key_file):
+                logger.error(
+                    'Missing client certificate or key for authentication')
+                return False
+
+            # Create SSL context for certificate authentication if needed
+            context = None
+            if use_cert_auth and client_cert_file and client_key_file:
+                logger.info(
+                    'Using TLS client certificate authentication for email')
+                context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+                context.load_cert_chain(certfile=client_cert_file,
+                                        keyfile=client_key_file)
+
+            # Create email message
+            msg = MIMEText(message, 'plain', message_encoding)
+            msg['From'] = formatted_sender
+            msg['To'] = recipient_separator.join(recipients)
+            msg['Subject'] = subject
+
+            # Determine connection type and send message
+            # Port 465 is typically for SMTP over SSL
+            if use_ssl or smtp_port == 465:
+                logger.info(
+                    f'Using direct SSL connection to {smtp_server}:{smtp_port}'
+                )
+
+                # Handle different connection string formats
+                server_address = smtp_server
+                if include_port_in_address:
+                    server_address = f'{smtp_server}:{smtp_port}'
+
+                # Use the SSL context if certificate authentication is enabled
+                if context:
+                    with smtplib.SMTP_SSL(
+                            server_address,
+                            smtp_port if not include_port_in_address else None,
+                            context=context) as server:
+                        # No login needed with client certificates
+                        server.send_message(msg)
+                else:
+                    # Standard SSL connection with password
+                    with smtplib.SMTP_SSL(
+                            server_address, smtp_port if
+                            not include_port_in_address else None) as server:
+                        server.login(username, password)
+                        server.sendmail(formatted_sender, recipients,
+                                        msg.as_string())
+            else:
+                # Standard connection with STARTTLS upgrade
+                logger.info(
+                    f'Using STARTTLS connection to {smtp_server}:{smtp_port}')
+
+                if use_cert_auth and client_cert_file and client_key_file:
+                    # Connect with certificate authentication
+                    with smtplib.SMTP(smtp_server, smtp_port) as server:
+                        server.starttls(context=context)
+                        # No login needed with client certificates
+                        server.send_message(msg)
+                else:
+                    # Connect with password authentication
+                    with smtplib.SMTP(smtp_server, smtp_port) as server:
+                        server.starttls()
+                        server.login(username, password)
+                        server.send_message(msg)
 
             return True
         except Exception as e:
-            import logging
-            logging.error(f'Failed to send email notification: {e}')
+            logger.error(f'Failed to send email notification: {e}')
             return False
 
     def _send_slack_notification(self, message: str, **kwargs):
