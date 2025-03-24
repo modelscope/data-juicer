@@ -4,6 +4,6 @@ CUDA_VISIBLE_DEVICES=2 swift eval \
   --ckpt_dir checkpoint_path \
   --port 8003 \
   --infer_backend pt \
-  --eval_dataset aime24 gsm8k math_500 trivia_qa \
+  --eval_dataset gsm8k math_500 \
   --eval_backend Native \
   --eval_num_proc 1
