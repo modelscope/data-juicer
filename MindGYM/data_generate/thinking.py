@@ -44,7 +44,7 @@ class DataDeduplicator:
         :param similarity_threshold: similarity threshold (0-1), if exceeded, it will be considered as a duplicate
         """
         self.vectorizer = TfidfVectorizer(stop_words='english')
-        self.existing_docs = []  # 存储已有文档
+        self.existing_docs = []
         self.threshold = similarity_threshold
         
     def calculate_similarity(self, new_doc):
