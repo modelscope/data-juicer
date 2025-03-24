@@ -141,7 +141,7 @@ We selected four datasets: `MMMU`, `MMStar`, `MathVision`, and `MathVista`, to c
 
 2. **Text-based Evaluation**
 
-We selected `AIME24`, `GSM8K`, `MATH`, `TriviaQA`, and `GPQA` for comprehensive evaluation. The `--eval_backend` is set to `Native`. Similarly, except for `GPQA` (`./eval/qw25/text-eval-2.sh`), where we set a limit of 300 due to time constraints, we conduct full evaluations on the other datasets (`./eval/qw25/text-eval-1.sh`), resulting in two separate scripts.
+We selected `GSM8K`, `MATH`, and `GPQA` for comprehensive evaluation. The `--eval_backend` is set to `Native`. Similarly, except for `GPQA` (`./eval/qw25/text-eval-2.sh`), where we set a limit of 300 due to time constraints, we conduct full evaluations on the other datasets (`./eval/qw25/text-eval-1.sh`), resulting in two separate scripts.
 
 (To avoid repetitive operations, can we ignore the time constraints and perform a full evaluation? It would take an additional 2-3 hours approximately.)
 
