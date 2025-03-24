@@ -31,7 +31,7 @@ dill==0.3.4
 psutil
 pydantic>=2.0
 Pillow
-fastapi[standard]>=0.100
+fastapi[standard]>=0.110
 httpx
 wordcloud
 jsonlines

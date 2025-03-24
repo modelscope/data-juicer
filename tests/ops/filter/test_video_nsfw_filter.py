@@ -59,7 +59,7 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.1,
+                            max_score=0.1,
                             frame_sampling_method='all_keyframes')
         self._run_filter(dataset, tgt_list, op)
 
@@ -81,7 +81,7 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.1,
+                            max_score=0.1,
                             frame_sampling_method='uniform',
                             frame_num=3)
         self._run_filter(dataset, tgt_list, op)
@@ -104,7 +104,7 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.9,
+                            max_score=0.9,
                             frame_sampling_method='all_keyframes',
                             reduce_mode='max')
         self._run_filter(dataset, tgt_list, op)
@@ -127,7 +127,7 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.0004,
+                            max_score=0.0004,
                             frame_sampling_method='all_keyframes',
                             reduce_mode='min')
         self._run_filter(dataset, tgt_list, op)
@@ -145,7 +145,7 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.01,
+                            max_score=0.01,
                             frame_sampling_method='all_keyframes',
                             any_or_all='any')
         self._run_filter(dataset, tgt_list, op)    
@@ -163,7 +163,7 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.1,
+                            max_score=0.1,
                             frame_sampling_method='all_keyframes',
                             any_or_all='all')
         self._run_filter(dataset, tgt_list, op)   
@@ -191,7 +191,7 @@ class VideoNSFWFilterTest(DataJuicerTestCaseBase):
 
         dataset = Dataset.from_list(ds_list)
         op = VideoNSFWFilter(hf_nsfw_model=self.hf_nsfw_model,
-                            score_threshold=0.1,
+                            max_score=0.1,
                             frame_sampling_method='all_keyframes')
         self._run_filter(dataset, tgt_list, op, num_proc=num_proc)
 
