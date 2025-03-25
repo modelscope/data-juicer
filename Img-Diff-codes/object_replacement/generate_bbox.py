@@ -144,9 +144,9 @@ def compare_text_index(text1, text2):
 
     for line in diff:
         if line.startswith('+'):
-            text1_split.append(lemmatizer.lemmatize(line.replace("+ ", "")))
+            text2_split.append(lemmatizer.lemmatize(line.replace("+ ", "")))
         elif line.startswith('-'):
-            text2_split.append(lemmatizer.lemmatize(line.replace("- ", "")))
+            text1_split.append(lemmatizer.lemmatize(line.replace("- ", "")))
 
     text1 = []
     text2 = []
