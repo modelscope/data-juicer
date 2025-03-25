@@ -1,3 +1,5 @@
+from .annotation.human_preference_annotation_mapper import \
+    HumanPreferenceAnnotationMapper
 from .audio_add_gaussian_noise_mapper import AudioAddGaussianNoiseMapper
 from .audio_ffmpeg_wrapped_mapper import AudioFFmpegWrappedMapper
 from .calibrate_qa_mapper import CalibrateQAMapper
@@ -92,8 +94,9 @@ __all__ = [
     'ExtractKeywordMapper', 'ExtractNicknameMapper',
     'ExtractSupportTextMapper', 'FixUnicodeMapper',
     'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
-    'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
-    'ImageCaptioningMapper', 'ImageDiffusionMapper', 'ImageFaceBlurMapper',
+    'HumanPreferenceAnnotationMapper', 'ImageBlurMapper',
+    'ImageCaptioningFromGPT4VMapper', 'ImageCaptioningMapper',
+    'ImageDiffusionMapper', 'ImageFaceBlurMapper',
     'ImageRemoveBackgroundMapper', 'ImageSegmentMapper', 'ImageTaggingMapper',
     'MllmMapper', 'NlpaugEnMapper', 'NlpcdaZhMapper', 'OptimizeQAMapper',
     'OptimizeQueryMapper', 'OptimizeResponseMapper', 'PairPreferenceMapper',
