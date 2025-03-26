@@ -87,7 +87,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnWiseAnalysis</span><span class="p">,</span> <span class="n">OverallAnalysis</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">init_configs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.format</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_formatter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data.dataset_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetBuilder</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">NON_STATS_FILTERS</span><span class="p">,</span> <span class="n">TAGGING_OPS</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">load_ops</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.op_fusion</span><span class="w"> </span><span class="kn">import</span> <span class="n">fuse_operators</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache_utils</span>
@@ -127,14 +127,9 @@
                         <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">cache_compress</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
             <span class="n">cache_utils</span><span class="o">.</span><span class="n">CACHE_COMPRESS</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">cache_compress</span>
 
-        <span class="c1"># setup formatter</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Setting up data formatter...&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span> <span class="o">=</span> <span class="n">load_formatter</span><span class="p">(</span>
-            <span class="n">dataset_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">,</span>
-            <span class="n">generated_dataset_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">generated_dataset_config</span><span class="p">,</span>
-            <span class="n">text_keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">text_keys</span><span class="p">,</span>
-            <span class="n">suffixes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">suffixes</span><span class="p">,</span>
-            <span class="n">add_suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">add_suffix</span><span class="p">)</span>
+        <span class="c1"># setup dataset builder</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Setting up dataset builder...&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_builder</span> <span class="o">=</span> <span class="n">DatasetBuilder</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">executor_type</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
 
         <span class="c1"># prepare exporter and check export path suffix</span>
         <span class="c1"># NOTICE: no need to export dataset texts for analyzer</span>
@@ -177,7 +172,7 @@
             <span class="n">load_data_np</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">np</span>
         <span class="k">if</span> <span class="n">dataset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading dataset from data formatter...&#39;</span><span class="p">)</span>
-            <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">load_data_np</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_builder</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">num_proc</span><span class="o">=</span><span class="n">load_data_np</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using existing dataset </span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">auto</span><span class="p">:</span>

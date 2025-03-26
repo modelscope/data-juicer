@@ -184,12 +184,25 @@
         <span class="s1">&#39;default. Accepted format:&lt;w1&gt; dataset1-path &lt;w2&gt; dataset2-path &#39;</span>
         <span class="s1">&#39;&lt;w3&gt; dataset3-path ...&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--dataset&#39;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">Dict</span><span class="p">],</span>
+        <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Dataset setting to define local/remote datasets; could be a &#39;</span>
+        <span class="s1">&#39;dict or a list of dicts; refer to configs/datasets for more &#39;</span>
+        <span class="s1">&#39;detailed examples&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;--generated_dataset_config&#39;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="n">Dict</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Configuration used to create a dataset. &#39;</span>
         <span class="s1">&#39;The dataset will be created from this configuration if provided. &#39;</span>
         <span class="s1">&#39;It must contain the `type` field to specify the dataset name.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s1">&#39;--validators&#39;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span>
+        <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;List of validators to apply to the dataset. Each validator &#39;</span>
+        <span class="s1">&#39;must have a `type` field specifying the validator type.&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s1">&#39;--export_path&#39;</span><span class="p">,</span>
         <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
@@ -534,19 +547,22 @@
 
     <span class="c1"># check and get dataset dir</span>
     <span class="k">if</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dataset_path&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;dataset_path config is set and a valid local path&#39;</span><span class="p">)</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">):</span>
             <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_dir</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;dataset_path is empty by default.&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;dataset&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;dataset_path config is empty; dataset is present&#39;</span><span class="p">)</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_dir</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;dataset_path [</span><span class="si">{</span><span class="n">cfg</span><span class="o">.</span><span class="n">dataset_path</span><span class="si">}</span><span class="s1">] is not a valid &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;local path. Please check and retry, otherwise we &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;will treat it as a remote dataset or a mixture of &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;several datasets.&#39;</span><span class="p">)</span>
+                       <span class="sa">f</span><span class="s1">&#39;local path, AND dataset is not present. &#39;</span>
+                       <span class="sa">f</span><span class="s1">&#39;Please check and retry, otherwise we &#39;</span>
+                       <span class="sa">f</span><span class="s1">&#39;will treat dataset_path as a remote dataset or a &#39;</span>
+                       <span class="sa">f</span><span class="s1">&#39;mixture of several datasets.&#39;</span><span class="p">)</span>
+
         <span class="n">cfg</span><span class="o">.</span><span class="n">dataset_dir</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
     <span class="c1"># check number of processes np</span>
@@ -1003,6 +1019,36 @@
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
     <span class="n">inited_dj_cfg</span> <span class="o">=</span> <span class="n">init_configs</span><span class="p">([</span><span class="s1">&#39;--config&#39;</span><span class="p">,</span> <span class="n">temp_file</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">inited_dj_cfg</span></div>
+
+
+
+<div class="viewcode-block" id="get_default_cfg">
+<a class="viewcode-back" href="../../../data_juicer.config.html#data_juicer.config.get_default_cfg">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_default_cfg</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get default config values from config_all.yaml&quot;&quot;&quot;</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">Namespace</span><span class="p">()</span>
+
+    <span class="c1"># Get path to config_all.yaml</span>
+    <span class="n">config_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">default_config_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config_dir</span><span class="p">,</span>
+                                       <span class="s1">&#39;../../configs/config_min.yaml&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Load default values from yaml</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">default_config_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">defaults</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="c1"># Convert to flat dictionary for namespace</span>
+    <span class="n">flat_defaults</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="c1"># Add other top-level keys from config_min.yaml</span>
+        <span class="o">**</span><span class="n">defaults</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Update cfg with defaults</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">flat_defaults</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">cfg</span></div>
 
 </pre></div>
 

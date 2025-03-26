@@ -631,7 +631,8 @@
 
 <div class="viewcode-block" id="RayBTSMinhashDeduplicator.run">
 <a class="viewcode-back" href="../../../../data_juicer.ops.deduplicator.html#data_juicer.ops.deduplicator.RayBTSMinhashDeduplicator.run">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Ignore additional parameters like exporter, tracer, etc.</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">id_generator</span> <span class="o">=</span> <span class="n">IdGenerator</span><span class="o">.</span><span class="n">remote</span><span class="p">()</span>
 
