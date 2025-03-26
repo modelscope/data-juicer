@@ -19,8 +19,8 @@ From Modelscope: \
 [Qwen2.5-VL-7B](https://modelscope.cn/models/Qwen/Qwen2.5-VL-7B-Instruct)
 
 We used _**Qwen2.5-VL-7B**_ to generate the data and corresponding model checkpoints, which can be obtained from the following link: \
-[MindGYM-data](https://modelscope.cn/datasets/xuzh226/MindGYM)
-[MindGYM-checkpoints-text](https://modelscope.cn/models/xuzh226/MindGYM-Qwen-7B)
+[MindGYM-data](https://modelscope.cn/datasets/xuzh226/MindGYM) \
+[MindGYM-checkpoints-text](https://modelscope.cn/models/xuzh226/MindGYM-Qwen-7B) \
 [MindGYM-checkpoints-ScienceQA](https://modelscope.cn/models/xuzh226/MindGYM-Qwen-7B-ScienceQA)
 
 ## Step 0. Installation
