@@ -1,16 +1,18 @@
 import os
 import shutil
 import time
+from typing import Optional
 
 import ray
+from jsonargparse import Namespace
 from loguru import logger
+from pydantic import PositiveInt
 
-from data_juicer.config import init_configs
-from data_juicer.core.ray_data import RayDataset
+from data_juicer.core.adapter import Adapter
+from data_juicer.core.data.dataset_builder import DatasetBuilder
+from data_juicer.core.executor import ExecutorBase
 from data_juicer.ops import load_ops
 from data_juicer.ops.op_fusion import fuse_operators
-
-from .adapter import Adapter
 
 
 class TempDirManager:
@@ -28,7 +30,7 @@ class TempDirManager:
             shutil.rmtree(self.tmp_dir)
 
 
-class RayExecutor:
+class RayExecutor(ExecutorBase):
     """
     Executor based on Ray.
 
@@ -40,47 +42,42 @@ class RayExecutor:
 
     """
 
-    def __init__(self, cfg=None):
+    def __init__(self, cfg: Optional[Namespace] = None):
         """
         Initialization method.
 
         :param cfg: optional config dict.
         """
-        self.cfg = init_configs() if cfg is None else cfg
-
+        super().__init__(cfg)
+        self.executor_type = 'ray'
         self.work_dir = self.cfg.work_dir
-
         self.adapter = Adapter(self.cfg)
 
         # init ray
-        logger.info('Initing Ray ...')
+        logger.info('Initializing Ray ...')
         ray.init(self.cfg.ray_address)
         self.tmp_dir = os.path.join(self.work_dir, '.tmp',
                                     ray.get_runtime_context().get_job_id())
 
-    def run(self, load_data_np=None):
+        # absolute path resolution logic
+
+        # init dataset builder
+        self.datasetbuilder = DatasetBuilder(self.cfg, executor_type='ray')
+
+    def run(self,
+            load_data_np: Optional[PositiveInt] = None,
+            skip_return=False):
         """
-        Running the dataset process pipeline.
+        Running the dataset process pipeline
 
         :param load_data_np: number of workers when loading the dataset.
+        :param skip_return: skip return for API called.
         :return: processed dataset.
         """
         # 1. load data
         logger.info('Loading dataset with Ray...')
+        dataset = self.datasetbuilder.load_dataset(num_proc=load_data_np)
 
-        if self.cfg.get('generated_dataset_config', None):
-            generated_dataset_config = self.cfg.generated_dataset_config
-            assert isinstance(generated_dataset_config,
-                              dict) and 'type' in generated_dataset_config
-            args = generated_dataset_config.copy()
-            obj_name = args.pop('type')
-            from data_juicer.format.formatter import FORMATTERS
-            dataset = FORMATTERS.modules[obj_name](**args).load_dataset()
-        else:
-            dataset = RayDataset.read_json(self.cfg.dataset_path)
-
-        # convert all the path in dataset to absolute path
-        dataset = RayDataset(dataset, self.cfg.dataset_path, self.cfg)
         # 2. extract processes
         logger.info('Preparing process operators...')
         ops = load_ops(self.cfg.process)
@@ -106,4 +103,6 @@ class RayExecutor:
             dataset.data.write_json(self.cfg.export_path, force_ascii=False)
             tend = time.time()
             logger.info(f'All Ops are done in {tend - tstart:.3f}s.')
-        return dataset
+
+        if not skip_return:
+            return dataset

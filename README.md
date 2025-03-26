@@ -76,6 +76,36 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 Table of Contents
 =================
 
+- [Data Processing for and with Foundation Models](#data-processing-for-and-with-foundation-models)
+  - [News](#news)
+- [Table of Contents](#table-of-contents)
+  - [Why Data-Juicer?](#why-data-juicer)
+  - [DJ-Cookbook](#dj-cookbook)
+    - [Curated Resources](#curated-resources)
+    - [Coding with Data-Juicer (DJ)](#coding-with-data-juicer-dj)
+    - [Use Cases \& Data Recipes](#use-cases--data-recipes)
+    - [Interactive Examples](#interactive-examples)
+  - [Installation](#installation)
+    - [Prerequisites](#prerequisites)
+    - [From Source](#from-source)
+    - [Using pip](#using-pip)
+    - [Using Docker](#using-docker)
+    - [Installation check](#installation-check)
+    - [For Video-related Operators](#for-video-related-operators)
+  - [Quick Start](#quick-start)
+    - [Dataset configuration](#dataset-configuration)
+    - [Data Processing](#data-processing)
+    - [Distributed Data Processing](#distributed-data-processing)
+    - [Data Analysis](#data-analysis)
+    - [Data Visualization](#data-visualization)
+    - [Build Up Config Files](#build-up-config-files)
+    - [Sandbox](#sandbox)
+    - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
+    - [For Docker Users](#for-docker-users)
+  - [License](#license)
+  - [Contributing](#contributing)
+  - [Acknowledgement](#acknowledgement)
+  - [References](#references)
 - [News](#news)
 - [Why Data-Juicer?](#why-data-juicer)
 - [DJ-Cookbook](#dj-cookbook)
@@ -296,6 +326,26 @@ Check if your environment path is set correctly by running the ffmpeg command fr
 
 
 ## Quick Start
+
+### Dataset Configuration
+
+DJ supports various dataset input types, including local files, remote datasets like huggingface; it also supports data validation and data mixture.
+
+Two ways to configure a input file
+- legacy way 
+```yaml
+dataset_path: '/path/to/your/dataset'  # path to your dataset directory or file
+```
+- updated way
+```yaml
+dataset:
+  configs:
+    - type: 'local'
+      path: 'path/to/your/dataset' # path to your dataset directory or file
+```
+
+Refer to [Dataset Configuration Guide](data_juicer/core/data/README.md) for more details.
+
 
 
 ### Data Processing

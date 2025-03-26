@@ -6,6 +6,26 @@
 project_name: 'all'                                         # project name for distinguish your configs
 dataset_path: '/path/to/your/dataset'                       # path to your dataset directory or file with weights(0.0-1.0), 1.0 as default.
                                                             # accepted format: 'weight1(optional) dataset1-path weight2(optional) dataset2-path'
+
+dataset:                                                    # dataset is another way to specify the input dataset.
+  max_sample_num: 10000                                     # max sample number to load from the dataset configs.
+  configs:                                                  # configs is a list of dataset configs, which can be mixtured per weight and max_sample_num
+    - type: 'local'                                         # type of dataset, support 'local', 'hf', 'modelscope', etc
+      weight: 0.5                                           # weight of the dataset, 1.0 as default.
+      path: '/path/to/json/file'                            # path to the dataset file; could be a single file or a directory containing multiple files
+    - type: 'local'                                         # consult configs/datasets for more details
+      weight: 0.5                                           # weight of the dataset, 1.0 as default.
+      path: '/path/to/csv/file'
+
+validators:                                                 # validators are a list of validators to be applied when loading a dataset
+                                                            # it checks a sample of the dataset for each validator
+                                                            # check data_juicer/ore/data/data_validator.py for more validator options
+  - type: 'required_fields'                                 # required_fields is a validator to check the required fields in the dataset.
+    required_fields:                                          # required_fields is a list of required fields.
+      - "text"
+    field_types:                                              # field_types is a dictionary of field types.
+      text: 'str'
+
 export_path: '/path/to/result/dataset.jsonl'                # path to processed result dataset. Supported suffixes include ['jsonl', 'json', 'parquet']
 export_shard_size: 0                                        # shard size of exported dataset in Byte. In default, it's 0, which means export the whole dataset into only one file. If it's set a positive number, the exported dataset will be split into several dataset shards, and the max size of each shard won't larger than the export_shard_size
 export_in_parallel: false                                   # whether to export the result dataset in parallel to a single file, which usually takes less time. It only works when export_shard_size is 0, and its default number of processes is the same as the argument np. **Notice**: If it's True, sometimes exporting in parallel might require much more time due to the IO blocking, especially for very large datasets. When this happens, False is a better choice, although it takes more time.

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from argparse import Namespace
 from functools import partial
 from typing import Any, Dict, List, Literal, Optional, Union
 
@@ -11,6 +12,7 @@ from loguru import logger
 
 from data_juicer import cuda_device_count
 from data_juicer.core.data import DJDataset
+from data_juicer.core.data.schema import Schema
 from data_juicer.ops import Deduplicator, Filter, Mapper
 from data_juicer.ops.base_op import TAGGING_OPS
 from data_juicer.utils.constant import Fields
@@ -52,6 +54,7 @@ def set_dataset_to_absolute_path(dataset, dataset_path, cfg):
             path_keys.append(key)
     if len(path_keys) > 0:
         dataset_dir = os.path.dirname(dataset_path)
+        logger.error(f'dataset_dir: {dataset_dir}')
         dataset = dataset.map_batches(partial(convert_to_absolute_paths,
                                               dataset_dir=dataset_dir,
                                               path_keys=path_keys),
@@ -83,11 +86,68 @@ class RayDataset(DJDataset):
     def __init__(self,
                  dataset: rd.Dataset,
                  dataset_path: str = None,
-                 cfg=None) -> None:
+                 cfg: Optional[Namespace] = None) -> None:
         self.data = preprocess_dataset(dataset, dataset_path, cfg)
-        self.num_proc = None
-        if cfg:
-            self.num_proc = cfg.np
+        self.num_proc = getattr(cfg, 'np', getattr(cfg, 'num_proc',
+                                                   None)) if cfg else None
+
+    def schema(self) -> Schema:
+        """Get dataset schema.
+
+        Returns:
+            Schema: Dataset schema containing column names and types
+        """
+        if self.data is None or self.data.columns() is None:
+            raise ValueError('Dataset is empty or not initialized')
+
+        # Get schema from Ray dataset
+        _schema = self.data.schema()
+
+        # convert schema to proper list and dict
+        column_types = {
+            k: Schema.map_ray_type_to_python(v)
+            for k, v in zip(_schema.names, _schema.types)
+        }
+        return Schema(column_types=column_types, columns=column_types.keys())
+
+    def get(self, k: int) -> List[Dict[str, Any]]:
+        """Get k rows from the dataset."""
+        if k < 0:
+            raise ValueError(f'k must be non-negative, got {k}')
+
+        if k == 0:
+            return []
+
+        k = min(k, self.data.count())
+        return list(self.data.limit(k).take())
+
+    def get_column(self, column: str, k: Optional[int] = None) -> List[Any]:
+        """Get column values from Ray dataset.
+
+        Args:
+            column: Name of the column to retrieve
+            k: Optional number of rows to return. If None, returns all rows
+
+        Returns:
+            List of values from the specified column
+
+        Raises:
+            KeyError: If column doesn't exist
+            ValueError: If k is negative
+        """
+        if (self.data is None or self.data.columns() is None
+                or column not in self.data.columns()):
+            raise KeyError(f"Column '{column}' not found in dataset")
+
+        if k is not None:
+            if k < 0:
+                raise ValueError(f'k must be non-negative, got {k}')
+            if k == 0:
+                return []
+            k = min(k, self.data.count())
+            return [row[column] for row in self.data.limit(k).take()]
+
+        return [row[column] for row in self.data.take()]
 
     def process(self,
                 operators,

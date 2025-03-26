@@ -1,3 +1,4 @@
+import functools
 import os
 import shutil
 import subprocess
@@ -8,7 +9,6 @@ import ray.data as rd
 
 from data_juicer import is_cuda_available
 from data_juicer.core.data import DJDataset, NestedDataset
-from data_juicer.core.ray_data import RayDataset
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import free_models
 
@@ -24,7 +24,24 @@ def TEST_TAG(*tags):
 
     def decorator(func):
         setattr(func, '__test_tags__', tags)
-        return func
+
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            # Save the original current_tag if it exists
+            original_tag = getattr(self, 'current_tag', 'standalone')
+
+            # Set the current_tag to the first tag
+            if tags:
+                self.current_tag = tags[0]
+
+            try:
+                # Run the test method
+                return func(self, *args, **kwargs)
+            finally:
+                # Restore the original current_tag
+                self.current_tag = original_tag
+
+        return wrapper
 
     return decorator
 
@@ -88,6 +105,7 @@ class DataJuicerTestCaseBase(unittest.TestCase):
         if current_tag.startswith('standalone'):
             return NestedDataset.from_list(data)
         elif current_tag.startswith('ray'):
+            from data_juicer.core.data.ray_dataset import RayDataset
             dataset = rd.from_items(data)
             return RayDataset(dataset)
         else:
