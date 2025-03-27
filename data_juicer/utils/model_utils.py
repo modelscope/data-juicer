@@ -13,6 +13,8 @@ from loguru import logger
 from data_juicer import cuda_device_count
 from data_juicer.utils.common_utils import nested_access
 from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
+from data_juicer.utils.nltk_utils import (ensure_nltk_resource,
+                                          patch_nltk_pickle_security)
 
 from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 
@@ -425,13 +427,16 @@ def prepare_kenlm_model(lang, name_pattern='{}.arpa.bin', **model_params):
 
 def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle', **model_params):
     """
-    Prepare and load a nltk punkt model.
+    Prepare and load a nltk punkt model with enhanced resource handling.
 
     :param model_name: input model name in formatting syntax
     :param lang: language to render model name
     :return: model instance.
     """
     model_params.pop('device', None)
+
+    # Ensure pickle security is patched
+    patch_nltk_pickle_security()
 
     nltk_to_punkt = {
         'en': 'english',
@@ -442,15 +447,80 @@ def prepare_nltk_model(lang, name_pattern='punkt.{}.pickle', **model_params):
     assert lang in nltk_to_punkt.keys(
     ), 'lang must be one of the following: {}'.format(
         list(nltk_to_punkt.keys()))
-    model_name = name_pattern.format(nltk_to_punkt[lang])
 
     logger.info('Loading nltk punkt split model...')
+
     try:
-        nltk_model = nltk.data.load(check_model(model_name), **model_params)
-    except:  # noqa: E722
-        nltk_model = nltk.data.load(check_model(model_name, force=True),
-                                    **model_params)
+        # Resource path and fallback for the punkt model
+        resource_path = f'tokenizers/punkt/{nltk_to_punkt[lang]}.pickle'
+
+        # Ensure the resource is available
+        if ensure_nltk_resource(resource_path, 'punkt'):
+            logger.info(f'Successfully verified resource {resource_path}')
+        else:
+            logger.warning(
+                f'Could not verify resource {resource_path}, model may not '
+                f'work correctly')
+
+        # Load the model
+        nltk_model = nltk.data.load(resource_path, **model_params)
+    except Exception as e:
+        # Fallback to downloading and retrying
+        logger.warning(f'Error loading model: {e}. Attempting to download...')
+        try:
+            nltk.download('punkt', quiet=False)
+            nltk_model = nltk.data.load(resource_path, **model_params)
+        except Exception as download_error:
+            logger.error(f'Failed to load model after download '
+                         f'attempt: {download_error}')
+            raise
+
     return nltk_model
+
+
+def prepare_nltk_pos_tagger(**model_params):
+    """
+    Prepare and load NLTK's part-of-speech tagger with enhanced resource
+      handling.
+
+    :return: The POS tagger model
+    """
+    model_params.pop('device', None)
+
+    # Ensure pickle security is patched
+    patch_nltk_pickle_security()
+
+    logger.info('Loading NLTK POS tagger model...')
+
+    try:
+        # Resource path and fallback for the averaged_perceptron_tagger
+        resource_path = 'taggers/averaged_perceptron_tagger/english.pickle'
+
+        # Ensure the resource is available
+        if ensure_nltk_resource(resource_path, 'averaged_perceptron_tagger'):
+            logger.info(f'Successfully verified resource {resource_path}')
+        else:
+            logger.warning(
+                f'Could not verify resource {resource_path}, model may not '
+                f'work correctly')
+
+        # Import the POS tagger
+        import nltk.tag
+        tagger = nltk.tag.pos_tag
+    except Exception as e:
+        # Fallback to downloading and retrying
+        logger.warning(
+            f'Error loading POS tagger: {e}. Attempting to download...')
+        try:
+            nltk.download('averaged_perceptron_tagger', quiet=False)
+            import nltk.tag
+            tagger = nltk.tag.pos_tag
+        except Exception as download_error:
+            logger.error(f'Failed to load POS tagger after download '
+                         f'attempt: {download_error}')
+            raise
+
+    return tagger
 
 
 def prepare_opencv_classifier(model_path, **model_params):
@@ -853,6 +923,7 @@ MODEL_FUNCTION_MAPPING = {
     'huggingface': prepare_huggingface_model,
     'kenlm': prepare_kenlm_model,
     'nltk': prepare_nltk_model,
+    'nltk_pos_tagger': prepare_nltk_pos_tagger,
     'opencv_classifier': prepare_opencv_classifier,
     'recognizeAnything': prepare_recognizeAnything_model,
     'sdxl-prompt-to-prompt': prepare_sdxl_prompt2prompt,
