@@ -1,4 +1,5 @@
 # Dataset Configuration Guide
+EN | [中文](DatasetCfg_ZH.md)
 
 This guide provides an overview of how to configure datasets using YAML format in the Data-Juicer framework. The configurations allow you to specify local and remote datasets, with data validation rules.
 
