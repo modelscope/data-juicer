@@ -36,4 +36,5 @@ RUN pip install --upgrade setuptools==69.5.1 setuptools_scm \
 
 # install data-juicer then
 COPY . .
-RUN pip install -v -e .[all] --default-timeout 1000
+RUN pip install -v -e .[all] --default-timeout 1000 \
+    && python -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger');  nltk.download('averaged_perceptron_tagger_eng')"
