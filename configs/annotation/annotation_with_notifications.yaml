@@ -26,7 +26,7 @@ process:
 
       # label studio connection settings
       api_url: "http://localhost:7070"  # Default Label Studio URL
-      api_key: "05409236-67a5-4169-af96-a52a818d0e81"  # Your API key for label studuio authentication
+      api_key: "05409236-67a5-4169-af96-a52a818d0e81"  # Your API key for label studuio authentication  # pragma: allowlist secret
 
       # human preference annotation settings
       prompt_key: "prompt"  # Prompt field
@@ -48,7 +48,7 @@ process:
 
           # Sender information
           username: "your_user_name"
-          password: "your_passsword"
+          password: "your_password"  # pragma: allowlist secret
           sender_email: "your_email@alibaba-inc.com"
           sender_name: "your_name"
 
