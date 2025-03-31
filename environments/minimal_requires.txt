@@ -38,5 +38,5 @@ wordcloud
 jsonlines
 bs4
 ray==2.40.0
-nltk=3.9.1
+nltk==3.9.1
 label-studio==1.16.0
