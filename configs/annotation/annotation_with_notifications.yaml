@@ -48,7 +48,8 @@ process:
 
           # Sender information
           username: "your_user_name"
-          password: "asbcdadf"
+          # uncomment and put in your password
+          # password: "your_password"
           sender_email: "your_email@alibaba-inc.com"
           sender_name: "your_name"
 
