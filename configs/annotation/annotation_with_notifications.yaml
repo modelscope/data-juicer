@@ -48,7 +48,7 @@ process:
 
           # Sender information
           username: "your_user_name"
-          password: "your_password"  # pragma: allowlist secret
+          password: "new_password"  # pragma: allowlist secret
           sender_email: "your_email@alibaba-inc.com"
           sender_name: "your_name"
 
