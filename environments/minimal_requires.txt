@@ -30,11 +30,13 @@ multiprocess==0.70.12
 dill==0.3.4
 psutil
 pydantic>=2.0
+mwparserfromhell
 Pillow
 fastapi[standard]>=0.110
 httpx
 wordcloud
 jsonlines
+bs4
 ray==2.40.0
 nltk=3.9.1
 label-studio==1.16.0

@@ -91,6 +91,7 @@ Table of Contents
   - [Installation check](#installation-check)
   - [For Video-related Operators](#for-video-related-operators)
 - [Quick Start](#quick-start)
+  - [Dataset Configuration](#dataset-configuration)
   - [Data Processing](#data-processing)
   - [Distributed Data Processing](#distributed-data-processing)
   - [Data Analysis](#data-analysis)
@@ -296,6 +297,26 @@ Check if your environment path is set correctly by running the ffmpeg command fr
 
 
 ## Quick Start
+
+### Dataset Configuration
+
+DJ supports various dataset input types, including local files, remote datasets like huggingface; it also supports data validation and data mixture.
+
+Two ways to configure a input file
+- Simple scenarios, single path for local/HF file
+```yaml
+dataset_path: '/path/to/your/dataset'  # path to your dataset directory or file
+```
+- advanced method, supports sub-configuration items and more features
+```yaml
+dataset:
+  configs:
+    - type: 'local'
+      path: 'path/to/your/dataset' # path to your dataset directory or file
+```
+
+Refer to [Dataset Configuration Guide](docs/DatasetCfg.md) for more details.
+
 
 
 ### Data Processing

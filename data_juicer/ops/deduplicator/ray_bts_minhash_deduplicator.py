@@ -533,7 +533,8 @@ class RayBTSMinhashDeduplicator(Deduplicator):
         ]
         return samples.select(columns_to_keep).filter(mask)
 
-    def run(self, dataset):
+    def run(self, dataset, **kwargs):
+        # Ignore additional parameters like exporter, tracer, etc.
         start_time = time.time()
         id_generator = IdGenerator.remote()
 
