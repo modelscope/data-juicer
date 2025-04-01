@@ -145,10 +145,7 @@ class MCPClient:
                 tools = response.tools
                 if any(tool.name == tool_call["tool"] for tool in tools):
                     try:
-                        # Call function and check if result is a coroutine
-                        result = self.session.call_tool(tool_call["tool"], tool_call["arguments"])
-                        if inspect.iscoroutine(result):
-                            result = await result
+                        result = await self.session.call_tool(tool_call["tool"], tool_call["arguments"])
 
                         if isinstance(result, dict) and "progress" in result:
                             progress = result["progress"]
