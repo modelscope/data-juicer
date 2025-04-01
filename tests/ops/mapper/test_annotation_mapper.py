@@ -103,7 +103,8 @@ class AnnotationMapperTest(DataJuicerTestCaseBase):
         self.assertEqual(mapper.notification_events, {
             'task_created': False,
             'batch_created': True,
-            'annotation_completed': True,
+            'annotation_completed': False,
+            'batch_annotation_completed': True,
             'error_occurred': True
         })
 
@@ -195,16 +196,23 @@ class AnnotationMapperTest(DataJuicerTestCaseBase):
         """Test annotation completed event handler"""
         mapper = MockAnnotationMapper()
         
-        # Add sample to task mapping for testing
+        # Test without notification (disabled by default)
         task_id = 123
         sample_ids = ['sample1', 'sample2']
         mapper.task_to_samples[task_id] = sample_ids
         
-        # Test with notification (enabled by default)
         annotation_data = {
             'task_id': task_id,
             'annotation_id': 'annotation_123'
         }
+        mapper._handle_annotation_completed(annotation_data)
+        
+        # Verify notification was not sent (disabled by default)
+        mock_send_notification.assert_not_called()
+        
+        # Test with notification enabled
+        mock_send_notification.reset_mock()
+        mapper.notification_events['annotation_completed'] = True
         mapper._handle_annotation_completed(annotation_data)
         
         # Verify notification was sent
@@ -212,15 +220,6 @@ class AnnotationMapperTest(DataJuicerTestCaseBase):
         
         # Verify task was marked as processed
         self.assertIn(task_id, mapper.processed_annotations)
-        
-        # Test without notification
-        mock_send_notification.reset_mock()
-        mapper.notification_events['annotation_completed'] = False
-        mapper._handle_annotation_completed({
-            'task_id': 456,
-            'annotation_id': 'annotation_456'
-        })
-        mock_send_notification.assert_not_called()
 
     @patch('data_juicer.ops.mapper.annotation.annotation_mapper.BaseAnnotationMapper.send_notification')
     def test_error_handler(self, mock_send_notification):
@@ -363,7 +362,8 @@ class AnnotationMapperTest(DataJuicerTestCaseBase):
 
     def test_process_uses_existing_ids(self):
         """Test that the mapper uses existing IDs in samples instead of generating new ones"""
-        mapper = MockAnnotationMapper(wait_for_annotations=True, timeout=0.1, poll_interval=0.01)
+        # First pass: process without waiting for annotations
+        mapper = MockAnnotationMapper(wait_for_annotations=False)
         
         # Create samples with predefined IDs
         samples_with_ids = {
@@ -389,7 +389,8 @@ class AnnotationMapperTest(DataJuicerTestCaseBase):
         for task_id in mapper.created_task_ids:
             mapper.add_mock_annotation(task_id, {"label": f"Annotation for task {task_id}"})
             
-        # Process the samples again
+        # Second pass: process with waiting for annotations
+        mapper.wait_for_annotations = True
         result = mapper.process_batched(samples_with_ids)
         
         # Verify results include the annotations
@@ -875,7 +876,8 @@ class HumanPreferenceAnnotationMapperTest(DataJuicerTestCaseBase):
 
     def test_process_uses_existing_ids(self):
         """Test that the Human Preference mapper uses existing IDs in samples instead of generating new ones"""
-        mapper = MockHumanPreferenceAnnotationMapper(wait_for_annotations=True)
+        # First pass: process without waiting for annotations
+        mapper = MockHumanPreferenceAnnotationMapper(wait_for_annotations=False)
         
         # Create samples with predefined IDs
         samples_with_ids = {
@@ -913,7 +915,8 @@ class HumanPreferenceAnnotationMapperTest(DataJuicerTestCaseBase):
                 }
             ])
         
-        # Process the samples again
+        # Second pass: process with waiting for annotations
+        mapper.wait_for_annotations = True
         result = mapper.process_batched(samples_with_ids)
         
         # Verify results include preference annotations
