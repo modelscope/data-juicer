@@ -3,6 +3,7 @@ torchaudio
 easyocr==1.7.1
 fasttext-wheel
 kenlm
+cmake>=3.10,<4.0
 sentencepiece
 scipy
 ftfy
