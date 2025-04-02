@@ -34,7 +34,7 @@ ENV JAVA_HOME=/opt/jdk
 WORKDIR /data-juicer
 
 # install requirements which need to be installed from source
-RUN pip install --upgrade setuptools==69.5.1 setuptools_scm \
+RUN pip install --upgrade setuptools==69.5.1 setuptools_scm "cmake>=3.1,<4.0"\
     && pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000
 
 # install data-juicer then
