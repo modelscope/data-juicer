@@ -3,6 +3,10 @@
 
 FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
+# change to aliyun source
+RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list \
+    && sed -i 's/security.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
+
 # install python 3.10
 RUN apt-get update \
     && apt-get install -y git curl vim wget python3.10 libpython3.10-dev python3-pip \
