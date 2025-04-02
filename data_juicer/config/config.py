@@ -33,7 +33,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
 
     :param args: list of params, e.g., ['--config', 'cfg.yaml'], default None.
     :param which_entry: which entry to init configs (executor/analyzer)
-    :return: a global cfg object used by the Executor or Analyzer
+    :return: a global cfg object used by the DefaultExecutor or Analyzer
     """
     parser = ArgumentParser(default_env=True, default_config_files=None)
 
