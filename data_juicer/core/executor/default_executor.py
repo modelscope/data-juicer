@@ -53,7 +53,7 @@ class DefaultExecutor(ExecutorBase):
 
         # setup dataset builder
         logger.info('Setting up dataset builder...')
-        self.dataset_builder = DatasetBuilder(cfg,
+        self.dataset_builder = DatasetBuilder(self.cfg,
                                               executor_type=self.executor_type)
 
         # whether to use checkpoint mechanism. If it's true, Executor will

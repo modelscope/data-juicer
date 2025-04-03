@@ -183,7 +183,8 @@ def setup_logger(save_dir,
 def make_log_summarization(max_show_item=10):
     error_pattern = r'^An error occurred in (.*?) when ' \
                     r'processing samples? \"(.*?)\" -- (.*?): (.*?)$'
-    log_file = get_log_file_path()
+    log_file = get_log_file_path().replace('_ERROR', '').replace(
+        '_WARNING', '').replace('_DEBUG', '')
     error_log_file = add_suffix_to_filename(log_file, '_ERROR')
     warning_log_file = add_suffix_to_filename(log_file, '_WARNING')
 
