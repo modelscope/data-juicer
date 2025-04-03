@@ -87,7 +87,7 @@ class ImagePairSimilarityFilter(Filter):
         similarity = torch.cosine_similarity(image1_batch_feature,
                                              image2_batch_feature,
                                              dim=1)
-        sample[Fields.stats][StatsKeys.image_pair_similarity] = similarity
+        sample[Fields.stats][StatsKeys.image_pair_similarity] = similarity.cpu()
 
         return sample
 

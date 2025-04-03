@@ -1,9 +1,13 @@
 import logging
+import os
+import random
+import time
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.ops.op_fusion import LOADED_IMAGES
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.cache_utils import DATA_JUICER_ASSETS_CACHE
 
 diffusers = LazyLoader('diffusers', 'diffusers')
 torch = LazyLoader('torch', 'torch')
@@ -33,8 +37,9 @@ class SDXLPrompt2PromptMapper(Mapper):
             torch_dtype: str = 'fp32',
             num_inference_steps: float = 50,
             guidance_scale: float = 7.5,
+            text_key=None,
             text_key_second=None,
-            text_key_third=None,
+            output_dir=DATA_JUICER_ASSETS_CACHE,
             *args,
             **kwargs):
         """
@@ -50,10 +55,11 @@ class SDXLPrompt2PromptMapper(Mapper):
         :param guidance_scale: A higher guidance scale value encourages the
             model to generate images closely linked to the text prompt at the
             expense of lower image quality. Guidance scale is enabled when
-        :param text_key_second: used to store the first caption
+        :param text_key: the key name used to store the first caption
             in the caption pair.
-        :param text_key_third: used to store the second caption
+        :param text_key_second: the key name used to store the second caption
             in the caption pair.
+        :param output_dir: the storage location of the generated images.
 
         """
         kwargs.setdefault('mem_required', '38GB')
@@ -69,7 +75,10 @@ class SDXLPrompt2PromptMapper(Mapper):
             pipe_func=p2p_pipeline.Prompt2PromptPipeline,
             torch_dtype=torch_dtype)
         self.text_key_second = text_key_second
-        self.text_key_third = text_key_third
+        self.output_dir = output_dir
+        
+        if not text_key == None:
+            self.text_key = text_key
 
     def process_single(self, sample, rank=None, context=False):
 
@@ -78,16 +87,18 @@ class SDXLPrompt2PromptMapper(Mapper):
                 processing multiple fields, and you need to specify \
                 valid `text_key_second`')
 
-        if self.text_key_third is None:
-            logger.error('This OP (sdxl_prompt2prompt_mapper) requires \
-                processing multiple fields, and you need to specify \
-                valid `text_key_third`')
+        if not os.path.exists(self.output_dir):
+            os.makedirs(self.output_dir, exist_ok=True)
+
+        random_num = str(random.randint(0, 9999))
+        t1 = time.localtime()
+        t2 = time.strftime("%Y-%m-%d-%H-%M-%S", t1)
 
         model = get_model(model_key=self.model_key,
                           rank=rank,
                           use_cuda=self.use_cuda())
 
-        seed = 0
+        seed = random.randint(0,9999)
         g_cpu = torch.Generator().manual_seed(seed)
 
         cross_attention_kwargs = {
@@ -99,11 +110,10 @@ class SDXLPrompt2PromptMapper(Mapper):
             },
         }
 
-        sample[self.image_key] = []
 
         with torch.no_grad():
             prompts = [
-                sample[self.text_key_second], sample[self.text_key_third]
+                sample[self.text_key], sample[self.text_key_second]
             ]
             image = model(prompts,
                           cross_attention_kwargs=cross_attention_kwargs,
@@ -111,7 +121,10 @@ class SDXLPrompt2PromptMapper(Mapper):
                           num_inference_steps=self.num_inference_steps,
                           generator=g_cpu)
 
-            for idx, img in enumerate(image[self.image_key]):
-                sample[self.image_key].append(img)
+            for idx, img in enumerate(image["images"]):
+                img_id = str(idx + 1)
+                image_name = "image_pair_" + t2 + "_" + random_num + "_" + img_id + ".jpg"
+                img.save(os.path.join(self.output_dir, image_name))
+                sample["image_path" + img_id] = image_name
 
         return sample
