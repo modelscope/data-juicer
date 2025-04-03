@@ -279,7 +279,7 @@ class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
     @TEST_TAG('ray')
     def test_absolute_path_resolution(self):
         """Test loading from absolute path"""
-        abs_path = os.path.join(WORK_DIR, 'data', 'sample.jsonl')
+        abs_path = os.path.join(WORK_DIR, 'test_data', 'sample.jsonl')
     
         # Now test the strategy
         strategy = RayLocalJsonDataLoadStrategy({
@@ -296,7 +296,7 @@ class TestRayLocalJsonDataLoadStrategy(DataJuicerTestCaseBase):
     @TEST_TAG('ray')
     def test_relative_path_resolution(self):
         """Test loading from relative path"""
-        rel_path = './tests/core/data/sample.jsonl'
+        rel_path = './tests/core/data/test_data/sample.jsonl'
     
         # Now test the strategy
         strategy = RayLocalJsonDataLoadStrategy({
