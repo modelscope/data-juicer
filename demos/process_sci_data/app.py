@@ -7,7 +7,7 @@ import streamlit as st
 from loguru import logger
 
 from data_juicer.config import init_configs
-from data_juicer.core import Analyzer, Executor
+from data_juicer.core import Analyzer, DefaultExecutor
 from data_juicer.utils.constant import HashKeys
 
 demo_path = os.path.dirname(os.path.abspath(__file__))
@@ -99,7 +99,7 @@ def process_and_show_res():
     analyzed_dataset = analyzer.run()
 
     logger.info('=========Stage 2: process original data=========')
-    executor = Executor(cfg)
+    executor = DefaultExecutor(cfg)
     processed_dataset = executor.run()
     trace_dir = executor.tracer.work_dir
     trace_files = list(Path(trace_dir).glob('*jsonl'))
