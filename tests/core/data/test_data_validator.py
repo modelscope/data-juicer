@@ -1,7 +1,7 @@
 from unittest import main
 import datasets
 from data_juicer.utils.unittest_utils import DataJuicerTestCaseBase, TEST_TAG
-from data_juicer.core.data import NestedDataset, DJDataset
+from data_juicer.core.data import NestedDataset
 from data_juicer.core.data.data_validator import (
     DataValidationError, 
     RequiredFieldsValidator,

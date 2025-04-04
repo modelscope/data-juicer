@@ -31,7 +31,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
 
 
     def test_rewrite_cli_datapath_local_single_file(self):
-        dataset_path =  os.path.join(WORK_DIR, "data/sample.txt")
+        dataset_path =  os.path.join(WORK_DIR, "test_data/sample.txt")
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
@@ -39,7 +39,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
              ans)
 
     def test_rewrite_cli_datapath_local_directory(self):
-        dataset_path = os.path.join(WORK_DIR, "data")
+        dataset_path = os.path.join(WORK_DIR, "")
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
@@ -62,12 +62,12 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
                                rewrite_cli_datapath, dataset_path)
 
     def test_rewrite_cli_datapath_with_weights(self):
-        dataset_path = "0.5 ./data/sample.jsonl ./data/sample.txt"
+        dataset_path = "0.5 ./test_data/sample.jsonl ./test_data/sample.txt"
         ans = rewrite_cli_datapath(dataset_path)
         self.assertEqual(
             {'configs': [
-                {'path': './data/sample.jsonl', 'type': 'local', 'weight': 0.5},
-                {'path': './data/sample.txt', 'type': 'local', 'weight': 1.0}]},
+                {'path': './test_data/sample.jsonl', 'type': 'local', 'weight': 0.5},
+                {'path': './test_data/sample.txt', 'type': 'local', 'weight': 1.0}]},
             ans)
 
     @patch('os.path.isdir')
@@ -105,7 +105,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
 
     def test_rewrite_cli_datapath_with_max_samples(self):
         """Test rewriting CLI datapath with max_sample_num"""
-        dataset_path = "./data/sample.txt"
+        dataset_path = "./test_data/sample.txt"
         max_sample_num = 1000
         
         result = rewrite_cli_datapath(dataset_path, max_sample_num)
@@ -113,7 +113,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         expected = {
             'configs': [{
                 'type': 'local',
-                'path': './data/sample.txt',
+                'path': './test_data/sample.txt',
                 'weight': 1.0
             }],
             'max_sample_num': 1000
@@ -122,14 +122,14 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
 
     def test_rewrite_cli_datapath_without_max_samples(self):
         """Test rewriting CLI datapath without max_sample_num"""
-        dataset_path = "./data/sample.txt"
+        dataset_path = "./test_data/sample.txt"
         
         result = rewrite_cli_datapath(dataset_path)
         
         expected = {
             'configs': [{
                 'type': 'local',
-                'path': './data/sample.txt',
+                'path': './test_data/sample.txt',
                 'weight': 1.0
             }]
         }
@@ -300,10 +300,11 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         """Test handling when both dataset and dataset_path are None"""
         self.base_cfg.dataset = None
         
-        with self.assertRaises(ConfigValidationError) as context:
-            DatasetBuilder(self.base_cfg, self.executor_type)
+        with self.assertRaises(ValueError) as context:
+            builder = DatasetBuilder(self.base_cfg, self.executor_type)
+            builder.load_dataset()
         
-        self.assertIn('Unable to initialize dataset', str(context.exception))
+        self.assertIn('Unable to load dataset', str(context.exception))
 
     def test_builder_mixed_dataset_types(self):
         """Test validation of mixed dataset types"""
@@ -367,7 +368,8 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
                       str(context.exception))
 
     def test_builder_ondisk_config(self):
-        test_config_file = os.path.join(WORK_DIR, 'data/test_config.yaml')
+        test_config_file = os.path.join(WORK_DIR,
+                                        'test_data/test_config.yaml')
         out = StringIO()
         with redirect_stdout(out):
             cfg = init_configs(args=f'--config {test_config_file}'.split())
@@ -378,7 +380,8 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
             self.assertEqual(not cfg.dataset_path, True)
 
     def test_builder_ondisk_config_list(self):
-        test_config_file = os.path.join(WORK_DIR, 'data/test_config_list.yaml')
+        test_config_file = os.path.join(WORK_DIR,
+                                        'test_data/test_config_list.yaml')
         out = StringIO()
         with redirect_stdout(out):
             cfg = init_configs(args=f'--config {test_config_file}'.split())
@@ -475,7 +478,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
     @TEST_TAG('ray')
     def test_builder_ray_config(self):
         """Test loading Ray configuration from YAML"""
-        test_config_file = os.path.join(WORK_DIR, 'data', 'test_config_ray.yaml')
+        test_config_file = os.path.join(WORK_DIR, 'test_data', 'test_config_ray.yaml')
 
         cfg = init_configs(args=f'--config {test_config_file}'.split())
         
@@ -489,7 +492,7 @@ class DatasetBuilderTest(DataJuicerTestCaseBase):
         self.assertEqual(cfg.dataset, {
             'configs': [{
                 'type': 'local',
-                'path': './data/sample.jsonl'
+                'path': './test_data/sample.jsonl'
             }]
         })
         
