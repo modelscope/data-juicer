@@ -15,6 +15,12 @@ dist
 wandb/
 __pycache__
 .vscode/
+
+# label studio related
+label_studio_data/
+label_studio_venv/
+label_studio_connection.json
+
 **/__dj__produced_data__/*
 venv/
 .venv/
