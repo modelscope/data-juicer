@@ -129,7 +129,8 @@
 
         <span class="c1"># setup dataset builder</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Setting up dataset builder...&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_builder</span> <span class="o">=</span> <span class="n">DatasetBuilder</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">executor_type</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_builder</span> <span class="o">=</span> <span class="n">DatasetBuilder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">,</span>
+                                              <span class="n">executor_type</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
 
         <span class="c1"># prepare exporter and check export path suffix</span>
         <span class="c1"># NOTICE: no need to export dataset texts for analyzer</span>

@@ -143,7 +143,7 @@
                 <span class="sa">f</span><span class="s2">&quot;Function &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">function_name</span><span class="si">}</span><span class="s2">&#39; not found in &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>  <span class="c1"># noqa: E501</span>
             <span class="p">)</span>
 
-        <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_name</span><span class="p">)</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">function_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">callable</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
