@@ -101,10 +101,15 @@
 
 <span class="c1"># NER algorithm adapted from GLIP starts</span>
 <span class="c1"># https://github.com/microsoft/GLIP/blob/main/maskrcnn_benchmark/engine/predictor_glip.py#L107-L127</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">find_noun_phrases</span><span class="p">(</span><span class="n">caption</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_noun_phrases</span><span class="p">(</span><span class="n">caption</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pos_tagger</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
     <span class="n">caption</span> <span class="o">=</span> <span class="n">caption</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="n">tokens</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">word_tokenize</span><span class="p">(</span><span class="n">caption</span><span class="p">)</span>
-    <span class="n">pos_tags</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">pos_tag</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+    <span class="c1"># Use the provided POS tagger if available, or fallback to the default</span>
+    <span class="k">if</span> <span class="n">pos_tagger</span><span class="p">:</span>
+        <span class="n">pos_tags</span> <span class="o">=</span> <span class="n">pos_tagger</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">pos_tags</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">pos_tag</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
 
     <span class="n">grammar</span> <span class="o">=</span> <span class="s1">&#39;NP: {&lt;DT&gt;?&lt;JJ.*&gt;*&lt;NN.*&gt;+}&#39;</span>
     <span class="n">cp</span> <span class="o">=</span> <span class="n">nltk</span><span class="o">.</span><span class="n">RegexpParser</span><span class="p">(</span><span class="n">grammar</span><span class="p">)</span>
@@ -128,8 +133,8 @@
     <span class="k">return</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">run_ner</span><span class="p">(</span><span class="n">caption</span><span class="p">):</span>
-    <span class="n">noun_phrases</span> <span class="o">=</span> <span class="n">find_noun_phrases</span><span class="p">(</span><span class="n">caption</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run_ner</span><span class="p">(</span><span class="n">caption</span><span class="p">,</span> <span class="n">pos_tagger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">noun_phrases</span> <span class="o">=</span> <span class="n">find_noun_phrases</span><span class="p">(</span><span class="n">caption</span><span class="p">,</span> <span class="n">pos_tagger</span><span class="p">)</span>
     <span class="n">noun_phrases</span> <span class="o">=</span> <span class="p">[</span><span class="n">remove_punctuation</span><span class="p">(</span><span class="n">phrase</span><span class="p">)</span> <span class="k">for</span> <span class="n">phrase</span> <span class="ow">in</span> <span class="n">noun_phrases</span><span class="p">]</span>
     <span class="n">noun_phrases</span> <span class="o">=</span> <span class="p">[</span><span class="n">phrase</span> <span class="k">for</span> <span class="n">phrase</span> <span class="ow">in</span> <span class="n">noun_phrases</span> <span class="k">if</span> <span class="n">phrase</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
     <span class="n">noun_phrases</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">noun_phrases</span><span class="p">))</span>  <span class="c1"># remove duplicate ners</span>
@@ -219,10 +224,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">large_area_ratio_thr</span> <span class="o">=</span> <span class="n">large_area_ratio_thr</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">conf_thr</span> <span class="o">=</span> <span class="n">conf_thr</span>
 
-        <span class="n">requires_nltk_data</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;punkt&#39;</span><span class="p">,</span> <span class="s1">&#39;averaged_perceptron_tagger&#39;</span><span class="p">]</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Downloading nltk data of </span><span class="si">{</span><span class="n">requires_nltk_data</span><span class="si">}</span><span class="s1">...&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">nltk_data_pkg</span> <span class="ow">in</span> <span class="n">requires_nltk_data</span><span class="p">:</span>
-            <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="n">nltk_data_pkg</span><span class="p">)</span></div>
+        <span class="c1"># Initialize NLTK resources needed for NER extraction</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading NLTK resources for NER extraction...&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nltk_tagger_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span><span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;nltk_pos_tagger&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Ensure NLTK resources are correctly downloaded and available</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Import nltk here to ensure it&#39;s available</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">nltk</span>
+
+            <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.nltk_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">patch_nltk_pickle_security</span>
+
+            <span class="c1"># Ensure pickle security patches are applied</span>
+            <span class="n">patch_nltk_pickle_security</span><span class="p">()</span>
+
+            <span class="c1"># Download required resources if not already available</span>
+            <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;punkt&#39;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">nltk</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;averaged_perceptron_tagger&#39;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Error initializing NLTK resources: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">. &#39;</span>
+                           <span class="s1">&#39;NER extraction may not work correctly.&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="PhraseGroundingRecallFilter.compute_stats_single">
@@ -248,6 +269,10 @@
         <span class="n">recalls</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">model</span><span class="p">,</span> <span class="n">processor</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
 
+        <span class="c1"># Get the POS tagger if available</span>
+        <span class="n">pos_tagger</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nltk_tagger_key</span><span class="p">)</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;nltk_tagger_key&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+
         <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">eoc</span><span class="p">):</span>
             <span class="n">count</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">SpecialTokens</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
 
@@ -256,7 +281,7 @@
                 <span class="k">continue</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">text_this_chunk</span> <span class="o">=</span> <span class="n">remove_special_tokens</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
-                <span class="n">ners_this_chunk</span> <span class="o">=</span> <span class="n">run_ner</span><span class="p">(</span><span class="n">text_this_chunk</span><span class="p">)</span>
+                <span class="n">ners_this_chunk</span> <span class="o">=</span> <span class="n">run_ner</span><span class="p">(</span><span class="n">text_this_chunk</span><span class="p">,</span> <span class="n">pos_tagger</span><span class="p">)</span>
                 <span class="n">num_ners</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ners_this_chunk</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">num_ners</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="c1"># no ners found, just skip this chunk</span>
