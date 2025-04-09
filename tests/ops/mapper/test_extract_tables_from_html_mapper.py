@@ -102,6 +102,19 @@ class ExtractTablesFromHtmlMapperTest(DataJuicerTestCaseBase):
         op = ExtractTablesFromHtmlMapper(retain_html_tags=False, include_header=True)
         self._run_mapper(op, ds_list)
 
+    def test_no_tables(self):
+        ds_list = [{
+            'text': "<html><body>New testCase - No tables here!</body></html>"
+        }]
+
+        op = ExtractTablesFromHtmlMapper(retain_html_tags=False, include_header=True)
+        dataset = Dataset.from_list(ds_list)
+        dataset = op.run(dataset)
+        sample = dataset[0]
+        self.assertIn(MetaKeys.html_tables, sample[Fields.meta])
+        self.assertEqual(len(sample[Fields.meta][MetaKeys.html_tables]), 0)
+        logger.info(f"Tables: {sample[Fields.meta][MetaKeys.html_tables]}")
+
 
 if __name__ == '__main__':
     unittest.main()
