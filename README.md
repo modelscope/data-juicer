@@ -85,7 +85,8 @@ Table of Contents
   - [Interactive Examples](#interactive-examples)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
-  - [From Source](#from-source)
+  - [From Source for Specific Scenarios](#from-source-for-specific-scenarios)
+  - [From Source for Specific OPs](#from-source-for-specific-ops)
   - [Using pip](#using-pip)
   - [Using Docker](#using-docker)
   - [Installation check](#installation-check)
@@ -201,7 +202,7 @@ Table of Contents
 - Recommend Python>=3.9,<=3.10
 - gcc >= 5 (at least C++14 support)
 
-### From Source 
+### From Source for Specific Scenarios
 
 - Run the following commands to install the latest basic `data_juicer` version in
   editable mode:
@@ -223,12 +224,14 @@ The dependency options are listed below:
 | Tag              | Description                                                                                  |
 |------------------|----------------------------------------------------------------------------------------------|
 | `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                                          |
-| `.[all]`         | Install all dependencies except sandbox.                                                     |
-| `.[sci]`         | Install all dependencies for all OPs.                                                        |
-| `.[dist]`        | Install dependencies for distributed data processing. (Experimental)                         |
+| `.[all]`         | Install dependencies for all OPs except sandbox.                                             |
+| `.[sci]`         | Install dependencies for OPs related to scientific usage.                                    |
+| `.[dist]`        | Install dependencies for additioal distributed data processing.                              |
 | `.[dev]`         | Install dependencies for developing the package as contributors.                             |
 | `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers.                       |
 | `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
+
+### From Source for Specific OPs
 
 - Install dependencies for specific OPs
 
