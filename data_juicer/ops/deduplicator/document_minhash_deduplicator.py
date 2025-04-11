@@ -227,25 +227,25 @@ class DocumentMinhashDeduplicator(Deduplicator):
         if self.tokenization == 'character':
             tokens = {
                 str.encode(text[i:i + self.window_size])
-                for i in range(len(text) - self.window_size)
+                for i in range(len(text) - self.window_size + 1)
             }
         elif self.tokenization == 'punctuation':
             tokens = self.punctuation_pattern.split(text)
             tokens = {
                 str.encode(' '.join(tokens[i:i + self.window_size]))
-                for i in range(len(tokens) - self.window_size)
+                for i in range(len(tokens) - self.window_size + 1)
             }
         elif self.tokenization == 'space':
             tokens = split_on_whitespace(text)
             tokens = {
                 str.encode(' '.join(tokens[i:i + self.window_size]))
-                for i in range(len(tokens) - self.window_size)
+                for i in range(len(tokens) - self.window_size + 1)
             }
         elif self.tokenization == 'sentencepiece':
             tokens = self.tokenizer.encode(text, out_type=str)
             tokens = {
                 str.encode(''.join(tokens[i:i + self.window_size]))
-                for i in range(len(tokens) - self.window_size)
+                for i in range(len(tokens) - self.window_size + 1)
             }
         else:
             raise NotImplementedError(
