@@ -76,7 +76,7 @@ json
 
     def __init__(self,
                  api_or_hf_model: str = 'gpt-4o',
-                 min_score: float = 0.5,
+                 min_score: float = 0.0,
                  *,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
