@@ -339,7 +339,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
             def tokenization_func(text):
                 return {
                     str.encode(text[i:i + self.window_size])
-                    for i in range(len(text) - self.window_size)
+                    for i in range(len(text) - self.window_size + 1)
                 }
         elif self.tokenization == 'punctuation':
 
@@ -347,7 +347,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 tokens = self.punctuation_pattern.split(text)
                 return {
                     str.encode(' '.join(tokens[i:i + self.window_size]))
-                    for i in range(len(tokens) - self.window_size)
+                    for i in range(len(tokens) - self.window_size + 1)
                 }
         elif self.tokenization == 'space':
 
@@ -355,7 +355,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 tokens = split_on_whitespace(text)
                 return {
                     str.encode(' '.join(tokens[i:i + self.window_size]))
-                    for i in range(len(tokens) - self.window_size)
+                    for i in range(len(tokens) - self.window_size + 1)
                 }
         elif self.tokenization == 'sentencepiece':
 
@@ -363,7 +363,7 @@ class RayBTSMinhashDeduplicator(Deduplicator):
                 tokens = self.tokenizer.encode(text, out_type=str)
                 return {
                     str.encode(''.join(tokens[i:i + self.window_size]))
-                    for i in range(len(tokens) - self.window_size)
+                    for i in range(len(tokens) - self.window_size + 1)
                 }
         else:
             raise NotImplementedError(
