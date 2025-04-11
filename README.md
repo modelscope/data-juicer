@@ -221,21 +221,21 @@ pip install -v -e .[tools] # Install a subset of tools dependencies
 
 The dependency options are listed below:
 
-| Tag              | Description                                                                                  |
-|------------------|----------------------------------------------------------------------------------------------|
-| `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                                          |
-| `.[all]`         | Install dependencies for all OPs except sandbox.                                             |
-| `.[sci]`         | Install dependencies for OPs related to scientific usage.                                    |
-| `.[dist]`        | Install dependencies for additioal distributed data processing.                              |
-| `.[dev]`         | Install dependencies for developing the package as contributors.                             |
-| `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers.                       |
-| `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
+| Tag              | Description                                                            |
+|------------------|------------------------------------------------------------------------|
+| `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                    |
+| `.[all]`         | Install dependencies for all OPs except sandbox.                       |
+| `.[sci]`         | Install dependencies for OPs related to scientific usage.              |
+| `.[dist]`        | Install dependencies for additional distributed data processing.       |
+| `.[dev]`         | Install dependencies for developing the package as contributors.       |
+| `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers. |
+| `.[sandbox]`     | Install all dependencies for sandbox.                                  |
 
 ### From Source for Specific OPs
 
 - Install dependencies for specific OPs
 
-With the growth of the number of OPs, the dependencies of all OPs become very heavy. Instead of using the command `pip install -v -e .[sci]` to install all dependencies,
+With the growth of the number of OPs, the dependencies of all OPs become very heavy. Instead of using the command `pip install -v -e .[all]` to install all dependencies,
 we provide two alternative, lighter options:
 
   - Automatic Minimal Dependency Installation: During the execution of Data-Juicer, minimal dependencies will be automatically installed. This allows for immediate execution, but may potentially lead to dependency conflicts.
