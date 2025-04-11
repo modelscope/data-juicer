@@ -1,11 +1,11 @@
 import os
 from typing import List
 
-import wandb
 import yaml
 from jsonargparse import Namespace as JsonNamespace
 from jsonargparse import namespace_to_dict
 
+import wandb
 from data_juicer.config import merge_config
 from data_juicer.core.sandbox.hooks import register_hook
 
