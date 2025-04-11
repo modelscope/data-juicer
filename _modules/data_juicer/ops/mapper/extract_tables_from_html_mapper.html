@@ -77,12 +77,11 @@
            <div itemprop="articleBody">
              
   <h1>Source code for data_juicer.ops.mapper.extract_tables_from_html_mapper</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">MetaKeys</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">bs4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.constant</span><span class="w"> </span><span class="kn">import</span> <span class="n">Fields</span><span class="p">,</span> <span class="n">MetaKeys</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">TAGGING_OPS</span><span class="p">,</span> <span class="n">Mapper</span>
-
-<span class="n">bs4</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;bs4&#39;</span><span class="p">,</span> <span class="s1">&#39;bs4&#39;</span><span class="p">)</span>
 
 <span class="n">OP_NAME</span> <span class="o">=</span> <span class="s1">&#39;extract_tables_from_html_mapper&#39;</span>
 

@@ -320,9 +320,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">NestedDataset</span><span class="p">):</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">NestedDataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="c1"># add meta field for OPs that produce tags</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_same_content_to_new_column</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">in</span> <span class="n">TAGGING_OPS</span><span class="o">.</span><span class="n">modules</span> \
                 <span class="ow">and</span> <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_same_content_to_new_column</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">add_same_content_to_new_column</span><span class="p">,</span>
                                   <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span>
                                       <span class="s1">&#39;new_column_name&#39;</span><span class="p">:</span> <span class="n">Fields</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
@@ -331,7 +331,20 @@
                                   <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">(),</span>
                                   <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
                                   <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Adding new column for meta&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># add stats field for Filters that produce stats</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Filter</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">NON_STATS_FILTERS</span><span class="o">.</span><span class="n">modules</span> \
+                <span class="ow">and</span> <span class="n">Fields</span><span class="o">.</span><span class="n">stats</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">add_same_content_to_new_column</span><span class="p">,</span>
+                                  <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span>
+                                      <span class="s1">&#39;new_column_name&#39;</span><span class="p">:</span> <span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
+                                      <span class="s1">&#39;initial_value&#39;</span><span class="p">:</span> <span class="p">{}</span>
+                                  <span class="p">},</span>
+                                  <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">(),</span>
+                                  <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+                                  <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Adding new column for stats&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> \
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">index_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
 
             <span class="k">def</span><span class="w"> </span><span class="nf">add_index</span><span class="p">(</span><span class="n">sample</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
                 <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
@@ -568,18 +581,6 @@
 <a class="viewcode-back" href="../../../data_juicer.ops.html#data_juicer.ops.Filter.run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">exporter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tracer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reduce</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Filter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-        <span class="c1"># add stats field for Filters that produce stats</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">NON_STATS_FILTERS</span><span class="o">.</span><span class="n">modules</span> \
-                <span class="ow">and</span> <span class="n">Fields</span><span class="o">.</span><span class="n">stats</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">features</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">add_same_content_to_new_column</span>
-            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">add_same_content_to_new_column</span><span class="p">,</span>
-                                  <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span>
-                                      <span class="s1">&#39;new_column_name&#39;</span><span class="p">:</span> <span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
-                                      <span class="s1">&#39;initial_value&#39;</span><span class="p">:</span> <span class="p">{}</span>
-                                  <span class="p">},</span>
-                                  <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">(),</span>
-                                  <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
-                                  <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Adding new column for stats&#39;</span><span class="p">)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">,</span>
                               <span class="n">num_proc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">runtime_np</span><span class="p">(),</span>
                               <span class="n">with_rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">(),</span>
