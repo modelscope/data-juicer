@@ -1,9 +1,8 @@
+import bs4
+
 from data_juicer.utils.constant import Fields, MetaKeys
-from data_juicer.utils.lazy_loader import LazyLoader
 
 from ..base_op import OPERATORS, TAGGING_OPS, Mapper
-
-bs4 = LazyLoader('bs4', 'bs4')
 
 OP_NAME = 'extract_tables_from_html_mapper'
 
