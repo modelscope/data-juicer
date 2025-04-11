@@ -200,8 +200,9 @@ class FusedFilter(Filter):
 
 @OPERATORS.register_module('general_fused_op')
 class GeneralFusedOP(OP):
-    """A general fused operator for OPs that is used to run sequential OPs on
-    the same batch to allow fine-grained control on data processing."""
+    """An explicitly fused operator designed to execute multiple sequential
+    operations (OPs) on the same batch, enabling fine-grained control over 
+    data processing."""
 
     _batched_op = True
 
