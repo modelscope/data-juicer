@@ -106,6 +106,8 @@ class MetaKeys(object):
     support_text = 'support_text'
     # # role relation
     role_relation = 'role_relation'
+    # # html tables
+    html_tables = 'html_tables'
 
 
 class StatsKeysMeta(type):
