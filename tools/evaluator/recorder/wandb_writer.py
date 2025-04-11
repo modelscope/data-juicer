@@ -2,9 +2,8 @@ import argparse
 import json
 import os
 
-import yaml
-
 import wandb
+import yaml
 
 
 def get_args():
