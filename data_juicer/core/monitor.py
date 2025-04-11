@@ -130,6 +130,9 @@ class Monitor:
     @staticmethod
     def draw_resource_util_graph(resource_util_list, store_dir):
         import matplotlib.pyplot as plt
+
+        # avoid error when running on not-main process/thread
+        plt.switch_backend('agg')
         for idx, resource_util_dict in enumerate(resource_util_list):
             resource_list = resource_util_dict['resource']
             interval = resource_util_dict['sampling interval']

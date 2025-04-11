@@ -10,7 +10,7 @@ simhash-pybind
 selectolax
 nlpaug
 nlpcda
-nltk<3.9
+nltk
 transformers>=4.47.0,<4.48.0
 transformers_stream_generator
 einops

@@ -8,7 +8,7 @@ from jsonargparse import namespace_to_dict
 from loguru import logger
 
 from data_juicer.config import init_configs
-from data_juicer.core import Analyzer, Executor
+from data_juicer.core import Analyzer, DefaultExecutor
 from data_juicer.utils.constant import StatsKeys
 
 
@@ -34,9 +34,9 @@ def main():
     # 3. process the data using the refined recipe
     logger.info('Begin to process the data with refined recipe')
     if cfg.executor_type == 'default':
-        executor = Executor(cfg)
+        executor = DefaultExecutor(cfg)
     elif cfg.executor_type == 'ray':
-        from data_juicer.core.ray_executor import RayExecutor
+        from data_juicer.core.executor.ray_executor import RayExecutor
         executor = RayExecutor(cfg)
     executor.run()
 

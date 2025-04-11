@@ -8,6 +8,7 @@
 ![](https://img.shields.io/badge/license-Apache--2.0-000000.svg)
 [![pypi version](https://img.shields.io/pypi/v/py-data-juicer?logo=pypi&color=026cad)](https://pypi.org/project/py-data-juicer)
 [![Docker version](https://img.shields.io/docker/v/datajuicer/data-juicer?logo=docker&label=Docker&color=498bdf)](https://hub.docker.com/r/datajuicer/data-juicer)
+![](https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2FHYLcool%2Ff856b14416f08f73d05d32fd992a9c29%2Fraw%2Ftotal_cov.json)
 
 [![DataModality](https://img.shields.io/badge/DataModality-Text,Image,Audio,Video-brightgreen.svg)](#dj-cookbook)
 [![Usage](https://img.shields.io/badge/Usage-Cleaning,Synthesis,Analysis-FFD21E.svg)](#dj-cookbook)
@@ -78,12 +79,14 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - [交互类示例](#交互类示例)
 - [安装](#安装)
   - [前置条件](#前置条件)
-  - [从源码安装](#从源码安装)
+  - [从源码安装 (指定使用场景)](#从源码安装-指定使用场景)
+  - [从源码安装 (指定部分算子)](#从源码安装-指定部分算子)
   - [使用 pip 安装](#使用-pip-安装)
   - [使用 Docker 安装](#使用-docker-安装)
   - [安装校验](#安装校验)
   - [使用视频相关算子](#使用视频相关算子)
 - [快速上手](#快速上手)
+  - [数据集配置](#数据集配置)
   - [数据处理](#数据处理)
   - [分布式数据处理](#分布式数据处理)
   - [数据分析](#数据分析)
@@ -189,7 +192,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 * gcc >= 5 (at least C++14 support)
 
 
-### 从源码安装
+### 从源码安装 (指定使用场景)
 
 * 运行以下命令以安装 `data_juicer` 可编辑模式的最新基础版本
 
@@ -208,25 +211,27 @@ pip install -v -e .[tools] # 安装部分工具库的依赖
 
 依赖选项如下表所示:
 
-| 标签               | 描述                           |
-|------------------|------------------------------|
-| `.` 或者 `.[mini]` | 安装支持 Data-Juicer 基础功能的最小依赖项  |
-| `.[all]`         | 安装除了沙盒实验以外的所有依赖项  |
-| `.[sci]`         | 安装所有算子的全量依赖                  |
-| `.[dist]`        | 安装以分布式方式进行数据处理的依赖（实验性功能）     |
-| `.[dev]`         | 安装作为贡献者开发 Data-Juicer 所需的依赖项 |
-| `.[tools]`       | 安装专用工具库（如质量分类器）所需的依赖项        |
-| `.[sandbox]`     | 安装沙盒实验室的基础依赖                 |
+| 标签              | 描述 |
+|------------------|----------------------------------|
+| `.` 或 `.[mini]` | 为基本 Data-Juicer 安装最小依赖项。  |
+| `.[all]`         | 为除沙盒之外的所有 OP 安装依赖项。    |
+| `.[sci]`         | 为与科学用途相关的 OP 安装依赖项。    |
+| `.[dist]`        | 安装用于分布式数据处理的额外依赖项。   |
+| `.[dev]`         | 安装作为贡献者开发软件包的依赖项。     |
+| `.[tools]`       | 安装专用工具（例如质量分类器）的依赖项。|
+| `.[sandbox]`     | 安装沙盒的所有依赖项。               |
+
+### 从源码安装 (指定部分算子)
 
 * 只安装部分算子依赖
 
-随着OP数量的增长，所有OP的依赖变得很重。为此，我们提供了两个替代的、更轻量的选项，作为使用命令`pip install -v -e .[sci]`安装所有依赖的替代：
+随着OP数量的增长，全OP环境的依赖安装会变得越来越重。为此，我们提供了两个替代的、更轻量的选项，作为使用命令`pip install -v -e .[sci]`安装所有依赖的替代：
 
-  * 自动最小依赖安装：在执行Data-Juicer的过程中，将自动安装最小依赖。也就是说你可以直接执行，但这种方式可能会导致一些依赖冲突。
+  * 自动最小依赖安装：在执行Data-Juicer的过程中，将自动安装最小依赖。也就是说你可以安装mini后直接执行，但这种方式可能会导致一些(滞后的)依赖冲突。
 
-  * 手动最小依赖安装：可以通过如下指令手动安装适合特定执行配置的最小依赖：
+  * 手动最小依赖安装：可以通过如下指令手动安装适合特定执行配置的最小依赖，可以提前确定依赖冲突、使其更易解决:
     ```shell
-    # 适用于从源码安装
+    # 从源码安装
     python tools/dj_install.py --config path_to_your_data-juicer_config_file
     
     # 使用命令行工具
@@ -280,6 +285,24 @@ print(dj.__version__)
 <p align="right"><a href="#table">🔼 back to index</a></p>
 
 ## 快速上手
+### 数据集配置
+
+DJ 支持多种数据集输入类型，包括本地文件、远程数据集（如 huggingface）；还支持数据验证和数据混合。
+
+配置输入文件的两种方法
+- 简单场景，本地/HF 文件的单一路径
+```yaml
+dataset_path: '/path/to/your/dataset' # 数据集目录或文件的路径
+```
+- 高级方法，支持子配置项和更多功能
+```yaml
+dataset:
+configs:
+- type: 'local'
+path: 'path/to/your/dataset' # 数据集目录或文件的路径
+```
+
+更多详细信息，请参阅 [数据集配置指南](docs/DatasetCfg_ZH.md)。
 
 ### 数据处理
 

@@ -33,7 +33,7 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
 
     :param args: list of params, e.g., ['--config', 'cfg.yaml'], default None.
     :param which_entry: which entry to init configs (executor/analyzer)
-    :return: a global cfg object used by the Executor or Analyzer
+    :return: a global cfg object used by the DefaultExecutor or Analyzer
     """
     parser = ArgumentParser(default_env=True, default_config_files=None)
 
@@ -103,12 +103,25 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
         'default. Accepted format:<w1> dataset1-path <w2> dataset2-path '
         '<w3> dataset3-path ...')
     parser.add_argument(
+        '--dataset',
+        type=Union[List[Dict], Dict],
+        default=[],
+        help='Dataset setting to define local/remote datasets; could be a '
+        'dict or a list of dicts; refer to configs/datasets for more '
+        'detailed examples')
+    parser.add_argument(
         '--generated_dataset_config',
         type=Dict,
         default=None,
         help='Configuration used to create a dataset. '
         'The dataset will be created from this configuration if provided. '
         'It must contain the `type` field to specify the dataset name.')
+    parser.add_argument(
+        '--validators',
+        type=List[Dict],
+        default=[],
+        help='List of validators to apply to the dataset. Each validator '
+        'must have a `type` field specifying the validator type.')
     parser.add_argument(
         '--export_path',
         type=str,
@@ -452,19 +465,22 @@ def init_setup_from_cfg(cfg: Namespace):
 
     # check and get dataset dir
     if cfg.get('dataset_path', None) and os.path.exists(cfg.dataset_path):
+        logger.info('dataset_path config is set and a valid local path')
         cfg.dataset_path = os.path.abspath(cfg.dataset_path)
         if os.path.isdir(cfg.dataset_path):
             cfg.dataset_dir = cfg.dataset_path
         else:
             cfg.dataset_dir = os.path.dirname(cfg.dataset_path)
-    elif cfg.dataset_path == '':
-        logger.warning('dataset_path is empty by default.')
+    elif cfg.dataset_path == '' and cfg.get('dataset', None):
+        logger.info('dataset_path config is empty; dataset is present')
         cfg.dataset_dir = ''
     else:
         logger.warning(f'dataset_path [{cfg.dataset_path}] is not a valid '
-                       f'local path. Please check and retry, otherwise we '
-                       f'will treat it as a remote dataset or a mixture of '
-                       f'several datasets.')
+                       f'local path, AND dataset is not present. '
+                       f'Please check and retry, otherwise we '
+                       f'will treat dataset_path as a remote dataset or a '
+                       f'mixture of several datasets.')
+
         cfg.dataset_dir = ''
 
     # check number of processes np
@@ -910,3 +926,30 @@ def get_init_configs(cfg: Union[Namespace, Dict]):
         json.dump(cfg, f)
     inited_dj_cfg = init_configs(['--config', temp_file])
     return inited_dj_cfg
+
+
+def get_default_cfg():
+    """Get default config values from config_all.yaml"""
+    cfg = Namespace()
+
+    # Get path to config_all.yaml
+    config_dir = os.path.dirname(os.path.abspath(__file__))
+    default_config_path = os.path.join(config_dir,
+                                       '../../configs/config_min.yaml')
+
+    # Load default values from yaml
+    with open(default_config_path, 'r', encoding='utf-8') as f:
+        defaults = yaml.safe_load(f)
+
+    # Convert to flat dictionary for namespace
+    flat_defaults = {
+        # Add other top-level keys from config_min.yaml
+        **defaults
+    }
+
+    # Update cfg with defaults
+    for key, value in flat_defaults.items():
+        if not hasattr(cfg, key):
+            setattr(cfg, key, value)
+
+    return cfg

@@ -6,6 +6,26 @@
 project_name: 'all'                                         # project name for distinguish your configs
 dataset_path: '/path/to/your/dataset'                       # path to your dataset directory or file with weights(0.0-1.0), 1.0 as default.
                                                             # accepted format: 'weight1(optional) dataset1-path weight2(optional) dataset2-path'
+
+dataset:                                                    # dataset is another way to specify the input dataset.
+  max_sample_num: 10000                                     # max sample number to load from the dataset configs.
+  configs:                                                  # configs is a list of dataset configs, which can be mixtured per weight and max_sample_num
+    - type: 'local'                                         # type of dataset, support 'local', 'hf', 'modelscope', etc
+      weight: 0.5                                           # weight of the dataset, 1.0 as default.
+      path: '/path/to/json/file'                            # path to the dataset file; could be a single file or a directory containing multiple files
+    - type: 'local'                                         # consult configs/datasets for more details
+      weight: 0.5                                           # weight of the dataset, 1.0 as default.
+      path: '/path/to/csv/file'
+
+validators:                                                 # validators are a list of validators to be applied when loading a dataset
+                                                            # it checks a sample of the dataset for each validator
+                                                            # check data_juicer/ore/data/data_validator.py for more validator options
+  - type: 'required_fields'                                 # required_fields is a validator to check the required fields in the dataset.
+    required_fields:                                          # required_fields is a list of required fields.
+      - "text"
+    field_types:                                              # field_types is a dictionary of field types.
+      text: 'str'
+
 export_path: '/path/to/result/dataset.jsonl'                # path to processed result dataset. Supported suffixes include ['jsonl', 'json', 'parquet']
 export_shard_size: 0                                        # shard size of exported dataset in Byte. In default, it's 0, which means export the whole dataset into only one file. If it's set a positive number, the exported dataset will be split into several dataset shards, and the max size of each shard won't larger than the export_shard_size
 export_in_parallel: false                                   # whether to export the result dataset in parallel to a single file, which usually takes less time. It only works when export_shard_size is 0, and its default number of processes is the same as the argument np. **Notice**: If it's True, sometimes exporting in parallel might require much more time due to the IO blocking, especially for very large datasets. When this happens, False is a better choice, although it takes more time.
@@ -250,6 +270,10 @@ process:
       drop_text: false                                        # If drop the text in the output.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - extract_tables_from_html_mapper:                        # extract tables from HTML content
+      tables_field_name: 'html_tables'                        # Field name to store the extracted tables.
+      retain_html_tags: false,                                # If True, retains HTML tags in the tables; otherwise, removes them.
+      include_header: true,                                   # If True, includes the table header; otherwise, excludes it. This parameter is effective only when `retain_html_tags` is False and applies solely to the extracted table content.
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - generate_qa_from_examples_mapper:                       # mapper to generate question and answer pairs from examples.
       hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # Model name on huggingface to generate question and answer pairs.
@@ -890,7 +914,7 @@ process:
       window_size: 5                                          # window size of shingling
       num_permutations: 256                                   # number of permutations in minhash computing
       jaccard_threshold: 0.7                                  # the min jaccard similarity threshold in near-duplicate detection. When the jaccard similarity of two sample texts is >= this threshold, they are regarded as similar samples and this op will only keep one of them after deduplication
-      num_bands: null                                         # number of bands in LSH. Default it's None, and it will be determined by an optimal params computation algorithm by minimize the weighted sum of probs of False Positives and False Negatives
+      num_bands: null                                         # number of bands in LSH. Default it's None, and it will be determined by an optimal params computation algorithm
       num_rows_per_band: null                                 # number of rows in each band in LSH. Default it's None, and it will be determined by an optimal params computation algorithm
       lowercase: true                                         # whether to convert text to lower case
       ignore_pattern: null                                    # whether to ignore sub-strings with specific pattern when computing simhash.
@@ -995,3 +1019,46 @@ process:
       try_num: 3                                              # The number of retry attempts when there is an API call error or output parsing error.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+
+# Notification configurations
+notification:
+  email:
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    sender_email: "notifications@example.com"
+    sender_password: ""  # Fill in your password or app-specific password
+    recipients: ["user@example.com"]
+    subject: "Data Juicer Notification"
+
+  slack:
+    webhook_url: ""  # Fill in your Slack webhook URL
+    channel: "#data-juicer-notifications"
+    username: "Data Juicer Bot"
+
+  dingtalk:
+    access_token: ""  # Fill in your DingTalk access token
+    secret: ""  # Fill in your DingTalk secret (optional)
+
+# Human annotation configurations
+annotation:
+  label_studio:
+    api_url: "http://localhost:8080"
+    api_key: ""  # Fill in your Label Studio API key
+    project_name: "Data Annotation Project"
+    label_config: |
+      <View>
+        <Text name="text" value="$text"/>
+        <Choices name="sentiment" toName="text" choice="single">
+          <Choice value="Positive"/>
+          <Choice value="Neutral"/>
+          <Choice value="Negative"/>
+        </Choices>
+      </View>
+    wait_for_annotations: false
+    timeout: 3600
+    poll_interval: 60
+    notification:
+      on_task_created: true
+      on_annotation_completed: true
+      on_project_completed: true
+      on_error: true

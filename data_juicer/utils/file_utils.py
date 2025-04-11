@@ -1,12 +1,15 @@
+import ast
 import asyncio
 import copy
 import os
 import re
 import shutil
+import warnings
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import AsyncGenerator, List, Union
+from typing import AsyncGenerator, Dict, List, Optional, Union
 
+import pandas as pd
 from datasets.utils.extract import ZstdExtractor as Extractor
 
 from data_juicer.utils.common_utils import dict_to_hash
@@ -46,7 +49,7 @@ async def follow_read(
 
 def find_files_with_suffix(
         path: Union[str, Path],
-        suffixes: Union[str, List[str], None] = None) -> List[str]:
+        suffixes: Union[str, List[str], None] = None) -> Dict[str, List[str]]:
     """
     Traverse a path to find all files with the specified suffixes.
 
@@ -214,3 +217,167 @@ def copy_data(from_dir, to_dir, data_path):
         os.makedirs(parent_dir)
     shutil.copy2(from_path, to_path)
     return True
+
+
+def expand_outdir_and_mkdir(outdir):
+    _outdir = os.path.abspath(os.path.expanduser(outdir))
+    if not os.path.exists(_outdir):
+        os.makedirs(_outdir)
+    return _outdir
+
+
+def single_partition_write_with_filename(
+    df: pd.DataFrame,
+    output_file_dir: str,
+    keep_filename_column: bool = False,
+    output_type: str = 'jsonl',
+) -> pd.Series:
+    """
+    This function processes a DataFrame and writes it to disk
+
+    Args:
+        df: A DataFrame.
+        output_file_dir: The output file path.
+        keep_filename_column: Whether to keep or drop the "filename" column, if it exists.
+        output_type="jsonl": The type of output file to write.
+    Returns:
+        If the DataFrame is non-empty, return a Series containing a single element, True.
+        If the DataFrame is empty, return a Series containing a single element, False.
+
+    """  # noqa: E501
+    assert 'filename' in df.columns
+
+    if len(df) > 0:
+        empty_partition = False
+    else:
+        warnings.warn('Empty partition found')
+        empty_partition = True
+
+    # if is_cudf_type(df):
+    #     import cudf
+    #     success_ser = cudf.Series([empty_partition])
+    # else:
+    success_ser = pd.Series([empty_partition])
+
+    if not empty_partition:
+        filenames = df.filename.unique()
+        filenames = list(filenames)
+        num_files = len(filenames)
+
+        for filename in filenames:
+            out_df = df[df.filename == filename] if num_files > 1 else df
+            if not keep_filename_column:
+                out_df = out_df.drop('filename', axis=1)
+
+            filename = Path(filename).stem
+            output_file_path = os.path.join(output_file_dir, filename)
+
+            if output_type == 'jsonl':
+                output_file_path = output_file_path + '.jsonl'
+                out_df.to_json(
+                    output_file_path,
+                    orient='records',
+                    lines=True,
+                    force_ascii=False,
+                )
+
+            elif output_type == 'parquet':
+                output_file_path = output_file_path + '.parquet'
+                out_df.to_parquet(output_file_path)
+
+            else:
+                raise ValueError(f'Unknown output type: {output_type}')
+
+    return success_ser
+
+
+def read_single_partition(
+    files,
+    filetype='jsonl',
+    add_filename=False,
+    input_meta: Union[str, dict] = None,
+    columns: Optional[List[str]] = None,
+    **kwargs,
+) -> pd.DataFrame:
+    """
+    This function reads a file with cuDF, sorts the columns of the DataFrame
+    and adds a "filename" column.
+
+    Args:
+        files: The path to the jsonl files to read.
+        add_filename: Whether to add a "filename" column to the DataFrame.
+        input_meta: A dictionary or a string formatted as a dictionary, which outlines
+            the field names and their respective data types within the JSONL input file.
+        columns: If not None, only these columns will be read from the file.
+            There is a significant performance gain when specifying columns for Parquet files.
+
+    Returns:
+        A pandas DataFrame.
+
+    """  # noqa: E501
+    if input_meta is not None and filetype != 'jsonl':
+        warnings.warn('input_meta is only valid for JSONL files and'
+                      'will be ignored for other file formats..')
+
+    if filetype in ['jsonl', 'json']:
+        read_kwargs = {'lines': filetype == 'jsonl'}
+        read_kwargs['dtype'] = False
+        read_f = pd.read_json
+
+        if input_meta is not None:
+            read_kwargs['dtype'] \
+                = (ast.literal_eval(input_meta)
+                   if type(input_meta) == str else input_meta)
+
+    elif filetype == 'parquet':
+        read_kwargs = {'columns': columns}
+        read_f = pd.read_parquet
+
+    else:
+        raise RuntimeError('Could not read data, please check file type')
+
+    read_files_one_at_a_time = True
+    if read_files_one_at_a_time:
+        concat_f = pd.concat
+        df_ls = []
+        for file in files:
+            df = read_f(file, **read_kwargs, **kwargs)
+            if add_filename:
+                df['filename'] = os.path.basename(file)
+            df_ls.append(df)
+        df = concat_f(df_ls, ignore_index=True)
+    else:
+        df = read_f(files, **read_kwargs, **kwargs)
+
+    if filetype in ['jsonl', 'json'] and columns is not None:
+        if add_filename and 'filename' not in columns:
+            columns.append('filename')
+        df = df[columns]
+
+    df = df[sorted(df.columns)]
+    return df
+
+
+def get_all_files_paths_under(root,
+                              recurse_subdirectories=True,
+                              followlinks=False):
+    """
+    This function returns a list of all the files under a specified directory.
+    Args:
+        root: The path to the directory to read.
+        recurse_subdirecties: Whether to recurse into subdirectories.
+                              Please note that this can be slow for large
+                              number of files.
+        followlinks: Whether to follow symbolic links.
+    """  # noqa: E501
+    if recurse_subdirectories:
+        file_ls = [
+            os.path.join(r, f)
+            for r, subdirs, files in os.walk(root, followlinks=followlinks)
+            for f in files
+        ]
+    else:
+        file_ls = [entry.path for entry in os.scandir(root)]
+
+    file_ls.sort()
+    return file_ls

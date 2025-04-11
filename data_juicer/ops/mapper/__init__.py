@@ -1,3 +1,5 @@
+from .annotation.human_preference_annotation_mapper import \
+    HumanPreferenceAnnotationMapper
 from .audio_add_gaussian_noise_mapper import AudioAddGaussianNoiseMapper
 from .audio_ffmpeg_wrapped_mapper import AudioFFmpegWrappedMapper
 from .calibrate_qa_mapper import CalibrateQAMapper
@@ -20,6 +22,7 @@ from .extract_event_mapper import ExtractEventMapper
 from .extract_keyword_mapper import ExtractKeywordMapper
 from .extract_nickname_mapper import ExtractNicknameMapper
 from .extract_support_text_mapper import ExtractSupportTextMapper
+from .extract_tables_from_html_mapper import ExtractTablesFromHtmlMapper
 from .fix_unicode_mapper import FixUnicodeMapper
 from .generate_qa_from_examples_mapper import GenerateQAFromExamplesMapper
 from .generate_qa_from_text_mapper import GenerateQAFromTextMapper
@@ -90,8 +93,9 @@ __all__ = [
     'ExpandMacroMapper', 'ExtractEntityAttributeMapper',
     'ExtractEntityRelationMapper', 'ExtractEventMapper',
     'ExtractKeywordMapper', 'ExtractNicknameMapper',
-    'ExtractSupportTextMapper', 'FixUnicodeMapper',
-    'GenerateQAFromExamplesMapper', 'GenerateQAFromTextMapper',
+    'ExtractSupportTextMapper', 'ExtractTablesFromHtmlMapper',
+    'FixUnicodeMapper', 'GenerateQAFromExamplesMapper',
+    'GenerateQAFromTextMapper', 'HumanPreferenceAnnotationMapper',
     'ImageBlurMapper', 'ImageCaptioningFromGPT4VMapper',
     'ImageCaptioningMapper', 'ImageDiffusionMapper', 'ImageFaceBlurMapper',
     'ImageRemoveBackgroundMapper', 'ImageSegmentMapper', 'ImageTaggingMapper',

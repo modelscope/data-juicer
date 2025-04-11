@@ -817,7 +817,10 @@ class RayBTSMinhashDeduplicatorTest(DataJuicerTestCaseBase):
             },
         ]
         dataset = self.generate_dataset(ds_list)
-        op = RayBTSMinhashDeduplicator(ignore_pattern=r'\p{P}', work_dir='english_dedup')
+        import os
+        cur_dir = os.path.dirname(os.path.abspath(__file__))
+        work_dir = os.path.join(cur_dir, 'english_dedup')
+        op = RayBTSMinhashDeduplicator(ignore_pattern=r'\p{P}', work_dir=work_dir)
         self._run_minhash_dedup(dataset, tgt_list, op)
 
     @TEST_TAG("ray")
@@ -953,9 +956,12 @@ class RayBTSMinhashDeduplicatorTest(DataJuicerTestCaseBase):
             },
         ]
         dataset = self.generate_dataset(ds_list)
+        import os
+        cur_dir = os.path.dirname(os.path.abspath(__file__))
+        work_dir = os.path.join(cur_dir, 'chinese_dedup')
         op = RayBTSMinhashDeduplicator(tokenization='character',
                                        ignore_pattern=r'\p{P}',
-                                       work_dir='chinese_dedup')
+                                       work_dir=work_dir)
         self._run_minhash_dedup(dataset, tgt_list, op)
 
 

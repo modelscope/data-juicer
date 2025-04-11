@@ -1,4 +1,5 @@
 from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.nltk_utils import patch_nltk_pickle_security
 
 from ..base_op import OPERATORS, Mapper
 from ..common import get_sentences_from_document
@@ -22,10 +23,15 @@ class SentenceSplitMapper(Mapper):
         """
         super().__init__(*args, **kwargs)
         self.lang = lang
+
+        # Ensure NLTK pickle security patch is applied
+        patch_nltk_pickle_security()
+
+        # Prepare the sentence tokenizer model
         self.model_key = prepare_model(model_type='nltk', lang=lang)
 
     def process_batched(self, samples):
-
+        # Get the sentence tokenizer model
         nltk_model = get_model(self.model_key)
 
         samples[self.text_key] = [
