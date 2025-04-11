@@ -68,6 +68,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.ExtractKeywordMapper"><code class="docutils literal notranslate"><span class="pre">ExtractKeywordMapper</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.ExtractNicknameMapper"><code class="docutils literal notranslate"><span class="pre">ExtractNicknameMapper</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.ExtractSupportTextMapper"><code class="docutils literal notranslate"><span class="pre">ExtractSupportTextMapper</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.ExtractTablesFromHtmlMapper"><code class="docutils literal notranslate"><span class="pre">ExtractTablesFromHtmlMapper</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.FixUnicodeMapper"><code class="docutils literal notranslate"><span class="pre">FixUnicodeMapper</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.GenerateQAFromExamplesMapper"><code class="docutils literal notranslate"><span class="pre">GenerateQAFromExamplesMapper</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data_juicer.ops.mapper.GenerateQAFromTextMapper"><code class="docutils literal notranslate"><span class="pre">GenerateQAFromTextMapper</span></code></a></li>
@@ -1511,6 +1512,50 @@ e.g {‘temperature’: 0.9, ‘top_p’: 0.95}</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.mapper.ExtractSupportTextMapper.process_single">
 <span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/extract_support_text_mapper.html#ExtractSupportTextMapper.process_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.ExtractSupportTextMapper.process_single" title="Link to this definition">¶</a></dt>
+<dd><p>For sample level, sample –&gt; sample</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sample</strong> – sample to process</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>processed sample</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.ExtractTablesFromHtmlMapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.mapper.</span></span><span class="sig-name descname"><span class="pre">ExtractTablesFromHtmlMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tables_field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'html_tables'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retain_html_tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/extract_tables_from_html_mapper.html#ExtractTablesFromHtmlMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.ExtractTablesFromHtmlMapper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_juicer.ops.html#data_juicer.ops.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
+<p>Mapper to extract tables from HTML content.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.ExtractTablesFromHtmlMapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tables_field_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'html_tables'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retain_html_tags</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/extract_tables_from_html_mapper.html#ExtractTablesFromHtmlMapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.ExtractTablesFromHtmlMapper.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.
+:param tables_field_name: Field name to store the extracted tables.
+:param retain_html_tags: If True, retains HTML tags in the tables;</p>
+<blockquote>
+<div><p>otherwise, removes them.</p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>include_header</strong> – <dl class="simple">
+<dt>If True, includes the table header;</dt><dd><p>otherwise, excludes it.</p>
+</dd>
+<dt>This parameter is effective</dt><dd><p>only when <cite>retain_html_tags</cite> is False</p>
+</dd>
+</dl>
+<p>and applies solely to the extracted table content.</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.ops.mapper.ExtractTablesFromHtmlMapper.process_single">
+<span class="sig-name descname"><span class="pre">process_single</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/mapper/extract_tables_from_html_mapper.html#ExtractTablesFromHtmlMapper.process_single"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.mapper.ExtractTablesFromHtmlMapper.process_single" title="Link to this definition">¶</a></dt>
 <dd><p>For sample level, sample –&gt; sample</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
