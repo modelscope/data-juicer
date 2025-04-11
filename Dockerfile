@@ -18,7 +18,8 @@ RUN apt-get update \
 
 # install 3rd-party system dependencies
 RUN apt-get update \
-    && apt-get install ffmpeg libsm6 libxext6 software-properties-common build-essential cmake gfortran libopenblas-dev liblapack-dev -y
+    && apt-get install ffmpeg libsm6 libxext6 software-properties-common build-essential cmake gfortran libopenblas-dev liblapack-dev -y \
+    && apt-get install -y postgresql postgresql-contrib libpq-dev
 
 # prepare the java env
 WORKDIR /opt
@@ -39,4 +40,5 @@ RUN pip install --upgrade setuptools==69.5.1 setuptools_scm \
 
 # install data-juicer then
 COPY . .
-RUN pip install -v -e .[all] --default-timeout 1000
+RUN pip install -v -e .[all] --default-timeout 1000 \
+    && python -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger');  nltk.download('averaged_perceptron_tagger_eng')"

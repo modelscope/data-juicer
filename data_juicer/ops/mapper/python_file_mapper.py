@@ -59,7 +59,7 @@ class PythonFileMapper(Mapper):
                 f"Function '{self.function_name}' not found in '{self.file_path}'."  # noqa: E501
             )
 
-        func = getattr(module, self.function_name)
+        func = getattr(module, self.function_name, None)
 
         if not callable(func):
             raise ValueError(

@@ -24,6 +24,7 @@ class DatasetBuilder(object):
         self.use_generated_dataset_config = False
         self.cfg = cfg
         self.executor_type = executor_type
+        self.require_dataset_arg = False
 
         # priority: generated_dataset_config > dataset_path > dataset
         if hasattr(
@@ -39,10 +40,11 @@ class DatasetBuilder(object):
             logger.info(f'found dataset setting: {cfg.dataset}')
             ds_configs = cfg.dataset
         else:
-            raise ConfigValidationError(
-                'Unable to initialize dataset; should have one of '
-                'generated_dataset_config, dataset_path, or dataset '
-                'in configurations')
+            logger.warning(
+                'No dataset setting found in configurations. Will '
+                'check the dataset argument before loading dataset.')
+            self.require_dataset_arg = True
+            return
 
         # validate dataset config for type constraints
         # TODO other constraints; ray dataset only supports local, etc.
@@ -121,6 +123,14 @@ class DatasetBuilder(object):
                         f'No data validator found for {validator_type}')
 
     def load_dataset(self, **kwargs) -> DJDataset:
+        if self.require_dataset_arg:
+            # should not get into this method
+            raise ValueError(
+                'Unable to load dataset; should have one of '
+                'generated_dataset_config, dataset_path, or dataset '
+                'in configurations, or pass the `dataset` object through `run`'
+                ' method')
+
         # if generated_dataset_config present, prioritize
         if self.use_generated_dataset_config:
             return DatasetBuilder.load_dataset_by_generated_config(

@@ -1,7 +1,7 @@
 datasets>=2.19.0
 fsspec==2023.5.0
 pandas
-numpy
+numpy>=1.22.0,<1.27.0
 av==13.1.0
 soundfile
 # need to install two dependencies by librosa to avoid lazy_loader error
@@ -38,3 +38,5 @@ wordcloud
 jsonlines
 bs4
 ray==2.40.0
+nltk==3.9.1
+label-studio==1.16.0
