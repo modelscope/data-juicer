@@ -252,16 +252,12 @@ class DocumentMinhashDeduplicator(Deduplicator):
                 f'Unimplemented tokenization method [{self.tokenization}]')
 
         # compute minhash value
-        hv = np.array([sha1_hash32(token) for token in tokens],
-                      dtype=np.uint64)
+        hv = np.fromiter((sha1_hash32(token) for token in tokens), dtype=np.uint64, count=len(tokens))
         phv = np.bitwise_and(
-            ((hv * np.tile(self.perm_a,
-                           (len(hv), 1)).T).T + self.perm_b) % MERSENNE_PRIME,
-            MAX_HASH)
-        hash_values = np.vstack([
-            phv,
-            np.ones(self.num_permutation, dtype=np.uint64) * MAX_HASH
-        ]).min(axis=0)
+            (hv[:, None] * self.perm_a + self.perm_b) % MERSENNE_PRIME,
+            MAX_HASH
+        )
+        hash_values = np.minimum(phv, MAX_HASH)
         sample[HashKeys.minhash] = [
             bytes(hash_values[start:end].byteswap().data)
             for start, end in self.hash_ranges
