@@ -194,35 +194,47 @@ def pull_docker_image(image):
 
 def check_container_exists(container_name):
     """Check if a container with the given name exists"""
-    result = subprocess.run([
-        'docker', 'ps', '-a', '--filter', f'name={container_name}', '--format',
-        '{{.Names}}'
-    ],
-                            capture_output=True,
-                            text=True,
-                            check=False)
+    try:
+        result = subprocess.run([
+            'docker', 'ps', '-a', '--filter', f'name={container_name}',
+            '--format', '{{.Names}}'
+        ],
+                                capture_output=True,
+                                text=True,
+                                check=False)
+    except FileNotFoundError:
+        logger.error('Docker is not installed or not in PATH.')
+        return False
     return container_name in result.stdout.strip().split('\n')
 
 
 def check_container_running(container_name):
     """Check if a container is currently running"""
-    result = subprocess.run([
-        'docker', 'ps', '--filter', f'name={container_name}', '--format',
-        '{{.Names}}'
-    ],
-                            capture_output=True,
-                            text=True,
-                            check=False)
+    try:
+        result = subprocess.run([
+            'docker', 'ps', '--filter', f'name={container_name}', '--format',
+            '{{.Names}}'
+        ],
+                                capture_output=True,
+                                text=True,
+                                check=False)
+    except FileNotFoundError:
+        logger.error('Docker is not installed or not in PATH.')
+        return False
     return container_name in result.stdout.strip().split('\n')
 
 
 def check_volume_exists(volume_name):
     """Check if a Docker volume exists"""
-    result = subprocess.run(
-        ['docker', 'volume', 'ls', '-q', '-f', f'name={volume_name}'],
-        capture_output=True,
-        text=True,
-        check=False)
+    try:
+        result = subprocess.run(
+            ['docker', 'volume', 'ls', '-q', '-f', f'name={volume_name}'],
+            capture_output=True,
+            text=True,
+            check=False)
+    except FileNotFoundError:
+        logger.error('Docker is not installed or not in PATH.')
+        return False
     return volume_name in result.stdout.strip().split('\n')
 
 
