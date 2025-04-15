@@ -767,11 +767,11 @@ def cleanup_test_project(server_url, api_token, project_id):
     """Clean up the test project after testing"""
     if not project_id:
         return
-        
+
     try:
         from label_studio_sdk import Client
         client = Client(url=server_url, api_key=api_token)
-        
+
         # Delete the project using the client's delete_project method
         client.delete_project(project_id)
         logger.info(f'Successfully deleted test project {project_id}')
@@ -820,10 +820,7 @@ def start_label_studio_pip(data_dir,
     try:
         # Use Popen to start the process in the background
         process = subprocess.Popen(
-            [
-                'label-studio', 'start',
-                '--no-browser', f'--port={port}'
-            ],
+            ['label-studio', 'start', '--no-browser', f'--port={port}'],
             env=env,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -909,10 +906,10 @@ def create_test_project(server_url, api_token):
     """Create a test project in Label Studio using SDK"""
     try:
         from label_studio_sdk import Client
-        
+
         # Initialize the Label Studio client
         client = Client(url=server_url, api_key=api_token)
-        
+
         # Create a test project
         project = client.create_project(
             title='Test Classification Project',
@@ -926,19 +923,20 @@ def create_test_project(server_url, api_token):
     <Choice value="Negative"/>
   </Choices>
 </View>
-"""
-        )
-        
+""")
+
         if project:
-            logger.info(f"Created test project: {project.title} (ID: {project.id})")
-            
+            logger.info(
+                f'Created test project: {project.title} (ID: {project.id})')
+
             # Create a sample task using import_tasks instead of create_task
             task_data = [{
                 'data': {
-                    'text': 'This is a sample text for annotation. Please classify the sentiment.'
+                    'text':
+                    'This is a sample text for annotation. Please classify the sentiment.'
                 }
             }]
-            
+
             try:
                 imported_tasks = project.import_tasks(task_data)
                 if imported_tasks:
@@ -950,13 +948,15 @@ def create_test_project(server_url, api_token):
                 # Clean up the project if task creation fails
                 try:
                     client.delete_project(project.id)
-                    logger.info('Cleaned up test project due to task creation failure')
+                    logger.info(
+                        'Cleaned up test project due to task creation failure')
                 except Exception as cleanup_error:
-                    logger.error(f'Error cleaning up test project: {cleanup_error}')
+                    logger.error(
+                        f'Error cleaning up test project: {cleanup_error}')
                 return None
-            
+
             return project.id
-            
+
         logger.error('Failed to create test project')
         return None
 
@@ -1118,7 +1118,7 @@ def main():
     if args.create_test_project and api_token:
         project_id = create_test_project(server_url, api_token)
         logger.info(f'Created test project with ID: {project_id}')
-        
+
         # Clean up test project immediately after creation
         if project_id:
             logger.info('Cleaning up test project...')
