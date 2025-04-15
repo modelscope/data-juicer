@@ -706,163 +706,46 @@ def start_label_studio_container(port,
     return None, None
 
 
-def get_api_token(server_url, username, password):
-    """Get API token for Label Studio"""
-    try:
-        # Create a session to maintain cookies
-        session = requests.Session()
+def get_container_error_message(container_name):
+    """Get detailed error information from a container that has exited"""
+    inspect_cmd = ['docker', 'inspect', container_name]
+    inspect_result = subprocess.run(inspect_cmd,
+                                    capture_output=True,
+                                    text=True,
+                                    check=False)
+    if inspect_result.returncode == 0:
+        try:
+            import json
+            container_info = json.loads(inspect_result.stdout)
+            if container_info and len(container_info) > 0:
+                state = container_info[0].get('State', {})
+                error = state.get('Error', '')
 
-        # Wait for server to be fully ready
-        logger.info('Waiting for Label Studio to fully initialize...')
-        time.sleep(20)  # Give more time for all services to start
-
-        # First get the login page to establish session and get CSRF token
-        logger.info(f'Getting login page from {server_url}/user/login')
-        login_page = session.get(f'{server_url}/user/login', timeout=10)
-
-        # Extract CSRF token from cookies or response
-        csrf_token = None
-        if 'csrftoken' in session.cookies:
-            csrf_token = session.cookies['csrftoken']
-
-        # Prepare login data - Label Studio expects form data, not JSON
-        login_data = {
-            'email': username,
-            'password': password,
-        }
-
-        # Add CSRF token if available
-        headers = {
-            'Referer': f'{server_url}/user/login',
-        }
-        if csrf_token:
-            headers['X-CSRFToken'] = csrf_token
-            login_data['csrfmiddlewaretoken'] = csrf_token
-            logger.info(f'Using CSRF token: {csrf_token[:10]}...')
-
-        # Attempt login
-        logger.info(f'Logging in as {username}...')
-        login_response = session.post(
-            f'{server_url}/user/login',
-            data=login_data,  # Use form data instead of JSON
-            headers=headers,
-            timeout=10)
-
-        if login_response.status_code != 200:
-            logger.info(
-                f'Login failed with status code: {login_response.status_code}')
-            logger.info(f'Response: {login_response.text[:500]}')
-            return None
-
-        logger.info('Login successful!')
-
-        # After successful login, get the user profile page which contains the token
-        logger.info('Fetching user profile page...')
-        profile_response = session.get(f'{server_url}/user/account',
-                                       timeout=10)
-
-        if profile_response.status_code != 200:
-            logger.info(
-                f'Failed to get profile page: {profile_response.status_code}')
-            return None
-
-        # Extract token from the profile page HTML
-        import re
-        token_match = re.search(r'id="access_token"[^>]*value="([^"]+)"',
-                                profile_response.text)
-        if token_match:
-            token = token_match.group(1)
-            logger.info(f'Successfully extracted API token from profile page')
-            return token
-
-        # If token not found in profile page, try API endpoint
-        logger.info('Token not found in profile page, trying API endpoint...')
-        token_response = session.get(f'{server_url}/api/current-user/token',
-                                     timeout=10)
-
-        if token_response.status_code == 200:
-            try:
-                token_data = token_response.json()
-                if 'token' in token_data:
-                    logger.info(
-                        'Successfully obtained API token from endpoint')
-                    return token_data['token']
-            except:
-                pass
-
-        logger.error('Failed to automatically retrieve API token')
-        return None
-
-    except Exception as e:
-        logger.error(f'Error getting API token: {e}')
-        import traceback
-        traceback.print_exc()
-        return None
-
-
-def create_test_project(server_url, api_token):
-    """Create a test project in Label Studio"""
-    project_url = f'{server_url}/api/projects'
-    headers = {
-        'Authorization': f'Token {api_token}',
-        'Content-Type': 'application/json'
-    }
-
-    # Simple text classification project
-    project_data = {
-        'title':
-        'Test Classification Project',
-        'description':
-        'A test project for text classification',
-        'label_config':
-        """
-<View>
-  <Text name="text" value="$text"/>
-  <Choices name="sentiment" toName="text" choice="single">
-    <Choice value="Positive"/>
-    <Choice value="Neutral"/>
-    <Choice value="Negative"/>
-  </Choices>
-</View>
-"""
-    }
-
-    try:
-        response = requests.post(project_url,
-                                 json=project_data,
-                                 headers=headers)
-        if response.status_code == 201:
-            project = response.json()
-            logger.info(f"Created test project: {project['title']} "
-                        f"(ID: {project['id']})")
-
-            # Create a sample task
-            task_url = f"{server_url}/api/projects/{project['id']}/import"
-            task_data = [{
-                'data': {
-                    'text':
-                    'This is a sample text for annotation. '
-                    'Please classify the sentiment.'
+                # Common exit codes and their meanings
+                exit_code = state.get('ExitCode')
+                exit_code_meanings = {
+                    125: 'Docker command failed (e.g., unsupported option)',
+                    126:
+                    'Command cannot be invoked (e.g., permission problem or not executable)',
+                    127: 'Command not found',
+                    137: 'Container received SIGKILL (possibly out of memory)',
+                    143: 'Container received SIGTERM'
                 }
-            }]
 
-            task_response = requests.post(task_url,
-                                          json=task_data,
-                                          headers=headers)
-            if task_response.status_code == 201:
-                logger.info('Added sample task to the project')
-            else:
-                logger.error(
-                    f'Failed to add sample task: {task_response.text}')
+                result = {}
 
-            return project['id']
-        else:
-            logger.error(f'Failed to create test project: {response.text}')
-            return None
+                if exit_code is not None:
+                    result['exit_code'] = exit_code
+                    if exit_code in exit_code_meanings:
+                        result['meaning'] = exit_code_meanings[exit_code]
 
-    except Exception as e:
-        logger.error(f'Error creating test project: {e}')
-        return None
+                if error:
+                    result['error'] = error
+
+                return result
+        except Exception as e:
+            logger.error(f'Error parsing container info: {e}')
+    return None
 
 
 def load_connection_info():
@@ -880,6 +763,22 @@ def load_connection_info():
     return None
 
 
+def cleanup_test_project(server_url, api_token, project_id):
+    """Clean up the test project after testing"""
+    if not project_id:
+        return
+        
+    try:
+        from label_studio_sdk import Client
+        client = Client(url=server_url, api_key=api_token)
+        
+        # Delete the project using the client's delete_project method
+        client.delete_project(project_id)
+        logger.info(f'Successfully deleted test project {project_id}')
+    except Exception as e:
+        logger.error(f'Error cleaning up test project: {e}')
+
+
 def check_pip_installed():
     """Check if pip is installed"""
     try:
@@ -892,51 +791,12 @@ def check_pip_installed():
         return False
 
 
-def install_label_studio_pip():
-    """Install Label Studio using pip"""
-    logger.info('Installing Label Studio using pip...')
-    try:
-        # Create a virtual environment
-        venv_dir = os.path.abspath('label_studio_venv')
-        if not os.path.exists(venv_dir):
-            logger.info(f'Creating virtual environment at {venv_dir}')
-            subprocess.run([sys.executable, '-m', 'venv', venv_dir],
-                           check=True)
-
-        # Determine the pip and python executables in the venv
-        if os.name == 'nt':  # Windows
-            pip_cmd = os.path.join(venv_dir, 'Scripts', 'pip')
-            python_cmd = os.path.join(venv_dir, 'Scripts', 'python')
-        else:  # Unix/Linux/Mac
-            pip_cmd = os.path.join(venv_dir, 'bin', 'pip')
-            python_cmd = os.path.join(venv_dir, 'bin', 'python')
-
-        # Upgrade pip
-        logger.info('Upgrading pip...')
-        subprocess.run([pip_cmd, 'install', '--upgrade', 'pip'], check=True)
-
-        # Install Label Studio
-        logger.info('Installing Label Studio...')
-        subprocess.run([pip_cmd, 'install', 'label-studio'], check=True)
-
-        logger.info('Label Studio installed successfully!')
-        return venv_dir, python_cmd
-    except subprocess.CalledProcessError as e:
-        logger.error(f'Error installing Label Studio: {e}')
-        return None, None
-
-
 def start_label_studio_pip(data_dir,
                            username,
                            password,
                            port,
                            predefined_token=None):
     """Start Label Studio using pip installation"""
-    venv_dir, python_cmd = install_label_studio_pip()
-    if not venv_dir or not python_cmd:
-        logger.error('Failed to install Label Studio.')
-        return None, None
-
     # Ensure data directory exists
     data_dir = os.path.abspath(data_dir)
     os.makedirs(data_dir, exist_ok=True)
@@ -961,7 +821,7 @@ def start_label_studio_pip(data_dir,
         # Use Popen to start the process in the background
         process = subprocess.Popen(
             [
-                python_cmd, '-m', 'label_studio.server', 'start',
+                'label-studio', 'start',
                 '--no-browser', f'--port={port}'
             ],
             env=env,
@@ -1045,64 +905,64 @@ def start_label_studio_pip(data_dir,
         return None, None
 
 
-def get_container_exit_code(container_name):
-    """Get the exit code of a stopped container"""
-    inspect_cmd = [
-        'docker', 'inspect', '--format={{.State.ExitCode}}', container_name
-    ]
-    inspect_result = subprocess.run(inspect_cmd,
-                                    capture_output=True,
-                                    text=True,
-                                    check=False)
-    if inspect_result.returncode == 0:
-        try:
-            exit_code = int(inspect_result.stdout.strip())
-            return exit_code
-        except (ValueError, TypeError):
-            logger.error(f'Failed to parse exit code: {inspect_result.stdout}')
-    return None
-
-
-def get_container_error_message(container_name):
-    """Get detailed error information from a container that has exited"""
-    inspect_cmd = ['docker', 'inspect', container_name]
-    inspect_result = subprocess.run(inspect_cmd,
-                                    capture_output=True,
-                                    text=True,
-                                    check=False)
-    if inspect_result.returncode == 0:
-        try:
-            import json
-            container_info = json.loads(inspect_result.stdout)
-            if container_info and len(container_info) > 0:
-                state = container_info[0].get('State', {})
-                error = state.get('Error', '')
-
-                # Common exit codes and their meanings
-                exit_code = state.get('ExitCode')
-                exit_code_meanings = {
-                    125: 'Docker command failed (e.g., unsupported option)',
-                    126:
-                    'Command cannot be invoked (e.g., permission problem or not executable)',
-                    127: 'Command not found',
-                    137: 'Container received SIGKILL (possibly out of memory)',
-                    143: 'Container received SIGTERM'
+def create_test_project(server_url, api_token):
+    """Create a test project in Label Studio using SDK"""
+    try:
+        from label_studio_sdk import Client
+        
+        # Initialize the Label Studio client
+        client = Client(url=server_url, api_key=api_token)
+        
+        # Create a test project
+        project = client.create_project(
+            title='Test Classification Project',
+            description='A test project for text classification',
+            label_config="""
+<View>
+  <Text name="text" value="$text"/>
+  <Choices name="sentiment" toName="text" choice="single">
+    <Choice value="Positive"/>
+    <Choice value="Neutral"/>
+    <Choice value="Negative"/>
+  </Choices>
+</View>
+"""
+        )
+        
+        if project:
+            logger.info(f"Created test project: {project.title} (ID: {project.id})")
+            
+            # Create a sample task using import_tasks instead of create_task
+            task_data = [{
+                'data': {
+                    'text': 'This is a sample text for annotation. Please classify the sentiment.'
                 }
+            }]
+            
+            try:
+                imported_tasks = project.import_tasks(task_data)
+                if imported_tasks:
+                    logger.info('Added sample task to the project')
+                else:
+                    logger.error('Failed to add sample task to the project')
+            except Exception as e:
+                logger.error(f'Error adding sample task: {e}')
+                # Clean up the project if task creation fails
+                try:
+                    client.delete_project(project.id)
+                    logger.info('Cleaned up test project due to task creation failure')
+                except Exception as cleanup_error:
+                    logger.error(f'Error cleaning up test project: {cleanup_error}')
+                return None
+            
+            return project.id
+            
+        logger.error('Failed to create test project')
+        return None
 
-                result = {}
-
-                if exit_code is not None:
-                    result['exit_code'] = exit_code
-                    if exit_code in exit_code_meanings:
-                        result['meaning'] = exit_code_meanings[exit_code]
-
-                if error:
-                    result['error'] = error
-
-                return result
-        except Exception as e:
-            logger.error(f'Error parsing container info: {e}')
-    return None
+    except Exception as e:
+        logger.error(f'Error creating test project using SDK: {e}')
+        return None
 
 
 def main():
@@ -1148,6 +1008,7 @@ def main():
     project_id = None
     username_from_file = None
     password_from_file = None
+    server_url = None
 
     if existing_connection:
         if 'api_token' in existing_connection:
@@ -1161,6 +1022,9 @@ def main():
 
         if 'project_id' in existing_connection:
             project_id = existing_connection['project_id']
+
+        if 'api_url' in existing_connection:
+            server_url = existing_connection['api_url']
 
     # Override with command line arguments if provided
     if args.api_token:
@@ -1215,9 +1079,6 @@ def main():
             return 1
 
     # Determine whether to use Docker or pip based on args and availability
-    server_url = None
-
-    # Check if pip installation is explicitly requested
     if args.use_pip:
         logger.info('Using pip installation as requested')
         use_docker = False
@@ -1257,6 +1118,12 @@ def main():
     if args.create_test_project and api_token:
         project_id = create_test_project(server_url, api_token)
         logger.info(f'Created test project with ID: {project_id}')
+        
+        # Clean up test project immediately after creation
+        if project_id:
+            logger.info('Cleaning up test project...')
+            cleanup_test_project(server_url, api_token, project_id)
+            project_id = None  # Reset project_id since it's been cleaned up
 
     # Display connection information but don't save it
     if api_token:
@@ -1291,6 +1158,9 @@ def main():
             time.sleep(1)
     except KeyboardInterrupt:
         logger.info('\nStopping Label Studio...')
+        # Clean up test project if it exists
+        if project_id:
+            cleanup_test_project(server_url, api_token, project_id)
         if use_docker:
             stop_container(args.container_name)
             logger.info('Label Studio container stopped.')
