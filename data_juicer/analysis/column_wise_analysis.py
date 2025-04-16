@@ -110,7 +110,10 @@ class ColumnWiseAnalysis:
         height_unit = 6
 
         stats_and_meta = pd.concat([self.stats, self.meta], axis=1)
-        all_columns = stats_and_meta.columns
+        all_columns = [
+            col_name for col_name in stats_and_meta.columns.to_list()
+            if col_name in self.overall_result.columns
+        ]
         num = len(all_columns)
 
         # get the recommended "best" number of columns and rows
@@ -124,8 +127,7 @@ class ColumnWiseAnalysis:
             fig = plt.figure(figsize=(rec_width, rec_height),
                              layout='constrained')
             subfigs = fig.subfigures(rec_row, rec_col, wspace=0.01)
-        for i, column_name in enumerate(
-                tqdm(all_columns.to_list(), desc='Column')):
+        for i, column_name in enumerate(tqdm(all_columns, desc='Column')):
             data = stats_and_meta[column_name]
             # explode data to flatten inner list
             data = data.explode().infer_objects()
@@ -143,7 +145,8 @@ class ColumnWiseAnalysis:
                 subfig.set_facecolor('0.85')
 
             # numeric or string via nan. Apply different plot method for them.
-            if pd.isna(self.overall_result[column_name].get('top')):
+            sampled_top = self.overall_result[column_name].get('top')
+            if pd.isna(sampled_top):
                 # numeric or numeric list -- draw histogram and box plot for
                 # this stat
                 percentiles = self.overall_result[column_name] \
@@ -172,6 +175,7 @@ class ColumnWiseAnalysis:
             else:
                 # object (string) or string list -- only draw histogram for
                 # this stat
+                print(type(sampled_top))
                 if self.save_stats_in_one_file:
                     axes = subfig.subplots(1, num_subcol)
                 else:
