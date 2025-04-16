@@ -1,3 +1,4 @@
+import argparse
 import copy
 import json
 import os
@@ -713,6 +714,8 @@ def update_op_process(cfg, parser):
 
     # check the op params via type hint
     temp_parser = copy.deepcopy(parser)
+    temp_parser.usage = argparse.SUPPRESS
+
     recognized_args = set([
         action.dest for action in parser._actions
         if hasattr(action, 'dest') and isinstance(action, ActionTypeHint)
