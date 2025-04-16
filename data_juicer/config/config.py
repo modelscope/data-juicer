@@ -1,3 +1,4 @@
+import argparse
 import copy
 import json
 import os
@@ -35,7 +36,9 @@ def init_configs(args: Optional[List[str]] = None, which_entry: object = None):
     :param which_entry: which entry to init configs (executor/analyzer)
     :return: a global cfg object used by the DefaultExecutor or Analyzer
     """
-    parser = ArgumentParser(default_env=True, default_config_files=None)
+    parser = ArgumentParser(default_env=True,
+                            default_config_files=None,
+                            usage=argparse.SUPPRESS)
 
     # required but mutually exclusive args group
     required_group = parser.add_mutually_exclusive_group(required=True)
@@ -713,6 +716,7 @@ def update_op_process(cfg, parser):
 
     # check the op params via type hint
     temp_parser = copy.deepcopy(parser)
+
     recognized_args = set([
         action.dest for action in parser._actions
         if hasattr(action, 'dest') and isinstance(action, ActionTypeHint)
