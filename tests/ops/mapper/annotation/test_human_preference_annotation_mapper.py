@@ -168,8 +168,10 @@ class MockHumanPreferenceAnnotationMapper(HumanPreferenceAnnotationMapper):
                     break
 
         # Store the preference result directly in the sample
-        sample_copy[self.chosen_key] = preference if preference else 'Unanswered'
-        sample_copy[self.rejected_key] = all_keys.replace(preference, '') if preference else 'Unanswered'
+        chosen = preference if preference else 'Unanswered'
+        rejected = all_keys.replace(preference, '') if preference else 'Unanswered'
+        sample_copy[self.chosen_key] = sample_copy[chosen]
+        sample_copy[self.rejected_key] = sample_copy[rejected]
 
         return sample_copy
 
@@ -428,7 +430,7 @@ class HumanPreferenceAnnotationMapperTest(DataJuicerTestCaseBase):
         self.assertEqual(result["chosen"][0], result["answer1"][0])
 
         # Second sample should prefer answer2 (right choice)
-        self.assertEqual(result["chosen"][1], result["answer2"][0])
+        self.assertEqual(result["chosen"][1], result["answer2"][1])
 
         # Verify the original IDs were preserved in the result
         self.assertEqual(result["id"], samples_with_ids["id"])
