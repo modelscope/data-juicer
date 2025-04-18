@@ -171,16 +171,6 @@ class MockHumanPreferenceAnnotationMapper(HumanPreferenceAnnotationMapper):
         sample_copy[self.chosen_key] = preference if preference else 'Unanswered'
         sample_copy[self.rejected_key] = all_keys.replace(preference, '') if preference else 'Unanswered'
 
-        # Also modify the text field to ensure the tracer detects the change
-        if self.prompt_key in sample_copy:
-            # Append the result to the text field in a way that doesn't affect
-            # the actual content
-            original_text = sample_copy[self.prompt_key]
-            if not original_text.endswith('\n'):
-                original_text += '\n'
-            sample_copy[self.prompt_key] = f'{original_text}' + \
-                                           f'[Preference: {sample_copy[self.chosen_key]}]'
-
         return sample_copy
 
 
@@ -273,8 +263,7 @@ class HumanPreferenceAnnotationMapperTest(DataJuicerTestCaseBase):
                                                              sample)
 
         # Verify the result
-        self.assertEqual(processed_sample['chosen'], 'answer1')
-        self.assertTrue('[Preference: answer1]' in processed_sample['prompt'])
+        self.assertEqual(processed_sample['chosen'], processed_sample['answer1'])
 
     def test_process_annotation_result_right_preference(self):
         """Test processing annotation result when right option is preferred"""
@@ -301,8 +290,7 @@ class HumanPreferenceAnnotationMapperTest(DataJuicerTestCaseBase):
                                                              sample)
 
         # Verify the result
-        self.assertEqual(processed_sample['chosen'], 'answer2')
-        self.assertTrue('[Preference: answer2]' in processed_sample['prompt'])
+        self.assertEqual(processed_sample['chosen'], processed_sample['answer2'])
 
     def test_process_batched(self):
         """Test processing a batch of samples with HumanPreferenceAnnotationMapper"""
@@ -336,10 +324,10 @@ class HumanPreferenceAnnotationMapperTest(DataJuicerTestCaseBase):
         self.assertIn("chosen", result)
 
         # First sample should prefer answer1 (left choice)
-        self.assertEqual(result["chosen"][0], "answer1")
+        self.assertEqual(result["chosen"][0], result["answer1"][0])
 
         # Second sample should prefer answer2 (right choice)
-        self.assertEqual(result["chosen"][1], "answer2")
+        self.assertEqual(result["chosen"][1],result["answer2"][1])
 
     def test_custom_keys(self):
         """Test using custom keys for answers and prompt"""
@@ -385,7 +373,7 @@ class HumanPreferenceAnnotationMapperTest(DataJuicerTestCaseBase):
 
         # Verify the results
         self.assertIn("chosen", result)
-        self.assertEqual(result["chosen"][0], "response_a")
+        self.assertEqual(result["chosen"][0], result["response_a"][0])
 
     def test_process_uses_existing_ids(self):
         """Test that the Human Preference mapper uses existing IDs in samples instead of generating new ones"""
@@ -437,10 +425,10 @@ class HumanPreferenceAnnotationMapperTest(DataJuicerTestCaseBase):
         self.assertIn("chosen", result)
 
         # First sample should prefer answer1 (left choice)
-        self.assertEqual(result["chosen"][0], "answer1")
+        self.assertEqual(result["chosen"][0], result["answer1"][0])
 
         # Second sample should prefer answer2 (right choice)
-        self.assertEqual(result["chosen"][1], "answer2")
+        self.assertEqual(result["chosen"][1], result["answer2"][0])
 
         # Verify the original IDs were preserved in the result
         self.assertEqual(result["id"], samples_with_ids["id"])

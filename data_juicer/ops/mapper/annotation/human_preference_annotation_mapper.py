@@ -234,20 +234,11 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
                     break
 
         # Store the preference result directly in the sample
-        sample[self.chosen_key] = preference if preference else 'Unanswered'
-        sample[self.rejected_key] = all_keys.replace(
-            preference, '') if preference else 'Unanswered'
-
-        # Also modify the text field to ensure the tracer detects the change
-        # This is needed because the tracer only checks the text_key field
-        if self.text_key in sample:
-            # Append the result to the text field in a way that doesn't affect
-            # the actual content
-            original_text = sample[self.text_key]
-            if not original_text.endswith('\n'):
-                original_text += '\n'
-            sample[self.text_key] = f'{original_text}' + \
-                                    f'[Preference: {sample[self.chosen_key]}]'
+        chosen = preference if preference else 'Unanswered'
+        rejected = all_keys.replace(preference,
+                                    '') if preference else 'Unanswered'
+        sample[self.chosen_key] = sample[chosen]
+        sample[self.rejected_key] = sample[rejected]
 
         logger.debug(f'Updated sample: {sample}')
         return sample
