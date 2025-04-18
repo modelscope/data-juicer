@@ -101,14 +101,16 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
                  answer1_key: str = 'answer1',
                  answer2_key: str = 'answer2',
                  prompt_key: str = 'prompt',
-                 result_key: str = 'result',
+                 chosen_key: str = 'chosen',
+                 rejected_key: str = 'rejected',
                  **kwargs):
         """Initialize the human preference annotation operator."""
         # Store our class-specific attributes
         self.answer1_key = answer1_key
         self.answer2_key = answer2_key
         self.prompt_key = prompt_key
-        self.result_key = result_key
+        self.chosen_key = chosen_key
+        self.rejected_key = rejected_key
 
         # Ensure text_key is set to prompt_key if not explicitly provided
         if 'text_key' not in kwargs:
@@ -214,6 +216,7 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
         # Extract the preference information
         logger.debug(f'Processing annotation result: {annotation}')
 
+        all_keys = f'{self.answer1_key}{self.answer2_key}'
         preference = None
         for item in annotation['result']:
             if item.get('type') == 'pairwise':
@@ -231,7 +234,9 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
                     break
 
         # Store the preference result directly in the sample
-        sample[self.result_key] = preference if preference else 'Unanswered'
+        sample[self.chosen_key] = preference if preference else 'Unanswered'
+        sample[self.rejected_key] = all_keys.replace(
+            preference, '') if preference else 'Unanswered'
 
         # Also modify the text field to ensure the tracer detects the change
         # This is needed because the tracer only checks the text_key field
@@ -242,7 +247,7 @@ class HumanPreferenceAnnotationMapper(LabelStudioAnnotationMapper):
             if not original_text.endswith('\n'):
                 original_text += '\n'
             sample[self.text_key] = f'{original_text}' + \
-                                    f'[Preference: {sample[self.result_key]}]'
+                                    f'[Preference: {sample[self.chosen_key]}]'
 
         logger.debug(f'Updated sample: {sample}')
         return sample
