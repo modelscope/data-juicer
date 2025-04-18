@@ -32,7 +32,8 @@ process:
       prompt_key: "prompt"  # Prompt field
       answer1_key: "answer1"  # First answer option
       answer2_key: "answer2"  # Second answer option
-      result_key: "result"  # Result field
+      chosen_key: "chosen"  # Chosen field
+      rejected_key: "rejected"  # Rejected field
 
       # Enable notifications for this operator with detailed configuration
       notification_config:
