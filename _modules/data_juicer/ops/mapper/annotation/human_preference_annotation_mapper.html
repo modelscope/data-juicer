@@ -184,14 +184,16 @@
                  <span class="n">answer1_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;answer1&#39;</span><span class="p">,</span>
                  <span class="n">answer2_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;answer2&#39;</span><span class="p">,</span>
                  <span class="n">prompt_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;prompt&#39;</span><span class="p">,</span>
-                 <span class="n">result_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;result&#39;</span><span class="p">,</span>
+                 <span class="n">chosen_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;chosen&#39;</span><span class="p">,</span>
+                 <span class="n">rejected_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;rejected&#39;</span><span class="p">,</span>
                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the human preference annotation operator.&quot;&quot;&quot;</span>
         <span class="c1"># Store our class-specific attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">answer1_key</span> <span class="o">=</span> <span class="n">answer1_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">answer2_key</span> <span class="o">=</span> <span class="n">answer2_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prompt_key</span> <span class="o">=</span> <span class="n">prompt_key</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">result_key</span> <span class="o">=</span> <span class="n">result_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chosen_key</span> <span class="o">=</span> <span class="n">chosen_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rejected_key</span> <span class="o">=</span> <span class="n">rejected_key</span>
 
         <span class="c1"># Ensure text_key is set to prompt_key if not explicitly provided</span>
         <span class="k">if</span> <span class="s1">&#39;text_key&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
@@ -298,6 +300,7 @@
         <span class="c1"># Extract the preference information</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Processing annotation result: </span><span class="si">{</span><span class="n">annotation</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
+        <span class="n">all_keys</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">answer1_key</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">answer2_key</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="n">preference</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">annotation</span><span class="p">[</span><span class="s1">&#39;result&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;pairwise&#39;</span><span class="p">:</span>
@@ -315,18 +318,11 @@
                     <span class="k">break</span>
 
         <span class="c1"># Store the preference result directly in the sample</span>
-        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">result_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">preference</span> <span class="k">if</span> <span class="n">preference</span> <span class="k">else</span> <span class="s1">&#39;Unanswered&#39;</span>
-
-        <span class="c1"># Also modify the text field to ensure the tracer detects the change</span>
-        <span class="c1"># This is needed because the tracer only checks the text_key field</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
-            <span class="c1"># Append the result to the text field in a way that doesn&#39;t affect</span>
-            <span class="c1"># the actual content</span>
-            <span class="n">original_text</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">original_text</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
-                <span class="n">original_text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
-            <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">original_text</span><span class="si">}</span><span class="s1">&#39;</span> <span class="o">+</span> \
-                                    <span class="sa">f</span><span class="s1">&#39;[Preference: </span><span class="si">{</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">result_key</span><span class="p">]</span><span class="si">}</span><span class="s1">]&#39;</span>
+        <span class="n">chosen</span> <span class="o">=</span> <span class="n">preference</span> <span class="k">if</span> <span class="n">preference</span> <span class="k">else</span> <span class="s1">&#39;Unanswered&#39;</span>
+        <span class="n">rejected</span> <span class="o">=</span> <span class="n">all_keys</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">preference</span><span class="p">,</span>
+                                    <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">preference</span> <span class="k">else</span> <span class="s1">&#39;Unanswered&#39;</span>
+        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">chosen_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">chosen</span><span class="p">]</span>
+        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rejected_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">rejected</span><span class="p">]</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Updated sample: </span><span class="si">{</span><span class="n">sample</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sample</span></div>
