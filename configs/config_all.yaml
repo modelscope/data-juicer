@@ -77,11 +77,16 @@ hpo_config: null                                            # path to a configur
 # process schedule: a list of several process operators with their arguments
 process:
   # Mapper ops. Most of these ops need no arguments.
-  - audio_add_gaussian_noise_mapper:                         # Mapper to add Gaussian noise to audio.
-      min_amplitude: 0.001                                     # Default: 0.001. Minimum noise amplification factor.
-      max_amplitude: 0.015                                     # Default: 0.015. Maximum noise amplification factor.
-      p: 0.5                                                   # Default: 0.5.(range: [ 0.0, 1.0 ].) The probability of applying this transform.
+  - audio_add_gaussian_noise_mapper:                        # Mapper to add Gaussian noise to audio.
+      min_amplitude: 0.001                                    # Default: 0.001. Minimum noise amplification factor.
+      max_amplitude: 0.015                                    # Default: 0.015. Maximum noise amplification factor.
+      p: 0.5                                                  # Default: 0.5.(range: [ 0.0, 1.0 ].) The probability of applying this transform.
   - audio_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg audio filters
+      filter_name: null                                       # ffmpeg audio filter name. e.g. 'atrim'.
+      filter_kwargs: null                                     # keyword-arguments passed to ffmpeg filter. e.g. {'end': 6}.
+      global_args: null                                       # list-arguments passed to ffmpeg command-line. e.g. ['-progress'].
+      capture_stderr: true                                    # whether to capture stderr.
+      overwrite_output: true                                  # whether to overwrite the output file.
   - calibrate_qa_mapper:                                    # calibrate question-answer pairs based on reference text.
       api_model: 'gpt-4o'                                     # API model name.
       api_endpoint: null                                      # URL endpoint for the API.
@@ -265,6 +270,10 @@ process:
       drop_text: false                                        # If drop the text in the output.
       model_params: {}                                        # Parameters for initializing the API model.
       sampling_params: {}                                     # Extra parameters passed to the API call. e.g {'temperature': 0.9, 'top_p': 0.95}
+  - extract_tables_from_html_mapper:                        # extract tables from HTML content
+      tables_field_name: 'html_tables'                        # Field name to store the extracted tables.
+      retain_html_tags: false,                                # If True, retains HTML tags in the tables; otherwise, removes them.
+      include_header: true,                                   # If True, includes the table header; otherwise, excludes it. This parameter is effective only when `retain_html_tags` is False and applies solely to the extracted table content.
   - fix_unicode_mapper:                                     # fix unicode errors in text.
   - generate_qa_from_examples_mapper:                       # mapper to generate question and answer pairs from examples.
       hf_model: 'Qwen/Qwen2.5-7B-Instruct'                    # Model name on huggingface to generate question and answer pairs.
@@ -539,6 +548,11 @@ process:
       blur_type: 'gaussian'                                   # type of blur kernel, including ['mean', 'box', 'gaussian']
       radius: 2                                               # radius of blur kernel
   - video_ffmpeg_wrapped_mapper:                            # simple wrapper for FFmpeg video filters
+      filter_name: null                                       # ffmpeg audio filter name. e.g. 'scale'.
+      filter_kwargs: null                                     # keyword-arguments passed to ffmpeg filter. e.g. {'width': 224, 'height': 224}.
+      global_args: null                                       # list-arguments passed to ffmpeg command-line. e.g. ['-progress'].
+      capture_stderr: true                                    # whether to capture stderr.
+      overwrite_output: true                                  # whether to overwrite the output file.
   - video_remove_watermark_mapper:                          # Remove the watermarks in videos given regions
       roi_strings: ['0,0,0.1,0.1']                            # a given list of regions the watermarks locate. The format of each can be "x1, y1, x2, y2", "(x1, y1, x2, y2)", or "[x1, y1, x2, y2]".
       roi_type: ratio                                         # the roi string type. When the type is 'pixel', (x1, y1), (x2, y2) are the locations of pixels in the top left corner and the bottom right corner respectively. If the roi_type is 'ratio', the coordinates are normalized by widths and heights.

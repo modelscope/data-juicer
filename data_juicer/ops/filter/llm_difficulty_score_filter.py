@@ -2,6 +2,7 @@ import json
 import re
 from typing import Dict, List, Optional
 
+import numpy as np
 from loguru import logger
 from pydantic import PositiveInt
 
@@ -183,6 +184,8 @@ json
 
         json_str = extract_outer_braces(raw_output)
         data = json.loads(json_str)
+        if 'flags' in data:
+            data['flags'] = np.array(data['flags'], dtype=np.str_)
 
         dimension_scores = data['dimension_scores']
         required_keys = [
@@ -196,7 +199,7 @@ json
         # div 5 for normalization
         avg_score = total_score / len(required_keys) / 5
 
-        return avg_score, json_str
+        return avg_score, data
 
     def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already

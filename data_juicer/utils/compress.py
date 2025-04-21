@@ -497,4 +497,9 @@ def decompress(ds, fingerprints=None, num_proc=1):
 
 
 def cleanup_compressed_cache_files(ds):
-    CacheCompressManager(cache_utils.CACHE_COMPRESS).cleanup_cache_files(ds)
+    if cache_utils.CACHE_COMPRESS is None:
+        for fmt in Compressor.compressors.keys():
+            CacheCompressManager(fmt).cleanup_cache_files(ds)
+    else:
+        CacheCompressManager(
+            cache_utils.CACHE_COMPRESS).cleanup_cache_files(ds)
