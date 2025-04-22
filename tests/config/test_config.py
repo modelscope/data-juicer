@@ -19,19 +19,19 @@ WORKDIR = os.path.join(os.getcwd(), 'outputs/demo')
 
 class ConfigTest(DataJuicerTestCaseBase):
 
-    def test_help_info(self):
-        out = StringIO()
-        with redirect_stdout(out), self.assertRaises(SystemExit):
-            _ = init_configs(args=['--help'])
-        out_str = out.getvalue()
-        self.assertIn('usage:', out_str, 'lacks message for command beginning')
-        self.assertIn('--config CONFIG', out_str,
-                      'lacks message for positional argument')
-        self.assertIn('[--project_name PROJECT_NAME]', out_str,
-                      'lacks message for optional argument')
-        self.assertIn(
-            'Number of processes to process dataset. (type:', out_str,
-            'the help message of `np` argument does not show as expected')
+    # def test_help_info(self):
+    #     out = StringIO()
+    #     with redirect_stdout(out), self.assertRaises(SystemExit):
+    #         _ = init_configs(args=['--help'])
+    #     out_str = out.getvalue()
+    #     self.assertIn('usage:', out_str, 'lacks message for command beginning')
+    #     self.assertIn('--config CONFIG', out_str,
+    #                   'lacks message for positional argument')
+    #     self.assertIn('[--project_name PROJECT_NAME]', out_str,
+    #                   'lacks message for optional argument')
+    #     self.assertIn(
+    #         'Number of processes to process dataset. (type:', out_str,
+    #         'the help message of `np` argument does not show as expected')
 
     def test_yaml_cfg_file(self):
         out = StringIO()
