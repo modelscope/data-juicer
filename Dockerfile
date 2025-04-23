@@ -16,9 +16,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && pip install --upgrade pip
 
 # install 3rd-party system dependencies
-RUN apt-get update \
-    && apt-get install ffmpeg libsm6 libxext6 software-properties-common build-essential cmake gfortran libopenblas-dev liblapack-dev -y \
-    && apt-get install -y postgresql postgresql-contrib libpq-dev
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg libsm6 libxext6 software-properties-common build-essential cmake gfortran libopenblas-dev liblapack-dev postgresql postgresql-contrib libpq-dev
 
 # prepare the java env
 WORKDIR /opt
