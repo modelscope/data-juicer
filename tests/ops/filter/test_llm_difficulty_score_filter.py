@@ -47,7 +47,7 @@ class LLMDifficultyScoreFilterTest(DataJuicerTestCaseBase):
             "In quantum field theory, renormalization addresses infinities arising from loop integrals in Feynman diagrams. By redefining parameters such as mass and charge, physicists ensure finite predictions align with experimental observations. However, this procedure raises philosophical questions about whether these adjustments reflect physical reality or merely mathematical conveniences."
         }]
         dataset = Dataset.from_list(ds_list)
-        op = LLMDifficultyScoreFilter(api_or_hf_model=self.api_or_hf_model)
+        op = LLMDifficultyScoreFilter(min_score=0.5, api_or_hf_model=self.api_or_hf_model)
         dataset= self._run_test(dataset, op)
 
     def test_rft_data(self):
@@ -67,6 +67,7 @@ class LLMDifficultyScoreFilterTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(ds_list)
         op = LLMDifficultyScoreFilter(
             api_or_hf_model=self.api_or_hf_model,
+            min_score=0.5,
             input_keys=['text', 'analysis', 'answer'],
             field_names=['Query', 'Analysis', 'Answer'],
         )
@@ -87,6 +88,7 @@ class LLMDifficultyScoreFilterTest(DataJuicerTestCaseBase):
     #     dataset = Dataset.from_list(ds_list)
     #     op = LLMDifficultyScoreFilter(
     #           api_or_hf_model=self.api_or_hf_model,
+    #           min_score=0.5,
     #           enable_vllm=True,
     #           accelerator='cuda'
     #       )
