@@ -82,6 +82,9 @@ class StreamToLoguru:
 
     def flush(self):
         self.buffer.flush()
+        
+    def isatty(self):
+        return False  # Log streams are usually not terminal devices
 
 
 def redirect_sys_output(log_level='INFO'):
