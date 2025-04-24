@@ -47,7 +47,7 @@ class LLMQualityScoreFilterTest(DataJuicerTestCaseBase):
             "Cats are domesticated animals known for their agility, intelligence, and independent nature. Research shows that they spend approximately 70% of their lives sleeping, which helps conserve energy for hunting. Unlike dogs, cats are obligate carnivores, meaning their diet must consist primarily of meat to meet nutritional needs."
         }]
         dataset = Dataset.from_list(ds_list)
-        op = LLMQualityScoreFilter(min_score=0.5, api_or_hf_model=self.api_or_hf_model)
+        op = LLMQualityScoreFilter(api_or_hf_model=self.api_or_hf_model)
         dataset= self._run_test(dataset, op)
 
     def test_rft_data(self):
@@ -67,7 +67,6 @@ class LLMQualityScoreFilterTest(DataJuicerTestCaseBase):
         dataset = Dataset.from_list(ds_list)
         op = LLMQualityScoreFilter(
             api_or_hf_model=self.api_or_hf_model,
-            min_score=0.5,
             input_keys=['text', 'analysis', 'answer'],
             field_names=['Query', 'Analysis', 'Answer'],
         )
@@ -88,7 +87,6 @@ class LLMQualityScoreFilterTest(DataJuicerTestCaseBase):
     #     dataset = Dataset.from_list(ds_list)
     #     op = LLMQualityScoreFilter(
     #           api_or_hf_model=self.api_or_hf_model,
-    #           min_score=0.5,
     #           enable_vllm=True,
     #           accelerator='cuda'
     #       )
