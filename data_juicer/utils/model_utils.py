@@ -289,15 +289,15 @@ def prepare_api_model(model,
 def prepare_diffusion_model(pretrained_model_name_or_path, diffusion_type,
                             **model_params):
     """
-        Prepare and load an Diffusion model from HuggingFace.
+    Prepare and load an Diffusion model from HuggingFace.
 
-        :param pretrained_model_name_or_path: input Diffusion model name
-            or local path to the model
-        :param diffusion_type: the use of the diffusion model. It can be
-            'image2image', 'text2image', 'inpainting'
-        :return: a Diffusion model.
+    :param pretrained_model_name_or_path: input Diffusion model name
+        or local path to the model
+    :param diffusion_type: the use of the diffusion model. It can be
+        'image2image', 'text2image', 'inpainting'
+    :return: a Diffusion model.
     """
-    AUTOINSTALL.check(['torch', 'transformers'])
+    LazyLoader.check_packages(['torch', 'transformers'])
 
     device = model_params.pop('device', None)
     if not device:
@@ -355,20 +355,26 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
                               pipe_task='text-generation',
                               **model_params):
     """
-    Prepare and load a HuggingFace model with the corresponding processor.
+    Prepare and load a huggingface model.
 
     :param pretrained_model_name_or_path: model name or path
     :param return_model: return model or not
-    :param return_pipe: whether to wrap model into pipeline
-    :param model_params: model initialization parameters.
-    :return: a tuple of (model, input processor) if `return_model` is True;
+    :param return_pipe: return pipeline or not
+    :param pipe_task: task for pipeline
+    :return: a tuple (model, processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
-    # require torch for transformer model
-    AUTOINSTALL.check(['torch'])
-
+    # Check if we need accelerate for device_map
     if 'device' in model_params:
-        model_params['device_map'] = model_params.pop('device')
+        device = model_params.pop('device')
+        if device.startswith('cuda'):
+            try:
+                import accelerate
+                model_params['device_map'] = device
+            except ImportError:
+                # If accelerate is not available, use device directly
+                model_params['device'] = device
+                logger.warning("accelerate not found, using device directly")
 
     processor = transformers.AutoProcessor.from_pretrained(
         pretrained_model_name_or_path, **model_params)
@@ -614,8 +620,17 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
     :return: a tuple (model, input processor) if `return_model` is True;
         otherwise, only the processor is returned.
     """
+    # Check if we need accelerate for device_map
     if 'device' in model_params:
-        model_params['device_map'] = model_params.pop('device')
+        device = model_params.pop('device')
+        if device.startswith('cuda'):
+            try:
+                import accelerate
+                model_params['device_map'] = device
+            except ImportError:
+                # If accelerate is not available, use device directly
+                model_params['device'] = device
+                logger.warning("accelerate not found, using device directly")
 
     processor = transformers.CLIPProcessor.from_pretrained(
         pretrained_model_name_or_path, **model_params)

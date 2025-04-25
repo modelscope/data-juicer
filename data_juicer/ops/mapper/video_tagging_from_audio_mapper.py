@@ -12,6 +12,7 @@ torch = LazyLoader('torch', 'torch')
 
 OP_NAME = 'video_tagging_from_audio_mapper'
 
+LazyLoader.check_packages(['torchaudio'])
 
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)
@@ -40,7 +41,6 @@ class VideoTaggingFromAudioMapper(Mapper):
         """
         kwargs.setdefault('mem_required', '500MB')
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['torchaudio'])
         self.model_key = prepare_model(model_type='huggingface',
                                        pretrained_model_name_or_path=hf_ast,
                                        trust_remote_code=trust_remote_code)

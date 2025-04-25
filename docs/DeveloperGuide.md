@@ -426,7 +426,7 @@ After installation, verify it's working by running `uv --version`.
 # Create a new virtual environment
 uv venv
 
-# Create a virtual environment with a specific Python version
+# Or create a virtual environment with a specific Python version
 uv venv --python 3.10
 
 # Activate the virtual environment
@@ -436,7 +436,7 @@ source .venv/bin/activate
 .venv\Scripts\activate
 
 # Install minimal dependencies in the virtual environment
-uv pip install -e .
+uv pip install -e 
 
 # Optional: lock up dependency versions
 # Export dependencies to requirements.txt

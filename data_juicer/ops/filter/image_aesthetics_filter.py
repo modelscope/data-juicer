@@ -60,7 +60,7 @@ class ImageAestheticsFilter(Filter):
         self.any = (any_or_all == 'any')
 
         self.model_key = prepare_model(
-            model_type='simple_aesthetics',
+            model_type='simple-aesthetics-predictor',
             pretrained_model_name_or_path=hf_scorer_model,
             trust_remote_code=trust_remote_code)
         # the original score predicted by laion-ai's scorer is within [0, 10]
