@@ -197,6 +197,44 @@ Table of Contents
 
 ## Installation
 
+Data-Juicer is now available on PyPI. You can install it with:
+
+```bash
+# install with pip
+pip install data-juicer
+
+# or install with uv for faster installation
+uv pip install data-juicer
+```
+
+For development, you can install it in editable mode:
+
+```bash
+# clone the repository
+git clone https://github.com/alibaba/data-juicer.git
+cd data-juicer
+
+# install all dependencies using pip
+pip install -e ".[all]"
+
+# or install specific groups
+pip install -e ".[sci]"    # science dependencies
+pip install -e ".[dev]"    # development tools
+pip install -e ".[tools]"  # tool dependencies
+
+# alternatively, using uv for faster installation
+uv pip install -e ".[all]"
+uv pip install -e ".[sci]"    # science dependencies
+uv pip install -e ".[dev]"    # development tools
+uv pip install -e ".[tools]"  # tool dependencies
+```
+
+Dependencies are installed on-demand when first used. This means:
+- Faster initial installation
+- Only necessary dependencies are installed
+- Dependencies are installed automatically when needed
+- Uses uv for faster installation when available
+
 ### Prerequisites
 
 - Recommend Python>=3.9,<=3.10

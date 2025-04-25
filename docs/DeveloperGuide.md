@@ -400,6 +400,103 @@ class PerplexityFilter(Filter):
         # ... (some codes)
 ```
 
+## Dependency Management
+
+Data-Juicer uses a modern dependency management system based on `uv` and `pyproject.toml`. Dependencies are managed through the standard Python packaging format (PEP 621) and installed on-demand using a lazy loading system.
+
+### Installing uv
+
+`uv` is a fast Python package installer and resolver, written in Rust, designed as a drop-in replacement for pip. You can install it using:
+
+```bash
+# Using curl
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Or using pip
+pip install uv
+```
+
+After installation, verify it's working by running `uv --version`.
+
+### Virtual Environment Management
+
+`uv` provides powerful virtual environment management capabilities that can replace `venv` and `virtualenv`. Here are the common commands:
+
+```bash
+# Create a new virtual environment
+uv venv
+
+# Create a virtual environment with a specific Python version
+uv venv --python 3.10
+
+# Activate the virtual environment
+# On Unix/macOS
+source .venv/bin/activate
+# On Windows
+.venv\Scripts\activate
+
+# Install minimal dependencies in the virtual environment
+uv pip install -e .
+
+# Optional: lock up dependency versions
+# Export dependencies to requirements.txt
+uv pip freeze > requirements.txt
+
+# Install dependencies from requirements.txt
+uv pip install -r requirements.txt
+```
+
+Advantages of using `uv` for virtual environment management:
+- Faster environment creation and dependency installation
+- Better dependency resolution and conflict handling
+- Support for lockfiles to ensure dependency version consistency
+- Seamless integration with `pyproject.toml`
+
+### Adding New Dependencies
+
+To add new dependencies:
+
+1. Add them to the appropriate section in `pyproject.toml`:
+   - Core dependencies go in `[project.dependencies]`
+   - Optional dependencies go in `[project.optional-dependencies]` under the appropriate group (sci, dev, tools, etc.)
+
+2. The lazy loading system will automatically handle installation when the dependencies are first used.
+
+Example:
+```toml
+[project.dependencies]
+# Core dependencies
+numpy = ">=1.26.4,<2.0.0"
+
+[project.optional-dependencies]
+sci = [
+    "torch>=1.11.0",
+    "transformers>=4.47.0,<4.48.0",
+]
+```
+
+### Development Setup
+
+1. Install the package with all dependencies:
+```bash
+uv pip install -e ".[all]"
+```
+
+2. Or install with specific groups:
+```bash
+uv pip install -e ".[sci]"    # Scientific dependencies
+uv pip install -e ".[dev]"    # Development tools
+uv pip install -e ".[tools]"  # Tool dependencies
+```
+
+### Lazy Loading
+
+The lazy loading system automatically installs dependencies when they are first used. This means:
+- Initial installation is faster
+- Only required dependencies are installed
+- Dependencies are installed on-demand
+- Uses `uv` for fast installation when available
+
 ## 3. Build Your Own Data Recipes and Configs
 - We provide easy configuration based on [jsonargparse](https://github.com/omni-us/jsonargparse/) to reduce cost for boilerplate codes.
 - We provide fruitful examples in [Data Recipe Gallery](../docs/RecipeGallery.md) for reference reuse and extension.
@@ -455,11 +552,11 @@ optional arguments:
   --project_name PROJECT_NAME
                         name of your data process project. (type: str, default: null)
   --dataset_path DATASET_PATH
-                        path to your dataset file, relative with respect to the config file’s location (type: Path_fr, default: null)
+                        path to your dataset file, relative with respect to the config file's location (type: Path_fr, default: null)
   --dataset_dir DATASET_DIR
-                        path to your dataset(s) within a directory, relative with respect to the config file’s location (type: Path_drw, default: null)
+                        path to your dataset(s) within a directory, relative with respect to the config file's location (type: Path_drw, default: null)
   --export_path EXPORT_PATH
-                        path to the output processed dataset, relative with respect to the config file’s location (type: Path_fc, default: null)
+                        path to the output processed dataset, relative with respect to the config file's location (type: Path_fc, default: null)
   --process PROCESS, --process+ PROCESS
                         a list of several process operators with their arguments (type: List[Dict], default: null)
   --np NP               number of subprocess to process your dataset. (type: PositiveInt, default: null)

@@ -44,7 +44,7 @@ git commit -m "<your_commit_message>"
 - 📣📣📣 社区贡献者可在alpha状态后就提相应算子PR。此后该贡献者可以与Data-Juicer团队一起在后续PR中，将其渐进完善到beta和stable版本。我们非常欢迎共建，并会高亮[致谢](https://github.com/modelscope/data-juicer?tab=readme-ov-file#acknowledgement)！
 
 ### 2.1 构建示例
-下面以 “TextLengthFilter” 的算子（过滤仅包含预期文本长度的样本语料）为例，展示相应开发构建过程。
+下面以 "TextLengthFilter" 的算子（过滤仅包含预期文本长度的样本语料）为例，展示相应开发构建过程。
 
 #### 2.1.2 提供算子基本功能（alpha版本)
 
@@ -435,11 +435,11 @@ optional arguments:
   --project_name PROJECT_NAME
                         name of your data process project. (type: str, default: null)
   --dataset_path DATASET_PATH
-                        path to your dataset file, relative with respect to the config file’s location (type: Path_fr, default: null)
+                        path to your dataset file, relative with respect to the config file's location (type: Path_fr, default: null)
   --dataset_dir DATASET_DIR
-                        path to your dataset(s) within a directory, relative with respect to the config file’s location (type: Path_drw, default: null)
+                        path to your dataset(s) within a directory, relative with respect to the config file's location (type: Path_drw, default: null)
   --export_path EXPORT_PATH
-                        path to the output processed dataset, relative with respect to the config file’s location (type: Path_fc, default: null)
+                        path to the output processed dataset, relative with respect to the config file's location (type: Path_fc, default: null)
   --process PROCESS, --process+ PROCESS
                         a list of several process operators with their arguments (type: List[Dict], default: null)
   --np NP               number of subprocess to process your dataset. (type: PositiveInt, default: null)
@@ -463,3 +463,99 @@ optional arguments:
 ......
 
 ```
+
+## 依赖管理
+
+Data-Juicer 使用基于 `uv` 和 `pyproject.toml` 的现代依赖管理系统。依赖通过标准的 Python 打包格式 (PEP 621) 进行管理，并使用延迟加载系统按需安装。
+
+### 安装 uv
+
+`uv` 是一个快速的 Python 包安装器和解析器，用于替代 pip。您可以通过以下方式安装：
+
+```bash
+# 使用 curl 安装
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 或使用 pip 安装
+pip install uv
+```
+
+安装完成后，您可以使用 `uv --version` 验证安装是否成功。
+
+### 虚拟环境管理
+
+`uv` 提供了强大的虚拟环境管理功能，可以替代 `venv` 和 `virtualenv`。以下是常用命令：
+
+```bash
+# 创建新的虚拟环境
+uv venv
+
+# 创建指定 Python 版本的虚拟环境
+uv venv --python 3.10
+
+# 激活虚拟环境
+# 在 Unix/macOS 上
+source .venv/bin/activate
+# 在 Windows 上
+.venv\Scripts\activate
+
+# 在虚拟环境中安装依赖
+uv pip install -e ".[all]"
+
+# 导出依赖列表
+uv pip freeze > requirements.txt
+
+# 从 requirements.txt 安装依赖
+uv pip install -r requirements.txt
+```
+
+`uv` 的虚拟环境管理相比传统工具的优势：
+- 更快的环境创建和依赖安装
+- 更好的依赖解析和冲突处理
+- 支持锁定文件（lockfile）确保依赖版本一致性
+- 与 `pyproject.toml` 无缝集成
+
+### 添加新依赖
+
+添加新依赖的方法：
+
+1. 将依赖添加到 `pyproject.toml` 的相应部分：
+   - 核心依赖放在 `[project.dependencies]` 中
+   - 可选依赖放在 `[project.optional-dependencies]` 的相应组中（sci、dev、tools 等）
+
+2. 延迟加载系统会在首次使用时自动处理依赖安装。
+
+示例：
+```toml
+[project.dependencies]
+# 核心依赖
+numpy = ">=1.26.4,<2.0.0"
+
+[project.optional-dependencies]
+sci = [
+    "torch>=1.11.0",
+    "transformers>=4.47.0,<4.48.0",
+]
+```
+
+### 开发环境设置
+
+1. 安装所有依赖：
+```bash
+uv pip install -e ".[all]"
+```
+
+2. 或安装特定组：
+```bash
+uv pip install -e ".[sci]"    # 科学计算依赖
+uv pip install -e ".[dev]"    # 开发工具
+uv pip install -e ".[tools]"  # 工具依赖
+```
+
+### 延迟加载
+
+延迟加载系统在首次使用时自动安装依赖。这意味着：
+- 初始安装更快
+- 只安装必需的依赖
+- 依赖按需安装
+- 优先使用 `uv` 进行快速安装
