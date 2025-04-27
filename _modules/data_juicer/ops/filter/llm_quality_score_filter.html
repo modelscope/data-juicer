@@ -159,11 +159,14 @@
     <span class="n">DEFAULT_INPUT_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;# Data</span><span class="se">\n</span><span class="s2">&#39;&#39;&#39;</span><span class="se">\n</span><span class="si">{data}</span><span class="se">\n</span><span class="s2">&#39;&#39;&#39;</span><span class="se">\n\n</span><span class="s2"># Response</span><span class="se">\n</span><span class="s2">json</span><span class="se">\n</span><span class="s2">&quot;</span>
     <span class="n">DEFAULT_FIELD_TEMPLATE</span> <span class="o">=</span> <span class="s1">&#39;**</span><span class="si">{field_name}</span><span class="s1">**</span><span class="se">\n</span><span class="si">{field_data}</span><span class="s1">&#39;</span>
 
+    <span class="n">_accelerator</span> <span class="o">=</span> <span class="s1">&#39;cuda&#39;</span>
+
 <div class="viewcode-block" id="LLMQualityScoreFilter.__init__">
 <a class="viewcode-back" href="../../../../data_juicer.ops.filter.html#data_juicer.ops.filter.LLMQualityScoreFilter.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">api_or_hf_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;gpt-4o&#39;</span><span class="p">,</span>
                  <span class="n">min_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+                 <span class="n">is_hf_model</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="o">*</span><span class="p">,</span>
                  <span class="n">api_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
                  <span class="n">response_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -216,6 +219,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">try_num</span> <span class="o">=</span> <span class="n">try_num</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span> <span class="o">=</span> <span class="n">enable_vllm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_hf_model</span> <span class="o">=</span> <span class="n">is_hf_model</span>
 
         <span class="n">sampling_params</span> <span class="o">=</span> <span class="n">update_sampling_params</span><span class="p">(</span><span class="n">sampling_params</span><span class="p">,</span>
                                                  <span class="n">api_or_hf_model</span><span class="p">,</span>
@@ -235,6 +239,14 @@
                 <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">api_or_hf_model</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">vllm</span><span class="o">.</span><span class="n">SamplingParams</span><span class="p">(</span><span class="o">**</span><span class="n">sampling_params</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">is_hf_model</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_key</span> <span class="o">=</span> <span class="n">prepare_model</span><span class="p">(</span>
+                <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;huggingface&#39;</span><span class="p">,</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="o">=</span><span class="n">api_or_hf_model</span><span class="p">,</span>
+                <span class="n">return_pipe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">trust_remote_code</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span> <span class="o">=</span> <span class="n">sampling_params</span>
 
@@ -298,7 +310,7 @@
         <span class="k">if</span> <span class="n">StatsKeys</span><span class="o">.</span><span class="n">llm_quality_score</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">sample</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_hf_model</span><span class="p">:</span>
             <span class="n">model</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span> <span class="n">rank</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
@@ -316,6 +328,11 @@
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_vllm</span><span class="p">:</span>
                     <span class="n">response</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
                     <span class="n">output</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_hf_model</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span>
+                                     <span class="n">return_full_text</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                     <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;generated_text&#39;</span><span class="p">]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sampling_params</span><span class="p">)</span>
                 <span class="n">score</span><span class="p">,</span> <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_output</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
