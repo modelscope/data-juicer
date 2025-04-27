@@ -218,7 +218,7 @@ json
         if StatsKeys.llm_quality_score in sample[Fields.stats]:
             return sample
 
-        if self.enable_vllm:
+        if self.enable_vllm or self.is_hf_model:
             model, _ = get_model(self.model_key, rank, self.use_cuda())
         else:
             model = get_model(self.model_key, rank, self.use_cuda())
