@@ -5,9 +5,10 @@ import time
 
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.ops.op_fusion import LOADED_IMAGES
+from data_juicer.utils.cache_utils import DATA_JUICER_ASSETS_CACHE
+from data_juicer.utils.file_utils import transfer_data_dir
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
-from data_juicer.utils.cache_utils import DATA_JUICER_ASSETS_CACHE
 
 diffusers = LazyLoader('diffusers', 'diffusers')
 torch = LazyLoader('torch', 'torch')
@@ -76,8 +77,8 @@ class SDXLPrompt2PromptMapper(Mapper):
             torch_dtype=torch_dtype)
         self.text_key_second = text_key_second
         self.output_dir = output_dir
-        
-        if not text_key == None:
+
+        if text_key is not None:
             self.text_key = text_key
 
     def process_single(self, sample, rank=None, context=False):
@@ -92,13 +93,13 @@ class SDXLPrompt2PromptMapper(Mapper):
 
         random_num = str(random.randint(0, 9999))
         t1 = time.localtime()
-        t2 = time.strftime("%Y-%m-%d-%H-%M-%S", t1)
+        t2 = time.strftime('%Y-%m-%d-%H-%M-%S', t1)
 
         model = get_model(model_key=self.model_key,
                           rank=rank,
                           use_cuda=self.use_cuda())
 
-        seed = random.randint(0,9999)
+        seed = random.randint(0, 9999)
         g_cpu = torch.Generator().manual_seed(seed)
 
         cross_attention_kwargs = {
@@ -110,21 +111,20 @@ class SDXLPrompt2PromptMapper(Mapper):
             },
         }
 
-
         with torch.no_grad():
-            prompts = [
-                sample[self.text_key], sample[self.text_key_second]
-            ]
+            prompts = [sample[self.text_key], sample[self.text_key_second]]
             image = model(prompts,
                           cross_attention_kwargs=cross_attention_kwargs,
                           guidance_scale=self.guidance_scale,
                           num_inference_steps=self.num_inference_steps,
                           generator=g_cpu)
 
-            for idx, img in enumerate(image["images"]):
+            new_output_dir = transfer_data_dir(self.output_dir, OP_NAME)
+            for idx, img in enumerate(image['images']):
                 img_id = str(idx + 1)
-                image_name = "image_pair_" + t2 + "_" + random_num + "_" + img_id + ".jpg"
-                img.save(os.path.join(self.output_dir, image_name))
-                sample["image_path" + img_id] = image_name
+                image_name = 'image_pair_' + t2 + '_' + random_num + '_' + img_id + '.jpg'
+                abs_image_path = os.path.join(new_output_dir, image_name)
+                img.save(abs_image_path)
+                sample['image_path' + img_id] = abs_image_path
 
         return sample

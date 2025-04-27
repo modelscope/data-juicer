@@ -83,7 +83,7 @@ class SentenceAugmentationMapper(Mapper):
         self.task_sentence = task_sentence
         self.text_key_second = text_key_second
 
-        if not text_key == None:
+        if text_key is not None:
             self.text_key = text_key
 
     def process_single(self, sample=None, rank=None):
@@ -99,7 +99,6 @@ class SentenceAugmentationMapper(Mapper):
             sample[self.text_key] = ''
             sample[self.text_key_second] = ''
             return sample
-            
 
         model, processor = get_model(model_key=self.model_key,
                                      rank=rank,
