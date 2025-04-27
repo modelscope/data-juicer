@@ -175,7 +175,6 @@ class ColumnWiseAnalysis:
             else:
                 # object (string) or string list -- only draw histogram for
                 # this stat
-                print(type(sampled_top))
                 if self.save_stats_in_one_file:
                     axes = subfig.subplots(1, num_subcol)
                 else:
