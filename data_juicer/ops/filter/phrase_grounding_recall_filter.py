@@ -22,10 +22,15 @@ OP_NAME = 'phrase_grounding_recall_filter'
 
 # NER algorithm adapted from GLIP starts
 # https://github.com/microsoft/GLIP/blob/main/maskrcnn_benchmark/engine/predictor_glip.py#L107-L127
-def find_noun_phrases(caption: str) -> List[str]:
+def find_noun_phrases(caption: str, pos_tagger=None) -> List[str]:
     caption = caption.lower()
     tokens = nltk.word_tokenize(caption)
-    pos_tags = nltk.pos_tag(tokens)
+
+    # Use the provided POS tagger if available, or fallback to the default
+    if pos_tagger:
+        pos_tags = pos_tagger(tokens)
+    else:
+        pos_tags = nltk.pos_tag(tokens)
 
     grammar = 'NP: {<DT>?<JJ.*>*<NN.*>+}'
     cp = nltk.RegexpParser(grammar)
@@ -49,8 +54,8 @@ def remove_punctuation(text: str) -> str:
     return text.strip()
 
 
-def run_ner(caption):
-    noun_phrases = find_noun_phrases(caption)
+def run_ner(caption, pos_tagger=None):
+    noun_phrases = find_noun_phrases(caption, pos_tagger)
     noun_phrases = [remove_punctuation(phrase) for phrase in noun_phrases]
     noun_phrases = [phrase for phrase in noun_phrases if phrase != '']
     noun_phrases = list(set(noun_phrases))  # remove duplicate ners
@@ -136,10 +141,26 @@ class PhraseGroundingRecallFilter(Filter):
         self.large_area_ratio_thr = large_area_ratio_thr
         self.conf_thr = conf_thr
 
-        requires_nltk_data = ['punkt', 'averaged_perceptron_tagger']
-        logger.info(f'Downloading nltk data of {requires_nltk_data}...')
-        for nltk_data_pkg in requires_nltk_data:
-            nltk.download(nltk_data_pkg)
+        # Initialize NLTK resources needed for NER extraction
+        logger.info('Loading NLTK resources for NER extraction...')
+        self.nltk_tagger_key = prepare_model(model_type='nltk_pos_tagger')
+
+        # Ensure NLTK resources are correctly downloaded and available
+        try:
+            # Import nltk here to ensure it's available
+            import nltk
+
+            from data_juicer.utils.nltk_utils import patch_nltk_pickle_security
+
+            # Ensure pickle security patches are applied
+            patch_nltk_pickle_security()
+
+            # Download required resources if not already available
+            nltk.download('punkt', quiet=True)
+            nltk.download('averaged_perceptron_tagger', quiet=True)
+        except Exception as e:
+            logger.warning(f'Error initializing NLTK resources: {e}. '
+                           'NER extraction may not work correctly.')
 
     def compute_stats_single(self, sample, rank=None, context=False):
         # check if it's computed already
@@ -162,6 +183,10 @@ class PhraseGroundingRecallFilter(Filter):
         recalls = []
         model, processor = get_model(self.model_key, rank, self.use_cuda())
 
+        # Get the POS tagger if available
+        pos_tagger = get_model(self.nltk_tagger_key) if hasattr(
+            self, 'nltk_tagger_key') else None
+
         for chunk in text.split(SpecialTokens.eoc):
             count = chunk.count(SpecialTokens.image)
 
@@ -170,7 +195,7 @@ class PhraseGroundingRecallFilter(Filter):
                 continue
             else:
                 text_this_chunk = remove_special_tokens(chunk)
-                ners_this_chunk = run_ner(text_this_chunk)
+                ners_this_chunk = run_ner(text_this_chunk, pos_tagger)
                 num_ners = len(ners_this_chunk)
                 if num_ners <= 0:
                     # no ners found, just skip this chunk

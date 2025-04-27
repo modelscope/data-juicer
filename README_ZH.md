@@ -39,7 +39,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-05] 我们提出了一种新的数据选择方法 *DaaR*，该方法基于理论指导，将数据多样性建模为奖励信号，在 7 个基准测试中，微调 SOTA LLMs 取得了更好的整体表现。有关更多详细信息，请参阅 [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380) 。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-11] 我们发布了 2.0 版论文 [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755)。DJ现在可以使用阿里云集群中 50 个 Ray 节点上的 6400 个 CPU 核心在 2.1 小时内处理 70B 数据样本，并使用 8 个 Ray 节点上的 1280 个 CPU 核心在 2.8 小时内对 5TB 数据进行重复数据删除。
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-03] 我们通过 20 多个相关的新 [OP](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2) 以及与 LLaMA-Factory 和 ModelScope-Swift 兼容的统一 [数据集格式](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) 更好地支持Post-Tuning场景。
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-12-17] 我们提出了 *HumanVBench*，它包含 16 个以人为中心的任务，使用合成数据，从内在情感和外在表现的角度对22个视频 MLLM 的能力进行基准测试。请参阅我们的 [论文](https://arxiv.org/abs/2412.17574) 中的更多详细信息，并尝试使用它 [评估](https://github.com/modelscope/data-juicer/tree/HumanVBench) 您的模型。
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-12-17] 我们提出了 *HumanVBench*，它包含 16 个以人为中心的任务，使用合成数据，从内在情感和外在表现的角度对22个视频 MLLM 的能力进行基准测试。请参阅我们的 [论文](https://arxiv.org/abs/2412.17574) 中的更多详细信息，并尝试使用它 [评估](https://github.com/modelscope/data-juicer/tree/HumanVBench) 您的模型。
 
 <details>
 <summary> History News:
@@ -79,12 +79,14 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
   - [交互类示例](#交互类示例)
 - [安装](#安装)
   - [前置条件](#前置条件)
-  - [从源码安装](#从源码安装)
+  - [从源码安装 (指定使用场景)](#从源码安装-指定使用场景)
+  - [从源码安装 (指定部分算子)](#从源码安装-指定部分算子)
   - [使用 pip 安装](#使用-pip-安装)
   - [使用 Docker 安装](#使用-docker-安装)
   - [安装校验](#安装校验)
   - [使用视频相关算子](#使用视频相关算子)
 - [快速上手](#快速上手)
+  - [数据集配置](#数据集配置)
   - [数据处理](#数据处理)
   - [分布式数据处理](#分布式数据处理)
   - [数据分析](#数据分析)
@@ -190,7 +192,7 @@ Data-Juicer正在积极更新和维护中，我们将定期强化和新增更多
 * gcc >= 5 (at least C++14 support)
 
 
-### 从源码安装
+### 从源码安装 (指定使用场景)
 
 * 运行以下命令以安装 `data_juicer` 可编辑模式的最新基础版本
 
@@ -209,25 +211,27 @@ pip install -v -e .[tools] # 安装部分工具库的依赖
 
 依赖选项如下表所示:
 
-| 标签               | 描述                           |
-|------------------|------------------------------|
-| `.` 或者 `.[mini]` | 安装支持 Data-Juicer 基础功能的最小依赖项  |
-| `.[all]`         | 安装除了沙盒实验以外的所有依赖项  |
-| `.[sci]`         | 安装所有算子的全量依赖                  |
-| `.[dist]`        | 安装以分布式方式进行数据处理的依赖（实验性功能）     |
-| `.[dev]`         | 安装作为贡献者开发 Data-Juicer 所需的依赖项 |
-| `.[tools]`       | 安装专用工具库（如质量分类器）所需的依赖项        |
-| `.[sandbox]`     | 安装沙盒实验室的基础依赖                 |
+| 标签              | 描述 |
+|------------------|----------------------------------|
+| `.` 或 `.[mini]` | 为基本 Data-Juicer 安装最小依赖项。  |
+| `.[all]`         | 为除沙盒之外的所有 OP 安装依赖项。    |
+| `.[sci]`         | 为与科学用途相关的 OP 安装依赖项。    |
+| `.[dist]`        | 安装用于分布式数据处理的额外依赖项。   |
+| `.[dev]`         | 安装作为贡献者开发软件包的依赖项。     |
+| `.[tools]`       | 安装专用工具（例如质量分类器）的依赖项。|
+| `.[sandbox]`     | 安装沙盒的所有依赖项。               |
+
+### 从源码安装 (指定部分算子)
 
 * 只安装部分算子依赖
 
-随着OP数量的增长，所有OP的依赖变得很重。为此，我们提供了两个替代的、更轻量的选项，作为使用命令`pip install -v -e .[sci]`安装所有依赖的替代：
+随着OP数量的增长，全OP环境的依赖安装会变得越来越重。为此，我们提供了两个替代的、更轻量的选项，作为使用命令`pip install -v -e .[sci]`安装所有依赖的替代：
 
-  * 自动最小依赖安装：在执行Data-Juicer的过程中，将自动安装最小依赖。也就是说你可以直接执行，但这种方式可能会导致一些依赖冲突。
+  * 自动最小依赖安装：在执行Data-Juicer的过程中，将自动安装最小依赖。也就是说你可以安装mini后直接执行，但这种方式可能会导致一些(滞后的)依赖冲突。
 
-  * 手动最小依赖安装：可以通过如下指令手动安装适合特定执行配置的最小依赖：
+  * 手动最小依赖安装：可以通过如下指令手动安装适合特定执行配置的最小依赖，可以提前确定依赖冲突、使其更易解决:
     ```shell
-    # 适用于从源码安装
+    # 从源码安装
     python tools/dj_install.py --config path_to_your_data-juicer_config_file
     
     # 使用命令行工具
@@ -281,6 +285,24 @@ print(dj.__version__)
 <p align="right"><a href="#table">🔼 back to index</a></p>
 
 ## 快速上手
+### 数据集配置
+
+DJ 支持多种数据集输入类型，包括本地文件、远程数据集（如 huggingface）；还支持数据验证和数据混合。
+
+配置输入文件的两种方法
+- 简单场景，本地/HF 文件的单一路径
+```yaml
+dataset_path: '/path/to/your/dataset' # 数据集目录或文件的路径
+```
+- 高级方法，支持子配置项和更多功能
+```yaml
+dataset:
+configs:
+- type: 'local'
+path: 'path/to/your/dataset' # 数据集目录或文件的路径
+```
+
+更多详细信息，请参阅 [数据集配置指南](docs/DatasetCfg_ZH.md)。
 
 ### 数据处理
 

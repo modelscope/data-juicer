@@ -227,41 +227,38 @@ class DocumentMinhashDeduplicator(Deduplicator):
         if self.tokenization == 'character':
             tokens = {
                 str.encode(text[i:i + self.window_size])
-                for i in range(len(text) - self.window_size)
+                for i in range(len(text) - self.window_size + 1)
             }
         elif self.tokenization == 'punctuation':
             tokens = self.punctuation_pattern.split(text)
             tokens = {
                 str.encode(' '.join(tokens[i:i + self.window_size]))
-                for i in range(len(tokens) - self.window_size)
+                for i in range(len(tokens) - self.window_size + 1)
             }
         elif self.tokenization == 'space':
             tokens = split_on_whitespace(text)
             tokens = {
                 str.encode(' '.join(tokens[i:i + self.window_size]))
-                for i in range(len(tokens) - self.window_size)
+                for i in range(len(tokens) - self.window_size + 1)
             }
         elif self.tokenization == 'sentencepiece':
             tokens = self.tokenizer.encode(text, out_type=str)
             tokens = {
                 str.encode(''.join(tokens[i:i + self.window_size]))
-                for i in range(len(tokens) - self.window_size)
+                for i in range(len(tokens) - self.window_size + 1)
             }
         else:
             raise NotImplementedError(
                 f'Unimplemented tokenization method [{self.tokenization}]')
 
         # compute minhash value
-        hv = np.array([sha1_hash32(token) for token in tokens],
-                      dtype=np.uint64)
+        hv = np.fromiter((sha1_hash32(token) for token in tokens),
+                         dtype=np.uint64,
+                         count=len(tokens))
         phv = np.bitwise_and(
-            ((hv * np.tile(self.perm_a,
-                           (len(hv), 1)).T).T + self.perm_b) % MERSENNE_PRIME,
+            (hv[:, None] * self.perm_a + self.perm_b) % MERSENNE_PRIME,
             MAX_HASH)
-        hash_values = np.vstack([
-            phv,
-            np.ones(self.num_permutation, dtype=np.uint64) * MAX_HASH
-        ]).min(axis=0)
+        hash_values = phv.min(axis=0)
         sample[HashKeys.minhash] = [
             bytes(hash_values[start:end].byteswap().data)
             for start, end in self.hash_ranges

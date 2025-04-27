@@ -18,7 +18,7 @@ from loguru import logger
 from data_juicer.analysis.diversity_analysis import (DiversityAnalysis,
                                                      get_diversity)
 from data_juicer.config import init_configs
-from data_juicer.core import Analyzer, Executor
+from data_juicer.core import Analyzer, DefaultExecutor
 from data_juicer.ops.base_op import OPERATORS
 from data_juicer.utils.constant import Fields, StatsKeys
 from data_juicer.utils.logger_utils import get_log_file_path
@@ -160,7 +160,7 @@ def process_and_show_res():
     # force generating separate figures
     cfg['save_stats_in_one_file'] = True
     logger.info('=========Stage 2: process original data=========')
-    executor = Executor(cfg)
+    executor = DefaultExecutor(cfg)
     dataset = executor.run()
 
     logger.info('=========Stage 3: analyze the processed data==========')

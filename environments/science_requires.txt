@@ -2,6 +2,7 @@ torch>=1.11.0
 torchaudio
 easyocr==1.7.1
 fasttext-wheel
+cmake>=3.10,<4.0
 kenlm
 sentencepiece
 scipy
@@ -10,7 +11,7 @@ simhash-pybind
 selectolax
 nlpaug
 nlpcda
-nltk<3.9
+nltk
 transformers>=4.47.0,<4.48.0
 transformers_stream_generator
 einops

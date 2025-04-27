@@ -43,7 +43,7 @@ Data-Juicer is being actively updated and maintained. We will periodically enhan
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-02-05] We propose a new data selection method, *DaaR*, which is theoretically informed, via treating diversity as a reward, achieves better overall performance across 7 benchmarks when post-training SOTA LLMs. See more details in [Diversity as a Reward: Fine-Tuning LLMs on a Mixture of Domain-Undetermined Data](https://www.arxiv.org/abs/2502.04380).
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-11] We release our 2.0 paper, [Data-Juicer 2.0: Cloud-Scale Adaptive Data Processing for Foundation Models](https://arxiv.org/abs/2501.14755). It now can process 70B data samples within 2.1h, using 6400 CPU cores on 50 Ray nodes from Alibaba Cloud cluster, and deduplicate 5TB data within 2.8h using 1280 CPU cores on 8 Ray nodes.
 - ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-01-03] We support post-tuning scenarios better, via 20+ related new [OPs](https://github.com/modelscope/data-juicer/releases/tag/v1.0.2), and via unified [dataset format](https://github.com/modelscope/data-juicer/releases/tag/v1.0.3) compatible to LLaMA-Factory and ModelScope-Swift.
-- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2025-12-17] We propose *HumanVBench*, which comprises 16 human-centric tasks with synthetic data, benchmarking 22 video-MLLMs' capabilities from views of inner emotion and outer manifestations. See more details in our [paper](https://arxiv.org/abs/2412.17574), and try to [evaluate](https://github.com/modelscope/data-juicer/tree/HumanVBench) your models with it.
+- ![new](https://img.alicdn.com/imgextra/i4/O1CN01kUiDtl1HVxN6G56vN_!!6000000000764-2-tps-43-19.png) [2024-12-17] We propose *HumanVBench*, which comprises 16 human-centric tasks with synthetic data, benchmarking 22 video-MLLMs' capabilities from views of inner emotion and outer manifestations. See more details in our [paper](https://arxiv.org/abs/2412.17574), and try to [evaluate](https://github.com/modelscope/data-juicer/tree/HumanVBench) your models with it.
 
 <details>
 <summary> History News:
@@ -76,36 +76,6 @@ Besides, our paper is also updated to [v3](https://arxiv.org/abs/2309.02033).
 Table of Contents
 =================
 
-- [Data Processing for and with Foundation Models](#data-processing-for-and-with-foundation-models)
-  - [News](#news)
-- [Table of Contents](#table-of-contents)
-  - [Why Data-Juicer?](#why-data-juicer)
-  - [DJ-Cookbook](#dj-cookbook)
-    - [Curated Resources](#curated-resources)
-    - [Coding with Data-Juicer (DJ)](#coding-with-data-juicer-dj)
-    - [Use Cases \& Data Recipes](#use-cases--data-recipes)
-    - [Interactive Examples](#interactive-examples)
-  - [Installation](#installation)
-    - [Prerequisites](#prerequisites)
-    - [From Source](#from-source)
-    - [Using pip](#using-pip)
-    - [Using Docker](#using-docker)
-    - [Installation check](#installation-check)
-    - [For Video-related Operators](#for-video-related-operators)
-  - [Quick Start](#quick-start)
-    - [Dataset configuration](#dataset-configuration)
-    - [Data Processing](#data-processing)
-    - [Distributed Data Processing](#distributed-data-processing)
-    - [Data Analysis](#data-analysis)
-    - [Data Visualization](#data-visualization)
-    - [Build Up Config Files](#build-up-config-files)
-    - [Sandbox](#sandbox)
-    - [Preprocess Raw Data (Optional)](#preprocess-raw-data-optional)
-    - [For Docker Users](#for-docker-users)
-  - [License](#license)
-  - [Contributing](#contributing)
-  - [Acknowledgement](#acknowledgement)
-  - [References](#references)
 - [News](#news)
 - [Why Data-Juicer?](#why-data-juicer)
 - [DJ-Cookbook](#dj-cookbook)
@@ -115,12 +85,14 @@ Table of Contents
   - [Interactive Examples](#interactive-examples)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
-  - [From Source](#from-source)
+  - [From Source for Specific Scenarios](#from-source-for-specific-scenarios)
+  - [From Source for Specific OPs](#from-source-for-specific-ops)
   - [Using pip](#using-pip)
   - [Using Docker](#using-docker)
   - [Installation check](#installation-check)
   - [For Video-related Operators](#for-video-related-operators)
 - [Quick Start](#quick-start)
+  - [Dataset Configuration](#dataset-configuration)
   - [Data Processing](#data-processing)
   - [Distributed Data Processing](#distributed-data-processing)
   - [Data Analysis](#data-analysis)
@@ -230,7 +202,7 @@ Table of Contents
 - Recommend Python>=3.9,<=3.10
 - gcc >= 5 (at least C++14 support)
 
-### From Source 
+### From Source for Specific Scenarios
 
 - Run the following commands to install the latest basic `data_juicer` version in
   editable mode:
@@ -249,19 +221,21 @@ pip install -v -e .[tools] # Install a subset of tools dependencies
 
 The dependency options are listed below:
 
-| Tag              | Description                                                                                  |
-|------------------|----------------------------------------------------------------------------------------------|
-| `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                                          |
-| `.[all]`         | Install all dependencies except sandbox.                                                     |
-| `.[sci]`         | Install all dependencies for all OPs.                                                        |
-| `.[dist]`        | Install dependencies for distributed data processing. (Experimental)                         |
-| `.[dev]`         | Install dependencies for developing the package as contributors.                             |
-| `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers.                       |
-| `.[sandbox]`     | Install all dependencies for sandbox.                                                        |
+| Tag              | Description                                                            |
+|------------------|------------------------------------------------------------------------|
+| `.` or `.[mini]` | Install minimal dependencies for basic Data-Juicer.                    |
+| `.[all]`         | Install dependencies for all OPs except sandbox.                       |
+| `.[sci]`         | Install dependencies for OPs related to scientific usage.              |
+| `.[dist]`        | Install dependencies for additional distributed data processing.       |
+| `.[dev]`         | Install dependencies for developing the package as contributors.       |
+| `.[tools]`       | Install dependencies for dedicated tools, such as quality classifiers. |
+| `.[sandbox]`     | Install all dependencies for sandbox.                                  |
+
+### From Source for Specific OPs
 
 - Install dependencies for specific OPs
 
-With the growth of the number of OPs, the dependencies of all OPs become very heavy. Instead of using the command `pip install -v -e .[sci]` to install all dependencies,
+With the growth of the number of OPs, the dependencies of all OPs become very heavy. Instead of using the command `pip install -v -e .[all]` to install all dependencies,
 we provide two alternative, lighter options:
 
   - Automatic Minimal Dependency Installation: During the execution of Data-Juicer, minimal dependencies will be automatically installed. This allows for immediate execution, but may potentially lead to dependency conflicts.
@@ -332,11 +306,11 @@ Check if your environment path is set correctly by running the ffmpeg command fr
 DJ supports various dataset input types, including local files, remote datasets like huggingface; it also supports data validation and data mixture.
 
 Two ways to configure a input file
-- legacy way 
+- Simple scenarios, single path for local/HF file
 ```yaml
 dataset_path: '/path/to/your/dataset'  # path to your dataset directory or file
 ```
-- updated way
+- advanced method, supports sub-configuration items and more features
 ```yaml
 dataset:
   configs:
@@ -344,7 +318,7 @@ dataset:
       path: 'path/to/your/dataset' # path to your dataset directory or file
 ```
 
-Refer to [Dataset Configuration Guide](data_juicer/core/data/README.md) for more details.
+Refer to [Dataset Configuration Guide](docs/DatasetCfg.md) for more details.
 
 
 

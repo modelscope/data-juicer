@@ -3,18 +3,21 @@
 
 FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
+# change to aliyun source
+RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list \
+    && sed -i 's/security.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
+
 # install python 3.10
-RUN apt-get update \
-    && apt-get install -y git curl vim wget python3.10 libpython3.10-dev python3-pip \
-    && apt-get install -y libgl1-mesa-glx libglib2.0-0 \
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y git curl vim wget python3.10 libpython3.10-dev python3-pip libgl1-mesa-glx libglib2.0-0 \
     && ln -sf /usr/bin/python3.10  /usr/bin/python3 \
     && ln -sf /usr/bin/python3.10  /usr/bin/python \
     && apt-get autoclean && rm -rf /var/lib/apt/lists/* \
     && pip install --upgrade pip
 
 # install 3rd-party system dependencies
-RUN apt-get update \
-    && apt-get install ffmpeg libsm6 libxext6 software-properties-common build-essential cmake gfortran libopenblas-dev liblapack-dev -y
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg libsm6 libxext6 software-properties-common build-essential cmake gfortran libopenblas-dev liblapack-dev postgresql postgresql-contrib libpq-dev
 
 # prepare the java env
 WORKDIR /opt
@@ -35,4 +38,5 @@ RUN pip install --upgrade setuptools==69.5.1 setuptools_scm \
 
 # install data-juicer then
 COPY . .
-RUN pip install -v -e .[all] --default-timeout 1000
+RUN pip install -v -e .[all] --default-timeout 1000 \
+    && python -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger');  nltk.download('averaged_perceptron_tagger_eng')"

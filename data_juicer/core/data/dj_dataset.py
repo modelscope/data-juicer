@@ -381,9 +381,9 @@ class NestedDataset(Dataset, DJDataset):
 
         if inspect.ismethod(called_func):
             # batched is required for fault-tolerant or batched OP
-            if callable(getattr(
-                    called_func.__self__,
-                    'is_batched_op')) and called_func.__self__.is_batched_op():
+            if callable(
+                    getattr(called_func.__self__, 'is_batched_op',
+                            None)) and called_func.__self__.is_batched_op():
                 kargs['batched'] = True
                 kargs['batch_size'] = kargs.pop('batch_size', 1)
             elif not getattr(called_func.__self__, 'turbo', False):
@@ -394,8 +394,8 @@ class NestedDataset(Dataset, DJDataset):
 
             # rank is required for cuda model loading for map
             if not is_filter and callable(
-                    getattr(called_func.__self__,
-                            'use_cuda')) and called_func.__self__.use_cuda():
+                    getattr(called_func.__self__, 'use_cuda',
+                            None)) and called_func.__self__.use_cuda():
                 kargs['with_rank'] = True
 
         if 'new_fingerprint' not in kargs or kargs['new_fingerprint'] is None:
