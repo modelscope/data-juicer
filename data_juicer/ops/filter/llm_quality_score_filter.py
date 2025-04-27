@@ -78,9 +78,12 @@ json
     DEFAULT_INPUT_TEMPLATE = "# Data\n'''\n{data}\n'''\n\n# Response\njson\n"
     DEFAULT_FIELD_TEMPLATE = '**{field_name}**\n{field_data}'
 
+    _accelerator = 'cuda'
+
     def __init__(self,
                  api_or_hf_model: str = 'gpt-4o',
                  min_score: float = 0.5,
+                 is_hf_model: bool = False,
                  *,
                  api_endpoint: Optional[str] = None,
                  response_path: Optional[str] = None,
@@ -133,6 +136,7 @@ json
         self.try_num = try_num
 
         self.enable_vllm = enable_vllm
+        self.is_hf_model = is_hf_model
 
         sampling_params = update_sampling_params(sampling_params,
                                                  api_or_hf_model,
@@ -152,6 +156,14 @@ json
                 pretrained_model_name_or_path=api_or_hf_model,
                 **model_params)
             self.sampling_params = vllm.SamplingParams(**sampling_params)
+        elif is_hf_model:
+            self.model_key = prepare_model(
+                model_type='huggingface',
+                pretrained_model_name_or_path=api_or_hf_model,
+                return_pipe=True,
+                trust_remote_code=True,
+                **model_params)
+            self.sampling_params = sampling_params
         else:
             self.sampling_params = sampling_params
 
@@ -224,6 +236,11 @@ json
                 if self.enable_vllm:
                     response = model.chat(messages, self.sampling_params)
                     output = response[0].outputs[0].text
+                elif self.is_hf_model:
+                    response = model(messages,
+                                     return_full_text=False,
+                                     **self.sampling_params)
+                    output = response[0]['generated_text']
                 else:
                     output = model(messages, **self.sampling_params)
                 score, record = self.parse_output(output)
