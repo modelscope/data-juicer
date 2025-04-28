@@ -8,6 +8,7 @@ from loguru import logger
 from data_juicer import is_cuda_available
 from data_juicer.utils.constant import Fields
 from data_juicer.utils.mm_utils import size_to_bytes
+from data_juicer.utils.model_utils import free_models
 from data_juicer.utils.process_utils import calculate_np
 from data_juicer.utils.registry import Registry
 
@@ -60,12 +61,14 @@ def catch_map_batches_exception(method, skip_op_error=False, op_name=None):
     def wrapper(samples, *args, **kwargs):
         try:
             return method(samples, *args, **kwargs)
-        except Exception as e:
+        except Exception:
             if not skip_op_error:
                 raise
+            import traceback
+
             from loguru import logger
             logger.error(f'An error occurred in {op_name} when processing '
-                         f'samples "{samples}" -- {type(e)}: {e}')
+                         f'samples "{samples}" -- {traceback.format_exc()}')
             ret = {key: [] for key in samples.keys()}
             ret[Fields.stats] = []
             ret[Fields.source_file] = []
@@ -107,12 +110,14 @@ def catch_map_single_exception(method,
                     return convert_list_dict_to_dict_list([res])
                 else:
                     return [res]
-            except Exception as e:
+            except Exception:
                 if not skip_op_error:
                     raise
+                import traceback
+
                 from loguru import logger
                 logger.error(f'An error occurred in {op_name} when processing '
-                             f'sample "{sample}" -- {type(e)}: {e}')
+                             f'sample "{sample}" -- {traceback.format_exc()}')
                 ret = {key: [] for key in sample.keys()}
                 ret[Fields.stats] = []
                 ret[Fields.source_file] = []
@@ -369,6 +374,7 @@ class Mapper(OP):
         if tracer:
             tracer.trace_mapper(self._name, dataset, new_dataset,
                                 self.text_key)
+        free_models()
         return new_dataset
 
 
@@ -468,23 +474,22 @@ class Filter(OP):
 
     def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         dataset = super(Filter, self).run(dataset)
-        dataset = dataset.map(self.compute_stats,
-                              num_proc=self.runtime_np(),
-                              with_rank=self.use_cuda(),
-                              batch_size=self.batch_size,
-                              desc=self._name + '_compute_stats')
+        new_dataset = dataset.map(self.compute_stats,
+                                  num_proc=self.runtime_np(),
+                                  with_rank=self.use_cuda(),
+                                  batch_size=self.batch_size,
+                                  desc=self._name + '_compute_stats')
         if exporter and self.stats_export_path is not None:
-            exporter.export_compute_stats(dataset, self.stats_export_path)
+            exporter.export_compute_stats(new_dataset, self.stats_export_path)
         if reduce:
-            new_dataset = dataset.filter(self.process,
-                                         num_proc=self.runtime_np(),
-                                         batch_size=self.batch_size,
-                                         desc=self._name + '_process')
+            new_dataset = new_dataset.filter(self.process,
+                                             num_proc=self.runtime_np(),
+                                             batch_size=self.batch_size,
+                                             desc=self._name + '_process')
             if tracer:
                 tracer.trace_filter(self._name, dataset, new_dataset)
-            return new_dataset
-        else:
-            return dataset
+        free_models()
+        return new_dataset
 
 
 class Deduplicator(OP):
@@ -542,18 +547,17 @@ class Deduplicator(OP):
 
     def run(self, dataset, *, exporter=None, tracer=None, reduce=True):
         dataset = super(Deduplicator, self).run(dataset)
-        dataset = dataset.map(self.compute_hash,
-                              num_proc=self.runtime_np(),
-                              with_rank=self.use_cuda(),
-                              desc=self._name + '_compute_hash')
+        new_dataset = dataset.map(self.compute_hash,
+                                  num_proc=self.runtime_np(),
+                                  with_rank=self.use_cuda(),
+                                  desc=self._name + '_compute_hash')
         if reduce:
             show_num = tracer.show_num if tracer else 0
-            new_dataset, dup_pairs = self.process(dataset, show_num)
+            new_dataset, dup_pairs = self.process(new_dataset, show_num)
             if tracer:
                 tracer.trace_deduplicator(self._name, dup_pairs)
-            return new_dataset
-        else:
-            return dataset
+        free_models()
+        return new_dataset
 
 
 class Selector(OP):
@@ -591,6 +595,7 @@ class Selector(OP):
         new_dataset = self.process(dataset)
         if tracer:
             tracer.trace_filter(self._name, dataset, new_dataset)
+        free_models()
         return new_dataset
 
 
@@ -631,6 +636,7 @@ class Grouper(OP):
         new_dataset = NestedDataset.from_list(batched_samples)
         if tracer:
             tracer.trace_filter(self._name, dataset, new_dataset)
+        free_models()
         return new_dataset
 
 
@@ -692,4 +698,5 @@ class Aggregator(OP):
         if tracer:
             tracer.trace_mapper(self._name, dataset, new_dataset,
                                 self.text_key)
+        free_models()
         return new_dataset
