@@ -101,6 +101,20 @@ class Difference_Caption_Generator_Mapper(Mapper):
             os.makedirs(DATA_JUICER_ASSETS_CACHE, exist_ok=True)
         cache_image_list = []
 
+
+        if len(samples[Fields.meta][MetaKeys.bbox_tag]) == 1 and \
+            np.sum(samples[Fields.meta][MetaKeys.bbox_tag][0]) == 0:
+            for temp_image_path in cache_image_list:
+                os.remove(temp_image_path)
+            return {
+                Fields.meta: {
+                    'region_caption1': [''],
+                    'region_caption2': [''],
+                    MetaKeys.bbox_tag: np.zeros((1, 4), dtype=np.float32),
+                    'bbox_difference_captions': ['']
+                }
+            }
+
         # fused_ops 1.mllm_mapper 2.image_text_matching_filter 3.text_pair_similarity_filter
         # keys of sample: "image_path1", "image_path2", Fields.meta[MetaKeys.bbox_tag]
         image_array1 = cv2.imread(samples['image_path1'])
@@ -262,12 +276,14 @@ class Difference_Caption_Generator_Mapper(Mapper):
                 filtered_caption_pairs.append(temp_filtered_caption_pairs)
 
         if len(filtered_caption_pairs) == 0:
+            for temp_image_path in cache_image_list:
+                os.remove(temp_image_path)
             return {
                 Fields.meta: {
-                    'region_caption1': [],
-                    'region_caption2': [],
-                    MetaKeys.bbox_tag: np.empty((0, 0, 4), dtype=np.float32),
-                    'bbox_difference_captions': []
+                    'region_caption1': [''],
+                    'region_caption2': [''],
+                    MetaKeys.bbox_tag: np.zeros((1, 4), dtype=np.float32),
+                    'bbox_difference_captions': ['']
                 }
             }
 
@@ -311,12 +327,14 @@ class Difference_Caption_Generator_Mapper(Mapper):
                 effective_bboxes.append(temp_bbox_json)
 
         if len(effective_bboxes) == 0:
+            for temp_image_path in cache_image_list:
+                os.remove(temp_image_path)
             return {
                 Fields.meta: {
-                    'region_caption1': [],
-                    'region_caption2': [],
-                    MetaKeys.bbox_tag: np.empty((0, 0, 4), dtype=np.float32),
-                    'bbox_difference_captions': []
+                    'region_caption1': [''],
+                    'region_caption2': [''],
+                    MetaKeys.bbox_tag: np.zeros((1, 4), dtype=np.float32),
+                    'bbox_difference_captions': ['']
                 }
             }
 

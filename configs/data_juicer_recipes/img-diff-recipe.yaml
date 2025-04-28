@@ -31,7 +31,7 @@ process:
 
   - imgdiff_difference_area_generator_mapper:
       image_pair_similarity_filter_args:
-        min_score_1: 0.9
+        min_score_1: 0.8
         max_score_1: 0.99
         min_score_2: 0
         max_score_2: 0.85
@@ -43,7 +43,7 @@ process:
         iou: 0.5
         model_path: FastSAM-x.pt
       image_text_matching_filter_args:
-        min_score: 0.4
+        min_score: 0.35
         max_score: 1.0
         hf_blip: Salesforce/blip-itm-base-coco
         num_proc: 1

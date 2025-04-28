@@ -214,7 +214,7 @@ class Difference_Area_Generator_Mapper(Mapper):
         if not new_samples_s1:
             return {
                 Fields.meta: {
-                    MetaKeys.bbox_tag: np.empty((0, 0, 4), dtype=np.float32)
+                    MetaKeys.bbox_tag: np.zeros((1, 4), dtype=np.float32)
                 }
             }
 
@@ -423,9 +423,13 @@ class Difference_Area_Generator_Mapper(Mapper):
         filtered_sub_image_pairs = filtered_sub_image_pairs.to_list()
 
         if len(filtered_sub_image_pairs) == 0:
+            for temp_image_path in crop_image1_path_to_bbox_dict:
+                os.remove(temp_image_path)
+            for temp_image_path in crop_image2_path_to_bbox_dict:
+                os.remove(temp_image_path)
             return {
                 Fields.meta: {
-                    MetaKeys.bbox_tag: np.empty((0, 0, 4), dtype=np.float32)
+                    MetaKeys.bbox_tag: np.zeros((1, 4), dtype=np.float32)
                 }
             }
 
