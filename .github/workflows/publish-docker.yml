@@ -26,6 +26,9 @@ jobs:
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
 
+    outputs:
+      image_version: ${{ steps.meta.outputs.version }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -73,13 +76,17 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+  sync2oss:
+    runs-on: [docker]
+    needs: build
+    steps:
       - name: Sync Docker image to Aliyun OSS
         id: sync_to_oss
         run: |
-          curl "http://127.0.0.1:5006/sync2oss?file_path=data-juicer-${{ steps.meta.outputs.version }}.tar"
+          curl "http://127.0.0.1:5006/sync2oss?file_path=data-juicer-${{ needs.build.outputs.image_version }}.tar"
 
       - name: Clean up resources
-        if: always()
+        if: success()
         run: |
           rm -rf dj-${{ github.run_id }}
-          rm -rf data-juicer-${{ steps.meta.outputs.version }}.tar
+          rm -rf data-juicer-${{ needs.build.outputs.image_version }}.tar
