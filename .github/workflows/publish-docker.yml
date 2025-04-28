@@ -63,25 +63,25 @@ jobs:
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@v6
-        with:
-          context: dj-${{ github.run_id }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+#      - name: Build and push Docker image
+#        id: build-and-push
+#        uses: docker/build-push-action@v6
+#        with:
+#          context: dj-${{ github.run_id }}
+#          push: true
+#          outputs: |
+#            docker,dest=data-juicer-${{ steps.meta.outputs.tags }}.tar
+#          tags: ${{ steps.meta.outputs.tags }}
+#          labels: ${{ steps.meta.outputs.labels }}
 
-      # Sign the resulting Docker image digest except on PRs.
-      # This will only write to the public Rekor transparency log when the Docker
-      # repository is public to avoid leaking data.  If you would like to publish
-      # transparency data even for private images, pass --force to cosign below.
-      # https://github.com/sigstore/cosign
-      - name: Sign the published Docker image
-        env:
-          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
-          TAGS: ${{ steps.meta.outputs.tags }}
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
-        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+      - name: Build and push Docker image Test
+        id: build-and-push
+        working-directory: dj-${{ github.run_id }}
+        run: |
+          echo "Building and pushing Docker image Test..." > test.txt && tar zcvf data-juicer-${{ steps.meta.outputs.tags }}.tar test.txt
+
+      - name: Sync Docker image to Aliyun OSS
+        id: sync_to_oss
+        working-directory: dj-${{ github.run_id }}
+        run: |
+          curl "http://127.0.0.1:5006/sync2oss?file_path=data-juicer-${{ steps.meta.outputs.tags }}.tar"
