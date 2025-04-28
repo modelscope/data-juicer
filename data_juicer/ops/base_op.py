@@ -61,14 +61,15 @@ def catch_map_batches_exception(method, skip_op_error=False, op_name=None):
     def wrapper(samples, *args, **kwargs):
         try:
             return method(samples, *args, **kwargs)
-        except Exception:
+        except Exception as e:
             if not skip_op_error:
                 raise
             import traceback
 
             from loguru import logger
             logger.error(f'An error occurred in {op_name} when processing '
-                         f'samples "{samples}" -- {traceback.format_exc()}')
+                         f'samples "{samples}" -- {type(e)}: {e} -- '
+                         f'{traceback.format_exc()}')
             ret = {key: [] for key in samples.keys()}
             ret[Fields.stats] = []
             ret[Fields.source_file] = []
@@ -110,14 +111,15 @@ def catch_map_single_exception(method,
                     return convert_list_dict_to_dict_list([res])
                 else:
                     return [res]
-            except Exception:
+            except Exception as e:
                 if not skip_op_error:
                     raise
                 import traceback
 
                 from loguru import logger
                 logger.error(f'An error occurred in {op_name} when processing '
-                             f'sample "{sample}" -- {traceback.format_exc()}')
+                             f'sample "{sample}" -- {type(e)}: {e} -- '
+                             f'{traceback.format_exc()}')
                 ret = {key: [] for key in sample.keys()}
                 ret[Fields.stats] = []
                 ret[Fields.source_file] = []
