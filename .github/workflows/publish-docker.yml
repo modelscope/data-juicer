@@ -82,6 +82,5 @@ jobs:
 
       - name: Sync Docker image to Aliyun OSS
         id: sync_to_oss
-        working-directory: dj-${{ github.run_id }}
         run: |
-          curl "http://127.0.0.1:5006/sync2oss?file_path=data-juicer-${{ steps.meta.outputs.version }}.tar"
+          curl "http://127.0.0.1:5006/sync2oss?file_path=dj-${{ github.run_id }}/data-juicer-${{ steps.meta.outputs.version }}.tar"
