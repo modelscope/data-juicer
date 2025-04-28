@@ -69,11 +69,17 @@ jobs:
         with:
           context: dj-${{ github.run_id }}
           push: true
-          outputs: type=docker,dest=dj-${{ github.run_id }}/data-juicer-${{ steps.meta.outputs.version }}.tar
+          outputs: type=docker,dest=data-juicer-${{ steps.meta.outputs.version }}.tar
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Sync Docker image to Aliyun OSS
         id: sync_to_oss
         run: |
-          curl "http://127.0.0.1:5006/sync2oss?file_path=dj-${{ github.run_id }}/data-juicer-${{ steps.meta.outputs.version }}.tar"
+          curl "http://127.0.0.1:5006/sync2oss?file_path=data-juicer-${{ steps.meta.outputs.version }}.tar"
+
+      - name: Clean up resources
+        if: always()
+        run: |
+          rm -rf dj-${{ github.run_id }}
+          rm -rf data-juicer-${{ steps.meta.outputs.version }}.tar
