@@ -6,7 +6,6 @@ name: Publish Docker Image to Aliyun
 # documentation.
 
 on:
-  push:
   workflow_dispatch:
   release:
     types: [published]
