@@ -101,9 +101,8 @@ class Difference_Caption_Generator_Mapper(Mapper):
             os.makedirs(DATA_JUICER_ASSETS_CACHE, exist_ok=True)
         cache_image_list = []
 
-
         if len(samples[Fields.meta][MetaKeys.bbox_tag]) == 1 and \
-            np.sum(samples[Fields.meta][MetaKeys.bbox_tag][0]) == 0:
+                np.sum(samples[Fields.meta][MetaKeys.bbox_tag][0]) == 0:
             for temp_image_path in cache_image_list:
                 os.remove(temp_image_path)
             return {
