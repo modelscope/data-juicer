@@ -34,7 +34,7 @@ WORKDIR /data-juicer
 
 # install requirements which need to be installed from source
 RUN pip install --upgrade setuptools==69.5.1 setuptools_scm -i https://pypi.tuna.tsinghua.edu.cn/simple \
-    && pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple
+    && pip install http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/recognize-anything-main.zip --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # install data-juicer then
 COPY . .
