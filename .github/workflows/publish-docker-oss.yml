@@ -43,7 +43,7 @@ jobs:
           config-inline: |
             debug = true
             [registry."docker.io"]
-              mirrors = ["docker.m.daocloud.io"]
+              mirrors = ["docker.xiaogenban1993.com", "docker.hlmirror.com", "docker.m.daocloud.io"]
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
