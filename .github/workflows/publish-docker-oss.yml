@@ -38,6 +38,10 @@ jobs:
       # https://github.com/docker/setup-buildx-action
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+        with:
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              mirrors = ["http://docker.m.daocloud.io"]
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
