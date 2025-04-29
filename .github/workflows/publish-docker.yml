@@ -26,9 +26,6 @@ jobs:
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
 
-    outputs:
-      image_version: ${{ steps.meta.outputs.version }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
