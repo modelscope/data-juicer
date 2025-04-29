@@ -39,7 +39,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
+          buildkitd-flags: --debug
           buildkitd-config-inline: |
+            debug = true
             [registry."docker.io"]
               mirrors = ["docker.m.daocloud.io"]
 
