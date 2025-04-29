@@ -13,7 +13,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && ln -sf /usr/bin/python3.10  /usr/bin/python3 \
     && ln -sf /usr/bin/python3.10  /usr/bin/python \
     && apt-get autoclean && rm -rf /var/lib/apt/lists/* \
-    && pip install --upgrade pip
+    && pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # install 3rd-party system dependencies
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
