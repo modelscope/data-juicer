@@ -33,10 +33,10 @@ ENV JAVA_HOME=/opt/jdk
 WORKDIR /data-juicer
 
 # install requirements which need to be installed from source
-RUN pip install --upgrade setuptools==69.5.1 setuptools_scm \
-    && pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000
+RUN pip install --upgrade setuptools==69.5.1 setuptools_scm -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    && pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # install data-juicer then
 COPY . .
-RUN pip install -v -e .[all] --default-timeout 1000 \
+RUN pip install -v -e .[all] --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple \
     && python -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger');  nltk.download('averaged_perceptron_tagger_eng')"
