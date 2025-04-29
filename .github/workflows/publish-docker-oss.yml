@@ -41,7 +41,7 @@ jobs:
         with:
           buildkitd-config-inline: |
             [registry."docker.io"]
-              mirrors = ["http://docker.m.daocloud.io"]
+              mirrors = ["docker.m.daocloud.io"]
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
