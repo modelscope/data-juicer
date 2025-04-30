@@ -155,6 +155,21 @@ sandbox = [
     "func_timeout",
 ]
 
+# All optional dependencies
+all = [
+    *generic,
+    *vision,
+    *nlp,
+    *audio,
+    *distributed,
+    *dev,
+    *ai_services,
+    *document,
+    *visualization,
+    *web,
+    *sandbox,
+]
+
 [project.scripts]
 dj-process = "data_juicer.tools.process_data:main"
 dj-analyze = "data_juicer.tools.analyze_data:main"
