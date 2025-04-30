@@ -6,7 +6,6 @@ name: Sync Docker Image to Aliyun OSS
 # documentation.
 
 on:
-  push:
   workflow_dispatch:
   schedule:
     - cron: '0 16 * * 1'  # Every Monday at 16:00 UTC -- Every Tuesday at 0:00 in Beijing Time
