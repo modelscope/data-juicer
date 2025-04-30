@@ -18,7 +18,6 @@ from data_juicer.utils.lazy_loader import LazyLoader
 
 cv2 = LazyLoader('cv2', 'opencv-python')
 
-
 # suppress most warnings from av
 av.logging.set_level(av.logging.PANIC)
 

@@ -1,4 +1,4 @@
-# Version of the data-juicer package. This should always match the version in pyproject.toml
+# Version of the data-juicer package. Auto populate to pyproject.toml
 __version__ = '1.3.1'
 
 import os

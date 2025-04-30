@@ -2,17 +2,16 @@ import librosa
 import numpy as np
 
 from data_juicer.utils.constant import Fields, MetaKeys
-from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import extract_audio_from_video
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 from ..base_op import OPERATORS, TAGGING_OPS, Mapper
 
 torch = LazyLoader('torch', 'torch')
-
 OP_NAME = 'video_tagging_from_audio_mapper'
-
 LazyLoader.check_packages(['torchaudio'])
+
 
 @TAGGING_OPS.register_module(OP_NAME)
 @OPERATORS.register_module(OP_NAME)

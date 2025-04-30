@@ -12,7 +12,7 @@ from loguru import logger
 
 from data_juicer import cuda_device_count
 from data_juicer.utils.common_utils import nested_access
-from data_juicer.utils.lazy_loader import AUTOINSTALL, LazyLoader
+from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.nltk_utils import (ensure_nltk_resource,
                                           patch_nltk_pickle_security)
 
@@ -369,12 +369,11 @@ def prepare_huggingface_model(pretrained_model_name_or_path,
         device = model_params.pop('device')
         if device.startswith('cuda'):
             try:
-                import accelerate
                 model_params['device_map'] = device
             except ImportError:
                 # If accelerate is not available, use device directly
                 model_params['device'] = device
-                logger.warning("accelerate not found, using device directly")
+                logger.warning('accelerate not found, using device directly')
 
     processor = transformers.AutoProcessor.from_pretrained(
         pretrained_model_name_or_path, **model_params)
@@ -625,12 +624,11 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
         device = model_params.pop('device')
         if device.startswith('cuda'):
             try:
-                import accelerate
                 model_params['device_map'] = device
             except ImportError:
                 # If accelerate is not available, use device directly
                 model_params['device'] = device
-                logger.warning("accelerate not found, using device directly")
+                logger.warning('accelerate not found, using device directly')
 
     processor = transformers.CLIPProcessor.from_pretrained(
         pretrained_model_name_or_path, **model_params)
