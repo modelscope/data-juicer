@@ -93,7 +93,7 @@ distributed = [
 # Development & Tools
 dev = [
     "coverage",
-    "pre-commit",
+    "pre-commit>=3.0.0",  # pre-commit hooks
     "sphinx",
     "sphinx-autobuild",
     "sphinx_rtd_theme",
