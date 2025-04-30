@@ -1,4 +1,4 @@
-name: Publish Docker Image to Aliyun
+name: Sync Docker Image to Aliyun OSS
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -8,78 +8,36 @@ name: Publish Docker Image to Aliyun
 on:
   push:
   workflow_dispatch:
-  release:
-    types: [published]
+  schedule:
+    - cron: '0 16 * * 1'  # Every Monday at 16:00 UTC -- Every Tuesday at 0:00 in Beijing Time
 
 env:
   IMAGE_NAME: datajuicer/data-juicer
+  IMAGE_TAG: latest
+  REGISTRY_MIRROR: docker.xiaogenban1993.com
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
 
 
 jobs:
   build:
     runs-on: [docker-internal]
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
-      id-token: write
+    timeout-minutes: 1440 # 24 hours
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          path: dj-${{ github.run_id }}
+      - name: Pull Docker image
+        run: |
+          docker pull ${{ env.REGISTRY_MIRROR }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
-      # Set up BuildKit Docker container builder to be able to build
-      # multi-platform images and export cache
-      # https://github.com/docker/setup-buildx-action
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          buildkitd-flags: --debug
-          config-inline: |
-            debug = true
-            [registry."docker.io"]
-              mirrors = ["docker.xiaogenban1993.com", "docker.hlmirror.com", "docker.m.daocloud.io"]
-
-      # Login against a Docker registry except on PR
-      # https://github.com/docker/login-action
-#      - name: Log into Docker Hub
-#        uses: docker/login-action@v2
-#        with:
-#          username: ${{ secrets.DOCKER_USERNAME }}
-#          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      # Extract metadata (tags, labels) for Docker
-      # https://github.com/docker/metadata-action
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE_NAME }}
-
-      # Build and push Docker image with Buildx (don't push on PR)
-      # https://github.com/docker/build-push-action
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@v6
-        with:
-          context: dj-${{ github.run_id }}
-          push: false
-          outputs: type=docker,dest=data-juicer-${{ steps.meta.outputs.version }}.tar
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+      - name: Export to tar file
+        run: |
+          docker save ${{ env.REGISTRY_MIRROR }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} > data-juicer-${{ env.IMAGE_TAG }}.tar
 
       - name: Sync Docker image to Aliyun OSS
         id: sync_to_oss
         run: |
-          curl "http://127.0.0.1:5006/sync2oss?file_path=data-juicer-${{ steps.meta.outputs.version }}.tar"
+          curl "http://127.0.0.1:5006/sync2oss?file_path=data-juicer-${{ env.IMAGE_TAG }}.tar"
 
       - name: Clean up resources
         if: success()
         run: |
-          rm -rf dj-${{ github.run_id }}
-          rm -rf data-juicer-${{ steps.meta.outputs.version }}.tar
+          rm -rf data-juicer-${{ env.IMAGE_TAG }}.tar
