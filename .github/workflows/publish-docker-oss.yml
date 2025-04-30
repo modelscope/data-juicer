@@ -30,14 +30,14 @@ jobs:
 
       - name: Export to tar file
         run: |
-          docker save ${{ env.REGISTRY_MIRROR }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} > data-juicer-${{ env.IMAGE_TAG }}.tar
+          docker save ${{ env.REGISTRY_MIRROR }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} | gzip > data-juicer-${{ env.IMAGE_TAG }}.tar.gz
 
       - name: Sync Docker image to Aliyun OSS
         id: sync_to_oss
         run: |
-          curl "http://127.0.0.1:5006/sync2oss?file_path=data-juicer-${{ env.IMAGE_TAG }}.tar"
+          curl -s "http://127.0.0.1:5006/sync2oss?file_path=data-juicer-${{ env.IMAGE_TAG }}.tar.gz" > /dev/null
 
       - name: Clean up resources
         if: success()
         run: |
-          rm -rf data-juicer-${{ env.IMAGE_TAG }}.tar
+          rm -rf data-juicer-${{ env.IMAGE_TAG }}.tar.gz
