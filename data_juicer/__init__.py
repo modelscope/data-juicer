@@ -1,5 +1,4 @@
-# Version of the data-juicer package. Auto populate to pyproject.toml
-__version__ = '1.3.1'
+__version__ = '1.3.2'
 
 import os
 import subprocess
