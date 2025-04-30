@@ -93,7 +93,7 @@ distributed = [
 # Development & Tools
 dev = [
     "coverage",
-    "pre-commit>=3.0.0",  # pre-commit hooks
+    "pre-commit",  # pre-commit hooks
     "sphinx",
     "sphinx-autobuild",
     "sphinx_rtd_theme",
@@ -102,6 +102,7 @@ dev = [
     "fire",
     "click",
     "wget",
+    "toml",  # for yapf configuration
 ]
 
 # AI Services & APIs
@@ -172,4 +173,4 @@ per-file-ignores = [
 ]
 
 [tool.hatch.version]
-path = "data_juicer/__init__.py" 
+path = "data_juicer/__init__.py"
