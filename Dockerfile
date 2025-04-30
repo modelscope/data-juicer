@@ -13,7 +13,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && ln -sf /usr/bin/python3.10  /usr/bin/python3 \
     && ln -sf /usr/bin/python3.10  /usr/bin/python \
     && apt-get autoclean && rm -rf /var/lib/apt/lists/* \
-    && pip install --upgrade pip
+    && pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # install 3rd-party system dependencies
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
@@ -33,10 +33,10 @@ ENV JAVA_HOME=/opt/jdk
 WORKDIR /data-juicer
 
 # install requirements which need to be installed from source
-RUN pip install --upgrade setuptools==69.5.1 setuptools_scm \
-    && pip install git+https://github.com/xinyu1205/recognize-anything.git --default-timeout 1000
+RUN pip install --upgrade setuptools==69.5.1 setuptools_scm -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    && pip install http://dail-wlcb.oss-cn-wulanchabu.aliyuncs.com/data_juicer/recognize-anything-main.zip --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 # install data-juicer then
 COPY . .
-RUN pip install -v -e .[all] --default-timeout 1000 \
+RUN pip install -v -e .[all] --default-timeout 1000 -i https://pypi.tuna.tsinghua.edu.cn/simple \
     && python -c "import nltk; nltk.download('punkt_tab'); nltk.download('punkt'); nltk.download('averaged_perceptron_tagger');  nltk.download('averaged_perceptron_tagger_eng')"
