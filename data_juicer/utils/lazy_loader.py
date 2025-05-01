@@ -21,7 +21,7 @@ class LazyLoader(types.ModuleType):
 
     # Special mappings for modules that have different package names
     MODULE_MAPPINGS = {
-        'cv2': 'opencv-python',
+        'cv2': 'opencv-python',  # module name -> package name
         'aesthetics_predictor': 'simple-aesthetics-predictor',
     }
 
@@ -117,33 +117,59 @@ class LazyLoader(types.ModuleType):
     @staticmethod
     def check_packages(packages, extra_args=None):
         """
-        Check if packages are installed and install them if needed.
+        Check if modules are installed and install them if needed.
 
         Args:
-            packages (list): List of package names to check/install
+            packages (list): List of module names to check/install
             extra_args (str, optional): Additional arguments for installation
+
+        Note:
+            For modules where the package name differs from the module name,
+            use the MODULE_MAPPINGS dictionary to specify the correct mapping.
+            For example: 'cv2' -> 'opencv-python'
         """
-        for package in packages:
+        for module_name in packages:
+            # First try to import the module directly
             try:
-                importlib.import_module(package.split('-')[0])
+                importlib.import_module(module_name)
+                continue
             except ImportError:
-                logger.info(f"Package '{package}' not found. Installing...")
-                try:
-                    # Try uv first
-                    cmd = [
-                        sys.executable, '-m', 'uv', 'pip', 'install', package
-                    ]
-                    if extra_args:
-                        cmd.extend(extra_args.split())
-                    subprocess.check_call(cmd)
-                except (subprocess.CalledProcessError, FileNotFoundError):
-                    # Fallback to pip if uv is not available
-                    logger.warning('uv not found, falling back to pip...')
-                    cmd = [sys.executable, '-m', 'pip', 'install', package]
-                    if extra_args:
-                        cmd.extend(extra_args.split())
-                    subprocess.check_call(cmd)
-                logger.info(f'Successfully installed {package}')
+                pass
+
+            # If that fails, get the package name from MODULE_MAPPINGS
+            package_name = LazyLoader.MODULE_MAPPINGS.get(
+                module_name, module_name)
+
+            # Install the package
+            logger.info(
+                f"Module '{module_name}' not found. Installing package "
+                f"{package_name}'...")
+            try:
+                # Try uv first
+                cmd = [
+                    sys.executable, '-m', 'uv', 'pip', 'install', package_name
+                ]
+                if extra_args:
+                    cmd.extend(extra_args.split())
+                subprocess.check_call(cmd)
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                # Fallback to pip if uv is not available
+                logger.warning('uv not found, falling back to pip...')
+                cmd = [sys.executable, '-m', 'pip', 'install', package_name]
+                if extra_args:
+                    cmd.extend(extra_args.split())
+                subprocess.check_call(cmd)
+            logger.info(f'Successfully installed {package_name}')
+
+            # After installation, try importing the module again
+            try:
+                importlib.import_module(module_name)
+            except ImportError:
+                logger.warning(
+                    f'Package {package_name} was installed but module '
+                    f'{module_name} could not be imported. This might '
+                    f'indicate a mismatch between the package name and '
+                    f'module name.')
 
     def _get_package_name(self, module_name):
         """Get the package name for a module, handling special cases."""
