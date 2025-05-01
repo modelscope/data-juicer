@@ -243,26 +243,6 @@ all = [
     "httpx",  # async HTTP
     "streamlit",  # web interface
     "fastapi[standard]>=0.110",  # API framework
-
-    # Sandbox Environment
-    "torch>=1.11.0",
-    "fire",
-    "pyspark",
-    "vbench",
-    "modelscope",
-    "Pillow",
-    "deepspeed",
-    "safetensors",
-    "timm",
-    "xformers",
-    "decord",
-    "opencv-python",
-    "omegaconf",
-    "imageio[ffmpeg,pyav]",
-    "tensorboard",
-    "diffusers==0.27.0",
-    "transformers>=4.37.2",
-    "func_timeout",
 ]
 
 [project.scripts]
