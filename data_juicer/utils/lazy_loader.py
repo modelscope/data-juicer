@@ -23,6 +23,7 @@ class LazyLoader(types.ModuleType):
     MODULE_MAPPINGS = {
         'cv2': 'opencv-python',  # module name -> package name
         'aesthetics_predictor': 'simple-aesthetics-predictor',
+        'ffmpeg': 'ffmpeg-python',  # Add ffmpeg mapping
     }
 
     def __init__(self, local_name, name, auto_install=True):
@@ -234,12 +235,3 @@ class LazyLoader(types.ModuleType):
         if self._module is None:
             self._load()
         return dir(self._module)
-
-
-# For backward compatibility
-class AUTOINSTALL:
-
-    @staticmethod
-    def check(packages, extra_args=None):
-        """Alias for LazyLoader.check_packages for backward compatibility"""
-        return LazyLoader.check_packages(packages, extra_args)

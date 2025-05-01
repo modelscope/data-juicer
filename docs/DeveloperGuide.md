@@ -376,11 +376,11 @@ else:
 ...
 ```
 
-5. As the number of OPs increases, Data-Juicer's dependencies also multiply. To prevent Data-Juicer from becoming excessively burdened with dependencies, we've implemented a strategy that incorporates lazy importing and on-demand installation of additional dependencies required by OPs. `LazyLoader` will check if the packages corresponding to the module being loaded are installed, and if not, it will dynamically install them automatically. `AUTOINSTALL` is used for installing additional patches. Below is an example illustrating this approach:
+5. As the number of OPs increases, Data-Juicer's dependencies also multiply. To prevent Data-Juicer from becoming excessively burdened with dependencies, we've implemented a strategy that incorporates lazy importing and on-demand installation of additional dependencies required by OPs. `LazyLoader` will check if the packages corresponding to the module being loaded are installed, and if not, it will dynamically install them automatically. Below is an example illustrating this approach:
 
 ```python
 # ... (import some library)
-from data_juicer.utils.lazy_loader import LazyLoader, AUTOINSTALL
+from data_juicer.utils.lazy_loader import LazyLoader
 
 # lazy import
 kenlm = LazyLoader('kenlm', 'kenlm')
@@ -393,7 +393,7 @@ class PerplexityFilter(Filter):
                 **kwargs):
         # auto install before init
         super().__init__(*args, **kwargs)
-        AUTOINSTALL.check(['fasttext-wheel'])
+        LazyLoader.check_packages(['fasttext-wheel'])
         # ... (some codes)
 
     def process_single(self, sample):
