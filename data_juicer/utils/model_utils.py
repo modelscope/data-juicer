@@ -25,7 +25,7 @@ fasttext = LazyLoader('fasttext', 'fasttext')
 sentencepiece = LazyLoader('sentencepiece', 'sentencepiece')
 kenlm = LazyLoader('kenlm', 'kenlm')
 nltk = LazyLoader('nltk', 'nltk')
-aes_pre = LazyLoader('aes_pre', 'aesthetics_predictor')
+aes_pred = LazyLoader('aesthetics_predictor', 'simple-aesthetics-predictor')
 vllm = LazyLoader('vllm', 'vllm')
 diffusers = LazyLoader('diffusers', 'diffusers')
 ram = LazyLoader('ram', 'ram.models')
@@ -636,15 +636,15 @@ def prepare_simple_aesthetics_model(pretrained_model_name_or_path,
         return processor
     else:
         if 'v1' in pretrained_model_name_or_path:
-            model = aes_pre.AestheticsPredictorV1.from_pretrained(
+            model = aes_pred.AestheticsPredictorV1.from_pretrained(
                 pretrained_model_name_or_path, **model_params)
         elif ('v2' in pretrained_model_name_or_path
               and 'linear' in pretrained_model_name_or_path):
-            model = aes_pre.AestheticsPredictorV2Linear.from_pretrained(
+            model = aes_pred.AestheticsPredictorV2Linear.from_pretrained(
                 pretrained_model_name_or_path, **model_params)
         elif ('v2' in pretrained_model_name_or_path
               and 'relu' in pretrained_model_name_or_path):
-            model = aes_pre.AestheticsPredictorV2ReLU.from_pretrained(
+            model = aes_pred.AestheticsPredictorV2ReLU.from_pretrained(
                 pretrained_model_name_or_path, **model_params)
         else:
             raise ValueError(

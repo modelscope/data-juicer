@@ -16,15 +16,7 @@ class LazyLoader(types.ModuleType):
     """
     Lazily import a module, mainly to avoid pulling in large dependencies.
     Uses uv for fast dependency installation when needed.
-    Automatically resolves dependencies from pyproject.toml.
     """
-
-    # Special mappings for modules that have different package names
-    MODULE_MAPPINGS = {
-        'cv2': 'opencv-python',  # module name -> package name
-        'aesthetics_predictor': 'simple-aesthetics-predictor',
-        'ffmpeg': 'ffmpeg-python',  # Add ffmpeg mapping
-    }
 
     def __init__(self, local_name, name, auto_install=True):
         """
@@ -36,6 +28,7 @@ class LazyLoader(types.ModuleType):
             auto_install: Whether to automatically install missing dependencies
         """
         self._local_name = local_name
+        self._name = name
         self._auto_install = auto_install
         frame = inspect.currentframe().f_back
         self._parent_module_globals = frame.f_globals
@@ -137,18 +130,14 @@ class LazyLoader(types.ModuleType):
             except ImportError:
                 pass
 
-            # If that fails, get the package name from MODULE_MAPPINGS
-            package_name = LazyLoader.MODULE_MAPPINGS.get(
-                module_name, module_name)
-
             # Install the package
             logger.info(
                 f"Module '{module_name}' not found. Installing package "
-                f"{package_name}'...")
+                f"{module_name}'...")
             try:
                 # Try uv first
                 cmd = [
-                    sys.executable, '-m', 'uv', 'pip', 'install', package_name
+                    sys.executable, '-m', 'uv', 'pip', 'install', module_name
                 ]
                 if extra_args:
                     cmd.extend(extra_args.split())
@@ -156,25 +145,21 @@ class LazyLoader(types.ModuleType):
             except (subprocess.CalledProcessError, FileNotFoundError):
                 # Fallback to pip if uv is not available
                 logger.warning('uv not found, falling back to pip...')
-                cmd = [sys.executable, '-m', 'pip', 'install', package_name]
+                cmd = [sys.executable, '-m', 'pip', 'install', module_name]
                 if extra_args:
                     cmd.extend(extra_args.split())
                 subprocess.check_call(cmd)
-            logger.info(f'Successfully installed {package_name}')
+            logger.info(f'Successfully installed {module_name}')
 
             # After installation, try importing the module again
             try:
                 importlib.import_module(module_name)
             except ImportError:
                 logger.warning(
-                    f'Package {package_name} was installed but module '
+                    f'Package {module_name} was installed but module '
                     f'{module_name} could not be imported. This might '
                     f'indicate a mismatch between the package name and '
                     f'module name.')
-
-    def _get_package_name(self, module_name):
-        """Get the package name for a module, handling special cases."""
-        return self.MODULE_MAPPINGS.get(module_name, module_name)
 
     def _load(self):
         """Load the module and handle any missing dependencies."""
@@ -188,29 +173,25 @@ class LazyLoader(types.ModuleType):
             if not self._auto_install:
                 raise
 
-            # Get the package name for installation
-            package_name = self._get_package_name(self.__name__)
-
             # Try to install the package using uv first
             try:
-                logger.info(f'Attempting to install {package_name} '
+                logger.info(f'Attempting to install {self._name} '
                             f'using uv...')
-                subprocess.check_call([
-                    sys.executable, '-m', 'uv', 'pip', 'install', package_name
-                ])
+                subprocess.check_call(
+                    [sys.executable, '-m', 'uv', 'pip', 'install', self._name])
             except (subprocess.CalledProcessError, FileNotFoundError):
                 # Fall back to pip if uv fails
                 logger.info(f'uv not available, falling back to pip '
-                            f'for {package_name}...')
+                            f'for {self._name}...')
                 try:
                     subprocess.check_call(
-                        [sys.executable, '-m', 'pip', 'install', package_name])
+                        [sys.executable, '-m', 'pip', 'install', self._name])
                 except subprocess.CalledProcessError as pip_error:
                     raise ImportError(
-                        f'Failed to install {package_name}. This package may '
+                        f'Failed to install {self._name}. This package may '
                         f'require system-level dependencies. Please try '
                         f'Please try installing it manually with: pip install '
-                        f'{package_name}\n'
+                        f'{self._name}\n'
                         f'Error details: {str(pip_error)}')
 
             # Try importing again - use the original module name
@@ -218,7 +199,7 @@ class LazyLoader(types.ModuleType):
                 self._module = importlib.import_module(self._local_name)
             except ImportError as import_error:
                 raise ImportError(f'Failed to import {self._local_name} after '
-                                  f'installing {package_name}. '
+                                  f'installing {self._name}. '
                                   f'Error details: {str(import_error)}')
 
         # Update the parent module's globals with the loaded module
