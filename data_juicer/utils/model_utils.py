@@ -32,6 +32,8 @@ ram = LazyLoader('ram', 'ram.models')
 cv2 = LazyLoader('cv2', 'cv2')
 openai = LazyLoader('openai', 'openai')
 ultralytics = LazyLoader('ultralytics', 'ultralytics')
+tiktoken = LazyLoader('tiktoken', 'tiktoken')
+dashscope = LazyLoader('dashscope', 'dashscope')
 
 MODEL_ZOO = {}
 
@@ -252,13 +254,11 @@ def prepare_api_model(model,
 
     def get_processor():
         try:
-            import tiktoken
             return tiktoken.encoding_for_model(model)
         except Exception:
             pass
 
         try:
-            import dashscope
             return dashscope.get_tokenizer(model)
         except Exception:
             pass
