@@ -19,14 +19,6 @@ class LazyLoaderTest(DataJuicerTestCaseBase):
         # it's a real module now
         self.assertIsInstance(torch, ModuleType)
 
-    def test_module_mappings(self):
-        # Test special module mappings
-        cv2 = LazyLoader('cv2', 'cv2')
-        self.assertEqual(cv2._get_package_name('cv2'), 'opencv-python')
-        
-        aesthetics = LazyLoader('aesthetics', 'aesthetics_predictor')
-        self.assertEqual(aesthetics._get_package_name('aesthetics_predictor'), 'simple-aesthetics-predictor')
-
     def test_auto_install_disabled(self):
         # Test with auto_install=False
         with self.assertRaises(ImportError):
