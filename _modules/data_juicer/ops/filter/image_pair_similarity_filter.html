@@ -173,7 +173,8 @@
         <span class="n">similarity</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cosine_similarity</span><span class="p">(</span><span class="n">image1_batch_feature</span><span class="p">,</span>
                                              <span class="n">image2_batch_feature</span><span class="p">,</span>
                                              <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span><span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_pair_similarity</span><span class="p">]</span> <span class="o">=</span> <span class="n">similarity</span>
+        <span class="n">sample</span><span class="p">[</span><span class="n">Fields</span><span class="o">.</span><span class="n">stats</span><span class="p">][</span>
+            <span class="n">StatsKeys</span><span class="o">.</span><span class="n">image_pair_similarity</span><span class="p">]</span> <span class="o">=</span> <span class="n">similarity</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
 
         <span class="k">return</span> <span class="n">sample</span></div>
 

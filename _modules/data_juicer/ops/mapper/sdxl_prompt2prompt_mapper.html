@@ -78,9 +78,14 @@
              
   <h1>Source code for data_juicer.ops.mapper.sdxl_prompt2prompt_mapper</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.op_fusion</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOADED_IMAGES</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.cache_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">DATA_JUICER_ASSETS_CACHE</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">transfer_data_dir</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.model_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">prepare_model</span>
 
@@ -116,8 +121,9 @@
             <span class="n">torch_dtype</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;fp32&#39;</span><span class="p">,</span>
             <span class="n">num_inference_steps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
             <span class="n">guidance_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">7.5</span><span class="p">,</span>
+            <span class="n">text_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">text_key_second</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">text_key_third</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="n">DATA_JUICER_ASSETS_CACHE</span><span class="p">,</span>
             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -133,10 +139,11 @@
 <span class="sd">        :param guidance_scale: A higher guidance scale value encourages the</span>
 <span class="sd">            model to generate images closely linked to the text prompt at the</span>
 <span class="sd">            expense of lower image quality. Guidance scale is enabled when</span>
-<span class="sd">        :param text_key_second: used to store the first caption</span>
+<span class="sd">        :param text_key: the key name used to store the first caption</span>
 <span class="sd">            in the caption pair.</span>
-<span class="sd">        :param text_key_third: used to store the second caption</span>
+<span class="sd">        :param text_key_second: the key name used to store the second caption</span>
 <span class="sd">            in the caption pair.</span>
+<span class="sd">        :param output_dir: the storage location of the generated images.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;mem_required&#39;</span><span class="p">,</span> <span class="s1">&#39;38GB&#39;</span><span class="p">)</span>
@@ -152,7 +159,10 @@
             <span class="n">pipe_func</span><span class="o">=</span><span class="n">p2p_pipeline</span><span class="o">.</span><span class="n">Prompt2PromptPipeline</span><span class="p">,</span>
             <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch_dtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">text_key_second</span> <span class="o">=</span> <span class="n">text_key_second</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">text_key_third</span> <span class="o">=</span> <span class="n">text_key_third</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">output_dir</span>
+
+        <span class="k">if</span> <span class="n">text_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text_key</span> <span class="o">=</span> <span class="n">text_key</span></div>
 
 
 <div class="viewcode-block" id="SDXLPrompt2PromptMapper.process_single">
@@ -164,16 +174,18 @@
 <span class="s1">                processing multiple fields, and you need to specify </span><span class="se">\</span>
 <span class="s1">                valid `text_key_second`&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_key_third</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;This OP (sdxl_prompt2prompt_mapper) requires </span><span class="se">\</span>
-<span class="s1">                processing multiple fields, and you need to specify </span><span class="se">\</span>
-<span class="s1">                valid `text_key_third`&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">random_num</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9999</span><span class="p">))</span>
+        <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">()</span>
+        <span class="n">t2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">-%H-%M-%S&#39;</span><span class="p">,</span> <span class="n">t1</span><span class="p">)</span>
 
         <span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">model_key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_key</span><span class="p">,</span>
                           <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
                           <span class="n">use_cuda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">use_cuda</span><span class="p">())</span>
 
-        <span class="n">seed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9999</span><span class="p">)</span>
         <span class="n">g_cpu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
         <span class="n">cross_attention_kwargs</span> <span class="o">=</span> <span class="p">{</span>
@@ -185,20 +197,21 @@
             <span class="p">},</span>
         <span class="p">}</span>
 
-        <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
         <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="n">prompts</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key_second</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key_third</span><span class="p">]</span>
-            <span class="p">]</span>
+            <span class="n">prompts</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key</span><span class="p">],</span> <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">text_key_second</span><span class="p">]]</span>
             <span class="n">image</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">prompts</span><span class="p">,</span>
                           <span class="n">cross_attention_kwargs</span><span class="o">=</span><span class="n">cross_attention_kwargs</span><span class="p">,</span>
                           <span class="n">guidance_scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">guidance_scale</span><span class="p">,</span>
                           <span class="n">num_inference_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_inference_steps</span><span class="p">,</span>
                           <span class="n">generator</span><span class="o">=</span><span class="n">g_cpu</span><span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">img</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]):</span>
-                <span class="n">sample</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">image_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+            <span class="n">new_output_dir</span> <span class="o">=</span> <span class="n">transfer_data_dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">OP_NAME</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">img</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="s1">&#39;images&#39;</span><span class="p">]):</span>
+                <span class="n">img_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">image_name</span> <span class="o">=</span> <span class="s1">&#39;image_pair_&#39;</span> <span class="o">+</span> <span class="n">t2</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">random_num</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">img_id</span> <span class="o">+</span> <span class="s1">&#39;.jpg&#39;</span>
+                <span class="n">abs_image_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_output_dir</span><span class="p">,</span> <span class="n">image_name</span><span class="p">)</span>
+                <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">abs_image_path</span><span class="p">)</span>
+                <span class="n">sample</span><span class="p">[</span><span class="s1">&#39;image_path&#39;</span> <span class="o">+</span> <span class="n">img_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">abs_image_path</span>
 
         <span class="k">return</span> <span class="n">sample</span></div>
 </div>
