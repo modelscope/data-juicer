@@ -80,7 +80,6 @@ audio = [
     "av==13.1.0",  # video/audio handling
     "soundfile",  # audio handling
     "librosa>=0.10",  # audio processing
-    "samplerate",  # audio resampling
     "resampy",  # audio resampling
 ]
 
@@ -204,7 +203,6 @@ all = [
     "av==13.1.0",  # video/audio handling
     "soundfile",  # audio handling
     "librosa>=0.10",  # audio processing
-    "samplerate",  # audio resampling
     "resampy",  # audio resampling
 
     # Distributed Computing
