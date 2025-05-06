@@ -74,15 +74,18 @@ class LoggerUtilsTest(DataJuicerTestCaseBase):
         setup_logger(self.temp_output_path)
         logger.info('normal log 1')
         logger.error(f'An error occurred in fake_op_1 when processing sample '
-                     f'"fake_sample_1" -- {ModuleNotFoundError}: err msg 1')
+                     f'"fake_sample_1" -- {ModuleNotFoundError}: err msg 1 -- '
+                     f'detailed error msg 1')
         logger.info('normal log 2')
         logger.warning('warning message')
         logger.info('normal log 3')
         logger.error(f'An error occurred in fake_op_2 when processing sample '
-                     f'"fake_sample_1" -- {ValueError}: err msg 1')
+                     f'"fake_sample_1" -- {ValueError}: err msg 1 -- detailed '
+                     f'error msg 1')
         logger.info('normal log 4')
         logger.error(f'An error occurred in fake_op_3 when processing sample '
-                     f'"fake_sample_3" -- {ModuleNotFoundError}: err msg 3')
+                     f'"fake_sample_3" -- {ModuleNotFoundError}: err msg 3 -- '
+                     f'detailed error msg 3')
         logger.info('normal log 5')
 
         make_log_summarization()
