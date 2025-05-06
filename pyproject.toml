@@ -155,7 +155,7 @@ sandbox = [
     "func_timeout",
 ]
 
-# All dependencies (default + all optional)
+# All dependencies (default + all optional, except sandbox)
 all = [
     # Generic ML & DL
     "torch>=1.11.0",  # PyTorch
