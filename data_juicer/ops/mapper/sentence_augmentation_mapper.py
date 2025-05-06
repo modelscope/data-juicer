@@ -1,9 +1,14 @@
+import logging
+
 from data_juicer.ops.base_op import OPERATORS, Mapper
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.model_utils import get_model, prepare_model
 
 torch = LazyLoader('torch', 'torch')
 transformers = LazyLoader('transformers', 'transformers')
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 DEFAULT_SYSTEM_PROMPT = "A chat between a curious user and an artificial \
     intelligence assistant. The assistant gives helpful, detailed, and \
@@ -35,6 +40,8 @@ class SentenceAugmentationMapper(Mapper):
                  temperature=0.2,
                  top_p=None,
                  num_beams=1,
+                 text_key=None,
+                 text_key_second=None,
                  *args,
                  **kwargs):
         """
@@ -51,6 +58,10 @@ class SentenceAugmentationMapper(Mapper):
             of words whose cumulative probability reaches p.
         :param num_beams: the larger the beam search size, the higher
             the quality of the generated text.
+        :param text_key: the key name used to store the first sentence
+            in the text pair. (optional, defalut='text')
+        :param text_key_second: the key name used to store the second sentence
+            in the text pair.
         :param args: extra args
         :param kwargs: extra args
         """
@@ -70,12 +81,23 @@ class SentenceAugmentationMapper(Mapper):
         self.top_p = top_p
         self.num_beams = num_beams
         self.task_sentence = task_sentence
+        self.text_key_second = text_key_second
+
+        if text_key is not None:
+            self.text_key = text_key
 
     def process_single(self, sample=None, rank=None):
+
+        # there is no target text
+        if self.text_key_second is None:
+            logger.error('This OP (text_pair_similarity_filter) requires \
+                processing multiple fields, and you need to specify \
+                valid `text_key_second`')
 
         if self.task_sentence is None:
             print('[Warning] task_sentence is None!')
             sample[self.text_key] = ''
+            sample[self.text_key_second] = ''
             return sample
 
         model, processor = get_model(model_key=self.model_key,
@@ -118,6 +140,6 @@ class SentenceAugmentationMapper(Mapper):
                                         skip_special_tokens=True)[0]
         output = output.strip().strip("\"")
 
-        sample[self.text_key] = output
+        sample[self.text_key_second] = output
 
         return sample

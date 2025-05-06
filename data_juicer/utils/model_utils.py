@@ -984,11 +984,12 @@ def get_model(model_key=None, rank=None, use_cuda=False):
     return MODEL_ZOO[model_key]
 
 
-def free_models():
+def free_models(clear_model_zoo=True):
     global MODEL_ZOO
     for model_key in MODEL_ZOO:
         try:
             MODEL_ZOO[model_key].to('cpu')
         except Exception:
             pass
-    MODEL_ZOO.clear()
+    if clear_model_zoo:
+        MODEL_ZOO.clear()
