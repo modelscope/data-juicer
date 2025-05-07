@@ -26,7 +26,7 @@ process:
 
       # label studio connection settings
       api_url: "http://localhost:7070"  # Default Label Studio URL
-      api_key: "05409236-67a5-4169-af96-a52a818d0e81"  # Your API key for label studuio authentication # pragma: allowlist secret
+      api_key: "05409236-67a5-4169-af96-a52a818d0e81"  # Your API key for label studio authentication # pragma: allowlist secret
 
       # human preference annotation settings
       prompt_key: "prompt"  # Prompt field
