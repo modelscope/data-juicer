@@ -21,6 +21,7 @@ class LazyLoader(types.ModuleType):
     def __init__(self,
                  module_name: str,
                  package_name: str = None,
+                 package_url: str = None,
                  auto_install: bool = True):
         """
         Initialize the LazyLoader.
@@ -28,19 +29,30 @@ class LazyLoader(types.ModuleType):
         Args:
             module_name: The name of the module to import (e.g., 'cv2', 'ffmpeg')
             package_name: The name of the pip package to install (e.g., 'opencv-python', 'ffmpeg-python')
-                        If None, will use module_name as package_name
+                        If None, will use module_name as package_name.
+                        Can also be in format 'package@url' for URL-based installations.
+            package_url: The URL to install the package from (e.g., git+https://github.com/...)
+                        If package_name contains '@', this parameter is ignored.
             auto_install: Whether to automatically install missing dependencies
         """
         self._module_name = module_name
-        self._package_name = package_name or module_name
+
+        # Handle package_name in format 'package@url'
+        if package_name and '@' in package_name:
+            self._package_name, self._package_url = package_name.split('@', 1)
+        else:
+            self._package_name = package_name or module_name
+            self._package_url = package_url
+
         self._auto_install = auto_install
         frame = inspect.currentframe().f_back
         self._parent_module_globals = frame.f_globals
         self._dependencies = self._load_dependencies()
         self._module = None
         logger.debug(
-            f'Initialized LazyLoader for module: {module_name} (package: {self._package_name})'
-        )
+            f'Initialized LazyLoader for module: {module_name} '
+            f'(package: {self._package_name}' +
+            (f', url: {self._package_url}' if self._package_url else '') + ')')
         super(LazyLoader, self).__init__(module_name)
 
     def _handle_error(self, error, module_name):
@@ -167,6 +179,35 @@ class LazyLoader(types.ModuleType):
                     f'indicate a mismatch between the package name and '
                     f'module name.')
 
+    def _install_github_deps(self, package_spec, use_uv=True):
+        """Install dependencies for a GitHub package."""
+        repo_path = package_spec.split('github.com/')[1].split('.git')[0]
+
+        # Clone the repo to a temp directory
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            try:
+                # Clone the repo
+                subprocess.check_call([
+                    'git', 'clone', f'https://github.com/{repo_path}.git',
+                    temp_dir
+                ])
+
+                # Install the package with dependencies
+                if use_uv:
+                    subprocess.check_call(['uv', 'pip', 'install', '.'],
+                                          cwd=temp_dir)
+                else:
+                    subprocess.check_call(['pip', 'install', '.'],
+                                          cwd=temp_dir)
+                return True
+            except Exception as e:
+                logger.warning(
+                    f'Failed to install dependencies for {package_spec}: {str(e)}'
+                )
+                return False
+
     def _load(self):
         """Load the module and handle any missing dependencies."""
         if self._module is not None:
@@ -179,50 +220,72 @@ class LazyLoader(types.ModuleType):
             if not self._auto_install:
                 raise
 
+            # Prepare the package spec for installation
+            package_spec = self._package_url if self._package_url else self._package_name
+
             # Try to install the package using uv first
             try:
                 logger.info(
-                    f'Attempting to install {self._package_name} using uv...')
+                    f'Attempting to install {package_spec} using uv...')
                 # Try using uv directly first
                 try:
-                    subprocess.check_call(
-                        ['uv', 'pip', 'install', self._package_name])
+                    # For GitHub packages, install with dependencies
+                    if 'git+' in package_spec:
+                        # Install package with dependencies
+                        self._install_github_deps(package_spec, use_uv=True)
+                    else:
+                        subprocess.check_call(
+                            ['uv', 'pip', 'install', package_spec])
                 except (subprocess.CalledProcessError, FileNotFoundError):
                     # If uv command fails, try using python -m uv
-                    subprocess.check_call([
-                        sys.executable, '-m', 'uv', 'pip', 'install',
-                        self._package_name
-                    ])
+                    if 'git+' in package_spec:
+                        # Install package with dependencies
+                        self._install_github_deps(package_spec, use_uv=True)
+                    else:
+                        subprocess.check_call([
+                            sys.executable, '-m', 'uv', 'pip', 'install',
+                            package_spec
+                        ])
             except (subprocess.CalledProcessError, FileNotFoundError):
                 # Fall back to pip if uv fails
                 logger.info(
-                    f'uv not available, falling back to pip for {self._package_name}...'
+                    f'uv not available, falling back to pip for {package_spec}...'
                 )
                 try:
                     # Try using pip directly first
                     try:
-                        subprocess.check_call(
-                            ['pip', 'install', self._package_name])
+                        if 'git+' in package_spec:
+                            # Install package with dependencies
+                            self._install_github_deps(package_spec,
+                                                      use_uv=False)
+                        else:
+                            subprocess.check_call(
+                                ['pip', 'install', package_spec])
                     except (subprocess.CalledProcessError, FileNotFoundError):
                         # If pip command fails, try using python -m pip
-                        subprocess.check_call([
-                            sys.executable, '-m', 'pip', 'install',
-                            self._package_name
-                        ])
+                        if 'git+' in package_spec:
+                            # Install package with dependencies
+                            self._install_github_deps(package_spec,
+                                                      use_uv=False)
+                        else:
+                            subprocess.check_call([
+                                sys.executable, '-m', 'pip', 'install',
+                                package_spec
+                            ])
                 except subprocess.CalledProcessError as pip_error:
                     raise ImportError(
-                        f'Failed to install {self._package_name}. This package may '
+                        f'Failed to install {package_spec}. This package may '
                         f'require system-level dependencies. Please try '
-                        f'installing it manually with: pip install {self._package_name}\n'
+                        f'installing it manually with: pip install {package_spec}\n'
                         f'Error details: {str(pip_error)}')
 
-            # Try importing again - use the original module name
+            # Try importing again - use the module name
             try:
                 self._module = importlib.import_module(self._module_name)
             except ImportError as import_error:
                 raise ImportError(
                     f'Failed to import {self._module_name} after '
-                    f'installing {self._package_name}. '
+                    f'installing {package_spec}. '
                     f'Error details: {str(import_error)}')
 
         # Update the parent module's globals with the loaded module
@@ -231,9 +294,23 @@ class LazyLoader(types.ModuleType):
         return self._module
 
     def __getattr__(self, item):
+        """Handle attribute access, including submodule imports."""
         if self._module is None:
             self._load()
-        return getattr(self._module, item)
+
+        # Try to get the attribute directly
+        try:
+            return getattr(self._module, item)
+        except AttributeError:
+            # If not found, try importing it as a submodule
+            try:
+                submodule = importlib.import_module(
+                    f'{self._module_name}.{item}')
+                setattr(self._module, item, submodule)
+                return submodule
+            except ImportError:
+                raise AttributeError(
+                    f"module '{self._module_name}' has no attribute '{item}'")
 
     def __dir__(self):
         if self._module is None:

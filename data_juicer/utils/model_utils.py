@@ -21,14 +21,16 @@ from .cache_utils import DATA_JUICER_MODELS_CACHE as DJMC
 torch = LazyLoader('torch', 'torch')
 transformers = LazyLoader('transformers', 'transformers')
 nn = LazyLoader('nn', 'torch.nn')
-fasttext = LazyLoader('fasttext', 'fasttext')
+fasttext = LazyLoader('fasttext', 'fasttext-wheel')
 sentencepiece = LazyLoader('sentencepiece', 'sentencepiece')
 kenlm = LazyLoader('kenlm', 'kenlm')
 nltk = LazyLoader('nltk', 'nltk')
 aes_pred = LazyLoader('aesthetics_predictor', 'simple-aesthetics-predictor')
 vllm = LazyLoader('vllm', 'vllm')
 diffusers = LazyLoader('diffusers', 'diffusers')
-ram = LazyLoader('ram', 'ram.models')
+ram = LazyLoader(
+    'ram',
+    package_url='git+https://github.com/xinyu1205/recognize-anything.git')
 cv2 = LazyLoader('cv2', 'opencv-python')
 openai = LazyLoader('openai', 'openai')
 ultralytics = LazyLoader('ultralytics', 'ultralytics')
@@ -546,16 +548,16 @@ def prepare_recognizeAnything_model(
     logger.info('Loading recognizeAnything model...')
 
     try:
-        model = ram.ram_plus(
+        model = ram.models.ram_plus(
             pretrained=check_model(pretrained_model_name_or_path),
             image_size=input_size,
             vit='swin_l')
     except (RuntimeError, UnpicklingError) as e:  # noqa: E722
         logger.warning(e)
-        model = ram.ram_plus(pretrained=check_model(
+        model = ram.models.ram_plus(pretrained=check_model(
             pretrained_model_name_or_path, force=True),
-                             image_size=input_size,
-                             vit='swin_l')
+                                    image_size=input_size,
+                                    vit='swin_l')
     device = model_params.pop('device', 'cpu')
     model.to(device).eval()
     return model

@@ -4,17 +4,13 @@ import numpy as np
 from pydantic import PositiveInt
 
 from data_juicer.utils.constant import Fields, MetaKeys
-from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import (close_video, extract_key_frames,
                                         extract_video_frames_uniformly,
                                         load_data_with_context, load_video)
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.model_utils import get_model, prepare_model, ram, torch
 
 from ..base_op import OPERATORS, TAGGING_OPS, UNFORKABLE, Mapper
 from ..op_fusion import LOADED_VIDEOS
-
-ram = LazyLoader('ram', 'ram')
-torch = LazyLoader('torch', 'torch')
 
 OP_NAME = 'video_tagging_from_frames_mapper'
 
