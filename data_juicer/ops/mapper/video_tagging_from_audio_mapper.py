@@ -1,16 +1,14 @@
-import librosa
 import numpy as np
 
 from data_juicer.utils.constant import Fields, MetaKeys
 from data_juicer.utils.lazy_loader import LazyLoader
 from data_juicer.utils.mm_utils import extract_audio_from_video
-from data_juicer.utils.model_utils import get_model, prepare_model
+from data_juicer.utils.model_utils import get_model, prepare_model, torch
 
 from ..base_op import OPERATORS, TAGGING_OPS, Mapper
 
-torch = LazyLoader('torch', 'torch')
 OP_NAME = 'video_tagging_from_audio_mapper'
-LazyLoader.check_packages(['torchaudio'])
+torchaudio = LazyLoader('torchaudio', 'torchaudio')
 
 
 @TAGGING_OPS.register_module(OP_NAME)
@@ -79,9 +77,9 @@ class VideoTaggingFromAudioMapper(Mapper):
             sr = srs[0]
             # check if it meets the sampling rate condition of the model
             if sr != self._model_sampling_rate:
-                y = librosa.resample(y,
-                                     orig_sr=sr,
-                                     target_sr=self._model_sampling_rate)
+                resampler = torchaudio.transforms.Resample(
+                    orig_freq=sr, new_freq=self._model_sampling_rate)
+                y = resampler(torch.from_numpy(y).float()).numpy()
                 sr = self._model_sampling_rate
             inputs = feature_extractor(y,
                                        sampling_rate=sr,
